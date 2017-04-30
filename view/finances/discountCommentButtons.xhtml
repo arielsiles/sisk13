@@ -1,0 +1,30 @@
+<ui:composition xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <div class="buttons">
+        <h:commandButton action="#{discountCommentAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton action="#{discountCommentAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','CREATE')}"/>
+        <h:commandButton action="#{discountCommentAction.update}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{discountCommentAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+</ui:composition>

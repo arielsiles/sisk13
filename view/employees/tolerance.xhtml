@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{toleranceAction.managed}">
+                #{messages['Tolerance.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Tolerance.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="toleranceForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{toleranceAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!toleranceAction.managed and s:hasPermission('TOLERANCE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{toleranceAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{toleranceAction.managed and s:hasPermission('TOLERANCE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{toleranceAction.managed and s:hasPermission('TOLERANCE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{toleranceAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{toleranceAction.managed}">
+                            #{messages['Tolerance.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Tolerance.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="beforeInitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.beforeInit']}</ui:define>
+                    <h:inputText id="beforeInit" value="#{tolerance.beforeInit}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="beforeInitField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="afterInitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.afterInit']}</ui:define>
+                    <h:inputText id="afterInit" value="#{tolerance.afterInit}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="afterInitField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="beforeEndField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.beforeEnd']}</ui:define>
+                    <h:inputText id="beforeEnd" value="#{tolerance.beforeEnd}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="beforeEndField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="afterEndField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.afterEnd']}</ui:define>
+                    <h:inputText id="afterEnd" value="#{tolerance.afterEnd}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="afterEndField"/>
+                    </h:inputText>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{toleranceAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!toleranceAction.managed and s:hasPermission('TOLERANCE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{toleranceAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{toleranceAction.managed and s:hasPermission('TOLERANCE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{toleranceAction.managed and s:hasPermission('TOLERANCE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{toleranceAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{toleranceAction.managed and s:hasPermission('TOLERANCE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Tolerance.delete.confirmation']}">
+                        <f:param value="#{tolerance.beforeInit}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{toleranceAction.delete}"
+                                   rendered="#{s:hasPermission('TOLERANCE','DELETE')}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

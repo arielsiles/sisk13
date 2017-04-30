@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <c:if test="${empty default}">
+        <c:set var="default" value="#{false}"/>
+    </c:if>
+
+    <div class="buttons">
+        <h:commandButton id="createButton${formLocation}Id" action="#{dismissalAction.create}"
+                         value="#{messages['Common.save']}" styleClass="button"
+                         rendered="#{!dismissalAction.managed and s:hasPermission('DISMISSAL','CREATE')}">
+            <s:defaultAction rendered="#{default}"/>
+        </h:commandButton>
+        <h:commandButton action="#{dismissalAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}" styleClass="button"
+                         rendered="#{!dismissalAction.managed and s:hasPermission('DISMISSAL','CREATE')}"/>
+        <h:commandButton id="updateButton${formLocation}Id" action="#{dismissalAction.update}"
+                         value="#{messages['Common.save']}" styleClass="button"
+                         rendered="#{dismissalAction.managed and s:hasPermission('DISMISSAL','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                         rendered="#{dismissalAction.managed and s:hasPermission('DISMISSAL','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick"
+                                   disableDefault="true" operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{dismissalAction.cancel}"
+                         value="#{messages['Common.cancel']}" styleClass="button" immediate="true"/>
+    </div>
+</ui:composition>

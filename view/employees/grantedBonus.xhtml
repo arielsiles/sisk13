@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{grantedBonusAction.managed}">
+                #{messages['GrantedBonus.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['GrantedBonus.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="grantedBonusForm">
+
+            <div class="buttons">
+                <h:commandButton id="updateButtonId"
+                                 action="#{grantedBonusAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{grantedBonusAction.managed and not grantedBonusAction.readOnly and s:hasPermission('GRANTEDBONUS','UPDATE')}"
+                                 styleClass="button"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 rendered="#{grantedBonusAction.managed and not grantedBonusAction.readOnly and s:hasPermission('GRANTEDBONUS','DELETE')}"
+                                 styleClass="button">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{grantedBonusAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 tabindex="2"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{grantedBonusAction.managed}">
+                            #{messages['GrantedBonus.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['GrantedBonus.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <app:fieldset id="grantedBonusFieldset"
+                              title="#{messages['GrantedBonus.grantedBonus']}">
+                    <h:panelGrid columns="2"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0"
+                                 columnClasses="width50percent, width50percent">
+
+                        <s:div>
+                            <s:decorate id="bonusTypeField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['Bonus.bonus']}</ui:define>
+                                <h:outputText value="#{grantedBonus.bonus.name}"/>
+                            </s:decorate>
+                            <s:decorate id="jobContractField" template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['JobContract.employee']}</ui:define>
+                                <h:outputText value="#{grantedBonus.jobContract.contract.employee.fullName}"/>
+                            </s:decorate>
+                            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['GrantedBonus.amount']}</ui:define>
+                                <h:inputText id="amount"
+                                             value="#{grantedBonus.amount}"
+                                             required="true"
+                                             rendered="#{not grantedBonusAction.readOnly}"
+                                             styleClass="input right"
+                                             tabindex="3">
+                                    <app:realNumberConverter minimum="0.01"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="amount"/>
+                                </h:inputText>
+                                <h:outputText value="#{grantedBonus.amount}"
+                                              rendered="#{grantedBonusAction.readOnly}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </s:decorate>
+                        </s:div>
+
+                    </h:panelGrid>
+                </app:fieldset>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{grantedBonusAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{grantedBonusAction.managed and not grantedBonusAction.readOnly and s:hasPermission('GRANTEDBONUS','UPDATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 rendered="#{grantedBonusAction.managed and not grantedBonusAction.readOnly and s:hasPermission('GRANTEDBONUS','DELETE')}"
+                                 styleClass="button">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{grantedBonusAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{grantedBonusAction.managed and not grantedBonusAction.readOnly and s:hasPermission('GRANTEDBONUS','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['GrantedBonus.delete.confirmation']}">
+                        <f:param value="#{grantedBonus.amount}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{grantedBonusAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#bonusType" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

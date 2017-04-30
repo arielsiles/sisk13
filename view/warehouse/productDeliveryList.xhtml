@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductDelivery.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+
+    <rich:simpleTogglePanel label="#{messages['menu.finances.warehouse.productDelivery']}" switchType="client">
+
+        <div class="center-buttons">
+            <s:button value="#{messages['menu.warehouse.productDeliverySales']}"
+                      view="/warehouse/productDeliveryVentaDirecta.xhtml"
+                      rendered="#{s:hasPermission('PRODUCTDELIVERY','CREATE')}"
+                      styleClass="button"
+                      propagation="begin"/>
+
+            <s:button value="#{messages['menu.warehouse.productDeliveryByOrder']}"
+                      view="/warehouse/productDelivery.xhtml"
+                      rendered="#{s:hasPermission('PRODUCTDELIVERY','CREATE')}"
+                      styleClass="button"
+                      propagation="begin"/>
+
+            <s:button value="#{messages['menu.warehouse.productDeliveryOrdersByDate']}"
+                      view="/warehouse/productDeliveryByDate.xhtml"
+                      rendered="#{s:hasPermission('PRODUCTDELIVERY','CREATE')}"
+                      styleClass="button"
+                      propagation="begin"/>
+        </div>
+
+                <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDelivery.documentNumber']}</ui:define>
+                    <h:inputText id="invoiceNumber"
+                                 value="#{productDeliveryDataModel.criteria.invoiceNumber}"
+                                 maxlength="20"
+                                 tabindex="2"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productDeliveryDataModel.search}"
+                                       reRender="productDeliveryList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#invoiceNumber" query="focus()" timing="onload"/>-->
+
+    </rich:simpleTogglePanel>
+
+            <!--<rich:dataTable id="productDeliveryList"
+                            value="#{productDeliveryDataModel}"
+                            var="productDeliveryItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="60%, 15%, 15%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['ProductDelivery.nameClient']}
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productDelivery.invoiceNumber"
+                                                   dataModel="#{productDeliveryDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['ProductDelivery.documentNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productDelivery.warehouseVoucher.number"
+                                                   dataModel="#{productDeliveryDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['ProductDelivery.warehouseVoucher']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{productDeliveryItem.fullNameClient}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productDeliveryItem.invoiceNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productDeliveryItem.warehouseVoucher.number}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{productDeliveryAction.select(productDeliveryItem)}"
+                                   rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+
+                    &#160;
+                    <h:commandLink action="#{productDeliveryReceiptReportAction.generateReport(productDeliveryItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['ProductDelivery.button.generateDocument']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>-->
+            <!--<app:dataScroller id="dataScroller" for="productDeliveryList" dataModel="#{productDeliveryDataModel}"/>-->
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ContractMode.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="contractModeSearch">
+
+            <rich:simpleTogglePanel label="#{messages['ContractMode.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ContractMode.name']}</ui:define>
+                    <h:inputText id="name" value="#{contractModeDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{contractModeDataModel.search}"
+                                       reRender="contractModeList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/contractMode.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          tabindex="3"/>
+            </div>
+
+            <rich:dataTable value="#{contractModeDataModel}" var="contractModeItem" id="contractModeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="30%, 25%, 20%, 10%,15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contractMode.name"
+                                                   dataModel="#{contractModeDataModel}"
+                                                   reRender="contractModeList, dataScroller">
+                                #{messages['ContractMode.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contractMode.description"
+                                                   dataModel="#{contractModeDataModel}"
+                                                   reRender="contractModeList, dataScroller">
+                                #{messages['ContractMode.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contractMode.definition"
+                                                   dataModel="#{contractModeDataModel}"
+                                                   reRender="contractModeList, dataScroller">
+                                #{messages['ContractMode.definition']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contractMode.dayDuration"
+                                                   dataModel="#{contractModeDataModel}"
+                                                   reRender="contractModeList, dataScroller">
+                                #{messages['ContractMode.dayDuration']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{contractModeItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{contractModeItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{contractModeItem.definition}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{contractModeItem.dayDuration}" styleClass="right">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{contractModeAction.select(contractModeItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="contractModeList" dataModel="#{contractModeDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/contractMode.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          tabindex="4"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

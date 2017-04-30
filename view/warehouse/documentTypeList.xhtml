@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['WarehouseDocumentType.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="warehouseDocumentTypeSearch">
+            <rich:simpleTogglePanel label="#{messages['WarehouseDocumentType.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseDocumentType.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{warehouseDocumentTypeDataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{warehouseDocumentTypeDataModel.search}"
+                                       reRender="warehouseDocumentTypeList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/documentType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+            <rich:dataTable value="#{warehouseDocumentTypeDataModel}"
+                            var="warehouseDocumentTypeItem"
+                            id="warehouseDocumentTypeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%, 15%, 15%, 15%, 15%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.name"
+                                                   dataModel="#{warehouseDocumentTypeDataModel}"
+                                                   reRender="warehouseDocumentTypeList, dataScroller">
+                                #{messages['WarehouseDocumentType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.documentCode"
+                                                   dataModel="#{warehouseDocumentTypeDataModel}"
+                                                   reRender="warehouseDocumentTypeList, dataScroller">
+                                #{messages['WarehouseDocumentType.documentCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.warehouseVoucherType"
+                                                   dataModel="#{warehouseDocumentTypeDataModel}"
+                                                   reRender="warehouseDocumentTypeList, dataScroller">
+                                #{messages['WarehouseDocumentType.warehouseVoucherType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.state"
+                                                   dataModel="#{warehouseDocumentTypeDataModel}"
+                                                   reRender="warehouseDocumentTypeList, dataScroller">
+                                #{messages['WarehouseDocumentType.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{warehouseDocumentTypeItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{warehouseDocumentTypeItem.id.documentCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[warehouseDocumentTypeItem.warehouseVoucherType.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[warehouseDocumentTypeItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{warehouseDocumentTypeAction.select(warehouseDocumentTypeItem)}"
+                                   rendered="#{s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="warehouseDocumentTypeList"
+                              dataModel="#{warehouseDocumentTypeDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/documentType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

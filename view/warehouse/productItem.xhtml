@@ -1,0 +1,370 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{productItemAction.managed}">
+            #{messages['ProductItem.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductItem.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="60%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<c:set var="isProductItemInUse" value="#{productItemAction.inUse}" scope="page"/>
+
+<h:form id="productItemForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{productItemAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!productItemAction.managed and s:hasPermission('PRODUCTITEM','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productItemAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!productItemAction.managed and s:hasPermission('PRODUCTITEM','CREATE')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{productItemAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','DELETE') and !isProductItemInUse}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productItemAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{productItemAction.managed}">
+            #{messages['ProductItem.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductItem.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+<s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+    <h:outputText value="#{productItem.id.productItemCode}"/>
+</s:decorate>
+
+<s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+    <h:inputText id="name"
+                 value="#{productItem.name}"
+                 styleClass="input"
+                 required="true"
+                 maxlength="100"
+                 tabindex="1"/>
+</s:decorate>
+<s:decorate id="nameShortField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.nameShort']}</ui:define>
+    <h:inputText id="nameShort"
+                 value="#{productItem.nameShort}"
+                 styleClass="input"
+                 maxlength="14"
+                 tabindex="2"/>
+</s:decorate>
+<s:div id="equivalentQuantityPanel">
+    <s:decorate id="equivalentQuantityField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{productItemAction.usedGroupMeasureUnit}">
+        <ui:define name="label">#{messages['ProductUnit.equivalentQuantity']}</ui:define>
+        <c:choose>
+            <c:when test="#{isProductItemInUse}">
+                <h:outputText value="#{productItem.equivalentQuantity}"/>
+            </c:when>
+            <c:otherwise>
+                <h:inputText id="equivalentQuantity"
+                             value="#{productItem.equivalentQuantity}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="10"
+                             tabindex="3">
+                    <app:realNumberConverter forId="equivalentQuantity"/>
+                </h:inputText>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</s:div>
+<s:decorate id="measureUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.usageMeasureUnit']}</ui:define>
+    <c:choose>
+        <c:when test="#{isProductItemInUse}">
+            <h:outputText value="#{productItem.usageMeasureUnit.fullName}"/>
+        </c:when>
+        <c:otherwise>
+            <app:quickSearch id="quickSearchMeasureUnit"
+                             textValue="productItem.usageMeasureUnit.measureUnitCode"
+                             value="#{productItem.usageMeasureUnit}"
+                             searchField="measureUnitCode"
+                             reRender="measureUnitField, minimalStockField, maximumStockField"
+                             tabindex="4"/>
+            <h:selectOneMenu id="measureUnit"
+                             value="#{productItem.usageMeasureUnit}"
+                             styleClass="input"
+                             required="true">
+                <s:selectItems value="#{measureUnitList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange" reRender="minimalStockField, maximumStockField" ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+<s:decorate id="measureUnitUpperField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.groupMeasureUnit']}</ui:define>
+    <c:choose>
+        <c:when test="#{isProductItemInUse}">
+            <c:if test="#{null != productItem.groupMeasureUnit}">
+                <h:outputText value="#{productItem.groupMeasureUnit.fullName}"/>
+            </c:if>
+        </c:when>
+        <c:otherwise>
+            <app:quickSearch id="quickSearchGroupMeasureUnit"
+                             textValue="productItem.groupMeasureUnit.measureUnitCode"
+                             value="#{productItem.groupMeasureUnit}"
+                             searchField="measureUnitCode"
+                             reRender="measureUnitUpperField, equivalentQuantityPanel"
+                             tabindex="5"/>
+            <h:selectOneMenu id="measureUnitUpper"
+                             value="#{productItem.groupMeasureUnit}"
+                             styleClass="input"
+                             required="false">
+                <s:selectItems value="#{measureUnitList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange" reRender="equivalentQuantityPanel" ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+
+<s:decorate id="minimalStockField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.minimalStock']}</ui:define>
+    <h:inputText id="minimalStock"
+                 value="#{productItem.minimalStock}"
+                 styleClass="input right"
+                 tabindex="6">
+        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}" minimum="0.000001"
+                                 forId="minimalStock"/>
+        <a4j:support event="onchange" reRender="minimalStock" ajaxSingle="true"/>
+    </h:inputText>
+    <h:outputFormat value="#{messages['Common.parenthesis']}"
+                    rendered="#{not empty productItem.usageMeasureUnit}">
+        <f:param value="#{productItem.usageMeasureUnit.measureUnitCode}"/>
+    </h:outputFormat>
+</s:decorate>
+
+<s:decorate id="maximumStockField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.maximumStock']}</ui:define>
+    <h:inputText id="maximumStock"
+                 value="#{productItem.maximumStock}"
+                 styleClass="input right"
+                 tabindex="7">
+        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}" minimum="0.000001"
+                                 forId="maximumStock"/>
+        <a4j:support event="onchange" reRender="maximumStock" ajaxSingle="true"/>
+    </h:inputText>
+    <h:outputFormat value="#{messages['Common.parenthesis']}"
+                    rendered="#{not empty productItem.usageMeasureUnit}">
+        <f:param value="#{productItem.usageMeasureUnit.measureUnitCode}"/>
+    </h:outputFormat>
+</s:decorate>
+
+<s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.state']}</ui:define>
+    <c:choose>
+        <c:when test="#{isProductItemInUse}">
+            <h:outputText value="#{messages[productItem.state.resourceKey]}"/>
+        </c:when>
+        <c:otherwise>
+            <h:selectOneMenu id="state"
+                             value="#{productItem.state}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{productItemStates}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+<s:decorate id="controlValuedField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.controlValued']}</ui:define>
+    <h:selectBooleanCheckbox id="controlValued"
+                             value="#{productItem.controlValued}"
+                             disabled="#{productItemAction.managed}"
+                             tabindex="9"/>
+</s:decorate>
+<s:decorate id="saleableField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.saleable']}</ui:define>
+    <h:selectBooleanCheckbox id="saleable"
+                             value="#{productItem.saleable}"
+                             tabindex="10"/>
+</s:decorate>
+<s:decorate id="productItemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.productItemAccount']}</ui:define>
+    <c:choose>
+        <c:when test="#{isProductItemInUse}">
+            <h:outputText value="#{productItem.cashAccount.fullName}"/>
+        </c:when>
+        <c:otherwise>
+            <app:selectPopUp id="productItemAccount"
+                             required="true"
+                             textValue="#{productItem.cashAccount.fullName}"
+                             value="#{productItem.cashAccount}"
+                             clearAction="productItemAction.clearProductItemAccount()"
+                             searchModalPanel="cashAccountListModalPanel"
+                             dataModel="#{cashAccountDataModel}"
+                             reRender="productItemAccountField"
+                             tabindex="11">
+                <ui:define name="criteriaValues">
+                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                </ui:define>
+            </app:selectPopUp>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+<s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['ProductItem.subGroup']}</ui:define>
+    <app:selectPopUp id="subGroup"
+                     required="true"
+                     textValue="#{productItem.subGroup.fullName}"
+                     value="#{productItem.subGroup}"
+                     clearAction="productItemAction.clearSubGroup()"
+                     searchModalPanel="subGroupListModalPanel"
+                     dataModel="#{subGroupSearchDataModel}"
+                     reRender="subGroupField"
+                     tabindex="12"/>
+</s:decorate>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{productItemAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!productItemAction.managed and s:hasPermission('PRODUCTITEM','CREATE')}"
+                     tabindex="15"/>
+
+    <h:commandButton action="#{productItemAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!productItemAction.managed and s:hasPermission('PRODUCTITEM','CREATE')}"
+                     tabindex="16"/>
+
+    <h:commandButton action="#{productItemAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','UPDATE')}"
+                     tabindex="17"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','DELETE') and !isProductItemInUse}"
+                     tabindex="18">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productItemAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="19"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','DELETE') and !isProductItemInUse}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['ProductItem.delete.confirmation']}">
+                <f:param value="#{productItem.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{productItemAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('PRODUCTITEM','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{productItemAction.assignProductItemAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="productItemAccountField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="subGroupListModalPanelContainer" template="/warehouse/subGroupListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{productItemAction.assignSubGroup(subGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="subGroupField"
+                           oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

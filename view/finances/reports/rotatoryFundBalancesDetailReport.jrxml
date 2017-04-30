@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReportTemplate" pageWidth="1092" pageHeight="612" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="1042" leftMargin="30" rightMargin="20" topMargin="30" bottomMargin="30"
+              scriptletClass="com.encens.khipus.action.finances.reports.RotatoryFundBalancesDetailReportScriptlet">
+    <property name="ireport.zoom" value="1.2100000000000006"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+    <parameter name="rotatoryFundService" class="com.encens.khipus.service.finances.RotatoryFundService"/>
+    <parameter name="accountingMovementService" class="com.encens.khipus.service.finances.AccountingMovementService"/>
+    <parameter name="financeDocumentService" class="com.encens.khipus.service.finances.FinanceDocumentService"/>
+    <parameter name="payableDocumentService" class="com.encens.khipus.service.finances.PayableDocumentService"/>
+    <parameter name="queryParameters" class="java.util.Map"/>
+    <parameter name="showMovements" class="java.lang.Boolean"/>
+    <parameter name="businessUnitName" class="java.lang.String"/>
+    <parameter name="employeeName" class="java.lang.String"/>
+    <parameter name="documentTypeName" class="java.lang.String"/>
+    <parameter name="rotatoryFundCode" class="java.lang.String"/>
+    <parameter name="movementDateRange" class="java.lang.String"/>
+    <parameter name="financesCurrencyName" class="java.lang.String"/>
+    <field name="documentType.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="documentType.code" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="documentType.name" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="cashAccount.companyNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="cashAccount.accountCode" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="cashAccount.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="employee.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="employee.lastName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="employee.maidenName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <field name="employee.firstName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.code" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.amount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.receivableResidue" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.payCurrency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+        <fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.date" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_16]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.state" class="com.encens.khipus.model.finances.RotatoryFundState">
+        <fieldDescription><![CDATA[COLUMN_17]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_18]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.date" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_19]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.movementClass" class="com.encens.khipus.model.finances.RotatoryFundMovementClass">
+        <fieldDescription><![CDATA[COLUMN_20]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.code" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_21]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.transactionNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_22]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.movementType" class="com.encens.khipus.model.finances.RotatoryFundMovementType">
+        <fieldDescription><![CDATA[COLUMN_23]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.voucherType" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_24]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.voucherNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_25]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.voucherDate" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_26]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.bankPaymentDocumentType" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_27]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.bankPaymentDocumentNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_28]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashBoxPaymentDocumentNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_29]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashBoxPaymentAccountNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_30]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashBoxPaymentAccountName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_31]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.documentBankCollectionDocumentType" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_32]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.documentBankCollectionDocumentNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_33]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.documentCollectionDocumentType"
+           class="com.encens.khipus.model.finances.CollectionDocumentType">
+        <fieldDescription><![CDATA[COLUMN_34]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.documentCollectionDocumentNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_35]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashAccountAdjustmentCollectionAccount" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_36]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashAccountAdjustmentCollectionNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_37]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.depositAdjustmentCollectionDocumentType" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_38]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.depositAdjustmentCollectionDocumentNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_39]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.purchaseOrderCollectionOrderNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_40]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashBoxCollectionAccountNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_41]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.cashBoxCollectionAccountName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_42]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.payrollCollectionName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_43]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_44]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.observation" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_45]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.paymentCurrency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+        <fieldDescription><![CDATA[COLUMN_46]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.paymentAmount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_47]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.collectionCurrency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+        <fieldDescription><![CDATA[COLUMN_48]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.collectionAmount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_49]]></fieldDescription>
+    </field>
+    <field name="rotatoryFundMovement.exchangeRate" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_50]]></fieldDescription>
+    </field>
+    <variable name="amountByRotatoryFundMapVar" class="java.util.Map" calculation="System">
+        <initialValueExpression>
+            <![CDATA[new HashMap<java.lang.String,java.math.BigDecimal>()]]></initialValueExpression>
+    </variable>
+    <variable name="amountByEmployeeMapVar" class="java.util.Map" calculation="System">
+        <initialValueExpression>
+            <![CDATA[new HashMap<java.lang.String,java.math.BigDecimal>()]]></initialValueExpression>
+    </variable>
+    <variable name="amountByRotatoryFundKey" class="java.lang.String">
+        <variableExpression>
+            <![CDATA[$F{documentType.code}+"_"+$F{cashAccount.accountCode}+"_"+$F{employee.id}+"_"+$F{rotatoryFund.code}]]></variableExpression>
+        <initialValueExpression>
+            <![CDATA[$F{documentType.code}+"_"+$F{cashAccount.accountCode}+"_"+$F{employee.id}+"_"+$F{rotatoryFund.code}]]></initialValueExpression>
+    </variable>
+    <variable name="amountByEmployeeKey" class="java.lang.String">
+        <variableExpression>
+            <![CDATA[$F{documentType.code}+"_"+$F{cashAccount.accountCode}+"_"+$F{employee.id}]]></variableExpression>
+        <initialValueExpression>
+            <![CDATA[$F{documentType.code}+"_"+$F{cashAccount.accountCode}+"_"+$F{employee.id}]]></initialValueExpression>
+    </variable>
+    <variable name="movementResidueAmountVar" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="movementBeforeResidueAmountVar" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="beforeResidueAmountVar" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="employeeTotalResidueAmountVar" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="movementDocumentNumberVar" class="java.lang.String" calculation="System"/>
+    <variable name="movementVoucherNumberVar" class="java.lang.String" calculation="System"/>
+    <group name="documentTypeGroup">
+        <groupExpression><![CDATA[$F{documentType.code}]]></groupExpression>
+        <groupHeader>
+            <band height="13">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="0" y="0" width="1042"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFundBalancesDetail.documentType}+" "+com.encens.khipus.reports.ReportFormatter.formatFullName(""+$F{documentType.code},$F{documentType.name})]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+    <group name="cashAccountGroup">
+        <groupExpression><![CDATA[$F{cashAccount.accountCode}]]></groupExpression>
+        <groupHeader>
+            <band height="13">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="10" y="0" width="1032"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFundBalancesDetail.cashAccount}+" "+com.encens.khipus.reports.ReportFormatter.formatFullName($F{cashAccount.accountCode},$F{cashAccount.description})]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+    <group name="employeeGroup">
+        <groupExpression><![CDATA[$F{employee.id}]]></groupExpression>
+        <groupHeader>
+            <band height="12">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="20" y="0" width="590"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFundBalancesDetail.employee}+" "+com.encens.khipus.reports.ReportFormatter.getPersonName($F{employee.firstName},$F{employee.maidenName},$F{employee.lastName})]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="610" y="0" width="432"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.rotatoryFundBalancesDetail.totalResidueAmount}
+                        +" "+com.encens.khipus.reports.ReportFormatter.formatNumber($V{employeeTotalResidueAmountVar},16,2,$P{REPORT_LOCALE})
+                        +" "+str($F{rotatoryFund.payCurrency}.getSymbolResourceKey())]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="13">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" positionType="Float" mode="Opaque" x="17" y="0" width="1025"
+                                   height="12" isRemoveLineWhenBlank="true">
+                        <printWhenExpression><![CDATA[Boolean.TRUE.equals($P{showMovements})]]></printWhenExpression>
+                    </reportElement>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.rotatoryFundBalancesDetail.totalResidueAmount}
+                        +" "+com.encens.khipus.reports.ReportDesignHelper.formatBigDecimal($V{amountByEmployeeMapVar},$V{amountByEmployeeKey},$P{REPORT_LOCALE})
+                        +" "+str($F{rotatoryFund.payCurrency}.getSymbolResourceKey())]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+    <group name="rotatoryFundGroup">
+        <groupExpression><![CDATA[$F{rotatoryFund.code}]]></groupExpression>
+        <groupHeader>
+            <band height="35">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="30" y="2" width="580"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.rotatoryFundBalancesDetail.rotatoryFundCode}
+                        +" "+$F{rotatoryFund.code}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" mode="Opaque" x="610" y="2" width="432"
+                                   height="12"/>
+                    <box padding="1">
+                        <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.rotatoryFundBalancesDetail.beforeResidueAmount}
+                        +" "+com.encens.khipus.reports.ReportFormatter.formatNumber($V{beforeResidueAmountVar},16,2,$P{REPORT_LOCALE})
+                        +" "+str($F{rotatoryFund.payCurrency}.getSymbolResourceKey())+" "+
+                        $R{Reports.rotatoryFundBalancesDetail.totalResidueAmount}
+                        +" "+com.encens.khipus.reports.ReportFormatter.formatNumber($V{movementBeforeResidueAmountVar},16,2,$P{REPORT_LOCALE})
+                        +" "+str($F{rotatoryFund.payCurrency}.getSymbolResourceKey())]]></textFieldExpression>
+                </textField>
+                <frame>
+                    <reportElement x="30" y="20" width="1012" height="15" isRemoveLineWhenBlank="true">
+                        <printWhenExpression><![CDATA[Boolean.TRUE.equals($P{showMovements})]]></printWhenExpression>
+                    </reportElement>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="0" y="0" width="70" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.voucherDate}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="70" y="0" width="70" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.code}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="140" y="0" width="120" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.document}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="260" y="0" width="100" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.voucherNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="360" y="0" width="190" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.detail}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="550" y="0" width="190" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.observation}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="740" y="0" width="90" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.paidAmount}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="830" y="0" width="90" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.receivedAmount}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="920" y="0" width="90" height="15"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Reports.rotatoryFundBalancesDetail.residueAmount}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="5"/>
+        </groupFooter>
+    </group>
+    <title>
+        <band height="90">
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58"
+                               isRemoveLineWhenBlank="true"/>
+                <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="titleStyle" positionType="Float" x="72" y="0" width="970" height="30"/>
+                <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.rotatoryFundBalancesDetail.title}]]></textFieldExpression>
+            </textField>
+            <frame>
+                <reportElement style="titleStyle" positionType="Float" x="72" y="40" width="970" height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{RotatoryFund.businessUnit}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$P{businessUnitName}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="300" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{RotatoryFund.code}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="400" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$P{rotatoryFundCode}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="titleStyle" positionType="Float" x="72" y="52" width="970" height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{RotatoryFund.employee}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$P{employeeName}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="300" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFundBalancesDetail.movementDate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="400" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$P{movementDateRange}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="titleStyle" positionType="Float" x="72" y="64" width="970" height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{RotatoryFund.documentType}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$P{documentTypeName}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="300" y="0" width="100" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Right" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFundBalancesDetail.financesCurrency}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="400" y="0" width="200" height="12"/>
+                    <box padding="1" leftPadding="2" rightPadding="2"/>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$P{financesCurrencyName}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </title>
+    <pageHeader>
+        <band/>
+    </pageHeader>
+    <columnHeader>
+        <band/>
+    </columnHeader>
+    <detail>
+        <band height="12">
+            <frame>
+                <reportElement x="30" y="0" width="1012" height="12" isRemoveLineWhenBlank="true">
+                    <printWhenExpression><![CDATA[Boolean.TRUE.equals($P{showMovements})]]></printWhenExpression>
+                </reportElement>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="70" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date">
+                        <![CDATA[$F{rotatoryFundMovement.voucherDate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="70" y="0" width="70" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$F{rotatoryFundMovement.code}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="140" y="0" width="120" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$V{movementDocumentNumberVar}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="260" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFundMovement.voucherType}!=null?$F{rotatoryFundMovement.voucherType}+"-"+$F{rotatoryFundMovement.voucherNumber}:""]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="360" y="0" width="190" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFundMovement.description}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="550" y="0" width="190" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFundMovement.observation}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="740" y="0" width="90" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.math.BigDecimal">
+                        <![CDATA[$F{rotatoryFundMovement.paymentAmount}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="830" y="0" width="90" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.math.BigDecimal">
+                        <![CDATA[$F{rotatoryFundMovement.collectionAmount}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="920" y="0" width="90" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.math.BigDecimal">
+                        <![CDATA[$V{movementResidueAmountVar}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </detail>
+    <columnFooter>
+        <band/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="1042"
+                               height="12"/>
+                <box padding="0">
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                   width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="950" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="990" y="0"
+                                   width="10" height="12"/>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="1000"
+                                   y="0" width="40" height="12"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band/>
+    </summary>
+</jasperReport>

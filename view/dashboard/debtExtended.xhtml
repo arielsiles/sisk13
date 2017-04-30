@@ -1,0 +1,299 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['Debt.search']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="95%"/>
+
+<ui:param name="selectedTab" value="home"/>
+<ui:define name="body">
+<h:form id="debtSearchForm">
+
+<rich:simpleTogglePanel label="#{messages['Debt.search']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:div id="leftSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Debt.year']}</ui:define>
+                <h:inputText id="year"
+                             value="#{debtExtendedAction.year}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="1">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Debt.executorUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{debtExtendedAction.executorUnit}"
+                                 styleClass="input">
+                    <s:selectItems value="#{executorUnitList.resultList}"
+                                   var="executorUnit"
+                                   label="#{executorUnit.description}"
+                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{debtExtendedAction.search}"
+                                       reRender="searchOptionsPanel, resultPanel"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}">
+                        <a4j:support event="onclick" reRender="leftSidePanel, rightSidePanel"/>
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#year" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<s:div id="resultPanel">
+<br/>
+<rich:panel>
+<f:facet name="header">
+    #{messages['Debt.label']}
+</f:facet>
+<s:div style="overflow: auto;">
+<rich:dataTable value="#{debtExtendedAction.resultList}"
+                var="element"
+                footerClass="rich-table-footer"
+                columnsWidth="0*">
+<f:facet name="header">
+    <ui:include src="debtExtendedHeaderFragment.xhtml"/>
+</f:facet>
+
+<rich:column styleClass="left rich-table-footer rich-table-footercell" colspan="226">
+    <h:outputText value="#{element.facultyName}"/>
+</rich:column>
+
+<rich:subTable var="career" value="#{element.careers}" footerClass="rich-table-footer">
+    <rich:column styleClass="left column-nowrap" footerClass="rich-table-footercell">
+        <h:outputText value="#{career.name}"/>
+        <f:facet name="footer">
+            #{messages['Dashboard.rowTitle.subTotal']}
+        </f:facet>
+    </rich:column>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.deposit}"/>
+        <ui:param name="debtExtended" value="#{element.deposit}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.admissionRight}"/>
+        <ui:param name="debtExtended" value="#{element.admissionRight}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.computer}"/>
+        <ui:param name="debtExtended" value="#{element.computer}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.halfYear}"/>
+        <ui:param name="debtExtended" value="#{element.halfYear}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.enrollment}"/>
+        <ui:param name="debtExtended" value="#{element.enrollment}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.firstPay}"/>
+        <ui:param name="debtExtended" value="#{element.firstPay}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.secondPay}"/>
+        <ui:param name="debtExtended" value="#{element.secondPay}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.thirdPay}"/>
+        <ui:param name="debtExtended" value="#{element.thirdPay}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fourthPay}"/>
+        <ui:param name="debtExtended" value="#{element.fourthPay}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fifthPay}"/>
+        <ui:param name="debtExtended" value="#{element.fifthPay}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.additionalTopic}"/>
+        <ui:param name="debtExtended" value="#{element.additionalTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.administrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.administrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.firstAdministrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.firstAdministrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.secondAdministrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.secondAdministrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.thirdAdministrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.thirdAdministrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fourthAdministrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.fourthAdministrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fifthAdministrationExpense}"/>
+        <ui:param name="debtExtended" value="#{element.fifthAdministrationExpense}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.delayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.delayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.firstPayDelayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.firstPayDelayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.secondPayDelayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.secondPayDelayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.thirdPayDelayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.thirdPayDelayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fourthPayDelayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.fourthPayDelayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.fifthPayDelayTopic}"/>
+        <ui:param name="debtExtended" value="#{element.fifthPayDelayTopic}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.hospitalPractice}"/>
+        <ui:param name="debtExtended" value="#{element.hospitalPractice}"/>
+    </ui:include>
+    <ui:include src="debtExtendedColumnFragment.xhtml">
+        <ui:param name="career" value="#{career.total}"/>
+        <ui:param name="debtExtended" value="#{element.total}"/>
+    </ui:include>
+</rich:subTable>
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="left">
+            #{messages['Dashboard.rowTitle.total']}
+        </rich:column>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['deposit']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['admissionRight']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['computer']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['halfYear']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['enrollment']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['firstPay']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['secondPay']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['thirdPay']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fourthPay']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fifthPay']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['additionalTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['administrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['firstAdministrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['secondAdministrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['thirdAdministrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fourthAdministrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fifthAdministrationExpense']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['delayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['firstPayDelayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['secondPayDelayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['thirdPayDelayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fourthPayDelayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['fifthPayDelayTopic']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['hospitalPractice']}"/>
+        </ui:include>
+        <ui:include src="debtExtendedFooterColumnFragment.xhtml">
+            <ui:param name="total" value="#{debtExtendedAction.totals['total']}"/>
+        </ui:include>
+    </rich:columnGroup>
+</f:facet>
+
+</rich:dataTable>
+</s:div>
+</rich:panel>
+</s:div>
+</h:form>
+</ui:define>
+</ui:composition>
+
+

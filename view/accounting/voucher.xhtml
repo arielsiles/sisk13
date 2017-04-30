@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['Voucher.edit']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+
+<ui:define name="body">
+
+<h:form id="voucherForm">
+
+<div class="buttons">
+
+    <!--<h:commandButton
+            action="#"
+            value="#{messages['WarehouseVoucher.button.generateDocument']}"
+            immediate="true"
+            styleClass="button"
+            rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"/>-->
+
+
+    <h:commandButton action="#{voucherAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['WarehouseVoucher.edit']}
+</f:facet>
+
+
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+
+<s:div>
+
+    <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Voucher.date']}</ui:define>
+        <h:outputText value="#{voucher.date}"/>
+    </s:decorate>
+    <s:decorate id="transactionNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Voucher.transactionNumber']}</ui:define>
+        <h:outputText value="#{voucher.transactionNumber}"/>
+    </s:decorate>
+    <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
+        <h:outputText value="#{voucher.gloss}"/>
+    </s:decorate>
+    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.state']}</ui:define>
+        <h:outputText value="PENDIENTE"/>
+    </s:decorate>
+</s:div>
+
+</h:panelGrid>
+</rich:panel>
+
+    <rich:spacer height="15px"/>
+
+    <rich:dataTable value="#{voucherAction.getVoucherDetailList(voucher.transactionNumber)}"
+                        var="voucherDetail"
+                        columnsWidth="5%, 20%, 35%, 20%, 20%"
+                        width="100%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                            #{messages['Voucher.transactionNumber']}
+                    </rich:column>
+                    <rich:column>
+                            #{messages['Voucher.account']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Voucher.accountDescription']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Voucher.debit']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Voucher.credit']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{voucherDetail.transactionNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{voucherDetail.account}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{voucherDetail.cashAccount.description}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{voucherDetail.debit}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{voucherDetail.credit}"/>
+            </rich:column>
+    </rich:dataTable>
+</h:form>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#quickSearchExecutorUnit" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

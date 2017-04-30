@@ -1,0 +1,295 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['ChristmasPayroll.list']}</ui:define>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="christmasPayrollSearch">
+
+<rich:simpleTogglePanel label="#{messages['ChristmasPayroll.search']}" switchType="client">
+    <h:panelGrid columns="2" width="95%" cellpadding="0" cellspacing="0">
+        <h:panelGroup>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{christmasPayrollDataModel.idNumber}" maxlength="100"
+                             tabindex="1"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{christmasPayrollDataModel.firstName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{christmasPayrollDataModel.lastName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{christmasPayrollDataModel.maidenName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+                <a4j:commandButton action="#{christmasPayrollDataModel.search()}"
+                                   reRender="christmasPayrollList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </h:panelGroup>
+    </h:panelGrid>
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<br/>
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.updateChristmasPayrollSelectItems}"
+                     rendered="#{generatedPayroll.officialPayrollType}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="6">
+        <s:conversationPropagation type="join"/>
+    </h:commandButton>
+    <h:commandButton action="#{generatedPayrollAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="7">
+    </h:commandButton>
+</div>
+
+<c:set var="customColumnsWidth"
+       value="#{!generatedPayroll.officialPayrollType?'5%, 9%, 9%, 11%, 6%, 6%, 6%, 6%, 6%, 6%, 6%, 6%, 6%, 6%, 6%':'5%, 5%,5%, 9%, 9%, 9%, 5%, 5%, 5%, 5%, 5%,5%, 5%, 5%, 5%, 5%, 5%'}"/>
+<rich:dataTable value="#{christmasPayrollDataModel}" var="christmasPayrollItem" id="christmasPayrollList"
+                rows="500000"
+                width="100%"
+                columnsWidth="#{customColumnsWidth}">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+                <app:selectCheckboxHeader dataModel="#{christmasPayrollDataModel}" reRender="christmasPayrollList"/>
+            </rich:column>
+            <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+                <app:commandSortHeader sortProperty="christmasPayroll.hasAccountingRecord"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.accountingRecord']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.employee.idNumber"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.idDocument']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.employee.lastName"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.lastName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.employee.maidenName"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.maidenName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.employee.firstName"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.firstName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.contractInitDate"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.contractInitDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.workedDays"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.workedDays']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.salary"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.salary']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.septemberTotalIncome"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.septemberTotalIncome']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.octoberTotalIncome"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.octoberTotalIncome']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.novemberTotalIncome"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.novemberTotalIncome']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.averageSalary"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.averageSalary']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.contributableSalary"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.contributableSalary']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.liquid"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.liquid']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.bankAccount"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.bankAccount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="christmasPayroll.bankAccountCurrency"
+                                       dataModel="#{christmasPayrollDataModel}"
+                                       reRender="christmasPayrollList, dataScroller">
+                    #{messages['ChristmasPayroll.bankAccountCurrency']}
+                </app:commandSortHeader>
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+        <app:selectCheckboxItem dataModel="#{christmasPayrollDataModel}" item="#{christmasPayrollItem}"
+                                rendered="#{not christmasPayrollItem.hasAccountingRecord}"/>
+    </rich:column>
+    <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+        <h:outputText value="#{messages['Common.yes']}" rendered="#{christmasPayrollItem.hasAccountingRecord}"/>
+        <h:outputText value="#{messages['Common.not']}" rendered="#{not christmasPayrollItem.hasAccountingRecord}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{christmasPayrollItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.firstName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.contractInitDate}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.workedDays}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.salary}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.septemberTotalIncome}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.octoberTotalIncome}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.novemberTotalIncome}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.averageSalary}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.contributableSalary}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.liquid}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.bankAccount}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.bankAccountCurrency}"/>
+    </rich:column>
+
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="christmasPayrollList" dataModel="#{christmasPayrollDataModel}"/>
+
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.updateChristmasPayrollSelectItems}"
+                     rendered="#{generatedPayroll.officialPayrollType}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="8">
+        <s:conversationPropagation type="join"/>
+    </h:commandButton>
+    <h:commandButton action="#{generatedPayrollAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="9">
+    </h:commandButton>
+</div>
+</h:form>
+</ui:define>
+
+</ui:composition>

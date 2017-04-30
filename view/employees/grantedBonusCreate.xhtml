@@ -1,0 +1,294 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{grantedBonusCreateAction.managed}">
+            #{messages['GrantedBonus.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['GrantedBonus.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="grantedBonusForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{grantedBonusCreateAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="1"
+                     rendered="#{!grantedBonusCreateAction.managed and s:hasPermission('GRANTEDBONUS','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{grantedBonusCreateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="2"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{grantedBonusCreateAction.managed}">
+                #{messages['GrantedBonus.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['GrantedBonus.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <app:fieldset id="grantedBonusFieldset"
+                  title="#{messages['Bonus.bonus']}">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent, width50percent">
+            <s:div>
+                <s:decorate id="bonusTypeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define
+                            name="label">#{messages['Bonus.bonus']}</ui:define>
+                    <h:selectOneMenu id="bonus"
+                                     value="#{grantedBonusCreateAction.bonus}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{activeBonusList}"
+                                       var="bonus"
+                                       label="#{bonus.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange"
+                                     reRender="grantedBonusFieldset, selectedJobContractsDiv, jobContractSelectListModalPanelContainer "
+                                     action="#{grantedBonusCreateAction.bonusChanged()}"
+                                     ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+
+                    <a4j:commandButton
+                            value="#{messages['GrantedBonus.addJobContracts']}"
+                            styleClass="button"
+                            ajaxSingle="true"
+                            immediate="true"
+                            rendered="#{!empty grantedBonusCreateAction.bonus}"
+                            reRender="selectedJobContractsDiv"
+                            oncomplete="if(#{not empty grantedBonusCreateAction.bonus}) {Richfaces.showModalPanel('jobContractSelectListModalPanel');
+}"
+                            tabindex="4">
+                        <a4j:support event="onclick"
+                                     action="#{jobContractForTaxPayrollBonusDataModel.loadParameters()}"
+                                     ajaxSingle="true"
+                                     reRender="jobContractSelectListModalPanelContainer"/>
+                        <a4j:support event="onclick"
+                                     action="#{jobContractForTaxPayrollBonusDataModel.updateAndSearch()}"
+                                     ajaxSingle="true"
+                                     reRender="jobContractSelectListModalPanelContainer"/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+    <s:div id="selectedJobContractsDiv">
+        <app:fieldset id="selectedJobContractsFieldset"
+                      title="#{messages['JobContract.list']}">
+
+            <!--fixed assets corresponding to the purchase order-->
+            #{selectedJobContractBlockDataModel.reset()}
+            <rich:dataTable value="#{selectedJobContractBlockDataModel}" var="jobContractItem"
+                            id="selectedJobContractList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%,10%,20%, 15%, 10%, 10%, 5%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="employee.idNumber"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['Person.idNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="employee.markCode"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['Employee.markCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="employee.lastName,employee.maidenName,employee.firstName"
+                                    dataModel="#{selectedJobContractBlockDataModel}"
+                                    reRender="selectedJobContractList, dataScroller">
+                                #{messages['JobContract.employee']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="organizationalUnit.name"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['JobContract.organizationalUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="charge.name"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['Job.charge']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobCategory.acronym"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['Job.jobCategory']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobContract.contract.cycle.gestion"
+                                                   dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['JobContract.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader dataModel="#{selectedJobContractBlockDataModel}"
+                                                   reRender="selectedJobContractList, dataScroller">
+                                #{messages['GrantedBonus.amount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column id="rowCol"
+                             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+                    <h:outputText value="#{jobContractItem.contract.employee.idNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.employee.markCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.employee.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.organizationalUnit.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.charge.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.jobCategory.acronym}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.cycle.gestion.year}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <s:decorate id="amountField" template="/include/validateField.xhtml" styleClass="formRow">
+                        <h:inputText id="amount#{jobContractItem.id}"
+                                     value="#{grantedBonusCreateAction.jobContractBonusHashMap[jobContractService.find(jobContractItem, null)].amount}"
+                                     required="true"
+                                     styleClass="inputSmall right"
+                                     tabindex="4">
+                            <app:realNumberConverter minimum="0.01"
+                                                     pattern="#{messages['patterns.decimalNumber']}"
+                                                     forId="amount#{jobContractItem.id}"/>
+                        </h:inputText>
+                    </s:decorate>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <a4j:commandLink immediate="true"
+                                     title="#{messages['Common.remove']}"
+                                     action="#{grantedBonusCreateAction.removeInstance(jobContractItem)}"
+                                     reRender=" selectedJobContractsDiv, jobContractSelectListModalPanelContainer">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="selectedDataScroller" for="selectedJobContractList"
+                              dataModel="#{selectedJobContractBlockDataModel}"
+                              zeroRowCountMessage="GrantedBonus.searchNoResults"/>
+        </app:fieldset>
+    </s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{grantedBonusCreateAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!grantedBonusCreateAction.managed
+                     and s:hasPermission('GRANTEDBONUS','VIEW')}">
+    </h:commandButton>
+
+    <h:commandButton action="#{grantedBonusCreateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{grantedBonusCreateAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['GrantedBonus.delete.confirmation']}">
+                <f:param value="#{grantedBonus.amount}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{grantedBonusCreateAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="jobContractSelectListModalPanelContainer"
+            template="/employees/jobContractForTaxPayrollBonusListModalPanel.xhtml">
+    <ui:param name="dialogId" value="jobContractSelectListModalPanel"/>
+    <ui:param name="multiSelectMode" value="true"/>
+    <ui:param name="dataModel" value="#{jobContractForTaxPayrollBonusDataModel}"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{grantedBonusCreateAction.addJobContractList(jobContractForTaxPayrollBonusDataModel.selectedIdList)}"
+                           value="#{messages['GrantedBonus.addJobContracts']}"
+                           styleClass="button"
+                           reRender="selectedJobContractsDiv"
+                           oncomplete="Richfaces.hideModalPanel('jobContractSelectListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<!--<rich:jQuery selector="#discountByPayroll" query="focus()" timing="onload"/>-->
+</ui:define>
+</ui:composition>

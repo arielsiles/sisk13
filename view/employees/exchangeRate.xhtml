@@ -1,0 +1,137 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{exchangeRateAction.managed}">
+                #{messages['ExchangeRate.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ExchangeRate.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="exchangeRateForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{exchangeRateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!exchangeRateAction.managed}" id="createButtonId"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{exchangeRateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{exchangeRateAction.managed}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{exchangeRateAction.managed}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{exchangeRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{exchangeRateAction.managed}">
+                            #{messages['ExchangeRate.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ExchangeRate.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="purchaseField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ExchangeRate.purchase']}</ui:define>
+                    <h:inputText id="purchase" value="#{exchangeRate.purchase}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="5">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="purchase"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="saleField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ExchangeRate.sale']}</ui:define>
+                    <h:inputText id="sale" value="#{exchangeRate.sale}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="6">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="sale"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+                    <h:inputText id="rate" value="#{exchangeRate.rate}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="7">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ExchangeRate.date']}</ui:define>
+                    <rich:calendar value="#{exchangeRate.date}" popup="true" datePattern="#{messages['patterns.date']}"
+                                   styleClass="input" tabindex="8" enableManualInput="true">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+            </rich:panel>
+
+
+            <div class="buttons">
+                <h:commandButton action="#{exchangeRateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!exchangeRateAction.managed}"
+                                 tabindex="9"/>
+                <h:commandButton action="#{exchangeRateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{exchangeRateAction.managed}"
+                                 tabindex="10"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{exchangeRateAction.managed}"
+                                 tabindex="11">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{exchangeRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="12"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{exchangeRateAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ExchangeRate.delete.confirmation']}">
+                        <f:param value="#{exchangeRate.rate}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{exchangeRateAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#purchase" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

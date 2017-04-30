@@ -1,0 +1,247 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{rawMaterialCollectionSessionAction.managed}">
+                #{messages['RawMaterialCollectionSession.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RawMaterialCollectionSession.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+
+    <ui:define name="body">
+        <h:form id="rawMaterialCollectionSessionForm">
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!rawMaterialCollectionSessionAction.managed
+                                 }"/>
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialCollectionSessionAction.managed and rawMaterialCollectionSessionAction.pending
+                                 }"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialCollectionSessionAction.managed and rawMaterialCollectionSessionAction.pending
+                                 }">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{rawMaterialCollectionSessionAction.managed}">
+                            #{messages['RawMaterialCollectionSession.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['RawMaterialCollectionSession.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['RawMaterialCollectionSession.productiveZoneName']}</ui:define>
+                        <h:inputText id="productiveZone"
+                                     value="#{rawMaterialCollectionSession.fullNameOfProductiveZone}" styleClass="input"
+                                     maxlength="150" tabindex="1" required="true">
+                        </h:inputText>
+                        <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
+                                         title="#{messages['RawMaterialCollectionSession.selectProductiveZone']}"
+                                         onclick="Richfaces.showModalPanel('productiveZoneModalPanel');"
+                                         rendered="#{!rawMaterialCollectionSessionAction.managed}">
+                            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </s:decorate>
+                    <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialCollectionSession.date']}</ui:define>
+                        <rich:calendar value="#{rawMaterialCollectionSession.date}"
+                                       required="true">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                         </rich:calendar>
+                    </s:decorate>
+                    <c:choose>
+                        <c:when test="#{!rawMaterialCollectionSessionAction.managed}">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['RawMaterialCollectionSession.rawMaterial']}</ui:define>
+                                <h:selectOneMenu value="#{rawMaterialCollectionSession.metaProduct}"
+                                                 styleClass="input" required="true" tabindex="2">
+                                    <s:selectItems value="#{collectableProductList}"
+                                                   var="product"
+                                                   label="#{product.fullNameRawMaterial}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </c:when>
+                        <c:otherwise>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['RawMaterialCollectionSession.rawMaterial']}</ui:define>
+                                <h:inputText value="#{rawMaterialCollectionSession.metaProduct.fullNameRawMaterial}"
+                                             styleClass="input"
+                                             maxlength="150" tabindex="1" required="false" readonly="true">
+                                </h:inputText>
+                            </s:decorate>
+                        </c:otherwise>
+                    </c:choose>
+                    <s:decorate id="totalAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialCollectionSession.totalAmount']}</ui:define>
+                        <h:outputText value="#{rawMaterialCollectionSessionAction.totalAmount}"/>
+                    </s:decorate>
+                    <s:decorate id="optionsNavegation" template="/include/viewField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{rawMaterialCollectionSessionAction.postDate(rawMaterialCollectionSession.productiveZone,rawMaterialCollectionSession.date)}"
+                                           id = "buttonPos"
+                                           value="#{messages['RawMaterialCollectionSession.postDate']}"
+                                           styleClass="button"
+                                           reRender="formPanel"
+                                           disabled="#{rawMaterialCollectionSessionAction.isStartPeriod(rawMaterialCollectionSession.date)}">
+                        </a4j:commandButton>
+
+                        <a4j:commandButton action="#{rawMaterialCollectionSessionAction.nextDate(rawMaterialCollectionSession.productiveZone,rawMaterialCollectionSession.date,rawMaterialCollectionSession.metaProduct,rawMaterialCollectionSession.collectedRawMaterialList)}"
+                                         id = "buttonNext"
+                                         value="#{messages['RawMaterialCollectionSession.nextDate']}"
+                                         disabled="#{rawMaterialCollectionSessionAction.isEndPeriod(rawMaterialCollectionSession.date)}"
+                                         reRender="formPanel"
+                                         styleClass="button">
+                        </a4j:commandButton>
+                    </s:decorate>
+                    <s:decorate id="optionsNavegationJump" template="/include/viewField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{rawMaterialCollectionSessionAction.jumpPostDate(rawMaterialCollectionSession.productiveZone,rawMaterialCollectionSession.date)}"
+                                         id = "buttonPosJump"
+                                         value="#{messages['RawMaterialCollectionSession.postDateJump']}"
+                                         reRender="formPanel"
+                                         styleClass="button">
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{rawMaterialCollectionSessionAction.jumpNextDate(rawMaterialCollectionSession.productiveZone,rawMaterialCollectionSession.date,rawMaterialCollectionSession.metaProduct,rawMaterialCollectionSession.collectedRawMaterialList)}"
+                                         id = "buttonNextJump"
+                                         value="#{messages['RawMaterialCollectionSession.nextDateJump']}"
+                                         reRender="formPanel"
+                                         styleClass="button">
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+
+                <rich:dataTable id="collectedRawMaterialList"
+                                value="#{rawMaterialCollectionSession.collectedRawMaterialList}"
+                                var="collectedRawMaterialItem" width="100%" columnsWidth="25%,25%,25%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['RawMaterialProducer.lastName']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialProducer.maidenName']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialProducer.firstName']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['CollectedRawMaterial.amount']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.lastName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.maidenName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.firstName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:inputText id="totalAmount" value="#{collectedRawMaterialItem.amount}" required="true"
+                                     style="width:95%;">
+                            <a4j:support ajaxSingle="true" event="onblur" reRender="totalAmountField"/>
+                        </h:inputText>
+                        <rich:message for="totalAmount" styleClass="single-error"/>
+                    </rich:column>
+                </rich:dataTable>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!rawMaterialCollectionSessionAction.managed
+                                 }"/>
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialCollectionSessionAction.managed and rawMaterialCollectionSessionAction.pending
+                                 }"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialCollectionSessionAction.managed and rawMaterialCollectionSessionAction.pending
+                                 }">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialCollectionSessionAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialCollectionSessionAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['RawMaterialCollectionSession.delete.confirmation']}">
+                        <f:param value="#{rawMaterialCollectionSession.date}"/>
+                        <f:param value="#{rawMaterialCollectionSession.productiveZone.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{rawMaterialCollectionSessionAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialCollectionSession.searchProductiveZone']}"/>
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialCollectionSession.searchProductiveZone']}"/>
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{rawMaterialCollectionSessionAction.selectProductiveZone(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true" reRender="productiveZoneField,collectedRawMaterialList"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

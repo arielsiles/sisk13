@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:simpleTogglePanel id="searchOptionsPanel" label="#{messages['Dismissal.search']}" switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width55percent,width45percent">
+            <s:div>
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Dismissal.employee']}</ui:define>
+                    <h:inputText id="employee" styleClass="input" readonly="true"
+                                 value="#{dismissalDataModel.employee.fullName}"
+                                 tabindex="1"/>
+                    <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
+                                     tabindex="2"
+                                     title="#{messages['Dismissal.selectEmployee']}"
+                                     reRender="employeeField"
+                                     onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
+                                     tabindex="3"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{dismissalDataModel.clearEmployee()}"
+                                     reRender="employeeField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Dismissal.code']}</ui:define>
+                    <h:inputText id="code"
+                                 value="#{dismissalDataModel.criteria.code}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Dismissal.description']}</ui:define>
+                    <h:inputText id="description"
+                                 value="#{dismissalDataModel.criteria.description}"
+                                 styleClass="input"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Dismissal.amount']}</ui:define>
+                    <h:inputText id="amount"
+                                 value="#{dismissalDataModel.criteria.amount}"
+                                 styleClass="input"
+                                 tabindex="6">
+                        <app:realNumberConverter forId="amount" pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+            </s:div>
+            <s:div>
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Dismissal.state']}</ui:define>
+                    <h:selectOneMenu id="state"
+                                     value="#{dismissalDataModel.criteria.state}"
+                                     styleClass="input"
+                                     tabindex="10">
+                        <s:selectItems value="#{dismissalStateEnum}"
+                                       var="dismissalState"
+                                       label="#{messages[dismissalState.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <s:div styleClass="right input">
+                        <a4j:commandButton action="#{dismissalDataModel.search()}"
+                                           reRender="dismissalList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="11">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{dismissalDataModel.clear()}"
+                                           reRender="searchOptionsPanel, dismissalList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.clear']}"
+                                           id="clearButtonId"
+                                           tabindex="12">
+                        </a4j:commandButton>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+        <rich:jQuery selector="#selectEmployee" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+</ui:composition>

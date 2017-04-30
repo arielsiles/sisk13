@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Sector.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="sectorSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Sector.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Sector.name']}</ui:define>
+                    <h:inputText id="name" value="#{sectorDataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{sectorDataModel.search}"
+                                       reRender="sectorList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/sector.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('SECTOR','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{sectorDataModel}" var="sectorItem" id="sectorList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="85%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="sector.name"
+                                                   dataModel="#{sectorDataModel}"
+                                                   reRender="sectorList, dataScroller">
+                                #{messages['Sector.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{sectorItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{sectorAction.select(sectorItem)}"
+                                   rendered="#{s:hasPermission('SECTOR','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="sectorList" dataModel="#{sectorDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/sector.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('SECTOR','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

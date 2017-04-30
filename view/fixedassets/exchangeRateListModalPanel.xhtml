@@ -1,0 +1,52 @@
+<rich:modalPanel height="150" width="400" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:exchangeRateListForm\\\\:exchangeRateField\\\\:exchangeRate').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['FixedAssetDepreciationRecord.exchageRate']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="exchangeRateListForm">
+        <s:decorate>
+            <ui:define name="label">#{messages['FixedAssetDepreciationRecord.exchageRateForDepreciation']}</ui:define>
+        </s:decorate>
+        <s:decorate id="exchangeRateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetDepreciationRecord.exchageRate']}</ui:define>
+
+            <h:inputText id="exchangeRateUFV"
+                         value="#{fixedAssetDepreciationExchangeRateAction.exchangeRate}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="1">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="exchangeRateUFV"/>
+            </h:inputText>
+        </s:decorate>
+        <br/>
+
+        <div class="center">
+            <a4j:commandButton action="#{fixedAssetDepreciationExchangeRateAction.depreciateAllFixedAssets()}"
+                               value="#{messages['FixedAsset.adjustAndDepreciate']}"
+                               rendered="#{s:hasPermission('DEPRECIATEFIXEDASSET','VIEW')}"
+                               immediate="true"
+                               styleClass="button"/>
+            <h:commandButton id="cancelButton" value="#{messages['Common.cancel']}" styleClass="button"/>
+
+        </div>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, cancelButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

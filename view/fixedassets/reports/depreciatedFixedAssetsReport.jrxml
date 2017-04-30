@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--created by -->
+<jasperReport
+        xmlns="http://jasperreports.sourceforge.net/jasperreports"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+
+        name="fixedAssetGroupsReport"
+        columnCount="1"
+        pageWidth="872"
+        pageHeight="612"
+        columnWidth="822"
+        columnSpacing="0"
+        leftMargin="30"
+        rightMargin="20"
+        topMargin="30"
+        bottomMargin="30"
+        whenNoDataType="AllSectionsNoDetail"
+        isTitleNewPage="false"
+        isSummaryNewPage="false">
+    <import value="com.encens.khipus.reports.ReportFormatter"/>
+
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+
+    <field name="fixedAsset.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_1</fieldDescription>
+    </field>
+    <field name="fixedAsset.description" class="java.lang.String">
+        <fieldDescription>COLUMN_2</fieldDescription>
+    </field>
+    <field name="fixedAssetLocation.name" class="java.lang.String">
+        <fieldDescription>COLUMN_3</fieldDescription>
+    </field>
+    <field name="fixedAsset.registrationDate" class="java.util.Date">
+        <fieldDescription>COLUMN_4</fieldDescription>
+    </field>
+    <field name="fixedAsset.depreciationRate" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_5</fieldDescription>
+    </field>
+    <field name="fixedAsset.originalValue" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_6</fieldDescription>
+    </field>
+    <field name="fixedAsset.improvement" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_7</fieldDescription>
+    </field>
+    <field name="fixedAsset.ufvAccumulatedDepreciation" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_8</fieldDescription>
+    </field>
+    <field name="fixedAsset.bsAccumulatedDepreciation" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_9</fieldDescription>
+    </field>
+    <field name="fixedAssetSubGroup.id" class="com.encens.khipus.model.fixedassets.FixedAssetSubGroupPk">
+        <fieldDescription>COLUMN_10</fieldDescription>
+    </field>
+    <field name="fixedAssetSubGroup.description" class="java.lang.String">
+        <fieldDescription>COLUMN_11</fieldDescription>
+    </field>
+    <field name="fixedAsset.ufvTotalValue" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_12</fieldDescription>
+    </field>
+    <field name="fixedAsset.bsTotalValue" class="java.math.BigDecimal">
+        <fieldDescription>COLUMN_13</fieldDescription>
+    </field>
+    <field name="fixedAsset.barCode" class="java.lang.String">
+        <fieldDescription>COLUMN_14</fieldDescription>
+    </field>
+    <!--Variables-->
+
+    <variable name="ufvTotalValueSum" class="java.math.BigDecimal" calculation="Sum" resetType="Group"
+              resetGroup="subGroupGroup">
+        <variableExpression>$F{fixedAsset.ufvTotalValue}</variableExpression>
+    </variable>
+    <variable name="bsTotalValueSum" class="java.math.BigDecimal" calculation="Sum" resetType="Group"
+              resetGroup="subGroupGroup">
+        <variableExpression>$F{fixedAsset.bsTotalValue}</variableExpression>
+    </variable>
+
+    <variable name="ufvAccumulatedDepreciationSum" class="java.math.BigDecimal" calculation="Sum" resetType="Group"
+              resetGroup="subGroupGroup">
+        <variableExpression>$F{fixedAsset.ufvAccumulatedDepreciation}</variableExpression>
+    </variable>
+    <variable name="bsAccumulatedDepreciationSum" class="java.math.BigDecimal" calculation="Sum" resetType="Group"
+              resetGroup="subGroupGroup">
+        <variableExpression>$F{fixedAsset.bsAccumulatedDepreciation}</variableExpression>
+    </variable>
+    <!--groups-->
+    <group name="subGroupGroup">
+        <groupExpression>$F{fixedAssetSubGroup.id}.getFixedAssetSubGroupCode()</groupExpression>
+        <groupHeader>
+            <band height="25" splitType="Stretch">
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="1" width="822" height="12" style="detailStyle"
+                                   stretchType="NoStretch" mode="Opaque"/>
+                    <box padding="1">
+                        <bottomPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{DepreciatedFixedAssets.report.subGroup}+" "+$F{fixedAssetSubGroup.id}.getFixedAssetSubGroupCode()+"("+ReportFormatter.showNotNull($F{fixedAssetSubGroup.description})+")"]]></textFieldExpression>
+                </textField>
+                <frame>
+                    <reportElement x="0" y="13" width="822" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="10" y="0" width="80" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.barCode}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="90" y="0" width="162" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.description}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="252" y="0" width="80" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.fixedAssetLocation}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="332" y="0" width="60" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.registerDate}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="392" y="0" width="80" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.depreciation}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="472" y="0" width="85" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.ufvTotalValue}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="557" y="0" width="85" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.bsTotalValue}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="642" y="0" width="85" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.ufvAcumulatedDepreciation}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                        <reportElement x="727" y="0" width="85" height="12" style="headerStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{DepreciatedFixedAssets.report.bsAcumulatedDepreciation}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="25" splitType="Stretch">
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="1" width="822" height="12" style="detailStyle"
+                                   stretchType="NoStretch" mode="Opaque"/>
+                    <box padding="1">
+                        <bottomPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{DepreciatedFixedAssets.report.subGroupTotal}+" "+$F{fixedAssetSubGroup.id}.getFixedAssetSubGroupCode()+"("+$V{subGroupGroup_COUNT}+" "+$R{DepreciatedFixedAssets.report.fixedActives}+")"]]></textFieldExpression>
+                </textField>
+                <frame>
+                    <reportElement x="0" y="13" width="822" height="12" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" style="detailStyle"/>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                        <reportElement x="472" y="0" width="85" height="12" style="detailStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.math.BigDecimal">
+                            <![CDATA[$V{ufvTotalValueSum}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                        <reportElement x="557" y="0" width="85" height="12" style="detailStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.math.BigDecimal">
+                            <![CDATA[$V{bsTotalValueSum}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                        <reportElement x="642" y="0" width="85" height="12" style="detailStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.math.BigDecimal">
+                            <![CDATA[$V{ufvAccumulatedDepreciationSum}]]></textFieldExpression>
+                    </textField>
+                    <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                        <reportElement x="727" y="0" width="85" height="12" style="detailStyle"
+                                       stretchType="RelativeToTallestObject" mode="Opaque"/>
+                        <box padding="1">
+                            <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.math.BigDecimal">
+                            <![CDATA[$V{bsAccumulatedDepreciationSum}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupFooter>
+    </group>
+    <!--*************TITLE******************-->
+    <title>
+        <band height="65" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon" isLazy="false">
+                <reportElement x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"
+                               key="COMPANY_LOGO_ELEMENT"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"
+                       hyperlinkTarget="Self">
+                <reportElement
+                        style="titleStyle"
+                        x="72"
+                        y="0"
+                        width="570"
+                        height="58"
+                        key="title_text"
+                        positionType="Float"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="0" splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="0" splitType="Stretch">
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="10" y="0" width="80" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAsset.barCode}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="90" y="0" width="162" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAsset.description}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="252" y="0" width="80" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAssetLocation.name}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="dd/MM/yyyy">
+                <reportElement x="332" y="0" width="60" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.util.Date">
+                    <![CDATA[$F{fixedAsset.registrationDate}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="392" y="0" width="80" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAsset.depreciationRate}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="472" y="0" width="85" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAsset.ufvTotalValue}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="557" y="0" width="85" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAsset.bsTotalValue}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="642" y="0" width="85" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAsset.ufvAccumulatedDepreciation}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="727" y="0" width="85" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAsset.bsAccumulatedDepreciation}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="0" splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement x="0" y="0" width="822" height="12" style="detailStyle"
+                               positionType="Float" mode="Opaque"/>
+                <box padding="0">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                </box>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm">
+                    <reportElement x="0" y="0" width="100" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date">
+                        <![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="730" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="770" y="0" width="10" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" evaluationTime="Report">
+                    <reportElement x="780" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="0" splitType="Stretch"/>
+    </summary>
+</jasperReport>

@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{costCenterAction.managed}">
+                #{messages['CostCenter.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CostCenter.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="costCenterForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{costCenterAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!costCenterAction.managed and s:hasPermission('COSTCENTER','CREATE')}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="updateButtonId"
+                                 action="#{costCenterAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{costCenterAction.managed and s:hasPermission('COSTCENTER','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{costCenterAction.managed and s:hasPermission('COSTCENTER','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{costCenterAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{costCenterAction.managed}">
+                            #{messages['CostCenter.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CostCenter.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.code']}</ui:define>
+                    <h:inputText id="code"
+                                 value="#{costCenter.id.code}"
+                                 required="true"
+                                 maxlength="200"
+                                 tabindex="1"
+                                 rendered="#{!costCenterAction.managed}"
+                                 styleClass="input"/>
+                    <h:outputText value="#{costCenter.code}"
+                                  rendered="#{costCenterAction.managed}"
+                                  styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.description']}</ui:define>
+                    <h:inputText id="description"
+                                 value="#{costCenter.description}"
+                                 required="true"
+                                 maxlength="200"
+                                 tabindex="2"
+                                 styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="costCenterGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.group']}</ui:define>
+                    <h:selectOneMenu id="costCenterGroup"
+                                     value="#{costCenter.costCenterGroup}"
+                                     required="true"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{costCenterGroupList}" var="costCenterGroup"
+                                       label="#{costCenterGroup.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.state']}</ui:define>
+                    <h:selectOneMenu id="state"
+                                     value="#{costCenter.state}"
+                                     required="true"
+                                     styleClass="input"
+                                     tabindex="4">
+                        <s:selectItems value="#{costCenterStateEnum}" var="costCenterState"
+                                       label="#{messages[costCenterState.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.type']}</ui:define>
+                    <h:selectOneMenu id="type"
+                                     value="#{costCenter.type}"
+                                     required="true"
+                                     styleClass="input"
+                                     tabindex="5">
+                        <s:selectItems value="#{costCenterTypeEnum}" var="costCenterType"
+                                       label="#{messages[costCenterType.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="hasMovementField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.hasMovement']}</ui:define>
+                    <h:selectBooleanCheckbox id="type"
+                                             value="#{costCenter.hasMovement}"
+                                             tabindex="6"/>
+                </s:decorate>
+                <s:decorate id="exclusiveConsumptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CostCenter.exclusiveConsumption']}</ui:define>
+                    <h:selectBooleanCheckbox id="exclusiveConsumption"
+                                             value="#{costCenter.exclusiveConsumption}"
+                                             tabindex="7"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{costCenterAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!costCenterAction.managed and s:hasPermission('COSTCENTER','CREATE')}"
+                                 tabindex="7">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{costCenterAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{costCenterAction.managed and s:hasPermission('COSTCENTER','UPDATE')}"
+                                 tabindex="8"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{costCenterAction.managed and s:hasPermission('COSTCENTER','DELETE')}"
+                                 tabindex="9">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{costCenterAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="10"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{costCenterAction.managed and s:hasPermission('COSTCENTER','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CostCenter.delete.confirmation']}">
+                        <f:param value="#{costCenter.description}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{costCenterAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   rendered="#{s:hasPermission('COSTCENTER','DELETE')}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

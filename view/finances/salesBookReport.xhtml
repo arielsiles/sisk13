@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.salesBookReport.page.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="reports"/>
+    <ui:define name="body">
+        <h:form id="salesBookReportForm">
+            <rich:simpleTogglePanel label="#{messages['Reports.salesBookReport.page.title']}" switchType="client">
+
+                <h:panelGrid id="searchOptionsPanel"
+                             columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftSidePanel">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salesBookReport.startDate']}</ui:define>
+                            <rich:calendar id="startDate"
+                                           value="#{salesBookReportAction.startDate}"
+                                           styleClass="input"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salesBookReport.endDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{salesBookReportAction.endDate}"
+                                           styleClass="input"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+
+                <rich:jQuery selector="#startDate" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <app:reportDefaultOptions reportAction="#{salesBookReportAction}" showPageFormat="false" tabIndex="21"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{salesBookReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="25">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

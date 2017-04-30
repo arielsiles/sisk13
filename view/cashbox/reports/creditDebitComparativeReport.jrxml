@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--created -->
+<jasperReport
+        xmlns="http://jasperreports.sourceforge.net/jasperreports"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+
+        name="creditDebitComparativeReport"
+        columnCount="1"
+        pageWidth="612"
+        pageHeight="792"
+        columnWidth="562"
+        columnSpacing="0"
+        leftMargin="30"
+        rightMargin="20"
+        topMargin="30"
+        bottomMargin="30"
+        whenNoDataType="AllSectionsNoDetail"
+        isTitleNewPage="false"
+        isSummaryNewPage="false"
+        resourceBundle="org.burrosoft.resources">
+
+    <import value="com.encens.khipus.reports.*"/>
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+
+    <parameter name="generalExchangeRate" class="java.lang.Double"/>
+    <parameter name="year" class="java.lang.String"/>
+    <field name="executorUnitCode" class="java.lang.String"/>
+    <field name="businessUnitName" class="java.lang.String"/>
+    <field name="costCenterName" class="java.lang.String"/>
+    <field name="costCenterCode" class="java.lang.String"/>
+    <field name="movementMonth" class="java.lang.String"/>
+    <field name="accountClass" class="java.lang.String"/>
+    <field name="bsAmount" class="java.lang.Double"/>
+    <field name="susAmount" class="java.lang.Double"/>
+
+    <variable name="monthTotal" class="java.lang.Double" >
+        <variableExpression>ReportDesignHelper.getMonthTotal($F{bsAmount},$F{susAmount},$P{generalExchangeRate})</variableExpression>
+    </variable>
+
+    <variable name="susSubTotal" class="java.lang.Double" calculation="Sum" resetType="Group" resetGroup="accountClassGroup">
+        <variableExpression>$F{susAmount}</variableExpression>
+    </variable>
+
+    <variable name="bsSubTotal" class="java.lang.Double" calculation="Sum" resetType="Group" resetGroup="accountClassGroup">
+        <variableExpression>$F{bsAmount}</variableExpression>
+    </variable>
+
+    <variable name="accountClassGroupTotal" class="java.lang.Double" calculation="Sum" resetType="Group" resetGroup="accountClassGroup">
+        <variableExpression>$V{monthTotal}</variableExpression>
+    </variable>
+
+    <variable name="costCenterGroupTotal" class="java.lang.Double" calculation="Sum" resetType="Group" resetGroup="costCenterGroup"
+            incrementType="Group" incrementGroup="accountClassGroup">
+        <variableExpression>$V{accountClassGroupTotal}</variableExpression>
+    </variable>
+
+    <group name="costCenterGroup">
+        <groupExpression>$F{costCenterCode}</groupExpression>
+        <groupHeader>
+            <band height="70">
+                <frame>
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="0"
+                            width="310"
+                            height="12"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="100"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $R{Reports.finances.creditDebitComparative.seat}
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="detailStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="100"
+                                y="0"
+                                width="210"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            ReportFormatter.formatFullName($F{executorUnitCode},$F{businessUnitName})
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+
+                <frame>
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="12"
+                            width="310"
+                            height="12"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="100"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $R{Reports.finances.creditDebitComparative.costCenter}
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="detailStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="100"
+                                y="0"
+                                width="210"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            ReportFormatter.formatFullName($F{costCenterCode},$F{costCenterName})
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+                <frame>
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="24"
+                            width="310"
+                            height="12"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="100"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $R{Reports.finances.creditDebitComparative.year}
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="detailStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="100"
+                                y="0"
+                                width="210"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $P{year}
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+                <frame>
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="36"
+                            width="310"
+                            height="12"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="100"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $R{Reports.finances.creditDebitComparative.changeRate}
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                        <reportElement
+                                style="detailStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="100"
+                                y="0"
+                                width="210"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.Double">
+                            $P{generalExchangeRate}
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="32" splitType="Stretch">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="110"
+                                y="0"
+                                width="130"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            $R{Reports.finances.creditDebitComparative.costCenterTotal}
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                        <reportElement
+                                style="detailStyle"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="240"
+                                y="0"
+                                width="70"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.lang.Double">
+                            <![CDATA[$V{costCenterGroupTotal}]]>
+                        </textFieldExpression>
+                    </textField>
+            </band>
+        </groupFooter>
+    </group>
+
+    <group name="accountClassGroup">
+        <groupExpression>$F{accountClass}</groupExpression>
+        <groupHeader>
+            <band height="27" splitType="Stretch">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="0"
+                            width="310"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[ReportDesignHelper.getAccountClassName($F{accountClass})]]>
+                    </textFieldExpression>
+                </textField>
+
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="15"
+                            width="100"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.finances.creditDebitComparative.month}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="100"
+                            y="15"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FinancesCurrencyType.symbol.P}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="170"
+                            y="15"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FinancesCurrencyType.symbol.D}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="240"
+                            y="15"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.finances.creditDebitComparative.totalUS}]]>
+                    </textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="22" splitType="Stretch">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement
+                            style="headerStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="0"
+                            y="0"
+                            width="100"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.finances.creditDebitComparative.totals}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="100"
+                            y="0"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Double">
+                        <![CDATA[$V{bsSubTotal}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="170"
+                            y="0"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Double">
+                        <![CDATA[$V{susSubTotal}]]>
+                    </textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                    <reportElement
+                            style="detailStyle"
+                            positionType="Float"
+                            stretchType="RelativeToTallestObject"
+                            mode="Opaque"
+                            x="240"
+                            y="0"
+                            width="70"
+                            height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Double">
+                        <![CDATA[$V{accountClassGroupTotal}]]>
+                    </textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+
+    <!--*************TITLE****************** -->
+    <title>
+        <band height="65" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon" isLazy="false">
+                <reportElement x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"
+                               key="COMPANY_LOGO_ELEMENT"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"
+                       hyperlinkTarget="Self">
+                <reportElement
+                        style="titleStyle"
+                        x="72"
+                        y="0"
+                        width="490"
+                        height="58"
+                        key="title_text"
+                        positionType="Float"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="0" splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="0" splitType="Stretch"/>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement
+                        style="detailStyle"
+                        positionType="Float"
+                        stretchType="RelativeToTallestObject"
+                        mode="Opaque"
+                        x="0"
+                        y="0"
+                        width="100"
+                        height="12"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[ReportDesignHelper.getMonthName($F{movementMonth})]]>
+                </textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                <reportElement
+                        style="detailStyle"
+                        positionType="Float"
+                        stretchType="RelativeToTallestObject"
+                        mode="Opaque"
+                        x="100"
+                        y="0"
+                        width="70"
+                        height="12"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.lang.Double">
+                    <![CDATA[$F{bsAmount}]]>
+                </textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                <reportElement
+                        style="detailStyle"
+                        positionType="Float"
+                        stretchType="RelativeToTallestObject"
+                        mode="Opaque"
+                        x="170"
+                        y="0"
+                        width="70"
+                        height="12"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.lang.Double">
+                    <![CDATA[$F{susAmount}]]>
+                </textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00" >
+                <reportElement
+                        style="detailStyle"
+                        positionType="Float"
+                        stretchType="RelativeToTallestObject"
+                        mode="Opaque"
+                        x="240"
+                        y="0"
+                        width="70"
+                        height="12"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000" lineWidth="1"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.lang.Double">
+                    <![CDATA[$V{monthTotal}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="0" splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement x="0" y="0" width="562" height="12" style="detailStyle"
+                               positionType="Float" mode="Opaque"/>
+                <box padding="0">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                </box>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm">
+                    <reportElement x="0" y="0" width="100" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date">
+                        <![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="470" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="510" y="0" width="10" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" evaluationTime="Report">
+                    <reportElement x="520" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="0" splitType="Stretch"/>
+    </summary>
+</jasperReport>

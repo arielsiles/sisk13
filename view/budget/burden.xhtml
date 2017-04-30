@@ -1,0 +1,234 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{burdenAction.managed}">
+            #{messages['Classifier.burden.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Classifier.burden.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="burdenForm">
+
+    <div class="buttons">
+
+        <h:commandButton action="#{classifierAccountAction.newAssignToBurden}"
+                         value="#{messages['ClassifierAccount.add']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERACCOUNT','UPDATE')}"/>
+
+        <h:commandButton id="createButtonId"
+                         action="#{burdenAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!burdenAction.managed and s:hasPermission('CLASSIFIERS','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{burdenAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!burdenAction.managed and s:hasPermission('CLASSIFIERS','CREATE')}"/>
+
+        <h:commandButton id="updateButtonId"
+                         action="#{burdenAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{burdenAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{burdenAction.managed}">
+                    #{messages['Classifier.burden.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Classifier.burden.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Classifier.name']}</ui:define>
+            <h:inputText id="name" value="#{burden.name}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+                <f:validateLength maximum="150"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Classifier.code']}</ui:define>
+            <h:inputText id="areaCode" value="#{burden.code}" styleClass="input" required="true"
+                         maxlength="20" tabindex="2"/>
+        </s:decorate>
+
+        <app:fieldset id="addClassifierAccount" title="#{messages['ClassifierAccount.add']}"
+                      rendered="#{!burdenAction.managed}">
+            <s:decorate id="accountCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Classifier.accountCode']}</ui:define>
+                <h:inputText required="true" styleClass="input" readonly="true"
+                             value="#{burden.accountCode}" id="accountCodeTextField"/>
+                <a4j:commandLink id="selectAccountCode" ajaxSingle="true" immediate="true" tabindex="3"
+                                 title="#{messages['CashAccount.select']}"
+                                 onclick="Richfaces.showModalPanel('cashAccountListModalPanel');">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="4"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{burdenAction.clearCashAccount}"
+                                 reRender="accountCodeField">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+        </app:fieldset>
+    </rich:panel>
+
+    <div class="buttons">
+
+        <h:commandButton action="#{classifierAccountAction.newAssignToBurden}"
+                         value="#{messages['ClassifierAccount.add']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERACCOUNT','UPDATE')}"/>
+
+        <h:commandButton action="#{burdenAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!burdenAction.managed and s:hasPermission('CLASSIFIERS','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{burdenAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!burdenAction.managed and s:hasPermission('CLASSIFIERS','CREATE')}"/>
+
+        <h:commandButton action="#{burdenAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{burdenAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+        </h:commandButton>
+    </div>
+
+    <s:div rendered="#{burdenAction.managed}">
+        #{classifierAccountDataModel.criteria.setClassifier(burden)}
+        <rich:dataTable value="#{classifierAccountDataModel}" var="classifierAccountItem"
+                        id="classifierAccountList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="80%,20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="classifierAccount.accountCode"
+                                               dataModel="#{classifierAccountDataModel}"
+                                               reRender="classifierAccountList, dataScroller">
+                            #{messages['ClassifierAccount.accountCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{classifierAccountItem.accountCode}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{classifierAccountAction.selectAssignToBurden(classifierAccountItem)}"
+                               rendered="#{s:hasPermission('CLASSIFIERACCOUNT','VIEW')}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="classifierAccountList"
+                          dataModel="#{classifierAccountDataModel}"/>
+    </s:div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Classifier.burden.delete.confirmation']}">
+                <f:param value="#{burden.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{burdenAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{burdenAction.managed and s:hasPermission('CLASSIFIERS','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml"
+            rendered="#{!burdenAction.managed}">
+    <ui:param name="accountType" value="I"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{burdenAction.assignCashAccount(cashAccountItem)}"
+                           reRender="accountCodeTextField"
+                           image="/img/active.gif" styleClass="image-middle"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"
+                           tabindex="6"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

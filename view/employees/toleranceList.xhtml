@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Tolerance.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="toleranceSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Tolerance.search']}" switchType="client">
+
+                <s:decorate id="afterInitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.afterInit']}</ui:define>
+                    <h:inputText id="afterInit" value="#{toleranceDataModel.criteria.afterInit}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                        <a4j:support event="onblur" reRender="afterInitField"/>
+                    </h:inputText>
+
+                    <a4j:commandButton action="#{toleranceDataModel.search}" reRender="toleranceList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#afterInit" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/tolerance.xhtml"
+                          rendered="#{s:hasPermission('TOLERANCE','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+
+            <rich:dataTable value="#{toleranceDataModel}" var="toleranceItem" id="toleranceList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="35%, 25%, 25%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="tolerance.beforeInit"
+                                                   dataModel="#{toleranceDataModel}"
+                                                   reRender="toleranceList, dataScroller">
+                                #{messages['Tolerance.beforeInit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="tolerance.afterInit"
+                                                   dataModel="#{toleranceDataModel}"
+                                                   reRender="toleranceList, dataScroller">
+                                #{messages['Tolerance.afterInit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="tolerance.beforeEnd"
+                                                   dataModel="#{toleranceDataModel}"
+                                                   reRender="toleranceList, dataScroller">
+                                #{messages['Tolerance.beforeEnd']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="tolerance.afterEnd"
+                                                   dataModel="#{toleranceDataModel}"
+                                                   reRender="toleranceList, dataScroller">
+                                #{messages['Tolerance.afterEnd']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{toleranceItem.beforeInit}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{toleranceItem.afterInit}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{toleranceItem.beforeEnd}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{toleranceItem.afterEnd}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('TOLERANCE','VIEW')}"
+                                   action="#{toleranceAction.select(toleranceItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="toleranceList" dataModel="#{toleranceDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/toleranceList.xhtml"
+                          rendered="#{s:hasPermission('TOLERANCE','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

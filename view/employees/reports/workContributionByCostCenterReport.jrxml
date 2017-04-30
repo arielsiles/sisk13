@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="2412" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="2382" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30" scriptletClass="com.encens.khipus.action.employees.reports.WorkContributionByCostCenterReportScriptlet">
+	<import value="com.encens.khipus.reports.ReportDesignHelper"/>
+	<import value="com.encens.khipus.action.employees.reports.WorkContributionReportUtil"/>
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<subDataset name="pensionFundOrgDataset">
+		<parameter name="payrollGenerationCycleIdParam" class="java.lang.Long"/>
+		<queryString language="ejbql">
+			<![CDATA[SELECT DISTINCT
+ pensionFundOrganization.id,
+ pensionFundOrganization.name
+ FROM FiscalPayroll fiscalPayroll
+ LEFT JOIN fiscalPayroll.payrollGenerationCycle payrollGenerationCycle
+ LEFT JOIN fiscalPayroll.jobContract jobContract
+ LEFT JOIN jobContract.contract contract
+ LEFT JOIN contract.pensionFundOrganization pensionFundOrganization
+ WHERE payrollGenerationCycle.id=$P{payrollGenerationCycleIdParam}]]>
+		</queryString>
+		<field name="pensionFundOrganizationId" class="java.lang.Long">
+			<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+		</field>
+		<field name="pensionFundOrganizationName" class="java.lang.String">
+			<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+		</field>
+	</subDataset>
+	<field name="costCenter.code" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="costCenter.description" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="pensionFundOrganization.id" class="java.lang.Long">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="pensionFundOrganization.name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="payrollGenerationCycle.id" class="java.lang.Long">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<field name="fiscalPayroll.totalGrained" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+	</field>
+	<field name="tributaryPayroll.cns" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+	</field>
+	<field name="fiscalPayroll.retentionAFP" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+	</field>
+	<field name="tributaryPayroll.patronalProffesionalRiskRetentionAFP" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+	</field>
+	<field name="tributaryPayroll.patronalProHomeRetentionAFP" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+	</field>
+	<field name="tributaryPayroll.patronalSolidaryRetentionAFP" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+	</field>
+	<variable name="valuesMapVar" class="java.util.Map" calculation="System">
+		<initialValueExpression><![CDATA[(new java.util.HashMap())]]></initialValueExpression>
+	</variable>
+	<group name="costCenterGroup">
+		<groupExpression><![CDATA[$F{costCenter.code}]]></groupExpression>
+		<groupFooter>
+			<band height="12">
+				<crosstab isRepeatColumnHeaders="false">
+					<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="2350" height="12"/>
+					<crosstabParameter name="costCenterCode">
+						<parameterValueExpression><![CDATA[$F{costCenter.code}]]></parameterValueExpression>
+					</crosstabParameter>
+					<crosstabParameter name="costCenterDescription">
+						<parameterValueExpression><![CDATA[$F{costCenter.description}]]></parameterValueExpression>
+					</crosstabParameter>
+					<crosstabParameter name="valuesMapParam" class="java.util.Map">
+						<parameterValueExpression><![CDATA[$V{valuesMapVar}]]></parameterValueExpression>
+					</crosstabParameter>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<crosstabDataset>
+						<dataset>
+							<datasetRun subDataset="pensionFundOrgDataset">
+								<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+								<datasetParameter name="payrollGenerationCycleIdParam">
+									<datasetParameterExpression><![CDATA[$F{payrollGenerationCycle.id}]]></datasetParameterExpression>
+								</datasetParameter>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="emptyRow" width="0">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents/>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="emptyColumn" height="0" totalPosition="End" headerPosition="Center">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents/>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeTotalKey($P{costCenterCode}),$P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<columnGroup name="organization" height="12" totalPosition="Start" headerPosition="Center">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[ReportDesignHelper.composeKeyValue($F{pensionFundOrganizationId},$F{pensionFundOrganizationName})]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="85" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeTotalGrainedKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="85" y="0" width="75" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeAFPKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="160" y="0" width="75" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeProfessionalRiskKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="235" y="0" width="75" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeProHomeKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="310" y="0" width="75" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeSolidaryKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="385" y="0" width="85" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeOrganizationSubTotalKey($P{costCenterCode}, ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="detailStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression class="java.lang.String"><![CDATA[$P{costCenterCode}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="detailStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="100" y="0" width="270" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Left"/>
+									<textFieldExpression class="java.lang.String"><![CDATA[$P{costCenterDescription}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+									<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="370" y="0" width="100" height="12"/>
+									<box padding="1">
+										<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeCNSKey($P{costCenterCode}),$P{valuesMapParam})]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="TempMeasure" class="java.lang.Integer">
+						<measureExpression><![CDATA[new Integer(0)]]></measureExpression>
+					</measure>
+					<crosstabCell width="470" height="0">
+						<cellContents/>
+					</crosstabCell>
+				</crosstab>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="80">
+			<image scaleImage="RetainShape" onErrorType="Icon">
+				<reportElement key="COMPANY_LOGO_ELEMENT" positionType="Float" x="0" y="13" width="59" height="51" isRemoveLineWhenBlank="true"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="225" height="12"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContribution.humanResourceManagement}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="" style="tinyTitleStyle" positionType="Float" x="245" y="14" width="580" height="12"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="" style="tinyTitleStyle" positionType="Float" x="245" y="26" width="580" height="12"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{subTitleParam}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="245" y="38" width="580" height="12"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContribution.expressedInBolivianos}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="0" y="64" width="554" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="50" height="12"/>
+					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.sede}+":"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="50" y="0" width="487" height="12"/>
+					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{businessUnitParam}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36">
+			<crosstab isRepeatColumnHeaders="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="2350" height="36"/>
+				<crosstabParameter name="cnsRateParam" class="java.math.BigDecimal">
+					<parameterValueExpression><![CDATA[$P{cnsRateParam}]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="afpRateParam" class="java.math.BigDecimal">
+					<parameterValueExpression><![CDATA[$P{afpRateParam}]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="professionalRiskRateParam" class="java.math.BigDecimal">
+					<parameterValueExpression><![CDATA[$P{professionalRiskRateParam}]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="housingAfpRateParam" class="java.math.BigDecimal">
+					<parameterValueExpression><![CDATA[$P{housingAfpRateParam}]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="solidaryRateParam" class="java.math.BigDecimal">
+					<parameterValueExpression><![CDATA[$P{solidaryRateParam}]]></parameterValueExpression>
+				</crosstabParameter>
+				<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+				<crosstabDataset>
+					<dataset>
+						<datasetRun subDataset="pensionFundOrgDataset">
+							<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+							<datasetParameter name="payrollGenerationCycleIdParam">
+								<datasetParameterExpression><![CDATA[$F{payrollGenerationCycle.id}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="emptyRow" width="0">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="emptyColumn" height="0" totalPosition="End" headerPosition="Center">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents/>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="36"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.total}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="organization" height="36" totalPosition="Start" headerPosition="Center">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[ReportDesignHelper.composeKeyValue($F{pensionFundOrganizationId},$F{pensionFundOrganizationName})]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="0" y="0" width="470" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[ReportDesignHelper.getValueOfKeyValue($V{organization})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="12" width="85" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.totalGrained}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="85" y="12" width="75" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.afp},$P{afpRateParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="160" y="12" width="75" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.professionalRisk},$P{professionalRiskRateParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="235" y="12" width="75" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.home},$P{housingAfpRateParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="310" y="12" width="75" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.solidaryFund},$P{solidaryRateParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="385" y="12" width="85" height="24"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.totalPensionFundOrganization}, ReportDesignHelper.getValueOfKeyValue($V{organization}))]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="36"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.costCenterCode}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="100" y="0" width="270" height="36"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.workContributionCosCenter.costCenter}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement style="headerStyle" stretchType="RelativeToBandHeight" mode="Opaque" x="370" y="0" width="100" height="36"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression class="java.lang.String"><![CDATA[msg($R{Reports.workContributionCosCenter.CNS},$P{cnsRateParam})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="TempMeasure" class="java.lang.Integer">
+					<measureExpression><![CDATA[new Integer(0)]]></measureExpression>
+				</measure>
+				<crosstabCell width="470" height="0">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+	<summary>
+		<band height="50">
+			<crosstab isRepeatColumnHeaders="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="2350" height="12"/>
+				<crosstabParameter name="valuesMapParam" class="java.util.Map">
+					<parameterValueExpression><![CDATA[$V{valuesMapVar}]]></parameterValueExpression>
+				</crosstabParameter>
+				<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+				<crosstabDataset>
+					<dataset>
+						<datasetRun subDataset="pensionFundOrgDataset">
+							<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+							<datasetParameter name="payrollGenerationCycleIdParam">
+								<datasetParameterExpression><![CDATA[$F{payrollGenerationCycle.id}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="emptyRow" width="0">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="emptyColumn" height="0" totalPosition="End" headerPosition="Center">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents/>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeTotalKey(),$P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="organization" height="12" totalPosition="Start" headerPosition="Center">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[ReportDesignHelper.composeKeyValue($F{pensionFundOrganizationId},$F{pensionFundOrganizationName})]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="85" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeTotalGrainedTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="85" y="0" width="75" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeAFPTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="160" y="0" width="75" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeProfessionalRiskTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="235" y="0" width="75" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeProHomeTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="310" y="0" width="75" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeSolidaryTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="385" y="0" width="85" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeOrganizationSubTotalTotalKey(ReportDesignHelper.getKeyOfKeyValue($V{organization})), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="370" y="0" width="100" height="12"/>
+								<box padding="1">
+									<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[WorkContributionReportUtil.getValue(WorkContributionReportUtil.composeCNSTotalKey(), $P{valuesMapParam})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="TempMeasure" class="java.lang.Integer">
+					<measureExpression><![CDATA[new Integer(0)]]></measureExpression>
+				</measure>
+				<crosstabCell width="470" height="0">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

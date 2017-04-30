@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <c:if test="#{s:hasPermission('BANKBALANCEPANEL','VIEW')}">
+        <rich:panel styleClass="center">
+            <f:facet name="header">
+                <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                    <s:div styleClass="left">
+                        <h:outputText value="#{messages['BankBalance.title']} (#{bankBalanceViewAction.year})"/>
+                    </s:div>
+                </h:panelGrid>
+            </f:facet>
+            <a4j:region renderRegionOnly="true">
+                <h:panelGrid columns="1" width="100%" styleClass="center">
+                    <s:graphicImage value="#{bankBalanceViewAction.createChart()}" usemap="#companyBalanceChartId"/>
+                    <s:graphicImage value="#{bankBalanceViewAction.createBankChart()}" usemap="#bankBalanceChartId"/>
+                </h:panelGrid>
+
+                <h:outputText value="#{bankBalanceViewAction.toolTipMap}" escape="false"/>
+                <ui:include src="/dashboard/componentStatus.xhtml"/>
+            </a4j:region>
+        </rich:panel>
+    </c:if>
+</ui:composition>

@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Inventory.list']}</ui:define>
+
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="inventorySearch">
+            <rich:simpleTogglePanel label="#{messages['Inventory.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Inventory.warehouse']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{warehouseInventoryDataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{warehouseInventoryDataModel.search}"
+                                       reRender="warehouseInventoryList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <rich:spacer height="15px"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['InventoryManagement.create']}"
+                          view="/warehouse/inventoryManagement.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INVENTORYMANAGEMENT','CREATE')}"
+                          propagation="begin"/>
+            </div>
+            <rich:dataTable value="#{warehouseInventoryDataModel}"
+                            var="warehouseItem"
+                            id="warehouseInventoryList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="85%, 15%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="inventoryWarehouse.name"
+                                                   dataModel="#{warehouseInventoryDataModel}"
+                                                   reRender="warehouseInventoryList, dataScroller">
+                                #{messages['Inventory.warehouse']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{warehouseItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{inventoryAction.select(warehouseItem)}"
+                                   rendered="#{s:hasPermission('INVENTORY','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="warehouseInventoryList"
+                              dataModel="#{warehouseInventoryDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['InventoryManagement.create']}"
+                          view="/warehouse/inventoryManagement.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INVENTORYMANAGEMENT','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

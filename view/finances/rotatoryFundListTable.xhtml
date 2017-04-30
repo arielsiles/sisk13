@@ -1,0 +1,195 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:dataTable id="rotatoryFundList"
+                    value="#{rotatoryFundDataModel}"
+                    var="rotatoryFundItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="7%,4%,6%,7%,13%,6%,6%,6%,6%,6%,13%,5%,4%">
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.documentType"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.documentType']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.code"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.code']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.businessUnit"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.businessUnit']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.employee"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.employee']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.description"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.description']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.startDate"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.startDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.expirationDate"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.expirationDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <!--
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="rotatoryFund.paymentsNumber"
+                                                       dataModel="#{rotatoryFundDataModel}"
+                                                       reRender="rotatoryFundList, dataScroller">
+                                    #{messages['RotatoryFund.paymentsNumber']}
+                                </app:commandSortHeader>
+                            </rich:column>
+                -->
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.amount"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.amount']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.receivableResidue"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.receivableResidue']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.payableResidue"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.payableResidue']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.cashAccount"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.cashAccount']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="rotatoryFund.state"
+                                           dataModel="#{rotatoryFundDataModel}"
+                                           reRender="rotatoryFundList, dataScroller">
+                        #{messages['RotatoryFund.state']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.documentType.fullName}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{rotatoryFundItem.code}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.businessUnit.fullName}">
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.employee.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.description}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.startDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.expirationDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <!--
+            <rich:column styleClass="right">
+                <h:outputText value="#{rotatoryFundItem.paymentsNumber}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </rich:column>
+        -->
+        <rich:column styleClass="right">
+            <h:outputText value="#{rotatoryFundItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{rotatoryFundItem.receivableResidue}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{rotatoryFundItem.payableResidue}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{rotatoryFundItem.cashAccount.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[rotatoryFundItem.state.resourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{rotatoryFundAction.select(rotatoryFundItem)}">
+                <s:conversationPropagation value="begin"/>
+            </h:commandLink>
+            &#160;
+            <h:commandLink action="#{rotatoryFundReceiptAction.generateReport(rotatoryFundItem)}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('ROTATORYFUND','VIEW')}">
+                <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                title="#{messages['Reports.rotatoryFunds.receipt.generateDocument']}"/>
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller" for="rotatoryFundList" dataModel="#{rotatoryFundDataModel}"/>
+</ui:composition>

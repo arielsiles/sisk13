@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DocumentType.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="documentTypeSearch">
+
+            <rich:simpleTogglePanel label="#{messages['DocumentType.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DocumentType.name']}</ui:define>
+                    <h:inputText id="name" value="#{documentTypeDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{documentTypeDataModel.search}"
+                                       reRender="documentTypeList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/customers/documentType.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('DOCUMENTTYPE','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{documentTypeDataModel}" var="documentTypeItem" id="documentTypeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="40%, 40%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.name" dataModel="#{documentTypeDataModel}"
+                                                   reRender="documentTypeList, dataScroller">
+                                #{messages['DocumentType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="documentType.entityType"
+                                                   dataModel="#{documentTypeDataModel}"
+                                                   reRender="documentTypeList, dataScroller">
+                                #{messages['DocumentType.entityType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{documentTypeItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[documentTypeItem.entityType.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DOCUMENTTYPE','VIEW')}"
+                                   action="#{documentTypeAction.select(documentTypeItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="documentTypeList" dataModel="#{documentTypeDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/customers/documentType.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('DOCUMENTTYPE','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

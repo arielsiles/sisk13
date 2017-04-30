@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{gestionPayrollAction.managed}">
+                #{messages['GestionPayroll.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['GestionPayroll.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="65%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <ui:include src="gestionPayrollBody.xhtml">
+            <ui:param name="jobCategoryListByGestionPayroll" value="#{activeJobCategoryList}"/>
+            <ui:param name="hasDefaultValuesFromGenerationCycle" value="true"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>
+

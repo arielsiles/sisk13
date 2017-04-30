@@ -1,0 +1,590 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<h:form id="fixedAssetVoucherBodyMovementsForm">
+
+<div id="topButtonsDiv" class="buttons">
+    <h:commandButton action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucher,'PDF')}"
+                     value="#{messages['FixedAssetVoucher.button.generateDocumentPDF']}"
+                     immediate="true"
+                     styleClass="button"
+                     tabindex="1"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW') and fixedAssetVoucherAction.managed}"/>
+    <h:commandButton action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucher,'XLS')}"
+                     value="#{messages['FixedAssetVoucher.button.generateDocumentEXCEL']}"
+                     immediate="true"
+                     styleClass="button"
+                     tabindex="2"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW') and fixedAssetVoucherAction.managed}"/>
+    <h:commandButton id="newDiscountCommentId"
+                     action="#{discountCommentAction.addFixedAssetVoucherDiscountComment}"
+                     value="#{messages['DiscountComment.newDiscountComment']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.instance.annulled
+                          and s:hasPermission('DISCOUNTCOMMENT','CREATE')}"
+                     tabindex="3"
+                     immediate="true"/>
+    <h:commandButton id="registrationButton"
+                     action="#{fixedAssetVoucherAction.registration}"
+                     rendered="#{s:hasPermission('FIXEDASSETREGISTRATION','VIEW')
+                          and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                                and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.registrationMovement}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="4"/>
+    <h:commandButton id="approveRegistrationButton"
+                     action="#{fixedAssetVoucherAction.approveRegistration}"
+                     rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW')
+                          and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                          and fixedAssetVoucherAction.fixedAssetVoucherPending
+                          and fixedAssetVoucherAction.registrationMovement}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     tabindex="5"/>
+    <h:commandButton id="tarnsferenceButton"
+                     action="#{fixedAssetVoucherAction.transfer}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.transferenceMovement}"
+                     tabindex="6"/>
+
+    <h:commandButton id="approveTarnsferenceButton"
+                     action="#{fixedAssetVoucherAction.approveTransfer}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.transferenceMovement}"
+                     tabindex="7"/>
+
+    <h:commandButton id="dischargeButton"
+                     action="#{fixedAssetVoucherAction.discharge}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.dischargeMovement}"
+                     tabindex="8"/>
+
+    <h:commandButton id="approveDischargeButton"
+                     action="#{fixedAssetVoucherAction.approveDischarge}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETDISCHARGEAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.dischargeMovement}"
+                     tabindex="9"/>
+    <h:commandButton id="improveButton"
+                     action="#{fixedAssetVoucherAction.improve}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETIMPROVEMENT','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.improvementMovement}"
+                     tabindex="10"/>
+
+    <h:commandButton id="approveImprovementButton"
+                     action="#{fixedAssetVoucherAction.approveImprovement}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.improvementMovement}"
+                     tabindex="11"/>
+
+    <h:commandButton id="annulButton"
+                     action="#{fixedAssetVoucherAction.annulFixedAssetVoucher}"
+                     value="#{messages['Common.annul']}"
+                     styleClass="button"
+                     tabindex="12"
+                     rendered="#{fixedAssetVoucherAction.managed
+                     and fixedAssetVoucherAction.fixedAssetVoucherPending
+                     and s:hasPermission('FIXEDASSETVOUCHERANNUL','VIEW')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{fixedAssetVoucherAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="13"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                     and s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+                     and fixedAssetVoucherAction.managed and fixedAssetVoucherAction.fixedAssetVoucherPending}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton id="cancelButton" action="#{fixedAssetVoucherAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="14">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        #{messages['FixedAssetVoucher.title']}
+    </f:facet>
+
+    <!-- here are the movement to apply to the FixedAssets -->
+    <s:div id="fixedAssetVoucherMovementFieldset">
+        <app:fieldset id="fixedAssetVoucherMovementFieldset1"
+                      rendered="#{ s:hasPermission('FIXEDASSET','UPDATE')}"
+                      width="100%"
+                      title="#{messages['FixedAssetVoucher.fixedAssetVoucherType']}">
+            <s:decorate id="movementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.fixedAssetVoucherType']}</ui:define>
+                <c:choose>
+                    <c:when test="#{!fixedAssetVoucherAction.managed}">
+                        <app:quickSearch id="quickSearchFixedAssetVoucherType"
+                                         textValue="fixedAssetVoucher.fixedAssetVoucherType.movementCode"
+                                         value="#{fixedAssetVoucher.fixedAssetVoucherType}"
+                                         postSearchAction="fixedAssetVoucherAction.fixedAssetVoucherTypeChanged()"
+                                         searchField="movementCode"
+                                         reRender="fixedAssetVoucherMovementFieldset, fixedAssetVoucherBodyMovementsForm, topButtonsDiv, bottomButtonsDiv, selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                         tabindex="14"/>
+                        <h:selectOneMenu id="movementType"
+                                         value="#{fixedAssetVoucher.fixedAssetVoucherType}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="14">
+                            <s:selectItems value="#{fixedAssetVoucherTypeList}"
+                                           var="movementType"
+                                           label="#{movementType.fullName}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange"
+                                         reRender="fixedAssetVoucherMovementFieldset, fixedAssetVoucherBodyMovementsForm, topButtonsDiv, bottomButtonsDiv, selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                         action="#{fixedAssetVoucherAction.fixedAssetVoucherTypeChanged()}"
+                                         ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </c:when>
+                    <c:otherwise>
+                        <h:outputText value="#{fixedAssetVoucher.fixedAssetVoucherType.fullName}"/>
+                    </c:otherwise>
+                </c:choose>
+            </s:decorate>
+        </app:fieldset>
+    </s:div>
+
+    <!-- voucher registration detail-->
+    <ui:include src="fixedAssetVoucherRegistrationDetail.xhtml"/>
+
+    <!--transference and discharge and improvement detail-->
+    <ui:include src="fixedAssetVoucherTransferenceDischargeImprovementDetail.xhtml"/>
+
+    <!--lis of selected fixedassets to transfer or to discharge or to improve -->
+    <c:if test="#{fixedAssetVoucherAction.showSelectedToTransferFixedAssetsDiv}">
+        <s:div id="selectedToTransferFixedAssetsDiv">
+            <app:fieldset id="selectedToTransferFixedAssetsFieldset"
+                          title="#{messages['FixedAsset.list']}">
+                <div class="buttons">
+                    <h:panelGroup style="display: inline-block">
+                        <h:panelGrid columns="2" bgcolor="white" style="text-align: right;"
+                                     columnClasses="fieldset-border, fieldset-border" cellspacing="10px">
+                            <h:panelGroup>
+                                <s:label value="#{messages['FixedAssetVoucher.addFixedAssetsByBarcode']}"
+                                         style="padding-right:5px; font-weight: bold;"/>
+                                <app:quickSearch id="barcodeQuickSearch"
+                                                 textValue="fixedAssetVoucherAction.fixedAsset.barCode"
+                                                 value="#{fixedAssetVoucherAction.fixedAsset}"
+                                                 namedQuery="fixedAssetByBarCodeQuickSearch"
+                                                 postSearchAction="fixedAssetVoucherAction.addSelectedFixedAsset()"
+                                                 reRender="selectedToTransferFixedAssetsDiv"
+                                                 styleClass="inputText"
+                                                 stopSubmit="true"
+                                                 stopSubmitRecoverFocus="true"
+                                                 tabindex="31"/>
+                                <s:div>
+                                    <s:validateAll>
+                                        <s:message styleClass="errors" style="display:block;"/>
+                                        <h:message for="barcodeQuickSearch" styleClass="errors"
+                                                   style="display:block;"/>
+                                    </s:validateAll>
+                                </s:div>
+                            </h:panelGroup>
+                            <a4j:commandButton
+                                    value="#{messages['FixedAssetVoucher.addFixedAssets']}"
+                                    styleClass="button"
+                                    reRender="selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                    oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');"
+                                    tabindex="32"/>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </div>
+                <s:div id="selectedToTransferFixedAssetListDiv">
+                    <ui:include src="selectedToTransferFixedAssetList.xhtml"/>
+                </s:div>
+
+                <div class="buttons">
+                    <h:panelGroup style="display: inline-block">
+                        <h:panelGrid columns="2" bgcolor="white" style="text-align: right;"
+                                     columnClasses="fieldset-border, fieldset-border" cellspacing="10px">
+                            <h:panelGroup>
+                                <s:label value="#{messages['FixedAssetVoucher.addFixedAssetsByBarcode']}"
+                                         style="padding-right:5px; font-weight: bold;"/>
+                                <app:quickSearch id="barcodeQuickSearchBottom"
+                                                 textValue="fixedAssetVoucherAction.fixedAsset.barCode"
+                                                 value="#{fixedAssetVoucherAction.fixedAsset}"
+                                                 namedQuery="fixedAssetByBarCodeQuickSearch"
+                                                 postSearchAction="fixedAssetVoucherAction.addSelectedFixedAsset()"
+                                                 reRender="selectedToTransferFixedAssetsDiv"
+                                                 styleClass="inputText"
+                                                 stopSubmitRecoverFocus="true"
+                                                 tabindex="33"/>
+
+                                <div>
+                                    <s:validateAll>
+                                        <s:message styleClass="errors" style="display:block;"/>
+                                        <h:message for="barcodeQuickSearchBottom" styleClass="errors"
+                                                   style="display:block;"/>
+                                    </s:validateAll>
+                                </div>
+                            </h:panelGroup>
+                            <a4j:commandButton
+                                    value="#{messages['FixedAssetVoucher.addFixedAssets']}"
+                                    styleClass="button"
+                                    immediate="true"
+                                    reRender="selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                    oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');"
+                                    tabindex="34"/>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </div>
+            </app:fieldset>
+        </s:div>
+    </c:if>
+
+</rich:panel>
+
+<div id="bottomButtonsDiv" class="buttons">
+
+    <h:commandButton action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucher,'PDF')}"
+                     value="#{messages['FixedAssetVoucher.button.generateDocumentPDF']}"
+                     immediate="true"
+                     styleClass="button"
+                     tabindex="35"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW') and fixedAssetVoucherAction.managed}"/>
+    <h:commandButton action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucher,'XLS')}"
+                     value="#{messages['FixedAssetVoucher.button.generateDocumentEXCEL']}"
+                     immediate="true"
+                     styleClass="button"
+                     tabindex="36"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW') and fixedAssetVoucherAction.managed}"/>
+    <h:commandButton action="#{discountCommentAction.addFixedAssetVoucherDiscountComment}"
+                     value="#{messages['DiscountComment.newDiscountComment']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.instance.annulled
+                      and s:hasPermission('DISCOUNTCOMMENT','CREATE')}"
+                     tabindex="37"
+                     immediate="true"/>
+    <h:commandButton action="#{fixedAssetVoucherAction.registration}"
+                     rendered="#{s:hasPermission('FIXEDASSETREGISTRATION','VIEW')
+                          and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                                and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.registrationMovement}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="38"/>
+    <h:commandButton action="#{fixedAssetVoucherAction.approveRegistration}"
+                     rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW')
+                          and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                          and fixedAssetVoucherAction.fixedAssetVoucherPending
+                          and fixedAssetVoucherAction.registrationMovement}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     tabindex="39"/>
+    <h:commandButton action="#{fixedAssetVoucherAction.transfer}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.transferenceMovement}"
+                     tabindex="40"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.approveTransfer}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.transferenceMovement}"
+                     tabindex="41"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.discharge}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.dischargeMovement}"
+                     tabindex="42"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.approveDischarge}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETDISCHARGEAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.dischargeMovement}"
+                     tabindex="43"/>
+    <h:commandButton action="#{fixedAssetVoucherAction.improve}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETIMPROVEMENT','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+                         and (!fixedAssetVoucherAction.managed)
+                             and fixedAssetVoucherAction.improvementMovement}"
+                     tabindex="44"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.approveImprovement}"
+                     value="#{messages['FixedAssetVoucher.approveFixedAssetVoucher']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW')
+                         and s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                         and fixedAssetVoucherAction.fixedAssetVoucherPending
+                         and fixedAssetVoucherAction.improvementMovement}"
+                     tabindex="45"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.annulFixedAssetVoucher}"
+                     value="#{messages['Common.annul']}"
+                     styleClass="button"
+                     tabindex="46"
+                     rendered="#{fixedAssetVoucherAction.managed
+                     and fixedAssetVoucherAction.fixedAssetVoucherPending
+                     and s:hasPermission('FIXEDASSETVOUCHERANNUL','VIEW')}"/>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="47"
+                     rendered="#{s:hasPermission('FIXEDASSETVOUCHER','UPDATE')
+                     and s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+                     and fixedAssetVoucherAction.managed and fixedAssetVoucherAction.fixedAssetVoucherPending}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetVoucherAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="48">
+    </h:commandButton>
+</div>
+
+<!--tabs section-->
+<c:if test="#{fixedAssetVoucherAction.managed}">
+    <ui:include src="fixedAssetVoucherTabs.xhtml"/>
+</c:if>
+
+</h:form>
+
+
+<s:div id="fixedAssetSerialUpdateDialogId">
+    <rich:modalPanel id="fixedAssetSerialDialogId"
+                     minHeight="220"
+                     minWidth="550"
+                     autosized="true"
+                     zindex="2000">
+        <f:facet name="header">
+            <h:outputText value="#{messages['FixedAssetPart.serialNumberUpdateDialog.title']}"/>
+        </f:facet>
+        <h:panelGroup>
+            <h:form>
+                <rich:panel>
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['FixedAsset.single.title']}"/>
+                    </f:facet>
+                    <h:panelGrid columns="2"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0"
+                                 columnClasses="width50percent,width50percent">
+                        <s:div>
+                            <s:decorate id="fixedAssetModelId"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['FixedAsset.model']}</ui:define>
+                                <h:outputText value="#{fixedAssetBaseAction.fixedAsset.model}"/>
+                            </s:decorate>
+                            <s:decorate id="fixedAssetTrademarkId"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['FixedAsset.trademark']}</ui:define>
+                                <h:outputText value="#{fixedAssetBaseAction.fixedAsset.trademark}"/>
+                            </s:decorate>
+                        </s:div>
+                        <s:div>
+                            <s:decorate id="fixedAssetDescriptionId"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['FixedAsset.fixedAssetGroupCode']}</ui:define>
+                                <h:outputText value="#{fixedAssetBaseAction.fixedAsset.detail}"/>
+                            </s:decorate>
+                        </s:div>
+                    </h:panelGrid>
+
+                    <app:fieldset id="fixedAssetPartDetailFieldset"
+                                  title="#{messages['FixedAsset.Detail']}">
+                        <s:div>
+                            <rich:dataTable value="#{fixedAssetBaseAction.fixedAssetParts}"
+                                            var="partElement"
+                                            columnsWidth="20%, 30%, 50%"
+                                            width="100%">
+                                <rich:column styleClass="right">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{messages['FixedAssetPart.number']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{partElement.number}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{messages['FixedAssetPart.description']}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{partElement.description}"/>
+                                </rich:column>
+                                <rich:column styleClass="center">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{messages['FixedAssetPart.serialNumber']}"/>
+                                    </f:facet>
+                                    <h:inputText value="#{partElement.serialNumber}" style="width: 90%">
+                                        <a4j:support
+                                                action="#{fixedAssetBaseAction.updateFixedAssetPartSerialNumber(partElement.id, partElement)}"
+                                                event="onblur"/>
+                                    </h:inputText>
+                                </rich:column>
+                            </rich:dataTable>
+                        </s:div>
+                    </app:fieldset>
+
+                </rich:panel>
+                <h:panelGroup styleClass="right">
+                    <h:commandButton value="#{messages['Common.close']}" styleClass="button">
+                        <rich:componentControl for="fixedAssetSerialDialogId"
+                                               event="onclick"
+                                               disableDefault="true"
+                                               operation="hide"/>
+                    </h:commandButton>
+                </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+    </rich:modalPanel>
+</s:div>
+
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{fixedAssetVoucherAction.managed and s:hasPermission('FIXEDASSETVOUCHER','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['FixedAssetVoucher.delete.confirmation']}">
+                <f:param value="#{fixedAssetVoucher.voucherCode}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{fixedAssetVoucherAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('FIXEDASSETVOUCHER','DELETE')}"
+                           immediate="true"
+                           styleClass="button"
+                           tabindex="49"/>
+    </ui:define>
+</s:decorate>
+
+<s:div rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}">
+
+    <s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="accountType" value="A"/>
+        <ui:param name="accountClass" value="A"/>
+        <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{fixedAssetVoucherAction.assignCashBoxCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="cashBoxCashAccountField, valuesDiv"
+                               oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:div id="registrationModalPanelsDiv">
+        <s:decorate id="fixedAssetPurchaseOrderListModalPanelContainer"
+                    template="/purchases/fixedAssetPurchaseOrderListModalPanel.xhtml">
+            <ui:param name="dialogId" value="fixedAssetPurchaseOrderListModalPanel"/>
+            <ui:param name="enableStateFilter" value="false"/>
+            <ui:param name="dataModel" value="#{fixedAssetPurchaseOrderToApproveFixedAssetRegistrationDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{fixedAssetVoucherAction.assignPurchaseOrder(fixedAssetPurchaseOrderItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="fixedAssetPurchaseOrderField,jobContractDiv, purchaseOrdersFixedAssetsDiv, causeDiv"
+                                   oncomplete="Richfaces.hideModalPanel('fixedAssetPurchaseOrderListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
+    <s:div id="transferenceModalPanelsDiv">
+        <s:decorate id="fixedAssetSelectListModalPanelContainer"
+                    template="/fixedassets/fixedAssetSelectListModalPanel.xhtml">
+            <ui:param name="dialogId" value="fixedAssetSelectListModalPanel"/>
+            <ui:param name="enableStateFilter" value="false"/>
+            <ui:param name="dataModel" value="#{fixedAssetDataModel}"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{fixedAssetVoucherAction.addFixedAssetList(fixedAssetDataModel.selectedObjectList)}"
+                                   value="#{messages['FixedAssetVoucher.addFixedAssets']}"
+                                   styleClass="button"
+                                   reRender="selectedToTransferFixedAssetsDiv"
+                                   oncomplete="Richfaces.hideModalPanel('fixedAssetSelectListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="jobContractListModalPanelContainer"
+                    template="/employees/jobContractListModalPanel.xhtml">
+            <ui:param name="dialogId" value="jobContractListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{fixedAssetVoucherAction.assignCustodianJobContract(jobContractItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="newCustodianJobContractDiv"
+                                   oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="newCostCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="newCostCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="newCostCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{fixedAssetVoucherAction.assignCostCenter(costCenterItem)}"
+                                   image="/img/active.gif" styleClass="select-image"
+                                   reRender="newCostCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('newCostCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
+</s:div>
+
+<rich:jQuery selector="#voucherCode" query="focus()" timing="onload"/>
+</ui:composition>

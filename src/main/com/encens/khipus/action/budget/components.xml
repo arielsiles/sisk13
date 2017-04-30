@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+    <factory name="burdenList" value="#{burdenListQuery}"/>
+    <framework:entity-query name="burdenListQuery"
+                            ejbql="select burden from Classifier burden ">
+        <framework:restrictions>
+            <value>burden.type =#{entryBudgetAction.burdenType}</value>
+        </framework:restrictions>
+        <framework:order>burden.code ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="accountingItemList" value="#{accountingItemListQuery}"/>
+    <framework:entity-query name="accountingItemListQuery"
+                            ejbql="select accountingItem from Classifier accountingItem ">
+        <framework:restrictions>
+            <value>accountingItem.type =#{expenseBudgetAction.accountingItemType}</value>
+        </framework:restrictions>
+        <framework:order>accountingItem.code ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="budgetProgramList" value="#{budgetProgramListQuery}"/>
+    <framework:entity-query name="budgetProgramListQuery"
+                            ejbql="select budgetProgram from BudgetProgram budgetProgram order by budgetProgram.code ASC"/>
+
+    <factory name="budgetActivityList" value="#{budgetActivityListQuery}"/>
+    <framework:entity-query name="budgetActivityListQuery"
+                            ejbql="select budgetActivity from BudgetActivity budgetActivity">
+        <framework:restrictions>
+            <value>budgetActivity.budgetProgram=#{expenseBudgetAction.budgetProgram}</value>
+            <value>budgetActivity.budgetProgram=#{expenseBudgetDataModel.budgetProgram}</value>
+        </framework:restrictions>
+        <framework:order>budgetActivity.code ASC</framework:order>
+    </framework:entity-query>
+    <framework:entity-query name="businessUnitListForExpenseBudgetExecutionReportQuery"
+                            ejbql="SELECT DISTINCT businessUnit.id,organization.name
+                            FROM ExpenseBudget expenseBudget
+                            LEFT JOIN expenseBudget.gestion gestion
+                            LEFT JOIN expenseBudget.classifier classifier
+                            LEFT JOIN expenseBudget.costCenter costCenter
+                            LEFT JOIN expenseBudget.businessUnit businessUnit
+                            LEFT JOIN businessUnit.organization organization
+                            WHERE expenseBudget.budgetDistribution is null">
+        <framework:restrictions>
+            <value>expenseBudget.company=#{currentCompany}</value>
+            <value>
+                expenseBudget.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.budget.BudgetState','APPROVED')}
+            </value>
+            <value>businessUnit=#{expenseBudgetExecutionReportAction.businessUnit}</value>
+            <value>costCenter=#{expenseBudgetExecutionReportAction.costCenter}</value>
+            <value>classifier=#{expenseBudgetExecutionReportAction.classifier}</value>
+            <value>gestion = #{expenseBudgetExecutionReportAction.gestion}</value>
+        </framework:restrictions>
+        <framework:order>businessUnit.id ASC</framework:order>
+    </framework:entity-query>
+    <framework:entity-query name="businessUnitListForExpenseBudgetConsolidatedExecutionReportQuery"
+                            ejbql="SELECT DISTINCT businessUnit.id,organization.name
+                            FROM  ExpenseBudget expenseBudget
+                            LEFT JOIN expenseBudget.gestion gestion
+                            LEFT JOIN expenseBudget.classifier classifier
+                            LEFT JOIN expenseBudget.businessUnit businessUnit
+                            LEFT JOIN businessUnit.organization organization
+                            WHERE expenseBudget.budgetDistribution is null">
+        <framework:restrictions>
+            <value>expenseBudget.company=#{currentCompany}</value>
+            <value>
+                expenseBudget.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.budget.BudgetState','APPROVED')}
+            </value>
+            <value>businessUnit=#{expenseBudgetConsolidatedExecutionReportAction.businessUnit}</value>
+            <value>classifier=#{expenseBudgetConsolidatedExecutionReportAction.classifier}</value>
+            <value>gestion = #{expenseBudgetConsolidatedExecutionReportAction.gestion}</value>
+        </framework:restrictions>
+        <framework:order>businessUnit.id ASC</framework:order>
+    </framework:entity-query>
+</components>

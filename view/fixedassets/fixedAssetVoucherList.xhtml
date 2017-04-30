@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['FixedAssetVoucher.list']}</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="FixedAssetVoucherSearch">
+
+<rich:simpleTogglePanel id="searchOptionsPanel" label="#{messages['FixedAssetVoucher.search']}" switchType="client">
+
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width55percent,width45percent">
+        <s:div>
+            <s:decorate id="voucherCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.voucherCode']}</ui:define>
+                <h:inputText id="voucherCode"
+                             value="#{fixedAssetVoucherDataModel.criteria.voucherCode}"
+                             styleClass="input"
+                             tabindex="1">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="fixedAssetField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['FixedAssetVoucher.fixedAsset']}"/>
+                </ui:define>
+                <app:selectPopUp id="fixedAsset"
+                                 textValue="#{fixedAssetVoucherDataModel.fixedAsset.barCode}"
+                                 value="#{fixedAssetVoucherDataModel.fixedAsset}"
+                                 clearAction="fixedAssetVoucherDataModel.clearFixedAsset()"
+                                 searchModalPanel="fixedAssetSelectListModalPanel"
+                                 dataModel="#{fixedAssetDataModel}"
+                                 reRender="fixedAssetField"
+                                 tabindex="2"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.businessUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{fixedAssetVoucherDataModel.criteria.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['FixedAssetVoucher.costCenter']}"/>
+                </ui:define>
+                <app:selectPopUp id="costCenter"
+                                 required="false"
+                                 textValue="#{fixedAssetVoucherDataModel.costCenter.fullName}"
+                                 value="#{fixedAssetVoucherDataModel.costCenter}"
+                                 clearAction="fixedAssetVoucherDataModel.clearCostCenter()"
+                                 searchModalPanel="costCenterListModalPanel"
+                                 dataModel="#{costCenterDataModel}"
+                                 reRender="costCenterCodeField"
+                                 tabindex="4"/>
+            </s:decorate>
+            <s:decorate id="responsibleField"
+                        template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.responsible']}</ui:define>
+                <app:selectPopUp id="employee"
+                                 textValue="#{fixedAssetVoucherDataModel.responsible.fullName}"
+                                 value="#{fixedAssetVoucherDataModel.responsible}"
+                                 clearAction="fixedAssetVoucherDataModel.cleanResponsible()"
+                                 searchModalPanel="generalEmployeeListModalPanel"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 reRender="responsibleField"
+                                 tabindex="5"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{fixedAssetVoucherDataModel.criteria.state}"
+                                 styleClass="input"
+                                 tabindex="6">
+                    <s:selectItems value="#{fixedAssetVoucherStateEnum}" var="fixedAssetVoucherState"
+                                   label="#{messages[fixedAssetVoucherState.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="fixedAssetVoucherTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.fixedAssetVoucherType']}</ui:define>
+                <h:selectOneMenu id="fixedAssetVoucherType"
+                                 value="#{fixedAssetVoucherDataModel.criteria.fixedAssetVoucherType}"
+                                 styleClass="input"
+                                 tabindex="7">
+                    <s:selectItems value="#{fixedAssetMovementTypeList}" var="fixedAssetVoucherType"
+                                   label="#{fixedAssetVoucherType.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="causeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.cause']}</ui:define>
+                <h:inputText id="cause"
+                             value="#{fixedAssetVoucherDataModel.criteria.cause}"
+                             styleClass="input"
+                             tabindex="8">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.movementDate']}</ui:define>
+                <h:panelGrid columns="4" width="100%"
+                             columnClasses="top,top,top,top">
+                    <h:outputText value="#{messages['Common.dateFrom']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="startDate"
+                                       value="#{fixedAssetVoucherDataModel.startDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="9">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                    <h:outputText value="#{messages['Common.dateTo']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="endDate"
+                                       value="#{fixedAssetVoucherDataModel.endDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="10">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </h:panelGrid>
+            </s:decorate>
+            <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{fixedAssetVoucherDataModel.search()}"
+                                       reRender="searchOptionsPanel, fixedAssetVoucherList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{fixedAssetVoucherDataModel.clear()}"
+                                       immediate="true"
+                                       ajaxSingle="true"
+                                       reRender="searchOptionsPanel, fixedAssetVoucherList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"/>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#voucherCode" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/fixedassets/fixedAssetVoucher.xhtml"
+              rendered="#{s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+              and (s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+              or s:hasPermission('FIXEDASSETREGISTRATION','VIEW')
+                )}"
+              styleClass="button"
+              propagation="begin"
+              tabindex="8"/>
+</div>
+
+
+<rich:dataTable id="fixedAssetVoucherList"
+                value="#{fixedAssetVoucherDataModel}"
+                var="fixedAssetVoucherItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%,5%,10%,10%,15%,15%,10%,5%,10%">
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.fixedAssetVoucherType"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.fixedAssetVoucherType']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.voucherCode"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.voucherCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.businessUnit"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.businessUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.costCenter"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.costCenter']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.custodianJobContract"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.custodianJobContract']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.cause"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.cause']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.movementDate"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.movementDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetVoucher.state"
+                                       dataModel="#{fixedAssetVoucherDataModel}"
+                                       reRender="fixedAssetVoucherList, dataScroller">
+                    #{messages['FixedAssetVoucher.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.fixedAssetVoucherType.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{fixedAssetVoucherItem.voucherCode}">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.businessUnit.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.costCenter.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.custodianJobContract.contract.employee.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.cause}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetVoucherItem.movementDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[fixedAssetVoucherItem.state.resourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{fixedAssetVoucherAction.select(fixedAssetVoucherItem)}">
+            <s:conversationPropagation value="begin"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucherItem,'PDF')}"
+                       immediate="true"
+                       rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW')}">
+            <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                            title="#{messages['FixedAssetVoucher.button.generateDocumentPDF']}"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{fixedAssetVoucherDocumentReportAction.generateReport(fixedAssetVoucherItem,'XLS')}"
+                       immediate="true"
+                       rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW')}">
+            <h:graphicImage value="/img/excelIcon.gif" styleClass="select-image"
+                            title="#{messages['FixedAssetVoucher.button.generateDocumentEXCEL']}"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="fixedAssetVoucherList" dataModel="#{fixedAssetVoucherDataModel}"/>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/fixedassets/fixedAssetVoucher.xhtml"
+              rendered="#{s:hasPermission('FIXEDASSETVOUCHER','CREATE')
+              and (s:hasPermission('FIXEDASSETTRANSFERENCE','VIEW')
+              or s:hasPermission('FIXEDASSETREGISTRATION','VIEW')
+                )}"
+              styleClass="button"
+              propagation="begin"
+              tabindex="9"/>
+
+</div>
+</h:form>
+<s:decorate id="fixedAssetSelectListModalPanelContainer"
+            template="/fixedassets/fixedAssetSelectListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSelectListModalPanel"/>
+    <ui:param name="multiSelect" value="false"/>
+    <ui:param name="enableValidStates" value="true"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{fixedAssetVoucherDataModel.setFixedAsset(fixedAssetItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="fixedAssetField"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSelectListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{fixedAssetVoucherDataModel.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterCodeField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{fixedAssetVoucherDataModel.setResponsible(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="responsibleField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

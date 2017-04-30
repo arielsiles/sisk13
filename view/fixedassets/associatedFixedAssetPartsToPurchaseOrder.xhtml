@@ -1,0 +1,190 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:c="http://java.sun.com/jstl/core"
+              xmlns:rich="http://richfaces.org/rich"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              template="/layout/template.xhtml"
+              id="associatedFixedAssetPartsToPurchaseOrder"
+              title="#{messages['FixedAssetPurchaseOrder.associatedFixedAssetParts']}">
+    <a4j:region id="selectedAssociatedFixedAssetPartsReg">
+        <app:fieldset id="fixedAssetPartFormFieldset" title="#{messages['PurchaseOrderFixedAssetPart.title.addParts']}">
+            <h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+                         columnClasses="width50percent, width50percent">
+                <s:div>
+                    <s:decorate id="fixedAssetPartFixedAssetField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:param name="required" value="true"/>
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.fixedAsset']}"/>
+                        </ui:define>
+                        <app:quickSearch id="fixedAssetPartFixedAssetQuickSearch"
+                                         textValue="purchaseOrderFixedAssetPartsCreateAction.instance.fixedAsset.barCode"
+                                         value="#{purchaseOrderFixedAssetPartsCreateAction.instance.fixedAsset}"
+                                         searchField="barCode"
+                                         reRender="fixedAssetPartFixedAssetField"
+                                         tabindex="30"/>
+                        <app:selectPopUp id="fixedAssetPartFixedAsset"
+                                         required="false"
+                                         textValue="#{purchaseOrderFixedAssetPartsCreateAction.instance.fixedAsset.fullName}"
+                                         value="#{purchaseOrderFixedAssetPartsCreateAction.instance.fixedAsset}"
+                                         clearAction="purchaseOrderFixedAssetPartsCreateAction.cleanFixedAsset()"
+                                         searchModalPanel="fixedAssetSelectListForPartsModalPanel"
+                                         dataModel="#{fixedAssetDataModel}"
+                                         reRender="fixedAssetPartFixedAssetField"
+                                         tabindex="31"/>
+                    </s:decorate>
+                    <s:decorate id="fixedAssetPartMeasureUnitField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:param name="required" value="true"/>
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.measureUnit']}"/>
+                        </ui:define>
+                        <app:quickSearch id="measureUnitQuickSearch"
+                                         textValue="purchaseOrderFixedAssetPartsCreateAction.instance.measureUnit.measureUnitCode"
+                                         value="#{purchaseOrderFixedAssetPartsCreateAction.instance.measureUnit}"
+                                         searchField="measureUnitCode"
+                                         reRender="fixedAssetPartMeasureUnitField"
+                                         tabindex="32"/>
+                        <h:selectOneMenu id="fixedAssetPartMeasureUnit"
+                                         value="#{purchaseOrderFixedAssetPartsCreateAction.instance.measureUnit}"
+                                         styleClass="inputMedium"
+                                         tabindex="33">
+                            <s:selectItems value="#{measureUnitList}"
+                                           var="element"
+                                           label="#{element.fullName}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                            <a4j:support event="onblur"
+                                         reRender="fixedAssetPartMeasureUnitField"
+                                         ajaxSingle="true"/>
+                            <a4j:support event="onchange"
+                                         reRender="fixedAssetPartMeasureUnitField"
+                                         ajaxSingle="true"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="fixedAssetPartUnitPriceField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:param name="required" value="true"/>
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.unitPrice']}"/>
+                        </ui:define>
+                        <h:inputText id="fixedAssetPartUnitPrice"
+                                     value="#{purchaseOrderFixedAssetPartsCreateAction.instance.unitPrice}"
+                                     styleClass="inputNumber"
+                                     tabindex="34">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                     forId="fixedAssetPartUnitPrice"/>
+                            <a4j:support event="onblur"
+                                         reRender="fixedAssetPartUnitPriceField"
+                                         ajaxSingle="true"/>
+                        </h:inputText>
+                        &#160;
+                        <h:outputText value="#{messages['Currency.Bs']}"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="fixedAssetPartDescriptionField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:param name="required" value="true"/>
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.description']}"/>
+                        </ui:define>
+                        <h:inputTextarea id="fixedAssetPartDescription"
+                                         value="#{purchaseOrderFixedAssetPartsCreateAction.instance.description}"
+                                         styleClass="textarea-small"
+                                         tabindex="35">
+                            <f:validateLength maximum="250"/>
+                            <a4j:support event="onblur"
+                                         reRender="fixedAssetPartDescriptionField"
+                                         ajaxSingle="true"/>
+                        </h:inputTextarea>
+                    </s:decorate>
+                    <s:decorate id="fixedAssetPartSerialNumberField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.serialNumber']}"/>
+                        </ui:define>
+                        <h:inputText id="fixedAssetPartSerialNumber"
+                                     value="#{purchaseOrderFixedAssetPartsCreateAction.instance.serialNumber}"
+                                     maxlength="250"
+                                     styleClass="input"
+                                     tabindex="36">
+                            <f:validateLength maximum="250"/>
+                            <a4j:support event="onblur"
+                                         reRender="fixedAssetPartSerialNumberField"
+                                         ajaxSingle="true"/>
+                        </h:inputText>
+                        &#160;
+                        <a4j:commandButton title="#{messages['PurchaseOrderFixedAssetPart.addPart']}"
+                                           value="#{messages['Common.add']}"
+                                           action="#{purchaseOrderFixedAssetPartsCreateAction.addInstance()}"
+                                           styleClass="button"
+                                           reRender="fixedAssetPartFixedAssetField, fixedAssetPartDescriptionField, fixedAssetPartUnitPriceField, fixedAssetPartMeasureUnitField, fixedAssetPartSerialNumberField, fixedAssetPartListFieldset"
+                                           ajaxSingle="true"
+                                           tabindex="37"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </app:fieldset>
+        <app:fieldset id="fixedAssetPartListFieldset" title="#{messages['PurchaseOrderFixedAssetPart.title']}">
+            <rich:dataTable id="fixedAssetPartList"
+                            value="#{purchaseOrderFixedAssetPartsCreateAction.instances}"
+                            var="fixedAssetPartItem"
+                            rows="#{purchaseOrderFixedAssetPartsCreateAction.instancesRowCounter}"
+                            width="100%"
+                            columnsWidth="20%, 30%, 15%, 15%, 10%, 10%">
+                <rich:column>
+                    <f:facet name="header">
+                        #{messages['PurchaseOrderFixedAssetPart.fixedAsset']}
+                    </f:facet>
+                    <h:outputText value="#{fixedAssetPartItem.fixedAsset.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        #{messages['PurchaseOrderFixedAssetPart.description']}
+                    </f:facet>
+                    <h:outputText value="#{fixedAssetPartItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        #{messages['PurchaseOrderFixedAssetPart.measureUnit']}
+                    </f:facet>
+                    <h:outputText value="#{fixedAssetPartItem.measureUnit.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        #{messages['PurchaseOrderFixedAssetPart.serialNumber']}
+                    </f:facet>
+                    <h:outputText value="#{fixedAssetPartItem.serialNumber}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <f:facet name="header">
+                        #{messages['PurchaseOrderFixedAssetPart.unitPrice']}
+                    </f:facet>
+                    <h:outputText value="#{fixedAssetPartItem.unitPrice}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['Currency.Bs']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <f:facet name="header">
+                        #{messages['Common.action']}
+                    </f:facet>
+                    <a4j:commandLink immediate="true"
+                                     title="#{messages['Common.remove']}"
+                                     action="#{purchaseOrderFixedAssetPartsCreateAction.removeInstance(fixedAssetPartItem)}"
+                                     reRender="fixedAssetPartListFieldset"
+                                     tabindex="38">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+        </app:fieldset>
+    </a4j:region>
+</app:fieldset>

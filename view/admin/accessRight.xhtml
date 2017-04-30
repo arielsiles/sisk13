@@ -1,0 +1,210 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['AccessRight.edit']}
+</ui:define>
+
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+    <h:form id="permissionForm">
+
+        <style type="text/css">
+            .functionColumn {
+                width: 40%;
+            }
+
+            .actionColumn {
+                width: 15%;
+            }
+        </style>
+
+        <div class="buttons">
+            <h:commandButton action="#{roleAction.setPermissions}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{roleAction.managed and s:hasPermission('ROLE','UPDATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{roleAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+
+        <rich:dataGrid value="#{roleAction.modules}" var="module" columns="1" width="100%">
+            <rich:panel>
+                <f:facet name="header">
+                    <h:panelGrid columns="3" width="100%" columnClasses="left, right">
+                        <h:outputText value="#{messages[module.resourceName]}"/>
+
+                        <s:div>
+                            <input type="checkbox" title="#{messages['Common.selectAll']}" checked="checked"
+                                   onclick="selectAll_module#{module.id}(); this.checked = true;"/>
+                            <input type="checkbox" title="#{messages['Common.unselectAll']}"
+                                   onclick="deselectAll_module#{module.id}(); this.checked = false;"/>
+                            <rich:jQuery selector="#functionsPerModule input:checkbox"
+                                         timing="onJScall" name="selectAll_module#{module.id}"
+                                         query="attr('checked', true)"/>
+                            <rich:jQuery selector="#functionsPerModule input:checkbox"
+                                         timing="onJScall" name="deselectAll_module#{module.id}"
+                                         query="attr('checked', false)"/>
+                        </s:div>
+                    </h:panelGrid>
+                </f:facet>
+                <h:dataTable id="functionsPerModule" value="#{roleAction.functionsPerModule[module.id]}"
+                             var="systemFunction" width="100%"
+                             columnClasses="functionColumn, actionColumn, actionColumn, actionColumn, actionColumn">
+                    <h:column headerClass="left">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages['AccessRight.function']}"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox
+                                id="checkboxAll"
+                                value="#{roleAction.permissionsPerFunction[systemFunction]['ALL']}"
+                                onclick="dependences('all', '#{rich:clientId('checkboxAll')}', '#{rich:clientId('checkboxView')}', '#{rich:clientId('checkboxCreate')}', '#{rich:clientId('checkboxUpdate')}', '#{rich:clientId('checkboxDelete')}')"/>
+                        <h:outputLabel value="#{messages[systemFunction.resourceName]}" for="checkboxAll"/>
+                    </h:column>
+                    <h:column headerClass="left">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages['AccessRight.view']}"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox
+                                id="checkboxView"
+                                value="#{roleAction.permissionsPerFunction[systemFunction]['VIEW']}"
+                                rendered="#{not empty roleAction.permissionsPerFunction[systemFunction]['VIEW']}"
+                                onclick="dependences('view', '#{rich:clientId('checkboxAll')}', '#{rich:clientId('checkboxView')}', '#{rich:clientId('checkboxCreate')}', '#{rich:clientId('checkboxUpdate')}', '#{rich:clientId('checkboxDelete')}')"/>
+                    </h:column>
+                    <h:column headerClass="left">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages['AccessRight.create']}"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox
+                                id="checkboxCreate"
+                                value="#{roleAction.permissionsPerFunction[systemFunction]['CREATE']}"
+                                rendered="#{not empty roleAction.permissionsPerFunction[systemFunction]['CREATE']}"
+                                onclick="dependences('create', '#{rich:clientId('checkboxAll')}', '#{rich:clientId('checkboxView')}', '#{rich:clientId('checkboxCreate')}', '#{rich:clientId('checkboxUpdate')}', '#{rich:clientId('checkboxDelete')}')"/>
+                    </h:column>
+                    <h:column headerClass="left">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages['AccessRight.update']}"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox
+                                id="checkboxUpdate"
+                                value="#{roleAction.permissionsPerFunction[systemFunction]['UPDATE']}"
+                                rendered="#{not empty roleAction.permissionsPerFunction[systemFunction]['UPDATE']}"
+                                onclick="dependences('update', '#{rich:clientId('checkboxAll')}', '#{rich:clientId('checkboxView')}', '#{rich:clientId('checkboxCreate')}', '#{rich:clientId('checkboxUpdate')}', '#{rich:clientId('checkboxDelete')}')"/>
+                    </h:column>
+                    <h:column headerClass="left">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages['AccessRight.delete']}"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox
+                                id="checkboxDelete"
+                                value="#{roleAction.permissionsPerFunction[systemFunction]['DELETE']}"
+                                rendered="#{not empty roleAction.permissionsPerFunction[systemFunction]['DELETE']}"
+                                onclick="dependences('delete', '#{rich:clientId('checkboxAll')}', '#{rich:clientId('checkboxView')}', '#{rich:clientId('checkboxCreate')}', '#{rich:clientId('checkboxUpdate')}', '#{rich:clientId('checkboxDelete')}')"/>
+                    </h:column>
+
+                </h:dataTable>
+            </rich:panel>
+        </rich:dataGrid>
+
+        <div class="buttons">
+            <h:commandButton action="#{roleAction.setPermissions}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{roleAction.managed and s:hasPermission('ROLE','UPDATE')}"
+                             tabindex="3"/>
+
+            <h:commandButton action="#{roleAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="4"/>
+        </div>
+
+    </h:form>
+    <script type="text/javascript">
+        function dependences(option, checkboxAllId, checkboxViewId, checkboxCreateId, checkboxUpdateId, checkboxDeleteId) {
+            var checkboxAll = document.getElementById(checkboxAllId)
+            var checkboxView = document.getElementById(checkboxViewId);
+            var checkboxCreate = document.getElementById(checkboxCreateId);
+            var checkboxUpdate = document.getElementById(checkboxUpdateId);
+            var checkboxDelete = document.getElementById(checkboxDeleteId);
+
+            if (option == 'all') {
+                if (checkboxView) {
+                    checkboxView.checked = checkboxAll.checked;
+                }
+                if (checkboxCreate) {
+                    checkboxCreate.checked = checkboxAll.checked;
+                }
+                if (checkboxUpdate) {
+                    checkboxUpdate.checked = checkboxAll.checked;
+                }
+                if (checkboxDelete) {
+                    checkboxDelete.checked = checkboxAll.checked;
+                }
+            }
+            if (option == 'view') {
+                if (!checkboxView.checked) { // When view is unchecked, the other options must be unchecked too
+                    if (checkboxCreate) {
+                        checkboxCreate.checked = false;
+                    }
+                    if (checkboxUpdate) {
+                        checkboxUpdate.checked = false;
+                    }
+                    if (checkboxDelete) {
+                        checkboxDelete.checked = false;
+                    }
+                }
+            }
+            else { // create, update, delete
+                if (checkboxView) {
+                    // If any op the options: create, update or delete is checked, then view must be checked too
+                    if (checkboxCreate) {
+                        checkboxView.checked |= checkboxCreate.checked;
+                    }
+                    if (checkboxUpdate) {
+                        checkboxView.checked |= checkboxUpdate.checked;
+                    }
+                    if (checkboxDelete) {
+                        checkboxView.checked |= checkboxDelete.checked;
+                    }
+                }
+            }
+
+            // Update the ALL checkbox
+            if (checkboxAll) {
+                var allSelected = true;
+
+                if (checkboxView) {
+                    allSelected &amp;= checkboxView.checked;
+                }
+                if (checkboxCreate) {
+                    allSelected &amp;= checkboxCreate.checked;
+                }
+                if (checkboxUpdate) {
+                    allSelected &amp;= checkboxUpdate.checked;
+                }
+                if (checkboxDelete) {
+                    allSelected &amp;= checkboxDelete.checked;
+                }
+
+                checkboxAll.checked = allSelected;
+            }
+        }
+    </script>
+</ui:define>
+</ui:composition>

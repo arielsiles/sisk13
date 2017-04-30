@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<field name="vacationPlanning.id" class="java.lang.Long">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="employee.idNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="employee.lastName" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="employee.maidenName" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="employee.firstName" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<field name="vacationPlanning.initDate" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+	</field>
+	<field name="vacationPlanning.seniorityYears" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+	</field>
+	<field name="vacationPlanning.vacationDays" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+	</field>
+	<field name="vacationPlanning.daysOff" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+	</field>
+	<field name="vacationPlanning.daysUsed" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+	</field>
+	<field name="vacationGestion.gestion" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+	</field>
+	<field name="vacationGestion.vacationDays" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+	</field>
+	<field name="vacation.initDate" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+	</field>
+	<field name="vacation.endDate" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+	</field>
+	<field name="vacation.totalDays" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+	</field>
+	<field name="vacation.daysOff" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_16]]></fieldDescription>
+	</field>
+	<field name="vacation.description" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_17]]></fieldDescription>
+	</field>
+	<field name="businessUnit.publicity" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_18]]></fieldDescription>
+	</field>
+	<field name="organizationalUnit.name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_19]]></fieldDescription>
+	</field>
+	<field name="charge.name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_20]]></fieldDescription>
+	</field>
+	<group name="vacationPlanning">
+		<groupExpression><![CDATA[$F{vacationPlanning.id}]]></groupExpression>
+		<groupHeader>
+			<band height="85">
+				<frame>
+					<reportElement positionType="Float" x="0" y="0" width="582" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="65" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.employee}+":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="65" y="0" width="295" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[com.encens.khipus.reports.ReportFormatter.getPersonName($F{employee.firstName},$F{employee.maidenName},$F{employee.lastName})]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="360" y="0" width="80" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.initDate} + ":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="440" y="0" width="70" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.util.Date"><![CDATA[$F{vacationPlanning.initDate}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="12" width="582" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="30" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.CI}+":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="30" y="0" width="300" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$F{employee.idNumber}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="330" y="0" width="110" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.seniorityYears} + ":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="440" y="0" width="70" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationPlanning.seniorityYears}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="24" width="582" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="45" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.sede}+":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="45" y="0" width="265" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$F{businessUnit.publicity}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="310" y="0" width="130" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.organizationalUnit} + ":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="440" y="0" width="142" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$F{organizationalUnit.name}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="36" width="582" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="45" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{VacationPlanning.charge}+":"]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="45" y="0" width="395" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$F{charge.name}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="headerStyleBlank" positionType="Float" mode="Transparent" x="0" y="49" width="120" height="12"/>
+					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Top"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.vacationDetail}]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement positionType="Float" x="0" y="61" width="582" height="24"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="30" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.nro}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="30" y="0" width="60" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.gestion}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="90" y="0" width="70" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.vacationDays}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="160" y="0" width="70" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.initDate}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="230" y="0" width="70" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.endDate}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="300" y="0" width="70" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.daysUsed}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="370" y="0" width="70" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.daysOff}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="440" y="0" width="142" height="24"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.description}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="35">
+				<frame>
+					<reportElement positionType="Float" x="0" y="0" width="582" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="90" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.summary}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="90" y="0" width="70" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationPlanning.vacationDays}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="160" y="0" width="140" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="300" y="0" width="70" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationPlanning.daysUsed}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="370" y="0" width="70" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationPlanning.daysOff}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="440" y="0" width="142" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="70">
+			<image scaleImage="RetainShape" onErrorType="Icon">
+				<reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="" style="titleStyle" positionType="Float" x="72" y="0" width="439" height="58"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.vacationPlanningEmployee.title}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band height="12">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="30" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="30" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationGestion.gestion}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="90" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacationGestion.vacationDays}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="160" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{vacation.initDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="230" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{vacation.endDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="300" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacation.totalDays}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="370" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{vacation.daysOff}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="440" y="0" width="142" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{vacation.description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="13" splitType="Stretch">
+			<frame>
+				<reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="0" width="582" height="12"/>
+				<box padding="0">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
+					<box padding="1">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="488" y="0" width="40" height="12"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="528" y="0" width="10" height="12"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="538" y="0" width="40" height="12"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

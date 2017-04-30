@@ -1,0 +1,16 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     xmlns:a4j="http://richfaces.org/a4j">
+    <a4j:status layout="block" startStyleClass="startAjax"
+                onstart="this.style.top = jQuery(window).scrollTop()+'px';">
+        <f:facet name="start">
+            <h:panelGroup>
+                <h:graphicImage value="/img/spinner.gif" style="border:0;vertical-align:middle;"/>
+                &#160;#{messages['Common.ajax.request']}
+            </h:panelGroup>
+        </f:facet>
+    </a4j:status>
+</div>

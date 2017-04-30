@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <rich:panel rendered="#{s:hasPermission('DEBTSPANEL','VIEW')}">
+        <f:facet name="header">
+            <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                <s:div styleClass="left">
+                    <h:outputText value="#{messages['DebtView.title']} (#{debtViewAction.year})"/>
+                </s:div>
+                <s:div styleClass="right">
+                    <s:link view="/cashbox/debtByStudentReport.xhtml"
+                            title="#{messages['DebtView.byStudentReport.link']}">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image"/>
+                    </s:link>
+<!--
+                    <s:link view="/dashboard/debtExtended.xhtml"
+                            title="#{messages['DebtView.debtReport.link']}">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image"/>
+                    </s:link>
+-->
+                    <s:link view="/cashbox/debtExtendedReport.xhtml"
+                            title="#{messages['DebtView.debtReport.link']}">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image"/>
+                    </s:link>
+                </s:div>
+            </h:panelGrid>
+
+        </f:facet>
+        <a4j:region renderRegionOnly="true">
+            <rich:tabPanel id="debtsTabPanel" switchType="ajax">
+                <rich:tab label="#{messages['Dashboard.tab.all']}"
+                          action="#{debtViewAction.disableExecutorUnit()}"
+                          ajaxSingle="true"
+                          styleClass="center">
+                    <a4j:actionparam value="#{rich:element('debtsTabPanel')}.offsetWidth"
+                                     assignTo="#{debtViewAction.containerWidth}"
+                                     noEscape="true"/>
+
+                    <s:graphicImage value="#{debtViewAction.createChart()}" usemap="#debtsChartId"/>
+                    <h:outputText value="#{debtViewAction.toolTipMap}" escape="false"/>
+                </rich:tab>
+                <c:forEach items="#{executorUnitList.resultList}" var="executorUnit">
+                    <rich:tab label="#{executorUnit.description}"
+                              action="#{debtViewAction.enableExecutorUnit(executorUnit.id)}"
+                              ajaxSingle="true">
+                        <a4j:actionparam value="#{rich:element('debtsTabPanel')}.offsetWidth"
+                                         assignTo="#{debtViewAction.containerWidth}"
+                                         noEscape="true"/>
+                        <s:graphicImage value="#{debtViewAction.createChart()}" usemap="#debtsChartId"/>
+                        <h:outputText value="#{debtViewAction.toolTipMap}" escape="false"/>
+                    </rich:tab>
+                </c:forEach>
+            </rich:tabPanel>
+            <ui:include src="/dashboard/componentStatus.xhtml"/>
+        </a4j:region>
+    </rich:panel>
+</ui:composition>

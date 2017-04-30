@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['AFPRate.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="afpRateSearch">
+            <rich:simpleTogglePanel label="#{messages['AFPRate.search']}" switchType="client">
+                <h:panelGrid columns="1"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width100percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AFPRAte.rate']}</ui:define>
+                            <h:inputText id="rate" value="#{afpRateDataModel.criteria.rate}"
+                                         maxlength="80"
+                                         tabindex="1"
+                                         styleClass="input">
+                                <app:realNumberConverter forId="rate" minimum="0" maximum="100"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AFPRAte.afpRateType']}</ui:define>
+                            <h:selectOneMenu id="afpRateType"
+                                             value="#{afpRateDataModel.criteria.afpRateType}"
+                                             styleClass="input"
+                                             tabindex="2">
+                                <s:selectItems value="#{afpRateType}" var="type"
+                                               label="#{messages[type.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{afpRateDataModel.search}"
+                                               value="#{messages['Common.search']}"
+                                               reRender="afpRateSearch, afpRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{afpRateDataModel.clear}"
+                                               value="#{messages['Common.clear']}"
+                                               reRender="afpRateSearch, afpRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="4"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/afpRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('AFPRATE','CREATE')}"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable id="afpRateList"
+                            value="#{afpRateDataModel}" var="afpRateItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%,30%,20%,20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="afpRate.rate"
+                                                   dataModel="#{afpRateDataModel}"
+                                                   reRender="afpRateList, dataScroller">
+                                #{messages['AFPRAte.rate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="afpRate.afpRateType"
+                                                   dataModel="#{afpRateDataModel}"
+                                                   reRender="afpRateList, dataScroller">
+                                #{messages['AFPRAte.afpRateType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="afpRate.active"
+                                                   dataModel="#{afpRateDataModel}"
+                                                   reRender="afpRateList, dataScroller">
+                                #{messages['AFPRAte.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{afpRateItem.rate}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[afpRateItem.afpRateType.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{afpRateItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{afpRateAction.select(afpRateItem)}"
+                                   rendered="#{s:hasPermission('AFPRATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="afpRateList" dataModel="#{afpRateDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/afpRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('AFPRATE','CREATE')}"
+                          tabindex="6"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

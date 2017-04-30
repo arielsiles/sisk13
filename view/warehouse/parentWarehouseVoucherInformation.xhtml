@@ -1,0 +1,96 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <c:set var="relatedWithPurchaseOrder"
+           value="#{warehouseVoucherUpdateAction.warehouseVoucher.relatedWithPurchaseOrder}"/>
+
+    <c:set var="isInputType" value="#{warehouseVoucherUpdateAction.warehouseVoucher.input}"/>
+
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent, width50percent">
+        <s:div>
+            <c:if test="#{relatedWithPurchaseOrder}">
+                <s:decorate id="orderNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.purchaseOrder.orderNumber']}</ui:define>
+                    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.purchaseOrder.orderNumber}"/>
+                </s:decorate>
+                <s:decorate id="invoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.purchaseOrder.invoiceNumber']}</ui:define>
+                    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.purchaseOrder.invoiceNumber}"/>
+                </s:decorate>
+            </c:if>
+            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.documentType.name}"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.number']}</ui:define>
+                <h:outputText value="#{messages[warehouseVoucherUpdateAction.warehouseVoucher.number]}"/>
+            </s:decorate>
+            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.state']}</ui:define>
+                <h:outputText value="#{messages[warehouseVoucherUpdateAction.warehouseVoucher.state.resourceKey]}"/>
+            </s:decorate>
+        </s:div>
+        <s:div id="leftSidePanel">
+            <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="validateId" value="executorUnitCode"/>
+                <ui:define name="label">#{messages['WarehouseVoucher.executorUnitCode']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit.fullName}"/>
+            </s:decorate>
+            <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.costCenter']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter.fullName}"/>
+            </s:decorate>
+            <s:decorate id="contraAccountField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{not empty warehouseVoucherUpdateAction.warehouseVoucher.contraAccount and (
+                warehouseVoucherUpdateAction.warehouseVoucher.documentType.isInputType() or
+                warehouseVoucherUpdateAction.warehouseVoucher.documentType.isOutputType())}">
+                <ui:define name="label">#{messages['WarehouseVoucher.contraAccount']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.contraAccount.fullName}"/>
+            </s:decorate>
+            <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.date}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+        <s:div id="rightSidePanel">
+            <s:div id="warehousePanel">
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+                    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse.fullName}"/>
+                </s:decorate>
+            </s:div>
+            <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.responsible']}</ui:define>
+                <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible.fullName}"/>
+            </s:decorate>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
+                <h:inputTextarea id="description"
+                                 value="#{warehouseVoucherUpdateAction.inventoryMovement.description}"
+                                 required="true"
+                                 readonly="true"
+                                 styleClass="input textarea"/>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</ui:composition>

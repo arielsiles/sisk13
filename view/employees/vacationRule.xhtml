@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{vacationRuleAction.managed}">
+                #{messages['VacationRule.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['VacationRule.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+
+    <ui:define name="body">
+
+        <h:form id="vacationRuleForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{vacationRuleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!vacationRuleAction.managed and s:hasPermission('VACATIONRULE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vacationRuleAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!vacationRuleAction.managed and s:hasPermission('VACATIONRULE','CREATE')}"/>
+
+                <h:commandButton action="#{vacationRuleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{vacationRuleAction.managed and s:hasPermission('VACATIONRULE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{vacationRuleAction.managed and vacationRuleAction.isNewOrLastVacationRule() and s:hasPermission('VACATIONRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vacationRuleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{vacationRuleAction.managed}">
+                            #{messages['VacationRule.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['VacationRule.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{vacationRuleAction.managed}">
+                    <ui:define name="label">#{messages['VacationRule.code']}</ui:define>
+                    <h:outputText value="#{vacationRule.code}"/>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['VacationRule.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{vacationRule.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="100"
+                                 tabindex="1">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="startRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['VacationRule.initYearsRange']}</ui:define>
+                    <h:outputText value="#{vacationRule.fromYears}"/>
+                    <h:inputHidden id="fromYears" value="#{vacationRule.fromYears}"/>
+                </s:decorate>
+                <s:decorate id="endRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['VacationRule.endYearsRange']}</ui:define>
+                    <h:inputText id="toYears"
+                                 value="#{vacationRule.toYears}"
+                                 styleClass="inputNumberTiny"
+                                 rendered="#{vacationRuleAction.isNewOrLastVacationRule()}"
+                                 tabindex="2">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                    forId="toYears"/>
+                        <app:numberRangeValidator forId="fromYears"
+                                                  forLabel="#{messages['VacationRule.initYearsRange']}"
+                                                  type="greater"/>
+                    </h:inputText>
+                    <h:outputText value="#{vacationRule.toYears}" rendered="#{not vacationRuleAction.isNewOrLastVacationRule()}"/>
+                </s:decorate>
+
+                <s:decorate id="vacationDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['VacationRule.vacationDays']}</ui:define>
+                    <h:inputText id="vacationDays"
+                                 value="#{vacationRule.vacationDays}"
+                                 styleClass="inputNumber"
+                                 required="true"
+                                 tabindex="3">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                    forId="vacationDays"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{vacationRuleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!vacationRuleAction.managed and s:hasPermission('VACATIONRULE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vacationRuleAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!vacationRuleAction.managed and s:hasPermission('VACATIONRULE','CREATE')}"/>
+
+                <h:commandButton action="#{vacationRuleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{vacationRuleAction.managed and s:hasPermission('VACATIONRULE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{vacationRuleAction.managed and vacationRuleAction.isNewOrLastVacationRule() and s:hasPermission('VACATIONRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vacationRuleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{vacationRuleAction.managed and s:hasPermission('VACATIONRULE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['VacationRule.delete.confirmation']}">
+                        <f:param value="#{vacationRule.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{vacationRuleAction.delete}"
+                                   rendered="#{s:hasPermission('VACATIONRULE','DELETE')}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

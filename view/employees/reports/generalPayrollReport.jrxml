@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReportTemplate" pageWidth="1401" pageHeight="612" orientation="Landscape"
+              whenNoDataType="AllSectionsNoDetail" columnWidth="1351" leftMargin="30" rightMargin="20" topMargin="30"
+              bottomMargin="30" scriptletClass="com.encens.khipus.action.employees.reports.GeneralPayrollReportScriptlet">
+    <property name="ireport.scriptlethandling" value="2"/>
+    <property name="ireport.encoding" value="UTF-8"/>
+    <import value="net.sf.jasperreports.engine.*"/>
+    <import value="java.util.*"/>
+    <import value="net.sf.jasperreports.engine.data.*"/>
+    <style name="titleStyle" isDefault="true" fontName="Verdana" fontSize="20" isBold="true" isItalic="false"
+           isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <style name="detailStyle" isDefault="true" fontName="Verdana" fontSize="9" isBold="false" isItalic="false"
+           isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <style name="headerStyle" isDefault="true" backcolor="#C0C0C0" fontName="Verdana" fontSize="9" isBold="true"
+           isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <field name="employee.idNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="employee.lastName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="employee.maidenName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="employee.firstName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.salary" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.totalperiodworked" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.absencediscount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.tardiness" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.otherDiscounts" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.difference" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.ivaRetention" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.incomeOutOfIva" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.liquid" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.totalDiscount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.absenceminut" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+    </field>
+    <field name="employee.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_16]]></fieldDescription>
+    </field>
+    <field name="employee.paymentType" class="com.encens.khipus.model.finances.PaymentType">
+        <fieldDescription><![CDATA[COLUMN_17]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.otherIncomes" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_18]]></fieldDescription>
+    </field>
+    <field name="generalPayroll.discountsOutOfRetention" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_19]]></fieldDescription>
+    </field>
+    <variable name="bankAccountNumberVar" class="java.lang.String" calculation="System"/>
+    <variable name="clientCodeVar" class="java.lang.String" calculation="System"/>
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    <title>
+        <band height="100" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="98" height="61"
+                               isRemoveLineWhenBlank="true"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/khipuslogo.gif")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="date_text" style="titleStyle" positionType="Float" x="108" y="0" width="579"
+                               height="26"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.generalPayroll.title}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="108" y="31"
+                               width="370" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.generalPayroll.month} + ": "+ $P{month} + ", "+ $P{year}]]></textFieldExpression>
+            </textField>
+            <frame>
+                <reportElement key="frame" positionType="Float" x="108" y="46" width="579" height="12"
+                               isPrintWhenDetailOverflows="true"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement key="textField" style="headerStyle" positionType="Float"
+                                   stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="133"
+                                   height="12" backcolor="#FFFFFF"/>
+                    <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                        <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.generalPayroll.generationDate} + ": "]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                    <reportElement key="textField" style="headerStyle" positionType="Float"
+                                   stretchType="RelativeToTallestObject" mode="Opaque" x="133" y="0" width="80"
+                                   height="12" backcolor="#FFFFFF"/>
+                    <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                        <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[$P{generationDate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement key="textField" style="headerStyle" positionType="Float"
+                                   stretchType="RelativeToTallestObject" mode="Opaque" x="261" y="0" width="157"
+                                   height="12" backcolor="#FFFFFF"/>
+                    <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                        <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.generalPayroll.type} + ": " + $P{payrollType}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="108" y="61"
+                               width="133" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.generalPayroll.range} + ": "]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="241" y="61"
+                               width="80" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.util.Date"><![CDATA[$P{initDate}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="321" y="61"
+                               width="23" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String"><![CDATA["-"]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="344" y="61"
+                               width="80" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="108" y="76"
+                               width="100" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.generalPayroll.changeType} + ": "]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" positionType="Float" mode="Opaque" x="208" y="76"
+                               width="62" height="12" backcolor="#FFFFFF"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{rate}]]></textFieldExpression>
+            </textField>
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="740" y="3" width="72" height="58"
+                               isRemoveLineWhenBlank="true"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+        </band>
+    </title>
+    <pageHeader>
+        <band splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="12" splitType="Stretch">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="0" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$R{GeneralPayroll.CI}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="60" y="0" width="75" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.lastName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="135" y="0" width="75" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.maidenName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="210" y="0" width="75" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.firstName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="285" y="0" width="70" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.salary}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="355" y="0" width="70" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.totalperiodworked}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="425" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.absencediscount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="485" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.tardiness}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="545" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.otherDiscounts}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="665" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.difference}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="725" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.ivaRetention}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="845" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.incomeOutOfIva}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="905" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.liquid}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="965" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.totalDiscount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="1025" y="0" width="53" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.absenceminut}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="1078" y="0" width="100" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.paymentType}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="1178" y="0" width="80" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.clientCode}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="1258" y="0" width="80" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.bankAccount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+                <reportElement key="textField-1" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="785" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.discountsOutOfRetention}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField-3" style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque"
+                               x="605" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{GeneralPayroll.otherIncomes}]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="60" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{employee.idNumber}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="60" y="0" width="75" height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{employee.lastName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="135" y="0" width="75"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{employee.maidenName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="210" y="0" width="75"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{employee.firstName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="285" y="0" width="70"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.salary}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="355" y="0" width="70"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.totalperiodworked}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="425" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.absencediscount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="485" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.tardiness}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="545" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.otherDiscounts}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="665" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.difference}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="725" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.ivaRetention}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="845" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.incomeOutOfIva}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="905" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.liquid}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="965" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.totalDiscount}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="1025" y="0" width="53"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.lang.Integer">
+                    <![CDATA[$F{generalPayroll.absenceminut}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="1078" y="0" width="100"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[str($F{employee.paymentType}.getResourceKey())]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="1178" y="0" width="80"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$V{clientCodeVar}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="textField" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="1258" y="0" width="80"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$V{bankAccountNumberVar}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField-2" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="785" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.discountsOutOfRetention}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement key="textField-4" style="detailStyle" positionType="Float"
+                               stretchType="RelativeToTallestObject" mode="Opaque" x="605" y="0" width="60"
+                               height="12"/>
+                <box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    <rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{generalPayroll.otherIncomes}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band splitType="Stretch"/>
+    </pageFooter>
+    <summary>
+        <band splitType="Stretch"/>
+    </summary>
+</jasperReport>

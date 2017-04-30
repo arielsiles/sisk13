@@ -1,0 +1,147 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['PollForm.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="pollFormSearch">
+
+            <rich:simpleTogglePanel label="#{messages['PollForm.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollForm.code']}</ui:define>
+                    <h:inputText id="code" value="#{pollFormDataModel.criteria.code}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{pollFormDataModel.search}"
+                                       reRender="pollFormList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <!--<h:commandButton action="#{pollByPersonReportAction.generateReport}"
+                                     value="#{messages['Reports.generateReport']}___"
+                                     styleClass="button"
+                                     immediate="true"/>-->
+                </s:decorate>
+                <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/pollForm.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('HUMANRESOURCESPOLL','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{pollFormDataModel}" var="pollFormItem" id="pollFormList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="8%, 25%, 25%, 7%, 7%, 7%, 7%, 7% , 7%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.code" dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.title" dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.title']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.subTitle" dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.subTitle']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.equivalentPercent"
+                                                   dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.equivalent']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.cycle.gestion.year"
+                                                   dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.approvalDate" dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.approval']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.review" dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.review']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="pollForm.samplePercent"
+                                                   dataModel="#{pollFormDataModel}"
+                                                   reRender="pollFormList, dataScroller">
+                                #{messages['PollForm.sample']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.title}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.subTitle}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.equivalentPercent}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.cycle.gestion.year}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.approvalDate}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.review}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pollFormItem.samplePercent}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{pollFormAction.select(pollFormItem)}"
+                                   rendered="#{s:hasPermission('HUMANRESOURCESPOLL','VIEW')}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="pollFormList" dataModel="#{pollFormDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/pollForm.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('HUMANRESOURCESPOLL','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

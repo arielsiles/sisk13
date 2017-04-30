@@ -1,0 +1,132 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="subGroupListModalPanel"
+                 onshow="jQuery('#subGroupListModalPanelContainer\\:subGroupListForm\\:nameField\\:name').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['SubGroup.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="subGroupListForm">
+        <rich:simpleTogglePanel label="#{messages['SubGroup.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SubGroup.name']}</ui:define>
+                        <h:inputText id="name"
+                                     value="#{subGroupSearchDataModel.criteria.name}"
+                                     maxlength="100"
+                                     tabindex="1"
+                                     styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SubGroup.subGroupCode']}</ui:define>
+                        <h:inputText id="subGroupCode"
+                                     value="#{subGroupSearchDataModel.criteria.subGroupCode}"
+                                     maxlength="3"
+                                     tabindex="2"
+                                     styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SubGroup.groupName']}</ui:define>
+                        <h:inputText id="groupName"
+                                     value="#{subGroupSearchDataModel.groupName}"
+                                     maxlength="100"
+                                     tabindex="3"
+                                     styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SubGroup.groupCode']}</ui:define>
+                        <h:inputText id="groupCode"
+                                     value="#{subGroupSearchDataModel.groupCode}"
+                                     maxlength="3"
+                                     tabindex="4"
+                                     styleClass="input">
+                        </h:inputText>
+                        <a4j:commandButton action="#{subGroupSearchDataModel.search}"
+                                           reRender="subGroupList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{subGroupSearchDataModel}"
+                        var="subGroupItem"
+                        id="subGroupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="40%, 15%, 30%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="subGroup.name"
+                                               dataModel="#{subGroupSearchDataModel}"
+                                               reRender="subGroupList, dataScroller">
+                            #{messages['SubGroup.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="subGroup.subGroupCode"
+                                               dataModel="#{subGroupSearchDataModel}"
+                                               reRender="subGroupList, dataScroller">
+                            #{messages['SubGroup.subGroupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="subGroup.group.name"
+                                               dataModel="#{subGroupSearchDataModel}"
+                                               reRender="subGroupList, dataScroller">
+                            #{messages['SubGroup.group']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{subGroupItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{subGroupItem.subGroupCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{subGroupItem.group.fullName}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="subGroupListModalPanel"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="subGroupList" dataModel="#{subGroupSearchDataModel}"/>
+
+        <rich:componentControl for="subGroupListModalPanel"
+                               attachTo="closeLink, assignButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.pendingSoldProductDelivery.page.title']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="pendingSoldProductDeliveryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.pendingSoldProductDelivery.page.title']}
+                </f:facet>
+                <s:decorate id="businessBranchField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.branch']}
+                    </ui:define>
+                    <app:quickSearch id="businessBranchQuickSearch"
+                                     textValue="pendingSoldProductDeliveryReportAction.branch.id"
+                                     value="#{pendingSoldProductDeliveryReportAction.branch}"
+                                     searchField="id"
+                                     alias="branch"
+                                     reRender="businessBranchField"
+                                     tabindex="1"/>
+                    <h:selectOneMenu id="businessBranch"
+                                     value="#{pendingSoldProductDeliveryReportAction.branch}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{branchList.resultList}"
+                                       var="element"
+                                       label="#{element.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="businessBranchField"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.productItem']}
+                    </ui:define>
+                    <app:quickSearch id="productItemQuickSearch"
+                                     textValue="pendingSoldProductDeliveryReportAction.productItem.productItemCode"
+                                     value="#{pendingSoldProductDeliveryReportAction.productItem}"
+                                     searchField="productItemCode"
+                                     alias="productItem"
+                                     reRender="productItemField"
+                                     tabindex="3">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="productItem"
+                                     textValue="#{pendingSoldProductDeliveryReportAction.productItem.name}"
+                                     value="#{pendingSoldProductDeliveryReportAction.productItem}"
+                                     clearAction="pendingSoldProductDeliveryReportAction.cleanProductItem()"
+                                     searchModalPanel="productItemListModalPanel"
+                                     dataModel="#{productItemSearchDataModel}"
+                                     reRender="productItemField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+                <s:decorate id="invoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.invoiceNumber']}
+                    </ui:define>
+                    <h:inputText id="invoiceNumber" value="#{pendingSoldProductDeliveryReportAction.invoiceNumber}"
+                                 maxlength="250" tabindex="4" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="personalIdentificationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.personalIdentification']}
+                    </ui:define>
+                    <h:inputText id="personalIdentification"
+                                 value="#{pendingSoldProductDeliveryReportAction.personalIdentification}"
+                                 maxlength="250" tabindex="5" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.firstName']}
+                    </ui:define>
+                    <h:inputText id="firstName" value="#{pendingSoldProductDeliveryReportAction.firstName}"
+                                 maxlength="250" tabindex="6" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="secondNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.secondName']}
+                    </ui:define>
+                    <h:inputText id="secondName" value="#{pendingSoldProductDeliveryReportAction.secondName}"
+                                 maxlength="250" tabindex="7" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="namesField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['Reports.pendingSoldProductDelivery.page.names']}
+                    </ui:define>
+                    <h:inputText id="names" value="#{pendingSoldProductDeliveryReportAction.names}"
+                                 maxlength="250" tabindex="8" styleClass="input"/>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{pendingSoldProductDeliveryReportAction}" showPageFormat="false"
+                                      tabIndex="5"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{pendingSoldProductDeliveryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{pendingSoldProductDeliveryReportAction.assignProductItem(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField"
+                                   oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#provider" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/admin/*" login-required="true"/>
+
+    <page view-id="/admin/userList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{userAction.select(userItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/user.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/user.xhtml" no-conversation-view-id="/admin/userList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/userList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/roleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{roleAction.select(roleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/role.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{roleAction.selectAndAccessRight(roleItem)}">
+            <begin-conversation join="true" flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/accessRight.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/role.xhtml" no-conversation-view-id="/admin/roleList.xhtml">
+        <navigation from-action="#{roleAction.assignPermissions}">
+            <begin-conversation join="true" flush-mode="MANUAL"/>
+            <rule>
+                <redirect view-id="/admin/accessRight.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/roleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/administrativeNotificationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{administrativeNotificationAction.select(administrativeNotificationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/administrativeNotification.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/administrativeNotification.xhtml"
+          no-conversation-view-id="/admin/administrativeNotificationList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/administrativeNotificationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/accessRight.xhtml" no-conversation-view-id="/admin/roleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/roleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/businessUnitTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{businessUnitTypeAction.select(businessUnitTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/businessUnitType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/admin/businessUnitType.xhtml" no-conversation-view-id="/admin/businessUnitTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/businessUnitTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/admin/businessUnitList.xhtml">
+        <navigation from-action="#{businessUnitAction.select(businessUnitItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/businessUnit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/admin/businessUnit.xhtml" no-conversation-view-id="/admin/businessUnitList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/businessUnitList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+</pages>

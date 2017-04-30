@@ -1,0 +1,141 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{contractModeAction.managed}">
+                #{messages['ContractMode.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ContractMode.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="contractModeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{contractModeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!contractModeAction.managed}" id="createButtonId"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{contractModeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{contractModeAction.managed}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{contractModeAction.managed}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{contractModeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{contractModeAction.managed}">
+                            #{messages['ContractMode.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ContractMode.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ContractMode.name']}</ui:define>
+                    <h:inputText id="name" value="#{contractMode.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ContractMode.description']}</ui:define>
+                    <h:inputText id="description" value="#{contractMode.description}" styleClass="input"
+                                 maxlength="150" tabindex="6">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="definitionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ContractMode.definition']}</ui:define>
+                    <h:inputText id="definition" value="#{contractMode.definition}" styleClass="input"
+                                 maxlength="150" tabindex="7">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="dayDurationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ContractMode.dayDuration']}</ui:define>
+                    <h:inputText id="dayDuration"
+                                 value="#{contractMode.dayDuration}"
+                                 styleClass="input right"
+                                 tabindex="8">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{contractModeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!contractModeAction.managed}"
+                                 tabindex="8">
+                </h:commandButton>
+
+                <h:commandButton action="#{contractModeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{contractModeAction.managed}"
+                                 tabindex="9"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{contractModeAction.managed}"
+                                 tabindex="10">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{contractModeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="11">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{contractModeAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ContractMode.delete.confirmation']}">
+                        <f:param value="#{contractMode.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{contractModeAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

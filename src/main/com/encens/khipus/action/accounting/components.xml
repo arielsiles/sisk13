@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+
+
+    <factory name="voucherDocumentTypeList" value="#{voucherDocumentTypeQuery}"/>
+    <framework:entity-query name="voucherDocumentTypeQuery"
+                            ejbql="select docType from DocType docType">
+    </framework:entity-query>
+
+    <!--Enumerations-->
+    <factory name="saleTypeEnum" value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.accounting.SaleType')}"/>
+
+</components>

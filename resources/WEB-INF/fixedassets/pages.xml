@@ -1,0 +1,694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/fixedassets/*" login-required="true"/>
+
+    <page view-id="/fixedassets/fixedAssetGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetGroupAction.select(fixedAssetGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetGroup.xhtml" no-conversation-view-id="/fixedassets/fixedAssetGroupList.xhtml">
+        <navigation from-action="#{fixedAssetGroupAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetGroup.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetSubGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetSubGroupAction.select(fixedAssetSubGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetSubGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetSubGroup.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetSubGroupList.xhtml">
+        <navigation from-action="#{fixedAssetSubGroupAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetSubGroup.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetSubGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetList.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation from-action="#{fixedAssetAction.select(fixedAssetItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAsset.xhtml"/>
+            </rule>
+        </navigation>
+        <end-conversation before-redirect="true"/>
+        <navigation from-action="#{fixedAssetAction.depreciateAllFixedAssets()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
+    <page view-id="/fixedassets/fixedAsset.xhtml" no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation from-action="#{fixedAssetAction.approveRegistration()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.cancel()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.transfer()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.positiveImprovement()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.discharge()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/fixedAssetMovementsBody.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation from-action="#{fixedAssetAction.approveRegistration()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.cancel()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.transfer()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.positiveImprovement()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.discharge()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+    <page view-id="/fixedassets/fixedAssetBody.xhtml" no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation from-action="#{fixedAssetAction.approveRegistration()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.cancel()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.transfer()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.positiveImprovement()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetAction.discharge()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/fixedassets/fixedAssetMovementTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetMovementTypeAction.select(fixedAssetMovementTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetMovementType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetMovementType.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetMovementTypeList.xhtml">
+        <navigation from-action="#{fixedAssetMovementTypeAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetMovementType.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetMovementTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.select(fixedAssetPurchaseOrderItem)}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.specialUpdate}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderDetailAction.addFixedAssetPurchaseOrderDetail}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderDetail.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{purchaseOrderFixedAssetPartAction.addPurchaseOrderFixedAssetPart}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/purchaseOrderFixedAssetPart.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.addFixedAssetPurchaseOrderDiscountComment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderDiscountComment.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.select(discountCommentItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderDiscountComment.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.approveFixedAssetPurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.annulFixedAssetPurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.finalizeFixedAssetPurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderAction.liquidateFixedAssetPurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseOrderDetailAction.select(fixedAssetPurchaseOrderDetailItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderDetail.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{purchaseOrderFixedAssetPartAction.select(fixedAssetPartItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/purchaseOrderFixedAssetPart.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+
+        <navigation from-action="#{fixedAssetAdvancePaymentAction.addAdvancePayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/advancePayment.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetAdvancePaymentAction.select(purchaseOrderPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/advancePayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetAdvancePaymentAction.selectToRemake(purchaseOrderPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/advancePayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetPurchaseDocumentAction.addPurchaseDocument}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseDocument.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetPurchaseDocumentAction.select(purchaseDocumentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseDocument.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetPurchaseOrderDiscountComment.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation from-action="#{discountCommentAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.cancel}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/advancePayment.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetPurchaseOrderDetail.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/purchaseOrderFixedAssetPart.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/fixedAssetVoucherList.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetVoucherList.xhtml">
+        <navigation from-action="#{fixedAssetVoucherAction.select(fixedAssetVoucherItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetVoucher.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetVoucherList.xhtml">
+        <navigation from-action="#{fixedAssetVoucherAction.registration}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetVoucherAction.approveRegistration}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.addFixedAssetVoucherDiscountComment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucherDiscountComment.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.select(discountCommentItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucherDiscountComment.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{fixedAssetVoucherAction.cancel}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/fixedAssetVoucherDiscountComment.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetVoucherList.xhtml">
+        <navigation from-action="#{discountCommentAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.cancel}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucher.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetMaintenanceList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetMaintenanceRequestAction.select(fixedAssetMaintenanceRequestItem)}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetMaintenance.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/fixedassets/fixedAssetMaintenance.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetMaintenanceList.xhtml">
+        <navigation from-action="#{fixedAssetMaintenanceRequestAction.sendRequest()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetMaintenanceList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetMaintenanceRequestAction.processRequest()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetMaintenanceList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetMaintenanceRequestAction.receiptMaintenance()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetMaintenanceList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fixedAssetMaintenanceRequestAction.cancel()}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetMaintenanceList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetMaintenanceList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetPurchaseDocument.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/purchaseOrderCauseList.xhtml">
+        <!--<end-conversation/>-->
+        <navigation from-action="#{purchaseOrderCauseAction.select(purchaseOrderCauseItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/purchaseOrderCause.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/purchaseOrderCause.xhtml"
+          no-conversation-view-id="/fixedassets/purchaseOrderCauseList.xhtml">
+        <navigation from-action="#{purchaseOrderCauseAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/purchaseOrderCause.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/purchaseOrderCauseList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetLocationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{fixedAssetLocationAction.select(fixedAssetLocationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/fixedassets/fixedAssetLocation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/fixedAssetLocation.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetLocationList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetLocationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/fixedassets/changeFixedAssetGuaranty.xhtml"
+          no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+</pages>

@@ -1,0 +1,252 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{bankAction.managed}">
+            #{messages['Bank.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Bank.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+<h:form id="bankForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{bankAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!bankAction.managed and s:hasPermission('BANKENTITY','CREATE')}"
+                         id="createButtonId">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton id="updateButtonId" action="#{bankAction.update}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{bankAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{bankAction.managed}">
+                    #{messages['Bank.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Bank.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{!bankAction.managed}">
+            <ui:define name="label">#{messages['Bank.idNumber']}</ui:define>
+            <h:inputText id="idNumber"
+                         value="#{bank.idNumber}"
+                         required="true"
+                         maxlength="100"
+                         tabindex="1"
+                         styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate template="/include/viewField.xhtml" rendered="#{bankAction.managed}" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.idNumber']}</ui:define>
+            <h:outputText value="#{bank.idNumber}"/>
+        </s:decorate>
+
+        <s:div id="documentDiv">
+            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Bank.documentType']}</ui:define>
+                <h:selectOneMenu id="documentType"
+                                 value="#{bank.documentType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="2">
+                    <s:selectItems value="#{organizationDocumentTypeList}"
+                                   var="documentType"
+                                   label="#{documentType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange"
+                                 action="#{bankAction.updateShowExtension()}"
+                                 reRender="documentDiv"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                        rendered="#{bankAction.showExtension}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                <h:selectOneMenu id="extension"
+                                 value="#{bank.extensionSite}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="3">
+                    <s:selectItems value="#{extensionList}"
+                                   var="extension"
+                                   label="#{extension.extension}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.name']}</ui:define>
+            <h:inputText id="name" value="#{bank.name}" styleClass="input" required="true"
+                         maxlength="200" tabindex="4"/>
+        </s:decorate>
+
+        <s:decorate id="bankNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.bankNumber']}</ui:define>
+            <h:inputText id="bankNumber" value="#{bank.bankNumber}" styleClass="input"
+                         maxlength="30" tabindex="5" required="true"/>
+        </s:decorate>
+
+        <s:decorate id="contractNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.contractNumber']}</ui:define>
+            <h:inputText id="contractNumber" value="#{bank.contractNumber}" styleClass="input"
+                         maxlength="50" tabindex="6" required="true"/>
+        </s:decorate>
+
+        <s:decorate id="contractEndDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.contractEndDate']}</ui:define>
+            <rich:calendar id="contractEndDate"
+                           value="#{bank.contractEndDate}"
+                           datePattern="#{messages['patterns.date']}"
+                           enableManualInput="true"
+                           tabindex="7">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+        </s:decorate>
+        <s:decorate id="anniversaryField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Organization.anniversary']}</ui:define>
+            <rich:calendar value="#{bank.anniversary}"
+                           datePattern="#{messages['patterns.date']}"
+                           enableManualInput="true"
+                           tabindex="8">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Bank.state']}</ui:define>
+            <h:selectOneMenu id="state" value="#{bank.state}" styleClass="input"
+                             tabindex="9" required="true">
+                <s:selectItems value="#{bankState}" var="state" label="#{messages[state.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange" reRender="cancelDateField, stateDateField" ajaxSingle="true"
+                             action="#{bankAction.changeState(bank.state)}"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow" rendered="#{bankAction.managed}">
+            <ui:define name="label">#{messages['Bank.activationDate']}</ui:define>
+            <h:outputText value="#{bank.activationDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="cancelDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{bankAction.managed}">
+            <ui:define name="label">#{messages['Bank.cancelDate']}</ui:define>
+            <h:outputText value="#{bank.cancelDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="stateDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{bankAction.managed}">
+            <ui:define name="label">#{messages['Bank.stateDate']}</ui:define>
+            <h:outputText value="#{bank.stateDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{bankAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!bankAction.managed and s:hasPermission('BANKENTITY','CREATE')}"
+                         tabindex="10"/>
+        <h:commandButton action="#{bankAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','UPDATE')}"
+                         tabindex="11"/>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','DELETE')}"
+                         tabindex="12">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{bankAction.cancel}" value="#{messages['Common.cancel']}" styleClass="button"
+                         immediate="true" tabindex="13"/>
+    </div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Bank.delete.confirmation']}">
+                <f:param value="#{bank.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{bankAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('BANKENTITY','DELETE')}"
+                           tabindex="21"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+
+<s:fragment rendered="#{!bankAction.managed}">
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</s:fragment>
+<s:fragment rendered="#{bankAction.managed}">
+    <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+</s:fragment>
+</ui:define>
+</ui:composition>

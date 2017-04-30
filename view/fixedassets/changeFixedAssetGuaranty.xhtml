@@ -1,0 +1,374 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['FixedAsset.changeGuaranty']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetSearch">
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetAction.changeGuaranty}"
+                     styleClass="button"
+                     value="#{messages['FixedAsset.changeGuaranty']}"
+                     id="changeGuarantyButtonId">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{countryAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+<rich:simpleTogglePanel id="fixedAssetSearchPanel" label="#{messages['FixedAsset.search']}"
+                        switchType="client">
+<app:fieldset id="fixedAssetchangeGuarantyFieldset"
+              title="#{messages['FixedAsset.FixedAssetchangeGuarantyDetail']}">
+    <s:decorate id="monthsGuarantyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:param name="required" value="true"/>
+        <ui:define name="label">#{messages['FixedAsset.monthsGuaranty']}</ui:define>
+        <h:inputText id="monthsGuaranty"
+                     value="#{fixedAssetAction.monthsGuaranty}"
+                     styleClass="input right"
+                     tabindex="9">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            <f:validateLongRange minimum="1" maximum="999"/>
+        </h:inputText>
+        <h:outputText value=" #{messages['Unit.month']}"/>
+    </s:decorate>
+</app:fieldset>
+<app:fieldset id="searchDetail"
+              title="#{messages['FixedAsset.changeGuaranty.searchDetail']}">
+<h:panelGrid id="searchDetailPanel"
+             columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent,width50percent">
+    <s:div>
+        <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.executorUnitCode']}</ui:define>
+            <app:quickSearch id="businessUnitQuickSearch"
+                             textValue="fixedAssetDataModel.criteria.businessUnit.executorUnitCode"
+                             value="#{fixedAssetDataModel.criteria.businessUnit}"
+                             searchField="executorUnitCode"
+                             reRender="executorUnitField"/>
+            <h:selectOneMenu id="executorUnit"
+                             value="#{fixedAssetDataModel.criteria.businessUnit}"
+                             styleClass="input"
+                             tabindex="1">
+                <s:selectItems value="#{businessUnitList.resultList}"
+                               var="businessUnit"
+                               label="#{businessUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="executorUnitField"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.costCenter']}</ui:define>
+            <app:quickSearch id="costCenterQuickSearch"
+                             textValue="fixedAssetDataModel.costCenter.code"
+                             value="#{fixedAssetDataModel.costCenter}"
+                             searchField="code"
+                             reRender="costCenterField"
+                             alias="costCenter">
+                <ui:define name="restrictions">
+                    <app:restriction
+                            condition=" costCenter.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.CostCenterState', 'VIG')} "/>
+                    <app:restriction
+                            condition=" costCenter.hasMovement=#{true}"/>
+                </ui:define>
+            </app:quickSearch>
+            <h:inputText id="costCenter"
+                         styleClass="inputMedium"
+                         readonly="true"
+                         value="#{fixedAssetDataModel.costCenter.fullName}"
+                         tabindex="2"/>
+            <a4j:commandLink id="selectCostCenter"
+                             ajaxSingle="true"
+                             immediate="true"
+                             title="#{messages['Common.choose']}"
+                             onclick="Richfaces.showModalPanel('costCenterListModalPanel');"
+                             tabindex="3">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="clearButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             title="#{messages['Common.clear']}"
+                             action="#{fixedAssetDataModel.clearCostCenter()}"
+                             reRender="costCenterField"
+                             tabindex="4">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+        <s:div id="fixedAssetGroupDiv">
+            <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetGroup']}</ui:define>
+                <app:quickSearch id="quickSearchFixedAssetGroup"
+                                 textValue="fixedAssetDataModel.fixedAssetGroup.groupCode"
+                                 value="#{fixedAssetDataModel.fixedAssetGroup}"
+                                 searchField="groupCode"
+                                 reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv"/>
+                <app:selectPopUp id="fixedAssetGroup"
+                                 textValue="#{fixedAssetDataModel.fixedAssetGroup.fullName}"
+                                 value="#{fixedAssetDataModel.fixedAssetGroup}"
+                                 dataModel="#{fixedAssetGroupDataModel}"
+                                 clearAction="fixedAssetDataModel.clearFixedAssetGroup()"
+                                 searchModalPanel="fixedAssetGroupListModalPanel"
+                                 reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel "
+                                 hotKeySelect="alt+1"
+                                 tabindex="5"/>
+            </s:decorate>
+        </s:div>
+        <s:div id="fixedAssetSubGroupDiv">
+            <s:decorate id="fixedAssetSubGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.fixedAssetSubGroup']}</ui:define>
+                <app:quickSearch id="quickSearchFixedAssetSubGroup"
+                                 textValue="fixedAssetDataModel.fixedAssetSubGroup.fixedAssetSubGroupCode"
+                                 value="#{fixedAssetDataModel.fixedAssetSubGroup}"
+                                 searchField="fixedAssetSubGroupCode"
+                                 alias="fixedAssetSubGroup"
+                                 reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetDataModel.fixedAssetGroup}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <app:selectPopUp id="fixedAssetSubGroup"
+                                 textValue="#{fixedAssetDataModel.fixedAssetSubGroup.fullName}"
+                                 value="#{fixedAssetDataModel.fixedAssetSubGroup}"
+                                 dataModel="#{fixedAssetSubGroupDataModel}"
+                                 clearAction="fixedAssetDataModel.clearFixedAssetSubGroup()"
+                                 searchModalPanel="fixedAssetSubGroupListModalPanel"
+                                 reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                 hotKeySelect="alt+2"
+                                 tabindex="6">
+                </app:selectPopUp>
+
+            </s:decorate>
+        </s:div>
+        <s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.barCode']}</ui:define>
+            <h:inputText id="barCode"
+                         value="#{fixedAssetDataModel.criteria.barCode}"
+                         maxlength="250"
+                         styleClass="input"
+                         tabindex="8"/>
+        </s:decorate>
+        <s:decorate id="fixedAssetPurchaseOrderNumberField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.PurchaseOrder.orderNumber']}</ui:define>
+            <h:inputText id="fixedAssetPurchaseOrderNumber" value="#{fixedAssetDataModel.orderNumber}"
+                         maxlength="10" styleClass="input"
+                         tabindex="9">
+            </h:inputText>
+        </s:decorate>
+    </s:div>
+    <s:div>
+        <s:decorate id="detailField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.detail']}</ui:define>
+            <h:inputText id="sequence" value="#{fixedAssetDataModel.criteria.detail}"
+                         maxlength="250" styleClass="input"
+                         tabindex="10">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="sequenceField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.sequence']}</ui:define>
+            <h:inputText id="sequence" value="#{fixedAssetDataModel.criteria.sequence}"
+                         maxlength="30" styleClass="input"
+                         tabindex="11">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="trademarkField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.trademark']}</ui:define>
+            <h:inputText id="trademark" value="#{fixedAssetDataModel.criteria.trademark}"
+                         maxlength="30" styleClass="input"
+                         tabindex="12">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="modelField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.model']}</ui:define>
+            <h:inputText id="model" value="#{fixedAssetDataModel.criteria.model}"
+                         maxlength="30" styleClass="input"
+                         tabindex="13">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.state']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{fixedAssetDataModel.criteria.state}"
+                             styleClass="input"
+                             tabindex="16">
+                <s:selectItems value="#{fixedAssetStates}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+            <s:div styleClass="right input">
+                <a4j:commandButton action="#{fixedAssetDataModel.search}"
+                                   reRender="searchDetailPanel, fixedAssetList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="7">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <a4j:commandButton action="#{fixedAssetDataModel.clear}"
+                                   reRender="searchDetailPanel, fixedAssetList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.clear']}"
+                                   id="clearButtonId"
+                                   tabindex="8"/>
+            </s:div>
+        </s:decorate>
+    </s:div>
+</h:panelGrid>
+<br/>
+<rich:dataTable value="#{fixedAssetDataModel}" var="fixedAssetItem" id="fixedAssetList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="20%,20%,10%,20%,20%,10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.businessUnit.executorUnitCode"
+                                       dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.executorUnitCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.costCenterCode"
+                                       dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.costCenterCode']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.fixedAssetSubGroup.id.fixedAssetSubGroupCode"
+                                       dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.fixedAssetSubGroupCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.barCode" dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.barCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.ufvOriginalValue"
+                                       dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.originalValue']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.state"
+                                       dataModel="#{fixedAssetDataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.state']}
+                </app:commandSortHeader>
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.businessUnit.fullName}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.costCenter.fullName}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.fixedAssetSubGroup.id.fixedAssetSubGroupCode}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.barCode}">
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{fixedAssetItem.ufvOriginalValue}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages[fixedAssetItem.currencyType.resourceKey]}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[fixedAssetItem.state.resourceKey]}">
+        </h:outputText>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="fixedAssetList" dataModel="#{fixedAssetDataModel}"/>
+</app:fieldset>
+<rich:jQuery selector="#executorUnit" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetAction.changeGuaranty}"
+                     styleClass="button"
+                     value="#{messages['FixedAsset.changeGuaranty']}"/>
+    <h:commandButton action="#{countryAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+</h:form>
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton1" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetDataModel.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="fixedAssetGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetDataModel.setFixedAssetGroup(fixedAssetGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel "
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="fixedAssetSubGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetSubGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSubGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetDataModel.setFixedAssetSubGroup(fixedAssetSubGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

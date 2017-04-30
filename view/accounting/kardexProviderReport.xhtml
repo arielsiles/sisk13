@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['AuxiliaryAnalytical.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="productItemReportForm">
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['AuxiliaryAnalytical.report']}
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent">
+
+                <s:decorate id="dateFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateFrom']}</ui:define>
+                    <rich:calendar id="dateFrom"
+                                   value="#{kardexProviderReportAction.startDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="dateToField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateTo']}</ui:define>
+                    <rich:calendar id="dateTo"
+                                   value="#{kardexProviderReportAction.endDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                             required="false"
+                                             textValue="#{kardexProviderReportAction.cashAccount.fullName}"
+                                             value="#{kardexProviderReportAction.cashAccount}"
+                                             clearAction="kardexProviderReportAction.clearAccount()"
+                                             searchModalPanel="cashAccountListModalPanel"
+                                             dataModel="#{cashAccountDataModel}"
+                                             reRender="itemAccountField"
+                                             tabindex="3"
+                                             styleClass="inputLarge">
+                                <ui:define name="criteriaValues">
+                                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                                </ui:define>
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['WarehousePurchaseOrder.providerAuxiliary']}"/>
+                    </ui:define>
+                    <app:quickSearch id="quickSearchProvider"
+                                     textValue="kardexProviderReportAction.provider.providerCode"
+                                     value="#{kardexProviderReportAction.provider}"
+                                     searchField="providerCode"
+                                     reRender="providerField"
+                                     rendered="false"
+                                     tabindex="6"/>
+                    <app:selectPopUp id="provider"
+                                     required="false"
+                                     textValue="#{kardexProviderReportAction.provider.fullName}"
+                                     value="#{kardexProviderReportAction.provider}"
+                                     clearAction="kardexProviderReportAction.clearProvider()"
+                                     searchModalPanel="providerListModalPanel"
+                                     dataModel="#{providerDataModel}"
+                                     reRender="providerField, purchaseOrderDetailsPanel"
+                                     readOnly="false"
+                                     renderedSelectLink="true"
+                                     renderedClearLink="true"
+                                     renderedNewLink="false"
+                                     renderedEditLink="false"
+                                     editAction="true"
+                                     newModalPanel="financeProviderModalPanel"
+                                     newAction="#{financeProviderAction.newInstanceInModalPanel()}"
+                                     editModalPanel="financeProviderModalPanel"
+                                     hotKeySelect="alt+3">
+                        <ui:define name="dataModelStaticProperties">
+                            <f:setPropertyActionListener
+                                    value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
+                                    target="#{providerDataModel.moduleProviderType}"/>
+                            <f:setPropertyActionListener
+                                    value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
+                                    target="#{providerDataModel.financesEntityState}"/>
+                        </ui:define>
+                    </app:selectPopUp>
+                    <a4j:commandLink id="textLink"
+                                     oncomplete="Richfaces.showModalPanel('financeProviderModalPanel');"
+                                     rendered="false"
+                                     reRender="financeProviderModalPanel"
+                                     ajaxSingle="true"
+                                     action="#{financeProviderAction.selectInstanceInModalPanel(warehousePurchaseOrder.provider)}"
+                                     title="#{messages['Common.edit']}"
+                                     immediate="true">
+                        <h:graphicImage value="/img/edit3.png" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+            </h:panelGrid>
+        </rich:panel>
+
+        <app:reportDefaultOptions reportAction="#{kardexProviderReportAction}" showPageFormat="false"
+                                  tabIndex="11"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{kardexProviderReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+    <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="hasWarehousePermission" value="true"/>
+        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{kardexProviderReportAction.setCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="itemAccountField"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="financeProviderModalPanelContainer"
+                template="/finances/financeProviderModalPanel.xhtml">
+        <ui:param name="containerId" value="financeProviderModalPanelContainer"/>
+        <ui:param name="dialogId" value="financeProviderModalPanel"/>
+        <ui:param name="reRender" value="providerField, purchaseOrderDetailsPanel"/>
+        <ui:param name="postCreateAction"
+                  value="warehousePurchaseOrderAction.assignProvider(financeProviderAction.instance)"/>
+        <ui:param name="postUpdateAction"
+                  value="warehousePurchaseOrderAction.assignProvider(financeProviderAction.instance)"/>
+    </s:decorate>
+    <s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{kardexProviderReportAction.setProvider(providerItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="providerField, purchaseOrderDetailsPanel"
+                               oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+</ui:define>
+</ui:composition>

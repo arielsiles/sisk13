@@ -1,0 +1,272 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 id="#{empty dialogId ? 'jobContractListModalPanel':dialogId}"
+                 onshow="focusFirstElement();">
+
+<c:if test="#{empty dataModel}">
+    <c:set var="dataModel" value="#{jobContractDataModel}"/>
+</c:if>
+<c:if test="#{empty dialogId}">
+    <c:set var="dialogId" value="jobContractListModalPanel"/>
+</c:if>
+<c:if test="#{empty multiSelectMode}">
+    <c:set var="multiSelectMode" value="false"/>
+</c:if>
+
+<f:facet name="header">
+    <h:outputText>#{messages['JobContract.list']}</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+</f:facet>
+<h:form id="jobContractSearch#{dialogId}">
+
+<rich:simpleTogglePanel id="jobContractSearchPanel" label="#{messages['JobContract.search']}" switchType="client">
+    <h:panelGrid id="jobContractSearchInfo"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{dataModel.idNumber}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1"/>
+            </s:decorate>
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{dataModel.firstName}"
+                             maxlength="100" styleClass="input"
+                             tabindex="2"/>
+            </s:decorate>
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{dataModel.lastName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="3"/>
+            </s:decorate>
+            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{dataModel.maidenName}"
+                             maxlength="100"
+                             styleClass="input"
+                             tabindex="4"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+
+                <h:selectOneMenu id="businessUnit"
+                                 value="#{dataModel.businessUnit}"
+                                 rendered="#{dataModel.enableBusinessUnitFilter}"
+                                 styleClass="input"
+                                 tabindex="5">
+                    <s:selectItems value="#{businessUnitList}" var="business"
+                                   label="#{business.organization.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" ajaxSingle="true"
+                                 reRender="businessUnitField"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+
+                <h:outputText value="#{dataModel.businessUnit.fullName}"
+                              rendered="#{not dataModel.enableBusinessUnitFilter}"/>
+            </s:decorate>
+
+            <s:decorate id="SectorField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{dataModel.enableJobCategoryFilter}">
+                <ui:define name="label">#{messages['Job.sector']}</ui:define>
+                <h:selectOneMenu id="sector" value="#{dataModel.sector}"
+                                 styleClass="input"
+                                 tabindex="6">
+                    <s:selectItems value="#{sectorList}" var="sector"
+                                   label="#{sector.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" ajaxSingle="true"
+                                 action="#{dataModel.refreshJobCategory}"
+                                 reRender="jobCategoryField"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Job.jobCategory']}</ui:define>
+                <h:selectOneMenu id="jobCategory" styleClass="input" tabindex="7"
+                                 rendered="#{dataModel.enableJobCategoryFilter}"
+                                 value="#{dataModel.jobCategory}">
+                    <s:selectItems value="#{dataModel.jobCategoryList}" var="jobCategory"
+                                   label="#{jobCategory.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <h:outputText value="#{dataModel.jobCategory.fullName}"
+                              rendered="#{not dataModel.enableJobCategoryFilter}"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <a4j:commandButton action="#{dataModel.search}"
+                                   reRender="jobContractList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="8">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <a4j:commandButton action="#{dataModel.clear}"
+                                   reRender="jobContractSearchInfo, jobContractList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.clear']}"
+                                   tabindex="9"/>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</rich:simpleTogglePanel>
+<c:choose>
+    <c:when test="#{multiSelectMode}">
+        <div class="buttons">
+            <ui:insert name="addButton"/>
+        </div>
+        <c:set var="columnsWidthVar" value="5%,10%,25%, 25%, 15%, 10%, 10%"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="columnsWidthVar" value="10%,25%, 25%, 15%, 10%, 10%, 5%"/>
+    </c:otherwise>
+</c:choose>
+<br/>
+<rich:dataTable value="#{dataModel}" var="jobContractItem"
+                id="jobContractList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="10%,25%, 25%, 15%, 10%, 10%, 5%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column rendered="#{multiSelectMode}" styleClass="center">
+                <app:selectCheckboxHeader dataModel="#{dataModel}"
+                                          reRender="jobContractList, dataScroller"/>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.idNumber"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['Person.idNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="employee.lastName,employee.maidenName,employee.firstName"
+                        dataModel="#{dataModel}"
+                        reRender="jobContractList, dataScroller">
+                    #{messages['JobContract.employee']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="organizationalUnit.name"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['JobContract.organizationalUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="charge.name"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['Job.charge']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="jobCategory.acronym"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['Job.jobCategory']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.initDate"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['JobContract.initDate']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.endDate"
+                                       dataModel="#{dataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['JobContract.endDate']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column rendered="#{!multiSelectMode}" styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column rendered="#{multiSelectMode}" styleClass="center">
+        <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                 immediate="true"
+                                 value="#{dataModel.selectedList[dataModel.page][jobContractItem.id]}">
+            <a4j:support event="onchange"
+                         reRender="selectCheckboxItem"/>
+        </h:selectBooleanCheckbox>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.contract.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.contract.employee.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.job.organizationalUnit.name}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.job.charge.name}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.job.jobCategory.acronym}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.contract.initDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{jobContractItem.contract.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column rendered="#{!multiSelectMode}" styleClass="center">
+        <ui:insert name="assignButton"/>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="jobContractList" dataModel="#{dataModel}"/>
+<rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton ,addButton"
+                       operation="hide" event="onclick"/>
+<script type="text/javascript">
+    function focusFirstElement() {
+        document.getElementById("#{rich:clientId('idNumber')}").focus();
+    }
+</script>
+</h:form>
+</rich:modalPanel>
+

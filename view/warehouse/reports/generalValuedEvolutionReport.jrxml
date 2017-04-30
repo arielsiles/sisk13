@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="articlesReport" pageWidth="792" pageHeight="612" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="742" leftMargin="30" rightMargin="20" topMargin="30" bottomMargin="30"
+              scriptletClass="com.encens.khipus.action.warehouse.reports.GeneralValuedEvolutionReportScriptlet">
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+    <field name="warehouse.id" class="com.encens.khipus.model.warehouse.WarehousePK">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="warehouse.name" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="productItem.id" class="com.encens.khipus.model.warehouse.ProductItemPK">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="productItem.productItemCode" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="productItem.name" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="productItem.usageMeasureUnit" class="com.encens.khipus.model.finances.MeasureUnit">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="productItem.unitCost" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="inventory.unitaryBalance" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="subGroup" class="com.encens.khipus.model.warehouse.SubGroup">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <field name="group" class="com.encens.khipus.model.warehouse.Group">
+        <fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+    </field>
+    <variable name="approvedEntries" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="approvedEgresses" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="remainingPlusPending" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="totalAmount" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="previousUnitaryBalance" class="java.math.BigDecimal" calculation="System"/>
+    <group name="warehouseGroup">
+        <groupExpression><![CDATA[$F{warehouse.id}]]></groupExpression>
+        <groupHeader>
+            <band height="13" splitType="Stretch">
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" mode="Opaque" x="0" y="1" width="60" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                        <bottomPen lineWidth="1.0"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{ValuedWarehouseResidueReport.report.warehouse}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyleBlank" mode="Opaque" x="60" y="1" width="682" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                        <bottomPen lineWidth="1.0"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{warehouse.id}.getWarehouseCode()+" - "+$F{warehouse.name}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+    <group name="productItemGroupGroup">
+        <groupExpression>$F{group}.getId()</groupExpression>
+        <groupHeader>
+            <band height="13" splitType="Stretch">
+                <frame>
+                    <reportElement x="5" y="1" width="732" height="12"/>
+                    <box padding="0">
+                        <bottomPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                    </box>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyleBlank"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="40"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.group}]]>
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyleBlank"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="40"
+                                y="0"
+                                width="692"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{group}.getFullName()]]>
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+    </group>
+    <group name="productItemSubGroupGroup">
+        <groupExpression>$F{subGroup}.getId()</groupExpression>
+        <groupHeader>
+            <band height="26" splitType="Stretch">
+                <frame>
+                    <reportElement x="10" y="1" width="722" height="12"/>
+                    <box padding="0">
+                        <bottomPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                    </box>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyleBlank"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="0"
+                                y="0"
+                                width="60"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.subGroup}]]>
+                        </textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement
+                                style="headerStyleBlank"
+                                positionType="Float"
+                                stretchType="RelativeToTallestObject"
+                                mode="Opaque"
+                                x="60"
+                                y="0"
+                                width="662"
+                                height="12"/>
+                        <box padding="1">
+                            <pen lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{subGroup}.getFullName()]]>
+                        </textFieldExpression>
+                    </textField>
+                </frame>
+                <frame>
+                    <reportElement x="10" y="14" width="722" height="12" stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="0"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                       width="75" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{ValuedWarehouseResidueReport.report.productItem}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="75" y="0"
+                                       width="107" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{ValuedWarehouseResidueReport.report.productItemDescription}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="182"
+                                       y="0" width="70" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{ValuedWarehouseResidueReport.report.productItemMeasure}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="252"
+                                       y="0" width="70" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.previousUnitRemainder}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="322"
+                                       y="0" width="80" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.entries}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="402"
+                                       y="0" width="80" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.egresses}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="482"
+                                       y="0" width="80" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{GeneralValuedEvolutionReport.report.total}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="562"
+                                       y="0" width="80" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{ValuedWarehouseResidueReport.report.unitCost}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="642"
+                                       y="0" width="80" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{ValuedWarehouseResidueReport.report.amount}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+    </group>
+    <title>
+        <band height="70" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58"
+                               isRemoveLineWhenBlank="true"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="date_text" style="titleStyle" positionType="Float" x="72" y="0" width="672"
+                               height="58"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band splitType="Stretch"/>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="10" y="0"
+                               width="75" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{productItem.productItemCode}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="85" y="0"
+                               width="107" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{productItem.name}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="192" y="0"
+                               width="70" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{productItem.usageMeasureUnit}.getName()]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="262" y="0"
+                               width="70" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{previousUnitaryBalance}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="332" y="0"
+                               width="80" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{approvedEntries}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="412" y="0"
+                               width="80" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{approvedEgresses}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="492" y="0"
+                               width="80" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{remainingPlusPending}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.000" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="572" y="0"
+                               width="80" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{productItem.unitCost}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" pattern="#,##0.000" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="652" y="0"
+                               width="80" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalAmount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="742"
+                               height="12"/>
+                <box padding="0">
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                   width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="651" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="691" y="0"
+                                   width="10" height="12"/>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="701" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band splitType="Stretch"/>
+    </summary>
+</jasperReport>

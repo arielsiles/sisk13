@@ -1,0 +1,362 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<h:form id="gestionPayrollForm">
+<c:if test="${empty hasDefaultValuesFromGenerationCycle}">
+    <c:set var="hasDefaultValuesFromGenerationCycle" value="false"/>
+</c:if>
+<c:set var="specialUpdateEnable"
+       value="#{not gestionPayrollAction.gestionPayrollReadOnly or s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+<c:set var="createPermission"
+       value="#{s:hasPermission('GESTIONPAYROLL','CREATE')}"/>
+<c:set var="gestionPayrollSpecialUpdatePermission"
+       value="#{s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+
+<div class="buttons">
+    <h:commandButton action="#{gestionPayrollAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','CREATE')}"
+                     id="createButtonId"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{gestionPayrollAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','UPDATE')}"
+                     tabindex="2"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{gestionPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{gestionPayrollAction.managed}">
+            #{messages['GestionPayroll.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['GestionPayroll.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+<s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Sede.sede']}</ui:define>
+    <h:selectOneMenu id="organizationalUnit"
+                     value="#{gestionPayroll.businessUnit}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+                     tabindex="5">
+        <s:selectItems value="#{sedeList.resultList}" var="sede"
+                       label="#{sede.fullName}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support event="onchange"
+                     action="#{gestionPayrollAction.businessUnitChanged()}"
+                     reRender="organizationalUnitField, gestionNameField"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{gestionPayroll.businessUnit.fullName}"
+                  rendered="#{gestionPayrollAction.gestionPayrollReadOnly or hasDefaultValuesFromGenerationCycle}"/>
+</s:decorate>
+
+<s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+    <h:selectOneMenu id="gestion"
+                     value="#{gestionPayroll.gestion}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+                     tabindex="6">
+        <s:selectItems value="#{gestionList}" var="gestion"
+                       label="#{gestion.year}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support action="#{gestionPayrollAction.gestionChanged()}"
+                     event="onchange"
+                     reRender="gestionField, datesFieldsDiv, gestionNameField"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{gestionPayroll.gestion.year}"
+                  rendered="#{gestionPayrollAction.gestionPayrollReadOnly or hasDefaultValuesFromGenerationCycle}"/>
+</s:decorate>
+<s:div id="monthFieldDiv" rendered="#{gestionPayrollAction.showSalaryFields}">
+    <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GestionPayroll.month']}</ui:define>
+        <h:selectOneMenu id="month"
+                         value="#{gestionPayroll.month}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+                         tabindex="7">
+            <s:selectItems value="#{month}" var="month" label="#{messages[month.resourceKey]}"
+                           hideNoSelectionLabel="false"
+                           noSelectionLabel=""/>
+            <s:convertEnum/>
+            <a4j:support action="#{gestionPayrollAction.monthChanged()}"
+                         event="onchange"
+                         reRender="monthFieldDiv, datesFieldsDiv, gestionNameField"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{messages[gestionPayroll.month.resourceKey]}"
+                      rendered="#{gestionPayrollAction.gestionPayrollReadOnly or hasDefaultValuesFromGenerationCycle}"/>
+    </s:decorate>
+</s:div>
+
+<s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.jobCategory']}</ui:define>
+    <h:selectOneMenu id="jobCategory"
+                     value="#{gestionPayroll.jobCategory}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly}"
+                     tabindex="8">
+        <s:selectItems value="#{jobCategoryListByGestionPayroll}" var="jobCategory"
+                       label="#{jobCategory.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support action="#{gestionPayrollAction.jobCategoryChanged()}"
+                     event="onchange"
+                     reRender="jobCategoryField, datesFieldsDiv, gestionNameField"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{gestionPayroll.jobCategory.name}"
+                  rendered="#{gestionPayrollAction.gestionPayrollReadOnly}"/>
+</s:decorate>
+
+<s:decorate id="gestionNameField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.gestionName']}</ui:define>
+    <h:inputText id="gestionName" value="#{gestionPayroll.gestionName}" styleClass="input"
+                 required="true"
+                 rendered="#{not gestionPayrollAction.gestionPayrollReadOnly}"
+                 maxlength="150"
+                 tabindex="9"/>
+    <h:outputText value="#{gestionPayroll.gestionName}"
+                  rendered="#{gestionPayrollAction.gestionPayrollReadOnly}"/>
+</s:decorate>
+
+<s:decorate id="gestionPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.gestionPayrollType']}</ui:define>
+    <h:selectOneMenu id="gestionPayrollType"
+                     value="#{gestionPayroll.gestionPayrollType}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+                     tabindex="10">
+        <s:selectItems value="#{gestionPayrollTypeEnum}" var="gestionPayrollType"
+                       label="#{messages[gestionPayrollType.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEnum/>
+        <a4j:support event="onchange"
+                     action="#{gestionPayrollAction.gestionPayrollTypeChanged()}"
+                     reRender="datesDiv"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{messages[gestionPayroll.gestionPayrollType.resourceKey]}"
+                  rendered="#{gestionPayrollAction.gestionPayrollReadOnly or hasDefaultValuesFromGenerationCycle}"/>
+</s:decorate>
+
+<s:div id="datesDiv">
+    <s:div id="datesFieldsDiv" rendered="#{gestionPayrollAction.showSalaryFields}">
+        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['GestionPayroll.initDate']}</ui:define>
+            <rich:calendar id="initDate"
+                           value="#{gestionPayroll.initDate}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           required="true"
+                           rendered="#{not gestionPayrollAction.gestionPayrollReadOnly}"
+                           tabindex="11"/>
+            <h:outputText value="#{gestionPayroll.initDate}"
+                          rendered="#{gestionPayrollAction.gestionPayrollReadOnly}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['GestionPayroll.endDate']}</ui:define>
+            <rich:calendar id="endDate"
+                           value="#{gestionPayroll.endDate}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           required="true"
+                           rendered="#{not gestionPayrollAction.gestionPayrollReadOnly}"
+                           tabindex="12">
+                <app:dateRangeValidator forId="initDate"
+                                        forLabel="#{messages['GestionPayroll.initDate']}"
+                                        type="greater"/>
+            </rich:calendar>
+            <h:outputText value="#{gestionPayroll.endDate}"
+                          rendered="#{gestionPayrollAction.gestionPayrollReadOnly}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+    </s:div>
+</s:div>
+
+<s:decorate id="generationBeginningField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.generationBeginning']}</ui:define>
+    <rich:calendar id="generationBeginning"
+                   value="#{gestionPayroll.generationBeginning}"
+                   popup="true"
+                   datePattern="#{messages['patterns.date']}"
+                   styleClass="input"
+                   enableManualInput="true"
+                   required="true"
+                   rendered="#{specialUpdateEnable}"
+                   tabindex="13"/>
+    <h:outputText value="#{gestionPayroll.generationBeginning}" rendered="#{not specialUpdateEnable}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </h:outputText>
+</s:decorate>
+
+<s:decorate id="generationDeadlineField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.generationDeadline']}</ui:define>
+    <rich:calendar id="generationDeadline"
+                   value="#{gestionPayroll.generationDeadline}"
+                   popup="true"
+                   datePattern="#{messages['patterns.date']}"
+                   styleClass="input"
+                   enableManualInput="true"
+                   required="true"
+                   rendered="#{specialUpdateEnable}"
+                   tabindex="14">
+        <app:dateRangeValidator forId="generationBeginning"
+                                forLabel="#{messages['GestionPayroll.generationBeginning']}"
+                                type="greater"/>
+    </rich:calendar>
+    <h:outputText value="#{gestionPayroll.generationDeadline}" rendered="#{not specialUpdateEnable}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </h:outputText>
+</s:decorate>
+
+<s:decorate id="officialPayrollDeadlineField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['GestionPayroll.officialPayrollDeadline']}</ui:define>
+    <rich:calendar id="officialPayrollDeadline"
+                   value="#{gestionPayroll.officialPayrollDeadline}"
+                   popup="true"
+                   datePattern="#{messages['patterns.date']}"
+                   styleClass="input"
+                   enableManualInput="true"
+                   required="true"
+                   rendered="#{specialUpdateEnable}"
+                   tabindex="15">
+        <app:dateRangeValidator forId="generationDeadline"
+                                forLabel="#{messages['GestionPayroll.generationDeadline']}"
+                                type="greater"/>
+    </rich:calendar>
+    <h:outputText value="#{gestionPayroll.officialPayrollDeadline}" rendered="#{not specialUpdateEnable}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </h:outputText>
+</s:decorate>
+
+<s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <c:set var="editable"
+           value="#{(not gestionPayrollAction.managed and createPermission) or ( gestionPayrollAction.managed and gestionPayrollSpecialUpdatePermission )}"/>
+
+    <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+    <h:inputText id="rate"
+                 value="#{gestionPayroll.exchangeRate.rate}"
+                 styleClass="input"
+                 maxlength="150"
+                 required="true"
+                 rendered="#{editable}"
+                 tabindex="16">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+    </h:inputText>
+    <h:outputText value="#{gestionPayroll.exchangeRate.rate}"
+                  rendered="#{not editable}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</s:decorate>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{gestionPayrollAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','CREATE')}"
+                     tabindex="20">
+    </h:commandButton>
+
+    <h:commandButton action="#{gestionPayrollAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','UPDATE')}"
+                     tabindex="21"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','DELETE')}"
+                     tabindex="22">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{gestionPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="23">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['GestionPayroll.delete.confirmation']}">
+                <f:param value="#{gestionPayroll.gestionName}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{gestionPayrollAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"
+                           rendered="#{gestionPayrollAction.managed and s:hasPermission('GESTIONPAYROLL','DELETE')}"
+                           tabindex="1000"/>
+    </ui:define>
+</s:decorate>
+
+
+<rich:jQuery selector="#gestionName" query="focus()" timing="onload"/>
+
+</ui:composition>

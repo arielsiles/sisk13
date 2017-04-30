@@ -1,0 +1,124 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:costCenterListForm\\\\:codeField\\\\:code').focus();">
+
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{inventoryCostCenterDataModel}"/>
+    </c:if>
+    <f:facet name="header">
+        <h:outputText>#{messages['CostCenter.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="costCenterListForm">
+        <rich:simpleTogglePanel label="#{messages['CostCenter.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <ui:insert name="searchOptions"/>
+                <s:div>
+                    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CostCenter.code']}</ui:define>
+                        <h:inputText id="code" value="#{dataModel.criteria.code}"
+                                     maxlength="20"
+                                     styleClass="input"
+                                     tabindex="1"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CostCenter.description']}</ui:define>
+                        <h:inputText id="description"
+                                     value="#{dataModel.criteria.description}"
+                                     maxlength="200"
+                                     styleClass="input"
+                                     tabindex="2"/>
+                        <a4j:commandButton action="#{dataModel.search}"
+                                           reRender="costCenterList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="4">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+        <br/>
+
+        <rich:dataTable value="#{dataModel}"
+                        var="costCenterItem"
+                        id="costCenterList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="25%, 15%, 45%, 10%, 5%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.groupCode,costCenter.code"
+                                               dataModel="#{dataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.group']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.code"
+                                               dataModel="#{dataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.description"
+                                               dataModel="#{dataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.exclusiveConsumption"
+                                               dataModel="#{dataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.exclusiveConsumption']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText rendered="#{not empty costCenterItem.costCenterGroup}"
+                              value="#{costCenterItem.costCenterGroup.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{costCenterItem.code}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{costCenterItem.description}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:outputText value="#{messages[costCenterItem.exclusiveConsumption?'Common.yes':'Common.not']}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="costCenterListModalPanel" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="costCenterList" dataModel="#{dataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

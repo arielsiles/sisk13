@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['SessionUserLog.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+        <h:form id="sessionUserLogSearch">
+            <rich:simpleTogglePanel label="#{messages['SessionUserLog.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SessionUserLog.user']}</ui:define>
+                    <h:inputText id="name" value="#{sessionUserLogDataModel.criteria}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton id="searchButtonId" action="#{sessionUserLogDataModel.search}"
+                                       reRender="sessionUserLogList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons"></div>
+
+            <rich:dataTable id="sessionUserLogList"
+                            value="#{sessionUserLogList}"
+                            var="sessionUserLogItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            reRender="dataScroller"
+                            sortPriority="#{sessionUserLogDataModel.sortPriority}"
+                            sortMode="multi"
+                            width="100%"
+                            columnsWidth="20%, 16%, 16%, 16%, 16%, 16%">
+                <rich:column sortBy="#{sessionUserLogItem.name}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.user']}"/>
+                    </f:facet>
+                    <h:outputText value="#{sessionUserLogItem.name}"/>
+                </rich:column>
+                <rich:column sortBy="#{sessionUserLogItem.lastLogin}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.lastLogin']}"/>
+                    </f:facet>
+                    <h:outputText value="#{sessionUserLogItem.lastLogin}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column id="lastAction" sortOrder="DESCENDING" sortBy="#{sessionUserLogItem.lastAction}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.lastAction']}"/>
+                    </f:facet>
+                    <h:outputText value="#{sessionUserLogItem.lastAction}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column sortBy="#{sessionUserLogItem.lastLogout}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.lastLogout']}"/>
+                    </f:facet>
+                    <h:outputText value="#{sessionUserLogItem.lastLogout}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column sortBy="#{sessionUserLogItem.ipAddress}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.ipAddress']}"/>
+                    </f:facet>
+                    <h:outputText value="#{sessionUserLogItem.ipAddress}"/>
+                </rich:column>
+                <rich:column id="online" sortOrder="DESCENDING" sortBy="#{sessionUserLogItem.online}"
+                             styleClass="center">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['SessionUserLog.online']}"/>
+                    </f:facet>
+                    <h:graphicImage value="/img/infoIcon.gif" style="border:0;vertical-align:middle;"
+                                    alt="#{messages['SessionUserLog.online']}"
+                                    rendered="#{sessionUserLogItem.online}"/>
+                    <h:graphicImage value="/img/errorIcon.gif" style="border:0;vertical-align:middle;"
+                                    alt="#{messages['SessionUserLog.online']}"
+                                    rendered="#{!sessionUserLogItem.online}"/>
+                </rich:column>
+            </rich:dataTable>
+            <rich:datascroller id="dataScroller" align="right" for="sessionUserLogList" maxPages="10"
+                               renderIfSinglePage="false"/>
+
+            <div class="buttons"></div>
+
+            <rich:jQuery selector="#sessionUserLogList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#sessionUserLogList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

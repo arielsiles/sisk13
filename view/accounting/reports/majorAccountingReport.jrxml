@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="majorAccountingReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
+	<property name="ireport.zoom" value="1.9487171000000127"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="documentTitle" class="java.lang.String"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="cashAccount" class="java.lang.String"/>
+	<parameter name="balance" class="java.lang.Double"/>
+	<parameter name="totalBalance" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<field name="date" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="account" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="documentType" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="transactionNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="gloss" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<field name="debit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+	</field>
+	<field name="credit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+	</field>
+	<variable name="totalCredit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
+	</variable>
+	<variable name="totalDebit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{debit}]]></variableExpression>
+	</variable>
+	<variable name="saldo" class="java.lang.Double">
+		<variableExpression><![CDATA[$P{balance}]]></variableExpression>
+	</variable>
+	<variable name="diference" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{debit}.doubleValue()-$F{credit}.doubleValue()]]></variableExpression>
+	</variable>
+	<variable name="rowBalance" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{diference}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="Inc_Var" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{REPORT_COUNT}.intValue()]]></variableExpression>
+	</variable>
+	<variable name="Col_Var" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{debit}.doubleValue()==0.00 ? $F{credit}.negate() : $F{debit}]]></variableExpression>
+	</variable>
+	<variable name="delta" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{Inc_Var}.intValue() == 1 ? (BigDecimal.valueOf($P{balance}).add($V{Col_Var})) : $V{Col_Var}]]></variableExpression>
+	</variable>
+	<variable name="delta_sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{delta}]]></variableExpression>
+	</variable>
+	<group name="purchaseOrderGroup">
+		<groupExpression><![CDATA[]]></groupExpression>
+		<groupHeader>
+			<band height="40" splitType="Stretch">
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="561" height="12"/>
+					<staticText>
+						<reportElement x="422" y="0" width="33" height="12"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Periodo:]]></text>
+					</staticText>
+					<textField pattern="dd/MM/yyyy">
+						<reportElement x="455" y="0" width="48" height="12"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+					</textField>
+					<textField pattern="dd/MM/yyyy">
+						<reportElement x="513" y="0" width="48" height="12"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="503" y="0" width="10" height="12"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[-]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="37" y="0" width="215" height="12"/>
+						<textElement>
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$P{cashAccount}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="1" y="0" width="36" height="12"/>
+						<textElement>
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[CUENTA:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Opaque" x="1" y="12" width="560" height="16" forecolor="#000000"/>
+					<line>
+						<reportElement x="0" y="0" width="560" height="1"/>
+						<graphicElement>
+							<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+						</graphicElement>
+					</line>
+					<line>
+						<reportElement x="0" y="15" width="560" height="1"/>
+						<graphicElement>
+							<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+						</graphicElement>
+					</line>
+					<staticText>
+						<reportElement x="17" y="1" width="42" height="15"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Fecha]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="59" y="1" width="15" height="15"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Doc]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="74" y="1" width="20" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[No.]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="104" y="1" width="266" height="15"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[ Glosa]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="370" y="1" width="60" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[DEBE ]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="430" y="1" width="60" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[HABER ]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="490" y="1" width="65" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Saldo]]></text>
+					</staticText>
+				</frame>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="491" y="28" width="65" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$P{balance}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="24" splitType="Stretch">
+				<frame>
+					<reportElement x="0" y="7" width="561" height="16"/>
+					<textField pattern="#,##0.00">
+						<reportElement x="431" y="0" width="60" height="16"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="7" isUnderline="true"/>
+						</textElement>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalCredit}]]></textFieldExpression>
+					</textField>
+					<textField pattern="#,##0.00">
+						<reportElement x="371" y="0" width="60" height="16"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="7" isUnderline="true"/>
+						</textElement>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalDebit}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<line>
+					<reportElement x="0" y="2" width="561" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+					</graphicElement>
+				</line>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="491" y="7" width="65" height="16"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{delta_sum}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="36" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="21" width="561" height="15"/>
+				<textField>
+					<reportElement x="216" y="0" width="133" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="0" y="0" width="561" height="20"/>
+				<staticText>
+					<reportElement x="0" y="0" width="161" height="10"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="9" width="161" height="10"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[SISTEMA INTEGRADO CONTABLE]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement x="60" y="0" width="15" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{documentType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="75" y="0" width="20" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transactionNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="0" width="266" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gloss}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="371" y="0" width="60" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="431" y="0" width="60" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="18" y="0" width="42" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="491" y="0" width="65" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{delta_sum}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="18" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Inc_Var}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="88" splitType="Stretch"/>
+	</summary>
+</jasperReport>

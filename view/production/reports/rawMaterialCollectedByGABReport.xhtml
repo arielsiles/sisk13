@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define
+            name="pageTitle">#{messages['menu.production.collectedByGAB']}
+    </ui:define>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="rawMaterialCollectedByGABReportSearch" prependId="false">
+
+            <rich:simpleTogglePanel id="rawMaterialCollectedByGABReportSearchPanel"
+                                    label="#{messages['menu.production.rawmaterialpayroll.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2"
+                             width="98%"
+                             columnClasses="width55percent,width45percent"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0">
+                    <h:panelGroup>
+
+                        <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayRoll.productiveZoneName']}</ui:define>
+                            <h:inputText id="productiveZone"
+                                         value="#{rawMaterialCollectedByGABReportAction.fullNameOfProductiveZone}"
+                                         styleClass="input"
+                                         maxlength="150" tabindex="1" disabled="true" readonly="true">
+                            </h:inputText>
+                            <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="1"
+                                             title="#{messages['RawMaterialPayRoll.selectProductiveZone']}"
+                                             onclick="Richfaces.showModalPanel('productiveZoneModalPanel');"
+                                    >
+                                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayRoll.rawMaterial']}</ui:define>
+                            <h:selectOneMenu id="metaProduct"
+                                             value="#{rawMaterialCollectedByGABReportAction.metaProduct}"
+                                             styleClass="input" required="true" tabindex="2">
+                                <s:selectItems value="#{collectableProductList}"
+                                               var="product"
+                                               label="#{product.fullNameRawMaterial}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                            <h:selectOneMenu id="gestion"
+                                             value="#{rawMaterialCollectedByGABReportAction.gestion}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="3">
+                                <s:selectItems value="#{gestionList}"
+                                               var="gestion"
+                                               label="#{gestion.year}"
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             action="#{rawMaterialCollectedByGABReportAction.cleanGestionList}"
+                                             reRender="gestionField, gestionPayrollListField" ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                    </h:panelGroup>
+                    <h:panelGroup>
+
+                        <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Month.month']}</ui:define>
+                            <h:selectOneMenu id="month"
+                                             value="#{rawMaterialCollectedByGABReportAction.month}"
+                                             styleClass="input"
+                                             required="true">
+
+                                <s:selectItems value="#{monthEnumCollectedByGAB}" var="month"
+                                               label="#{messages[month.resourceKey]}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="periodoField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.controlReport.period']}</ui:define>
+                            <h:selectOneMenu id="periodo"
+                                             value="#{rawMaterialCollectedByGABReportAction.periodo}"
+                                             styleClass="input" required="true">
+
+                                <s:selectItems value="#{periodosCollectedByGAB}" var="periodos"
+                                               label="#{messages[periodos.resourceKey]}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                    </h:panelGroup>
+                </h:panelGrid>
+
+            </rich:simpleTogglePanel>
+
+            <app:reportDefaultOptions reportAction="#{rawMaterialCollectedByGABReportAction}" showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialCollectedByGABReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}"/>
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}"/>
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{rawMaterialCollectedByGABReportAction.selectProductiveZone(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true" reRender="productiveZoneField"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

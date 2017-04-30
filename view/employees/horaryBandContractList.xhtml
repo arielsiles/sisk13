@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['HoraryBandContract.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="horaryBandContractSearch">
+
+<rich:simpleTogglePanel id="horaryBandContractSearchPanel" label="#{messages['HoraryBandContract.search']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.employee']}</ui:define>
+                <h:inputText styleClass="input" readonly="true"
+                             value="#{horaryBandContractDataModel.employee.fullName}"
+                             tabindex="1"/>
+                <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
+                                 tabindex="2"
+                                 title="#{messages['HoraryBandContract.selectEmployee']}"
+                                 reRender="employeeField"
+                                 onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
+                                 tabindex="3"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{horaryBandContractDataModel.clearEmployee()}"
+                                 reRender="employeeField">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+            <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Cycle.cycle']}</ui:define>
+                <h:selectOneMenu id="cycle"
+                                 value="#{horaryBandContractDataModel.cycle}"
+                                 tabindex="4"
+                                 styleClass="input">
+                    <s:selectItems value="#{cycleList}" var="cycle"
+                                   label="#{cycle.name} - #{cycle.cycleType.sector.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.initDate']}</ui:define>
+                <rich:calendar id="initDate" value="#{horaryBandContractDataModel.criteria.initDate}"
+                               styleClass="input" datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="5">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.endDate']}</ui:define>
+                <rich:calendar id="endDate" value="#{horaryBandContractDataModel.criteria.endDate}"
+                               styleClass="input" datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="6">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+        </s:div>
+
+        <s:div>
+            <s:decorate id="initHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.initHour']}</ui:define>
+                <h:inputText id="initHour" maxlength="8" styleClass="input"
+                             value="#{horaryBandContractDataModel.initHour}"
+                             tabindex="7">
+                    <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                       timeZone="#{sessionUser.timeZone}" type="time"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.endHour']}</ui:define>
+                <h:inputText id="endHour" maxlength="8" styleClass="input"
+                             value="#{horaryBandContractDataModel.endHour}"
+                             tabindex="8">
+                    <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                       timeZone="#{sessionUser.timeZone}" type="time"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="initDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.initDay']}</ui:define>
+                <h:selectOneMenu id="initDay" value="#{horaryBandContractDataModel.initDay}" styleClass="input"
+                                 tabindex="9">
+                    <s:selectItems value="#{availableDay}" var="ad"
+                                   itemValue="#{messages[ad.resourceKey]}"
+                                   label="#{messages[ad.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="endDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.endDay']}</ui:define>
+                <h:selectOneMenu id="endDay" value="#{horaryBandContractDataModel.endDay}" styleClass="input"
+                                 tabindex="10">
+                    <s:selectItems value="#{availableDay}" var="ad"
+                                   itemValue="#{messages[ad.resourceKey]}"
+                                   label="#{messages[ad.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{horaryBandContractDataModel.search}"
+                                       reRender="horaryBandContractSearchPanel,horaryBandContractList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId"
+                                       tabindex="11">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{horaryBandContractDataModel.clear}"
+                                       reRender="horaryBandContractSearchPanel,horaryBandContractList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       id="clearButtonId"
+                                       tabindex="12">
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+
+
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+
+<div class="buttons">
+    <!--
+        <s:button value="#{messages['HoraryBandContract.blockHoraryBandContractChange']}"
+                  view="/employees/blockHoraryBandContractChangeList.xhtml"
+                  styleClass="button"
+                  propagation="begin"
+                  tabindex="12"/>
+    -->
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/horaryBandContract.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('HORARYBANDCONTRACT','CREATE')}"
+              tabindex="13"/>
+</div>
+
+<rich:dataTable value="#{horaryBandContractDataModel}" var="horaryBandContractItem"
+                id="horaryBandContractList" rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="7%, 5%, 15%, 15%, 8%, 8%, 5%, 5%, 6%, 6%, 5%,10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="horaryBandContract.jobContract.contract.employee.idNumber"
+                        dataModel="#{horaryBandContractDataModel}"
+                        reRender="horaryBandContractList, dataScroller">
+                    #{messages['Employee.ci']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="horaryBandContract.jobContract.job.jobCategory"
+                        dataModel="#{horaryBandContractDataModel}"
+                        reRender="horaryBandContractList, dataScroller">
+                    #{messages['JobCategory.acronym']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="horaryBandContract.jobContract.contract.employee.lastName,horaryBandContract.jobContract.contract.employee.maidenName,horaryBandContract.jobContract.contract.employee.firstName"
+                        dataModel="#{horaryBandContractDataModel}"
+                        reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBandContract.employee']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="horaryBandContract.jobContract.job.organizationalUnit.name"
+                        dataModel="#{horaryBandContractDataModel}"
+                        reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBandContract.organizationalUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.initDate"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBandContract.initDate']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.endDate"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBandContract.endDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.horaryBand.initHour"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBand.initHour']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.horaryBand.endHour"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBand.endHour']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.horaryBand.initDay"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBand.initDay']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.horaryBand.endDay"
+                                       dataModel="#{horaryBandContractDataModel}"
+                                       reRender="horaryBandContractList, dataScroller">
+                    #{messages['HoraryBand.endDay']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="horaryBandContract.active"
+                                       dataModel="#{discountRuleDataModel}"
+                                       reRender="discountRuleList, dataScroller">
+                    #{messages['DiscountRule.active']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.jobContract.contract.employee.idNumber}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.jobContract.job.jobCategory.acronym}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.jobContract.contract.employee.fullName}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText
+                value="#{horaryBandContractAction.findCareer(horaryBandContractItem.academicSchedule, horaryBandContractItem)}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.initDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.horaryBand.initHour}">
+            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                               type="time"
+                               timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.horaryBand.endHour}">
+            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                               type="time"
+                               timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.horaryBand.initDay}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{horaryBandContractItem.horaryBand.endDay}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:graphicImage rendered="#{horaryBandContractItem.active}" value="/img/active.gif"
+                        styleClass="select-image-middle"/>
+    </rich:column>
+    <rich:column styleClass="left">
+        <h:panelGrid width="100%" columns="1" cellpadding="0" cellspacing="0" border="0">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{horaryBandContractAction.select(horaryBandContractItem)}"
+                           rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}">
+                <s:conversationPropagation value="none"/>
+            </h:commandLink>
+            <h:commandLink value="#{messages['HoraryBandContract.unsubscribe']}"
+                           immediate="true"
+                           action="#{horaryBandContractAction.selectUnsubscribe(horaryBandContractItem)}"
+                           rendered="#{s:hasPermission('HORARYBANDCONTRACT','UPDATE')}">
+                <s:conversationPropagation value="none"/>
+            </h:commandLink>
+            <h:commandLink value="#{messages['HoraryBandContract.bandChange']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('HORARYBANDCONTRACT','UPDATE')}"
+                           action="#{horaryBandContractAction.selectBandChange(horaryBandContractItem)}">
+                <s:conversationPropagation value="none"/>
+            </h:commandLink>
+        </h:panelGrid>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="horaryBandContractList"
+                  dataModel="#{horaryBandContractDataModel}"/>
+
+<div class="buttons">
+    <!--
+        <s:button value="#{messages['HoraryBandContract.blockHoraryBandContractChange']}"
+                  view="/employees/blockHoraryBandContractChangeList.xhtml"
+                  styleClass="button"
+                  propagation="begin"
+                  tabindex="14"/>
+    -->
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/horaryBandContract.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('HORARYBANDCONTRACT','CREATE')}"
+              tabindex="15"/>
+</div>
+
+</h:form>
+<s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{horaryBandContractDataModel.setEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

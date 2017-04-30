@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:s="http://jboss.com/products/seam/taglib">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <title>
+        <ui:insert name="pageTitle"/>
+        - #{messages['App.name']}
+    </title>
+    <a4j:loadStyle src="/stylesheet/theme.css"/>
+    <ui:insert name="head"/>
+</head>
+
+<body id="body">
+<div id="bodyContainer" class="bodyContainer">
+    <c:choose>
+        <c:when test="#{identity.loggedIn and not showPowered}">
+            <ui:include src="header.xhtml"/>
+            <ui:include src="menu.xhtml"/>
+        </c:when>
+        <c:otherwise>
+            <div id="left">
+                &#160;
+                <a4j:status layout="block" startStyleClass="startAjax"
+                            onstart="this.style.top = jQuery(window).scrollTop()+'px';">
+                    <f:facet name="start">
+                        <h:panelGroup>
+                            <h:graphicImage value="/img/spinner.gif" style="border:0;vertical-align:middle;"/>
+                            &#160;#{messages['Common.ajax.request']}
+                        </h:panelGroup>
+                    </f:facet>
+                </a4j:status>
+            </div>
+        </c:otherwise>
+    </c:choose>
+
+    <div class="body">
+
+        <ui:include src="/include/messages.xhtml"/>
+
+        <div align="#{not empty bodyAlign ? bodyAlign : '' }">
+            <div style="width: #{not empty bodyWidth ? bodyWidth :'100%'};">
+                <ui:insert name="body"/>
+            </div>
+        </div>
+    </div>
+    <div class="spacer">&nbsp;</div>
+</div>
+<c:choose>
+    <c:when test="#{not showPowered}">
+        <ui:include src="/layout/footer.xhtml"/>
+    </c:when>
+    <c:otherwise>
+        <ui:include src="/layout/footerPowered.xhtml"/>
+    </c:otherwise>
+</c:choose>
+<c:if test="#{identity.loggedIn}">
+    <iframe id="administrativeNotificationPanelFrame"
+            src="#{request.contextPath}/admin/administrativeNotificationPanel;jsessionid=#{facesContext.externalContext.request.session.id}"
+            style="visibility:hidden;position:absolute;top:0;left:0;border:0;z-index:-1;background-color: transparent;"
+            width="0" height="0" frameborder="0"></iframe>
+</c:if>
+</body>
+</html>

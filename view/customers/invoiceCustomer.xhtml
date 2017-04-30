@@ -1,0 +1,293 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['InvoiceCustomer.title']}
+</ui:define>
+<ui:define name="head">
+    <a4j:loadScript src="/scripts/jquery.field.js"/>
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="disableMenu" value="true"/>
+<ui:param name="selectedTab" value="customers"/>
+
+<ui:define name="body">
+
+<script type="text/javascript">
+    //<![CDATA[
+    jQuery.extend(jQuery.expr[':'], {
+        focus:"a==document.activeElement"
+    });
+
+    jQuery(document).ready(function () {
+        document.forms['invoiceCustomerForm'].onkeypress = function (event) {
+            var keycode;
+            if (window.event) {
+                keycode = window.event.keyCode;
+            }
+            else if (event) {
+                keycode = event.which;
+            }
+            else {
+                return true;
+            }
+            if (keycode == 13) {
+                //jQuery("#invoiceCustomerForm\\:customerNumberField\\:customerNumber").focus();
+                var currentField = jQuery("INPUT:focus()");
+                var currentFieldId = currentField.attr("id");
+                if ("invoiceCustomerForm:newInvoice" == currentFieldId) {
+                    currentField.click();
+                }
+                else {
+                    currentField.moveNext();
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }
+    });
+    //]]>
+
+</script>
+
+<h:form id="invoiceCustomerForm">
+    <div class="buttons">
+        <h:commandButton action="#{invoiceCustomerAction.select}" value="#{messages['Invoice.new']}"
+                         styleClass="button"/>
+
+        <a4j:commandButton action="#{invoiceCustomerAction.pressPrintPrevious}" reRender="printPreviousInvoice"
+                           ajaxSingle="true" styleClass="button" value="#{messages['Invoice.printPrevious']}"/>
+
+        <h:commandButton action="#{invoiceCustomerAction.cancel}" styleClass="button"
+                         value="#{messages['Common.cancel']}" immediate="true"/>
+
+        <a4j:commandButton rendered="#{invoiceCustomerAction.requiredAuthorizationToClose}" ajaxSingle="true"
+                           oncomplete="Richfaces.showModalPanel('validateAuthorizationForCashBox');"
+                           value="#{messages['Common.exit']}"/>
+        <h:commandButton action="#{invoiceCustomerAction.closeCashBox}" value="#{messages['Common.exit']}"
+                         immediate="true"
+                         styleClass="button" rendered="#{!invoiceCustomerAction.requiredAuthorizationToClose}"/>
+    </div>
+
+    <style type="text/css">
+        .leftCell {
+            vertical-align: top;
+            width: 34%
+        }
+
+        .centerCell {
+            vertical-align: top;
+            width: 33%
+        }
+
+        .rightCell {
+            vertical-align: top;
+            width: 33%
+        }
+    </style>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            #{messages['InvoiceCustomer.title']}
+        </f:facet>
+
+
+        <h:panelGrid columns="3" columnClasses="leftCell, centerCell, rightCell">
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Entity.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{invoiceCustomerAction.idNumber}" styleClass="input"
+                             required="true" valueChangeListener="#{invoiceCustomerAction.idNumberChange}"
+                             maxlength="150" tabindex="1">
+                    <a4j:support event="onblur" reRender="formPanel" ajaxSingle="true"
+                                 focus="#{invoiceCustomerAction.customerFound ? 'newInvoice' : 'customerNumber' }"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="entityTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Entity.type']}</ui:define>
+                <h:selectOneMenu id="entityType" value="#{invoiceCustomerAction.entityType}"
+                                 styleClass="input" tabindex="2" required="true">
+                    <s:selectItems value="#{entityTypeList}" var="entityType"
+                                   label="#{messages[entityType.resourceKey]}"/>
+                    <a4j:support event="onchange" reRender="formPanel" ajaxSingle="true" focus="customerNumber"
+                                 action="#{invoiceCustomerAction.changeEntityType(invoiceCustomerAction.entityType)}"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Entity.documentType']}</ui:define>
+                <h:selectOneMenu id="documentType" value="#{selectedCustomer.entity.documentType}" styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{documentTypeList.resultList}" var="documentType"
+                                   label="#{documentType.name}"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="customerNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Entity.customerNumber']}</ui:define>
+                <h:inputText id="customerNumber" value="#{invoiceCustomerAction.customerNumber}" styleClass="input"
+                             valueChangeListener="#{invoiceCustomerAction.customerNumberChange}" maxlength="150"
+                             tabindex="4" validator="#{invoiceCustomerAction.validateCustomerNumber}"
+                             validatorMessage="#{messages['Entity.message.duplicatedCustomerNumber']}">
+                    <a4j:support event="onblur" reRender="formPanel" ajaxSingle="true"
+                                 focus="#{invoiceCustomerAction.person ? 'firstName' : 'organizationName' }"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                <h:selectOneMenu id="extension"
+                                 value="#{selectedCustomer.entity.extensionSite}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{extensionList}"
+                                   var="extension"
+                                   label="#{extension.extension}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <h:outputText value=""/>
+
+
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{invoiceCustomerAction.person}">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{selectedCustomer.entity.firstName}" required="true"
+                             maxlength="200" tabindex="#{invoiceCustomerAction.person ? '5' : '9' }"
+                             styleClass="input"/>
+            </s:decorate>
+
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{invoiceCustomerAction.person}">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{selectedCustomer.entity.lastName}" required="true"
+                             maxlength="80" tabindex="#{invoiceCustomerAction.person ? '6' : '10' }"
+                             styleClass="input"/>
+
+            </s:decorate>
+
+            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{invoiceCustomerAction.person}">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{selectedCustomer.entity.maidenName}"
+                             maxlength="200" tabindex="#{invoiceCustomerAction.person ? '7' : '11' }"
+                             styleClass="input"/>
+
+            </s:decorate>
+
+
+            <s:decorate id="organizationNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{!invoiceCustomerAction.person}">
+                <ui:param name="oneLine" value="false"/>
+                <ui:define name="label">#{messages['Organization.name']}</ui:define>
+                <h:inputText id="organizationName" value="#{selectedCustomer.entity.name}" required="true"
+                             maxlength="200" tabindex="#{!invoiceCustomerAction.person ? '5' : '11' }"
+                             styleClass="input"/>
+            </s:decorate>
+            <h:outputText value="" rendered="#{!invoiceCustomerAction.person}"/>
+            <h:outputText value="" rendered="#{!invoiceCustomerAction.person}"/>
+
+        </h:panelGrid>
+
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton id="newInvoice" action="#{invoiceCustomerAction.select}" value="#{messages['Invoice.new']}"
+                         styleClass="button" tabindex="#{invoiceCustomerAction.person ? '8' : '6' }">
+            <rich:componentControl rendered="#{invoiceCustomerAction.zeroInvoice}" for="zeroInvoiceD" event="onclick"
+                                   disableDefault="true" operation="show"/>
+        </h:commandButton>
+
+        <a4j:commandButton action="#{invoiceCustomerAction.pressPrintPrevious}" reRender="printPreviousInvoice"
+                           ajaxSingle="true" styleClass="button" value="#{messages['Invoice.printPrevious']}"/>
+
+        <h:commandButton id="cancel" action="#{invoiceCustomerAction.cancel}" styleClass="button"
+                         value="#{messages['Common.cancel']}" immediate="true"
+                         tabindex="#{invoiceCustomerAction.person ? '9' : '7' }"/>
+
+        <a4j:commandButton value="#{messages['Common.exit']}" tabindex="#{invoiceCustomerAction.person ? '10' : '8' }"
+                           rendered="#{invoiceCustomerAction.requiredAuthorizationToClose}" ajaxSingle="true"
+                           oncomplete="Richfaces.showModalPanel('validateAuthorizationForCashBox');"/>
+
+        <h:commandButton id="exit" action="#{invoiceCustomerAction.closeCashBox}" value="#{messages['Common.exit']}"
+                         styleClass="button" immediate="true" tabindex="#{invoiceCustomerAction.person ? '10' : '8'}"
+                         rendered="#{!invoiceCustomerAction.requiredAuthorizationToClose}"/>
+
+    </div>
+
+</h:form>
+
+<rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+
+<s:div id="refreshApplet">
+    <c:if test="${param.id != -1}">
+        <!-- <c:if test="${param.id != 'null'}">        -->
+        <s:fragment rendered="#{not empty param.id}">
+            <APPLET CODE="com.encens.khipus.applet.printer.PrintApplet.class"
+                    CODEBASE="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/applet/"
+                    archive="printer.jar, htmlparser.jar" WIDTH="0" HEIGHT="0">
+                <PARAM name="url"
+                       value="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/customers/invoicePrintFooter;jsessionid=#{facesContext.externalContext.request.session.id}?id=#{param.id}"/>
+            </APPLET>
+        </s:fragment>
+    </c:if>
+</s:div>
+
+<s:div id="printPreviousInvoice">
+    <c:if test="#{invoiceCustomerAction.printPrevious == 'press'}">
+        <c:if test="#{invoiceCustomerAction.idPreviousInvoice != null}">
+            <s:fragment>
+                <APPLET CODE="com.encens.khipus.applet.printer.PrintApplet.class"
+                        CODEBASE="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/applet/"
+                        archive="printer.jar, htmlparser.jar" WIDTH="0" HEIGHT="0">
+                    <PARAM name="url"
+                           value="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/customers/invoicePrintTxt;jsessionid=#{facesContext.externalContext.request.session.id}?id=#{invoiceCustomerAction.idPreviousInvoice}"/>
+                </APPLET>
+
+            </s:fragment>
+        </c:if>
+    </c:if>
+</s:div>
+
+<!-- OJO -->
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{invoiceCustomerAction.zeroInvoice}">
+    <ui:param name="dialogId" value="zeroInvoiceD"/>
+    <ui:define name="dialogTitle">#{messages['Invoice.zeroInvoice']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Invoice.create.zeroInvoice']}">
+                <f:param value="algun nombre"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{invoiceCustomerAction.select}" value="#{messages['Invoice.new']}"
+                           immediate="true" tabindex="14"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,87 @@
+<rich:modalPanel id="searchRHMarkModalPanel" height="450" width="600" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 onshow="jQuery('#searchRHMarkModalPanelContainer\\:rHMarkSearch\\:marRefCardField\\:marRefCard').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['RHMark.search']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:panelGroup>
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+            <rich:componentControl for="searchRHMarkModalPanel" attachTo="closeLink" operation="hide" event="onclick"/>
+        </h:panelGroup>
+    </f:facet>
+
+    <h:form id="rHMarkSearch">
+        <h:inputHidden value="#{loginRHMarkDataModel.defaultCompany}"/>
+        <rich:panel id="searchRHMarkTopPanel">
+            <s:decorate id="marRefCardField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
+                <h:inputText id="marRefCard" value="#{loginRHMarkDataModel.criteria.marRefCard}"
+                             styleClass="input"
+                             required="true"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RHMark.startMarDate']}</ui:define>
+                <rich:calendar value="#{loginRHMarkDataModel.criteria.startMarDate}" styleClass="input"
+                               datePattern="#{messages['patterns.date']}" required="true"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RHMark.endMarDate']}</ui:define>
+                <rich:calendar value="#{loginRHMarkDataModel.criteria.endMarDate}" styleClass="input"
+                               datePattern="#{messages['patterns.date']}" required="true"/>
+                <a4j:commandButton action="#{loginRHMarkDataModel.search}"
+                                   reRender="searchRHMarkTopPanel, rHMarkList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:panel>
+
+        <rich:dataTable value="#{loginRHMarkDataModel}" var="rHMarkItem" id="rHMarkList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="25%, 25%, 25%, 25%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['RHMark.marRefCard']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['RHMark.marDate']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['RHMark.marTime']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['RHMark.marIpPc']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{rHMarkItem.marRefCard}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rHMarkItem.marDate}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rHMarkItem.marTime}">
+                    <f:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                       type="time"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rHMarkItem.marIpPc}"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="rHMarkList" dataModel="#{loginRHMarkDataModel}"/>
+
+    </h:form>
+</rich:modalPanel>

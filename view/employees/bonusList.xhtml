@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Bonus.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="bonusSearch">
+            <rich:simpleTogglePanel label="#{messages['Bonus.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Bonus.name']}</ui:define>
+                            <h:inputText id="rate" value="#{bonusDataModel.criteria.name}"
+                                         maxlength="255"
+                                         tabindex="1"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Bonus.amount']}</ui:define>
+                            <h:inputText id="rate" value="#{bonusDataModel.criteria.amount}"
+                                         maxlength="255"
+                                         tabindex="2"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Bonus.description']}</ui:define>
+                            <h:inputText id="rate" value="#{bonusDataModel.description}"
+                                         maxlength="255"
+                                         tabindex="3"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Bonus.bonusType']}</ui:define>
+                            <h:selectOneMenu id="bonusType"
+                                             value="#{bonusDataModel.criteria.bonusType}"
+                                             styleClass="input"
+                                             tabindex="4">
+                                <s:selectItems value="#{bonusType}" var="type"
+                                               label="#{messages[type.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{bonusDataModel.search}"
+                                               value="#{messages['Common.search']}"
+                                               reRender="bonusSearch, bonusList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="5">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{bonusDataModel.clear}"
+                                               value="#{messages['Common.clear']}"
+                                               reRender="bonusSearch, bonusList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="6"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/bonus.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('BONUS','CREATE')}"
+                          tabindex="7"/>
+            </div>
+
+            <rich:dataTable id="bonusList"
+                            value="#{bonusDataModel}" var="bonusItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%,20%,20%%,20%,10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="bonus.name"
+                                                   dataModel="#{bonusDataModel}"
+                                                   reRender="bonusList, dataScroller">
+                                #{messages['Bonus.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="bonus.amount"
+                                                   dataModel="#{bonusDataModel}"
+                                                   reRender="bonusList, dataScroller">
+                                #{messages['Bonus.amount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="bonus.bonusType"
+                                                   dataModel="#{bonusDataModel}"
+                                                   reRender="bonusList, dataScroller">
+                                #{messages['Bonus.bonusType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="bonus.active"
+                                                   dataModel="#{bonusDataModel}"
+                                                   reRender="bonusList, dataScroller">
+                                #{messages['Bonus.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{bonusItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{bonusItem.amount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    <h:outputText value=" #{messages['Currency.Bs']}"
+                                  rendered="#{not empty bonusItem.amount}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[bonusItem.bonusType.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{bonusItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{bonusAction.select(bonusItem)}"
+                                   rendered="#{s:hasPermission('BONUS','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="bonusList" dataModel="#{bonusDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/bonus.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('BONUS','CREATE')}"
+                          tabindex="8"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

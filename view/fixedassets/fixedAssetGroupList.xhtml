@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['FixedAssetGroup.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="fixedAssetGroupSearch">
+
+            <rich:simpleTogglePanel id="fixedAssetGroupSearchPanel" label="#{messages['FixedAssetGroup.search']}"
+                                    switchType="client">
+                <s:div>
+                    <s:decorate id="groupCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetGroup.groupCode']}</ui:define>
+                        <h:inputText id="groupCode" value="#{fixedAssetGroupDataModel.criteria.groupCode}"
+                                     maxlength="3" styleClass="input"
+                                     tabindex="1">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+                            <a4j:commandButton action="#{fixedAssetGroupDataModel.search()}"
+                                               reRender="fixedAssetGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{fixedAssetGroupDataModel.clear()}"
+                                               reRender="searchOptionsPanel, fixedAssetGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               id="clearButtonId"
+                                               tabindex="4">
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+                </s:div>
+                <rich:jQuery selector="#groupCode" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/fixedassets/fixedAssetGroup.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                          propagation="begin"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable value="#{fixedAssetGroupDataModel}" var="fixedAssetGroupItem" id="fixedAssetGroupList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="40%, 40%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetGroup.id.groupCode"
+                                                   dataModel="#{fixedAssetGroupDataModel}"
+                                                   reRender="fixedAssetGroupList, dataScroller">
+                                #{messages['FixedAssetGroup.groupCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetGroup.description"
+                                                   dataModel="#{fixedAssetGroupDataModel}"
+                                                   reRender="fixedAssetGroupList, dataScroller">
+                                #{messages['FixedAssetGroup.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{fixedAssetGroupItem.id.groupCode}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{fixedAssetGroupItem.description}">
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{fixedAssetGroupAction.select(fixedAssetGroupItem)}"
+                                   rendered="#{s:hasPermission('FIXEDASSETGROUP','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="fixedAssetGroupList" dataModel="#{fixedAssetGroupDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/fixedassets/fixedAssetGroup.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                          propagation="begin"
+                          tabindex="6"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

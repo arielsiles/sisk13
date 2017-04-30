@@ -1,0 +1,221 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <a4j:region id="selectedToTransferFixedAssetsReg">
+
+        <!--fixed assets corresponding to the purchase order-->
+        #{selectedFixedAssetBlockDataModel.reset()}
+        <c:choose>
+            <c:when test="#{fixedAssetVoucherAction.improvementMovement}">
+                <c:set var="columnsWidthVar" value="5%,6%,8%,4%,8%,8%,8%,6%,5%,6%,4%,6%,4%,4%"/>
+            </c:when>
+            <c:otherwise>
+                <c:set var="columnsWidthVar" value="5%,6%,8%,4%,8%,8%,8%,6%,4%,5%,6%,6%,4%,4%"/>
+            </c:otherwise>
+
+        </c:choose>
+        <rich:dataTable value="#{selectedFixedAssetBlockDataModel}" var="fixedAssetItem" id="selectedFixedAssetList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="#{columnsWidthVar}">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.businessUnit.executorUnitCode"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.executorUnitCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.costCenterCode"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.costCenterCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.custodian"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.custodian']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader
+                                sortProperty="fixedAsset.fixedAssetSubGroup.id.fixedAssetSubGroupCode"
+                                dataModel="#{selectedFixedAssetBlockDataModel}"
+                                reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.fixedAssetSubGroupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.barCode"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.barCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.detail"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.detail']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.measurement"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.measurement']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.registrationDate"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.registrationDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.sequence"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.sequence']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.duration"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.duration']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column rendered="#{!fixedAssetVoucherAction.improvementMovement}">
+                        <app:commandSortHeader sortProperty="fixedAsset.endDate"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.endDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.ufvOriginalValue"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.originalValue']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.state"
+                                               dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAsset.state']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column rendered="#{fixedAssetVoucherAction.improvementMovement}">
+                        <app:commandSortHeader dataModel="#{selectedFixedAssetBlockDataModel}"
+                                               reRender="selectedFixedAssetList, dataScroller">
+                            #{messages['FixedAssetMovement.fixedAssetImprovementAmount']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.businessUnit.fullName}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.costCenter.fullName}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.custodianJobContract.contract.employee.fullName}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.fixedAssetSubGroup.id.fixedAssetSubGroupCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.barCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.detail}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.measurement}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.registrationDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.sequence}">
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{fixedAssetItem.duration}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+                <h:outputText rendered="#{not empty fixedAssetItem.monthsGuaranty}"
+                              value=" #{messages['Unit.month']}"/>
+            </rich:column>
+            <rich:column rendered="#{!fixedAssetVoucherAction.improvementMovement}">
+                <h:outputText value="#{fixedAssetItem.endDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{fixedAssetItem.ufvOriginalValue}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages[fixedAssetItem.currencyType.resourceKey]}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{messages[fixedAssetItem.state.resourceKey]}">
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right" rendered="#{fixedAssetVoucherAction.improvementMovement}">
+                <s:decorate id="bsAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <h:inputText id="bsFixedAssetImprovementAmount#{fixedAssetItem.barCode}"
+                                 value="#{fixedAssetVoucherAction.fixedAssetFixedAssetMovementHashMap[fixedAssetService.findFixedAsset(fixedAssetItem)].bsAmount}"
+                                 required="true"
+                                 styleClass="inputTiny right"
+                                 tabindex="32">
+                        <app:realNumberConverter minimum="0.000001"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="bsFixedAssetImprovementAmount#{fixedAssetItem.barCode}"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:column>
+            <rich:column styleClass="center">
+                <a4j:commandLink immediate="true"
+                                 title="#{messages['Common.remove']}"
+                                 action="#{fixedAssetVoucherAction.removeInstance(fixedAssetItem)}"
+                                 reRender=" selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="selectedDataScroller" for="selectedFixedAssetList"
+                          dataModel="#{selectedFixedAssetBlockDataModel}"
+                          zeroRowCountMessage="FixedAssetVoucher.searchNoResults"/>
+    </a4j:region>
+</ui:composition>

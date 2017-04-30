@@ -1,0 +1,164 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:organizationalUnitListForm\\\\:nameField\\\\:name').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['OrganizationalUnit.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="organizationalUnitListForm">
+        <rich:simpleTogglePanel label="#{messages['OrganizationalUnit.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <ui:insert name="searchOptions"/>
+                <s:div>
+                    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['OrganizationalUnit.name']}</ui:define>
+                        <h:inputText id="name" value="#{organizationalUnitDataModel.criteria.name}"
+                                     maxlength="200"
+                                     styleClass="input"
+                                     tabindex="1"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['OrganizationalUnit.description']}</ui:define>
+                        <h:inputText id="description"
+                                     value="#{organizationalUnitDataModel.criteria.description}"
+                                     maxlength="200"
+                                     styleClass="input"
+                                     tabindex="2"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{organizationalUnitDataModel.search()}"
+                                           reRender="organizationalUnitList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="4">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+        <br/>
+        <rich:dataTable value="#{organizationalUnitDataModel}"
+                        var="organizationalUnitItem"
+                        id="organizationalUnitList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%"
+                        columnsWidth="20%, 5%,15%,15%,10%,10%,10%,10%, 5%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.name"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.acronym"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.acronym']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.organizationalLevel.name"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.level']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.description"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.organizationalUnitRoot.name"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.organizationalUnitRoot']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.businessUnit.organization.name"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.businessUnit']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.sector.name"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['OrganizationalUnit.sector']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organizationalUnit.costCenter"
+                                               dataModel="#{organizationalUnitDataModel}"
+                                               reRender="organizationalUnitList, dataScroller">
+                            #{messages['CostCenter.costCenter']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.acronym}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.organizationalLevel.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.description}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.organizationalUnitRoot.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.businessUnit.organization.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.sector.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationalUnitItem.costCenter.description}"/>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="organizationalUnitListModalPanel" attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="organizationalUnitList" dataModel="#{organizationalUnitDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>

@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Country.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="countrySearch">
+
+            <rich:simpleTogglePanel label="#{messages['Country.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Country.name']}</ui:define>
+                    <h:inputText id="name" value="#{countryDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Country.areaCode']}</ui:define>
+                    <h:inputText id="areaCode" value="#{countryDataModel.criteria.areaCode}"
+                                 maxlength="150" tabindex="2" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Country.prefix']}</ui:define>
+                    <h:inputText id="prefix" value="#{countryDataModel.criteria.prefix}"
+                                 maxlength="150" tabindex="3" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{countryDataModel.search}"
+                                       reRender="countryList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/country.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('COUNTRY','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{countryDataModel}" var="countryItem" id="countryList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="30%, 25%, 25% 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="country.name" dataModel="#{countryDataModel}"
+                                                   reRender="countryList, dataScroller">
+                                #{messages['Country.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="country.areaCode" dataModel="#{countryDataModel}"
+                                                   reRender="countryList, dataScroller">
+                                #{messages['Country.areaCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="country.prefix" dataModel="#{countryDataModel}"
+                                                   reRender="countryList, dataScroller">
+                                #{messages['Country.prefix']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{countryItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{countryItem.areaCode}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{countryItem.prefix}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{countryAction.select(countryItem)}"
+                                   rendered="#{s:hasPermission('COUNTRY','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="countryList" dataModel="#{countryDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/country.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('COUNTRY','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

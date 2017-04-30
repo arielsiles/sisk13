@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{spendDistributionAction.managed}">
+            #{messages['SpendDistribution.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['SpendDistribution.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="spendDistributionForm">
+    <div class="buttons">
+        <h:commandButton id="createButtonId"
+                         action="#{spendDistributionAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!spendDistributionAction.managed and s:hasPermission('SPENDDISTRIBUTION','CREATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton action="#{spendDistributionAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!spendDistributionAction.managed and s:hasPermission('SPENDDISTRIBUTION','CREATE')}"
+                         tabindex="2"/>
+        <h:commandButton id="updateButtonId"
+                         action="#{spendDistributionAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{spendDistributionAction.managed and
+                                 (rotatoryFundAction.rotatoryFundPending or rotatoryFundAction.rotatoryFundApproved)
+                                 and s:hasPermission('SPENDDISTRIBUTION','UPDATE')}"
+                         tabindex="3">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{spendDistributionAction.managed
+                         and (rotatoryFundAction.rotatoryFundPending or rotatoryFundAction.rotatoryFundApproved)
+                          and s:hasPermission('SPENDDISTRIBUTION','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{spendDistributionAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="4"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{spendDistributionAction.managed}">
+                    #{messages['SpendDistribution.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['SpendDistribution.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+        <!--
+                    <s:decorate id="percentageField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['SpendDistribution.percentage']}</ui:define>
+                        <h:inputText id="percentage"
+                                     value="#{spendDistribution.percentage}"
+                                     styleClass="inputMedium"
+                                     required="true"
+                                     tabindex="5">
+                            <app:realNumberConverter minimum="0.001"
+                                                     maximum="100"
+                                                     pattern="#{messages['patterns.decimal3FNumber']}"
+                                                     forId="percentage"/>
+                        </h:inputText>
+                    </s:decorate>
+        -->
+        <!--<s:decorate id="businessUnitField" template="/include/inputField.xhtml"-->
+        <!--styleClass="formRow">-->
+        <!--<ui:define name="label">#{messages['SpendDistribution.businessUnit']}</ui:define>-->
+        <!--<h:selectOneMenu id="businessUnit"-->
+        <!--value="#{spendDistribution.businessUnit}"-->
+        <!--styleClass="inputMedium"-->
+        <!--rendered="#{spendDistributionAction.enableBusinessUnit}"-->
+        <!--required="true"-->
+        <!--tabindex="6">-->
+        <!--<s:selectItems value="#{businessUnitList}"-->
+        <!--var="element"-->
+        <!--label="#{element.fullName}"-->
+        <!--noSelectionLabel=""-->
+        <!--hideNoSelectionLabel="false"/>-->
+        <!--<s:convertEntity/>-->
+        <!--</h:selectOneMenu>-->
+        <!--<h:outputText value="#{messages['SpendDistribution.businessUnit']}"-->
+        <!--rendered="#{!spendDistributionAction.enableBusinessUnit}"/>-->
+        <!--</s:decorate>-->
+        <s:div id="dataDiv">
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SpendDistribution.costCenter']}</ui:define>
+                <app:selectPopUp id="costCenter"
+                                 textValue="#{spendDistribution.costCenter.fullName}"
+                                 value="#{spendDistribution.costCenter}"
+                                 clearAction="spendDistributionAction.clearCostCenter()"
+                                 searchModalPanel="costCenterListModalPanel"
+                                 dataModel="#{costCenterDataModel}"
+                                 reRender="costCenterField,dataDiv"
+                                 readOnly="#{!spendDistributionAction.enableCostCenter}"
+                                 hotKeySelect="alt+1"
+                                 tabindex="7"/>
+            </s:decorate>
+            <s:decorate id="cashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SpendDistribution.cashAccount']}</ui:define>
+                <app:selectPopUp id="cashAccount"
+                                 textValue="#{spendDistribution.cashAccount.fullName}"
+                                 value="#{spendDistribution.cashAccount}"
+                                 clearAction="spendDistributionAction.clearCashAccount()"
+                                 searchModalPanel="cashAccountListModalPanel"
+                                 dataModel="#{cashAccountDataModel}"
+                                 reRender="cashAccountField,dataDiv"
+                                 hotKeySelect="alt+2"
+                                 readOnly="#{!spendDistributionAction.enableCashAccount}"
+                                 tabindex="8"/>
+            </s:decorate>
+        </s:div>
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{spendDistributionAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!spendDistributionAction.managed and s:hasPermission('SPENDDISTRIBUTION','CREATE')}"
+                         tabindex="9"/>
+        <h:commandButton action="#{spendDistributionAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!spendDistributionAction.managed and s:hasPermission('SPENDDISTRIBUTION','CREATE')}"
+                         tabindex="10"/>
+
+        <h:commandButton action="#{spendDistributionAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{spendDistributionAction.managed and
+                                 (rotatoryFundAction.rotatoryFundPending or rotatoryFundAction.rotatoryFundApproved)
+                                  and s:hasPermission('SPENDDISTRIBUTION','UPDATE')}"
+                         tabindex="11"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{spendDistributionAction.managed and
+                         (rotatoryFundAction.rotatoryFundPending or rotatoryFundAction.rotatoryFundApproved)
+                                 and s:hasPermission('SPENDDISTRIBUTION','DELETE')}"
+                         tabindex="12">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{spendDistributionAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="13"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{spendDistributionAction.managed and
+             (rotatoryFundAction.rotatoryFundPending or rotatoryFundAction.rotatoryFundApproved)
+             and s:hasPermission('SPENDDISTRIBUTION','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['SpendDistribution.delete.confirmation']}">
+                <f:param value="#{spendDistribution.percentage}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{spendDistributionAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{spendDistributionAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:param name="accountClass" value="G"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{spendDistributionAction.assignCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashAccountField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#percentage" query="focus()" timing="onload"/>
+</ui:define>
+
+</ui:composition>

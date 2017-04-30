@@ -1,0 +1,219 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <h:outputText
+            value="#{dismissalAction.managed?messages['Dismissal.edit']:messages['Dismissal.new']}"/>
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="rrhh"/>
+
+<ui:define name="body">
+    <h:form id="dismissalForm" enctype="multipart/form-data">
+
+        <ui:include src="dismissalFormButtons.xhtml">
+            <ui:param name="formLocation" value="Top"/>
+            <ui:param name="default" value="${true}"/>
+        </ui:include>
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <h:outputText
+                        value="#{dismissalAction.managed?messages['Dismissal.edit']:messages['Dismissal.new']}"/>
+            </f:facet>
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent, width50percent">
+                <s:div id="paymentLeftPanel">
+                    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{dismissalAction.managed}">
+                        <ui:define name="label">#{messages['Dismissal.code']}</ui:define>
+                        <h:outputText id="code" value="#{dismissal.code}">
+                            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="stateField" template="/include/inputField.xhtml"
+                                rendered="#{dismissalAction.managed}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['Dismissal.state']}</ui:define>
+                        <h:outputText value="#{dismissal.state}"/>
+                    </s:decorate>
+                    <app:fieldset id="contractFielset"
+                                  title="#{messages['Contract.title']}">
+                        <s:div id="contractDiv">
+                            <s:decorate id="contractField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow"
+                                        rendered="#{dismissalAction.pending}">
+                                <ui:define name="label">#{messages['Dismissal.employee']}</ui:define>
+                                <app:selectPopUp id="contract"
+                                                 required="true"
+                                                 textValue="#{dismissal.contract.employee.fullName}"
+                                                 value="#{dismissal.contract}"
+                                                 dataModel="#{jobContractDataModel}"
+                                                 clearAction="dismissalAction.clearContract()"
+                                                 searchModalPanel="jobContractListModalPanel"
+                                                 reRender="contractDiv, workedDaysField"
+                                                 hotKeySelect="alt+1"
+                                                 tabindex="15"/>
+                            </s:decorate>
+                            <s:div id="contractDataDiv" rendered="#{not empty dismissal.contract}">
+                                <s:decorate id="initDateField" template="/include/inputField.xhtml"
+                                            styleClass="formRow">
+                                    <ui:define name="label">#{messages['Contract.initDate']}</ui:define>
+                                    <h:outputText id="initDate"
+                                                  value="#{dismissal.contract.initDate}"
+                                                  styleClass="input">
+                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                           timeZone="#{sessionUser.timeZone}"
+                                                           type="both"/>
+                                    </h:outputText>
+                                </s:decorate>
+                                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+                                    <h:outputText id="endDate"
+                                                  value="#{dismissal.contract.endDate}"
+                                                  styleClass="input">
+                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                           timeZone="#{sessionUser.timeZone}"
+                                                           type="both"/>
+                                    </h:outputText>
+                                </s:decorate>
+                            </s:div>
+                        </s:div>
+                    </app:fieldset>
+
+                    <s:decorate id="layOffDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Dismissal.layOffDate']}</ui:define>
+                        <rich:calendar id="layOffDate"
+                                       value="#{dismissal.layOffDate}"
+                                       styleClass="input"
+                                       datePattern="#{messages['patterns.date']}"
+                                       reRender="workedDaysField"
+                                       tabindex="23">
+                            <a4j:support event="onchanged"
+                                         actionListener="#{dismissalAction.calculateWorkedDays()}"
+                                         reRender="layOffDateField, workedDaysField"
+                                         ajaxSingle="true"/>
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                    <s:decorate id="workedDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Dismissal.workedDays']}</ui:define>
+                        <h:outputText id="workedDays"
+                                      value="#{dismissalAction.workedDays}"
+                                      styleClass="input">
+                        </h:outputText>
+                        <h:outputFormat value=" #{messages['Common.parenthesis']}"
+                                        rendered="#{not empty dismissalAction.workedDays}">
+                            <f:param value="#{messages['Common.unit.days']}"/>
+                        </h:outputFormat>
+                    </s:decorate>
+                </s:div>
+                <s:div id="rigthPanel">
+                    <s:div id="amountDiv" rendered="#{not empty dismissal.amount}">
+                        <s:decorate id="amountField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['Dismissal.amount']}</ui:define>
+                            <h:outputText id="amount"
+                                          value="#{dismissal.amount} ">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         minimum="0.01"
+                                                         forId="amount"/>
+                            </h:outputText>
+                            <h:outputFormat rendered="#{not empty dismissal.currency}"
+                                            value="#{messages['Common.parenthesis']}">
+                                <f:param value="#{messages[dismissal.currency.symbolResourceKey]}"/>
+                            </h:outputFormat>
+                        </s:decorate>
+                        <s:decorate id="currencyField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['Dismissal.currency']}</ui:define>
+                            <h:outputText value="#{dismissal.jobContract.job.salary.currency.fullName}"/>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Dismissal.file']}</ui:define>
+                        <s:fileUpload id="file"
+                                      styleClass="input"
+                                      data="#{dismissalAction.file.value}"
+                                      fileName="#{dismissalAction.file.name}"
+                                      fileSize="#{dismissalAction.file.size}"
+                                      contentType="#{dismissalAction.file.contentType}">
+                        </s:fileUpload>
+
+                        <h:commandLink value="#{messages['Common.download']}"
+                                       immediate="true"
+                                       title="#{dismissalAction.file.name}"
+                                       target="_blank"
+                                       action="#{dismissalAction.download()}"
+                                       rendered="#{not empty dismissalAction.file.value}">
+                        </h:commandLink>
+                    </s:decorate>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Dismissal.description']}</ui:define>
+                        <h:inputTextarea id="description"
+                                         value="#{dismissal.description}"
+                                         required="true"
+                                         styleClass="input textarea"
+                                         tabindex="7">
+                            <f:validateLength maximum="1000"/>
+                        </h:inputTextarea>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:panel>
+
+        <ui:include src="dismissalFormButtons.xhtml">
+            <ui:param name="formLocation" value="Button"/>
+        </ui:include>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{dismissalAction.managed and s:hasPermission('DISMISSAL','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['Dismissal.delete.confirmation']}">
+                    <f:param value="#{dismissal.code}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{dismissalAction.delete}"
+                               value="#{messages['Common.delete']}" immediate="true"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+
+    <c:if test="${dismissalAction.pending}">
+        <s:decorate id="jobContractListModalPanelContainer"
+                    template="/employees/jobContractListModalPanel.xhtml">
+            <ui:param name="dialogId" value="jobContractListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{dismissalAction.assignContract(jobContractItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="contractDiv, workedDaysField"
+                                   oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </c:if>
+
+    <rich:jQuery selector="#contract" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

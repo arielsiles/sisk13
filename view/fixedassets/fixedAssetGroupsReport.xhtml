@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['menu.finances.fixedassets.fixedAssetGroupsReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="fixedAssetGroupsReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['menu.finances.fixedassets.fixedAssetGroupsReport']}
+                </f:facet>
+                <s:div id="fixedAssetGroupDiv">
+                    <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Fixedassets.report.fixedAssetGroup']}</ui:define>
+                        <app:quickSearch id="quickSearchFixedAssetGroup"
+                                         textValue="fixedAssetGroupsReportAction.fixedAssetGroup.groupCode"
+                                         value="#{fixedAssetGroupsReportAction.fixedAssetGroup}"
+                                         searchField="groupCode"
+                                         reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv"
+                                         tabindex="1"/>
+                        <app:selectPopUp id="fixedAssetGroup"
+                                         textValue="#{fixedAssetGroupsReportAction.fixedAssetGroup.fullName}"
+                                         value="#{fixedAssetGroupsReportAction.fixedAssetGroup}"
+                                         dataModel="#{fixedAssetGroupDataModel}"
+                                         clearAction="fixedAssetGroupsReportAction.clearFixedAssetGroup()"
+                                         searchModalPanel="fixedAssetGroupListModalPanel"
+                                         reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel"
+                                         hotKeySelect="alt+1"/>
+                    </s:decorate>
+                </s:div>
+                <s:div id="fixedAssetSubGroupDiv">
+                    <s:decorate id="fixedAssetSubGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAsset.fixedAssetSubGroup']}</ui:define>
+                        <app:quickSearch id="quickSearchFixedAssetSubGroup"
+                                         textValue="fixedAssetGroupsReportAction.fixedAssetSubGroup.fixedAssetSubGroupCode"
+                                         value="#{fixedAssetGroupsReportAction.fixedAssetSubGroup}"
+                                         searchField="fixedAssetSubGroupCode"
+                                         alias="fixedAssetSubGroup"
+                                         reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                         tabindex="2">
+                            <ui:define name="restrictions">
+                                <app:restriction
+                                        condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetGroupsReportAction.fixedAssetGroup}"/>
+                            </ui:define>
+                        </app:quickSearch>
+                        <app:selectPopUp id="fixedAssetSubGroup"
+                                         textValue="#{fixedAssetGroupsReportAction.fixedAssetSubGroup.fullName}"
+                                         value="#{fixedAssetGroupsReportAction.fixedAssetSubGroup}"
+                                         dataModel="#{fixedAssetSubGroupDataModel}"
+                                         clearAction="fixedAssetGroupsReportAction.clearFixedAssetSubGroup()"
+                                         searchModalPanel="fixedAssetSubGroupListModalPanel"
+                                         reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                         hotKeySelect="alt+2">
+                        </app:selectPopUp>
+                    </s:decorate>
+                </s:div>
+                <s:decorate id="depreciationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetsGroups.report.depreciation']}</ui:define>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+                    <h:inputText id="initDepreciationRate" value="#{fixedAssetGroupsReportAction.initDepreciationRate}"
+                                 styleClass="input1"
+                                 maxlength="20"
+                                 tabindex="3">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="initDepreciationRate"/>
+                    </h:inputText>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+                    <h:inputText id="endDepreciationRate" value="#{fixedAssetGroupsReportAction.endDepreciationRate}"
+                                 styleClass="input1"
+                                 maxlength="20"
+                                 tabindex="4">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="endDepreciationRate"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="durationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetsGroups.report.duration']}</ui:define>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+                    <h:inputText id="initDuration" value="#{fixedAssetGroupsReportAction.initDuration}"
+                                 styleClass="input1"
+                                 maxlength="20"
+                                 tabindex="5">
+                        <app:naturalNumberConverter forId="initDuration"/>
+                    </h:inputText>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+                    <h:inputText id="endDuration" value="#{fixedAssetGroupsReportAction.endDuration}"
+                                 styleClass="input1"
+                                 maxlength="20"
+                                 tabindex="6">
+                        <app:naturalNumberConverter forId="endDuration"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{fixedAssetGroupsReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"
+                                      tabIndex="7"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{fixedAssetGroupsReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+            <rich:jQuery selector="#quickSearchFixedAssetGroup" query="focus()" timing="onload"/>
+        </h:form>
+        <s:decorate id="fixedAssetGroupListModalPanelContainer"
+                    template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+            <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{fixedAssetGroupsReportAction.setFixedAssetGroup(fixedAssetGroupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel "
+                                   oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="fixedAssetSubGroupListModalPanelContainer"
+                    template="/fixedassets/fixedAssetSubGroupListModalPanel.xhtml">
+            <ui:param name="dialogId" value="fixedAssetSubGroupListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{fixedAssetGroupsReportAction.setFixedAssetSubGroup(fixedAssetSubGroupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                   oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>
+
+

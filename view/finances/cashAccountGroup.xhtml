@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{cashAccountGroupAction.managed}">
+                #{messages['CashAccountGroup.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CashAccountGroup.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+
+        <h:form id="cashAccountGroupForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{cashAccountGroupAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{cashAccountGroupAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','CREATE')}"/>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{cashAccountGroupAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{cashAccountGroupAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{cashAccountGroupAction.managed}">
+                            #{messages['CashAccountGroup.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CashAccountGroup.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{cashAccountGroupAction.managed}">
+                    <ui:define name="label">#{messages['CashAccountGroup.code']}</ui:define>
+                    <h:outputText value="#{cashAccountGroup.code}" styleClass="input">
+                        <f:convertNumber pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccountGroup.name']}</ui:define>
+                    <h:inputText id="name" value="#{cashAccountGroup.name}" styleClass="input" required="true"
+                                 maxlength="250" tabindex="2"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{cashAccountGroupAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','CREATE')}"
+                                 tabindex="4"/>
+
+                <h:commandButton action="#{cashAccountGroupAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','CREATE')}"/>
+
+                <h:commandButton action="#{cashAccountGroupAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','UPDATE')}"
+                                 tabindex="5"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','DELETE')}"
+                                 tabindex="6">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{cashAccountGroupAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="7">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CashAccountGroup.delete.confirmation']}">
+                        <f:param value="#{cashAccountGroup.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{cashAccountGroupAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{cashAccountGroupAction.managed and s:hasPermission('CASHACCOUNTGROUP','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

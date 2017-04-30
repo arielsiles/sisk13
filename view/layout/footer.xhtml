@@ -1,0 +1,19 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     xmlns:a4j="http://richfaces.org/a4j"
+     id="footer">
+
+    <div style="text-align:center; padding-top:10px;font-size:12px">
+        &#169;&#160;Copyright&#160;
+        <h:outputText value="#{currentDate}">
+            <f:convertDateTime pattern="yyyy"/>
+        </h:outputText>
+        All rights reserved.
+    </div>
+    <div style="text-align:center; padding-top:6px;font-size:10px">
+        @@APPNAME_VERSION@@
+    </div>
+</div>

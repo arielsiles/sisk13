@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['DiscountProducer.list']}</ui:define>
+    <style type="text/css">
+        .special tr[id] {
+            display: none;
+        }
+    </style>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productiveZoneSearch">
+            <rich:simpleTogglePanel label="#{messages['DiscountProducer.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountProducer.startDate']}</ui:define>
+                    <rich:calendar value="#{discountProducerDataModel.criteria.startDate}"
+                                   tabindex="1" styleClass="input">
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountProducer.endDate']}</ui:define>
+                    <rich:calendar value="#{discountProducerDataModel.criteria.endDate}"
+                                   tabindex="2" styleClass="input">
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{discountProducerDataModel.search}"
+                                       reRender="discountProducerList, dataScroller"
+                                       styleClass="button" value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/discountProducer.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('RESERVPRODUCERMILK','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{discountProducerDataModel}" var="discountProducerItem" id="discountProducerList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountProducer.startDate"
+                                                   dataModel="#{discountProducerDataModel}"
+                                                   reRender="discountProducerList, dataScroller">
+                                #{messages['DiscountProducer.startDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountProducer.endDate"
+                                                   dataModel="#{discountProducerDataModel}"
+                                                   reRender="discountProducerList, dataScroller">
+                                #{messages['DiscountProducer.endDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountProducer.state"
+                                                   dataModel="#{discountProducerDataModel}"
+                                                   reRender="discountProducerList, dataScroller">
+                                #{messages['DiscountProducer.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountProducer.reserve"
+                                                   dataModel="#{discountProducerDataModel}"
+                                                   reRender="discountProducerList, dataScroller">
+                                #{messages['DiscountProducer.reserv']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{discountProducerItem.startDate}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountProducerItem.endDate}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountProducerItem.state == 'APPROVED' ? 'APROBADO':'HABILITADO'}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountProducerItem.reserve}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{discountProducerAction.select(discountProducerItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="discountProducerList" dataModel="#{discountProducerDataModel}"/>
+
+
+            <rich:jQuery selector="#discountProducerList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#discountProducerList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/discountProducer.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('RESERVPRODUCERMILK','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,170 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:rich="http://richfaces.org/rich">
+    <s:div id="baseProductionList">
+    <a4j:region rendered = "#{productionPlanningAction.showListReprocessedProduct}" >
+<!--<app:fieldset  title="#{messages['ProductionPlanning.productReproccesing']}">-->
+
+        <table class="rich-table">
+
+            <c:forEach var="baseProduct" items="#{productionPlanning.baseProducts}" varStatus="row">
+
+
+
+                <rich:dataTable value="#{baseProduct.singleProducts}" var="singleProduct"
+                                width="100%"
+                        >
+
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+
+                                #{messages['BaseProduct.code']} : #{baseProduct.code}
+
+
+                                <rich:spacer width="10"/>
+                                <a4j:commandButton value="#{ baseProduct.state == 'TABULATED' ? messages['BaseProduct.action.select'] :messages['BaseProduct.action.edit']}"
+                                                   action="#{productionPlanningAction.editReprocessedProduct(baseProduct)}"
+                                                   reRender="formulaSet,containerCreateButton,ruleBotton2,ruleBotton1,baseProductionList,productionOrderList,productionList"
+                                                   ajaxSingle="true"/>
+                                <rich:spacer width="10"/>
+
+
+                                <a4j:commandButton value="#{messages['BaseProduct.action.addProduct']}"
+                                                   action="#{productionPlanningAction.addProduct(baseProduct)}"
+                                                   rendered="#{baseProduct.state != 'FINALIZED' and baseProduct.state != 'TABULATED' and baseProduct.state != 'INSTOCK' and s:hasPermission('ADDPRODUCTOREPROCCED','VIEW')}"
+                                                   reRender="formulaSet,containerCreateButton,ruleBotton2,ruleBotton1,baseProductionList,productionOrderList,productionList"
+                                                   ajaxSingle="true"/>
+
+
+                            </rich:column>
+
+                            <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
+                                #{messages['ProductionPlanning.producingAmount']}
+                            </rich:column>
+
+                            <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+                                #{messages['ProductionOrder.producingAmountResposible']}
+                            </rich:column>
+
+                            <rich:column rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
+                                #{messages['BaseProduct.choice']}
+                            </rich:column>
+
+                            <rich:column>
+                                #{messages['BaseProduct.state']}
+                            </rich:column>
+
+                            <rich:column>
+                                #{messages['BaseProduct.percentajeGrease']}
+                            </rich:column>
+
+                            <rich:column styleClass="center">
+                                #{messages['Common.action']}
+                            </rich:column>
+
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{singleProduct.productProcessingSingle.metaProduct.fullName}"/>
+                    </rich:column>
+                    <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
+                        <h:inputText id = "producedAmountField"
+                                     value="#{singleProduct.amount}"
+                                     maxlength="7" styleClass="input"
+                                     disabled="#{singleProduct.state != 'EXECUTED'}"
+                                     size="10"
+                                     required="false">
+                            <h:commandButton action="#{productionPlanningAction.saveProduccingAmount()}" value="#{messages['Common.save']}"
+                                             styleClass="button"
+                                             rendered="#{singleProduct.state eq 'EXECUTED' and s:hasPermission('SETAMOUNTPRODECER','VIEW')}">
+
+                                <s:defaultAction/>
+                            </h:commandButton>
+                        </h:inputText>
+                    </rich:column>
+                    <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+                        <h:inputText id = "producedAmountResponsibleField"
+                                     value="#{singleProduct.amountResponsible}"
+                                     maxlength="7" styleClass="input"
+                                     size="10"
+                                     required="false">
+                            <h:commandButton action="#{productionPlanningAction.saveProduccingAmount()}" value="#{messages['Common.save']}"
+                                             styleClass="button"
+                                             rendered="#{s:hasPermission('AMOUNTPRODUCERRESPONSIBLE','CREATE')}">
+
+                                <s:defaultAction/>
+                            </h:commandButton>
+                        </h:inputText>
+                    </rich:column>
+                    <rich:column styleClass="center" rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
+                        <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                                 immediate="true"
+                                                 value="#{baseProduct.selected}">
+                            <a4j:support event="onchange"
+                                         reRender="selectCheckboxItem"/>
+                        </h:selectBooleanCheckbox>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText
+                                style="font-weight: bold; color: #{singleProduct.state == 'PENDING' ? 'red' :(singleProduct.state == 'EXECUTED' ? 'blue' : (singleProduct.state == 'TABULATED' ? 'fuchsia' : (singleProduct.state == 'INSTOCK' ? 'fuchsia' : 'green')))}"
+                                value="#{singleProduct.state == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (singleProduct.state == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (singleProduct.state == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : (singleProduct.state == 'INSTOCK' ? messages['productionOrderForPlanning.estateOrder.ab.instock'] : messages['productionOrderForPlanning.estateOrder.finalized'])))}"
+                                rendered="#{singleProduct.state != 'EXECUTED'}"
+                                />
+                        <a4j:commandLink
+                                style="font-weight: bold; color: #{singleProduct.state == 'PENDING' ? 'red' :(singleProduct.state == 'EXECUTED' ? 'blue' : (singleProduct.state == 'TABULATED' ? 'fuchsia' : (singleProduct.state == 'INSTOCK' ? 'fuchsia' : 'green')))}"
+                                ajaxSingle="true" immediate="true"
+                                value="#{singleProduct.state == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (singleProduct.state == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (singleProduct.state == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : (singleProduct.state == 'INSTOCK' ? messages['productionOrderForPlanning.estateOrder.ab.instock'] : messages['productionOrderForPlanning.estateOrder.finalized'])))}"
+                                action="#{productionPlanningAction.changeState(singleProduct)}"
+                                rendered="#{singleProduct.state eq 'EXECUTED' and s:hasPermission('CHANGESTATEORDER','VIEW')}"
+                                reRender="baseProductionList"></a4j:commandLink>
+                    </rich:column>
+
+                    <rich:column>
+                        <h:inputText value="#{singleProduct.greasePorentage}"
+                                     maxlength="4" styleClass="input"
+                                     disabled="#{singleProduct.state eq 'FINALIZED' or  singleProduct.state eq 'TABULATED' ? true : false}"
+                                     required="false">
+                            <h:commandButton action="#{productionPlanningAction.saveGreasePercentajeSingle}" value="#{messages['Common.save']}"
+                                             styleClass="button"
+                                             rendered="#{s:hasPermission('SINGLESAVEGRAASEPERCENTAGE','CREATE')}">
+
+                                <s:defaultAction/>
+                            </h:commandButton>
+                        </h:inputText>
+
+                    </rich:column>
+
+                    <rich:column styleClass="center">
+
+                        <a4j:commandLink ajaxSingle="true" immediate="true"
+                                         value="#{singleProduct.state == 'PENDING' ? messages['BaseProduct.single.action.edit']: messages['SingleProduct.action.setAmounts']}"
+                                         action="#{productionPlanningAction.editSingle(baseProduct,singleProduct)}"
+                                         rendered="#{singleProduct.state == 'EXECUTED' or singleProduct.state == 'PENDING'}"
+                                         reRender="formulaSet,ruleBotton2,ruleBotton1,productionList,baseProductionList"/>
+                        <rich:spacer width="5"/>
+
+                        <a4j:commandLink ajaxSingle="true" immediate="true"
+                                         value="#{messages['ProductionOrder.materialProduccion.selectOrder']}"
+                                         action="#{productionPlanningAction.showDetailSingle(singleProduct,baseProduct)}"
+                                         reRender="formulaSet,containerCreateButton,ruleBotton2,ruleBotton1,baseProductionList,productionOrderList,productionList"/>
+
+
+                    </rich:column>
+                </rich:dataTable>
+
+            </c:forEach>
+        </table>
+        <rich:jQuery selector="#singleProductsList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+        <rich:jQuery selector="#singleProductsList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+<!--</app:fieldset>-->
+    </a4j:region>
+    </s:div>
+    </ui:composition>

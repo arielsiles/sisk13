@@ -1,0 +1,34 @@
+<rich:modalPanel id="#{dialogId}" minHeight="120" minWidth="200" autosized="true" zindex="2000"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib">
+    <f:facet name="header">
+        <ui:insert name="dialogTitle">Dialog</ui:insert>
+    </f:facet>
+    <h:panelGroup>
+        <div align="center">
+            <h:form>
+                <p>
+                    <ui:insert name="dialogContent">The dialog content</ui:insert>
+                </p>
+                <h:panelGroup>
+                    <ui:insert name="dialogOption"/>
+                    <s:fragment rendered="#{!dialogHideCancel}">
+                        <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                            <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true"
+                                                   operation="hide"/>
+                        </h:commandButton>
+                    </s:fragment>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:panelGroup>
+</rich:modalPanel>
+
+
+
+
+

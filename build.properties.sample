@@ -1,0 +1,11 @@
+
+#Sat Jun 30 16:56:03 GMT-04:00 2007
+jboss.home=D:/appserver/jboss-5.1.0.GA
+profile=dev
+#The following 5 properties define whether the login form must be filled up with a custom username or not.
+replaceLogin=true
+username=root
+password=khipus.pwd
+companyLogin=efestia
+embeddedLoginScript=#{rich:element('username')}.value='${username}';#{rich:element('password')}.value='${password}';#{rich:element('companyLogin')}.value='${companyLogin}';
+

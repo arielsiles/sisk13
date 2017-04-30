@@ -1,0 +1,11 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <h:graphicImage value="/img/errorIcon.gif" styleClass="select-image-middle"/>
+    &#160;
+    <h:outputFormat styleClass="messageError" value="#{messages['ScheduleEvaluationForm.error.notEnabled']}">
+        <f:param value="#{request.getParameter('gestion')}"/>
+        <f:param value="#{request.getParameter('period')}"/>
+    </h:outputFormat>
+</ui:composition>

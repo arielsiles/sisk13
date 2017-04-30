@@ -1,0 +1,16 @@
+<!--
+validate: boolean parameters used to skip the validation on the input.
+-->
+
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     class="#{empty styleClass?'entry':styleClass} #{invalid ? 'errors':''}">
+    <s:span styleClass="required" rendered="#{showRequired}">*&#160;</s:span>
+    <s:validateAll>
+        <ui:insert/>
+        <s:message styleClass="errors #{errorStyleClass}" style="display:block;"/>
+    </s:validateAll>
+</div>
+
+

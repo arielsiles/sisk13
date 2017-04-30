@@ -1,0 +1,11 @@
+--Khipus KHIPUS-88
+--Fecha de creacion: 06/10/2014
+--descripcion : CRUD RESERVAS PRODUCTORES LECHEROS
+--permiso para crear un producto en base a otro
+INSERT  INTO FUNCIONALIDAD (IDFUNCIONALIDAD,CODIGO,DESCRIPCION,PERMISO,NOMBRERECURSO,IDMODULO)
+  VALUES (405, 'RESERVPRODUCERMILK', NULL, 15,'productionOrderForPlanning.orderProduction.reservProducerMilk', 6); 
+INSERT  INTO DERECHOACCESO (IDFUNCIONALIDAD,IDROL,PERMISO,IDCOMPANIA,IDMODULO)
+  VALUES (405, 50, 15, 1, 6);   
+-- select * from funcionalidad  
+--COMMIT
+  

@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.realCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.paymentCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.debtCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.realBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.realUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.paymentBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.paymentUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.debtBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{total.debtUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+</ui:composition>

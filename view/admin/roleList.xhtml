@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Role.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+        <h:form id="roleSearch">
+            <rich:simpleTogglePanel label="#{messages['Role.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Role.name']}</ui:define>
+                    <h:inputText id="name" value="#{roleDataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+
+                    <a4j:commandButton action="#{roleDataModel.search}" reRender="roleList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/role.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ROLE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+
+            <rich:dataTable value="#{roleDataModel}"
+                            var="roleItem"
+                            id="roleList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="85%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="role.name"
+                                                   dataModel="#{roleDataModel}"
+                                                   reRender="roleList, dataScroller">
+                                #{messages['Role.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{roleItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('ROLE','VIEW')}"
+                                   action="#{roleAction.select(roleItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                    &#160;
+                    <h:commandLink action="#{roleAction.selectAndAccessRight(roleItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}">
+                        <h:graphicImage value="/img/key.gif" styleClass="select-image"
+                                        title="#{messages['Role.assignPermissions']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="roleList" dataModel="#{roleDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/role.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ROLE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,215 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{streetAction.managed}">
+            #{messages['Street.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Street.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="global"/>
+<ui:define name="body">
+    <h:form id="streetForm">
+        <div class="buttons">
+            <h:commandButton id="createButtonId"
+                             action="#{streetAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!streetAction.managed and s:hasPermission('STREET','CREATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton id="updateButtonId"
+                             action="#{streetAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{streetAction.managed and s:hasPermission('STREET','UPDATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{streetAction.managed and s:hasPermission('STREET','DELETE')}">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{streetAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{streetAction.managed}">
+                        #{messages['Street.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['Street.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+
+            <s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.country']}</ui:define>
+                <h:selectOneMenu id="country"
+                                 value="#{streetAction.country}"
+                                 styleClass="input"
+                                 tabindex="1">
+                    <s:selectItems value="#{countryList.resultList}"
+                                   var="country"
+                                   label="#{country.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange" reRender="department" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.department']}</ui:define>
+                <h:selectOneMenu id="department"
+                                 value="#{streetAction.department}"
+                                 styleClass="input"
+                                 tabindex="2">
+                    <s:selectItems value="#{departmentList.resultList}"
+                                   var="department"
+                                   label="#{department.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="city" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="cityField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.city']}</ui:define>
+                <h:selectOneMenu id="city"
+                                 value="#{streetAction.city}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{cityList.resultList}"
+                                   var="city"
+                                   label="#{city.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="zone" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="zoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.zone']}</ui:define>
+                <h:selectOneMenu id="zone"
+                                 value="#{streetAction.zone}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    <s:selectItems value="#{zoneList.resultList}"
+                                   var="zone"
+                                   label="#{zone.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="district" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="districtField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.district']}</ui:define>
+                <h:selectOneMenu id="district"
+                                 value="#{street.district}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="5">
+                    <s:selectItems value="#{districtList.resultList}"
+                                   var="district"
+                                   label="#{district.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Street.name']}</ui:define>
+                <h:inputText id="name"
+                             value="#{street.name}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="200" tabindex="6"/>
+            </s:decorate>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{streetAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!streetAction.managed and s:hasPermission('STREET','CREATE')}"
+                             tabindex="6"/>
+
+            <h:commandButton action="#{streetAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{streetAction.managed and s:hasPermission('STREET','UPDATE')}"
+                             tabindex="7"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{streetAction.managed and s:hasPermission('STREET','DELETE')}"
+                             tabindex="8">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{streetAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="9"/>
+        </div>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{streetAction.managed and s:hasPermission('STREET','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['Street.delete.confirmation']}">
+                    <f:param value="#{street.name}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{streetAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               rendered="#{streetAction.managed and s:hasPermission('STREET','DELETE')}"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+
+
+    <rich:jQuery selector="#country" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

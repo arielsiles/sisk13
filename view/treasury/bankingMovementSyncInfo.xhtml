@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        #{messages['BankingMovementSync.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="bankingMovementSyncForm" enctype="multipart/form-data">
+            <div class="buttons">
+                <h:commandButton action="#{bankingMovementSyncAction.nextInfo}"
+                                 value="#{messages['Common.next']}"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['BankingMovementSync.info']}
+                </f:facet>
+
+                <s:decorate id="bankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankingMovementSync.bankAccount']}</ui:define>
+                    <h:selectOneMenu id="bankAccount"
+                                     value="#{bankingMovementSync.bankAccount}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{financesBankAccountList.resultList}" var="financesBankAccount"
+                                       label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="columnSeparatorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankingMovementSync.columnSeparator']}</ui:define>
+                    <h:inputText id="columnSeparator"
+                                 required="true"
+                                 styleClass="input"
+                                 value="#{bankingMovementSync.columnSeparator}"
+                                 tabindex="2"/>
+
+                </s:decorate>
+
+                <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankingMovementSync.file']}</ui:define>
+                    <s:fileUpload id="file"
+                                  required="true"
+                                  styleClass="input"
+                                  accept="text/plain"
+                                  data="#{bankingMovementSyncAction.file.value}"
+                                  fileName="#{bankingMovementSyncAction.file.name}"
+                                  fileSize="#{bankingMovementSyncAction.file.size}"
+                                  contentType="#{bankingMovementSyncAction.file.contentType}"
+                                  tabindex="3"/>
+                </s:decorate>
+
+
+                <!--
+                <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankingMovementSync.file']}</ui:define>
+                    <rich:fileUpload id="file"
+                                     maxFilesQuantity="#{sessionUser.maxFilesQuantity}"
+                                     allowFlash="true"
+                                     fileUploadListener="#{bankingMovementSyncAction.listener}"
+                                     autoclear="true"
+                                     acceptedTypes="txt">
+                        <a4j:support event="onuploadcomplete" reRender="info"/>
+                        <f:facet name="label">
+                            <h:outputText value="#{messages['Common.uploadingMessage']}"/>
+                        </f:facet>
+                    </rich:fileUpload>
+                    <br/>
+                    <h:panelGroup id="info">
+                        <rich:panel bodyClass="info">
+                            <f:facet name="header">
+                                <h:outputText value="Uploaded Files Info"/>
+                            </f:facet>
+                            <rich:panel bodyClass="rich-laguna-panel-no-header">
+                                <b><h:outputText value="File Name:"/></b>
+                                <h:outputText value="#{bankingMovementSyncAction.file.name}"/>
+                                <br/>
+                                <b><h:outputText value="File Length(bytes):"/></b>
+                                <h:outputText value="#{bankingMovementSyncAction.file.size}"/>
+                                <br/>
+                                <b><h:outputText value="File mapDataContainer:"/></b>
+                                <h:outputText value="#{bankingMovementSyncAction.mapDataContainer}"/>
+                                <br/>
+                                <b><h:outputText value="File mapContainerByRow:"/></b>
+                                <h:outputText value="#{bankingMovementSyncAction.mapContainerByRow}"/>
+                            </rich:panel>
+                        </rich:panel>
+                        <rich:spacer height="3"/>
+                    </h:panelGroup>
+                </s:decorate>
+                -->
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{bankingMovementSyncAction.nextInfo}"
+                                 value="#{messages['Common.next']}"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+        </h:form>
+        <!--Set selector Id to enable focus-->
+        <rich:jQuery selector="#bankAccount" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

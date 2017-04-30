@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['checkSumsAndBalances.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="productItemReportForm">
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['checkSumsAndBalances.report']}
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent">
+
+                <s:decorate id="dateFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateFrom']}</ui:define>
+                    <rich:calendar id="dateFrom"
+                                   value="#{checkSumsBalancesReportAction.startDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="dateToField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateTo']}</ui:define>
+                    <rich:calendar id="dateTo"
+                                   value="#{checkSumsBalancesReportAction.endDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <!--<s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                             required="true"
+                                             textValue="#{majorAccountingReportAction.cashAccount.fullName}"
+                                             value="#{majorAccountingReportAction.cashAccount}"
+                                             clearAction="majorAccountingReportAction.clearAccount()"
+                                             searchModalPanel="cashAccountListModalPanel"
+                                             dataModel="#{cashAccountDataModel}"
+                                             reRender="itemAccountField"
+                                             tabindex="3">
+                                <ui:define name="criteriaValues">
+                                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                                </ui:define>
+                    </app:selectPopUp>
+                </s:decorate>-->
+                <!--<s:decorate><h:outputText value="#{majorAccountingReportAction.cashAccount.fullName}"/></s:decorate>-->
+
+            </h:panelGrid>
+        </rich:panel>
+
+        <app:reportDefaultOptions reportAction="#{checkSumsBalancesReportAction}" showPageFormat="false"
+                                  tabIndex="11"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{checkSumsBalancesReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+    <!--<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="hasWarehousePermission" value="true"/>
+        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{majorAccountingReportAction.setCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="itemAccountField"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>-->
+
+</ui:define>
+</ui:composition>

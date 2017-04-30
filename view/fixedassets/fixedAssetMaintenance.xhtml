@@ -1,0 +1,602 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.managed}">
+            #{messages['DocumentType.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['DocumentType.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetMaintenanceRequestForm">
+
+<div class="buttons">
+    <h:commandButton
+            action="#{fixedAssetMaintenanceDocumentReportAction.generateReport(fixedAssetMaintenanceRequest)}"
+            value="#{messages['FixedAssetMaintenanceRequest.button.generateDocument']}"
+            immediate="true"
+            styleClass="button"
+            rendered="#{s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') and fixedAssetMaintenanceRequestAction.managed}"/>
+
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.sendRequest']}"
+                     action="#{fixedAssetMaintenanceRequestAction.sendRequest}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetMaintenanceRequestAction.managed and
+                                 s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.processRequest']}"
+                     action="#{fixedAssetMaintenanceRequestAction.processRequest}"
+                     styleClass="button"
+                     rendered="#{fixedAssetMaintenanceRequestAction.managed and
+                                 fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest and
+                                 s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.receiptMaintenance']}"
+                     action="#{fixedAssetMaintenanceRequestAction.receiptMaintenance}"
+                     styleClass="button"
+                     rendered="#{fixedAssetMaintenanceRequestAction.managed and
+                                 fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest and
+                                 s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{fixedAssetMaintenanceRequestAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.managed}">
+            #{messages['FixedAssetMaintenanceRequest.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FixedAssetMaintenanceRequest.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<rich:jQuery selector="#petitioner" query="focus()" timing="onload"/>
+<app:fieldset id="fixedAssetMaintenanceRequestFieldset"
+              title="#{messages['FixedAssetMaintenanceRequest.maintenanceRequest']}">
+    <c:choose>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.managed}">
+            <s:decorate id="codeField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.code']}</ui:define>
+                <h:outputText value="#{fixedAssetMaintenanceRequest.code}" styleClass="input"/>
+            </s:decorate>
+        </c:when>
+    </c:choose>
+    <s:decorate id="requestDateField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.requestDate']}</ui:define>
+        <h:outputText value="#{fixedAssetMaintenanceRequest.requestDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <c:choose>
+        <c:when test="#{!fixedAssetMaintenanceRequestAction.managed}">
+            <s:decorate id="petitionerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.petitioner']}</ui:define>
+                <h:selectOneMenu id="petitioner"
+                                 value="#{fixedAssetMaintenanceRequest.petitioner}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="2">
+                    <s:selectItems value="#{jobContractByLoggedUser}"
+                                   var="petitioner"
+                                   label="#{petitioner.contract.employee.fullName} - #{petitioner.job.charge.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange"
+                                 reRender="chargeField, costCenterField, executorUnitField, addFixedAssets, selectedFixedAssetsForMaintenanceDiv"
+                                 action="#{fixedAssetMaintenanceRequestAction.changePetitioner()}"
+                                 ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="petitionerField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.petitioner']}</ui:define>
+                <h:outputText
+                        value="#{fixedAssetMaintenanceRequest.petitioner.contract.employee.fullName} - #{fixedAssetMaintenanceRequest.petitioner.job.charge.name}"/>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <s:decorate id="chargeField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.charge']}</ui:define>
+        <h:outputText value="#{fixedAssetMaintenanceRequest.petitioner.job.charge.name}"/>
+    </s:decorate>
+    <s:decorate id="costCenterField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.costCenter']}</ui:define>
+        <h:outputText value="#{fixedAssetMaintenanceRequest.costCenter.fullName}"/>
+    </s:decorate>
+    <s:decorate id="executorUnitField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.executorUnit']}</ui:define>
+        <h:outputText value="#{fixedAssetMaintenanceRequest.executorUnit.fullName}"/>
+    </s:decorate>
+    <s:decorate id="stateField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.state']}</ui:define>
+        <h:outputText value="#{messages[fixedAssetMaintenanceRequest.requestState.resourceKey]}"/>
+    </s:decorate>
+    <c:choose>
+        <c:when test="#{!fixedAssetMaintenanceRequestAction.managed}">
+            <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.type']}</ui:define>
+                <h:selectOneMenu id="type"
+                                 value="#{fixedAssetMaintenanceRequest.type}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="3">
+                    <s:selectItems value="#{fixedAssetMaintenanceRequestType}"
+                                   var="type"
+                                   label="#{messages[type.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="typeField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.type']}</ui:define>
+                <h:outputText value="#{messages[fixedAssetMaintenanceRequest.type.resourceKey]}"/>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <s:decorate id="maintenanceReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.maintenanceReason']}</ui:define>
+        <h:inputTextarea id="maintenanceReason"
+                         value="#{fixedAssetMaintenanceRequestAction.maintenanceReason}"
+                         styleClass="input textarea"
+                         readonly="#{fixedAssetMaintenanceRequestAction.managed}"
+                         required="#{!fixedAssetMaintenanceRequestAction.managed}"
+                         tabindex="4">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+</app:fieldset>
+<app:fieldset id="fixedAssetMaintenanceRequestAction"
+              title="#{messages[fixedAssetMaintenanceRequestAction.actionTitle]}"
+              rendered="#{fixedAssetMaintenanceRequestAction.managed and
+                          (s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') or !fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest)}">
+    <s:decorate id="actionField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest}">
+        <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.action']}</ui:define>
+        <h:selectOneMenu id="action"
+                         value="#{fixedAssetMaintenanceRequestAction.action}"
+                         styleClass="input"
+                         valueChangeListener="#{fixedAssetMaintenanceRequestAction.changeAction}"
+                         tabindex="5">
+            <f:selectItem itemLabel="#{messages['FixedAssetMaintenanceRequest.approve']}" itemValue="0"/>
+            <f:selectItem itemLabel="#{messages['FixedAssetMaintenanceRequest.reject']}" itemValue="1"/>
+            <a4j:support event="onchange" reRender="actionEstimatedReceiptDatePanel"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <c:choose>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest}">
+            <s:decorate id="actionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.date']}</ui:define>
+                <rich:calendar id="actionDate"
+                               value="#{fixedAssetMaintenanceRequestAction.actionDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               required="true"
+                               tabindex="6">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="actionDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.date']}</ui:define>
+                <h:outputText value="#{fixedAssetMaintenanceRequestAction.actionDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <c:choose>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest}">
+            <a4j:outputPanel id="actionEstimatedReceiptDatePanel">
+                <s:decorate id="actionEstimatedReceiptDateField" template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{fixedAssetMaintenanceRequestAction.estimatedReceiptDateEnabled}">
+                    <ui:define name="label">#{messages['FixedAssetMaintenance.estimatedReceiptDate']}</ui:define>
+                    <rich:calendar id="actionEstimatedReceiptDate"
+                                   value="#{fixedAssetMaintenanceRequestAction.estimatedReceiptDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="7">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+            </a4j:outputPanel>
+        </c:when>
+        <c:when test="#{fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest or
+                        fixedAssetMaintenanceRequestAction.finishedMaintenanceRequest}">
+            <s:decorate id="actionEstimatedReceiptDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenance.estimatedReceiptDate']}</ui:define>
+                <h:outputText value="#{fixedAssetMaintenanceRequestAction.estimatedReceiptDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </s:decorate>
+        </c:when>
+    </c:choose>
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define
+                name="label">#{messages['FixedAssetMaintenanceRequest.description']}</ui:define>
+        <h:inputTextarea id="actionDescription"
+                         value="#{fixedAssetMaintenanceRequestAction.actionDescription}"
+                         styleClass="input textarea"
+                         required="#{fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest}"
+                         readonly="#{!fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest}"
+                         tabindex="8">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+</app:fieldset>
+<app:fieldset id="fixedAssetMaintenanceRequestReceipt"
+              title="#{messages['FixedAssetMaintenanceRequest.maintenanceReceipt']}"
+              rendered="#{(fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest and s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')) or
+                          fixedAssetMaintenanceRequestAction.finishedMaintenanceRequest}">
+    <c:choose>
+        <c:when test="#{s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') and
+                        fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest}">
+            <s:decorate id="receiptDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.date']}</ui:define>
+                <rich:calendar id="receiptDate"
+                               value="#{fixedAssetMaintenanceRequest.maintenance.receiptDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               required="true"
+                               tabindex="9">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="receiptDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.date']}</ui:define>
+                <h:outputText value="#{fixedAssetMaintenanceRequest.maintenance.receiptDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <c:choose>
+        <c:when test="#{s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') and
+                        fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest}">
+            <s:decorate id="receiptStateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.fixedAssetState']}</ui:define>
+                <h:selectOneMenu id="receiptState"
+                                 value="#{fixedAssetMaintenanceRequest.maintenance.receiptState}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="3">
+                    <s:selectItems value="#{fixedAssetMaintenanceReceiptStateList.resultList}"
+                                   var="state"
+                                   label="#{state.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange"
+                                 action="#{fixedAssetMaintenanceRequestAction.clearMaintenanceCurrencyAndAmount()}"
+                                 ajaxSingle="true"
+                                 reRender="maintenanceCurrencyAmountField"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="receiptStateField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.fixedAssetState']}</ui:define>
+                <h:outputText value="#{messages[fixedAssetMaintenanceRequest.maintenance.receiptState.name]}"/>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <s:div id="maintenanceCurrencyAmountField">
+        <c:choose>
+            <c:when test="#{s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') and
+                        fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest}">
+                <s:decorate id="maintenanceCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.currency']}</ui:define>
+                    <h:selectOneMenu id="maintenanceCurrency"
+                                     value="#{fixedAssetMaintenanceRequest.maintenance.currency}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="4">
+                        <s:selectItems value="#{currencyList}"
+                                       var="currency"
+                                       label="#{currency.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="maintenanceAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.amount']}</ui:define>
+                    <h:inputText id="maintenanceAmount"
+                                 value="#{fixedAssetMaintenanceRequest.maintenance.amount}"
+                                 styleClass="input right"
+                                 required="true"
+                                 tabindex="5">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
+                                                 forId="maintenanceAmount"/>
+                    </h:inputText>
+                </s:decorate>
+            </c:when>
+            <c:otherwise>
+                <s:decorate id="maintenanceCurrencyField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{not empty fixedAssetMaintenanceRequest.maintenance.currency}">
+                    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.currency']}</ui:define>
+                    <h:outputText value="#{fixedAssetMaintenanceRequest.maintenance.currency.fullName}"/>
+                </s:decorate>
+                <s:decorate id="maintenanceAmountField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{not empty fixedAssetMaintenanceRequest.maintenance.amount}">
+                    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.amount']}</ui:define>
+                    <h:outputText value="#{fixedAssetMaintenanceRequest.maintenance.amount}"
+                                  styleClass="input right">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+            </c:otherwise>
+        </c:choose>
+    </s:div>
+    <s:decorate id="receiptDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define
+                name="label">#{messages['FixedAssetMaintenanceRequest.description']}</ui:define>
+        <h:inputTextarea id="receiptDescription"
+                         value="#{fixedAssetMaintenanceRequestAction.receiptDescription}"
+                         styleClass="input textarea"
+                         required="#{fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest}"
+                         readonly="#{fixedAssetMaintenanceRequestAction.finishedMaintenanceRequest}"
+                         tabindex="10">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+</app:fieldset>
+<app:fieldset id="fixedAssetsFieldset"
+              title="#{messages['FixedAssetMaintenanceRequest.detail']}">
+    <div class="buttons">
+        <a4j:commandButton id="addFixedAssets"
+                           value="#{messages['FixedAssetMaintenanceRequest.addFixedAssets']}"
+                           styleClass="button"
+                           disabled="#{empty fixedAssetMaintenanceRequest.petitioner}"
+                           rendered="#{!fixedAssetMaintenanceRequestAction.managed}"
+                           oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');">
+            <a4j:support event="onclick" action="#{fixedAssetDataModel.reset()}" ajaxSingle="true"
+                         reRender="fixedAssetSelectListModalPanelContainer"/>
+        </a4j:commandButton>
+    </div>
+    <s:div id="selectedFixedAssetsForMaintenanceDiv">
+        <rich:dataTable id="fixedAssetList"
+                        value="#{fixedAssetMaintenanceRequest.fixedAssets}"
+                        var="fixedAssetItem"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="10%,10%,10%,10%,10%,10%,10%,10%,10%,10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.custodian"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.custodian']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader
+                                sortProperty="fixedAsset.fixedAssetSubGroup.id.fixedAssetSubGroupCode"
+                                dataModel="#{fixedAssetDataModel}"
+                                reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.fixedAssetSubGroupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.barCode"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.barCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.detail"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.detail']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.measurement"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.measurement']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.registrationDate"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.registrationDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.endDate"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.endDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.ufvOriginalValue"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.originalValue']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAsset.state"
+                                               dataModel="#{fixedAssetDataModel}"
+                                               reRender="fixedAssetList, dataScroller">
+                            #{messages['FixedAsset.state']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.custodianJobContract.contract.employee.fullName}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.fixedAssetSubGroup.id.fixedAssetSubGroupCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.barCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.detail}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.measurement}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.registrationDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetItem.endDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{fixedAssetItem.ufvOriginalValue}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages[fixedAssetItem.currencyType.resourceKey]}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{messages[fixedAssetItem.state.resourceKey]}">
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <a4j:commandLink immediate="true"
+                                 ajaxSingle="true"
+                                 value="#{messages['Common.remove']}"
+                                 action="#{fixedAssetMaintenanceRequestAction.removeFixedAsset(fixedAssetItem)}"
+                                 rendered="#{!fixedAssetMaintenanceRequestAction.managed}"
+                                 reRender="selectedFixedAssetsForMaintenanceDiv"/>
+            </rich:column>
+        </rich:dataTable>
+        <rich:datascroller id="dataScroller" align="right" for="fixedAssetList" maxPages="10"
+                           renderIfSinglePage="false"/>
+    </s:div>
+</app:fieldset>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton
+            action="#{fixedAssetMaintenanceDocumentReportAction.generateReport(fixedAssetMaintenanceRequest)}"
+            value="#{messages['FixedAssetMaintenanceRequest.button.generateDocument']}"
+            immediate="true"
+            styleClass="button"
+            rendered="#{s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') and fixedAssetMaintenanceRequestAction.managed}"/>
+
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.sendRequest']}"
+                     action="#{fixedAssetMaintenanceRequestAction.sendRequest}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetMaintenanceRequestAction.managed and
+                                 s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.processRequest']}"
+                     action="#{fixedAssetMaintenanceRequestAction.processRequest}"
+                     styleClass="button"
+                     rendered="#{fixedAssetMaintenanceRequestAction.managed and
+                                 fixedAssetMaintenanceRequestAction.pendingMaintenanceRequest and
+                                 s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['FixedAssetMaintenanceRequest.receiptMaintenance']}"
+                     action="#{fixedAssetMaintenanceRequestAction.receiptMaintenance}"
+                     styleClass="button"
+                     rendered="#{fixedAssetMaintenanceRequestAction.managed and
+                                 fixedAssetMaintenanceRequestAction.approvedMaintenanceRequest and
+                                 s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{fixedAssetMaintenanceRequestAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+</h:form>
+
+<s:decorate id="fixedAssetSelectListModalPanelContainer"
+            template="/fixedassets/fixedAssetSelectListModalPanel.xhtml"
+            rendered="#{!fixedAssetMaintenanceRequestAction.managed and
+                        s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','CREATE')}">
+    <ui:param name="dialogId" value="fixedAssetSelectListModalPanel"/>
+    <ui:param name="enableStateFilter" value="false"/>
+    <ui:param name="enableExecutorUnitFilter" value="false"/>
+    <ui:param name="enableCostCenterFilter" value="false"/>
+    <ui:param name="enableCustodianFilter" value="false"/>
+    <ui:param name="dataModel" value="#{fixedAssetDataModel}"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{fixedAssetMaintenanceRequestAction.addFixedAssetList(dataModel.selectedObjectList)}"
+                           value="#{messages['FixedAssetMaintenanceRequest.addFixedAssets']}"
+                           styleClass="button"
+                           reRender="selectedFixedAssetsForMaintenanceDiv"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSelectListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>   

@@ -1,0 +1,80 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:a4j="http://richfaces.org/a4j"
+     xmlns:c="http://java.sun.com/jstl/core"
+     xmlns:rich="http://richfaces.org/rich"
+     xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <c:if test="#{not empty purchaseOrder}">
+        #{purchaseOrderFixedAssetPartDataModel.searchByPurchaseOrder(purchaseOrder)}
+    </c:if>
+
+    <c:choose>
+        <c:when test="#{not empty showActionColumn}">
+            <c:set value="showActionColumn" var="#{showActionColumn}"/>
+        </c:when>
+        <c:otherwise>
+            <c:set value="showActionColumn" var="#{false}"/>
+        </c:otherwise>
+    </c:choose>
+
+    <c:set var="columnsWidth" value="#{showActionColumn?'20%, 30%, 15%, 15%, 10%, 10%':'25%, 35%, 15%, 15%, 10%'}"/>
+
+    <rich:dataTable id="purchaseOrderFixedAssetPartList"
+                    value="#{purchaseOrderFixedAssetPartDataModel}"
+                    var="fixedAssetPartItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="#{columnsWidth}">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.fixedAsset']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.description']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.measureUnit']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.serialNumber']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.unitPrice']}"/>
+                </rich:column>
+                <rich:column rendered="#{showActionColumn}">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{fixedAssetPartItem.fixedAsset.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{fixedAssetPartItem.description}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{fixedAssetPartItem.measureUnit.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{fixedAssetPartItem.serialNumber}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{fixedAssetPartItem.unitPrice}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputText value="#{messages['Currency.Bs']}"/>
+        </rich:column>
+        <rich:column styleClass="center" rendered="#{showActionColumn}">
+            <ui:insert name="selectButton"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="purchaseOrderFixedAssetPartDataScroller"
+                      for="purchaseOrderFixedAssetPartList"
+                      dataModel="#{purchaseOrderFixedAssetPartDataModel}"/>
+</div>

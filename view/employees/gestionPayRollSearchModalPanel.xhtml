@@ -1,0 +1,210 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="focusFirstElement();">
+<c:if test="#{empty dataModel}">
+    <c:set var="dataModel" value="#{gestionPayRollSearchDataModel}"/>
+</c:if>
+
+<c:set var="firstInputToFocusId" value="#{dialogId}-gestionNameInputText"/>
+<f:facet name="header">
+    <h:outputText>#{messages['GestionPayroll.list']}</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+</f:facet>
+<h:form id="gestionPayRollListForm#{dialogId}">
+    <rich:simpleTogglePanel id="gestionPayRollSimpleTogglePanel"
+                            label="#{messages['GestionPayroll.search']}"
+                            switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent, width50percent">
+            <s:div>
+                <s:decorate id="gestionNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionPayroll.gestionName']}</ui:define>
+                    <h:inputText id="#{firstInputToFocusId}"
+                                 value="#{dataModel.criteria.gestionName}"
+                                 maxlength="150"
+                                 styleClass="input"
+                                 tabindex="1">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="yearId" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Gestion.year']}</ui:define>
+                    <h:inputText value="#{dataModel.year}"
+                                 maxlength="5"
+                                 styleClass="input"
+                                 tabindex="2">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="monthId" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionPayroll.month']}</ui:define>
+                    <h:selectOneMenu value="#{dataModel.month}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{month}" var="month" label="#{messages[month.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{dataModel.search()}"
+                                       reRender="gestionPayrollList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{dataModel.clear()}"
+                                       reRender="gestionNameField, yearId, monthId, gestionPayrollList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       tabindex="5"/>
+                </s:div>
+            </s:div>
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
+    <br/>
+    <rich:dataTable value="#{dataModel}"
+                    var="gestionPayrollItem"
+                    id="gestionPayrollList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="9%, 17%, 25%, 6%, 8%, 12%, 12%, 6%, 5%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.businessUnit.organization.name"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['Sede.sede']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.jobCategory.name"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['GestionPayroll.jobCategory']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.gestionName"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['GestionPayroll.gestionName']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.gestion.year"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['Gestion.year']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.month"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['GestionPayroll.month']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.initDate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['GestionPayroll.initDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.endDate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['GestionPayroll.endDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.exchangeRate.rate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, dataScroller">
+                        #{messages['ExchangeRate.rate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.businessUnit.organization.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.jobCategory.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.gestionName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.gestion.year}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[gestionPayrollItem.month.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.initDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.endDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.exchangeRate.rate}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column styleClass="center">
+            <ui:insert name="assignButton"/>
+            <rich:componentControl for="#{dialogId}"
+                                   attachTo="assignButton"
+                                   operation="hide"
+                                   event="onclick"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller"
+                      for="gestionPayrollList"
+                      dataModel="#{dataModel}"/>
+    <rich:componentControl for="#{dialogId}"
+                           attachTo="closeLink, addButton"
+                           operation="hide"
+                           event="onclick"/>
+</h:form>
+<script type="text/javascript">
+    function focusFirstElement() {
+        document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+    }
+</script>
+</rich:modalPanel>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/budget/*" login-required="true"/>
+
+    <page view-id="/budget/burdenList.xhtml">
+        <navigation from-action="#{burdenAction.select(burdenItem)}">
+            <rule>
+                <redirect view-id="/budget/burden.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/burden.xhtml" no-conversation-view-id="/budget/burdenList.xhtml">
+        <navigation from-action="#{classifierAccountAction.newAssignToBurden}">
+            <rule>
+                <redirect view-id="/budget/classifierAccount.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{classifierAccountAction.selectAssignToBurden(classifierAccountItem)}">
+            <rule>
+                <redirect view-id="/budget/classifierAccount.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/burdenList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/accountingItemList.xhtml">
+        <navigation from-action="#{accountingItemAction.select(accountingItemItem)}">
+            <rule>
+                <redirect view-id="/budget/accountingItem.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/accountingItem.xhtml" no-conversation-view-id="/budget/accountingItemList.xhtml">
+        <navigation from-action="#{classifierAccountAction.newAssignToAccountingItem}">
+            <rule>
+                <redirect view-id="/budget/classifierAccount.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{classifierAccountAction.selectAssignToAccountingItem(classifierAccountItem)}">
+            <rule>
+                <redirect view-id="/budget/classifierAccount.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/accountingItemList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/classifierAccount.xhtml" no-conversation-view-id="/home.xhtml">
+        <navigation>
+            <rule if-outcome="BurdenView">
+                <redirect view-id="/budget/burden.xhtml"/>
+            </rule>
+            <rule if-outcome="AccountingItemView">
+                <redirect view-id="/budget/accountingItem.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/entryBudgetList.xhtml">
+        <navigation from-action="#{entryBudgetAction.select(entryBudgetItem)}">
+            <rule>
+                <redirect view-id="/budget/entryBudget.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/entryBudget.xhtml" no-conversation-view-id="/budget/entryBudget.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/entryBudgetList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{entryBudgetAction.verify()}">
+            <rule>
+                <redirect view-id="/budget/entryBudgetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/budgetProgramList.xhtml">
+        <navigation from-action="#{budgetProgramAction.select(budgetProgramItem)}">
+            <rule>
+                <redirect view-id="/budget/budgetProgram.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/budgetProgram.xhtml" no-conversation-view-id="/budget/budgetProgramList.xhtml">
+        <navigation from-action="#{budgetActivityAction.newBudgetActivity}">
+            <rule>
+                <redirect view-id="/budget/budgetActivity.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{budgetActivityAction.select(budgetActivityItem)}">
+            <rule>
+                <redirect view-id="/budget/budgetActivity.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/budgetProgramList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/budget/budgetActivity.xhtml" no-conversation-view-id="/budget/budgetProgramList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/budgetProgram.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/budget/expenseBudgetList.xhtml">
+        <navigation from-action="#{expenseBudgetAction.select(expenseBudgetItem)}">
+            <rule>
+                <redirect view-id="/budget/expenseBudget.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/budget/expenseBudget.xhtml" no-conversation-view-id="/budget/expenseBudgetList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/expenseBudgetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/budget/budgetDistributionList.xhtml">
+        <navigation from-action="#{budgetDistributionAction.select(budgetDistributionItem)}">
+            <rule>
+                <redirect view-id="/budget/budgetDistribution.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/budget/budgetDistribution.xhtml" no-conversation-view-id="/budget/budgetDistributionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/budget/budgetDistributionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/budget/expenseBudgetExecutionReport.xhtml"
+          no-conversation-view-id="/budget/budgetDistributionList.xhtml">
+        <restrict>#{s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW')}</restrict>
+    </page>
+
+</pages>

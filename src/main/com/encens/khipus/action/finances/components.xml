@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+
+    <factory name="cashBoxTypeList" value="#{cashBoxTypeQuery}"/>
+    <framework:entity-query name="cashBoxTypeQuery" ejbql="select c from CashBoxType c"/>
+
+    <!--<factory name="cashBoxStateList" value="#{cashBoxStateQuery}"/>-->
+    <!--<framework:entity-query name="cashBoxStateQuery" ejbql="select c from CashBoxState c"/>-->
+
+    <factory name="taxPercentageTypeList" value="#{taxPercentageTypeQuery}"/>
+    <framework:entity-query name="taxPercentageTypeQuery" ejbql="select tpt from TaxPercentageType tpt"/>
+
+    <factory name="taxPercentageList" value="#{taxPercentageQuery}"/>
+    <framework:entity-query name="taxPercentageQuery" ejbql="select tp from TaxPercentage tp"/>
+
+    <factory name="dosageTypeList" value="#{dosageTypeQuery}"/>
+    <framework:entity-query name="dosageTypeQuery" ejbql="select dt from DosageType dt"/>
+
+    <factory name="userList" value="#{userQuery}"/>
+    <framework:entity-query name="userQuery" ejbql="select u from User u"/>
+
+    <factory name="exchangeRateList" value="#{exchangeRateQuery}"/>
+    <framework:entity-query name="exchangeRateQuery"
+                            ejbql="select o from ExchangeRate o order by o.rate ASC"/>
+
+    <factory name="bankAccountList" value="#{bankAccountQuery}"/>
+    <framework:entity-query name="bankAccountQuery"
+                            ejbql="select o from BankAccount o order by o.accountNumber ASC"/>
+    <factory name="costCenterList" value="#{costCenterQuery}"/>
+    <framework:entity-query name="costCenterQuery"
+                            ejbql="select o from CostCenter o order by o.groupCode ASC,o.code ASC"/>
+
+    <factory name="costCenterGroupList" value="#{costCenterGroupQuery}"/>
+    <framework:entity-query name="costCenterGroupQuery"
+                            ejbql="select o from CostCenterGroup o order by o.code ASC"/>
+
+    <factory name="financesBankAccountList" value="#{financesBankAccountQuery}"/>
+    <framework:entity-query name="financesBankAccountQuery"
+                            ejbql="select financesBankAccount from FinancesBankAccount financesBankAccount where financesBankAccount.state='VIG' order by financesBankAccount.description asc,financesBankAccount.currency asc"/>
+
+    <factory name="financesDocumentTypeList" value="#{financesDocumentTypeQuery}"/>
+    <framework:entity-query name="financesDocumentTypeQuery"
+                            ejbql="select financesDocumentType from FinancesDocumentType financesDocumentType where financesDocumentType.state='VIG' order by financesDocumentType.documentType asc,financesDocumentType.description asc"/>
+
+    <framework:entity-query name="countCashAccountGroupCodeQuery"
+                            ejbql="select count(cashAccountGroup) from CashAccountGroup cashAccountGroup">
+        <framework:restrictions>
+            <value>cashAccountGroup.code = #{cashAccountGroup.code}</value>
+            <value>cashAccountGroup.id != #{cashAccountGroup.id}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <framework:entity-query name="countCashAccountGroupNameQuery"
+                            ejbql="select count(cashAccountGroup) from CashAccountGroup cashAccountGroup">
+        <framework:restrictions>
+            <value>lower(cashAccountGroup.name) = lower(#{cashAccountGroup.name})</value>
+            <value>cashAccountGroup.id != #{cashAccountGroup.id}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="rotatoryFundDocumentTypeList" value="#{rotatoryFundDocumentTypeQuery}"/>
+    <framework:entity-query name="rotatoryFundDocumentTypeQuery"
+                            ejbql="select rotatoryFundDocumentType from RotatoryFundDocumentType rotatoryFundDocumentType">
+        <framework:restrictions>
+            <value>rotatoryFundDocumentType.active = #{true}</value>
+            <value>rotatoryFundDocumentType.rotatoryFundType =
+                #{s:hasPermission('OTHERRECEIVABLES','VIEW')?enumerationUtil.getEnumValue('com.encens.khipus.model.finances.RotatoryFundType','OTHER_RECEIVABLES'):null}
+            </value>
+        </framework:restrictions>
+        <framework:order>rotatoryFundDocumentType.code</framework:order>
+    </framework:entity-query>
+
+    <factory name="providerClassList" value="#{providerClassQuery}"/>
+    <framework:entity-query name="providerClassQuery"
+                            ejbql="select providerClass from ProviderClass providerClass order by providerClass.code"/>
+
+    <factory name="payableDocumentTypeList" value="#{payableDocumentTypeQuery}"/>
+    <framework:entity-query name="payableDocumentTypeQuery"
+                            ejbql="select payableDocumentType from PayableDocumentType payableDocumentType">
+        <framework:restrictions>
+            <value>payableDocumentType.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentTypeState','VIG')}
+            </value>
+        </framework:restrictions>
+        <framework:order>payableDocumentType.description</framework:order>
+    </framework:entity-query>
+
+    <factory name="creditOtherPayableDocumentTypeList" value="#{creditOtherPayableDocumentTypeQuery}"/>
+    <framework:entity-query name="creditOtherPayableDocumentTypeQuery"
+                            ejbql="select payableDocumentType from PayableDocumentType payableDocumentType">
+        <framework:restrictions>
+            <value>payableDocumentType.movementType =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinanceMovementType','C')}
+            </value>
+            <value>payableDocumentType.documentClass =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentClass','OTR')}
+            </value>
+            <value>payableDocumentType.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentTypeState','VIG')}
+            </value>
+        </framework:restrictions>
+        <framework:order>payableDocumentType.description</framework:order>
+    </framework:entity-query>
+
+    <factory name="financesCurrencyList" value="#{financesCurrencyQuery}"/>
+    <framework:entity-query name="financesCurrencyQuery"
+                            ejbql="select financesCurrency from FinancesCurrency financesCurrency">
+        <framework:restrictions>
+            <value>financesCurrency.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesCurrencyState','VIG')}
+            </value>
+        </framework:restrictions>
+        <framework:order>financesCurrency.description</framework:order>
+    </framework:entity-query>
+
+    <!--Enumerations-->
+
+    <factory name="costCenterStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.CostCenterState')}"/>
+
+    <factory name="costCenterTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.CostCenterType')}"/>
+
+    <factory name="rotatoryFundTypeEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.RotatoryFundType')}"/>
+
+    <factory name="payrollColumnTypeEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.PayrollColumnType')}"/>
+
+    <factory name="rotatoryFundDocumentTypeFieldRestrictionEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.RotatoryFundDocumentTypeFieldRestriction')}"/>
+
+    <factory name="moduleProviderTypeEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.ModuleProviderType')}"/>
+
+    <factory name="financesEntityStateEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.FinancesEntityState')}"/>
+
+    <factory name="payableDocumentSourceTypeEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.util.finances.PayableDocumentSourceType')}"/>
+
+</components>

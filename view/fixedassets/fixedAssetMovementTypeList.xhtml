@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['FixedAssetMovementType.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="fixedAssetMovementTypeSearch">
+
+            <rich:simpleTogglePanel id="fixedAssetMovementTypeSearchPanel"
+                                    label="#{messages['FixedAssetMovementType.search']}"
+                                    switchType="client">
+
+                <s:decorate id="movementCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetMovementType.movementCode']}</ui:define>
+                    <h:inputText id="movementCode" value="#{fixedAssetMovementTypeDataModel.criteria.movementCode}"
+                                 maxlength="3" styleClass="input"
+                                 tabindex="1">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="fixedAssetMovementTypeStateField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define
+                            name="label">#{messages['FixedAssetMovementType.fixedAssetMovementTypeState']}</ui:define>
+                    <h:selectOneMenu id="fixedAssetMovementTypeState"
+                                     value="#{fixedAssetMovementTypeDataModel.criteria.fixedAssetMovementTypeState}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{fixedAssetMovementTypeStates}"
+                                       var="state"
+                                       label="#{messages[state.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="fixedAssetMovementTypeEnumField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetMovementType.fixedAssetMovementTypeEnum']}</ui:define>
+                    <h:selectOneMenu id="fixedAssetMovementTypeEnum"
+                                     value="#{fixedAssetMovementTypeDataModel.criteria.fixedAssetMovementTypeEnum}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{fixedAssetMovementTypeEnums}"
+                                       var="types"
+                                       label="#{messages[types.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                    <a4j:commandButton action="#{fixedAssetMovementTypeDataModel.search}"
+                                       reRender="fixedAssetMovementTypeSearchPanel, fixedAssetMovementTypeList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId"
+                                       tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#movementCode" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/fixedassets/fixedAssetMovementType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('FIXEDASSETMOVEMENTTYPE','CREATE')}"
+                          propagation="none"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable value="#{fixedAssetMovementTypeDataModel}" var="fixedAssetMovementTypeItem"
+                            id="fixedAssetMovementTypeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 25%, 20%,20%,15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetMovementType.movementCode"
+                                                   dataModel="#{fixedAssetMovementTypeDataModel}"
+                                                   reRender="fixedAssetMovementTypeList, dataScroller">
+                                #{messages['FixedAssetMovementType.movementCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetMovementType.description"
+                                                   dataModel="#{fixedAssetMovementTypeDataModel}"
+                                                   reRender="fixedAssetMovementTypeList, dataScroller">
+                                #{messages['FixedAssetMovementType.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetMovementType.fixedAssetMovementTypeState"
+                                                   dataModel="#{fixedAssetMovementTypeDataModel}"
+                                                   reRender="fixedAssetMovementTypeList, dataScroller">
+                                #{messages['FixedAssetMovementType.fixedAssetMovementTypeState']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="fixedAssetMovementType.fixedAssetMovementTypeEnum"
+                                                   dataModel="#{fixedAssetMovementTypeDataModel}"
+                                                   reRender="fixedAssetMovementTypeList, dataScroller">
+                                #{messages['FixedAssetMovementType.fixedAssetMovementTypeEnum']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{fixedAssetMovementTypeItem.movementCode}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{fixedAssetMovementTypeItem.description}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{messages[fixedAssetMovementTypeItem.fixedAssetMovementTypeState.resourceKey]}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{messages[fixedAssetMovementTypeItem.fixedAssetMovementTypeEnum.resourceKey]}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{fixedAssetMovementTypeAction.select(fixedAssetMovementTypeItem)}"
+                                   rendered="#{s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="fixedAssetMovementTypeList"
+                              dataModel="#{fixedAssetMovementTypeDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/fixedAssetMovementType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('FIXEDASSETMOVEMENTTYPE','CREATE')}"
+                          propagation="none"
+                          tabindex="6"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

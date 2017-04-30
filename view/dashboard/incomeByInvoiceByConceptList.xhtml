@@ -1,0 +1,1085 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<br/>
+<rich:panel>
+<f:facet name="header">
+    #{messages['IncomeByInvoiceByConcept.label']}
+</f:facet>
+<s:div style="overflow: auto;">
+<rich:dataTable width="100%"
+                value="#{incomeByInvoiceByConceptAction.resultList}"
+                var="element"
+                footerClass="rich-table-footer">
+<f:facet name="header">
+<rich:columnGroup>
+<rich:column rowspan="2">
+    #{messages['IncomeByInvoiceByConcept.month']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.uniqueDeposit']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.admission']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.computer']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.halfYear']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.enrollment']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.payment']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.expense']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.additionalTopic']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.delayTopic']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.congress']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.rightCharges']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.dentistryPractice']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.hospitalPractice']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.internship']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.certification']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.extracurricularWork']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.paperwork']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.summerWinter']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.duelTopic']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.extemporaneousTest']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.secondTurn']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.souvenir']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.didacticMaterial']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.auditoriumRental']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.coffeeShopRental']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.reserve']}
+</rich:column>
+<rich:column colspan="2">
+    #{messages['IncomeByInvoiceByConcept.total']}
+</rich:column>
+<rich:column rowspan="2">
+    #{messages['Dashboard.columnTitle.total']}
+</rich:column>
+<rich:column rowspan="2">
+    #{messages['IncomeByInvoiceByConcept.exchangeRate']}
+</rich:column>
+
+<rich:column breakBefore="true">
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+<rich:column>
+    #{messages['Dashboard.symbol.bs']}
+</rich:column>
+<rich:column>
+    #{messages['Dashboard.symbol.usd']}
+</rich:column>
+
+</rich:columnGroup>
+</f:facet>
+<rich:column styleClass="left" footerClass="rich-table-footercell">
+    <h:outputText value="#{element.month}"/>
+    <f:facet name="footer">
+        #{messages['Dashboard.rowTitle.subTotal']}
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.uniqueDepositBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['uniqueDepositBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.uniqueDepositUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['uniqueDepositUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.admissionBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['admissionBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.admissionUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['admissionUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.computerBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['computerBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.computerUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['computerUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.halfYearBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['halfYearBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.halfYearUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['halfYearUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.enrollmentBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['enrollmentBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.enrollmentUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['enrollmentUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.paymentBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['paymentBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.paymentUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['paymentUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.expenseBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['expenseBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.expenseUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['expenseUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.additionalTopicBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['additionalTopicBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.additionalTopicUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['additionalTopicUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.delayTopicBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['delayTopicBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.delayTopicUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['delayTopicUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.congressBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['congressBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.congressUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['congressUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.rightChargesBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['rightChargesBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.rightChargesUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['rightChargesUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.dentistryPracticeBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['dentistryPracticeBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.dentistryPracticeUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['dentistryPracticeUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.hospitalPracticeBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['hospitalPracticeBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.hospitalPracticeUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['hospitalPracticeUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.internshipBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['internshipBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.internshipUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['internshipUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.certificationBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['certificationBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.certificationUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['certificationUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.extracurricularWorkBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['extracurricularWorkBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.extracurricularWorkUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['extracurricularWorkUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.paperworkBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['paperworkBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.paperworkUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['paperworkUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.summerWinterBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['summerWinterBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.summerWinterUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['summerWinterUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.duelTopicBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['duelTopicBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.duelTopicUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['duelTopicUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.extemporaneousTestBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['extemporaneousTestBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.extemporaneousTestUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['extemporaneousTestUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.secondTurnBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['secondTurnBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.secondTurnUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['secondTurnUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.souvenirBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['souvenirBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.souvenirUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['souvenirUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.didacticMaterialBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['didacticMaterialBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.didacticMaterialUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['didacticMaterialUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.auditoriumRentalBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['auditoriumRentalBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.auditoriumRentalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['auditoriumRentalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.coffeeShopRentalBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['coffeeShopRentalBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.coffeeShopRentalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['coffeeShopRentalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.reserveBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['reserveBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.reserveUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['reserveUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.bs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['bs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.usd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['usd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.mainTotalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByConceptAction.totals['mainTotalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.exchangeRate}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+
+
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="left">
+            #{messages['Dashboard.rowTitle.total']}
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalUniqueDepositUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalAdmissionUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalComputerUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalHalfYearUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalEnrollmentUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalPaymentUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalExpenseUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalAdditionalTopicUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalDelayTopicUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalCongressUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalRightChargesUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalDentistryPracticeUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalHospitalPracticeUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalInternshipUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalCertificationUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalExtracurricularWorkUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalPaperworkUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalSummerWinterUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalDuelTopicUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalExtemporaneousTestUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalSecondTurnUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalSouvenirUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalDidacticMaterialUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalAuditoriumRentalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalCoffeeShopRentalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalReserveUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['totalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <!--<rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['mainTotalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByConceptAction.totals['']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>-->
+
+        <rich:column colspan="2">
+            <rich:spacer/>
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+</rich:dataTable>
+</s:div>
+
+</rich:panel>
+
+</ui:composition>

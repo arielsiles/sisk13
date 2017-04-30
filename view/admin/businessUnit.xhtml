@@ -1,0 +1,420 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{businessUnitAction.managed}">
+            #{messages['BusinessUnit.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['BusinessUnit.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+<h:form id="businessUnitForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{businessUnitAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <a4j:commandButton id="updateButtonId"
+                       action="#{businessUnitAction.update}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','UPDATE')}"
+                       reRender="businessUnitForm">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{businessUnitAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{businessUnitAction.managed}">
+            #{messages['BusinessUnit.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['BusinessUnit.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+<s:div>
+<s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.idNumber']}</ui:define>
+    <h:inputText id="idNumber" value="#{businessUnit.organization.idNumber}"
+                 required="true"
+                 maxlength="100"
+                 tabindex="1"
+                 styleClass="input"/>
+</s:decorate>
+<a4j:region>
+    <s:div id="documentDiv">
+        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Entity.documentType']}</ui:define>
+            <h:selectOneMenu id="documentType"
+                             value="#{businessUnit.organization.documentType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="2">
+                <s:selectItems value="#{organizationDocumentTypeList}"
+                               var="documentType"
+                               label="#{documentType.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             action="#{businessUnitAction.updateShowExtension()}"
+                             reRender="documentType,extensionField, documentDiv"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                    rendered="#{businessUnitAction.showExtension}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+            <h:selectOneMenu id="extension"
+                             value="#{businessUnit.organization.extensionSite}"
+                             styleClass="input"
+                             rendered="#{businessUnitAction.showExtension}"
+                             required="true"
+                             tabindex="3">
+                <s:selectItems value="#{businessUnitExtensionList}"
+                               var="extension"
+                               label="#{extension.extension}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchanged"
+                             reRender="extensionField"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+</a4j:region>
+<s:decorate id="cityField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Street.city']}</ui:define>
+    <h:selectOneMenu id="city"
+                     value="#{businessUnitAction.city}"
+                     styleClass="input"
+                     tabindex="4">
+        <s:selectItems value="#{pECityList}"
+                       var="city"
+                       label="#{city.name}"
+                       noSelectionLabel=""/>
+        <a4j:support event="onchange" reRender="zone" ajaxSingle="true"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="zoneField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Street.zone']}</ui:define>
+    <h:selectOneMenu id="zone"
+                     value="#{businessUnitAction.zone}"
+                     styleClass="input"
+                     tabindex="5">
+        <s:selectItems value="#{zoneList}"
+                       var="zone"
+                       label="#{zone.name}"
+                       noSelectionLabel=""/>
+        <a4j:support event="onchange" reRender="district" ajaxSingle="true"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="districtField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Street.district']}</ui:define>
+    <h:selectOneMenu id="district"
+                     value="#{businessUnitAction.district}"
+                     styleClass="input"
+                     tabindex="6">
+        <s:selectItems value="#{districtList}"
+                       var="district"
+                       label="#{district.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support event="onchange" reRender="street" ajaxSingle="true"/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="streetField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.street']}</ui:define>
+    <h:selectOneMenu id="street"
+                     value="#{businessUnit.organization.address.street}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="7">
+        <s:selectItems value="#{streetList}"
+                       var="street"
+                       label="#{street.name}"
+                       hideNoSelectionLabel="false"
+                       noSelectionLabel=""/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="addressNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.addressNumber']}</ui:define>
+    <h:inputText id="addressNumber"
+                 value="#{businessUnit.organization.address.number}"
+                 required="true"
+                 maxlength="100"
+                 tabindex="8"
+                 styleClass="input">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+    </h:inputText>
+</s:decorate>
+<s:decorate id="businessUnitTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.businessUnitType']}</ui:define>
+    <h:selectOneMenu id="businessUnitType"
+                     value="#{businessUnit.businessUnitType}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="9">
+        <s:selectItems value="#{businessUnitTypeList.resultList}" var="businessUnitType"
+                       label="#{businessUnitType.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['Organization.name']}</ui:define>
+    <h:inputText id="name"
+                 value="#{businessUnit.organization.name}"
+                 required="true"
+                 maxlength="200"
+                 tabindex="10"
+                 styleClass="input"/>
+</s:decorate>
+<s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.acronym']}</ui:define>
+    <h:inputText id="acronym"
+                 value="#{businessUnit.acronym}"
+                 required="true"
+                 maxlength="10"
+                 tabindex="11"
+                 styleClass="input"/>
+</s:decorate>
+<s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.executorUnitCode']}</ui:define>
+    <h:inputText id="name"
+                 value="#{businessUnit.executorUnitCode}"
+                 maxlength="10"
+                 tabindex="12"
+                 styleClass="input"
+                 required="true"/>
+</s:decorate>
+<s:decorate id="commercialEnrollmentNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.commercialEnrollmentNumber']}</ui:define>
+    <h:inputText id="commercialEnrollmentNumber"
+                 value="#{businessUnit.commercialEnrollmentNumber}"
+                 maxlength="100"
+                 tabindex="12"
+                 styleClass="input"/>
+</s:decorate>
+<s:decorate id="quantityDepartmentsField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.quantityDepartments']}</ui:define>
+    <h:inputText id="quantityDepartments"
+                 value="#{businessUnit.quantityDepartments}"
+                 maxlength="50"
+                 tabindex="13"
+                 styleClass="input"
+                 required="true">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+    </h:inputText>
+</s:decorate>
+<s:decorate id="quantityEmployeesField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.quantityEmployees']}</ui:define>
+    <h:inputText id="quantityEmployees"
+                 value="#{businessUnit.quantityEmployees}"
+                 maxlength="50"
+                 tabindex="14"
+                 styleClass="input"
+                 required="true">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+    </h:inputText>
+</s:decorate>
+<s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['BusinessUnit.position']}</ui:define>
+    <h:inputText id="position"
+                 value="#{businessUnit.position}"
+                 tabindex="15"
+                 styleClass="input">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        <f:validateLongRange minimum="0" maximum="9999999999"/>
+    </h:inputText>
+</s:decorate>
+</s:div>
+<s:div>
+    <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BusinessUnit.humanResourcesResponsible']}</ui:define>
+        <app:quickSearch id="quickSearchEmployee"
+                         textValue="businessUnit.humanResourcesResponsible.idNumber"
+                         value="#{businessUnit.humanResourcesResponsible}"
+                         searchField="idNumber"
+                         reRender="employeeField"
+                         tabindex="16"/>
+        <app:selectPopUp id="employee"
+                         textValue="#{businessUnit.humanResourcesResponsible.fullName}"
+                         value="#{businessUnit.humanResourcesResponsible}"
+                         dataModel="#{generalEmployeeDataModel}"
+                         clearAction="businessUnitAction.clearHumanResourcesResponsible()"
+                         searchModalPanel="generalEmployeeListModalPanel"
+                         reRender="employeeField"
+                         required="true"
+                         hotKeySelect="alt+1"/>
+    </s:decorate>
+    <s:decorate id="descriptionBUField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BusinessUnit.description']}</ui:define>
+        <h:inputTextarea id="descriptionBU"
+                         value="#{businessUnit.descriptionBU}"
+                         styleClass="input textarea"
+                         tabindex="16"/>
+    </s:decorate>
+    <s:decorate id="publicityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BusinessUnit.publicity']}</ui:define>
+        <h:inputTextarea id="publicity"
+                         value="#{businessUnit.publicity}"
+                         styleClass="input textarea"
+                         tabindex="17"/>
+    </s:decorate>
+    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BusinessUnit.address']}</ui:define>
+        <h:inputTextarea id="address"
+                         value="#{businessUnit.address}"
+                         styleClass="input textarea"
+                         tabindex="18"/>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{businessUnitAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','CREATE')}"
+                     tabindex="18"/>
+
+    <a4j:commandButton action="#{businessUnitAction.update}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','UPDATE')}"
+                       reRender="businessUnitForm"
+                       tabindex="19">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','DELETE')}"
+                     tabindex="20">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{businessUnitAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="21"
+                     immediate="true"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['BusinessUnit.delete.confirmation']}">
+                <f:param value="#{businessUnit.organization.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{businessUnitAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('BUSINESSUNIT','DELETE')}"
+                           tabindex="22"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{!businessUnitAction.managed and s:hasPermission('BUSINESSUNIT','CREATE')}">
+    <ui:param name="dialogId" value="createConfirmationOutLimit"/>
+    <ui:define name="dialogTitle">#{messages['BusinessUnit.new.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['BusinessUnit.create.confirmation']}">
+                <f:param value="#{businessUnit.organization.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{businessUnitAction.create}"
+                           value="#{messages['Common.add']}"
+                           rendered="#{s:hasPermission('BUSINESSUNIT','CREATE')}"
+                           immediate="true"
+                           tabindex="22"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{businessUnit.setHumanResourcesResponsible(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>
+

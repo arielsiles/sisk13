@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{evaluationCriteriaValueAction.managed}">
+                #{messages['EvaluationCriteriaValue.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['EvaluationCriteriaValue.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="evaluationCriteriaValueForm">
+            <div class="buttons">
+                <h:commandButton action="#{evaluationCriteriaValueAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{evaluationCriteriaValueAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{evaluationCriteriaValueAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{evaluationCriteriaValueAction.managed}">
+                            #{messages['EvaluationCriteriaValue.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['EvaluationCriteriaValue.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="indexField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EvaluationCriteriaValue.sequence']}</ui:define>
+                    <h:inputText id="index"
+                                 value="#{evaluationCriteriaValueAction.sequence}"
+                                 styleClass="input"
+                                 maxlength="250"
+                                 readonly="true"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EvaluationCriteriaValue.title']}</ui:define>
+                    <h:inputText id="title"
+                                 value="#{evaluationCriteriaValue.title}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="250"
+                                 tabindex="6">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="valueField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EvaluationCriteriaValue.value']}</ui:define>
+                    <h:inputText id="description"
+                                 value="#{evaluationCriteriaValue.value}"
+                                 styleClass="input"
+                                 tabindex="7"
+                                 required="true">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <f:validateLongRange minimum="0" maximum="100"/>
+                    </h:inputText>
+                </s:decorate>
+                <rich:jQuery selector="#index" query="focus()" timing="onload"/>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{evaluationCriteriaValueAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','CREATE')}"
+                                 tabindex="8">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{evaluationCriteriaValueAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','UPDATE')}"
+                                 tabindex="9"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','DELETE')}"
+                                 tabindex="10">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{evaluationCriteriaValueAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="11"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['EvaluationCriteriaValue.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{evaluationCriteriaValueAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   rendered="#{evaluationCriteriaValueAction.managed and s:hasPermission('EVALUATIONCRITERIAVALUE','DELETE')}"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

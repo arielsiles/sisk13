@@ -1,0 +1,224 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['RawMaterialPayRecordDetails.edit']}
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+
+    <h:form id="rawMaterialRejectionNoteForm">
+        <div class="buttons">
+            <h:commandButton action="#{rawMaterialPayRollAction.selectJoin(rawMaterialPayRecord.rawMaterialPayRoll)}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"/>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                #{messages['RawMaterialPayRecordDetails.edit']}
+            </f:facet>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.generalData']}</legend>
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['RawMaterialPayRecordDetails.rawMaterialProducer']}</ui:define>
+                        <h:inputText
+                                value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.rawMaterialProducer.fullName}"
+                                styleClass="input"
+                                tabindex="1" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.rawMaterial']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialPayRoll.metaProduct.fullNameRawMaterial}"
+                                     styleClass="input"
+                                     tabindex="1" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.productiveZone']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialPayRoll.productiveZone.fullName}"
+                                     styleClass="input"
+                                     tabindex="1" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                </h:panelGrid>
+            </fieldset>
+            <rich:spacer height="10"/>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.taxLicense']}</legend>
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.codeLicense']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.taxLicense}" styleClass="input"
+                                     tabindex="1" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <rich:spacer width="100"/>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.startDate']}</ui:define>
+                        <rich:calendar value="#{rawMaterialPayRecord.startDateTaxLicence}" styleClass="input"
+                                       tabindex="1" required="false" readonly="true">
+                        </rich:calendar>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.endDate']}</ui:define>
+                        <rich:calendar value="#{rawMaterialPayRecord.expirationDateTaxLicence}" styleClass="input"
+                                       tabindex="1" required="false" readonly="true">
+                        </rich:calendar>
+                    </s:decorate>
+                </h:panelGrid>
+            </fieldset>
+            <rich:spacer height="10"/>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.Discounts']}</legend>
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.yogurt']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.yogurt}"
+                                     styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.veterinary']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.veterinary}"
+                                     styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.credit']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.credit}"
+                                     styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.cans']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.cans}" styleClass="input"
+                                     required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.otherDiscounts']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.otherDiscount}"
+                                     styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                </h:panelGrid>
+            </fieldset>
+            <!--<rich:spacer height="10"/>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.extraordinaryIncomings']}</legend>
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.otherIncomings']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.otherIncoming}" styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <rich:spacer width="200"/>
+                </h:panelGrid>
+            </fieldset>-->
+            <rich:spacer height="10"/>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.collectionDetail']}</legend>
+                <rich:dataTable value="#{rawMaterialPayRecordDetailDummyList}" var="rawMaterialPayRecordDetailDummyItem"
+                                style="width:100%;">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.date']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.collectedAmount']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.productiveZoneAdjustment']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.unitPrice']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.earned']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.withholding']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['RawMaterialPayRecordDetails.grandTotal']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.date}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.collectedAmount}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.productiveZoneDelta}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.unitPrice}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.earned}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.withholding}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{rawMaterialPayRecordDetailDummyItem.grandTotal}"/>
+                    </rich:column>
+                </rich:dataTable>
+            </fieldset>
+            <rich:spacer height="15"/>
+            <fieldset class="fieldset-border">
+                <legend class="fieldset-title">#{messages['RawMaterialPayRecordDetails.grandTotals']}</legend>
+                <h:panelGrid columns="4" width="100%">
+                    <s:decorate template="/include/inputField.xhtml">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.totalMoney']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecordDetailsAction.totalMoney}" styleClass="input"
+                                     required="false" readonly="true" style="width:100px;">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.otherIncomings']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecord.rawMaterialProducerDiscount.otherIncoming}"
+                                     styleClass="input" required="false" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialProducerDiscount.totalDiscounts']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecordDetailsAction.totalDiscount}" styleClass="input"
+                                     required="false" readonly="true" style="width:100px;">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRecordDetails.grandTotal']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRecordDetailsAction.grandTotal}" styleClass="input"
+                                     required="false" readonly="true" style="width:100px;">
+                        </h:inputText>
+                    </s:decorate>
+                </h:panelGrid>
+            </fieldset>
+        </rich:panel>
+
+
+        <div class="buttons">
+            <h:commandButton action="#{rawMaterialPayRollAction.selectJoin(rawMaterialPayRecord.rawMaterialPayRoll)}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"/>
+        </div>
+    </h:form>
+</ui:define>
+</ui:composition>

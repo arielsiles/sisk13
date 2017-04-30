@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!--Build used for development-->
+<project name="KHIPUS" default="explode" basedir=".">
+    <!-- Give user a chance to override without editing this file or typing -D -->
+    <property name="profile" value="dev"/>
+    <import file="build-common.xml"/>
+</project>

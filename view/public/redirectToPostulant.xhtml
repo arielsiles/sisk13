@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        Iniciando registro de postulante
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:define name="body">
+        <h:form id="postulantForm">
+            <div align="center" style="vertical-align:middle;" class="messageInfo">
+                <h:panelGroup styleClass="startAjaxCenter">
+                    <h:graphicImage value="/img/spinner.gif" style="border:0;vertical-align:middle;"/>
+                    &#160;#{messages['Common.ajax.request']}
+                </h:panelGroup>
+                <br/>
+
+                <div align="center">
+                    <br/>
+                    <h:outputText value="#{messages['Common.waiting']}"/>
+                </div>
+            </div>
+
+            <div class="buttons" style="margin-right:20px;display:none;">
+                <s:button value="Registrar solicitud" view="/public/postulant.xhtml" styleClass="button"
+                          propagation="begin" id="postulantButton"/>
+            </div>
+        </h:form>
+
+        <rich:jQuery selector="#postulantButton" query="click()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['FinalEvaluationForm.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="finalEvaluationFormSearch">
+
+            <rich:simpleTogglePanel id="finalEvaluationFormSearchPanel"
+                                    label="#{messages['FinalEvaluationForm.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['FinalEvaluationForm.code']}</ui:define>
+                            <h:inputText value="#{finalEvaluationFormDataModel.criteria.code}"
+                                         maxlength="50"
+                                         tabindex="1"
+                                         styleClass="input"/>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['FinalEvaluationForm.title']}</ui:define>
+                            <h:inputText value="#{finalEvaluationFormDataModel.criteria.title}"
+                                         maxlength="250"
+                                         tabindex="2"
+                                         styleClass="input"/>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['FinalEvaluationForm.subtitle']}</ui:define>
+                            <h:inputText value="#{finalEvaluationFormDataModel.criteria.subtitle}"
+                                         maxlength="250"
+                                         tabindex="3"
+                                         styleClass="input"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['FinalEvaluationForm.cycle']}</ui:define>
+                            <h:selectOneMenu value="#{finalEvaluationFormDataModel.criteria.cycle}"
+                                             styleClass="input"
+                                             tabindex="4">
+                                <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['FinalEvaluationForm.type']}</ui:define>
+                            <h:selectOneMenu value="#{finalEvaluationFormDataModel.criteria.type}"
+                                             styleClass="input"
+                                             tabindex="5">
+                                <s:selectItems value="#{finalEvaluationFormTypeEnum}" var="type"
+                                               label="#{messages[type.resourceKey]}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton action="#{finalEvaluationFormDataModel.search}"
+                                               reRender="finalEvaluationFormSearchPanel, finalEvaluationFormList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}" id="searchButtonId" tabindex="6">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{finalEvaluationFormDataModel.clear}"
+                                               reRender="finalEvaluationFormSearchPanel, finalEvaluationFormList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}" id="clearButtonId" tabindex="7">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/finalEvaluationForm.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                          tabindex="3"/>
+            </div>
+
+            <rich:dataTable value="#{finalEvaluationFormDataModel}" var="finalEvaluationFormItem"
+                            id="finalEvaluationFormList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%, 10%, 15%, 25%, 25%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.name"
+                                                   dataModel="#{finalEvaluationFormDataModel}"
+                                                   reRender="finalEvaluationFormList, dataScroller">
+                                #{messages['FinalEvaluationForm.cycle']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="finalEvaluationForm.type"
+                                                   dataModel="#{finalEvaluationFormDataModel}"
+                                                   reRender="finalEvaluationFormList, dataScroller">
+                                #{messages['FinalEvaluationForm.type']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="finalEvaluationForm.code"
+                                                   dataModel="#{finalEvaluationFormDataModel}"
+                                                   reRender="finalEvaluationFormList, dataScroller">
+                                #{messages['FinalEvaluationForm.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="finalEvaluationForm.title"
+                                                   dataModel="#{finalEvaluationFormDataModel}"
+                                                   reRender="finalEvaluationFormList, dataScroller">
+                                #{messages['FinalEvaluationForm.title']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="finalEvaluationForm.subtitle"
+                                                   dataModel="#{finalEvaluationFormDataModel}"
+                                                   reRender="finalEvaluationFormList, dataScroller">
+                                #{messages['FinalEvaluationForm.subtitle']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{finalEvaluationFormItem.cycle.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[finalEvaluationFormItem.type.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{finalEvaluationFormItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{finalEvaluationFormItem.title}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{finalEvaluationFormItem.subtitle}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{finalEvaluationFormAction.select(finalEvaluationFormItem)}"
+                                   rendered="#{s:hasPermission('FINALEVALUATIONFORM','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="finalEvaluationFormList"
+                              dataModel="#{finalEvaluationFormDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/finalEvaluationForm.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                          tabindex="4"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

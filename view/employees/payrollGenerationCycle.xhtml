@@ -1,0 +1,897 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <h:outputText
+            value="#{payrollGenerationCycleAction.managed?messages['PayrollGenerationCycle.edit']:messages['PayrollGenerationCycle.new']}"/>
+</ui:define>
+
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="payrollGenerationCycleForm">
+
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="left, right">
+    <s:div>
+        <h:panelGrid columns="2" cellpadding="2" cellspacing="0" border="0">
+            <rich:dropDownMenu style="color: #{a4jSkin.generalLinkColor};"
+                               styleClass="tiny-menu-cell-border"
+                               rendered="#{payrollGenerationCycleAction.managed and payrollGenerationCycleAction.hasTributaryPayroll() and s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}"
+                               event="onclick">
+                <f:facet name="label">
+                    <h:panelGroup>
+                        <h:graphicImage value="/img/payroll.jpg" styleClass="select-image-middle"/>
+                        <h:outputText value="#{messages['PayrollGenerationCycle.tributaryPayroll']}"/>
+                    </h:panelGroup>
+                </f:facet>
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['PayrollGenerationCycle.tributaryPayroll.view']}"
+                               immediate="true"
+                               action="#{payrollGenerationCycleAction.viewTributaryPayroll(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.tributaryPayroll.exportToExcel']}"
+                               immediate="true"
+                               action="#{tributaryPayrollReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.tributaryPayroll.exportDavinciFormat']}"
+                               immediate="true"
+                               action="#{payrollDavinciFormatReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+            </rich:dropDownMenu>
+            <rich:dropDownMenu style="color: #{a4jSkin.generalLinkColor};"
+                               styleClass="tiny-menu-cell-border"
+                               rendered="#{payrollGenerationCycleAction.managed and payrollGenerationCycleAction.hasFiscalPayroll() and s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}"
+                               event="onclick">
+                <f:facet name="label">
+                    <h:panelGroup>
+                        <h:graphicImage value="/img/payroll.jpg" styleClass="select-image-middle"/>
+                        <h:outputText value="#{messages['PayrollGenerationCycle.fiscalPayroll']}"/>
+                    </h:panelGroup>
+                </f:facet>
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['PayrollGenerationCycle.fiscalPayroll.view']}"
+                               immediate="true"
+                               action="#{payrollGenerationCycleAction.viewFiscalPayroll(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.fiscalPayroll.exportToExcel']}"
+                               immediate="true"
+                               action="#{fiscalPayrollReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/pdfIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.fiscalPayroll.paymentSlip']}"
+                               immediate="true"
+                               action="#{paymentSlipReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.workContribution']}"
+                               immediate="true"
+                               action="#{workContributionReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['PayrollGenerationCycle.workContributionCostCenter']}"
+                               immediate="true"
+                               action="#{workContributionByCostCenterReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
+            </rich:dropDownMenu>
+        </h:panelGrid>
+    </s:div>
+    <s:div styleClass="buttons">
+        <a4j:commandButton value="#{messages['PayrollGenerationInvestmentRegistration.button']}"
+                           action="#{payrollGenerationInvestmentRegistrationCreateAction.newInstance}"
+                           rendered="#{payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONINVESTMENTREGISTRATION','VIEW') and payrollGenerationCycleAction.hasAllManagersAndFiscalProfessorsPayrollsAsOfficial}"
+                           immediate="true"
+                           styleClass="button"/>
+        <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addGestionPayroll']}"
+                           action="#{gestionPayrollAction.newInstance}"
+                           rendered="#{payrollGenerationCycleAction.managed}"
+                           immediate="true"
+                           styleClass="button"/>
+        <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addInvoicesForm']}"
+                           action="#{invoicesFormAction.newInstance}"
+                           rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial}"
+                           immediate="true"
+                           styleClass="button"/>
+        <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addExtraHoursWorked']}"
+                           action="#{extraHoursWorkedAction.newInstance}"
+                           rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial}"
+                           immediate="true"
+                           styleClass="button"/>
+        <a4j:commandButton id="newGrantedBonusId"
+                           action="#{grantedBonusCreateAction.addGrantedBonus}"
+                           value="#{messages['PayrollGenerationCycle.button.addGrantedBonus']}"
+                           styleClass="button"
+                           immediate="true"
+                           rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial and s:hasPermission('GRANTEDBONUS','CREATE')}"/>
+        <h:commandButton id="createButtonId"
+                         action="#{payrollGenerationCycleAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONCYCLE','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton id="updateButtonId"
+                         action="#{payrollGenerationCycleAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.readOnly and s:hasPermission('PAYROLLGENERATIONCYCLE','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.readOnly and s:hasPermission('PAYROLLGENERATIONCYCLE','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{payrollGenerationCycleAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </s:div>
+</h:panelGrid>
+
+
+<rich:panel id="payrollGenerationCyclePanel">
+<f:facet name="header">
+    <h:outputText
+            value="#{payrollGenerationCycleAction.managed?messages['PayrollGenerationCycle.edit']:messages['PayrollGenerationCycle.new']}"/>
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="leftPanelDiv">
+    <s:decorate id="businessUnitId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.businessUnit']}"/>
+        </ui:define>
+        <h:selectOneMenu id="businessUnitSelectOne"
+                         value="#{payrollGenerationCycle.businessUnit}"
+                         styleClass="inputMedium"
+                         rendered="#{not payrollGenerationCycleAction.managed}"
+                         required="true">
+            <s:selectItems value="#{businessUnitList.resultList}"
+                           var="businessUnit"
+                           label="#{businessUnit.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange"
+                         action="#{payrollGenerationCycleAction.businessUnitChanged()}"
+                         reRender="businessUnitId, payrollGenerationCycleDiv, nameField"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{payrollGenerationCycle.businessUnit.fullName}"
+                      rendered="#{payrollGenerationCycleAction.managed}"/>
+    </s:decorate>
+    <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PayrollGenerationCycle.gestion']}</ui:define>
+        <h:selectOneMenu id="gestion"
+                         value="#{payrollGenerationCycle.gestion}"
+                         styleClass="inputMedium"
+                         required="true"
+                         rendered="#{not payrollGenerationCycleAction.managed}"
+                         tabindex="2">
+            <s:selectItems value="#{gestionList}" var="gestion"
+                           label="#{gestion.year}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support action="#{payrollGenerationCycleAction.gestionChanged()}"
+                         event="onchange"
+                         reRender="gestionField, monthId, startDateId, endDateId, initialUfvExchangeRateId, finalUfvExchangeRateId, nameField"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{payrollGenerationCycle.gestion.year}"
+                      rendered="#{payrollGenerationCycleAction.managed}"/>
+    </s:decorate>
+    <s:decorate id="monthId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.month']}"/>
+        </ui:define>
+        <h:selectOneMenu id="monthSelectOneMenu"
+                         value="#{payrollGenerationCycle.month}"
+                         styleClass="inputMedium"
+                         required="true"
+                         rendered="#{not payrollGenerationCycleAction.managed}"
+                         tabindex="3">
+            <s:selectItems value="#{monthEnumeration}"
+                           var="monthENUM"
+                           label="#{messages[monthENUM.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+            <a4j:support action="#{payrollGenerationCycleAction.monthChanged()}"
+                         event="onchange"
+                         reRender="gestionField, monthId, startDateId, endDateId, generationInitDateField, generationEndDateField, initialUfvExchangeRateId, finalUfvExchangeRateId, nameField"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{messages[payrollGenerationCycle.month.resourceKey]}"
+                      rendered="#{payrollGenerationCycleAction.managed}"/>
+    </s:decorate>
+
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PayrollGenerationCycle.name']}</ui:define>
+        <h:inputText id="name" value="#{payrollGenerationCycle.name}" styleClass="input"
+                     required="true"
+                     rendered="#{not payrollGenerationCycleAction.readOnly}"
+                     maxlength="150"
+                     tabindex="4"/>
+        <h:outputText value="#{payrollGenerationCycle.name}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}"/>
+    </s:decorate>
+
+    <s:decorate id="generationInitDateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PayrollGenerationCycle.generationInitDate']}</ui:define>
+        <rich:calendar id="initDate"
+                       value="#{payrollGenerationCycle.generationInitDate}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="input"
+                       enableManualInput="true"
+                       required="true"
+                       rendered="#{not payrollGenerationCycleAction.readOnly}"
+                       tabindex="5"/>
+        <h:outputText value="#{payrollGenerationCycle.generationInitDate}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="generationEndDateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PayrollGenerationCycle.generationEndDate']}</ui:define>
+        <rich:calendar id="endDate"
+                       value="#{payrollGenerationCycle.generationEndDate}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="input"
+                       enableManualInput="true"
+                       required="true"
+                       rendered="#{not payrollGenerationCycleAction.readOnly}"
+                       tabindex="6"/>
+        <h:outputText value="#{payrollGenerationCycle.generationEndDate}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="generationBeginningField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GestionPayroll.generationBeginning']}</ui:define>
+        <rich:calendar id="generationBeginning"
+                       value="#{payrollGenerationCycle.generationBeginning}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="input"
+                       enableManualInput="true"
+                       required="true"
+                       rendered="#{not payrollGenerationCycleAction.readOnly}"
+                       tabindex="7"/>
+        <h:outputText value="#{payrollGenerationCycle.generationBeginning}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="generationDeadlineField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GestionPayroll.generationDeadline']}</ui:define>
+        <rich:calendar id="generationDeadline"
+                       value="#{payrollGenerationCycle.generationDeadline}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="input"
+                       enableManualInput="true"
+                       required="true"
+                       rendered="#{not payrollGenerationCycleAction.readOnly}"
+                       tabindex="8">
+            <app:dateRangeValidator forId="generationBeginning"
+                                    forLabel="#{messages['GestionPayroll.generationBeginning']}"
+                                    type="greater"/>
+        </rich:calendar>
+        <h:outputText value="#{payrollGenerationCycle.generationDeadline}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="officialPayrollDeadlineField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GestionPayroll.officialPayrollDeadline']}</ui:define>
+        <rich:calendar id="officialPayrollDeadline"
+                       value="#{payrollGenerationCycle.officialPayrollDeadline}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="input"
+                       enableManualInput="true"
+                       required="true"
+                       rendered="#{not payrollGenerationCycleAction.readOnly}"
+                       tabindex="9">
+            <app:dateRangeValidator forId="generationDeadline"
+                                    forLabel="#{messages['GestionPayroll.generationDeadline']}"
+                                    type="greater"/>
+        </rich:calendar>
+        <h:outputText value="#{payrollGenerationCycle.officialPayrollDeadline}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+        <h:inputText id="rate"
+                     value="#{payrollGenerationCycle.exchangeRate.rate}"
+                     styleClass="inputMedium"
+                     maxlength="150"
+                     required="true"
+                     rendered="#{not payrollGenerationCycleAction.readOnly}"
+                     tabindex="10">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+        </h:inputText>
+        <h:outputText value="#{payrollGenerationCycle.exchangeRate.rate}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
+</s:div>
+<s:div id="rightPanelDiv">
+    <s:decorate id="startDateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.startDate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.startDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="endDateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.endDate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="initialUfvExchangeRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.initialUfvExchangeRate']}"/>
+        </ui:define>
+        <h:inputText id="initialUfvExchangeRateInputText"
+                     value="#{payrollGenerationCycle.initialUfvExchangeRate}"
+                     styleClass="inputMedium right"
+                     rendered="#{not payrollGenerationCycleAction.readOnly}"
+                     required="true"
+                     tabindex="11">
+            <app:realNumberConverter minimum="0.000001"
+                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                     forId="initialUfvExchangeRateInputText"/>
+        </h:inputText>
+        <h:outputText value="#{payrollGenerationCycle.initialUfvExchangeRate}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <app:realNumberConverter minimum="0.000001"
+                                     pattern="#{messages['patterns.decimal6FNumber']}"/>
+        </h:outputText>
+        &#160;(
+        <h:outputText value="#{payrollGenerationCycle.startDate}"
+                      rendered="#{null != payrollGenerationCycle.startDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>)
+    </s:decorate>
+    <s:decorate id="finalUfvExchangeRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.finalUfvExchangeRate']}"/>
+        </ui:define>
+        <h:inputText id="finalUfvExchangeRateInputText"
+                     value="#{payrollGenerationCycle.finalUfvExchangeRate}"
+                     styleClass="inputMedium right"
+                     rendered="#{not payrollGenerationCycleAction.readOnly}"
+                     required="true"
+                     tabindex="12">
+            <app:realNumberConverter minimum="0.000001"
+                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                     forId="finalUfvExchangeRateInputText"/>
+        </h:inputText>
+        <h:outputText value="#{payrollGenerationCycle.finalUfvExchangeRate}"
+                      rendered="#{payrollGenerationCycleAction.readOnly}">
+            <app:realNumberConverter minimum="0.000001"
+                                     pattern="#{messages['patterns.decimal6FNumber']}"/>
+        </h:outputText>
+        &#160;(
+        <h:outputText value="#{payrollGenerationCycle.endDate}"
+                      rendered="#{null != payrollGenerationCycle.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>)
+    </s:decorate>
+    <s:decorate id="afpRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.afpRate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.afpRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="nationalSolidaryAfpDiscountRuleId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.nationalSolidaryAfpDiscountRule']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.nationalSolidaryAfpDiscountRule.name}"/>
+    </s:decorate>
+    <s:decorate id="afpRateProfessionalRiskId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.afpRateProfessionalRisk']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.professionalRiskAfpRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="afpRateProHousing"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.afpRateProHousing']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.proHousingAfpRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="solidaryAfpRate"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.solidaryAfpRate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.solidaryAfpRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="cnsRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.cnsRate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.cnsRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="ivaRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.ivaRate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.ivaRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="smnRateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['PayrollGenerationCycle.smnRate']}"/>
+        </ui:define>
+        <h:outputText value="#{payrollGenerationCycle.smnRate.rate}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:div id="includeActiveJobCategoriesDiv">
+        <s:decorate id="includeActiveJobCategoriesField"
+                    template="/include/inputField.xhtml"
+                    rendered="#{!payrollGenerationCycleAction.managed}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PayrollGenerationCycle.includeActiveJobCategories']}</ui:define>
+            <h:selectBooleanCheckbox id="includeActiveJobCategories"
+                                     value="#{payrollGenerationCycleAction.includeActiveJobCategories}"
+                                     tabindex="13">
+                <a4j:support event="onchange"
+                             reRender="includeActiveJobCategoriesField"
+                             ajaxSingle="true"/>
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+    </s:div>
+
+</s:div>
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <a4j:commandButton value="#{messages['PayrollGenerationInvestmentRegistration.button']}"
+                       action="#{payrollGenerationInvestmentRegistrationCreateAction.newInstance}"
+                       rendered="#{payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONINVESTMENTREGISTRATION','VIEW') and payrollGenerationCycleAction.hasAllManagersAndFiscalProfessorsPayrollsAsOfficial}"
+                       immediate="true"
+                       styleClass="button"/>
+    <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addGestionPayroll']}"
+                       action="#{gestionPayrollAction.newInstance}"
+                       rendered="#{payrollGenerationCycleAction.managed}"
+                       immediate="true"
+                       styleClass="button"/>
+    <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addInvoicesForm']}"
+                       action="#{invoicesFormAction.newInstance}"
+                       rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial}"
+                       immediate="true"
+                       styleClass="button"/>
+    <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addExtraHoursWorked']}"
+                       action="#{extraHoursWorkedAction.newInstance}"
+                       rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial}"
+                       immediate="true"
+                       styleClass="button"/>
+    <a4j:commandButton value="#{messages['PayrollGenerationCycle.button.addGrantedBonus']}"
+                       action="#{grantedBonusCreateAction.addGrantedBonus}"
+                       styleClass="button"
+                       immediate="true"
+                       rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.hasAllPayrollsAsOfficial and s:hasPermission('GRANTEDBONUS','CREATE')}"/>
+    <h:commandButton value="#{messages['Common.save']}"
+                     action="#{payrollGenerationCycleAction.create}"
+                     styleClass="button"
+                     rendered="#{!payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONCYCLE','CREATE')}"/>
+    <h:commandButton value="#{messages['Common.save']}"
+                     action="#{payrollGenerationCycleAction.update}"
+                     styleClass="button"
+                     rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.readOnly and s:hasPermission('PAYROLLGENERATIONCYCLE','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{payrollGenerationCycleAction.managed and not payrollGenerationCycleAction.readOnly and s:hasPermission('PAYROLLGENERATIONCYCLE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['Common.cancel']}"
+                     action="#{payrollGenerationCycleAction.cancel}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<c:if test="${payrollGenerationCycleAction.managed}">
+<rich:tabPanel switchType="ajax" selectedTab="#{payrollGenerationCycleAction.selectedTab}">
+<rich:tab name="gestionPayrollTab"
+          rendered="#{payrollGenerationCycleAction.managed}"
+          label="#{messages['GestionPayroll.tab']}"
+          ajaxSingle="true">
+    #{genCycleGestionPayrollDataModel.setPayrollGenerationCycle(payrollGenerationCycle)}
+    #{genCycleGestionPayrollDataModel.updateAndSearch()}
+
+    <c:choose>
+        <c:when test="#{s:hasPermission('GESTIONPAYROLL','DELETE')}">
+            <c:set var="columnsWidthString" value="30%,30%,30%,10%"/>
+        </c:when>
+        <c:otherwise>
+            <c:set var="columnsWidthString" value="40%,30%,30%"/>
+        </c:otherwise>
+    </c:choose>
+
+    <ui:include src="gestionPayrollDataTable.xhtml">
+        <ui:param name="dataModel" value="#{genCycleGestionPayrollDataModel}"/>
+        <ui:param name="dataScrollerId" value="genCycleGestionPayrollDataScrollerId"/>
+    </ui:include>
+
+</rich:tab>
+<rich:tab name="invoicesForms"
+          label="#{messages['TaxPayrollGenerated.invoicesForm.tab']}"
+          ajaxSingle="true"
+          immediate="true">
+    <rich:dataTable id="invoicesFormDataTable"
+                    value="#{invoicesFormDataModel}"
+                    var="invoicesFormItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="30%, 20%, 20%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="invoicesForm.jobContract.contract.employee.lastName"
+                                           dataModel="#{invoicesFormDataModel}"
+                                           reRender="invoicesFormDataTable, invoicesFormDataScroller">
+                        #{messages['InvoicesForm.employee']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="invoicesForm.presentationDate"
+                                           dataModel="#{invoicesFormDataModel}"
+                                           reRender="invoicesFormDataTable, invoicesFormDataScroller">
+                        #{messages['InvoicesForm.presentationDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="invoicesForm.invoicingAmount"
+                                           dataModel="#{invoicesFormDataModel}"
+                                           reRender="invoicesFormDataTable, invoicesFormDataScroller">
+                        #{messages['InvoicesForm.invoicingAmount']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText
+                    value="#{invoicesFormItem.jobContract.contract.employee.fullName} - #{invoicesFormItem.jobContract.job.charge.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{invoicesFormItem.presentationDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{invoicesFormItem.fiscalCredit}"/>
+            <h:outputText value=" #{messages['Currency.Bs']}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{invoicesFormAction.select(invoicesFormItem)}">
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="invoicesFormDataScroller"
+                      for="invoicesFormDataTable"
+                      dataModel="#{invoicesFormDataModel}"/>
+</rich:tab>
+<rich:tab name="extraHoursWorked"
+          label="#{messages['TaxPayrollGenerated.extraHoursWorked.tab']}"
+          ajaxSingle="true"
+          immediate="true">
+    <rich:dataTable id="extraHoursWorkedDataTable"
+                    value="#{extraHoursWorkedDataModel}"
+                    var="extraHoursWorkedItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="30%, 30%, 30%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="extraHoursWorked.jobContract.contract.employee.lastName"
+                                           dataModel="#{extraHoursWorkedDataModel}"
+                                           reRender="extraHoursWorkedDataTable, extraHoursWorkedDataScroller">
+                        #{messages['ExtraHoursWorked.employee']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="extraHoursWorked.extraHours"
+                                           dataModel="#{extraHoursWorkedDataModel}"
+                                           reRender="extraHoursWorkedDataTable, extraHoursWorkedDataScroller">
+                        #{messages['ExtraHoursWorked.extraHours']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="extraHoursWorked.totalPaid"
+                                           dataModel="#{extraHoursWorkedDataModel}"
+                                           reRender="extraHoursWorkedDataTable, extraHoursWorkedDataScroller">
+                        #{messages['ExtraHoursWorked.totalPaid']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText
+                    value="#{extraHoursWorkedItem.jobContract.contract.employee.fullName} - #{extraHoursWorkedItem.jobContract.job.charge.name}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{extraHoursWorkedItem.extraHours}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{extraHoursWorkedItem.totalPaid}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Currency.Bs']}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{extraHoursWorkedAction.select(extraHoursWorkedItem)}">
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="extraHoursWorkedDataScroller"
+                      for="extraHoursWorkedDataTable"
+                      dataModel="#{extraHoursWorkedDataModel}"/>
+</rich:tab>
+<rich:tab name="grantedBonusTab"
+          rendered="#{payrollGenerationCycleAction.managed}"
+          label="#{messages['GrantedBonus.tab']}"
+          ajaxSingle="true">
+    <c:choose>
+        <c:when test="#{s:hasPermission('GRANTEDBONUS','DELETE')}">
+            <c:set var="columnsWidthString" value="30%,30%,30%,10%"/>
+        </c:when>
+        <c:otherwise>
+            <c:set var="columnsWidthString" value="40%,30%,30%"/>
+        </c:otherwise>
+    </c:choose>
+
+    <rich:dataTable value="#{grantedBonusDataModel}"
+                    var="grantedBonusItem"
+                    id="grantedBonusList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="#{columnsWidthString}">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    #{messages['Employee.fullName']}
+                </rich:column>
+                <rich:column>
+                    #{messages['GrantedBonus.bonus']}
+                </rich:column>
+                <rich:column>
+                    #{messages['GrantedBonus.amount']}
+                </rich:column>
+                <rich:column styleClass="center"
+                             rendered="#{s:hasPermission('GRANTEDBONUS','DELETE')}">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{grantedBonusItem.jobContract.contract.employee.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{grantedBonusItem.bonus.name}"/>
+        </rich:column>
+        <rich:column styleClass=" right">
+            <h:outputText value="#{grantedBonusItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Currency.Bs']}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('GRANTEDBONUS','VIEW')}"
+                           action="#{grantedBonusAction.select(grantedBonusItem)}"/>
+        </rich:column>
+
+    </rich:dataTable>
+    <app:dataScroller id="grantedBonusDataScroller"
+                      for="grantedBonusList"
+                      dataModel="#{grantedBonusDataModel}"/>
+</rich:tab>
+
+<rich:tab name="payrollGenerationInvestmentRegistrations"
+          label="#{messages['TaxPayrollGenerated.payrollGenerationInvestmentRegistration.tab']}"
+          ajaxSingle="true"
+          immediate="true"
+          rendered="#{s:hasPermission('PAYROLLGENERATIONINVESTMENTREGISTRATION','VIEW') and payrollGenerationCycleAction.hasAllManagersAndFiscalProfessorsPayrollsAsOfficial}">
+    <rich:dataTable id="payrollGenerationInvestmentRegistrationDataTable"
+                    value="#{payrollGenerationInvestmentRegistrationDataModel}"
+                    var="payrollGenerationInvestmentRegistrationItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="45%, 25%, 10%, 20%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="socialWelfareEntity.name"
+                                           dataModel="#{payrollGenerationInvestmentRegistrationDataModel}"
+                                           reRender="payrollGenerationInvestmentRegistrationDataTable, payrollGenerationInvestmentRegistrationDataScroller">
+                        #{messages['PayrollGenerationInvestmentRegistration.socialWelfareEntity']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="payrollGenerationInvestmentRegistration.amount"
+                                           dataModel="#{payrollGenerationInvestmentRegistrationDataModel}"
+                                           reRender="payrollGenerationInvestmentRegistrationDataTable, payrollGenerationInvestmentRegistrationDataScroller">
+                        #{messages['PayrollGenerationInvestmentRegistration.payableAmount']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="currency.name"
+                                           dataModel="#{payrollGenerationInvestmentRegistrationDataModel}"
+                                           reRender="payrollGenerationInvestmentRegistrationDataTable, payrollGenerationInvestmentRegistrationDataScroller">
+                        #{messages['PayrollGenerationInvestmentRegistration.payableCurrency']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="payableDocument.voucherType, payableDocument.voucherNumber "
+                                           dataModel="#{payrollGenerationInvestmentRegistrationDataModel}"
+                                           reRender="payrollGenerationInvestmentRegistrationDataTable, payrollGenerationInvestmentRegistrationDataScroller">
+                        #{messages['PayrollGenerationInvestmentRegistration.voucherNumber']}
+                    </app:commandSortHeader>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{payrollGenerationInvestmentRegistrationItem.socialWelfareEntity.name}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{payrollGenerationInvestmentRegistrationItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{payrollGenerationInvestmentRegistrationItem.currency.symbol}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{payrollGenerationInvestmentRegistrationItem.payableDocument.fullVoucherNumber}"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="payrollGenerationInvestmentRegistrationDataScroller"
+                      for="payrollGenerationInvestmentRegistrationDataTable"
+                      dataModel="#{payrollGenerationInvestmentRegistrationDataModel}"/>
+</rich:tab>
+</rich:tabPanel>
+</c:if>
+</h:form>
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONCYCLE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['PayrollGenerationCycle.delete.confirmation']}">
+                <f:param value="#{payrollGenerationCycle.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{payrollGenerationCycleAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{payrollGenerationCycleAction.managed and s:hasPermission('PAYROLLGENERATIONCYCLE','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="gestionPayRollListModalPanelContainer"
+            template="/employees/gestionPayRollSearchModalPanel.xhtml">
+    <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+    <ui:param name="dataModel" value="#{payrollGenerationCycleOfficialSearchDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{payrollGenerationCycleAction.assignAdministrativeGestionPayRoll(payrollGenerationCycleItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="payrollGenerationCycleId"
+                           oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

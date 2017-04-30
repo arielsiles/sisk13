@@ -1,0 +1,396 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{discountRuleAction.managed}">
+            #{messages['DiscountRule.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['DiscountRule.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="discountRuleForm">
+
+<div class="buttons">
+    <h:commandButton action="#{discountRuleAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{discountRuleAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}"/>
+
+
+    <h:commandButton action="#{discountRuleRangeAction.newInstance}"
+                     value="#{messages['DiscountRule.addRange']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+    <h:commandButton action="#{discountRuleAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{discountRuleAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{discountRuleAction.managed}">
+                #{messages['DiscountRule.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DiscountRule.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="discountRuleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['DiscountRule.discountRuleType']}</ui:define>
+                <h:selectOneMenu id="discountRuleType"
+                                 value="#{discountRule.discountRuleType}"
+                                 styleClass="input"
+                                 required="true"
+                                 rendered="#{!discountRuleAction.managed}"
+                                 tabindex="6">
+                    <s:selectItems value="#{discountRuleTypeEnum}"
+                                   var="discountRuleType"
+                                   label="#{messages[discountRuleType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange"
+                                 action="#{discountRuleAction.discountRuleRangeTypeChanged()}"
+                                 reRender="latenessDiv, typeFieldsDiv"
+                                 ajaxSingle="true"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <h:outputText rendered="#{discountRuleAction.managed}"
+                              value="#{messages[discountRule.discountRuleType.resourceKey]}"/>
+            </s:decorate>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['DiscountRule.name']}</ui:define>
+                <h:inputText id="name"
+                             value="#{discountRule.name}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="1">
+                </h:inputText>
+            </s:decorate>
+            <s:div id="latenessDiv">
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{discountRuleAction.latenessType}">
+                    <ui:define name="label">#{messages['DiscountRule.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{discountRule.gestion}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{gestionList}" var="gestion" label="#{gestion.year}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{discountRuleAction.latenessType}">
+                    <ui:define name="label">#{messages['DiscountRule.businessUnit']}</ui:define>
+                    <h:selectOneMenu id="businessUnit"
+                                     value="#{discountRule.businessUnit}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                       label="#{businessUnit.organization.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{discountRuleAction.latenessType}">
+                    <ui:define name="label">#{messages['DiscountRule.jobCategory']}</ui:define>
+                    <h:selectOneMenu id="jobCategory"
+                                     styleClass="input"
+                                     value="#{discountRule.jobCategory}"
+                                     tabindex="4">
+                        <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                       label="#{jobCategory.name}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+            <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['DiscountRule.active']}</ui:define>
+                <h:selectBooleanCheckbox
+                        id="active"
+                        value="#{discountRule.active}"
+                        disabled="#{discountRuleAction.disableActive}"
+                        tabindex="5">
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:div id="typeFieldsDiv">
+                <s:decorate id="intervalTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRule.intervalType']}</ui:define>
+                    <h:selectOneMenu id="intervalType"
+                                     value="#{discountRule.intervalType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{discountRuleAction.intervalType}"
+                                       var="intervalType"
+                                       label="#{messages[intervalType.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="rangeTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRule.rangeType']}</ui:define>
+                    <h:selectOneMenu id="rangeType"
+                                     value="#{discountRule.discountRuleRangeType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{discountRuleAction.discountRuleRangeType}"
+                                       var="rangeType"
+                                       label="#{messages[rangeType.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+
+            <s:decorate id="discountUnitTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['DiscountRule.discountUnitType']}</ui:define>
+                <h:selectOneMenu id="discountUnitType"
+                                 value="#{discountRule.discountUnitType}"
+                                 styleClass="input"
+                                 required="true"
+                                 rendered="#{not discountRuleAction.hasRangeRuleDefined()}"
+                                 tabindex="7">
+                    <s:selectItems value="#{discountUnitTypeEnum}"
+                                   var="unitType"
+                                   label="#{messages[unitType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange"
+                                 action="#{discountRuleAction.cleanCurrency()}"
+                                 reRender="discountUnitTypeField, currencyPanel"
+                                 ajaxSingle="true"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <h:outputText value="#{messages[discountRule.discountUnitType.resourceKey]}"
+                              rendered="#{discountRuleAction.hasRangeRuleDefined()}"/>
+            </s:decorate>
+
+            <h:panelGroup id="currencyPanel">
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{discountRuleAction.isCurrencyDiscountUnitType()}">
+                    <ui:define name="label">#{messages['DiscountRule.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{discountRule.currency}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="8">
+                        <s:selectItems value="#{currencyList}" var="currency"
+                                       label="#{currency.name} - #{currency.symbol}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </h:panelGroup>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['DiscountRule.description']}</ui:define>
+                <h:inputTextarea id="description"
+                                 value="#{discountRule.description}"
+                                 styleClass="textarea"
+                                 required="true"
+                                 tabindex="9"
+                                 style="width:200px;height:40px;"/>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{discountRuleAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="15"
+                     rendered="#{!discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{discountRuleAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     tabindex="16"
+                     rendered="#{!discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}"/>
+
+
+    <h:commandButton action="#{discountRuleRangeAction.newInstance}"
+                     value="#{messages['DiscountRule.addRange']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="17"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+    <h:commandButton action="#{discountRuleAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="18"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     tabindex="19"
+                     rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{discountRuleAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     tabindex="20"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<br/>
+
+<c:if test="#{discountRuleAction.managed}">
+    <rich:dataTable value="#{discountRuleRangeDataModel}"
+                    var="discountRuleRangeItem"
+                    id="discountRuleRangeList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="15%,30%,15%,15%,15%,10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="discountRuleRange.sequence"
+                                           dataModel="#{discountRuleRangeDataModel}"
+                                           reRender="discountRuleRangeList, dataScroller">
+                        <h:outputText value="#{messages['DiscountRuleRange.sequence']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="discountRuleRange.name"
+                                           dataModel="#{discountRuleRangeDataModel}"
+                                           reRender="discountRuleRangeList, dataScroller">
+                        <h:outputText value="#{messages['DiscountRuleRange.name']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="discountRuleRange.initRange"
+                                           dataModel="#{discountRuleRangeDataModel}"
+                                           reRender="discountRuleRangeList, dataScroller">
+                        <h:outputText value="#{messages['DiscountRuleRange.initRange']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="discountRuleRange.endRange"
+                                           dataModel="#{discountRuleRangeDataModel}"
+                                           reRender="discountRuleRangeList, dataScroller">
+                        <h:outputText value="#{messages['DiscountRuleRange.endRange']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="discountRuleRange.amount"
+                                           dataModel="#{discountRuleRangeDataModel}"
+                                           reRender="discountRuleRangeList, dataScroller">
+                        <h:outputText value="#{messages['DiscountRuleRange.amount']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{discountRuleRangeItem.sequence}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{discountRuleRangeItem.name}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{discountRuleRangeItem.initRange}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{discountRuleRangeItem.endRange}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{discountRuleRangeItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{discountRuleRangeAction.select(discountRuleRangeItem)}"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller" for="discountRuleRangeList" dataModel="#{discountRuleRangeDataModel}"/>
+</c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{discountRuleAction.managed and s:hasPermission('DISCOUNTRULE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['DiscountRule.delete.confirmation']}">
+                <f:param value="#{discountRule.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{discountRuleAction.delete}"
+                           rendered="#{s:hasPermission('DISCOUNTRULE','DELETE')}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>
+

@@ -1,0 +1,10 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <div class="buttons">
+        <s:button value="#{messages['Common.new']}" view="/employees/dismissal.xhtml"
+                  styleClass="button"
+                  rendered="#{s:hasPermission('DISMISSAL','CREATE')}"
+                  propagation="begin"/>
+    </div>
+</ui:composition>

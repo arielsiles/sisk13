@@ -1,0 +1,803 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<div class="buttons">
+    <c:if test="#{!postulantAction.managed}">
+        <input type="button" class="button" value="#{messages['Common.save']}"
+               onclick="jQuery('#postulantForm\\:createButtonId').click()" tabindex="1"/>
+    </c:if>
+    <input type="button" class="button" value="#{messages['Common.cancel']}"
+           onclick="jQuery('#postulantForm\\:cancelButtonId').click()" tabindex="1"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['Postulant.title']}
+</f:facet>
+<h:panelGroup styleClass="panel-border" rendered="#{!postulantAction.managed}">
+    <div style="padding:5px">
+        #{messages['Postulant.firstMessage']}
+        <a href="examples/postulantFormExample.pdf" target="_blank">#{messages['Postulant.viewExample']}</a>
+    </div>
+    <hr/>
+    <div style="padding:5px">
+        #{messages['Postulant.secondMessage']}
+    </div>
+</h:panelGroup>
+
+<app:fieldset id="ownInformation" title="#{messages['Postulant.ownInformation']}">
+    <h:form id="postulantForm" onsubmit="#{postulantAction.setManagerPostulant(manager)}">
+        <div style="display:none;">
+            <h:commandButton action="#{postulantAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button" id="createButtonId">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{postulantAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true" id="cancelButtonId">
+            </h:commandButton>
+        </div>
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.lastName']}</ui:define>
+                    <h:inputText id="lastName" value="#{postulant.lastName}" styleClass="input" required="true"
+                                 maxlength="200" readonly="#{postulantAction.managed}" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.maidenName']}</ui:define>
+                    <h:inputText id="maidenName" value="#{postulant.maidenName}" styleClass="input" required="true"
+                                 maxlength="200" readonly="#{postulantAction.managed}" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.firstName']}</ui:define>
+                    <h:inputText id="firstName" value="#{postulant.firstName}" styleClass="input" required="true"
+                                 maxlength="250" readonly="#{postulantAction.managed}" tabindex="3"/>
+                </s:decorate>
+
+                <s:decorate id="emailField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.email']}</ui:define>
+                    <h:inputText id="email" value="#{postulant.email}" styleClass="input" required="true"
+                                 maxlength="100" readonly="#{postulantAction.managed}" tabindex="4"/>
+                </s:decorate>
+
+                <s:decorate id="cellPhoneNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.cellPhoneNumber']}</ui:define>
+                    <h:inputText id="cellPhoneNumber" value="#{postulant.cellPhoneNumber}" styleClass="input"
+                                 required="true" maxlength="10" readonly="#{postulantAction.managed}" tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="phoneNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.phoneNumber']}</ui:define>
+                    <h:inputText id="phoneNumber" value="#{postulant.phoneNumber}" styleClass="input"
+                                 maxlength="10" readonly="#{postulantAction.managed}" tabindex="6"/>
+                </s:decorate>
+            </s:div>
+
+            <s:div>
+                <s:decorate id="birthDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.birthDate']}</ui:define>
+                    <rich:calendar value="#{postulant.birthDay}" popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input" required="true" enableManualInput="true"
+                                   rendered="#{!postulantAction.managed}" tabindex="7">
+                    </rich:calendar>
+                    <h:inputText id="birthDay" value="#{postulant.birthDay}"
+                                 styleClass="input" required="true" rendered="#{postulantAction.managed}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="time"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="birthPlaceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.birthPlace']}</ui:define>
+                    <h:inputText id="birthPlace" value="#{postulant.birthPlace}" styleClass="input" required="true"
+                                 maxlength="50" readonly="#{postulantAction.managed}" tabindex="8"/>
+                </s:decorate>
+
+                <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.idNumber']}</ui:define>
+                    <h:inputText id="idNumber" value="#{postulant.idNumber}" styleClass="input" required="true"
+                                 maxlength="10" readonly="#{postulantAction.managed}" tabindex="9"/>
+                </s:decorate>
+
+                <s:decorate id="expendedPlaceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.expendedPlace']}</ui:define>
+                    <h:inputText id="expendedPlace" value="#{postulant.expendedPlace}" styleClass="input"
+                                 required="true" maxlength="250" readonly="#{postulantAction.managed}" tabindex="10"/>
+                </s:decorate>
+
+                <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.gender']}</ui:define>
+                    <h:selectOneMenu id="genderType" value="#{postulant.gender}"
+                                     styleClass="input" required="true" readonly="#{postulantAction.managed}"
+                                     tabindex="11">
+                        <s:selectItems value="#{genderEnum}" var="gender" label="#{messages[gender.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </h:form>
+</app:fieldset>
+
+<app:fieldset id="academicFormationMainPanel" title="#{messages['AcademicFormation.title']}">
+    <h:form id="academicFormationForm">
+        <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width30percent,width70percent">
+
+            <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                <s:decorate id="AFNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.name']}</ui:define>
+                    <h:inputText id="AFName" value="#{postulantAction.academicFormation.name}"
+                                 styleClass="inputMedium" required="true" maxlength="250" tabindex="12"/>
+                </s:decorate>
+
+                <s:decorate id="AFUniversityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.university']}</ui:define>
+                    <h:inputText id="AFUniversity" value="#{postulantAction.academicFormation.university}"
+                                 styleClass="inputMedium" required="true" maxlength="250" tabindex="13"/>
+                </s:decorate>
+
+                <s:decorate id="academicFormationTypeField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.type']}</ui:define>
+                    <h:selectOneMenu id="academicFormationType"
+                                     value="#{postulantAction.academicFormation.academicFormationType}"
+                                     styleClass="inputMedium" required="true" tabindex="14">
+                        <s:selectItems value="#{academicFormationTypeEnum}" var="aft"
+                                       label="#{messages[aft.resourceKey]}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="center-buttons">
+                    <a4j:commandButton action="#{postulantAction.addAcademicFormation}"
+                                       reRender="academicFormationMainPanel"
+                                       styleClass="button" value="#{messages['Common.add']}"
+                                       id="addButton" tabindex="15">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </h:panelGroup>
+
+            <rich:dataTable value="#{postulantAction.academicFormationList}" var="academicFormationItem"
+                            id="academicFormationList" rowKeyVar="rowIndex"
+                            width="99%" align="center" columnsWidth="40%, 45%, 10%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['AcademicFormation.name']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['AcademicFormation.university']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['AcademicFormation.type']}
+                        </rich:column>
+                        <rich:column>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{academicFormationItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{academicFormationItem.university}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[academicFormationItem.academicFormationType.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <a4j:commandLink action="#{postulantAction.removeAcademicFormation(rowIndex)}"
+                                     reRender="academicFormationList"
+                                     styleClass="button"
+                                     title="#{messages['Common.remove']}"
+                                     ajaxSingle="true"
+                                     immediate="true"
+                                     rendered="#{not postulantAction.managed}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:panelGrid>
+
+    </h:form>
+</app:fieldset>
+
+<app:fieldset id="laboralExperienceMainPanel" title="Experiencia Profesional">
+    <h:form id="laboralExperienceForm">
+        <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width30percent,width70percent">
+            <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                <s:decorate id="placeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.company']}</ui:define>
+                    <h:inputText id="place" value="#{postulantAction.laboralExperience.place}"
+                                 styleClass="inputMedium" required="true" maxlength="250" tabindex="16"/>
+                </s:decorate>
+                <s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.occupation']}</ui:define>
+                    <h:inputText id="position" value="#{postulantAction.laboralExperience.position}"
+                                 styleClass="inputMedium" required="true" maxlength="250" tabindex="17"/>
+                </s:decorate>
+
+                <s:decorate id="laboralExperienceInitDateField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.from']}</ui:define>
+                    <rich:calendar id="laboralExperienceInitDate" value="#{postulantAction.laboralExperience.initDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}" tabindex="18"
+                                   styleClass="input" required="true" enableManualInput="true"/>
+                </s:decorate>
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.to']}</ui:define>
+                    <rich:calendar id="endDate" value="#{postulantAction.laboralExperience.endDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" tabindex="19"
+                                   styleClass="input" enableManualInput="true">
+                        <app:dateRangeValidator forId="laboralExperienceInitDate"
+                                                forLabel="Fecha inicio 'Desde'"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <div class="center-buttons">
+                    <a4j:commandButton action="#{postulantAction.addLaboralExperience}"
+                                       reRender="laboralExperienceMainPanel" tabindex="20"
+                                       styleClass="button" value="#{messages['Common.add']}"
+                                       id="addLaboralExperienceButton">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </h:panelGroup>
+
+            <rich:dataTable value="#{postulantAction.laboralExperienceList}" var="laboralExperienceItem"
+                            id="laboralExperienceList" rowKeyVar="rowIndex"
+                            width="99%" align="center" columnsWidth="30%, 25%, 20%, 20%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['Postulant.company']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.occupation']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.from']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.to']}
+                        </rich:column>
+                        <rich:column>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{laboralExperienceItem.place}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{laboralExperienceItem.position}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{laboralExperienceItem.initDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{laboralExperienceItem.endDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <a4j:commandLink action="#{postulantAction.removeLaboralExperience(rowIndex)}"
+                                     reRender="laboralExperienceList"
+                                     styleClass="button"
+                                     title="#{messages['Common.remove']}"
+                                     ajaxSingle="true"
+                                     immediate="true"
+                                     rendered="#{not postulantAction.managed}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
+    </h:form>
+</app:fieldset>
+
+<app:fieldset id="professorExperienceMainPanel" title="Experiencia Docente">
+    <h:form id="professorExperienceForm">
+        <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width30percent,width70percent">
+            <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                <s:decorate id="placeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.university']}</ui:define>
+                    <h:inputText id="place" value="#{postulantAction.professorExperience.place}"
+                                 styleClass="inputMedium" tabindex="21"
+                                 required="true" maxlength="250"/>
+                </s:decorate>
+                <s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.subject']}</ui:define>
+                    <h:inputText id="position" value="#{postulantAction.professorExperience.position}"
+                                 styleClass="inputMedium" required="true" maxlength="250" tabindex="22"/>
+                </s:decorate>
+                <s:decorate id="professorExperienceInitDateField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.from']}</ui:define>
+                    <rich:calendar id="professorExperienceInitDate"
+                                   value="#{postulantAction.professorExperience.initDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" tabindex="23"
+                                   styleClass="input" required="true" enableManualInput="true"/>
+                </s:decorate>
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.to']}</ui:define>
+                    <rich:calendar id="professorExperienceEndDate"
+                                   value="#{postulantAction.professorExperience.endDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" tabindex="24"
+                                   styleClass="input" enableManualInput="true">
+                        <app:dateRangeValidator forId="professorExperienceInitDate"
+                                                forLabel="Fecha inicio 'Desde'"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <div class="center-buttons">
+                    <a4j:commandButton action="#{postulantAction.addProfessorExperience}"
+                                       reRender="professorExperienceMainPanel" tabindex="25"
+                                       styleClass="button" value="#{messages['Common.add']}"
+                                       id="addProfessorExperienceButton">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </h:panelGroup>
+
+            <rich:dataTable value="#{postulantAction.professorExperienceList}" var="professorExperienceItem"
+                            id="professorExperienceList" rowKeyVar="rowIndex"
+                            width="99%" align="center" columnsWidth="30%, 25%, 20%, 20%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['Postulant.university']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.subject']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.from']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Postulant.to']}
+                        </rich:column>
+                        <rich:column>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{professorExperienceItem.place}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{professorExperienceItem.position}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{professorExperienceItem.initDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{professorExperienceItem.endDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <a4j:commandLink action="#{postulantAction.removeProfessorExperience(rowIndex)}"
+                                     reRender="professorExperienceList"
+                                     styleClass="button"
+                                     title="#{messages['Common.remove']}"
+                                     ajaxSingle="true"
+                                     immediate="true"
+                                     rendered="#{not postulantAction.managed}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
+    </h:form>
+</app:fieldset>
+
+<app:fieldset id="articlesInfoFieldset" title="Premios y Distinciones">
+    <h:form id="articlesInfoForm">
+        <s:decorate id="nationcalPriseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.nationals']}</ui:define>
+            <h:inputTextarea id="nationcalPrise" value="#{postulantAction.nationalPrise}"
+                             styleClass="input textarea-largest"
+                             readonly="#{postulantAction.managed}" tabindex="26">
+                <a4j:support event="onchange" reRender="nationcalPriseField" rendered="#{!postulantAction.managed}"/>
+            </h:inputTextarea>
+        </s:decorate>
+        <s:decorate id="internationcalPriseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.internationals']}</ui:define>
+            <h:inputTextarea id="internationcalPrise" value="#{postulantAction.internationalPrise}" tabindex="27"
+                             styleClass="input textarea-largest" readonly="#{postulantAction.managed}">
+                <a4j:support event="onchange" reRender="internationcalPriseField"
+                             rendered="#{!postulantAction.managed}"/>
+            </h:inputTextarea>
+        </s:decorate>
+    </h:form>
+</app:fieldset>
+
+<app:fieldset id="knowledgeInfoFieldset" title="Producción Intelectual">
+    <h:form id="knowledgeInfoForm">
+        <s:decorate id="booksField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.books']}</ui:define>
+            <h:inputTextarea id="books" value="#{postulantAction.books}" styleClass="input textarea-largest"
+                             readonly="#{postulantAction.managed}" tabindex="28">
+                <a4j:support event="onchange" reRender="booksField" rendered="#{!postulantAction.managed}"/>
+            </h:inputTextarea>
+        </s:decorate>
+        <s:decorate id="nationalArticlesField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.nationalMagazineArticles']}</ui:define>
+            <h:inputTextarea id="nationalArticles" value="#{postulantAction.nationalArticles}" tabindex="29"
+                             styleClass="input textarea-largest" readonly="#{postulantAction.managed}">
+                <a4j:support event="onchange" reRender="nationalArticlesField" rendered="#{!postulantAction.managed}"/>
+            </h:inputTextarea>
+        </s:decorate>
+        <s:decorate id="internationalArticlesField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.internationalMagazineArticles']}</ui:define>
+            <h:inputTextarea id="internationalArticles" value="#{postulantAction.internationalArticles}" tabindex="30"
+                             styleClass="input textarea-largest" readonly="#{postulantAction.managed}">
+                <a4j:support event="onchange" reRender="internationalArticlesField"
+                             rendered="#{!postulantAction.managed}"/>
+            </h:inputTextarea>
+        </s:decorate>
+    </h:form>
+</app:fieldset>
+<c:if test="#{!manager}">
+    <app:fieldset id="subjectMainPanel" title="Asignaturas a postular">
+        <h:form id="subjectForm">
+            <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width30percent,width70percent">
+                <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                    <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                        <h:selectOneMenu id="location" value="#{postulantAction.location}" styleClass="inputMedium"
+                                         tabindex="31">
+                            <s:selectItems value="#{postulantAction.locationList}" var="location"
+                                           label="#{location.name}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange" reRender="facultyField, careerField, subjectField"
+                                         action="#{postulantAction.refleshLocation}" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="facultyField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['PollCopy.faculty']}</ui:define>
+                        <h:selectOneMenu id="faculty" value="#{postulantAction.faculty}" styleClass="inputMedium"
+                                         tabindex="32">
+                            <s:selectItems value="#{postulantAction.facultyList}" var="faculty" label="#{faculty.name}"
+                                           hideNoSelectionLabel="false" noSelectionLabel=""/>
+                            <a4j:support event="onchange" reRender="careerField, subjectField"
+                                         action="#{postulantAction.refleshFaculty}" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="careerField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['PollCopy.career']}</ui:define>
+                        <h:selectOneMenu id="career" value="#{postulantAction.career}" styleClass="inputMedium"
+                                         tabindex="33">
+                            <s:selectItems value="#{postulantAction.careerList}" var="career" label="#{career.name}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange" reRender="subjectField"
+                                         action="#{postulantAction.refleshCareer}" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="subjectField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['PollCopy.subject']}</ui:define>
+                        <h:selectOneMenu id="subject" value="#{postulantAction.subject}" styleClass="inputMedium"
+                                         required="true" tabindex="34">
+                            <s:selectItems value="#{postulantAction.subjectList}" var="subject" label="#{subject.name}"
+                                           hideNoSelectionLabel="false"
+                                           noSelectionLabel=""/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <div class="center-buttons">
+                        <a4j:commandButton action="#{postulantAction.addSubject}"
+                                           reRender="subjectMainPanel"
+                                           styleClass="button" value="#{messages['Common.add']}"
+                                           id="addButton" tabindex="35">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <rich:dataTable value="#{postulantAction.subjectResultList}" var="subjectItem"
+                                    id="subjectList" rowKeyVar="rowIndex"
+                                    width="99%" align="center" columnsWidth="20%,25%,25%,25%,5%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['PollCopy.location']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PollCopy.faculty']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PollCopy.career']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PollCopy.subject']}
+                                </rich:column>
+                                <rich:column>
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{subjectItem.career.faculty.location.name}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{subjectItem.career.faculty.name}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{subjectItem.career.name}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{subjectItem.name}"/>
+                        </rich:column>
+                        <rich:column>
+                            <a4j:commandLink action="#{postulantAction.removeSubject(rowIndex)}"
+                                             reRender="subjectList"
+                                             styleClass="button"
+                                             title="#{messages['Common.remove']}"
+                                             ajaxSingle="true"
+                                             immediate="true"
+                                             rendered="#{not postulantAction.managed}">
+                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                    <h:outputText rendered="#{empty postulantAction.subjectResultList}"
+                                  value="#{messages['Postulant.error.subject']}" styleClass="messageError">
+                        <s:span styleClass="required">*</s:span>
+                    </h:outputText>
+                </h:panelGroup>
+            </h:panelGrid>
+        </h:form>
+    </app:fieldset>
+</c:if>
+
+<c:if test="#{manager}">
+    <app:fieldset id="chargeMainPanel" title="#{messages['Postulant.chargeToApply']}">
+        <h:form id="chargeForm">
+            <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width30percent,width50percent,width20percent">
+                <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                    <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                        <h:selectOneMenu id="location" value="#{postulantAction.postulantCharge.businessUnit}"
+                                         styleClass="inputMedium"
+                                         tabindex="31">
+                            <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                           label="#{businessUnit.fullName}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="chargeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Job.charge']}</ui:define>
+                        <app:selectPopUp id="charge"
+                                         required="true"
+                                         textValue="#{postulantAction.postulantCharge.charge.name}"
+                                         value="#{postulantAction.postulantCharge.charge}"
+                                         dataModel="#{chargeDataModel}"
+                                         clearAction="postulantAction.clearPostulantCharge()"
+                                         searchModalPanel="chargeListModalPanel"
+                                         newModalPanel="chargeModalPanel"
+                                         reRender="chargeField"
+                                         tabindex="34"
+                                         hotKeySelect="alt+1"/>
+                    </s:decorate>
+
+                    <div class="center-buttons">
+                        <a4j:commandButton action="#{postulantAction.addPostulantCharge()}"
+                                           reRender="chargeMainPanel"
+                                           styleClass="button" value="#{messages['Common.add']}"
+                                           id="addButton" tabindex="35">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <rich:dataTable value="#{postulantAction.postulantChargeList}" var="postulantChargeItem"
+                                    id="postulantChargeList" rowKeyVar="rowIndex"
+                                    width="99%" align="center" columnsWidth="35%,60%,5%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['PollCopy.location']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PollCopy.charge']}
+                                </rich:column>
+                                <rich:column>
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{postulantChargeItem.businessUnit.fullName}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{postulantChargeItem.charge.name}"/>
+                        </rich:column>
+                        <rich:column>
+                            <a4j:commandLink action="#{postulantAction.removePostulantCharge(rowIndex)}"
+                                             reRender="postulantChargeList"
+                                             styleClass="button"
+                                             title="#{messages['Common.remove']}"
+                                             ajaxSingle="true"
+                                             immediate="true"
+                                             rendered="#{not postulantAction.managed}">
+                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                    <h:outputText rendered="#{empty postulantAction.postulantChargeList}"
+                                  value="#{messages['Postulant.error.charge']}" styleClass="messageError">
+                        <s:span styleClass="required">*</s:span>
+                    </h:outputText>
+                </h:panelGroup>
+            </h:panelGrid>
+        </h:form>
+    </app:fieldset>
+
+</c:if>
+<app:fieldset id="hourAvailableMainPanel" title="Horas disponibles">
+    <h:form id="hourAvailableForm">
+        <h:panelGrid width="100%" columns="2" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width30percent,width70percent">
+            <h:panelGroup rendered="#{!postulantAction.managed}" styleClass="panel-border">
+                <s:decorate id="initHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.initHour']}</ui:define>
+                    <h:inputText id="initHour"
+                                 value="#{postulantAction.hourAvailable.initHour}"
+                                 styleClass="inputMedium" required="true"
+                                 maxlength="50" tabindex="36">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.endHour']}</ui:define>
+                    <h:inputText id="endHour"
+                                 value="#{postulantAction.hourAvailable.endHour}"
+                                 styleClass="inputMedium" required="true"
+                                 maxlength="50" tabindex="37">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                        <app:dateRangeValidator forId="initHour"
+                                                forLabel="Hora inicio"
+                                                type="greater"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="availableDayField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.day']}</ui:define>
+                    <h:selectOneMenu id="availableDay" tabindex="38"
+                                     value="#{postulantAction.hourAvailable.availableDay}"
+                                     styleClass="inputMedium" required="true">
+                        <s:selectItems value="#{availableDay}" var="ad" label="#{messages[ad.resourceKey]}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="center-buttons">
+                    <a4j:commandButton action="#{postulantAction.addHourAvailable}"
+                                       reRender="hourAvailableMainPanel"
+                                       styleClass="button" value="#{messages['Common.add']}"
+                                       id="addButton" tabindex="39">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup>
+                <rich:dataTable value="#{postulantAction.hourAvailableList}" var="hourAvailableItem"
+                                id="hourAvailableList" rowKeyVar="rowIndex"
+                                width="99%" align="center" columnsWidth="35%,30%,30%,5%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['Postulant.initHour']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['Postulant.endHour']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['Postulant.day']}
+                            </rich:column>
+                            <rich:column>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{hourAvailableItem.initHour}">
+                            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{hourAvailableItem.endHour}">
+                            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages[hourAvailableItem.availableDay.resourceKey]}"/>
+                    </rich:column>
+                    <rich:column>
+                        <a4j:commandLink action="#{postulantAction.removeHourAvailable(rowIndex)}"
+                                         reRender="hourAvailableList"
+                                         styleClass="button"
+                                         title="#{messages['Common.remove']}"
+                                         ajaxSingle="true"
+                                         immediate="true"
+                                         rendered="#{not postulantAction.managed}">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+
+                <h:outputText rendered="#{empty postulantAction.hourAvailableList}"
+                              value="#{messages['Postulant.error.hourAvailable']}" styleClass="messageError">
+                    <s:span styleClass="required">*</s:span>
+                </h:outputText>
+            </h:panelGroup>
+        </h:panelGrid>
+    </h:form>
+</app:fieldset>
+
+</rich:panel>
+
+<div class="buttons">
+    <c:if test="#{!postulantAction.managed}">
+        <input type="button" class="button" value="#{messages['Common.save']}"
+               onclick="jQuery('#postulantForm\\:createButtonId').click()" tabindex="40"/>
+    </c:if>
+    <input type="button" class="button" value="#{messages['Common.cancel']}"
+           onclick="jQuery('#postulantForm\\:cancelButtonId').click()" tabindex="41"/>
+</div>
+
+<rich:jQuery selector="#lastName" query="focus()" timing="onload"/>
+
+<s:decorate id="chargeListModalPanelContainer"
+            template="/employees/chargeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="chargeListModalPanel"/>
+    <ui:param name="dataModel" value="${chargeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{postulantAction.postulantCharge.setCharge(chargeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="chargeField"
+                           focus="selectCharge"
+                           oncomplete="Richfaces.hideModalPanel('chargeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:composition>

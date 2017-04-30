@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReportTemplate"
+              pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="0"
+              rightMargin="50" topMargin="0" bottomMargin="0">
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    <style name="titleStyle" isDefault="true" fontName="Verdana" fontSize="20" isBold="true" isItalic="false"
+           isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <style name="detailStyle" isDefault="true" fontName="Verdana" fontSize="9" isBold="false" isItalic="false"
+           isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <style name="headerStyle" isDefault="true" backcolor="#C0C0C0" fontName="Verdana" fontSize="9" isBold="true"
+           isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <style name="headerStyleBlank" isDefault="true" fontName="Verdana" fontSize="9" isBold="true" isItalic="false"
+           isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+    <parameter name="postulantIdParam" class="java.lang.Long"/>
+    <field name="postulant.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="businessUnit.publicity" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="charge.name" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <title>
+        <band height="12">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                               width="271" height="12"/>
+                <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                    <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.0"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Postulant.chargePostulate}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band/>
+    </pageHeader>
+    <columnHeader>
+        <band height="12">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                               width="270" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$R{PollCopy.location}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="270" y="0"
+                               width="291" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$R{PollCopy.charge}]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="12">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                               mode="Opaque" x="0" y="0" width="270" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{businessUnit.publicity}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                               mode="Opaque" x="270" y="0" width="291" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{charge.name}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band/>
+    </columnFooter>
+    <pageFooter>
+        <band/>
+    </pageFooter>
+    <summary>
+        <band/>
+    </summary>
+</jasperReport>

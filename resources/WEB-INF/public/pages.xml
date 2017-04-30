@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/public/*" login-required="false"/>
+
+    <page view-id="/public/resources.xhtml">
+        <end-conversation/>
+    </page>
+
+    <page view-id="/public/postulant.xhtml" no-conversation-view-id="/public/resources.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/resources.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/public/managerPostulant.xhtml" no-conversation-view-id="/public/resources.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/resources.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/public/studentScheduleEvaluationForm.xhtml"
+          no-conversation-view-id="/public/redirectScheduleEvalution.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/redirectScheduleEvalution.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/public/teacherScheduleEvaluationForm.xhtml"
+          no-conversation-view-id="/public/redirectScheduleEvalution.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/redirectScheduleEvalution.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/public/academicEmployeeScheduleEvaluationForm.xhtml"
+          no-conversation-view-id="/public/redirectScheduleEvalution.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/redirectScheduleEvalution.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/public/careerManagerScheduleEvaluationForm.xhtml"
+          no-conversation-view-id="/public/redirectScheduleEvalution.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/public/redirectScheduleEvalution.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+</pages>

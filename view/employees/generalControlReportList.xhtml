@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ControlReport.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="controlReportSearch">
+
+            <rich:simpleTogglePanel label="#{controlReportAction.generatedPayroll.name}" switchType="client">
+                <h:panelGrid columns="2" width="95%" cellpadding="0" cellspacing="0">
+                    <h:panelGroup>
+                        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                            <h:inputText id="idNumber" value="#{controlReportDataModel.idNumber}" maxlength="100"
+                                         tabindex="1"
+                                         styleClass="input"/>
+                        </s:decorate>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                            <h:inputText id="firstName" value="#{controlReportDataModel.firstName}" maxlength="100"
+                                         tabindex="2"
+                                         styleClass="input"/>
+                        </s:decorate>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                            <h:inputText id="lastName" value="#{controlReportDataModel.lastName}" maxlength="100"
+                                         tabindex="2"
+                                         styleClass="input"/>
+                        </s:decorate>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                            <h:inputText id="maidenName" value="#{controlReportDataModel.maidenName}" maxlength="100"
+                                         tabindex="2"
+                                         styleClass="input"/>
+                            <a4j:commandButton action="#{controlReportDataModel.search()}"
+                                               reRender="controlReportList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </h:panelGroup>
+                </h:panelGrid>
+                <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+            <br/>
+
+
+            <div class="buttons">
+                <h:commandButton action="#{controlReportAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:dataTable value="#{controlReportDataModel}" var="controlReportItem" id="controlReportList"
+                            rows="500000"
+                            width="100%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            #{messages['ControlReport.ci']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Employee.lastName']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Employee.maidenName']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Employee.fullName']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ControlReport.date']}
+                        </rich:column>
+                        <rich:column>
+
+                            #{messages['HoraryBand.initHour']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['HoraryBand.endHour']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['HoraryBand.duration']}
+                        </rich:column>
+
+                        <rich:column>
+                            #{messages['ControlReport.initMark']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ControlReport.endMark']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ControlReport.minutesDiscount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ControlReport.bandAbsence']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ControlReport.marks']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText
+                            value="#{controlReportItem.horaryBandContract.jobContract.contract.employee.idNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{controlReportItem.horaryBandContract.jobContract.contract.employee.lastName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{controlReportItem.horaryBandContract.jobContract.contract.employee.maidenName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{controlReportItem.horaryBandContract.jobContract.contract.employee.firstName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.horaryBandContract.horaryBand.initHour}">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" type="time"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.horaryBandContract.horaryBand.endHour}">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" type="time"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{controlReportItem.horaryBandContract.horaryBand.duration}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.initMark}">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" type="time"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.endMark}">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" type="time"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{controlReportItem.minutesDiscount}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{controlReportItem.bandAbsence}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{controlReportItem.marks}">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" type="time"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="controlReportList" dataModel="#{managersPayrollDataModel}"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{controlReportAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

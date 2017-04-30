@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.com/products/seam/taglib">
+    <f:facet name="afterInvalidField">
+        <s:div styleClass="entry" style="padding:0;">
+            <div class="label" style="padding-top:0;">&#160;</div>
+            <div class="data" style="padding-top:0;">
+                <s:message styleClass="errors"/>
+            </div>
+        </s:div>
+    </f:facet>
+</ui:composition>
+
+
+
+

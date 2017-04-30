@@ -1,0 +1,238 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['VacationPlanning.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="vacationPlanningSearch">
+            <rich:simpleTogglePanel id="vacationPlanningSeachPanel" label="#{messages['VacationPlanning.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <ui:insert name="searchOptions"/>
+                    <s:div>
+                        <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationPlanning.employee']}</ui:define>
+                            <app:quickSearch id="quickSearchEmployee"
+                                             textValue="vacationPlanningDataModel.employee.idNumber"
+                                             value="#{vacationPlanningDataModel.employee}"
+                                             searchField="idNumber"
+                                             reRender="employeeField"
+                                             tabindex="1"/>
+                            <app:selectPopUp id="employee"
+                                             textValue="#{vacationPlanningDataModel.employee.fullName}"
+                                             value="#{vacationPlanningDataModel.employee}"
+                                             dataModel="#{generalEmployeeDataModel}"
+                                             clearAction="vacationPlanningDataModel.clearEmployee()"
+                                             searchModalPanel="generalEmployeeListModalPanel"
+                                             reRender="employeeField"
+                                             hotKeySelect="alt+1"
+                                             tabindex="2"/>
+                        </s:decorate>
+                        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationPlanning.sede']}</ui:define>
+                            <h:selectOneMenu id="businessUnit" styleClass="input"
+                                             tabindex="3"
+                                             value="#{vacationPlanningDataModel.businessUnit}">
+                                <s:selectItems value="#{businessUnitList}" var="business"
+                                               label="#{business.organization.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationPlanning.code']}</ui:define>
+                            <h:inputText id="code"
+                                         value="#{vacationPlanningDataModel.criteria.code}"
+                                         styleClass="input"
+                                         tabindex="4"/>
+                            <a4j:commandButton action="#{vacationPlanningDataModel.search}"
+                                               reRender="vacationPlanSeachPanel, vacationPlanningList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="5">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#quickSearchEmployee" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/vacationPlanning.xhtml"
+                          rendered="#{s:hasPermission('VACATIONPLANNING','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+
+            <rich:dataTable value="#{vacationPlanningDataModel}"
+                            var="vacationPlanningItem"
+                            id="vacationPlanningList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="5%,25%,10%,15%,15%,5%,5%,5%,5%,10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.code"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="employee.lastName,employee.maidenName,employee.firstName"
+                                    dataModel="#{vacationPlanningDataModel}"
+                                    reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.employee']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.jobContract.job.organizationalUnit.businessUnit.organization.name"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.sede']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.jobContract.job.organizationalUnit.name"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.organizationalUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.jobContract.job.charge.name"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.charge']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.seniorityYears"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.seniorityYears']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.vacationDays"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.vacationDays']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.daysOff"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.daysOff']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationPlanning.daysUsed"
+                                                   dataModel="#{vacationPlanningDataModel}"
+                                                   reRender="vacationPlanningList, dataScroller">
+                                #{messages['VacationPlanning.daysUsed']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{vacationPlanningItem.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{vacationPlanningItem.jobContract.contract.employee.idNumberAndFullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{vacationPlanningItem.jobContract.job.organizationalUnit.businessUnit.organization.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{vacationPlanningItem.jobContract.job.organizationalUnit.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{vacationPlanningItem.jobContract.job.charge.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationPlanningItem.seniorityYears}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationPlanningItem.vacationDays}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationPlanningItem.daysOff}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationPlanningItem.daysUsed}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}"
+                                   action="#{vacationPlanningAction.select(vacationPlanningItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                    &#160;
+                    <h:commandLink action="#{vacationPlanningEmployeeReportAction.generateReport(vacationPlanningItem)}"
+                                   rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image-middle"
+                                        title="#{messages['Reports.vacationPlanningEmployee.page.title']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="vacationPlanningList" dataModel="#{vacationPlanningDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/vacationPlanning.xhtml"
+                          rendered="#{s:hasPermission('VACATIONPLANNING','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{vacationPlanningDataModel.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

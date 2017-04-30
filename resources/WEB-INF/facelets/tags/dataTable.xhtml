@@ -1,0 +1,71 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j">
+
+
+    <table cellspacing="#{cellspacing}" cellpadding="#{cellpadding}" border="#{border}" width="#{width}" id="#{id}"
+           class="dr-table rich-table">
+        <tbody>
+        <c:choose>
+            <c:when test="#{layout=='horizontal'}">
+                <tr class="dr-table-row rich-table-row">
+                    <c:forEach items="#{value}" var="#{var}">
+                        <td class="dr-table-cell rich-table-cell">
+                            <ui:insert/>
+                        </td>
+                    </c:forEach>
+                </tr>
+            </c:when>
+            <c:when test="#{layout=='vertical'}">
+                <colgroup span="1"/>
+                <c:forEach items="#{value}" var="#{var}">
+                    <tr class="dr-table-row rich-table-row">
+                        <td class="dr-table-cell rich-table-cell">
+                            <ui:insert/>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </c:when>
+        </c:choose>
+        </tbody>
+    </table>
+
+</ui:composition>
+
+
+        <!--<table cellspacing="0" cellpadding="0" border="0" width="100%" id="pollCopyForm:questionListForSection1"-->
+        <!--class="dr-table rich-table">-->
+        <!--<colgroup span="3"/>-->
+        <!--<tbody id="pollCopyForm:questionListForSection1:tb">-->
+        <!--<tr class="dr-table-row rich-table-row dr-table-firstrow rich-table-firstrow">-->
+        <!--<td id="pollCopyForm:questionListForSection1:0:j_id392" class="dr-table-cell rich-table-cell width5percent">1</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:0:j_id394"-->
+        <!--class="dr-table-cell rich-table-cell width65percent">El proceso de asiganación de materias a docentes, toma en cuenta el perfil y las capacitaciones de estos, es decir existe pertinecia profecional.-->
+        <!--</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:0:j_id396" class="dr-table-cell rich-table-cell width30percent">-->
+
+        <!--</td>-->
+        <!--</tr>-->
+        <!--<tr class="dr-table-row rich-table-row">-->
+        <!--<td id="pollCopyForm:questionListForSection1:1:j_id392" class="dr-table-cell rich-table-cell width5percent">2</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:1:j_id394"-->
+        <!--class="dr-table-cell rich-table-cell width65percent">Con qué frecuencia evalúa el trabajo de los docentes de su carrera.-->
+        <!--</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:1:j_id396" class="dr-table-cell rich-table-cell width30percent">-->
+
+        <!--</td>-->
+        <!--</tr>-->
+        <!--<tr class="dr-table-row rich-table-row">-->
+        <!--<td id="pollCopyForm:questionListForSection1:2:j_id392" class="dr-table-cell rich-table-cell width5percent">3</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:2:j_id394"-->
+        <!--class="dr-table-cell rich-table-cell width65percent">Tienen formación postgrado en la diciplina que realiza su trabajo academico.-->
+        <!--</td>-->
+        <!--<td id="pollCopyForm:questionListForSection1:2:j_id396" class="dr-table-cell rich-table-cell width30percent">-->
+        <!--</td>-->
+        <!--</tr>-->
+        <!--</tbody>-->
+        <!--</table>-->

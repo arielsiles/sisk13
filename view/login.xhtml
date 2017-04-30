@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Common.login']}</ui:define>
+    <ui:param name="bodyWidth" value="400px"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:define name="body">
+        <h:form id="loginForm">
+
+            <div style="margin:5px; text-align:center">
+                <h:graphicImage value="/img/encenslogo.jpg" style="border:0;vertical-align:middle;"/>
+            </div>
+
+            <!--<div class="right" style="margin:2px;">
+                <h:outputLink value="public/registerMark">
+                    <h:outputText value="#{messages['RHMark.register']}"/>
+                </h:outputLink>
+            </div>-->
+            <rich:panel id="loginPanel">
+                <f:facet name="header">
+                    #{messages['Common.login']}
+                </f:facet>
+                <s:decorate id="usernameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Login.username']}</ui:define>
+                    <h:inputText id="username" value="#{credentials.username}" tabindex="1" styleClass="input"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Login.password']}</ui:define>
+                    <h:inputSecret id="password" value="#{credentials.password}" tabindex="2" styleClass="input"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Login.companyLogin']}</ui:define>
+                    <h:inputText id="companyLogin" value="#{authenticator.companyLogin}" tabindex="3"
+                                 styleClass="input"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.login']}" action="#{identity.login}" tabindex="3"
+                                 styleClass="button"/>
+            </div>
+
+        </h:form>
+        <rich:jQuery selector="#username" query="focus()" timing="onload"/>
+        <script type="text/javascript">
+            //defaultScript
+        </script>
+    </ui:define>
+</ui:composition>

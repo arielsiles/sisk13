@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.warehouse.EstimationStockReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="estimationStockReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.warehouse.EstimationStockReport']}
+                </f:facet>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{estimationStockReportAction.gestion}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{gestionList}"
+                                       var="gestion"
+                                       label="#{gestion.year}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['ValuedWarehouseResidueReport.report.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouseField"
+                                     textValue="estimationStockReportAction.warehouse.warehouseCode"
+                                     disable = "true"
+                                     value="#{estimationStockReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="1">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouseSelectPopup"
+                                     textValue="#{estimationStockReportAction.warehouse.fullName}"
+                                     value="#{estimationStockReportAction.warehouse}"
+                                     clearAction="estimationStockReportAction.clearWarehouse()"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ValuedWarehouseResidueReport.report.productItem']}</ui:define>
+                    <app:quickSearch id="productItemQuickSearch"
+                                     textValue="estimationStockReportAction.productItem.productItemCode"
+                                     value="#{estimationStockReportAction.productItem}"
+                                     searchField="productItemCode"
+                                     alias="productItem"
+                                     reRender="productItemField"
+                                     tabindex="2">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="productItem"
+                                     textValue="#{estimationStockReportAction.productItem.name}"
+                                     value="#{estimationStockReportAction.productItem}"
+                                     clearAction="estimationStockReportAction.cleanProductItem()"
+                                     searchModalPanel="singleProductListModalPanel"
+                                     reRender="productItemField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ValuedWarehouseResidueReport.report.date']}</ui:define>
+                    <rich:calendar id="deliveryDateField"
+                                   value="#{estimationStockReportAction.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="false"
+                                   tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{estimationStockReportAction}" showPageFormat="false"
+                                      tabIndex="4"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{estimationStockReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="warehouseModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{estimationStockReportAction.assignWarehouse(warehouseItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="warehouseField"
+                                   oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+
+        <!--<s:decorate id="productListModalPanelContainer"
+                    template="/warehouse/productItemsArticleListModalPanel.xhtml">
+            <ui:param name="containerId" value="productListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productListModalPanel"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{productionPlanningAction.addProductToBaseProduct(productItemArticleSearchDataModel.selectedProductItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="productItemField"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('productListModalPanel');"/>
+            </ui:define>
+        </s:decorate>-->
+
+        <s:decorate id="singleProductListModalPanelContainer" template="/production/metaProductListModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['ProductionPlanning.selectProcessedProduct']}"/>
+            <ui:param name="searchPanelTitle" value="#{messages['ProductionPlanning.searchProcessedProduct']}"/>
+            <ui:param name="dialogId" value="singleProductListModalPanel"/>
+            <ui:param name="dataModel" value="#{processedProductDataModel}"/>
+            <ui:param name="showMeasureUnit" value="false"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{estimationStockReportAction.assignProductItem(dataItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="productItemField"
+                                   oncomplete="Richfaces.hideModalPanel('singleProductListModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+
+    </ui:define>
+</ui:composition>

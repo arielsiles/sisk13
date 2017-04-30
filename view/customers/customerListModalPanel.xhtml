@@ -1,0 +1,166 @@
+<rich:modalPanel height="550" width="650" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="customerListModalPanel"
+                 onshow="jQuery('#customers\\:customerListForm\\:idNumberField\\:idNumber').focus();">
+
+    <style type="text/css">
+        .leftCell {
+            vertical-align: top;
+            width: 25%;
+        }
+
+        .rightCell {
+            vertical-align: top;
+            width: 75%;
+        }
+    </style>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['CustomerDiscountRule.customers.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="customerListForm">
+
+        <rich:simpleTogglePanel label="#{messages['CustomerDiscountRule.customers.search']}" switchType="client"
+                                width="100%">
+
+            <h:panelGrid columns="2" columnClasses="leftCell, rightCell" width="100%">
+                <s:decorate id="searchTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <h:selectOneRadio id="searchType" value="#{customerDiscountRuleAction.searchOption}"
+                                      layout="pageDirection">
+                        <f:selectItem itemValue="1"
+                                      itemLabel="#{messages['CustomerDiscountRule.customers.searchPerson']}"/>
+                        <f:selectItem itemValue="2"
+                                      itemLabel="#{messages['CustomerDiscountRule.customers.searchOrganization']}"/>
+                        <a4j:support event="onchange" reRender="searchFields, customerList, dataScroller"
+                                     focus="idNumber" ajaxSingle="true"/>
+                    </h:selectOneRadio>
+                </s:decorate>
+
+                <h:panelGroup id="searchFields">
+                    <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Entity.idNumber']}</ui:define>
+                        <h:inputText id="idNumber" styleClass="input" value="#{customerDiscountRuleAction.idNumber}"
+                                     maxlength="150" tabindex="1"/>
+                    </s:decorate>
+
+                    <s:decorate id="customerNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Entity.customerNumber']}</ui:define>
+                        <h:inputText id="customerNumber" styleClass="input"
+                                     value="#{customerDiscountRuleAction.customerNumber}"
+                                     maxlength="150" tabindex="2"/>
+                    </s:decorate>
+
+                    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{customerDiscountRuleAction.searchPerson}">
+                        <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                        <h:inputText id="firstName" maxlength="80" styleClass="input"
+                                     tabindex="#{customerDiscountRuleAction.searchPerson?'3':'7'}"
+                                     value="#{customerDiscountRuleAction.firstName}"/>
+                        <ui:param name="oneLine" value="true"/>
+                    </s:decorate>
+                    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{customerDiscountRuleAction.searchPerson}">
+                        <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                        <h:inputText id="lastName" maxlength="80" styleClass="input"
+                                     tabindex="#{customerDiscountRuleAction.searchPerson?'4':'8'}"
+                                     value="#{customerDiscountRuleAction.lastName}"/>
+                        <a4j:commandButton id="searchButtonId" reRender="customerList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           tabindex="#{customerDiscountRuleAction.searchPerson?'5':'9'}">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+
+                    <s:decorate id="organizationNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{!customerDiscountRuleAction.searchPerson}">
+                        <ui:define name="label">#{messages['Organization.name']}</ui:define>
+                        <h:inputText id="organizationName" value="#{customerDiscountRuleAction.organizationName}"
+                                     maxlength="100" styleClass="input"
+                                     tabindex="#{!customerDiscountRuleAction.searchPerson?'3':'8'}"/>
+                        <a4j:commandButton id="searchButtonId" reRender="customerList, dataScroller" styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           tabindex="#{!customerDiscountRuleAction.searchPerson?'4':'9'}">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGroup>
+
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+        <br/>
+        <rich:dataTable value="#{customerList}" var="customerItem" id="customerList" rows="8"
+                        width="100%" columnsWidth="50%, 20%, 20%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['CustomerDiscountRule.customers.name']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Entity.idNumber']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Entity.customerNumber']}
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <!--#{messages['CustomerDiscountRule.customers.select']}-->
+                        <h:selectBooleanCheckbox id="selectAll" value="#{customerDiscountRuleAction.selectAllOption}">
+                            <a4j:support event="onclick" reRender="customerList" ajaxSingle="true"
+                                         action="#{customerDiscountRuleAction.selectAllAction}"/>
+                            <s:conversationPropagation value="none"/>
+                        </h:selectBooleanCheckbox>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{customerItem.name}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{customerItem.idNumber}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{customerItem.customer.number}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:selectBooleanCheckbox value="#{customerDiscountRuleAction.selectedCustomers[customerItem]}">
+                    <a4j:support event="onclick" action="#{customerDiscountRuleAction.selectCustomer(customerItem)}"
+                                 ajaxSingle="true" reRender="customerList"/>
+                    <s:conversationPropagation value="none"/>
+                </h:selectBooleanCheckbox>
+            </rich:column>
+        </rich:dataTable>
+
+        <rich:datascroller align="right" for="customerList" maxPages="10" id="dataScroller" renderIfSinglePage="false"/>
+
+        <br/><br/>
+
+        <div class="buttons">
+            <a4j:commandButton id="assignButton" action="#{customerDiscountRuleAction.assignCustomers}"
+                               value="#{messages['Common.add']}" styleClass="button" ajaxSingle="true"
+                               tabindex="#{customerDiscountRuleAction.searchPerson?'6':'5'}"
+                               reRender="customerListModalPanel"/>
+            <a4j:commandButton id="cancelButton" value="#{messages['Common.cancel']}" styleClass="button"
+                               tabindex="#{customerDiscountRuleAction.searchPerson?'7':'6'}"
+                               action="#{customerDiscountRuleAction.cancelAction}" reRender="customerList"/>
+            <rich:componentControl for="customerListModalPanel" attachTo="closeLink, cancelButton, assignButton"
+                                   operation="hide"
+                                   event="onclick"/>
+        </div>
+
+    </h:form>
+
+</rich:modalPanel>
+

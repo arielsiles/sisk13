@@ -1,0 +1,45 @@
+<rich:modalPanel id="authenticationModalPanel" height="170" width="340" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 onshow="jQuery('#authenticationModalPanelContainer\\:loginForm\\:usernameField\\:username').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Common.login']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:panelGroup>
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+            <rich:componentControl for="authenticationModalPanel" attachTo="closeLink" operation="hide"
+                                   event="onclick"/>
+        </h:panelGroup>
+    </f:facet>
+
+    <h:form id="loginForm">
+        <div class="dataPanel">
+            <s:decorate id="usernameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Login.username']}</ui:define>
+                <h:inputText id="username" value="#{credentials.username}" tabindex="1" styleClass="input"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Login.password']}</ui:define>
+                <h:inputSecret id="password" value="#{credentials.password}" tabindex="2" styleClass="input"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Login.companyLogin']}</ui:define>
+                <h:inputText id="companyLogin" value="#{authenticator.companyLogin}" tabindex="3"
+                             styleClass="input"/>
+            </s:decorate>
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.login']}" action="#{identity.login}" tabindex="3"
+                                 styleClass="button"/>
+            </div>
+        </div>
+    </h:form>
+
+</rich:modalPanel>

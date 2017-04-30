@@ -1,0 +1,259 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core">
+<app:fieldset id="contractFieldset" title="#{messages['JobContract.contract']}">
+
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+    <s:div>
+        <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+            <h:selectOneMenu id="cycle"
+                             value="#{contract.cycle}"
+                             styleClass="input"
+                             rendered="#{editable}"
+                             required="true">
+                <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{contract.cycle.name}"
+                          rendered="#{!editable}"/>
+        </s:decorate>
+
+        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.initDate']}</ui:define>
+            <rich:calendar id="initDate"
+                           value="#{contract.initDate}"
+                           required="true"
+                           enableManualInput="true"
+                           datePattern="#{messages['patterns.date']}"
+                           rendered="#{editable}"
+                           tabindex="22">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+                <a4j:support event="onchanged" reRender="initDateField,endDateField"/>
+                <a4j:support event="oninputchange" reRender="initDateField,endDateField"/>
+            </rich:calendar>
+            <h:outputText value="#{contract.initDate}"
+                          rendered="#{!editable}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+            <rich:calendar id="endDate"
+                           value="#{contract.endDate}"
+                           required="true"
+                           enableManualInput="true"
+                           datePattern="#{messages['patterns.date']}"
+                           rendered="#{editable}"
+                           tabindex="23">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+                <app:dateRangeValidator forId="initDate" forLabel="#{messages['Contract.initDate']}"
+                                        type="greater"/>
+                <a4j:support event="onchanged" reRender="initDateField,endDateField"/>
+                <a4j:support event="oninputchange" reRender="initDateField,endDateField"/>
+            </rich:calendar>
+            <h:outputText value="#{contract.endDate}"
+                          rendered="#{!editable}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="activeForPayrollGenerationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.activeForPayrollGeneration']}</ui:define>
+            <h:selectBooleanCheckbox id="activeForPayrollGeneration"
+                                     value="#{contract.activeForPayrollGeneration}"
+                                     disabled="#{!editable}"
+                                     tabindex="24"/>
+        </s:decorate>
+        <s:decorate id="activeForTaxPayrollGenerationField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.activeForTaxPayrollGeneration']}</ui:define>
+            <h:selectBooleanCheckbox id="activeForTaxPayrollGeneration"
+                                     value="#{contract.activeForTaxPayrollGeneration}"
+                                     disabled="#{!editable}"
+                                     tabindex="31">
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+    </s:div>
+    <s:div>
+        <s:decorate id="contractModeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.mode']}</ui:define>
+            <h:selectOneMenu id="contractMode" value="#{contract.contractMode}"
+                             styleClass="input" required="true"
+                             rendered="#{(not action.managed or s:hasPermission('JOBCONTRACTSPECIALUPDATE','VIEW'))
+                                 and editable }"
+                             tabindex="28">
+                <s:selectItems value="#{contractModeList}" var="contractMode" label="#{contractMode.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+
+            <h:outputText value="#{contract.contractMode.name}"
+                          rendered="#{(action.managed and not s:hasPermission('JOBCONTRACTSPECIALUPDATE','VIEW')) or ! editable }"/>
+        </s:decorate>
+
+        <s:decorate id="contractStateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.state']}</ui:define>
+            <h:selectOneMenu id="contractState" value="#{contract.contractState}"
+                             styleClass="input" required="true"
+                             rendered="#{editable}"
+                             tabindex="29">
+                <s:selectItems value="#{contractStateList}" var="contractState" label="#{contractState.name}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{contract.contractState.name}"
+                          rendered="#{!editable}">
+            </h:outputText>
+        </s:decorate>
+        <c:if test="${showCharge}">
+            <s:decorate id="chargeField" template="/include/inputField.xhtml"
+                        rendered="#{showCharge}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Job.charge']}</ui:define>
+                <app:quickSearch id="quickSearchCharge"
+                                 textValue="#{charge.id}"
+                                 value="#{charge}"
+                                 searchField="id"
+                                 reRender="chargeField"
+                                 rendered="#{editable}"
+                                 tabindex="30">
+                    <ui:define name="converters">
+                        <f:convertNumber groupingUsed="false"/>
+                    </ui:define>
+                </app:quickSearch>
+                <app:selectPopUp id="charge"
+                                 required="true"
+                                 textValue="#{charge.name}"
+                                 value="#{charge}"
+                                 dataModel="#{chargeDataModel}"
+                                 clearAction="action.clearCharge()"
+                                 searchModalPanel="chargeListModalPanel"
+                                 newModalPanel="chargeModalPanel"
+                                 reRender="chargeField"
+                                 renderedNewLink="#{s:hasPermission('CHARGE','CREATE')}"
+                                 readOnly="#{!editable}"
+                                 hotKeySelect="alt+2"/>
+            </s:decorate>
+        </c:if>
+        <s:decorate id="specialField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.special']}</ui:define>
+            <h:selectBooleanCheckbox id="special"
+                                     disabled="s:hasPermission('CONTRACT','UPDATE')"
+                                     value="#{contract.special}"
+                                     tabindex="25"/>
+        </s:decorate>
+        <s:decorate id="activePensionFundField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.activePensionFund']}</ui:define>
+            <h:selectBooleanCheckbox id="activeForPayrollGeneration"
+                                     value="#{contract.activePensionFund}"
+                                     disabled="#{!editable}"
+                                     tabindex="26">
+                <a4j:support event="onchange"
+                             ajaxSingle="true"
+                             action="#{action.clearPensionFundInfo}"
+                             reRender="pensionFundOrganizationListModalPanelDiv, socialSecurityOrganizationListModalPanelDiv, pensionFundInfoDiv"/>
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+    </s:div>
+</h:panelGrid>
+<s:div id="pensionFundInfoDiv">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent" rendered="#{contract.activePensionFund}">
+        <s:div>
+            <s:decorate id="pensionFundOrganizationField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.pensionFundOrganization']}</ui:define>
+                <app:selectPopUp id="pensionFundOrganization"
+                                 required="true"
+                                 styleClass="input"
+                                 textValue="#{contract.pensionFundOrganization.name}"
+                                 value="#{contract.pensionFundOrganization}"
+                                 dataModel="#{socialWelfareEntityDataModel}"
+                                 clearAction="jobContractAction.clearPensionFundOrganization()"
+                                 searchModalPanel="pensionFundOrganizationListModalPanel"
+                                 reRender="pensionFundOrganizationField"
+                                 readOnly="#{!editable}"
+                                 hotKeySelect="alt+3">
+                    <ui:define name="criteriaValues">
+                        <app:criteriaValue fieldName="type"
+                                           value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.SocialWelfareEntityType','PENSION_FUND')}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </s:decorate>
+            <s:decorate id="socialSecurityOrganizationField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.socialSecurityOrganization']}</ui:define>
+                <app:selectPopUp id="socialSecurityOrganization"
+                                 required="true"
+                                 styleClass="input"
+                                 textValue="#{contract.socialSecurityOrganization.name}"
+                                 value="#{contract.socialSecurityOrganization}"
+                                 dataModel="#{socialWelfareEntityDataModel}"
+                                 clearAction="jobContractAction.clearSocialSecurityOrganization()"
+                                 searchModalPanel="socialSecurityOrganizationListModalPanel"
+                                 reRender="socialSecurityOrganizationField"
+                                 readOnly="#{!editable}"
+                                 hotKeySelect="alt+4">
+                    <ui:define name="criteriaValues">
+                        <app:criteriaValue fieldName="type"
+                                           value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.SocialWelfareEntityType','SOCIAL_SECURITY')}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="pensionFundRegistrationCodeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.pensionFundRegistrationCode']}</ui:define>
+                <h:inputText id="pensionFundRegistrationCode"
+                             value="#{contract.pensionFundRegistrationCode}"
+                             maxlength="250"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{editable}"
+                             tabindex="33"/>
+                <h:outputText value="#{contract.pensionFundRegistrationCode}"
+                              rendered="#{!editable}">
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="socialSecurityRegistrationCodeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.socialSecurityRegistrationCode']}</ui:define>
+                <h:inputText id="socialSecurityRegistrationCode"
+                             value="#{contract.socialSecurityRegistrationCode}"
+                             maxlength="250"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{editable}"
+                             tabindex="32"/>
+                <h:outputText value="#{contract.socialSecurityRegistrationCode}"
+                              rendered="#{!editable}">
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</s:div>
+</app:fieldset>
+</ui:composition>

@@ -1,0 +1,137 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['RHMark.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="rHMarkSearch">
+
+            <rich:simpleTogglePanel id="searchPanelId"
+                                    label="#{messages['RHMark.search']}"
+                                    switchType="client">
+
+                <s:decorate id="marRefCardField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
+                    <h:inputText id="marRefCard"
+                                 value="#{rHMarkDataModel.criteria.marRefCard}"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="marDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marDate']}</ui:define>
+                    <rich:calendar id="marDate"
+                                   value="#{rHMarkDataModel.criteria.marDate}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   popup="true"
+                                   tabindex="2"
+                                   datePattern="#{messages['patterns.date']}">
+                        <a4j:support event="oninputchange" reRender="marDateField"/>
+                    </rich:calendar>
+                    <a4j:commandButton action="#{rHMarkDataModel.search}"
+                                       reRender="searchPanelId, rHMarkList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#marRefCard" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <rich:spacer height="15px"/>
+
+            <rich:dataTable id="rHMarkList"
+                            value="#{rHMarkDataModel}"
+                            var="rHMarkItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="20%, 25%, 20%, 20%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rHMark.marRefCard"
+                                                   dataModel="#{rHMarkDataModel}"
+                                                   reRender="rHMarkList, dataScroller">
+                                #{messages['RHMark.marRefCard']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rHMark.marDate"
+                                                   dataModel="#{rHMarkDataModel}"
+                                                   reRender="rHMarkList, dataScroller">
+                                #{messages['RHMark.marDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rHMark.marTime"
+                                                   dataModel="#{rHMarkDataModel}"
+                                                   reRender="rHMarkList, dataScroller">
+                                #{messages['RHMark.marTime']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rHMark.marIpPc"
+                                                   dataModel="#{rHMarkDataModel}"
+                                                   reRender="rHMarkList, dataScroller">
+                                #{messages['RHMark.marIpPc']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.marRefCard}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.marDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.marTime}">
+                        <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                           type="time"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.marIpPc}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{rHMarkAction.select(rHMarkItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('RHMARK','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="rHMarkList" dataModel="#{rHMarkDataModel}"/>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

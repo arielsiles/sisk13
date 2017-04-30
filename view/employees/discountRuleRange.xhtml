@@ -1,0 +1,204 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{discountRuleRangeAction.managed}">
+                #{messages['DiscountRuleRange.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DiscountRuleRange.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+
+    <ui:define name="body">
+
+        <h:form id="discountRuleRangeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{discountRuleRangeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountRuleRangeAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}"/>
+
+                <h:commandButton action="#{discountRuleRangeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{discountRuleRangeAction.managed and discountRuleRangeAction.showDeleteButton and s:hasPermission('DISCOUNTRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountRuleRangeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{discountRuleRangeAction.managed}">
+                            #{messages['DiscountRuleRange.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DiscountRuleRange.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRuleRange.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{discountRuleRange.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="100"
+                                 tabindex="1">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="initRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRuleRange.initRange']}</ui:define>
+                    <h:inputText id="initRange"
+                                 value="#{discountRuleRange.initRange}"
+                                 styleClass="inputNumberTiny"
+                                 required="#{true}"
+                                 rendered="#{discountRuleRangeAction.initRangeEditable}"
+                                 tabindex="2">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}" forId="initRange"/>
+                    </h:inputText>
+                    <h:outputText value="#{discountRuleRange.initRange}"
+                                  rendered="#{not discountRuleRangeAction.initRangeEditable}"/>
+                </s:decorate>
+
+                <s:decorate id="endRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRuleRange.endRange']}</ui:define>
+                    <h:inputText id="endRange"
+                                 value="#{discountRuleRange.endRange}"
+                                 styleClass="inputNumberTiny"
+                                 rendered="#{discountRuleRangeAction.endRangeEditable}"
+                                 tabindex="3">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}" forId="endRange"/>
+                        <app:numberRangeValidator forId="initRange"
+                                                  forLabel="#{messages['DiscountRuleRange.initRange']}"
+                                                  type="greater"/>
+                    </h:inputText>
+                    <h:outputText value="#{discountRuleRange.endRange}"
+                                  rendered="#{not discountRuleRangeAction.endRangeEditable}"/>
+                </s:decorate>
+
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountRuleRange.amount']}</ui:define>
+                    <h:inputText id="amountPercent"
+                                 value="#{discountRuleRange.amount}"
+                                 required="true"
+                                 rendered="#{discountRuleAction.isPercentDiscountUnitType()}"
+                                 styleClass="inputNumber"
+                                 tabindex="4">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountPercent"/>
+                        <app:numberRangeValidator forValue="#{0}"
+                                                  forLabel="0"
+                                                  type="greaterEqual"/>
+                        <app:numberRangeValidator forValue="#{100}"
+                                                  forLabel="100"
+                                                  type="lessEqual"/>
+                    </h:inputText>
+                    <h:inputText id="amount"
+                                 value="#{discountRuleRange.amount}"
+                                 required="true"
+                                 rendered="#{not discountRuleAction.isPercentDiscountUnitType()}"
+                                 styleClass="inputNumber"
+                                 tabindex="4">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                    </h:inputText>
+                    &#160;
+                    <h:outputText value="#{discountRuleRangeAction.getDiscountUnitMessage()}"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{discountRuleRangeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 tabindex="10"
+                                 rendered="#{!discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountRuleRangeAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 tabindex="11"
+                                 rendered="#{!discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','CREATE')}"/>
+
+                <h:commandButton action="#{discountRuleRangeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 tabindex="12"
+                                 rendered="#{discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 tabindex="13"
+                                 rendered="#{discountRuleRangeAction.managed and discountRuleRangeAction.showDeleteButton and s:hasPermission('DISCOUNTRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountRuleRangeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 tabindex="14"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{discountRuleRangeAction.managed and s:hasPermission('DISCOUNTRULE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DiscountRuleRange.delete.confirmation']}">
+                        <f:param value="#{discountRuleRange.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{discountRuleRangeAction.delete}"
+                                   rendered="#{s:hasPermission('DISCOUNTRULE','DELETE')}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

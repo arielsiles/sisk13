@@ -1,0 +1,100 @@
+<rich:modalPanel height="520" width="650" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['Charge.list']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="chargeListForm">
+        <rich:simpleTogglePanel label="#{messages['Charge.search']}"
+                                width="100%"
+                                switchType="client">
+            <ui:insert name="searchOptions"/>
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Charge.code']}</ui:define>
+                <h:inputText id="#{dialogId}-code"
+                             value="#{dataModel.criteria.code}"
+                             maxlength="200"
+                             styleClass="input"
+                             tabindex="1">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Charge.name']}</ui:define>
+                <h:inputText id="#{dialogId}-name"
+                             value="#{dataModel.criteria.name}"
+                             maxlength="200"
+                             styleClass="input"
+                             tabindex="2">
+                </h:inputText>
+                <a4j:commandButton action="#{dataModel.search}"
+                                   reRender="chargeList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="2">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <c:if test="#{s:hasPermission('CHARGE','CREATE')}">
+                    <input type="button"
+                           class="button"
+                           value="#{messages['Common.new']}"
+                           onclick="Richfaces.hideModalPanel('#{dialogId}');Richfaces.showModalPanel('#{createNewDialogId}');"/>
+                </c:if>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{dataModel}" var="chargeItem" id="chargeList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="15%,80%,5%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="charge.code"
+                                               dataModel="#{dataModel}"
+                                               reRender="chargeList, dataScroller">
+                            #{messages['Charge.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="charge.name"
+                                               dataModel="#{dataModel}"
+                                               reRender="chargeList, dataScroller">
+                            #{messages['Charge.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{chargeItem.code}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{chargeItem.name}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="chargeList" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+    <c:set var="firstInputToFocusId" value="#{dialogId}-code"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+
+</rich:modalPanel>
+

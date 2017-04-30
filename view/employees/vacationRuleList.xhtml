@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['VacationRule.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="vacationRuleSearch">
+            <rich:simpleTogglePanel id="vacationRuleSeachPanel" label="#{messages['VacationRule.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <ui:insert name="searchOptions"/>
+                    <s:div>
+                        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationRule.code']}</ui:define>
+                            <h:inputText id="code"
+                                         value="#{vacationRuleDataModel.criteria.code}"
+                                         styleClass="input"
+                                         tabindex="1">
+                                <!--<app:naturalNumberConverter forId="code"/>-->
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationRule.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{vacationRuleDataModel.criteria.name}"
+                                         styleClass="input"
+                                         tabindex="2"/>
+                            <a4j:commandButton action="#{vacationRuleDataModel.search}"
+                                               reRender="vacationRuleSeachPanel, vacationRuleList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#afterInit" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/vacationRule.xhtml"
+                          rendered="#{s:hasPermission('VACATIONRULE','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+
+            <rich:dataTable value="#{vacationRuleDataModel}"
+                            var="vacationRuleItem"
+                            id="vacationRuleList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%, 30%, 15%, 15%, 15%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationRule.code"
+                                                   dataModel="#{vacationRuleDataModel}"
+                                                   reRender="vacationRuleList, dataScroller">
+                                #{messages['VacationRule.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationRule.name"
+                                                   dataModel="#{vacationRuleDataModel}"
+                                                   reRender="vacationRuleList, dataScroller">
+                                #{messages['VacationRule.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationRule.fromYears"
+                                                   dataModel="#{vacationRuleDataModel}"
+                                                   reRender="vacationRuleList, dataScroller">
+                                #{messages['VacationRule.initYearsRange']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationRule.toYears"
+                                                   dataModel="#{vacationRuleDataModel}"
+                                                   reRender="vacationRuleList, dataScroller">
+                                #{messages['VacationRule.endYearsRange']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="vacationRule.vacationDays"
+                                                   dataModel="#{vacationRuleDataModel}"
+                                                   reRender="vacationRuleList, dataScroller">
+                                #{messages['VacationRule.vacationDays']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{vacationRuleItem.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{vacationRuleItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationRuleItem.fromYears}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationRuleItem.toYears}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationRuleItem.vacationDays}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('VACATIONRULE','VIEW')}"
+                                   action="#{vacationRuleAction.select(vacationRuleItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="vacationRuleList" dataModel="#{vacationRuleDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/vacationRule.xhtml"
+                          rendered="#{s:hasPermission('VACATIONRULE','CREATE')}"
+                          styleClass="button"
+                          propagation="none"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

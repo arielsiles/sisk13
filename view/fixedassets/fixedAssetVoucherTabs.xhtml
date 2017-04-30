@@ -1,0 +1,101 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <s:div id="tabPanelDiv">
+        <rich:tabPanel id="tabPanel" switchType="ajax"
+                       rendered="#{fixedAssetVoucherAction.managed}">
+
+            <!--fixed assets corresponding to the purchase order-->
+            <!--fixed assets datatable corresponding to the purchase order when an approveRegistration opration is in progress -->
+            <rich:tab name="fixedAssetByPurchaseOrderTab"
+                      rendered="#{fixedAssetVoucherAction.showFixedAssetByPurchaseOrderTab}"
+                      label="#{messages['FixedAssetVoucher.fixedAssetByPurchaseOrder.tab']}"
+                      ajaxSingle="true">
+                <ui:include src="fixedAssetByPurchaseOrderList.xhtml"/>
+            </rich:tab>
+
+            <rich:tab name="fixedAssetPartByPurchaseOrderTab"
+                      rendered="#{fixedAssetVoucherAction.showFixedAssetPartByPurchaseOrderTab or
+                      (fixedAssetVoucherAction.registrationMovement and fixedAssetVoucher.purchaseOrder.purchaseOrderCause.fixedassetPartsPurchase)}"
+                      label="#{messages['FixedAssetVoucher.fixedAssetPartByPurchaseOrder.tab']}"
+                      ajaxSingle="true">
+                <ui:include src="purchaseOrderFixedAssetPartList.xhtml">
+                    <ui:param name="showActionColumn" value="#{false}"/>
+                    <ui:param name="purchaseOrder" value="#{fixedAssetVoucher.purchaseOrder}"/>
+                </ui:include>
+            </rich:tab>
+
+            <!--fixed assets corresponding to the ALT or BAJ or MPO movement in case the voucher selected is approved -->
+            <rich:tab name="approvedFixedAssetsTab"
+                      label="#{messages['FixedAssetVoucher.approvedFixedAssets.tab']}"
+                      rendered="#{((fixedAssetVoucherAction.registrationMovement and fixedAssetVoucher.purchaseOrder.purchaseOrderCause.fixedassetPurchase)
+                                    or fixedAssetVoucherAction.dischargeMovement)
+                                    and ( fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled )}"
+                      ajaxSingle="true">
+                <ui:include src="fixedAssetByFixedAssetVoucherList.xhtml"/>
+            </rich:tab>
+
+            <!--fixed asset movements corresponding to the MPO movement in case the voucher selected is approved -->
+            <rich:tab name="approvedFixedAssetsTab"
+                      label="#{messages['FixedAssetVoucher.fixedAssetMovement.tab']}"
+                      rendered="#{fixedAssetVoucherAction.improvementMovement and
+                      ( fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled )}"
+                      ajaxSingle="true">
+                <ui:include src="fixedAssetMovementsByFixedAssetVoucherList.xhtml"/>
+            </rich:tab>
+
+            <!--fixed asset movements corresponding to the TRA movement in case the voucher selected is approved -->
+            <rich:tab name="approvedFixedAssetsTab"
+                      label="#{messages['FixedAssetVoucher.fixedAssetMovement.tab']}"
+                      rendered="#{fixedAssetVoucherAction.transferenceMovement and
+                      ( fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled )}"
+                      ajaxSingle="true">
+                <ui:include src="fixedAssetTransferenceMovementsByFixedAssetVoucherList.xhtml"/>
+            </rich:tab>
+
+            <!--lis of selected fixedassets to transfer or to discharge or to improve -->
+            <rich:tab name="selectedToTransferFixedAssetsTab"
+                      label="#{messages['FixedAssetVoucher.selectedToTransferFixedAssets.tab']}"
+                      rendered="#{(fixedAssetVoucherAction.transferenceMovement
+                      or fixedAssetVoucherAction.dischargeMovement
+                      or fixedAssetVoucherAction.improvementMovement) and fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                      ajaxSingle="true">
+                <s:div id="selectedToTransferFixedAssetsDiv">
+                    <div class="buttons">
+                        <a4j:commandButton
+                                value="#{messages['FixedAssetVoucher.addFixedAssets']}"
+                                styleClass="button"
+                                reRender="selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');"
+                                tabindex="31"/>
+                    </div>
+                    <ui:include src="selectedToTransferFixedAssetList.xhtml"/>
+
+                    <div class="buttons">
+                        <a4j:commandButton
+                                value="#{messages['FixedAssetVoucher.addFixedAssets']}"
+                                styleClass="button"
+                                immediate="true"
+                                reRender="selectedToTransferFixedAssetsDiv, fixedAssetSelectListModalPanelContainer"
+                                oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');"
+                                tabindex="33"/>
+                    </div>
+                </s:div>
+            </rich:tab>
+
+            <rich:tab name="discountCommentTab"
+                      label="#{messages['FixedAssetVoucher.discountComment.tab']}"
+                      ajaxSingle="true">
+                <ui:include src="/finances/discountCommentListFragment.xhtml">
+                    <ui:param name="dataModel" value="#{discountCommentDataModel}"/>
+                    <ui:param name="searchByFixedAssetVoucher" value="true"/>
+                </ui:include>
+            </rich:tab>
+        </rich:tabPanel>
+    </s:div>
+</ui:composition>

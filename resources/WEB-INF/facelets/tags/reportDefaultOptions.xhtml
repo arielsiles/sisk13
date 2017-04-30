@@ -1,0 +1,60 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j">
+
+    <c:if test="#{empty tabIndex}">
+        <c:set var="tabIndex" value="1"/>
+    </c:if>
+
+    <rich:panel id="reportDefaultOptionsPanel">
+        <f:facet name="header">
+            #{messages['Reports.options']}
+        </f:facet>
+
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{empty showReportTitle or showReportTitle}">
+                <ui:define name="label">#{messages['Reports.title']}</ui:define>
+                <h:inputText id="reportTitle"
+                             value="#{reportAction.reportTitle}"
+                             styleClass="input"
+                             maxlength="150"
+                             tabindex="#{tabIndex+1}"/>
+            </s:decorate>
+
+            <s:decorate id="formatField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{empty showReportFormat or showReportFormat}">
+                <ui:define name="label">#{messages['Reports.format']}</ui:define>
+                <h:selectOneMenu id="reportFormat"
+                                 value="#{reportAction.reportFormat}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="#{tabIndex+3}">
+                    <s:selectItems value="#{reportAction.reportFormats}" var="reportFormat"
+                                   label="#{messages[reportFormat.resourceKey]}"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="pageField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{empty showPageFormat or showPageFormat}">
+                <ui:define name="label">#{messages['Reports.page']}</ui:define>
+                <h:selectOneMenu id="pageFormat"
+                                 value="#{reportAction.pageFormat}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="#{tabIndex +2}">
+                    <s:selectItems value="#{reportAction.pageFormats}" var="pageFormat"
+                                   label="#{messages[pageFormat.resourceKey]}"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+        </h:panelGrid>
+    </rich:panel>
+</ui:composition>

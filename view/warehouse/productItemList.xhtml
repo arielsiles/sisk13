@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductItem.list']}</ui:define>
+
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="productItemSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductItem.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+                        <h:inputText id="productItemCode"
+                                     value="#{productItemDataModel.criteria.id.productItemCode}"
+                                     maxlength="150"
+                                     tabindex="1"
+                                     styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+                        <h:inputText id="name"
+                                     value="#{productItemDataModel.criteria.name}"
+                                     maxlength="150"
+                                     tabindex="2"
+                                     styleClass="input"/>
+                        <a4j:commandButton action="#{productItemDataModel.search}"
+                                           reRender="productItemList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+                <rich:jQuery selector="#productItemCode" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/productItem.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('PRODUCTITEM','CREATE')}"
+                          propagation="begin"/>
+            </div>
+            <rich:dataTable value="#{productItemDataModel}"
+                            var="productItemItem"
+                            id="productItemList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 25%, 10%, 15%, 15%, 15%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.productItemCode"
+                                                   dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.productItemCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.name" dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.state" dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.usageMeasureUnit.name"
+                                                   dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.usageMeasureUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.investmentAmount"
+                                                   dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.investmentAmount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.unitCost"
+                                                   dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.unitCost']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{productItemItem.productItemCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productItemItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[productItemItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productItemItem.usageMeasureUnit.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{productItemItem.investmentAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{productItemItem.unitCost}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{productItemAction.select(productItemItem)}"
+                                   rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="productItemList" dataModel="#{productItemDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/productItem.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('PRODUCTITEM','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

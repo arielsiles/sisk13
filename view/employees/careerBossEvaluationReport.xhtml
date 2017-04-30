@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CareerBossEvaluationReport.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="finalEvaluationReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['CareerBossEvaluationReport.title']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div>
+                        <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.finalTeacherEvaluation.cycle']}</ui:define>
+                            <h:selectOneMenu id="cycle" value="#{careerBossEvaluationReportAction.cycle}"
+                                             styleClass="input" tabindex="1" required="true">
+                                <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <a4j:support event="onchange" reRender="studentFormField"
+                                             action="#{careerBossEvaluationReportAction.refreshCycle}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="studentFormField"
+                                             action="#{careerBossEvaluationReportAction.refreshCycle}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="studentFormField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['CareerBossEvaluationReport.teacherPollForm']}</ui:define>
+                            <h:selectOneMenu id="studentPollForm"
+                                             value="#{careerBossEvaluationReportAction.teacherPollForm}"
+                                             styleClass="input" required="true"
+                                             tabindex="2">
+                                <s:selectItems value="#{careerBossEvaluationReportAction.pollFormList}" var="pollForm"
+                                               label="#{pollForm.title} - #{pollForm.subTitle}"
+                                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['User.idNumber']}</ui:define>
+                            <h:inputText id="idNumber" value="#{careerBossEvaluationReportAction.idNumber}"
+                                         maxlength="100" tabindex="3" styleClass="input">
+                                <app:naturalNumberConverter forId="idNumber"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                            <h:selectOneMenu id="location" value="#{careerBossEvaluationReportAction.location}"
+                                             styleClass="input"
+                                             tabindex="4">
+                                <s:selectItems value="#{careerBossEvaluationReportAction.locationList}" var="location"
+                                               label="#{location.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+
+                                <a4j:support event="onchange" reRender="facultyField, careerField"
+                                             action="#{careerBossEvaluationReportAction.refreshLocation}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="facultyField, careerField"
+                                             action="#{careerBossEvaluationReportAction.refreshLocation}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="facultyField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PollCopy.faculty']}</ui:define>
+                            <h:selectOneMenu id="faculty" value="#{careerBossEvaluationReportAction.faculty}"
+                                             styleClass="input"
+                                             tabindex="5">
+                                <s:selectItems value="#{careerBossEvaluationReportAction.facultyList}" var="faculty"
+                                               label="#{faculty.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <a4j:support event="onchange" reRender="careerField"
+                                             action="#{careerBossEvaluationReportAction.refreshFaculty}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="careerField"
+                                             action="#{careerBossEvaluationReportAction.refreshFaculty}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="careerField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PollCopy.career']}</ui:define>
+                            <h:selectOneMenu id="career" value="#{careerBossEvaluationReportAction.career}"
+                                             styleClass="input"
+                                             tabindex="6">
+                                <s:selectItems value="#{careerBossEvaluationReportAction.careerList}" var="career"
+                                               label="#{career.name}"
+                                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{careerBossEvaluationReportAction}" showPageFormat="false"
+                                      tabIndex="12"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{careerBossEvaluationReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

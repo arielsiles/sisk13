@@ -1,0 +1,22 @@
+<rich:modalPanel id="rhMarkHelpModalPanel" height="600" width="800" zindex="2000" resizeable="true"
+                 style="overflow:auto;"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core">
+    <f:facet name="header">
+        <h:outputText>#{messages['Common.help']} - #{messages['RHMark.search']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:panelGroup>
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="helpCloseLink"/>
+            <rich:componentControl for="rhMarkHelpModalPanel" attachTo="helpCloseLink" operation="hide"
+                                   event="onclick"/>
+        </h:panelGroup>
+    </f:facet>
+    <h:panelGrid width="100%" columns="1">
+        <!--<h:graphicImage value="/img/employees/RHMarkHome.gif"/>-->
+        <h:graphicImage value="/img/employees/RHMarkSearch.gif"/>
+    </h:panelGrid>
+</rich:modalPanel>

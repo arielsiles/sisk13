@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CashBoxType.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="cashBoxTypeSearch">
+            <rich:simpleTogglePanel label="#{messages['CashBoxType.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxType.name']}</ui:define>
+                    <h:inputText id="name" value="#{cashBoxTypeDataModel.criteria.name}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{cashBoxTypeDataModel.search}"
+                                       reRender="cashBoxTypeList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/cashBoxType.xhtml" styleClass="button"
+                          propagation="none"/>
+            </div>
+            <rich:dataTable value="#{cashBoxTypeDataModel}" var="cashBoxTypeItem" id="cashBoxTypeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="80%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashBoxType.name" dataModel="#{cashBoxTypeDataModel}"
+                                                   reRender="cashBoxTypeList, dataScroller">
+                                #{messages['CashBoxType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{cashBoxTypeItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{cashBoxTypeAction.select(cashBoxTypeItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="cashBoxTypeList" dataModel="#{cashBoxTypeDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/cashBoxType.xhtml" styleClass="button"
+                          propagation="none"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

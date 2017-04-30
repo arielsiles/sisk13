@@ -1,0 +1,183 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\:fixedAssetSubGroupListForm#{dialogId}\\:fixedAssetGroupField\\:fixedAssetGroupCode').focus();">
+
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{fixedAssetSubGroupDataModel}"/>
+    </c:if>
+    <c:if test="#{empty enablefixedAssetGroup}">
+        <c:set var="enablefixedAssetGroup" value="true"/>
+    </c:if>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['FixedAssetSubGroup.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="fixedAssetSubGroupListForm#{dialogId}">
+        <rich:simpleTogglePanel id="fixedAssetSubGroupSearchPanel" label="#{messages['FixedAssetSubGroup.search']}"
+                                switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width40percent,width60percent">
+                <s:div>
+                    <s:decorate id="fixedAssetSubGroupCodeField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetSubGroupCode']}</ui:define>
+                        <h:inputText id="fixedAssetSubGroupCode"
+                                     value="#{dataModel.fixedAssetSubGroupCode}"
+                                     maxlength="3" styleClass="input"
+                                     tabindex="2">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="fixedAssetGroupField"
+                                rendered="#{enablefixedAssetGroup and (empty fixedAssetPurchaseOrderDetailAction.fixedAssetGroup or empty fixedAssetDataModel.fixedAssetGroup)
+                            and empty fixedAssetsReportAction.fixedAssetGroup
+                            and empty fixedAssetGroupsReportAction.fixedAssetGroup
+                            and empty depreciatedFixedAssetsReportAction.fixedAssetGroup
+                            and empty fixedAssetFileReportAction.fixedAssetGroup
+                            and empty fixedAssetByCustodianReportAction.fixedAssetGroup
+                            and empty depreciationSummaryReportAction.fixedAssetGroup
+                            and empty accumulatedDepreciationSummaryByFixedAssetReportAction.fixedAssetGroup
+                            and empty evolutionBySubGroupSummaryReportAction.fixedAssetGroup
+                            and empty evolutionByFixedAssetSummaryReportAction.fixedAssetGroup}"
+                                template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetGroupCode']}</ui:define>
+                        <h:inputText id="fixedAssetGroupCode"
+                                     value="#{dataModel.groupCode}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetSubGroup.description']}</ui:define>
+                        <h:inputText id="descriptionInputText"
+                                     value="#{dataModel.criteria.description}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+                            <a4j:commandButton action="#{dataModel.search}"
+                                               reRender="fixedAssetSubGroupSearchPanel, fixedAssetSubGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}" id="searchButtonId"
+                                               tabindex="6">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{dataModel.clear}"
+                                               reRender="fixedAssetSubGroupSearchPanel, fixedAssetSubGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               id="clearButtonId"
+                                               tabindex="7">
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+            <rich:jQuery selector="#fixedAssetGroupCode" query="focus()" timing="onload"/>
+        </rich:simpleTogglePanel>
+
+        <br/>
+
+        <rich:dataTable value="#{dataModel}" var="fixedAssetSubGroupItem"
+                        id="fixedAssetSubGroupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="10%, 10%, 40%, 15%, 15%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetSubGroup.id.fixedAssetGroupCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetSubGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.fixedAssetGroupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetSubGroup.id.fixedAssetSubGroupCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetSubGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.fixedAssetSubGroupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetSubGroup.description"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetSubGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetSubGroup.depreciationRate"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetSubGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.depreciationRate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetSubGroup.duration"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetSubGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.duration']}
+                        </app:commandSortHeader>
+                    </rich:column>
+
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{fixedAssetSubGroupItem.id.fixedAssetGroupCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetSubGroupItem.id.fixedAssetSubGroupCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetSubGroupItem.description}">
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{fixedAssetSubGroupItem.depreciationRate}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Unit.percentage']}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{fixedAssetSubGroupItem.duration}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Unit.month']}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="fixedAssetSubGroupList"
+                          dataModel="#{dataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, addButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>

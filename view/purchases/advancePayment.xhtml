@@ -1,0 +1,422 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<h:form id="purchaseOrderPaymentForm">
+
+<c:set var="payAmountId" value="payAmount"/>
+<c:set var="isPurchaseOrderLiquidated" value="#{action.purchaseOrderLiquidated}"/>
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{action.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!action.managed and !action.remake and s:hasPermission('ADVANCEPAYMENT','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{action.remake}"
+                     value="#{messages['PurchaseOrderPayment.button.remake']}"
+                     styleClass="button"
+                     rendered="#{!action.managed and action.remake and action.instanceToRemake.approved and s:hasPermission('REMAKEPURCHASEORDERPAYMENT','VIEW')}"
+                     tabindex="1"/>
+
+    <h:commandButton id="approveId"
+                     action="#{action.approve}"
+                     value="#{messages['PurchaseOrderPayment.approve']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('APPROVEADVANCEPAYMENT','VIEW')}"/>
+
+    <h:commandButton id="nullifyId"
+                     action="#{action.nullify}"
+                     value="#{messages['PurchaseOrderPayment.nullify']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('NULLIFYADVANCEPAYMENT','VIEW')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{action.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('ADVANCEPAYMENT','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{action.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{action.managed}">
+            #{messages['PurchaseOrderPayment.edit']}
+        </c:when>
+        <c:when test="#{action.remake}">
+            #{messages['PurchaseOrderPayment.remake']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PurchaseOrderPayment.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['PurchaseOrderPayment.paymentType']}</ui:define>
+    <h:selectOneMenu id="paymentType"
+                     value="#{advancePayment.paymentType}"
+                     styleClass="input"
+                     disabled="#{action.managed}"
+                     required="true"
+                     tabindex="1">
+        <s:selectItems value="#{purchaseOrderPaymentTypeEnum}"
+                       var="element"
+                       label="#{messages[element.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <a4j:support event="onchange"
+                     reRender="beneficiaryPanel, cashBoxCashAccountDiv, bankDiv, rotatoryFundDiv, rotatoryFundListModalPanelDiv"
+                     action="#{action.paymentTypeChanged}"
+                     ajaxSingle="true"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:div id="beneficiaryPanel">
+    <s:decorate id="beneficiaryNameField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.enableBeneficiaryFields}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.beneficiaryName']}</ui:define>
+        <h:inputText id="beneficiaryName"
+                     value="#{advancePayment.beneficiaryName}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="200"
+                     tabindex="2"/>
+    </s:decorate>
+    <s:decorate id="beneficiaryTypeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.enableBeneficiaryFields}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.beneficiaryType']}</ui:define>
+        <h:selectOneRadio value="#{advancePayment.beneficiaryType}"
+                          layout="pageDirection">
+            <s:selectItems value="#{beneficiaryTypes}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"/>
+            <s:convertEnum/>
+        </h:selectOneRadio>
+    </s:decorate>
+</s:div>
+<s:div id="bankDiv">
+    <s:decorate id="bankAccountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.enableBankAccount}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.bankAccount']}</ui:define>
+        <h:selectOneMenu id="bankAccount"
+                         value="#{advancePayment.bankAccount}"
+                         styleClass="input"
+                         disabled="#{action.managed}"
+                         required="true"
+                         tabindex="3">
+            <s:selectItems value="#{financesBankAccountList}"
+                           var="element"
+                           label="#{element.description}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         reRender="sourceCurrencyDiv, exchangeRatePanel, payCurrencyField, payAmountField"
+                         action="#{action.accountChanged}"
+                         ajaxSingle="true"
+                         oncomplete="document.getElementById('#{rich:clientId(payAmountId)}').focus();"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+</s:div>
+<s:div id="cashBoxCashAccountDiv">
+    <s:decorate id="cashBoxCashAccountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.cashBoxPayment}">
+        <ui:define name="label">#{messages['RotatoryFundPayment.cashBoxCashAccount']}</ui:define>
+        <c:choose>
+            <c:when test="#{action.managed}">
+                <h:outputText value="#{advancePayment.cashBoxCashAccount.fullName}"/>
+            </c:when>
+            <c:otherwise>
+                <app:selectPopUp id="cashBoxCashAccount"
+                                 required="true"
+                                 textValue="#{advancePayment.cashBoxCashAccount.fullName}"
+                                 value="#{advancePayment.cashBoxCashAccount}"
+                                 dataModel="#{cashAccountDataModel}"
+                                 clearAction="action.clearCashBoxCashAccount()"
+                                 searchModalPanel="cashBoxCashAccountListModalPanel"
+                                 reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                                 hotKeySelect="alt+3"
+                                 tabindex="4">
+                </app:selectPopUp>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</s:div>
+
+<s:div id="rotatoryFundDiv">
+    <s:decorate id="rotatoryFundField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.rotatoryFundPayment}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.rotatoryFund']}</ui:define>
+        <app:selectPopUp id="rotatoryFund"
+                         required="true"
+                         textValue="#{advancePayment.rotatoryFund.fullName}"
+                         value="#{advancePayment.rotatoryFund}"
+                         dataModel="#{rotatoryFundDataModel}"
+                         clearAction="action.clearRotatoryFund()"
+                         searchModalPanel="rotatoryFundListModalPanel"
+                         reRender="rotatoryFundListModalPanelDiv, rotatoryFundDiv, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                         hotKeySelect="alt+3"
+                         tabindex="1003">
+        </app:selectPopUp>
+    </s:decorate>
+</s:div>
+
+<s:decorate id="sourceAmountField"
+            template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{action.managed}">
+    <ui:define name="label">
+        <c:choose>
+            <c:when test="#{action.checkPayment}">
+                #{messages['PurchaseOrderPayment.sourceCheckAmount']}
+            </c:when>
+            <c:when test="#{action.bankPayment}">
+                #{messages['PurchaseOrderPayment.sourceBankAmount']}
+            </c:when>
+            <c:otherwise>
+                #{messages['PurchaseOrderPayment.sourceCashBoxAmount']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <h:outputText value="#{advancePayment.sourceAmount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</s:decorate>
+<s:div id="sourceCurrencyDiv">
+    <s:decorate id="sourceCurrencyField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{not empty advancePayment.sourceCurrency}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.sourceCurrency']}</ui:define>
+        <h:outputText
+                value="#{messages[advancePayment.sourceCurrency.resourceKey]} (#{messages[advancePayment.sourceCurrency.symbolResourceKey]})"/>
+    </s:decorate>
+</s:div>
+<s:decorate id="payCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['PurchaseOrderPayment.payCurrency']}</ui:define>
+    <h:selectOneMenu id="payCurrency"
+                     value="#{advancePayment.payCurrency}"
+                     styleClass="input"
+                     disabled="#{action.managed || isPurchaseOrderLiquidated}"
+                     required="true"
+                     tabindex="5">
+        <s:selectItems value="#{payCurrencies}"
+                       var="element"
+                       label="#{messages[element.resourceKey]} (#{messages[element.symbolResourceKey]})"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <a4j:support event="onchange"
+                     reRender="exchangeRatePanel"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+</s:decorate>
+
+<s:decorate id="payAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['PurchaseOrderPayment.payAmount']}</ui:define>
+    <c:choose>
+        <c:when test="#{isPurchaseOrderLiquidated}">
+            <h:outputText value="#{advancePayment.payAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </c:when>
+        <c:otherwise>
+            <h:inputText id="payAmount"
+                         value="#{advancePayment.payAmount}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="6">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="payAmount"/>
+            </h:inputText>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+<s:div id="exchangeRatePanel">
+    <s:decorate id="exchangeRateField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.enableExchangeRateField}">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.exchangeRate']}</ui:define>
+        <h:inputText id="exchangeRate"
+                     value="#{advancePayment.exchangeRate}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="7">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="exchangeRate"/>
+        </h:inputText>
+    </s:decorate>
+</s:div>
+<s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['PurchaseOrderPayment.description']}</ui:define>
+    <h:inputTextarea id="description"
+                     value="#{advancePayment.description}"
+                     styleClass="input textarea"
+                     required="true"
+                     tabindex="8">
+        <f:validateLength maximum="1000"/>
+    </h:inputTextarea>
+</s:decorate>
+<s:decorate id="stateField"
+            template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{action.managed}">
+    <ui:define name="label">#{messages['PurchaseOrderPayment.state']}</ui:define>
+    <h:outputText value="#{messages[advancePayment.state.resourceKey]}"/>
+</s:decorate>
+
+<s:div id="documentInformation">
+    <app:fieldset id="documentInformationSet" title="#{messages['PurchaseOrderPayment.documentInformation']}"
+                  rendered="#{action.managed}">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent, width50percent">
+            <s:div>
+                <s:decorate id="registerEmployeeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{action.managed}">
+                    <ui:define name="label">#{messages['PurchaseOrderPayment.registerEmployee']}</ui:define>
+                    <h:outputText value="#{advancePayment.registerEmployee.employee.fullName}">
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="approvedByEmployeeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{action.managed and not empty advancePayment.approvedByEmployee}">
+                    <ui:define name="label">#{messages['PurchaseOrderPayment.approvedByEmployee']}</ui:define>
+                    <h:outputText value="#{advancePayment.approvedByEmployee.employee.fullName}">
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="creationDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{action.managed}">
+                    <ui:define name="label">#{messages['PurchaseOrderPayment.created']}</ui:define>
+                    <h:outputText value="#{advancePayment.creationDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="approvalDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{action.managed and not empty advancePayment.approvalDate}">
+                    <ui:define name="label">#{messages['PurchaseOrderPayment.approvalDate']}</ui:define>
+                    <h:outputText value="#{advancePayment.approvalDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{action.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!action.managed and !action.remake and s:hasPermission('ADVANCEPAYMENT','CREATE')}"
+                     tabindex="9"/>
+    <h:commandButton action="#{action.remake}"
+                     value="#{messages['PurchaseOrderPayment.button.remake']}"
+                     styleClass="button"
+                     rendered="#{!action.managed and action.remake and action.instanceToRemake.approved and s:hasPermission('REMAKEPURCHASEORDERPAYMENT','VIEW')}"
+                     tabindex="9"/>
+
+    <h:commandButton action="#{action.approve}"
+                     value="#{messages['PurchaseOrderPayment.approve']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('APPROVEADVANCEPAYMENT','VIEW')}"
+                     tabindex="10"/>
+
+    <h:commandButton action="#{action.nullify}"
+                     value="#{messages['PurchaseOrderPayment.nullify']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('NULLIFYADVANCEPAYMENT','VIEW')}"
+                     tabindex="11"/>
+
+    <h:commandButton action="#{action.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{action.managed and action.pending and s:hasPermission('ADVANCEPAYMENT','UPDATE')}"
+                     tabindex="12"/>
+
+    <h:commandButton action="#{action.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="13"/>
+</div>
+</h:form>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#paymentType" query="focus()" timing="onload"/>
+
+<s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="accountType" value="A"/>
+    <ui:param name="accountClass" value="A"/>
+    <ui:param name="hasPayableAccountsPermission" value="true"/>
+    <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{action.assignCashBoxCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel, payAmountField, payCurrencyField"
+                           oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+
+<s:div id="rotatoryFundListModalPanelDiv">
+    <s:decorate id="rotatoryFundListModalPanelContainer"
+                template="/finances/rotatoryFundListModalPanel.xhtml"
+                rendered="#{action.rotatoryFundPayment}">
+        <ui:param name="containerId" value="rotatoryFundListModalPanelContainer"/>
+        <ui:param name="dialogId" value="rotatoryFundListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{action.assignRotatoryFund(rotatoryFundItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="rotatoryFundListModalPanelDiv, rotatoryFundDiv, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                               oncomplete="Richfaces.hideModalPanel('rotatoryFundListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+
+</ui:composition>

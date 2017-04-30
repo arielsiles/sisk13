@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{finalEvaluationFormAction.managed}">
+            #{messages['FinalEvaluationForm.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FinalEvaluationForm.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="finalEvaluationFormFrom">
+
+<div class="buttons">
+    <h:commandButton action="#{finalEvaluationPunctuationRangeAction.newInstance}"
+                     value="#{messages['FinalEvaluationForm.addPunctuation']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                     tabindex="1"/>
+    <h:commandButton action="#{finalEvaluationFormAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                     id="createButtonId"
+                     tabindex="2">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{finalEvaluationFormAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                     tabindex="3"/>
+    <h:commandButton action="#{finalEvaluationFormAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','UPDATE')}"
+                     tabindex="4"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','DELETE')}"
+                     tabindex="5">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{finalEvaluationFormAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="6"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{finalEvaluationFormAction.managed}">
+                #{messages['FinalEvaluationForm.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['FinalEvaluationForm.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.code']}</ui:define>
+        <h:inputText id="code"
+                     value="#{finalEvaluationForm.code}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="50"
+                     tabindex="7">
+            <f:validateLength maximum="50"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="revisionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.revision']}</ui:define>
+        <h:inputText id="revision"
+                     value="#{finalEvaluationForm.revision}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="8">
+            <app:naturalNumberConverter forId="revision"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.title']}</ui:define>
+        <h:inputText id="title"
+                     value="#{finalEvaluationForm.title}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="250"
+                     tabindex="9">
+            <f:validateLength maximum="250"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="subtitleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.subtitle']}</ui:define>
+        <h:inputText id="subtitle"
+                     value="#{finalEvaluationForm.subtitle}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="250"
+                     tabindex="10">
+            <f:validateLength maximum="250"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="approvalDateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.approvalDate']}</ui:define>
+        <rich:calendar id="approvalDate"
+                       value="#{finalEvaluationForm.approvalDate}"
+                       styleClass="input"
+                       required="true"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       popup="true"
+                       tabindex="11">
+            <a4j:support event="onchanged" reRender="approvalDateField"/>
+            <a4j:support event="oninputchange" reRender="approvalDateField"/>
+        </rich:calendar>
+    </s:decorate>
+    <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.cycle']}</ui:define>
+        <h:selectOneMenu id="cycle"
+                         value="#{finalEvaluationForm.cycle}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="12">
+            <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                           hideNoSelectionLabel="false"
+                           noSelectionLabel=""/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.type']}</ui:define>
+        <h:selectOneMenu id="type"
+                         value="#{finalEvaluationForm.type}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="13">
+            <s:selectItems value="#{finalEvaluationFormTypeEnum}" var="type"
+                           label="#{messages[type.resourceKey]}"
+                           hideNoSelectionLabel="false"
+                           noSelectionLabel=""/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="targetField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.target']}</ui:define>
+        <h:inputTextarea id="target"
+                         value="#{finalEvaluationForm.targetValue}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="14"/>
+    </s:decorate>
+    <s:decorate id="methodologyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FinalEvaluationForm.methodology']}</ui:define>
+        <h:inputTextarea id="methodology"
+                         value="#{finalEvaluationForm.methodologyValue}"
+                         styleClass="input"
+                         tabindex="15"/>
+    </s:decorate>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{finalEvaluationPunctuationRangeAction.newInstance}"
+                     value="#{messages['FinalEvaluationForm.addPunctuation']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                     tabindex="16"/>
+    <h:commandButton action="#{finalEvaluationFormAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                     tabindex="17"/>
+    <h:commandButton action="#{finalEvaluationFormAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','CREATE')}"
+                     tabindex="18"/>
+    <h:commandButton action="#{finalEvaluationFormAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','UPDATE')}"
+                     tabindex="19"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','DELETE')}"
+                     tabindex="20">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{finalEvaluationFormAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="21"/>
+</div>
+<c:if test="#{finalEvaluationFormAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','VIEW')}">
+    <rich:dataTable value="#{finalEvaluationPunctuationRangeDataModel}"
+                    var="finalEvaluationPunctuationRangeItem"
+                    id="finalEvaluationPunctuationRangeList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="10%, 25%, 25%, 10%, 10%, 15%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="finalEvaluationPunctuationRange.position"
+                                           dataModel="#{finalEvaluationPunctuationRangeDataModel}"
+                                           reRender="finalEvaluationPunctuationRangeList, dataScroller">
+                        #{messages['FinalEvaluationPunctuationRange.position']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="finalEvaluationPunctuationRange.name"
+                                           dataModel="#{finalEvaluationPunctuationRangeDataModel}"
+                                           reRender="finalEvaluationPunctuationRangeList, dataScroller">
+                        #{messages['FinalEvaluationPunctuationRange.name']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="finalEvaluationPunctuationRange.interpretation"
+                                           dataModel="#{finalEvaluationPunctuationRangeDataModel}"
+                                           reRender="finalEvaluationPunctuationRangeList, dataScroller">
+                        #{messages['FinalEvaluationPunctuationRange.interpretation']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="finalEvaluationPunctuationRange.startRange"
+                                           dataModel="#{finalEvaluationPunctuationRangeDataModel}"
+                                           reRender="finalEvaluationPunctuationRangeList, dataScroller">
+                        #{messages['FinalEvaluationPunctuationRange.startRange']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="finalEvaluationPunctuationRange.endRange"
+                                           dataModel="#{finalEvaluationPunctuationRangeDataModel}"
+                                           reRender="finalEvaluationPunctuationRangeList, dataScroller">
+                        #{messages['FinalEvaluationPunctuationRange.endRange']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{finalEvaluationPunctuationRangeItem.position}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{finalEvaluationPunctuationRangeItem.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{finalEvaluationPunctuationRangeItem.interpretation}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{finalEvaluationPunctuationRangeItem.startRange}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{finalEvaluationPunctuationRangeItem.endRange}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('FEPUNCTUATIONRANGE','VIEW')}"
+                           action="#{finalEvaluationPunctuationRangeAction.select(finalEvaluationPunctuationRangeItem)}"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller" for="finalEvaluationPunctuationRangeList"
+                      dataModel="#{finalEvaluationPunctuationRangeDataModel}"/>
+</c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['FinalEvaluationForm.delete.confirmation']}">
+                <f:param value="#{finalEvaluationForm.code}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{finalEvaluationFormAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           rendered="#{finalEvaluationFormAction.managed and s:hasPermission('FINALEVALUATIONFORM','DELETE')}"
+                           styleClass="button"
+                           tabindex="1000"/>
+    </ui:define>
+</s:decorate>
+<rich:jQuery selector="#code" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

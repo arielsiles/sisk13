@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--created by -->
+<jasperReport
+        xmlns="http://jasperreports.sourceforge.net/jasperreports"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+
+        name="ReportTemplate"
+        columnCount="1"
+        pageWidth="612"
+        pageHeight="792"
+        columnWidth="562"
+        columnSpacing="0"
+        leftMargin="30"
+        rightMargin="20"
+        topMargin="30"
+        bottomMargin="30"
+        whenNoDataType="AllSectionsNoDetail"
+        isTitleNewPage="false"
+        isSummaryNewPage="false">
+
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+
+    <field name="pollCopy.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_1</fieldDescription>
+    </field>
+    <field name="person.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_2</fieldDescription>
+    </field>
+    <field name="career.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_3</fieldDescription>
+    </field>
+    <field name="faculty.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_4</fieldDescription>
+    </field>
+    <field name="location.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_5</fieldDescription>
+    </field>
+    <field name="pollForm.id" class="java.lang.Long">
+        <fieldDescription>COLUMN_6</fieldDescription>
+    </field>
+    <field name="person.firstName" class="java.lang.String">
+        <fieldDescription>COLUMN_7</fieldDescription>
+    </field>
+    <field name="person.maidenName" class="java.lang.String">
+        <fieldDescription>COLUMN_8</fieldDescription>
+    </field>
+    <field name="person.lastName" class="java.lang.String">
+        <fieldDescription>COLUMN_9</fieldDescription>
+    </field>
+    <field name="person.idNumber" class="java.lang.String">
+        <fieldDescription>COLUMN_10</fieldDescription>
+    </field>
+    <field name="extensionSite.extension" class="java.lang.String">
+        <fieldDescription>COLUMN_11</fieldDescription>
+    </field>
+    <field name="career.name" class="java.lang.String">
+        <fieldDescription>COLUMN_12</fieldDescription>
+    </field>
+    <field name="career.code" class="java.lang.String">
+        <fieldDescription>COLUMN_13</fieldDescription>
+    </field>
+    <field name="faculty.name" class="java.lang.String">
+        <fieldDescription>COLUMN_14</fieldDescription>
+    </field>
+    <field name="faculty.code" class="java.lang.String">
+        <fieldDescription>COLUMN_15</fieldDescription>
+    </field>
+    <field name="location.name" class="java.lang.String">
+        <fieldDescription>COLUMN_16</fieldDescription>
+    </field>
+    <field name="location.code" class="java.lang.String">
+        <fieldDescription>COLUMN_17</fieldDescription>
+    </field>
+
+
+    <group name="personGroup" minHeightToStartNewPage="30">
+        <groupExpression>$F{person.firstName}+$F{person.lastName}+$F{person.id}</groupExpression>
+        <groupHeader>
+            <band height="42" splitType="Stretch">
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="0" width="450" height="12" style="headerStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.professorName}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="450" y="0" width="112" height="12" style="headerStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.idNumber}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="12" width="450" height="12" style="detailStyle" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[com.encens.khipus.reports.ReportFormatter.getPersonName($F{person.firstName},$F{person.maidenName},$F{person.lastName})]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="450" y="12" width="112" height="12" style="detailStyle" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[com.encens.khipus.reports.ReportFormatter.getPersonIdNumber($F{person.idNumber},$F{extensionSite.extension})]]></textFieldExpression>
+                </textField>
+                <!--blank space-->
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="30" width="150" height="12" style="headerStyle" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.location}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="150" y="30" width="300" height="12" style="headerStyle" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.career}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="450" y="30" width="112" height="12" style="headerStyle" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.pollNumberLabel}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="60" splitType="Stretch">
+                <!--subreport-->
+                <subreport isUsingCache="true">
+                    <reportElement
+                            x="0"
+                            y="0"
+                            width="562"
+                            height="24"
+                            key="subreportpollByCareerSubReport"
+                            positionType="Float">
+                    </reportElement>
+                    <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                    <subreportParameter name="JPA_ENTITY_MANAGER">
+                        <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                    </subreportParameter>
+                    <subreportParameter name="personIdParam">
+                        <subreportParameterExpression><![CDATA[$F{person.id}]]></subreportParameterExpression>
+                    </subreportParameter>
+                    <subreportParameter name="pollFormIdParam">
+                        <subreportParameterExpression><![CDATA[$F{pollForm.id}]]></subreportParameterExpression>
+                    </subreportParameter>
+                    <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                        <![CDATA[$P{pollByCareerSubReport}]]></subreportExpression>
+                </subreport>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="270" y="30" width="180" height="12" style="detailStyle" mode="Opaque"
+                                   positionType="Float"/>
+                    <box padding="1">
+                        <pen lineWidth="0" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.pollByPersonReport.pollStudentsTotal}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="450" y="30" width="112" height="12" style="detailStyle" mode="Opaque"
+                                   positionType="Float"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{personGroup_COUNT}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+
+    <group name="locationGroup" minHeightToStartNewPage="30">
+        <groupExpression>$F{location.name}+$F{location.id}</groupExpression>
+        <groupHeader>
+            <band height="0" splitType="Stretch"/>
+        </groupHeader>
+        <groupFooter>
+            <band height="0" splitType="Stretch"/>
+        </groupFooter>
+    </group>
+
+    <group name="careerGroup" minHeightToStartNewPage="30">
+        <groupExpression>$F{career.name}+$F{career.id}</groupExpression>
+        <groupHeader>
+            <band height="0" splitType="Stretch"/>
+        </groupHeader>
+        <groupFooter>
+            <band height="12" splitType="Stretch">
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="0" y="0" width="150" height="12" style="detailStyle" mode="Opaque"
+                                   stretchType="RelativeToTallestObject"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$F{location.name}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="150" y="0" width="300" height="12" style="detailStyle" mode="Opaque"
+                                   stretchType="RelativeToTallestObject"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$F{career.name}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="450" y="0" width="112" height="12" style="detailStyle" mode="Opaque"
+                                   stretchType="RelativeToTallestObject"/>
+                    <box padding="1">
+                        <pen lineWidth="1" lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{careerGroup_COUNT}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+    <!--*************TITLE******************-->
+    <title>
+        <band height="65" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon" isLazy="false">
+                <reportElement x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"
+                               key="COMPANY_LOGO_ELEMENT"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"
+                       hyperlinkTarget="Self">
+                <reportElement
+                        style="titleStyle"
+                        x="72"
+                        y="0"
+                        width="450"
+                        height="58"
+                        key="date_text"
+
+                        positionType="Float"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="0" splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="0" splitType="Stretch"/>
+    </columnHeader>
+    <detail>
+        <band height="0" splitType="Stretch"/>
+    </detail>
+    <columnFooter>
+        <band height="0" splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement x="0" y="0" width="562" height="12" style="detailStyle"
+                               positionType="Float" mode="Opaque"/>
+                <box padding="0">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                </box>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm">
+                    <reportElement x="0" y="0" width="100" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date">
+                        <![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="470" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="510" y="0" width="10" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" evaluationTime="Report">
+                    <reportElement x="520" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="0" splitType="Stretch"/>
+    </summary>
+</jasperReport>

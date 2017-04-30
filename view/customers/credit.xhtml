@@ -1,0 +1,267 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{creditAction.managed}">
+                #{messages['Credit.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Credit.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+
+        <h:form id="creditForm">
+
+            <div class="buttons">
+
+                <h:commandButton action="#{creditAction.addPayoutCredit}"
+                                 value="#{messages['CreditTransaction.payoutCredit']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 rendered="#{creditAction.managed and !credit.delivered}"/>
+
+                <h:commandButton action="#{creditAction.addCreditPayment}"
+                                 value="#{messages['CreditTransaction.newPayment']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 rendered="#{creditAction.managed and credit.delivered}"/>
+
+                <h:commandButton id="createButtonId"
+                                 action="#{creditAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!creditAction.managed and s:hasPermission('CREDIT','CREATE')}">
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{creditAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{creditAction.managed}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{creditAction.managed}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{creditAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{creditAction.managed}">
+                            #{messages['Credit.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Credit.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.partner']}</ui:define>
+                    <h:selectOneMenu id="partnerId" value="#{credit.partner}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{partnerList.resultList}"
+                                       var="partner"
+                                       label="#{partner.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <!--<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
+                    <h:inputText id="bankNumber" value="#{credit.code}" styleClass="input"
+                                 maxlength="25" tabindex="2" required="true"/>
+                </s:decorate>-->
+
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.amount']}</ui:define>
+                    <h:inputText id="amount" value="#{credit.amount}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="20"
+                                 tabindex="3">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="annualRateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.annualRate']}</ui:define>
+                    <h:inputText id="annualRate" value="#{credit.annualRate}" styleClass="input"
+                                 required="true" tabindex="4">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.term']}</ui:define>
+                    <h:inputText id="term" value="#{credit.term}" styleClass="input"
+                                 required="true" tabindex="5">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="amortizationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.amortization']}</ui:define>
+                    <h:inputText id="amortization" value="#{credit.amortization}" styleClass="input"
+                                 required="true" tabindex="6">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="grantDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.grantDate']}</ui:define>
+                    <rich:calendar value="#{credit.grantDate}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="7">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="firstPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.firstPayment']}</ui:define>
+                    <rich:calendar value="#{credit.firstPayment}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="8">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                    <h:inputText id="quota" value="#{credit.quota}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="20"
+                                 tabindex="9">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.creditStatus']}</ui:define>
+                    <h:outputText value="#{messages[credit.state.resourceKey]}"/>
+                </s:decorate>
+
+            </rich:panel>
+            <c:if test="#{creditAction.managed}">
+            <rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">
+                <rich:tab name="creditTransactionTab"
+                          label="#{messages['CreditTransaction.transactions']}"
+                          ajaxSingle="true">
+                    <rich:dataTable id="creditTransactionListId"
+                                    value="#{creditTransactionDataModel}"
+                                    var="creditTransactionItem"
+                                    rows="#{sessionUser.rowsPerPage}"
+                                    width="100%"
+                                    columnsWidth="20%, 20%, 50%, 10%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    <h:outputText value="#{messages['CreditTransaction.paymentDate']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['CreditTransaction.amount']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['CreditTransaction.gloss']}"/>
+                                </rich:column>
+                                <rich:column styleClass="center">
+                                    <h:outputText value="#{messages['Common.action']}"/>
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+
+                        <rich:column>
+                            <h:outputText value="#{creditTransactionItem.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{creditTransactionItem.amount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{creditTransactionItem.gloss}"/>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            <h:commandLink value="#{messages['Common.select']}"
+                                           immediate="true"
+                                           action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
+                                           rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                            </h:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                    <app:dataScroller id="ListIdListDataScrollerId"
+                                      for="creditTransactionListId"
+                                      dataModel="#{creditTransactionDataModel}"/>
+                </rich:tab>
+            </rich:tabPanel>
+            </c:if>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Credit.delete.confirmation']}">
+                        <f:param value="#{credit.amount}"/>
+                        <f:param value="#{credit.partner.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{creditAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+
+        <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

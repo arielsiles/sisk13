@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <a4j:region renderRegionOnly="true">
+        <rich:dataTable width="100%"
+                        value="#{humanResourcesComponentAction.resultList}"
+                        var="element"
+                        footerClass="rich-table-footer">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['HumanResources.monthName']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['HumanResources.totalAmountLocalCurrency']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['HumanResources.totalAmountExchangeCurrency']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{element.monthName}"/>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.localCurrencyAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.exchangeCurrencyAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['HumanResources.main.total']}
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{humanResourcesComponentAction.totals['localCurrencyTotalAmount']}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{humanResourcesComponentAction.totals['exchangeCurrencyTotalAmount']}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+        </rich:dataTable>
+    </a4j:region>
+</ui:composition>

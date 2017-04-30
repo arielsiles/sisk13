@@ -1,0 +1,186 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{bankAccountAction.managed}">
+                #{messages['BankAccount.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['BankAccount.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="bankAccountForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{bankAccountAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!bankAccountAction.managed and s:hasPermission('BANKACCOUNT','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{bankAccountAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','UPDATE')}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{bankAccountAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{bankAccountAction.managed}">
+                            #{messages['BankAccount.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['BankAccount.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.owner']}</ui:define>
+                    <h:inputText id="owner" required="true" styleClass="input" readonly="true"
+                                 value="#{bankAccountAction.employeeFullName}" tabindex="5"/>
+                    <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="6"
+                                     title="#{messages['BankAccount.selectOwner']}"
+                                     onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true" tabindex="7"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{bankAccountAction.clearEmployee}"
+                                     reRender="employeeField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+                <s:decorate id="bankEntityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.bankEntity']}</ui:define>
+                    <h:selectOneMenu id="bankEntity" value="#{bankAccount.bankEntity}" styleClass="input" tabindex="8"
+                                     required="true">
+                        <s:selectItems value="#{bankEntityList}" var="bankEntity" label="#{bankEntity.name}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{bankAccount.currency}" styleClass="input" tabindex="9"
+                                     required="true">
+                        <s:selectItems value="#{currencyList}" var="currency"
+                                       label="#{currency.name} - #{currency.symbol}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.accountNumber']}</ui:define>
+                    <h:inputText id="accountNumber" value="#{bankAccount.accountNumber}" styleClass="input"
+                                 required="true" maxlength="150" tabindex="10"/>
+                </s:decorate>
+
+                <s:decorate id="clientCodField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.clientCod']}</ui:define>
+                    <h:inputText id="clientCod" value="#{bankAccount.clientCod}" styleClass="input"
+                                 required="true" maxlength="150" tabindex="11"/>
+                </s:decorate>
+
+                <s:decorate id="defaultAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.defaultAccount']}</ui:define>
+                    <h:selectBooleanCheckbox id="defaultAccount" value="#{bankAccount.defaultAccount}" tabindex="12"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{bankAccountAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!bankAccountAction.managed and s:hasPermission('BANKACCOUNT','CREATE')}"
+                                 tabindex="13">
+                </h:commandButton>
+
+                <h:commandButton action="#{bankAccountAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','UPDATE')}"
+                                 tabindex="14"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','DELETE')}"
+                                 tabindex="15">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{bankAccountAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="16">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['BankAccount.delete.confirmation']}">
+                        <f:param value="#{bankAccount.accountNumber}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{bankAccountAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   rendered="#{bankAccountAction.managed and s:hasPermission('BANKACCOUNT','DELETE')}"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" action="#{bankAccountAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif" style="border:0" ajaxSingle="true" reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#owner" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,155 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['SalaryMovementType.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementTypeSearch">
+            <rich:simpleTogglePanel id="searchPanelId"
+                                    label="#{messages['SalaryMovementType.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SalaryMovementType.name']}</ui:define>
+                        <h:inputText id="name"
+                                     value="#{salaryMovementTypeDataModel.criteria.name}"
+                                     tabindex="1"
+                                     styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SalaryMovementType.movementType']}</ui:define>
+                        <h:selectOneMenu id="salaryMovementType"
+                                         value="#{salaryMovementTypeDataModel.criteria.movementType}"
+                                         styleClass="input"
+                                         tabindex="4">
+                            <s:selectItems value="#{movementTypeEnum}"
+                                           var="movementType"
+                                           label="#{messages[movementType.resourceKey]}"
+                                           hideNoSelectionLabel="false"
+                                           noSelectionLabel=""/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                        <a4j:commandButton action="#{salaryMovementTypeDataModel.search}"
+                                           reRender="salaryMovementTypeList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/salaryMovementType.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+            </div>
+
+
+            <rich:dataTable id="salaryMovementTypeList"
+                            value="#{salaryMovementTypeDataModel}"
+                            var="salaryMovementTypeItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%, 20%, 30%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementType.name"
+                                                   dataModel="#{salaryMovementTypeDataModel}"
+                                                   reRender="salaryMovementTypeList, dataScroller">
+                                #{messages['SalaryMovementType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementType.movementType"
+                                                   dataModel="#{salaryMovementTypeDataModel}"
+                                                   reRender="salaryMovementTypeList, dataScroller">
+                                #{messages['SalaryMovementType.movementType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashAccount.description"
+                                                   dataModel="#{salaryMovementTypeDataModel}"
+                                                   reRender="salaryMovementTypeList, dataScroller">
+                                #{messages['SalaryMovementType.cashAccount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementType.byDefault"
+                                                   dataModel="#{salaryMovementTypeDataModel}"
+                                                   reRender="salaryMovementTypeList, dataScroller">
+                                #{messages['SalaryMovementType.byDefault']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{salaryMovementTypeItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{messages[salaryMovementTypeItem.movementType.resourceKey]}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{salaryMovementTypeItem.cashAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:graphicImage value="/img/active.gif"
+                                    title="#{messages['SalaryMovementType.byDefault']}"
+                                    rendered="#{salaryMovementTypeItem.byDefault}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{salaryMovementTypeAction.select(salaryMovementTypeItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('SALARYMOVEMENT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="salaryMovementTypeList"
+                              dataModel="#{salaryMovementTypeDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/salaryMovementType.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

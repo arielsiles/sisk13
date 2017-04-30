@@ -1,0 +1,409 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['HumanResourcesExpense.label']}
+</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="95%"/>
+<ui:param name="selectedTab" value="home"/>
+<ui:define name="body">
+<h:form id="searchForm">
+<rich:simpleTogglePanel label="#{messages['HumanResourcesExpense.label']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:div id="leftSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HumanResourcesExpense.year']}</ui:define>
+                <h:inputText id="year"
+                             value="#{humanResourcesExpenseExtendedAction.year}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="1">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HumanResourcesExpense.executorUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{humanResourcesExpenseExtendedAction.executorUnit}"
+                                 styleClass="input">
+                    <s:selectItems value="#{executorUnitList.resultList}"
+                                   var="executorUnit"
+                                   label="#{executorUnit.description}"
+                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{humanResourcesExpenseExtendedAction.search}"
+                                       reRender="searchOptionsPanel, resultPanel"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}">
+                        <a4j:support event="onclick" reRender="leftSidePanel, rightSidePanel"/>
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#year" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<s:div id="resultPanel">
+<br/>
+<rich:panel>
+<f:facet name="header">
+    #{messages['HumanResourcesExpense.label']}
+</f:facet>
+<s:div style="overflow: auto;">
+<rich:dataTable value="#{humanResourcesExpenseExtendedAction.resultList}"
+                var="element"
+                footerClass="rich-table-footer"
+                columnsWidth="0*">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column rowspan="2">
+            #{messages['HumanResourcesExpense.concept']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.january']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.february']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.march']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.april']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.may']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.june']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.july']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.august']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.september']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.october']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.november']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.december']}
+        </rich:column>
+        <rich:column colspan="3">
+            #{messages['HumanResourcesExpense.column.total']}
+        </rich:column>
+
+        <rich:column breakBefore="true">
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column styleClass="column-nowrap">
+            #{messages['Dashboard.symbol.total.usd']}
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+<rich:column styleClass="left column-nowrap">
+    <h:outputText value="#{element.description}"/>
+</rich:column>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.januaryBs}"/>
+    <ui:param name="amountUsd" value="#{element.januaryUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalJanuaryUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.februaryBs}"/>
+    <ui:param name="amountUsd" value="#{element.februaryUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalFebruaryUsd}"/>
+</ui:include>
+
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.marchBs}"/>
+    <ui:param name="amountUsd" value="#{element.marchUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalMarchUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.aprilBs}"/>
+    <ui:param name="amountUsd" value="#{element.aprilUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalAprilUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.mayBs}"/>
+    <ui:param name="amountUsd" value="#{element.mayUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalMayUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.juneBs}"/>
+    <ui:param name="amountUsd" value="#{element.juneUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalJuneUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.julyBs}"/>
+    <ui:param name="amountUsd" value="#{element.julyUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalJulyUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.augustBs}"/>
+    <ui:param name="amountUsd" value="#{element.augustUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalAugustUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.septemberBs}"/>
+    <ui:param name="amountUsd" value="#{element.septemberUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalSeptemberUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.octoberBs}"/>
+    <ui:param name="amountUsd" value="#{element.octoberUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalOctoberUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.novemberBs}"/>
+    <ui:param name="amountUsd" value="#{element.novemberUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalNovemberUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.decemberBs}"/>
+    <ui:param name="amountUsd" value="#{element.decemberUsd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalDecemberUsd}"/>
+</ui:include>
+<ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+    <ui:param name="amountBs" value="#{element.bs}"/>
+    <ui:param name="amountUsd" value="#{element.usd}"/>
+    <ui:param name="totalAmountUsd" value="#{element.totalUsd}"/>
+</ui:include>
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="left">
+            #{messages['HumanResourcesExpense.row.total']}
+        </rich:column>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['januaryBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['januaryUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalJanuaryUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['februaryBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['februaryUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalFebruaryUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['marchBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['marchUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalMarchUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['aprilBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['aprilUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalAprilUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['mayBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['mayUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalMayUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['juneBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['juneUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalJuneUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['julyBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['julyUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalJulyUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['augustBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['augustUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalAugustUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['septemberBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['septemberUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalSeptemberUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['octoberBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['octoberUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalOctoberUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['novemberBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['novemberUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalNovemberUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['decemberBs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['decemberUsd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalDecemberUsd']}"/>
+        </ui:include>
+        <ui:include src="humanResourcesExpenseExtendedColumnFragment.xhtml">
+            <ui:param name="amountBs" value="#{humanResourcesExpenseExtendedAction.totals['bs']}"/>
+            <ui:param name="amountUsd" value="#{humanResourcesExpenseExtendedAction.totals['usd']}"/>
+            <ui:param name="totalAmountUsd" value="#{humanResourcesExpenseExtendedAction.totals['totalUsd']}"/>
+        </ui:include>
+    </rich:columnGroup>
+</f:facet>
+</rich:dataTable>
+</s:div>
+</rich:panel>
+</s:div>
+</h:form>
+</ui:define>
+</ui:composition>

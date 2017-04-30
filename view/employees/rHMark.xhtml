@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{rHMarkAction.managed}">
+                #{messages['RHMark.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RHMark.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="rHMarkForm">
+            <div class="buttons">
+                <h:commandButton action="#{rHMarkAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="6">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{rHMarkAction.managed}">
+                            #{messages['RHMark.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['RHMark.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="marRefCardField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
+                    <h:inputText id="marRefCard"
+                                 value="#{rHMark.marRefCard}"
+                                 styleClass="input"
+                                 maxlength="200"
+                                 readonly="true"
+                                 tabindex="1">
+                        <a4j:support event="onblur" reRender="marRefCardField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="marDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marDate']}</ui:define>
+                    <h:inputText id="marDate"
+                                 value="#{rHMark.marDate}"
+                                 styleClass="input"
+                                 maxlength="150"
+                                 readonly="true"
+                                 tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                        <a4j:support event="onblur" reRender="marDateField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="marTimeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marTime']}</ui:define>
+                    <h:inputText id="marTime"
+                                 value="#{rHMark.marTime}"
+                                 styleClass="input"
+                                 maxlength="150"
+                                 readonly="true"
+                                 tabindex="3">
+                        <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                           type="time"/>
+                        <a4j:support event="onblur" reRender="marTimeField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="marIpPcField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.marIpPc']}</ui:define>
+                    <h:inputText id="marIpPc"
+                                 value="#{rHMark.marIpPc}"
+                                 styleClass="input"
+                                 maxlength="200"
+                                 readonly="true"
+                                 tabindex="4">
+                        <a4j:support event="onblur" reRender="marIpPcField"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{rHMarkAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="5">
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:jQuery selector="#marRefCard" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,260 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Postulant.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="80%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="pollFormSearch">
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['Postulant.report']}
+</f:facet>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+    <h:panelGroup>
+        <s:decorate id="initRegisterDateField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.initRegisterDate']}</ui:define>
+            <rich:calendar id="initRegisterDate" value="#{postulantReportAction.initRegisterDate}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input" enableManualInput="true"
+                           tabindex="1">
+                <a4j:support event="onblur" reRender="endRegisterDateField"/>
+            </rich:calendar>
+        </s:decorate>
+        <s:decorate id="endRegisterDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.endRegisterDate']}</ui:define>
+            <rich:calendar id="endRegisterDate" value="#{postulantReportAction.endRegisterDate}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input" enableManualInput="true"
+                           tabindex="2">
+                <a4j:support event="onblur" reRender="endRegisterDateField"/>
+                <app:dateRangeValidator forId="initRegisterDate"
+                                        forLabel="#{messages['Postulant.initRegisterDate']}"
+                                        type="greater"/>
+            </rich:calendar>
+        </s:decorate>
+        <s:decorate id="postulantTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.postulantType']}</ui:define>
+            <h:selectOneMenu id="postulantType" value="#{postulantReportAction.postulantType}"
+                             styleClass="input"
+                             tabindex="3">
+                <s:selectItems value="#{postulantTypeEnum}" var="postulantType"
+                               label="#{messages[postulantType.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <a4j:support event="onchange"
+                             action="#{postulantReportAction.postulantTypeChanged()}"
+                             reRender="professorDiv, managerDiv"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="experienceTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.experienceType']}</ui:define>
+            <h:selectOneMenu id="experienceType" value="#{postulantReportAction.experienceType}"
+                             styleClass="input"
+                             tabindex="4">
+                <s:selectItems value="#{experienceType}" var="et" label="#{messages[et.resourceKey]}"
+                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="academicFormationTypeField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.academicFormationType']}</ui:define>
+            <h:selectOneMenu id="academicFormationType"
+                             value="#{postulantReportAction.academicFormationType}"
+                             styleClass="input"
+                             tabindex="5">
+                <s:selectItems value="#{academicFormationTypeEnum}" var="aft"
+                               label="#{messages[aft.resourceKey]}"
+                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </h:panelGroup>
+    <h:panelGroup>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.lastName']}</ui:define>
+            <h:inputText id="lastName" value="#{postulantReportAction.lastName}"
+                         maxlength="80" tabindex="6" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.maidenName']}</ui:define>
+            <h:inputText id="maidenName" value="#{postulantReportAction.maidenName}"
+                         maxlength="80" tabindex="7" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.firstName']}</ui:define>
+            <h:inputText id="firstName" value="#{postulantReportAction.firstName}"
+                         maxlength="150" tabindex="8" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.idNumber']}</ui:define>
+            <h:inputText id="idNumber" value="#{postulantReportAction.idNumber}"
+                         maxlength="80" tabindex="1" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="academicFormationNameField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Postulant.academicFormationName']}</ui:define>
+            <h:inputText id="academicFormationName" value="#{postulantReportAction.academicFormationName}"
+                         styleClass="inputMedium" maxlength="250"
+                         tabindex="10"/>
+        </s:decorate>
+    </h:panelGroup>
+</h:panelGrid>
+<s:div id="professorDiv">
+    <app:fieldset id="professorFieldset"
+                  title="#{messages['Postulant.professorSearchDetail']}"
+                  rendered="#{empty postulantReportAction.postulantType or postulantReportAction.professorPostulantType()}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <h:panelGroup>
+                <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                    <h:selectOneMenu id="location" value="#{postulantReportAction.location}" styleClass="input"
+                                     tabindex="11">
+                        <s:selectItems value="#{postulantReportAction.locationList}" var="location"
+                                       label="#{location.name}" hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="facultyField, careerField, subjectField"
+                                     action="#{postulantReportAction.refleshLocation()}" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="facultyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.facultyBusinessUnit']}</ui:define>
+                    <h:selectOneMenu id="faculty" value="#{postulantReportAction.faculty}" styleClass="input"
+                                     tabindex="12">
+                        <s:selectItems value="#{postulantReportAction.facultyList}" var="faculty"
+                                       label="#{faculty.name}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="careerField, subjectField"
+                                     action="#{postulantReportAction.refleshFaculty()}" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </h:panelGroup>
+            <h:panelGroup>
+                <s:decorate id="careerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollCopy.career']}</ui:define>
+                    <h:selectOneMenu id="career" value="#{postulantReportAction.career}" styleClass="input"
+                                     tabindex="13">
+                        <s:selectItems value="#{postulantReportAction.careerList}" var="career"
+                                       label="#{career.name}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="subjectField"
+                                     action="#{postulantReportAction.refleshCareer()}" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="subjectField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollCopy.subject']}</ui:define>
+                    <h:selectOneMenu id="subject" value="#{postulantReportAction.subject}" styleClass="input"
+                                     tabindex="14">
+                        <s:selectItems value="#{postulantReportAction.subjectList}" var="subject"
+                                       label="#{subject.name}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </h:panelGroup>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+<s:div id="managerDiv">
+    <app:fieldset id="managerFieldset"
+                  title="#{messages['Postulant.managerSearchDetail']}"
+                  rendered="#{empty postulantReportAction.postulantType or !postulantReportAction.professorPostulantType()}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <h:panelGroup>
+                <s:decorate id="businessUnitField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Postulant.chargeBusinessUnit']}</ui:define>
+                    <h:selectOneMenu id="businessUnit" value="#{postulantReportAction.businessUnit}" styleClass="input"
+                                     tabindex="15">
+                        <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </h:panelGroup>
+            <h:panelGroup>
+
+                <s:decorate id="chargeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Job.charge']}</ui:define>
+                    <app:selectPopUp id="charge"
+                                     textValue="#{postulantReportAction.charge.name}"
+                                     value="#{postulantReportAction.charge}"
+                                     dataModel="#{chargeDataModel}"
+                                     clearAction="postulantReportAction.clearPostulantCharge()"
+                                     searchModalPanel="chargeListModalPanel"
+                                     newModalPanel="chargeModalPanel"
+                                     reRender="chargeField"
+                                     tabindex="5"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+            </h:panelGroup>
+
+        </h:panelGrid>
+    </app:fieldset>
+
+</s:div>
+<app:reportDefaultOptions reportAction="#{postulantReportAction}" showPageFormat="false"
+                          showReportTitle="false"/>
+
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+    <s:div/>
+    <s:div>
+        <div class="buttons">
+            <h:commandButton action="#{postulantReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+    </s:div>
+</h:panelGrid>
+</rich:panel>
+</h:form>
+<s:decorate id="chargeListModalPanelContainer"
+            template="/employees/chargeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="chargeListModalPanel"/>
+    <ui:param name="dataModel" value="${chargeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{postulantReportAction.setCharge(chargeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="chargeField"
+                           focus="selectCharge"
+                           oncomplete="Richfaces.hideModalPanel('chargeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

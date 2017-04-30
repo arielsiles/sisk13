@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voucherReport" pageWidth="611" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="561" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.VoucherReportScriptlet">
+	<property name="ireport.zoom" value="1.9487171000000025"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="totalD" class="java.math.BigDecimal"/>
+	<parameter name="totalC" class="java.math.BigDecimal"/>
+	<parameter name="documentTitle" class="java.lang.String"/>
+	<parameter name="literalAmount" class="java.lang.String"/>
+	<field name="voucher" class="com.encens.khipus.model.finances.Voucher">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="account" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="description" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="debit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="credit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<field name="voucherDetail" class="com.encens.khipus.model.finances.VoucherDetail">
+		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+	</field>
+	<variable name="totalDebits" class="java.math.BigDecimal"/>
+	<variable name="totalCredits" class="java.math.BigDecimal"/>
+	<variable name="debit" class="java.lang.String">
+		<variableExpression><![CDATA[$F{debit}.doubleValue() == 0.00 ? "" : $F{debit}.toString()]]></variableExpression>
+	</variable>
+	<group name="purchaseOrderGroup">
+		<groupExpression><![CDATA[]]></groupExpression>
+		<groupHeader>
+			<band height="81" splitType="Stretch">
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="562" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="50" height="12"/>
+						<box padding="1">
+							<pen lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Arial" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.date}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="50" y="0" width="100" height="12"/>
+						<textElement/>
+						<textFieldExpression class="java.util.Date"><![CDATA[$F{voucher}.getDate()]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="12" width="562" height="36"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="50" height="12"/>
+						<box padding="1">
+							<pen lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Arial" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.gloss}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+						<reportElement x="50" y="0" width="498" height="36"/>
+						<textElement textAlignment="Justified">
+							<font fontName="Arial" size="8" isBold="false" isItalic="false"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$F{voucher}.getGloss()]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="52" width="562" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="11" y="0" width="189" height="12"/>
+						<box padding="1">
+							<pen lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Arial" size="8" isBold="false"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.documentDetail}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Opaque" x="0" y="65" width="562" height="16" forecolor="#000000"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="398" y="0" width="74" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.debit}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="480" y="0" width="74" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.credit}]]></textFieldExpression>
+					</textField>
+					<line>
+						<reportElement x="0" y="0" width="561" height="1"/>
+						<graphicElement>
+							<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+						</graphicElement>
+					</line>
+					<line>
+						<reportElement x="0" y="14" width="561" height="1"/>
+						<graphicElement>
+							<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+						</graphicElement>
+					</line>
+					<staticText>
+						<reportElement x="11" y="0" width="111" height="15"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[CUENTA - DESCRIPCION]]></text>
+					</staticText>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="30" splitType="Stretch">
+				<frame>
+					<reportElement x="0" y="1" width="561" height="16"/>
+					<textField pattern="#,##0.00">
+						<reportElement x="397" y="1" width="80" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true" isUnderline="true"/>
+						</textElement>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{totalD}]]></textFieldExpression>
+					</textField>
+					<textField pattern="#,##0.00">
+						<reportElement x="479" y="1" width="80" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true" isUnderline="true"/>
+						</textElement>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{totalC}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<line>
+					<reportElement x="0" y="2" width="561" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement x="29" y="17" width="530" height="13"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{literalAmount}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="11" y="17" width="18" height="13"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<text><![CDATA[Son: ]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="42" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="21" width="561" height="15"/>
+				<textField>
+					<reportElement x="356" y="0" width="40" height="15"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{voucher}.getDocumentNumber()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="333" y="0" width="20" height="15"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="163" y="0" width="160" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="0" y="0" width="561" height="20"/>
+				<staticText>
+					<reportElement x="0" y="0" width="213" height="10"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[COOPERATIVA INTEGRAL DE SERVICIOS CBBA.LTDA.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="9" width="161" height="10"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="397" y="0" width="80" height="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="479" y="0" width="80" height="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{credit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="11" y="0" width="387" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voucherDetail}.getFullCashAccount()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="103" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="22" y="42" width="80" height="12"/>
+				<box padding="1">
+					<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.prepare}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="449" y="42" width="80" height="12"/>
+				<box padding="1">
+					<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.client}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="243" y="42" width="80" height="12"/>
+				<box padding="1">
+					<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#666666"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Voucher.report.approval}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

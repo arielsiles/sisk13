@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['BusinessUnit.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+        <h:form id="businessUnitSearch">
+            <rich:simpleTogglePanel label="#{messages['BusinessUnit.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BusinessUnit.descriptionBU']}</ui:define>
+                    <h:inputText id="description" value="#{businessUnitDataModel.criteria.descriptionBU}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+
+                    <a4j:commandButton action="#{businessUnitDataModel.search}"
+                                       reRender="businessUnitList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#description" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/businessUnit.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('BUSINESSUNIT','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{businessUnitDataModel}" var="businessUnitItem" id="businessUnitList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="20%, 10%, 20%, 20%, 10%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.organization.name"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.acronym"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.acronym']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.descriptionBU"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.descriptionBU']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.businessUnitType.name"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.businessUnitType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.executorUnitCode"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.executorUnitCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.quantityDepartments"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.quantityDepartments']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="businessUnit.quantityEmployees"
+                                                   dataModel="#{businessUnitDataModel}"
+                                                   reRender="businessUnitList, dataScroller">
+                                #{messages['BusinessUnit.quantityEmployees']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{businessUnitItem.organization.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{businessUnitItem.acronym}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{businessUnitItem.descriptionBU}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{businessUnitItem.businessUnitType.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{businessUnitItem.executorUnitCode}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{businessUnitItem.quantityDepartments}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{businessUnitItem.quantityEmployees}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   rendered="#{s:hasPermission('BUSINESSUNIT','VIEW')}"
+                                   immediate="true"
+                                   action="#{businessUnitAction.select(businessUnitItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="businessUnitList" dataModel="#{businessUnitDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/businessUnit.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('BUSINESSUNIT','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

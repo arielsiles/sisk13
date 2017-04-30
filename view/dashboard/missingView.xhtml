@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <rich:panel rendered="#{s:hasPermission('MISSINGPANEL','VIEW')}">
+        <f:facet name="header">
+            <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                <s:div styleClass="left">
+                    <h:outputText value="#{messages['Reports.missing.title']}"/>
+                </s:div>
+            </h:panelGrid>
+        </f:facet>
+        <a4j:region renderRegionOnly="true">
+            <rich:tabPanel id="missingTabPanel" switchType="ajax">
+                <rich:tab label="#{messages['Dashboard.tab.all']}"
+                          action="#{missingViewAction.disableBusinessUnit()}"
+                          ajaxSingle="true"
+                          styleClass="center">
+                    <a4j:form id="missingAjaxFormAll" ajaxSubmit="true"
+                              reRender="missingAll">
+                        <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <s:div id="costCenterAll">
+                                <h:panelGrid columns="1" width="100%">
+                                    <s:decorate id="costCenterField_Missing" template="/include/inputField.xhtml"
+                                                styleClass="formRow">
+                                        <ui:define name="label">#{messages['CostCenter.costCenter']}</ui:define>
+                                        <app:selectPopUp id="costCenter"
+                                                         textValue="#{missingViewAction.costCenter.fullName}"
+                                                         value="#{missingViewAction.costCenter}"
+                                                         clearAction="missingViewAction.clearCostCenter()"
+                                                         searchModalPanel="costCenterListModalPanel_Missing"
+                                                         dataModel="#{costCenterDataModel}"
+                                                         reRender="costCenterField_Missing"
+                                                         hotKeySelect="alt+1"/>
+                                    </s:decorate>
+                                    <s:decorate id="organizationalUnitField_Missing"
+                                                template="/include/inputField.xhtml"
+                                                styleClass="formRow">
+                                        <ui:define
+                                                name="label">#{messages['OrganizationalUnit.unit']}</ui:define>
+                                        <app:selectPopUp id="organizationalUnit"
+                                                         textValue="#{missingViewAction.organizationalUnit.fullName}"
+                                                         value="#{missingViewAction.organizationalUnit}"
+                                                         clearAction="missingViewAction.clearOrganizationalUnit()"
+                                                         searchModalPanel="organizationalUnitListModalPanel_Missing"
+                                                         dataModel="#{organizationalUnitDataModel}"
+                                                         reRender="organizationalUnitField_Missing"
+                                                         hotKeySelect="alt+2"/>
+                                        <a4j:commandButton value="#{messages['Common.refresh']}"
+                                                           action="#{missingViewAction.refresh(null)}"
+                                                           reRender="costCenterAll"
+                                                           styleClass="button"/>
+                                    </s:decorate>
+                                </h:panelGrid>
+                            </s:div>
+                            <s:div id="missingAll">
+                                <a4j:actionparam value="#{rich:element('missingTabPanel')}.offsetWidth"
+                                                 assignTo="#{missingViewAction.containerWidth}"
+                                                 noEscape="true"/>
+
+                                <s:graphicImage value="#{missingViewAction.createChart()}" usemap="#missingChartId"/>
+                                <h:outputText value="#{missingViewAction.toolTipMap}" escape="false"/>
+                            </s:div>
+                        </h:panelGrid>
+                    </a4j:form>
+                </rich:tab>
+                <c:forEach items="#{businessUnitList.resultList}" var="businessUnit">
+                    <rich:tab label="#{businessUnit.publicity}"
+                              action="#{missingViewAction.enableBusinessUnit(businessUnit.id)}"
+                              ajaxSingle="true"
+                              styleClass="center">
+                        <a4j:form id="missingAjaxForm_#{businessUnit.id}" ajaxSubmit="true"
+                                  reRender="missing_#{businessUnit.id}">
+                            <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <s:div id="costCenter_#{businessUnit.id}">
+                                    <h:panelGrid columns="1" width="100%">
+                                        <s:decorate id="costCenterField_Missing_#{businessUnit.id}"
+                                                    template="/include/inputField.xhtml"
+                                                    styleClass="formRow">
+                                            <ui:define name="label">#{messages['CostCenter.costCenter']}</ui:define>
+                                            <app:selectPopUp id="costCenter"
+                                                             textValue="#{missingViewAction.costCenter.fullName}"
+                                                             value="#{missingViewAction.costCenter}"
+                                                             clearAction="missingViewAction.clearCostCenter()"
+                                                             searchModalPanel="costCenterListModalPanel_Missing_#{businessUnit.id}"
+                                                             dataModel="#{costCenterDataModel}"
+                                                             reRender="costCenterField_Missing_#{businessUnit.id}"
+                                                             hotKeySelect="alt+1"/>
+                                        </s:decorate>
+                                        <s:decorate id="organizationalUnitField_Missing_#{businessUnit.id}"
+                                                    template="/include/inputField.xhtml"
+                                                    styleClass="formRow">
+                                            <ui:define
+                                                    name="label">#{messages['OrganizationalUnit.organizationalUnit']}</ui:define>
+                                            <app:selectPopUp id="organizationalUnit"
+                                                             textValue="#{missingViewAction.organizationalUnit.fullName}"
+                                                             value="#{missingViewAction.organizationalUnit}"
+                                                             clearAction="missingViewAction.clearOrganizationalUnit()"
+                                                             searchModalPanel="organizationalUnitListModalPanel_Missing_#{businessUnit.id}"
+                                                             dataModel="#{organizationalUnitDataModel}"
+                                                             reRender="organizationalUnitField_Missing_#{businessUnit.id}"
+                                                             hotKeySelect="alt+1"/>
+                                            <a4j:commandButton value="#{messages['Common.refresh']}"
+                                                               action="#{missingViewAction.refresh(businessUnit.id)}"
+                                                               reRender="costCenter_#{businessUnit.id}"
+                                                               styleClass="button"/>
+                                        </s:decorate>
+                                    </h:panelGrid>
+                                </s:div>
+                                <s:div id="missing_#{businessUnit.id}">
+                                    <a4j:actionparam value="#{rich:element('missingTabPanel')}.offsetWidth"
+                                                     assignTo="#{missingViewAction.containerWidth}"
+                                                     noEscape="true"/>
+                                    <s:graphicImage value="#{missingViewAction.createChart()}"
+                                                    usemap="#missingChartId"/>
+                                    <h:outputText value="#{missingViewAction.toolTipMap}" escape="false"/>
+                                </s:div>
+                            </h:panelGrid>
+                        </a4j:form>
+                    </rich:tab>
+                </c:forEach>
+            </rich:tabPanel>
+            <ui:include src="/dashboard/componentStatus.xhtml"/>
+        </a4j:region>
+    </rich:panel>
+
+    <c:if test="#{s:hasPermission('MISSINGPANEL','VIEW')}">
+        <s:decorate id="costCenterListModalPanelContainerMissingView"
+                    template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainerMissingView"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel_Missing"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{missingViewAction.assignCostCenter(costCenterItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   immediate="true"
+                                   reRender="costCenterField_Missing"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel_Missing');"/>
+            </ui:define>
+        </s:decorate>
+
+        <c:forEach items="#{businessUnitList.resultList}" var="businessUnit">
+            <s:decorate id="costCenterListModalPanelContainerMissingView_#{businessUnit.id}"
+                        template="/finances/costCenterListModalPanel.xhtml">
+                <ui:param name="containerId" value="costCenterListModalPanelContainerMissingView"/>
+                <ui:param name="dialogId" value="costCenterListModalPanel_Missing_#{businessUnit.id}"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                       action="#{missingViewAction.assignCostCenter(costCenterItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image"
+                                       immediate="true"
+                                       reRender="costCenterField_Missing_#{businessUnit.id}"
+                                       oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel_Missing_#{businessUnit.id}');"/>
+                </ui:define>
+            </s:decorate>
+        </c:forEach>
+        <s:decorate id="organizationalUnitListModalPanelContainerMissingView"
+                    template="/finances/organizationalUnitListModalPanel.xhtml">
+            <ui:param name="containerId" value="organizationalUnitListModalPanelContainerMissingView"/>
+            <ui:param name="dialogId" value="organizationalUnitListModalPanel_Missing"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{missingViewAction.assignOrganizationalUnit(organizationalUnitItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   immediate="true"
+                                   reRender="organizationalUnitField_Missing"
+                                   oncomplete="Richfaces.hideModalPanel('organizationalUnitListModalPanel_Missing');"/>
+            </ui:define>
+        </s:decorate>
+        <c:forEach items="#{businessUnitList.resultList}" var="businessUnit">
+            <s:decorate id="organizationalUnitListModalPanelContainerMissingView_#{businessUnit.id}"
+                        template="/finances/organizationalUnitListModalPanel.xhtml">
+                <ui:param name="containerId" value="organizationalUnitListModalPanelContainerMissingView"/>
+                <ui:param name="dialogId" value="organizationalUnitListModalPanel_Missing_#{businessUnit.id}"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                       action="#{missingViewAction.assignOrganizationalUnit(organizationalUnitItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image"
+                                       immediate="true"
+                                       reRender="organizationalUnitField_Missing_#{businessUnit.id}"
+                                       oncomplete="Richfaces.hideModalPanel('organizationalUnitListModalPanel_Missing_#{businessUnit.id}');"/>
+                </ui:define>
+            </s:decorate>
+        </c:forEach>
+    </c:if>
+</ui:composition>

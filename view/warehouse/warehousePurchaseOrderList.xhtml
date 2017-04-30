@@ -1,0 +1,376 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['WarehousePurchaseOrder.list']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="98%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="PurchaseOrderSearch">
+
+<rich:simpleTogglePanel label="#{messages['WarehousePurchaseOrder.search']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:div id="leftSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.orderNumber']}</ui:define>
+                <h:inputText id="orderNumber"
+                             value="#{warehousePurchaseOrderDataModel.criteria.orderNumber}"
+                             maxlength="150"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.invoiceNumber']}</ui:define>
+                <h:inputText id="invoiceNumber"
+                             value="#{warehousePurchaseOrderDataModel.criteria.invoiceNumber}"
+                             maxlength="150"
+                             tabindex="2"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="employeeField"
+                        template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.responsible']}</ui:define>
+                <app:selectPopUp id="employee"
+                                 textValue="#{warehousePurchaseOrderDataModel.responsible.fullName}"
+                                 value="#{warehousePurchaseOrderDataModel.responsible}"
+                                 clearAction="warehousePurchaseOrderDataModel.cleanResponsible()"
+                                 searchModalPanel="generalEmployeeListModalPanel"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 reRender="employeeField"
+                                 tabindex="3"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.startDate']}</ui:define>
+                <rich:calendar id="startDate"
+                               value="#{warehousePurchaseOrderDataModel.startDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="5">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.endDate']}</ui:define>
+                <rich:calendar id="endDate"
+                               value="#{warehousePurchaseOrderDataModel.endDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="6">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.gloss']}</ui:define>
+                <h:inputText id="gloss"
+                             value="#{warehousePurchaseOrderDataModel.criteria.gloss}"
+                             maxlength="250"
+                             tabindex="7"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrder.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{warehousePurchaseOrderDataModel.criteria.state}"
+                                 styleClass="input"
+                                 tabindex="8">
+                    <s:selectItems value="#{purchaseOrderStateEnum}"
+                                   var="purchaseOrderState"
+                                   label="#{messages[purchaseOrderState.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.executorUnit']}</ui:define>
+                <ui:param name="validate" value="false"/>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{warehousePurchaseOrderDataModel.criteria.executorUnit}"
+                                 styleClass="input"
+                                 tabindex="9" immediate="true">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.costCenter']}</ui:define>
+                <app:selectPopUp id="costCenter"
+                                 textValue="#{warehousePurchaseOrderDataModel.costCenter.fullName}"
+                                 value="#{warehousePurchaseOrderDataModel.costCenter}"
+                                 clearAction="warehousePurchaseOrderDataModel.cleanCostCenter()"
+                                 searchModalPanel="costCenterListModalPanel"
+                                 dataModel="#{costCenterDataModel}"
+                                 reRender="costCenterField"
+                                 tabindex="11"/>
+            </s:decorate>
+            <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
+                <app:selectPopUp id="provider"
+                                 required="false"
+                                 textValue="#{warehousePurchaseOrderDataModel.provider.fullName}"
+                                 value="#{warehousePurchaseOrderDataModel.provider}"
+                                 clearAction="warehousePurchaseOrderDataModel.cleanProvider()"
+                                 searchModalPanel="providerListModalPanel"
+                                 dataModel="#{providerDataModel}"
+                                 reRender="providerField"
+                                 tabindex="12">
+                    <ui:define name="dataModelStaticProperties">
+                        <f:setPropertyActionListener
+                                value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
+                                target="#{providerDataModel.moduleProviderType}"/>
+                        <f:setPropertyActionListener
+                                value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
+                                target="#{providerDataModel.financesEntityState}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.warehouse']}</ui:define>
+                <h:selectOneMenu id="warehouseField"
+                                 value="#{warehousePurchaseOrderDataModel.warehouse}"
+                                 styleClass="input"
+                                 tabindex="13">
+                    <s:selectItems value="#{warehouseList.resultList}"
+                                   var="element"
+                                   label="#{element.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrder.purchaseDocumentType']}</ui:define>
+                <h:selectOneMenu id="purchaseDocumentType"
+                                 value="#{warehousePurchaseOrderDataModel.documentType}"
+                                 styleClass="inputMedium"
+                                 tabindex="14">
+                    <s:selectItems value="#{purchaseCollectionDocumentTypeEnum}"
+                                   var="element"
+                                   label="#{messages[element.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+                <a4j:commandButton id="searchButtonId"
+                                   action="#{warehousePurchaseOrderDataModel.search}"
+                                   reRender="searchOptionsPanel, purchaseOrderList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   tabindex="15">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <a4j:commandButton action="#{warehousePurchaseOrderDataModel.clear}"
+                                   reRender="searchOptionsPanel, purchaseOrderList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.clear']}"
+                                   id="clearButtonId"
+                                   tabindex="16">
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#orderNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/warehouse/warehousePurchaseOrder.xhtml"
+              rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','CREATE')}"
+              styleClass="button"
+              propagation="begin"/>
+</div>
+
+
+<rich:dataTable value="#{warehousePurchaseOrderDataModel}"
+                var="purchaseOrderItem"
+                id="purchaseOrderList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%, 15%, 10%, 14%, 15%, 18%, 10%, 8%">
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.orderNumber"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.orderNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.invoiceNumber"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.invoiceNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.date"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.date']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.responsible"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.responsible']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.provider"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.provider']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.warehouse"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.warehouse']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehousePurchaseOrder.state"
+                                       dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.orderNumber}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.invoiceNumber}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.responsible.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.provider.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.warehouse.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{messages[purchaseOrderItem.state.resourceKey]}"/>
+    </rich:column>
+
+    <rich:column styleClass="center #{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{warehousePurchaseOrderAction.select(purchaseOrderItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{warehousePurchaseOrderPrintAction.generateReport(purchaseOrderItem)}"
+                       immediate="true"
+                       rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}">
+            <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                            title="#{messages['Warehouse.purchaseOrder.report.generateReport']}"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="purchaseOrderList" dataModel="#{warehousePurchaseOrderDataModel}"/>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/warehouse/warehousePurchaseOrder.xhtml"
+              styleClass="button"
+              rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','CREATE')}"
+              propagation="begin"/>
+</div>
+</h:form>
+
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderDataModel.setResponsible(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderDataModel.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderDataModel.setProvider(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="providerField"
+                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+
+</ui:composition>

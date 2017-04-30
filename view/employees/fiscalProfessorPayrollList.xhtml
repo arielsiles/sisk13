@@ -1,0 +1,407 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['FiscalProfessorPayroll.list']}</ui:define>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="fiscalProfessorPayrollSearch">
+
+<rich:simpleTogglePanel label="#{messages['FiscalProfessorPayroll.search']}" switchType="client">
+    <h:panelGrid columns="2" width="95%" cellpadding="0" cellspacing="0">
+        <h:panelGroup>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{fiscalProfessorPayrollDataModel.idNumber}" maxlength="100"
+                             tabindex="1"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{fiscalProfessorPayrollDataModel.firstName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{fiscalProfessorPayrollDataModel.lastName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+            </s:decorate>
+        </h:panelGroup>
+        <h:panelGroup>
+            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{fiscalProfessorPayrollDataModel.maidenName}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+                <a4j:commandButton action="#{fiscalProfessorPayrollDataModel.search()}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </h:panelGroup>
+    </h:panelGrid>
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<br/>
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.updateFiscalProfessorPayrollSelectItems()}"
+                     rendered="#{generatedPayroll.officialPayrollType}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="6">
+        <s:conversationPropagation type="join"/>
+    </h:commandButton>
+    <h:commandButton action="#{generatedPayrollAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="7">
+    </h:commandButton>
+</div>
+
+<rich:dataTable value="#{fiscalProfessorPayrollDataModel}" var="fiscalProfessorPayrollItem"
+                id="fiscalProfessorPayrollList"
+                rows="500000"
+                width="100%"
+                columnsWidth="3%, 8% 8%, 10%, 10%, 10%, 8%, 10%, 8%, 5%, 8%,8%, 8%, 8%, 8%, 8%, 8%, 8%, 8%, , 8%, 8%, 8%, 10%, 10%, 8%, 10%">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+            <app:selectCheckboxHeader dataModel="#{fiscalProfessorPayrollDataModel}"
+                                      reRender="fiscalProfessorPayrollList"/>
+        </rich:column>
+        <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.hasAccountingRecord"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.accountingRecord']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.employee.idNumber"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.CI']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.employee.lastName"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.lastName']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.employee.maidenName"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.maidenName']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.employee.firstName"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.firstName']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.contractInitDate"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.contractInitDate']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.unit"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.unit']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.job"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.job']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.workedDays"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.workedDays']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.basicSalary"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.salary']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.basicIncome"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.basicIncome']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.otherIncomes"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.otherIncomes']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.totalIncome"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.totalIncomes']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.tardinessMinutes"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.tardinessMinutes']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.tardinessMinutesDiscount"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.tardinessMinutesDiscount']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.loanDiscount"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.loanDiscount']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.winDiscount"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.winDiscount']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.advanceDiscount"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.advanceDiscount']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.otherlDiscounts"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.otherlDiscounts']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.afp"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.afp']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.rciva"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.rciva']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.totalDiscount"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.totalDiscount']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.liquid"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.liquid']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="fiscalProfessorPayroll.employee.paymentType"
+                                   dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.paymentType']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.clientCode']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader dataModel="#{fiscalProfessorPayrollDataModel}"
+                                   reRender="fiscalProfessorPayrollList, dataScroller">
+                #{messages['FiscalProfessorPayroll.bankAccount']}
+            </app:commandSortHeader>
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+<rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+    <app:selectCheckboxItem dataModel="#{fiscalProfessorPayrollDataModel}" item="#{fiscalProfessorPayrollItem}"
+                            rendered="#{not fiscalProfessorPayrollItem.hasAccountingRecord}"/>
+</rich:column>
+<rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
+    <h:outputText value="#{messages['Common.yes']}" rendered="#{fiscalProfessorPayrollItem.hasAccountingRecord}"/>
+    <h:outputText value="#{messages['Common.not']}" rendered="#{not fiscalProfessorPayrollItem.hasAccountingRecord}"/>
+</rich:column>
+<rich:column styleClass="center">
+    <h:outputText value="#{fiscalProfessorPayrollItem.employee.idNumber}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.employee.lastName}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.employee.maidenName}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.employee.firstName}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.contractInitDate}">
+        <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.unit}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.job}"/>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.workedDays}">
+        <f:convertNumber pattern="#{messages['patterns.integerNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.basicSalary}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.basicIncome}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.otherIncomes}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.totalIncome}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.tardinessMinutes}">
+        <f:convertNumber pattern="#{messages['patterns.integerNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.tardinessMinutesDiscount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.loanDiscount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.winDiscount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.advanceDiscount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.otherDiscounts}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.afp}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.rciva}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.totalDiscount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalProfessorPayrollItem.liquid}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages[fiscalProfessorPayrollItem.paymentType.resourceKey]}"/>
+</rich:column>
+
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.clientCod}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalProfessorPayrollItem.accountNumber}"/>
+</rich:column>
+
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="fiscalProfessorPayrollList" dataModel="#{fiscalProfessorPayrollDataModel}"/>
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.updateFiscalProfessorPayrollSelectItems()}"
+                     rendered="#{generatedPayroll.officialPayrollType}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="8">
+        <s:conversationPropagation type="join"/>
+    </h:commandButton>
+    <h:commandButton action="#{generatedPayrollAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="9">
+    </h:commandButton>
+</div>
+</h:form>
+</ui:define>
+
+</ui:composition>

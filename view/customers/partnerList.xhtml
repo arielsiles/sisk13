@@ -1,0 +1,128 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Partner.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="partnerSearch">
+            <rich:simpleTogglePanel label="#{messages['Partner.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.name']}</ui:define>
+                    <h:inputText id="name" value="#{partnerDataModel.criteria.name}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.idNumber']}</ui:define>
+                    <h:inputText id="idNumber" value="#{partnerDataModel.criteria.idNumber}"
+                                 maxlength="80" tabindex="2" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{partnerDataModel.search}" reRender="partnerList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+
+                <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/partner.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('PARTNER','CREATE')}"/>
+
+            </div>
+
+            <rich:dataTable value="#{partnerDataModel}" var="partnerItem" id="partnerList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="50%, 15%, 15%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="partner.name"
+                                                   dataModel="#{partnerDataModel}"
+                                                   reRender="partnerList, dataScroller">
+                                #{messages['Partner.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="partner.number"
+                                                   dataModel="#{partnerDataModel}"
+                                                   reRender="partnerList, dataScroller">
+                                #{messages['Partner.number']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="partner.idNumber"
+                                                   dataModel="#{partnerDataModel}"
+                                                   reRender="creditList, dataScroller">
+                                #{messages['Partner.idNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>#{messages['Partner.numberOfCredits']}</rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{partnerItem.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{partnerItem.number}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{partnerItem.idNumber}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{partnerItem.numberCredit}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{partnerAction.select(partnerItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="partnerList" dataModel="#{partnerDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/credit.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CREDIT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

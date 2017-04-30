@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+
+    <f:view>
+        <!--         solo para el primero de la lista
+        <c:forEach begin="0" end="0" step="1" items="#{invoicePrintAction.invoice.details}" var="details" >
+                <h:outputText>|#{details.quantity}|</h:outputText>
+                <h:outputText>#{details.product.name}|</h:outputText>
+                <h:outputText value="#{details.price}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value="#{details.totalAmount}|">|
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>      <br/>
+
+        </c:forEach>     -->
+
+        <!-- para el maximo-->
+
+
+        <!--<c:forEach items="#{invoicePrintAction.invoice.details}" var="details">
+            <c:if test="#{details.id == invoicePrintAction.maxInvoiceDetailId}">
+                <h:outputText>|#{details.quantity}|</h:outputText>
+                <h:outputText>#{details.product.name}|</h:outputText>
+                <h:outputText value="#{details.price}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value="#{details.totalAmount}|">|
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </c:if>
+        </c:forEach>-->
+
+
+        <c:if test="#{invoicePrintAction.invoiceDetailId != null}">
+            <h:outputText>|#{invoicePrintAction.invoiceDetail.quantity}|</h:outputText>
+            <h:outputText>#{invoicePrintAction.invoiceDetail.product.name}|</h:outputText>
+            <h:outputText value="#{invoicePrintAction.invoiceDetail.price}">
+                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value="#{invoicePrintAction.invoiceDetail.totalAmount}|">|
+                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </c:if>
+
+
+        <!--
+        <c:forEach items="#{invoicePrintAction.invoiceDetail}" var="details2">
+                <h:outputText>|#{details2.quantity}|</h:outputText>
+                <h:outputText>#{details2.product.name}|</h:outputText>
+                <h:outputText value="#{details2.price}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value="#{details2.totalAmount}|">|
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+
+        </c:forEach>-->
+    </f:view>
+</ui:composition>
+

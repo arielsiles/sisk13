@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['BudgetProgram.list']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="budgetProgramSearch">
+
+            <rich:simpleTogglePanel label="#{messages['BudgetProgram.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BudgetProgram.name']}</ui:define>
+                    <h:inputText id="name" value="#{budgetProgramDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BudgetProgram.code']}</ui:define>
+                    <h:inputText id="code" value="#{budgetProgramDataModel.criteria.code}"
+                                 maxlength="3" tabindex="2" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{budgetProgramDataModel.search}"
+                                       reRender="budgetProgramList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/budgetProgram.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('BUDGETPROGRAM','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{budgetProgramDataModel}" var="budgetProgramItem" id="budgetProgramList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="50%,30%,20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="budgetProgram.name"
+                                                   dataModel="#{budgetProgramDataModel}"
+                                                   reRender="budgetProgramList, dataScroller">
+                                #{messages['BudgetProgram.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="budgetProgram.code"
+                                                   dataModel="#{budgetProgramDataModel}"
+                                                   reRender="budgetProgramList, dataScroller">
+                                #{messages['BudgetProgram.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{budgetProgramItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{budgetProgramItem.code}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{budgetProgramAction.select(budgetProgramItem)}"
+                                   rendered="#{s:hasPermission('BUDGETPROGRAM','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="budgetProgramList" dataModel="#{budgetProgramDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/budgetProgram.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('BUDGETPROGRAM','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

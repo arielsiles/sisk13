@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['ExpenseBudget.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="isStateForVerifyInBlockOperation"
+       value="#{expenseBudgetDataModel.stateForVerifyInBlockOperation and s:hasPermission('EXPENSEBUDGET','UPDATE') and s:hasPermission('EXPENSEBUDGETSVERIFICATION','VIEW')}"/>
+<c:set var="isStateForApproveInBlockOperation"
+       value="#{expenseBudgetDataModel.stateForApproveInBlockOperation and s:hasPermission('EXPENSEBUDGET','UPDATE') and s:hasPermission('EXPENSEBUDGETSAPPROVAL','VIEW')}"/>
+<c:set var="isStateForFreezeInBlockOperation"
+       value="#{expenseBudgetDataModel.stateForFreezeInBlockOperation and s:hasPermission('EXPENSEBUDGET','UPDATE') and s:hasPermission('EXPENSEBUDGETSAPPROVAL','VIEW')}"/>
+
+<h:form id="expenseBudgetSearch">
+
+<rich:simpleTogglePanel label="#{messages['ExpenseBudget.search']}" switchType="client">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.businessUnit']}</ui:define>
+                <h:selectOneMenu id="businessUnit"
+                                 value="#{expenseBudgetDataModel.criteria.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="1">
+                    <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                   label="#{businessUnit.organization.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.costCenter']}</ui:define>
+                <app:quickSearch id="quickSearchCostCenterField"
+                                 textValue="expenseBudgetDataModel.criteria.costCenter.code"
+                                 value="#{expenseBudgetDataModel.criteria.costCenter}"
+                                 searchField="code"
+                                 reRender="costCenterField"
+                                 tabindex="2"/>
+                <app:selectPopUp id="costCenter"
+                                 textValue="#{expenseBudgetDataModel.criteria.costCenter.fullName}"
+                                 value="#{expenseBudgetDataModel.criteria.costCenter}"
+                                 clearAction="expenseBudgetDataModel.clearCostCenter()"
+                                 searchModalPanel="costCenterListModalPanel"
+                                 dataModel="#{costCenterDataModel}"
+                                 reRender="costCenterField"
+                                 hotKeySelect="alt+1"/>
+            </s:decorate>
+            <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.gestion']}</ui:define>
+                <h:selectOneMenu id="gestion"
+                                 value="#{expenseBudgetDataModel.criteria.gestion}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{gestionList}" var="gestion"
+                                   label="#{gestion.year}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="budgetProgramField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.budgetProgram']}</ui:define>
+                <h:selectOneMenu id="budgetProgram"
+                                 value="#{expenseBudgetDataModel.budgetProgram}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    <s:selectItems value="#{budgetProgramList}"
+                                   var="budgetProgram"
+                                   label="#{budgetProgram.fullName}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange" ajaxSingle="true" reRender="budgetProgramField, budgetActivityField"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="budgetActivityField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.budgetActivity']}</ui:define>
+                <h:selectOneMenu id="budgetActivity"
+                                 value="#{expenseBudgetDataModel.criteria.budgetActivity}"
+                                 styleClass="input"
+                                 tabindex="5">
+                    <s:selectItems value="#{budgetActivityList}"
+                                   var="budgetActivity"
+                                   label="#{budgetActivity.fullName}"
+                                   disabled="#{empty expenseBudgetDataModel.budgetProgram}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{expenseBudgetDataModel.criteria.state}"
+                                 styleClass="input"
+                                 tabindex="6">
+                    <s:selectItems value="#{budgetStatesEnum}" var="state"
+                                   label="#{messages[state.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <a4j:commandButton action="#{expenseBudgetDataModel.search}"
+                                   reRender="topOperations,bottomOperations,expenseBudgetList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId" tabindex="7">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#businessUnitName" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <h:panelGroup id="topOperations">
+        <h:commandButton action="#{expenseBudgetDataModel.verifyInBlock}"
+                         value="#{messages['ExpenseBudget.verify']}"
+                         styleClass="button"
+                         rendered="#{isStateForVerifyInBlockOperation}"/>
+        <h:commandButton action="#{expenseBudgetDataModel.approveInBlock}"
+                         value="#{messages['ExpenseBudget.approve']}"
+                         styleClass="button"
+                         rendered="#{isStateForApproveInBlockOperation}"/>
+        <h:commandButton action="#{expenseBudgetDataModel.freezeInBlock}"
+                         value="#{messages['ExpenseBudget.freeze']}"
+                         styleClass="button"
+                         rendered="#{isStateForFreezeInBlockOperation}"/>
+    </h:panelGroup>
+    <s:button value="#{messages['Common.new']}" view="/budget/expenseBudget.xhtml" styleClass="button"
+              propagation="begin" rendered="#{s:hasPermission('EXPENSEBUDGET','CREATE')}"/>
+</div>
+
+<rich:dataTable value="#{expenseBudgetDataModel}" var="expenseBudgetItem" id="expenseBudgetList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="5%,10%, 15%, 15%, 15%, 10%, 10%, 10%, 10%, 10%">
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column styleClass="center">
+                <app:selectCheckboxHeader dataModel="#{expenseBudgetDataModel}" reRender="expenseBudgetList"
+                                          rendered="#{isStateForVerifyInBlockOperation or isStateForApproveInBlockOperation or isStateForFreezeInBlockOperation}"/>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="expenseBudget.businessUnit"
+                        dataModel="#{expenseBudgetDataModel}"
+                        reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.businessUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="expenseBudget.costCenter"
+                        dataModel="#{expenseBudgetDataModel}"
+                        reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.costCenter']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="expenseBudget.budgetActivity.budgetProgram.name"
+                        dataModel="#{expenseBudgetDataModel}"
+                        reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.budgetProgram']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="expenseBudget.budgetActivity.name"
+                        dataModel="#{expenseBudgetDataModel}"
+                        reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.budgetActivity']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="expenseBudget.gestion.year"
+                                       dataModel="#{expenseBudgetDataModel}"
+                                       reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.gestion']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="expenseBudget.classifier.name"
+                                       dataModel="#{expenseBudgetDataModel}"
+                                       reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.accountingItem']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="expenseBudget.amount"
+                                       dataModel="#{expenseBudgetDataModel}"
+                                       reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.amount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="expenseBudget.state"
+                                       dataModel="#{expenseBudgetDataModel}"
+                                       reRender="expenseBudgetList, dataScroller">
+                    #{messages['ExpenseBudget.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column styleClass="center">
+        <app:selectCheckboxItem dataModel="#{expenseBudgetDataModel}" item="#{expenseBudgetItem}"
+                                rendered="#{isStateForVerifyInBlockOperation or isStateForApproveInBlockOperation or isStateForFreezeInBlockOperation}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.businessUnit.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.costCenter.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.budgetActivity.budgetProgram.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.budgetActivity.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.gestion.year}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{expenseBudgetItem.classifier.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{expenseBudgetItem.amount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[expenseBudgetItem.state.resourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{expenseBudgetAction.select(expenseBudgetItem)}"
+                       rendered="#{s:hasPermission('EXPENSEBUDGET','VIEW')}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="expenseBudgetList" dataModel="#{expenseBudgetDataModel}"/>
+
+<div class="buttons">
+    <h:panelGroup id="bottomOperations">
+        <h:commandButton action="#{expenseBudgetDataModel.verifyInBlock}"
+                         value="#{messages['ExpenseBudget.verify']}"
+                         styleClass="button"
+                         rendered="#{isStateForVerifyInBlockOperation}"/>
+        <h:commandButton action="#{expenseBudgetDataModel.approveInBlock}"
+                         value="#{messages['ExpenseBudget.approve']}"
+                         styleClass="button"
+                         rendered="#{isStateForApproveInBlockOperation}"/>
+        <h:commandButton action="#{expenseBudgetDataModel.freezeInBlock}"
+                         value="#{messages['ExpenseBudget.freeze']}"
+                         styleClass="button"
+                         rendered="#{isStateForFreezeInBlockOperation}"/>
+    </h:panelGroup>
+    <s:button value="#{messages['Common.new']}" view="/budget/expenseBudget.xhtml" styleClass="button"
+              propagation="begin" rendered="#{s:hasPermission('EXPENSEBUDGET','CREATE')}"/>
+</div>
+
+</h:form>
+<s:decorate id="costCenterListModalPanelContainer"
+            template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="dataModel" value="#{costCenterDataModel}"/>
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{expenseBudgetDataModel.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           style="border:0"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

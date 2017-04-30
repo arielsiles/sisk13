@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DiscountRule.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="discountRuleSearch">
+            <rich:simpleTogglePanel id="discountRuleSearchPanel" label="#{messages['DiscountRule.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <ui:insert name="searchOptions"/>
+                    <s:div>
+                        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DiscountRule.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{discountRuleDataModel.criteria.name}"
+                                         styleClass="input"
+                                         tabindex="2"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="discountRuleTypeField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['DiscountRule.discountRuleType']}</ui:define>
+                            <h:selectOneMenu id="discountRuleType"
+                                             value="#{discountRuleDataModel.criteria.discountRuleType}"
+                                             styleClass="input"
+                                             tabindex="3">
+                                <s:selectItems value="#{discountRuleTypeEnum}"
+                                               var="discountRuleType"
+                                               label="#{messages[discountRuleType.resourceKey]}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <s:div styleClass="right input">
+                                <a4j:commandButton action="#{discountRuleDataModel.search()}"
+                                                   reRender="discountRuleSearchPanel, discountRuleList, dataScroller"
+                                                   styleClass="button"
+                                                   value="#{messages['Common.search']}"
+                                                   id="searchButtonId"
+                                                   tabindex="4">
+                                    <s:defaultAction/>
+                                </a4j:commandButton>
+                            </s:div>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/discountRule.xhtml"
+                          rendered="#{s:hasPermission('DISCOUNTRULE','CREATE')}"
+                          styleClass="button"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{discountRuleDataModel}"
+                            id="discountRuleList"
+                            var="discountRuleItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%,10%,10%,15%,10%,10%,10%,10%,5%,8%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountRule.name"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="gestion.year"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="organization.name"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.businessUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobCategory.name"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.jobCategory']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountRule.discountRuleRangeType"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.rangeType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountRule.discountUnitType"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.discountUnitType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="currency.symbol"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.currency']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountRule.discountRuleType"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.discountRuleType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountRule.active"
+                                                   dataModel="#{discountRuleDataModel}"
+                                                   reRender="discountRuleList, dataScroller">
+                                #{messages['DiscountRule.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{discountRuleItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountRuleItem.gestion.year}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountRuleItem.businessUnit.organization.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountRuleItem.jobCategory.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[discountRuleItem.discountRuleRangeType.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[discountRuleItem.discountUnitType.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{discountRuleItem.currency.symbol}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[discountRuleItem.discountRuleType.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:graphicImage rendered="#{discountRuleItem.active}" value="/img/active.gif"
+                                    styleClass="select-image-middle"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DISCOUNTRULE','VIEW')}"
+                                   action="#{discountRuleAction.select(discountRuleItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="discountRuleList" dataModel="#{discountRuleDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/discountRule.xhtml"
+                          rendered="#{s:hasPermission('DISCOUNTRULE','CREATE')}"
+                          styleClass="button"
+                          propagation="begin"/>
+
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

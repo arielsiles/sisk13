@@ -1,0 +1,260 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['TributaryPayroll.title']}
+</ui:define>
+
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="tributaryPayrollForm">
+
+<rich:simpleTogglePanel id="tributaryPayrollSearchPanel" label="#{messages['TributaryPayroll.search']}"
+                        switchType="client">
+    <h:panelGrid columns="2" columnClasses="width50percent, width50percent" width="95%" cellpadding="0" cellspacing="0">
+        <s:div>
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TributaryPayroll.code']}</ui:define>
+                <h:inputText id="code" value="#{tributaryPayrollDataModel.code}" maxlength="100"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TributaryPayroll.name']}</ui:define>
+                <h:inputText id="name" value="#{tributaryPayrollDataModel.name}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+                <a4j:commandButton action="#{tributaryPayrollDataModel.search}"
+                                   reRender="tributaryPayrollSearchPanel, tributaryPayrollDataTable, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="10">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<br/>
+
+<div class="buttons">
+    <h:commandButton action="#{tributaryPayrollDataModel.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<s:div style="overflow: auto;">
+    <rich:dataTable id="tributaryPayrollDataTable"
+                    value="#{tributaryPayrollDataModel}"
+                    var="tributaryPayrollItem"
+                    rows="500000"
+                    width="100%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="tributaryPayroll.code"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.number']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column width="15%">
+                    <app:commandSortHeader sortProperty="tributaryPayroll.name"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.names']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="tributaryPayroll.totalGrained"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.totalGrained']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.retentionAFP']}"/>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="tributaryPayroll.netSalary"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.netSalary']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.salaryNotTaxableTwoSMN']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.unlikeTaxable']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputFormat value="#{messages['TributaryPayroll.tax']}">
+                        <f:param value="#{payrollGenerationCycleAction.instance.ivaRate.rate}"/>
+                    </h:outputFormat>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.fiscalCredit']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputFormat value="#{messages['TributaryPayroll.taxForTwoSMN']}">
+                        <f:param value="#{payrollGenerationCycleAction.instance.ivaRate.rate}"/>
+                    </h:outputFormat>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.physicalBalance']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.dependentBalance']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.lastMonthBalance']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.maintenanceOfValue']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.lastBalanceUpdated']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.dependentTotalBalance']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['TributaryPayroll.usedBalance']}"/>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="tributaryPayroll.retentionClearance"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.retentionClearance']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="tributaryPayroll.dependentBalanceToNextMonth"
+                                           dataModel="#{tributaryPayrollDataModel}"
+                                           reRender="tributaryPayrollDataTable, dataScroller">
+                        <h:outputText value="#{messages['TributaryPayroll.dependentBalanceToNextMonth']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{tributaryPayrollItem.code}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{tributaryPayrollItem.name}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.totalGrained}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.retentionAFP}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.netSalary}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.salaryNotTaxableTwoSMN}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.unlikeTaxable}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.tax}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.fiscalCredit}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.taxForTwoSMN}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.physicalBalance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.dependentBalance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.lastMonthBalance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.maintenanceOfValue}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.lastBalanceUpdated}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.dependentTotalBalance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.usedBalance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.retentionClearance}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{tributaryPayrollItem.dependentBalanceToNextMonth}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller" for="tributaryPayrollDataTable" dataModel="#{tributaryPayrollDataModel}"/>
+</s:div>
+
+<div class="buttons">
+    <h:commandButton action="#{tributaryPayrollDataModel.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="20"
+                     immediate="true"/>
+</div>
+
+</h:form>
+</ui:define>
+</ui:composition>

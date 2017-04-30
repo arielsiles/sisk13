@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['ExpenseBudgetExtended.label']}
+</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="95%"/>
+<ui:param name="selectedTab" value="home"/>
+<ui:define name="body">
+<h:form id="searchForm">
+<rich:simpleTogglePanel label="#{messages['ExpenseBudgetExtended.search']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:div id="leftSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudgetExtended.year']}</ui:define>
+                <h:inputText id="year"
+                             value="#{expenseBudgetExtendedAction.year}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="1">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudgetExtended.month']}</ui:define>
+                <h:selectOneMenu id="month"
+                                 value="#{expenseBudgetExtendedAction.month}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="2">
+                    <s:selectItems value="#{month}"
+                                   var="month"
+                                   label="#{messages[month.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudgetExtended.executorUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{expenseBudgetExtendedAction.executorUnit}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{executorUnitList.resultList}"
+                                   var="executorUnit"
+                                   label="#{executorUnit.description}"
+                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{expenseBudgetExtendedAction.search}"
+                                       reRender="searchOptionsPanel, resultPanel"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}">
+                        <a4j:support event="onclick" reRender="leftSidePanel, rightSidePanel"/>
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#year" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<s:div id="resultPanel">
+    <br/>
+    <rich:panel>
+        <f:facet name="header">
+            #{messages['ExpenseBudgetExtended.label']}
+        </f:facet>
+        <s:div style="overflow: auto;">
+            <rich:dataTable value="#{expenseBudgetExtendedAction.resultList}"
+                            var="element"
+                            footerClass="rich-table-footer"
+                            columnsWidth="0*">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column rowspan="2">
+                            #{messages['ExpenseBudgetExtended.name']}
+                        </rich:column>
+                        <rich:column colspan="8">
+                            #{messages['ExpenseBudgetExtended.budget']}
+                        </rich:column>
+                        <rich:column breakBefore="true">
+                            #{messages['ExpenseBudgetExtended.yearBudget']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.accruedExecution']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.monthBudget']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.monthExecution']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.monthVarianceExecution']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.currentExecution']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.yearVarianceExecution']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ExpenseBudgetExtended.yearPercentageExecution']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="left column-nowrap">
+                    <h:outputText value="#{element.code} - #{element.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.yearBudget}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.accruedExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.monthBudget}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.monthExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.monthVarianceExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.currentExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.yearVarianceExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.yearPercentageExecution}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <f:facet name="footer">
+                    <rich:columnGroup>
+                        <rich:column styleClass="left">
+                            #{messages['ExpenseBudgetExtended.row.total']}
+                        </rich:column>
+                        <rich:column>
+                            <rich:spacer/>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{expenseBudgetExtendedAction.totals['accruedExecution']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{expenseBudgetExtendedAction.totals['monthBudget']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{expenseBudgetExtendedAction.totals['monthExecution']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText
+                                    value="#{expenseBudgetExtendedAction.totals['monthVarianceExecution']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{expenseBudgetExtendedAction.totals['currentExecution']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText
+                                    value="#{expenseBudgetExtendedAction.totals['yearVarianceExecution']}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <rich:spacer/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+            </rich:dataTable>
+        </s:div>
+    </rich:panel>
+</s:div>
+</h:form>
+</ui:define>
+</ui:composition>

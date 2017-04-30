@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:dataTable value="#{dismissalDataModel}" var="dismissalItem"
+                    id="dismissalList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="15%, 30%, 10%, 25%, 10%,10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissal.code"
+                                           dataModel="#{dismissalDataModel}"
+                                           reRender="dismissalList, dataScroller">
+                        <h:outputText value="#{messages['Dismissal.code']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissal.employee"
+                                           dataModel="#{dismissalDataModel}"
+                                           reRender="dismissalList, dataScroller">
+                        #{messages['Dismissal.employee']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissal.layOffDate"
+                                           dataModel="#{dismissalDataModel}"
+                                           reRender="dismissalList, dataScroller">
+                        #{messages['Dismissal.layOffDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissal.description"
+                                           dataModel="#{dismissalDataModel}"
+                                           reRender="dismissalList, dataScroller">
+                        #{messages['Dismissal.description']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissal.state"
+                                           dataModel="#{dismissalDataModel}"
+                                           reRender="dismissalList, dataScroller">
+                        #{messages['Dismissal.state']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{dismissalItem.code}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{dismissalItem.jobContract.contract.employee.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{dismissalItem.layOffDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{dismissalItem.description}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[dismissalItem.state.resourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{dismissalAction.select(dismissalItem)}"
+                           rendered="#{s:hasPermission('DISMISSAL','VIEW')}">
+                <s:conversationPropagation value="none"/>
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+
+    <app:dataScroller id="dataScroller" for="dismissalList"
+                      dataModel="#{dismissalDataModel}"/></ui:composition>

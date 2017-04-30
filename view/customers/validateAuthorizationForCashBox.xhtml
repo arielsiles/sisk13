@@ -1,0 +1,47 @@
+<rich:modalPanel height="125" width="350" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="validateAuthorizationForCashBox"
+                 onshow="jQuery('#validateAuthorization\\:validateAuthorizationForm\\:usernameField\\:username').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['InvoiceCustomer.validateAuthorization.title']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="validateAuthorizationForm">
+
+        <s:decorate id="usernameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Login.username']}</ui:define>
+            <h:inputText id="username" value="#{invoiceCustomerAction.responsibleUsername}" tabindex="1"
+                         styleClass="input"/>
+        </s:decorate>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Login.password']}</ui:define>
+            <h:inputSecret value="#{invoiceCustomerAction.responsiblePassword}" tabindex="2"
+                           styleClass="input"/>
+        </s:decorate>
+
+        <div class="buttons">
+            <a4j:commandButton id="acceptButton" action="#{invoiceCustomerAction.validateResponsibleUser}" tabindex="3"
+                               value="#{messages['InvoiceCustomer.validateAuthorization.authorize']}"
+                               styleClass="button">
+                <s:conversationPropagation type="none"/>
+                <s:defaultAction/>
+            </a4j:commandButton>
+            <h:commandButton id="cancelButton" value="#{messages['Common.cancel']}" styleClass="button" tabindex="4"/>
+        </div>
+
+        <rich:componentControl for="validateAuthorizationForCashBox" disableDefault="true"
+                               attachTo="acceptButton, cancelButton, closeLink" operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>
+

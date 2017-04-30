@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+
+    <factory name="roleList" value="#{rolesQuery}"/>
+    <framework:entity-query name="rolesQuery" ejbql="select r from Role r"/>
+
+    <factory name="businessUnitList" value="#{businessUnitQuery}"/>
+    <framework:entity-query name="businessUnitQuery"
+                            ejbql="select b from BusinessUnit b left join fetch b.organization order by b.position asc"/>
+
+    <factory name="modulesFinancesList" value="#{modulesFinancesQuery}"/>
+    <framework:entity-query name="modulesFinancesQuery"
+                            ejbql="select b from FinancesModule b "/>
+
+    <factory name="businessUnitsByUserList" value="#{businessUnitsByUserQuery}"/>
+    <framework:entity-query name="businessUnitsByUserQuery"
+                            ejbql="select businessUnit from com.encens.khipus.model.admin.BusinessUnit businessUnit left join fetch b.organization"
+                            order="businessUnit.id asc">
+        <framework:restrictions>
+            <value>
+                businessUnit.id in (#{sessionUser.businessUnitIds})
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="businessUnitTypeList" value="#{businessUnitTypeQuery}"/>
+    <framework:entity-query name="businessUnitTypeQuery" ejbql="select but from BusinessUnitType but"/>
+
+    <factory name="documentTypeList" value="#{documentTypeQuery}"/>
+    <framework:entity-query name="documentTypeQuery" ejbql="select dt from DocumentType dt"/>
+
+    <factory name="organizationDocumentTypeList" value="#{organizationDocumentTypeQuery}"/>
+    <framework:entity-query name="organizationDocumentTypeQuery" ejbql="select odt from DocumentType odt">
+        <framework:restrictions>
+            <value>
+                odt.entityType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.contacts.EntityType', 'ORGANIZATION')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="personDocumentTypeList" value="#{personDocumentTypeQuery}"/>
+    <framework:entity-query name="personDocumentTypeQuery" ejbql="select pdt from DocumentType pdt">
+        <framework:restrictions>
+            <value>pdt.entityType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.contacts.EntityType', 'PERSON')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="salutationList" value="#{salutationQuery}"/>
+    <framework:entity-query name="salutationQuery" ejbql="select s from Salutation s"/>
+
+    <factory name="maritalStatusList" value="#{maritalStatusQuery}"/>
+    <framework:entity-query name="maritalStatusQuery" ejbql="select s from MaritalStatus s order by s.name"/>
+
+    <factory name="pECityList" value="#{pECityQuery}"/>
+    <framework:entity-query name="pECityQuery"
+                            ejbql="select c from City c where c.department.id=(select d.id from Department d where d.name like '%ochabamba' ) ">
+        <framework:restrictions>
+            <value>c.department = #{zoneAction.department}</value>
+            <value>c.department = #{districtAction.department}</value>
+            <value>c.department = #{streetAction.department}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="districBtList" value="#{districtBQuery}"/>
+    <framework:entity-query name="districtBQuery" ejbql="select dB from District dB"/>
+
+
+    <factory name="streetList" value="#{streetQuery}"/>
+    <framework:entity-query name="streetQuery" ejbql="select s from Street s">
+        <framework:restrictions>
+            <value>s.district = #{businessUnitAction.district}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="taxRuleList" value="#{taxRulesQuery}"/>
+    <framework:entity-query name="taxRulesQuery" ejbql="select tr from TaxRule tr"/>
+
+    <!--
+    <factory name="streetPruebaList" value="#{streetPQuery}"/>
+    <framework:entity-query name="districtBQuery" ejbql="select dB from District dB"/>      -->
+
+    <!--Enumerations-->
+
+    <factory name="userRoleGroupingTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.admin.UserRoleGroupingType')}"/>
+
+    <factory name="productSaleTypeEnum" value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.admin.ProductSaleType')}"/>
+
+
+</components>

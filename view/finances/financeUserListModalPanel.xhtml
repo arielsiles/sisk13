@@ -1,0 +1,81 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['FinanceUser.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="financeUserSearchForm">
+
+        <rich:simpleTogglePanel label="#{messages['FianceUser.search']}" switchType="client">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FianceUser.name']}</ui:define>
+                <h:inputText id="name" value="#{financeUserDataModel.criteria.name}"
+                             maxlength="100" tabindex="1" styleClass="input">
+                </h:inputText>
+                <a4j:commandButton action="#{financeUserDataModel.search()}"
+                                   reRender="financeUserList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{financeUserDataModel}" var="financeUserItem"
+                        id="financeUserList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="40%, 40%, 20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="financeUser.name"
+                                               dataModel="#{financeUserDataModel}"
+                                               reRender="financeUserList, dataScroller">
+                            #{messages['FianceUser.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="financeUser.oracleUser"
+                                               dataModel="#{financeUserDataModel}"
+                                               reRender="financeUserList, dataScroller">
+                            #{messages['FianceUser.oracleUser']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{financeUserItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{financeUserItem.oracleUser}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="financeUserList" dataModel="#{financeUserDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton" operation="hide" event="onclick"/>
+
+        <script type="text/javascript">
+            function focusFirstElement() {
+                document.getElementById("#{rich:clientId('name')}").focus();
+            }
+        </script>
+    </h:form>
+</rich:modalPanel>

@@ -1,0 +1,112 @@
+<rich:modalPanel height="320" width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+                 <!--onshow="jQuery('##{containerId}\\:cashAccountListForm#{dialogId}\\:accountCodeField\\:accountCode').focus();">-->
+
+    <ui:param name="productItemEntity" value="#{productItem}"/>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['CashAccount.list']}</h:outputText>
+    </f:facet>
+
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <rich:panel id="formPanel">
+        <h:form id="updateStockForm">
+
+            <s:decorate id="productInventoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['ProductInventoryRecord.product']}"/>
+                </ui:define>
+                <app:suggestionBox id="productInventorySuggestionBox"
+                                   value="#{productInventoryAction.productItemFullname}"
+                                   entity="#{productInventory.productItem}"
+                                   styleClass="input"
+                                   entityAlias="productItem"
+                                   searchField="fullName2"
+                                   searchCompoundFields="productItem.productItemCode,productItem.name"
+                                   searchCompoundCondition="concat(concat(productItem.productItemCode,' - '),productItem.name)"
+                                   updateFocusOnSelect="true"
+                                   required="true">
+                    <ui:define name="columns">
+                        <h:column>
+                            <h:outputText value="#{entityItem.fullName2}" />
+                        </h:column>
+                    </ui:define>
+                </app:suggestionBox>
+            </s:decorate>
+
+            <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductInventoryRecord.type']}</ui:define>
+                <h:selectOneMenu id="type"
+                                 value="#{productInventoryAction.productInventoryRecordType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="6">
+                    <s:selectItems value="#{productInventoryRecordTypes}"
+                                   var="productInventoryRecordType"
+                                   label="#{messages[productInventoryRecordType.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="quantityField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductInventoryRecord.quantity']}</ui:define>
+                <h:inputText id="quantity" value="#{productInventoryAction.quantityStock}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="5">
+                    <a4j:support event="onblur" reRender="quantityField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductInventoryRecord.description']}</ui:define>
+                <h:inputTextarea id="description"
+                                 value="#{productInventoryAction.descriptionStock}"
+                                 styleClass="input textarea"
+                                 tabindex="6">
+                </h:inputTextarea>
+            </s:decorate>
+
+            <div class="center-buttons">
+
+                <a4j:commandButton action="#{productInventoryAction.updateStock}"
+                                   value="#{messages['ProductInventoryRecord.button.updateStock']}"
+                                   styleClass="button"
+                                   reRender="updateStockForm"
+                        />
+
+                <a4j:commandButton value="#{messages['Common.cancel']}"
+                                   styleClass="button"
+                                   action="#{productInventoryAction.cancel}"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   oncomplete="Richfaces.hideModalPanel('updateStockModalPanel');"
+                                   reRender="updateStockForm,productInventoryField" />
+            </div>
+
+        </h:form>
+    </rich:panel>
+
+
+
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton" operation="hide" event="onclick"/>
+
+
+</rich:modalPanel>
+

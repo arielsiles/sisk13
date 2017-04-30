@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <style type="text/css">
+        .special tr[id] {
+            display: none;
+        }
+    </style>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="processedProductSearch">
+            <rich:simpleTogglePanel label="#{messages['ProcessedProduct.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProcessedProduct.name']}</ui:define>
+                    <h:inputText id="number" value="#{processedProductDataModel.criteria.name}"
+                                 maxlength="200" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProcessedProduct.code']}</ui:define>
+                    <h:inputText id="group" value="#{processedProductDataModel.criteria.code}"
+                                 maxlength="50" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProcessedProduct.description']}</ui:define>
+                    <h:inputText id="name" value="#{processedProductDataModel.criteria.description}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{processedProductDataModel.search}"
+                                       reRender="processedProductList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/processedProduct.xhtml"
+                          styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('PROCESSEDPRODUCT','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{processedProductDataModel}" var="processedProductItem" id="processedProductList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="processedProduct.name"
+                                                   dataModel="#{processedProductDataModel}"
+                                                   reRender="processedProductList, dataScroller">
+                                #{messages['ProcessedProduct.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="processedProduct.code"
+                                                   dataModel="#{processedProductDataModel}"
+                                                   reRender="processedProductList, dataScroller">
+                                #{messages['ProcessedProduct.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="processedProduct.description"
+                                                   dataModel="#{processedProductDataModel}"
+                                                   reRender="processedProductList, dataScroller">
+                                #{messages['ProcessedProduct.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProcessedProduct.unidMeasure']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProcessedProduct.amount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{processedProductItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{processedProductItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{processedProductItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{processedProductItem.unidMeasure}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{processedProductItem.amount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{processedProductAction.select(processedProductItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="processedProductList" dataModel="#{processedProductDataModel}"/>
+
+
+            <rich:jQuery selector="#processedProductList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#processedProductList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/processedProduct.xhtml"
+                          styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('PROCESSEDPRODUCT','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

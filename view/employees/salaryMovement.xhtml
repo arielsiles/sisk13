@@ -1,0 +1,254 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{salaryMovementAction.managed}">
+            #{messages['SalaryMovement.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['SalaryMovement.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="salaryMovementForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{salaryMovementAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton action="#{salaryMovementAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+        <h:commandButton action="#{salaryMovementAction.update}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','UPDATE') and not salaryMovementAction.readOnly}"/>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','DELETE') and not salaryMovementAction.readOnly}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{salaryMovementAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="salaryMovementPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="${salaryMovementAction.managed}">
+                    #{messages['SalaryMovement.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['SalaryMovement.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="gestionPayrollField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.gestionPayroll']}</ui:define>
+            <app:selectPopUp id="gestionPayrollSelectPopup"
+                             textValue="#{salaryMovement.gestionPayroll.gestionName}"
+                             value="#{salaryMovement.gestionPayroll}"
+                             dataModel="#{gestionPayRollSearchDataModel}"
+                             clearAction="salaryMovementAction.cleanGestionPayroll()"
+                             searchModalPanel="gestionPayRollSearchModalPanel"
+                             readOnly="#{salaryMovementAction.managed}"
+                             required="true"
+                             reRender="gestionPayrollField,salaryMovementTypeField, employeeField"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+        <s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.salaryMovementType']}</ui:define>
+            <h:selectOneMenu id="salaryMovementType"
+                             value="#{salaryMovement.salaryMovementType}"
+                             styleClass="input"
+                             rendered="#{not salaryMovementAction.managed}"
+                             required="true"
+                             tabindex="2">
+                <c:if test="${not empty movementTypeByAccessRightEnum}">
+                    <s:selectItems value="#{salaryMovementTypeByAccessRightList}"
+                                   var="salaryMovementType"
+                                   label="#{salaryMovementType.fullName}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                </c:if>
+                <a4j:support event="onchange"
+                             action="#{salaryMovementAction.clearEmployee()}"
+                             ajaxSingle="true"
+                             reRender="salaryMovementType, employeeField"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{salaryMovement.salaryMovementType.fullName}"
+                          rendered="#{salaryMovementAction.managed}"/>
+        </s:decorate>
+        <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.employee']}</ui:define>
+            <app:selectPopUp id="employee"
+                             required="true"
+                             textValue="#{salaryMovement.employee.fullName}"
+                             value="#{salaryMovement.employee}"
+                             dataModel="#{employeeContractDataModel}"
+                             clearAction="salaryMovementAction.clearEmployee()"
+                             searchModalPanel="employeeContractListModalPanel"
+                             reRender="employeeField"
+                             readOnly="#{salaryMovementAction.managed}"
+                             hotKeySelect="alt+2"/>
+        </s:decorate>
+        <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.currency']}</ui:define>
+            <h:selectOneMenu id="currency"
+                             value="#{salaryMovement.currency}"
+                             styleClass="input"
+                             tabindex="2"
+                             rendered="#{not salaryMovementAction.readOnly}"
+                             required="true">
+                <s:selectItems value="#{currencyList}" var="currency"
+                               label="#{currency.fullName}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{salaryMovement.currency.fullName}"
+                          rendered="#{salaryMovementAction.readOnly}"/>
+        </s:decorate>
+        <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.amount']}</ui:define>
+            <h:inputText id="amount"
+                         value="#{salaryMovement.amount}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="10"
+                         rendered="#{not salaryMovementAction.readOnly}"
+                         tabindex="3">
+                <a4j:support event="onchange" reRender="amountField"/>
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                <f:validateDoubleRange maximum="#{messages['validator.maxDoubleRange']}"
+                                       minimum="#{messages['validator.minDoubleRange']}"/>
+            </h:inputText>
+            <h:outputText value="#{salaryMovement.amount}"
+                          rendered="#{salaryMovementAction.readOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.date']}</ui:define>
+            <rich:calendar id="date"
+                           value="#{salaryMovement.date}"
+                           styleClass="input"
+                           datePattern="#{messages['patterns.date']}"
+                           timeZone="#{sessionUser.timeZone}"
+                           required="true"
+                           enableManualInput="true"
+                           rendered="#{not salaryMovementAction.readOnly}"
+                           tabindex="4"/>
+            <h:outputText value="#{salaryMovement.date}"
+                          rendered="#{salaryMovementAction.readOnly}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SalaryMovement.description']}</ui:define>
+            <h:inputTextarea id="description"
+                             value="#{salaryMovement.description}"
+                             styleClass="input textarea"
+                             readonly="#{salaryMovementAction.readOnly}">
+                <a4j:support event="onblur" reRender="descriptionField"/>
+            </h:inputTextarea>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{salaryMovementAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+        <h:commandButton action="#{salaryMovementAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+        <h:commandButton action="#{salaryMovementAction.update}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','UPDATE') and not salaryMovementAction.readOnly}"/>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','DELETE') and not salaryMovementAction.readOnly}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{salaryMovementAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','DELETE') and not salaryMovementAction.readOnly}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['SalaryMovement.delete.confirmation']}">
+                <f:param value="#{salaryMovement.amount}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{salaryMovementAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{salaryMovementAction.managed and s:hasPermission('SALARYMOVEMENT','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="gestionPayRollListModalPanelContainer"
+            template="/employees/gestionPayRollSearchModalPanel.xhtml"
+            rendered="#{not salaryMovementAction.managed}">
+    <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{salaryMovementAction.assignGestionPayroll(gestionPayrollItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="gestionPayrollField,salaryMovementTypeField, employeeField"
+                           oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="employeeContractListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml"
+            rendered="#{not salaryMovementAction.managed}">
+    <ui:param name="dialogId" value="employeeContractListModalPanel"/>
+    <ui:param name="dataModel" value="#{employeeContractDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{salaryMovementAction.assingEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('employeeContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#salaryMovementType" query="focus()" timing="onload"
+             rendered="#{not salaryMovementAction.managed}"/>
+<rich:jQuery selector="#amount" query="focus()" timing="onload"
+             rendered="#{salaryMovementAction.managed}"/>
+</ui:define>
+</ui:composition>
+

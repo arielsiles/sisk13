@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:dataTable value="#{dismissalRuleDataModel}" var="dismissalRuleItem"
+                    id="dismissalRuleList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="20%, 40%, 20%,  10%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissalRule.code"
+                                           dataModel="#{dismissalRuleDataModel}"
+                                           reRender="dismissalRuleList, dataScroller">
+                        <h:outputText value="#{messages['DismissalRule.code']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissalRule.name"
+                                           dataModel="#{dismissalRuleDataModel}"
+                                           reRender="dismissalRuleList, dataScroller">
+                        <h:outputText value="#{messages['DismissalRule.name']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissalRule.dismissalRuleType"
+                                           dataModel="#{dismissalRuleDataModel}"
+                                           reRender="dismissalRuleList, dataScroller">
+                        <h:outputText value="#{messages['DismissalRule.dismissalRuleType']}"/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="dismissalRule.active"
+                                           dataModel="#{dismissalRuleDataModel}"
+                                           reRender="dismissalRuleList, dataScroller">
+                        <h:outputText value="#{messages['DismissalRule.active']} "/>
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{dismissalRuleItem.code}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{dismissalRuleItem.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[dismissalRuleItem.dismissalRuleType.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:graphicImage value="/img/active.gif" styleClass="select-image-middle"
+                            rendered="#{dismissalRuleItem.active}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{dismissalRuleAction.select(dismissalRuleItem)}"
+                           rendered="#{s:hasPermission('DISMISSALRULE','VIEW')}">
+                <s:conversationPropagation value="none"/>
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+
+    <app:dataScroller id="dataScroller" for="dismissalRuleList"
+                      dataModel="#{dismissalRuleDataModel}"/></ui:composition>

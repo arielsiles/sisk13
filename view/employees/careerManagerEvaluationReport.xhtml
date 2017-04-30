@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['PollCopy.careerManagerEvaluationReport']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="careerManagerEvaluationReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['PollCopy.careerManagerEvaluationReport']}
+                </f:facet>
+                <ui:decorate template="genericPollReport.xhtml">
+                    <ui:param name="reportAction" value="#{careerManagerEvaluationReportAction}"/>
+                    <ui:param name="showCareerField" value="true"/>
+                </ui:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{careerManagerEvaluationReportAction}" showPageFormat="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{careerManagerEvaluationReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="1000">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

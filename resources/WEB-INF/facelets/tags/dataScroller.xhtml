@@ -1,0 +1,95 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j">
+
+    <h:panelGrid id="#{id}" columns="1" columnClasses="datascroller-right" width="100%"
+                 cellpadding="0" cellspacing="0" style="padding-top:3px;"
+                 rendered="#{empty rendered or rendered}">
+        <h:outputText value="#{messages[ empty zeroRowCountMessage?'Common.searchNoResults':zeroRowCountMessage]}"
+                      rendered="#{dataModel.rowCount == 0}"
+                      style="font-size:9pt"/>
+        <h:panelGrid columns="2" columnClasses="datascroller-left, datascroller-right" width="100%"
+                     styleClass="datascroller" cellpadding="0" cellspacing="0" rendered="#{dataModel.rowCount > 0}">
+            <h:outputFormat value="#{messages['component.dataPaginator.summary']}" id="#{id}_PanelInfo"
+                            style="font-size:9pt" styleClass="left">
+                <f:param value="#{dataModel.rangeRowsString}"/>
+                <f:param value="#{dataModel.rowCountString}"/>
+            </h:outputFormat>
+            <rich:datascroller renderIfSinglePage="false" for="#{for}" align="right" ajaxSingle="false" maxPages="10"
+                               page="#{dataModel.page}" reRender="#{id}_PanelInfo, #{id}" style="font-size:9pt"/>
+        </h:panelGrid>
+
+        <s:fragment>
+            <rich:jQuery selector="##{for} tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+
+            <rich:jQuery selector="##{for} tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+        </s:fragment>
+    </h:panelGrid>
+
+
+    <!--<h:panelGrid columns="2" columnClasses="datascroller-left, datascroller-right" width="100%"
+                 styleClass="datascroller" cellpadding="0" cellspacing="0">
+        <h:panelGroup>
+            <h:outputFormat value="#{messages['component.dataPaginator.summary']}">
+                <f:param value="#{backingBean.itemsRange}"/>
+                <f:param value="#{backingBean.resultCount}"/>
+            </h:outputFormat>
+        </h:panelGroup>
+
+        <h:panelGroup>
+            <a4j:commandLink reRender="#{dataTableId}" rendered="#{backingBean.previousExists}"
+                             action="#{backingBean.first}" title="#{messages['component.dataPaginator.firstpage']}">
+                <h:graphicImage value="/img/scroller/first.gif" style="border:0;vertical-align:middle;"/>
+            </a4j:commandLink>
+            <h:graphicImage value="/img/scroller/first-grey.gif" style="border:0;vertical-align:middle;"
+                            rendered="#{!backingBean.previousExists}"
+                            title="#{messages['component.dataPaginator.firstpage']}"/>
+
+
+            <a4j:commandLink reRender="#{dataTableId}" rendered="#{backingBean.previousExists}"
+                             action="#{backingBean.previous}"
+                             title="#{messages['component.dataPaginator.previouspage']}">
+                <h:graphicImage value="/img/scroller/left.gif" style="border:0;vertical-align:middle;"/>
+            </a4j:commandLink>
+            <h:graphicImage value="/img/scroller/left-grey.gif" style="border:0;vertical-align:middle;"
+                            rendered="#{!backingBean.previousExists}"
+                            title="#{messages['component.dataPaginator.previouspage']}"/>
+
+            <div style="display: inline; vertical-align: middle;">
+                <h:outputText value="#{messages['component.dataPaginator.page']} "/>
+
+                <h:inputText id="currentPage" value="#{backingBean.currentPage}"
+                             style="width:25px; height:10px;font-size:9px;vertical-align:top;"
+                             title="#{messages['component.dataPaginator.currentPage']}">
+                    <a4j:support event="onkeypress" reRender="#{dataTableId}" ajaxSingle="true" requestDelay="100"/>
+                </h:inputText>
+
+                <h:outputFormat value=" #{messages['component.dataPaginator.pageOf']}">
+                    <f:param value="#{backingBean.pageCount}"/>
+                </h:outputFormat>
+            </div>
+
+            <a4j:commandLink reRender="#{dataTableId}" rendered="#{backingBean.nextExists}"
+                             action="#{backingBean.next}" title="#{messages['component.dataPaginator.nextpage']}">
+                <h:graphicImage value="/img/scroller/right.gif" style="border:0;vertical-align:middle;"/>
+            </a4j:commandLink>
+            <h:graphicImage value="/img/scroller/right-grey.gif" style="border:0;vertical-align:middle;"
+                            rendered="#{!backingBean.nextExists}"
+                            title="#{messages['component.dataPaginator.nextpage']}"/>
+
+            <a4j:commandLink reRender="#{dataTableId}" rendered="#{backingBean.nextExists}"
+                             action="#{backingBean.last}" title="#{messages['component.dataPaginator.lastpage']}">
+                <h:graphicImage value="/img/scroller/last.gif" style="border:0;vertical-align:middle;"/>
+            </a4j:commandLink>
+            <h:graphicImage value="/img/scroller/last-grey.gif" style="border:0;vertical-align:middle;"
+                            rendered="#{!backingBean.nextExists}"
+                            title="#{messages['component.dataPaginator.lastpage']}"/>
+        </h:panelGroup>
+    </h:panelGrid>-->
+</ui:composition>
+

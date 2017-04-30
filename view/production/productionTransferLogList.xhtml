@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductionPlanning.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <style type="text/css">
+            .special tr[id] {
+                display: none;
+            }
+
+            .top-aligned {
+                vertical-align: top;
+                border: none;
+            }
+
+            .row-borders {
+                border-top: solid #616161 thin;
+                border-bottom: solid #616161 thin;
+            }
+        </style>
+        <h:form id="productiveZoneSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductionPlanning.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlanning.criteria.startDate']}</ui:define>
+                    <rich:calendar id="startDate" datePattern="dd-MM-yyyy"
+                                   value="#{productionTransferLogDataModel.modelCriteria.startDate}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlanning.criteria.endDate']}</ui:define>
+                    <rich:calendar id="endDate" datePattern="dd-MM-yyyy"
+                                   value="#{productionTransferLogDataModel.modelCriteria.endDate}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlanning.criteria.order']}</ui:define>
+                    <h:inputText id="order" value="#{productionTransferLogDataModel.modelCriteria.order}"
+                                 maxlength="15" style="width: 13em;" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productionTransferLogDataModel.search}"
+                                       reRender="productionPlanningList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#order" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <a4j:commandButton action="#{productionPlanningAction.generateAllVoucher(productionTransferLogDataModel.getListProductoPlannig())}"
+                                   reRender="productionPlanningList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['ProductionPlanning.generateAllVoucherByProductionDay']}">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </div>
+
+            <div class="buttons">
+                <a4j:commandButton action="#{productionPlanningAction.generateAllVoucher(productionTransferLogDataModel.getListProductoPlannig())}"
+                                   reRender="productionPlanningList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['ProductionPlanning.generateAccountingByProductionDay']}">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </div>
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.new']}" action="#{productionPlanningAction.createNew}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"/>
+            </div>
+            <rich:dataGrid value="#{productionTransferLogDataModel}" var="productionPlanningItem"
+                           id="productionPlanningList"
+                           width="100%" columns="3" elements="6" border="0" rowClasses="row-borders"
+                           columnClasses="top-aligned" style="border: none;">
+                <rich:panel style="position:relative; top:0;">
+                    <f:facet name="header">
+                        <h:outputFormat value="{0, date, dd-MM-yyyy}">
+                            <f:param value="#{productionPlanningItem.date}"/>
+                        </h:outputFormat>
+                    </f:facet>
+<!--                    <s:div>
+                        <h:commandLink style="float:left;" value="#{messages['Common.select']}"
+                                       action="#{productionPlanningAction.select(productionPlanningItem)}"/>
+                    </s:div>-->
+                    <s:div style="float:right;">
+                        #{messages['ProductionPlanning.etiq.totalMilk']} #{productionPlanningItem.totalMilk}
+                    </s:div>
+                    <rich:dataTable value="#{productionPlanningItem.productionOrderList}" var="productionOrderItem"
+                                    id="productionOrderList"
+                                    width="100%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['ProductionOrder.processedProduct.name']}
+                                </rich:column>
+                                <!--<rich:column>
+                                    #{messages['ProductionOrder.processedProduct.code']}
+                                </rich:column>-->
+                                <rich:column>
+                                    #{messages['ProductionOrder.code']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['ProductionOrder.expectedAmountList']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['ProductionOrder.estateOrderProduction']}
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{productionOrderItem.productComposition.processedProduct.nameCode}"/>
+                        </rich:column>
+
+                        <!--<rich:column>
+                            <h:outputText value="#{productionOrderItem.productComposition.processedProduct.code}"/>
+                        </rich:column>-->
+                        <rich:column>
+                            <h:outputText value="#{productionOrderItem.code}"/>
+                        </rich:column>
+                        <!--<rich:column>
+                            <h:outputText value="#{productionOrderItem.producingAmount}"/>
+                        </rich:column>-->
+                        <rich:column>
+                            <h:outputText value="#{productionOrderItem.expendAmount}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText
+                                    style="font-weight: bold; color: #{productionOrderItem.estateOrder == 'PENDING' ? 'red' :(productionOrderItem.estateOrder == 'EXECUTED' ? 'blue' : (productionOrderItem.estateOrder == 'TABULATED' ? 'fuchsia' : 'green'))}"
+                                    value="#{productionOrderItem.estateOrder == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (productionOrderItem.estateOrder == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (productionOrderItem.estateOrder == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : messages['productionOrderForPlanning.estateOrder.finalized']))}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                    <rich:dataTable value="#{productionPlanningItem.baseProducts}" var="productionBaseItem"
+                                    id="productionBaseList"
+                                    width="100%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['ProductionOrder.reprocessedProduct']}
+                                </rich:column>
+
+                                <rich:column>
+                                    #{messages['ProductionOrder.reprocessedProduct.unid']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['ProductionOrder.reprocessedProduct.volume']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['ProductionOrder.estateOrderProduction']}
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{productionBaseItem.code}"/>
+                        </rich:column>
+
+                        <rich:column>
+                            <h:outputText value="#{productionBaseItem.units}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{productionBaseItem.volume}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText
+                                    style="font-weight: bold; color: #{productionBaseItem.state == 'PENDING' ? 'red' :(productionBaseItem.state == 'EXECUTED' ? 'blue' : (productionBaseItem.state == 'TABULATED' ? 'fuchsia' : 'green'))}"
+                                    value="#{productionBaseItem.state == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (productionBaseItem.state == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (productionBaseItem.state == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : messages['productionOrderForPlanning.estateOrder.finalized']))}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </rich:panel>
+            </rich:dataGrid>
+            <app:dataScroller id="dataScroller" for="productionPlanningList"
+                              dataModel="#{productionTransferLogDataModel}"/>
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.new']}" action="#{productionPlanningAction.createNew}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,102 @@
+<rich:modalPanel height="520" width="600" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="productListModalPanel"
+                 onshow="jQuery('#products\\:productListForm\\:nameField\\:name').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['ProductDiscountRule.products.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="productListForm">
+
+        <rich:simpleTogglePanel label="#{messages['Product.search']}" switchType="client">
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Product.name']}</ui:define>
+                <h:inputText id="name" value="#{productDiscountRuleAction.searchName}" maxlength="100" tabindex="1"
+                             styleClass="input"/>
+            </s:decorate>
+
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Product.code']}</ui:define>
+                <h:inputText id="code" value="#{productDiscountRuleAction.searchCode}" maxlength="150" tabindex="2"
+                             styleClass="input"/>
+                <a4j:commandButton id="searchButtonId" reRender="productList, dataScroller" styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+
+        <br/>
+        <rich:dataTable value="#{productDiscountRuleAction.productList}" var="productItem" id="productList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="50%, 35%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+
+                    <rich:column>
+                        #{messages['Product.name']}
+                    </rich:column>
+
+                    <rich:column>
+                        #{messages['Product.code']}
+                    </rich:column>
+
+                    <rich:column styleClass="center">
+                        <!--#{messages['ProductDiscountRule.products.select']}-->
+                        <h:selectBooleanCheckbox id="selectAll" value="#{productDiscountRuleAction.selectAllOption}">
+                            <a4j:support event="onclick" reRender="productList" ajaxSingle="true"
+                                         action="#{productDiscountRuleAction.selectAllAction}"/>
+                            <s:conversationPropagation value="none"/>
+                        </h:selectBooleanCheckbox>
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{productItem.name}"/>
+            </rich:column>
+
+            <rich:column>
+                <h:outputText value="#{productItem.code}"/>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                <h:selectBooleanCheckbox value="#{productDiscountRuleAction.selectedProducts[productItem]}">
+                    <a4j:support event="onclick" action="#{productDiscountRuleAction.selectProduct(productItem)}"
+                                 ajaxSingle="true" reRender="selectAll"/>
+                    <s:conversationPropagation value="none"/>
+                </h:selectBooleanCheckbox>
+            </rich:column>
+        </rich:dataTable>
+
+        <rich:datascroller align="right" for="productList" maxPages="10" id="dataScroller" renderIfSinglePage="false"/>
+
+        <br/><br/>
+
+        <div class="buttons">
+            <a4j:commandButton id="assignButton" action="#{productDiscountRuleAction.assignCustomers}"
+                               value="#{messages['Common.add']}" styleClass="button" ajaxSingle="true"
+                               tabindex="4" reRender="customerListModalPanel"/>
+            <a4j:commandButton id="cancelButton" value="#{messages['Common.cancel']}" styleClass="button"
+                               tabindex="5" action="#{productDiscountRuleAction.cancelAction}"
+                               reRender="customerList"/>
+            <rich:componentControl for="productListModalPanel" attachTo="closeLink, cancelButton, assignButton"
+                                   operation="hide" event="onclick"/>
+        </div>
+
+    </h:form>
+
+</rich:modalPanel>
+

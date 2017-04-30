@@ -1,0 +1,104 @@
+<rich:modalPanel height="620" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\:cashAccountListForm#{dialogId}\\:accountCodeField\\:accountCode').focus();">
+
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{cashAccountDataModel}"/>
+    </c:if>
+
+    <f:facet name="header">
+        <!--<h:outputText>#{messages['CashAccount.list']}</h:outputText>-->
+        <h:outputText>Cuentas Contables - Auxiliares 1</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="cashAccountListForm#{dialogId}">
+        <rich:simpleTogglePanel label="#{messages['CashAccount.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="accountCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccount.accountCode']}</ui:define>
+                    <h:inputText id="accountCode" value="#{dataModel.criteria.accountCode}" maxlength="20"
+                                 styleClass="input"
+                                 tabindex="2001"/>
+                </s:decorate>
+
+                <s:decorate id="desciptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccount.description']}</ui:define>
+                    <h:inputText id="description" value="#{dataModel.criteria.description}" maxlength="100"
+                                 styleClass="input"
+                                 tabindex="2002"/>
+                </s:decorate>
+
+                <s:decorate id="movementAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccount.movementAccount']}</ui:define>
+                    <h:selectBooleanCheckbox id="movementAccount" value="#{dataModel.movementAccount}"
+                                             tabindex="2003"/>
+                </s:decorate>
+
+                <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{dataModel.search}"
+                                       reRender="cashAccountList, dataScroller"
+                                       styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                       tabindex="2004">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{dataModel}" var="cashAccountItem" id="cashAccountList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 60%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="cashAccount.accountCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="cashAccountList, dataScroller">
+                            #{messages['CashAccount.accountCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="cashAccount.description"
+                                               dataModel="#{dataModel}"
+                                               reRender="cashAccountList, dataScroller">
+                            #{messages['CashAccount.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{cashAccountItem.accountCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{cashAccountItem.description}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <s:div rendered="#{cashAccountItem.movementAccount}">
+                    <ui:insert name="assignButton"/>
+                </s:div>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="cashAccountList" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

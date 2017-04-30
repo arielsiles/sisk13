@@ -1,0 +1,246 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<br/>
+<rich:panel>
+<f:facet name="header">
+    #{messages['IncomeByInvoiceByCategory.label']}
+</f:facet>
+<s:div style="overflow: auto;">
+<rich:dataTable width="100%"
+                value="#{incomeByInvoiceByCategoryAction.resultList}"
+                var="element"
+                footerClass="rich-table-footer">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column rowspan="2">
+            #{messages['IncomeByInvoiceByCategory.month']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByInvoiceByCategory.requiredService']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByInvoiceByCategory.optionalService']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByInvoiceByCategory.soldProduct']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByInvoiceByCategory.rental']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByInvoiceByCategory.total']}
+        </rich:column>
+        <rich:column rowspan="2">
+            #{messages['Dashboard.columnTitle.total']}
+        </rich:column>
+        <rich:column rowspan="2">
+            #{messages['IncomeByInvoiceByCategory.exchangeRate']}
+        </rich:column>
+        <rich:column breakBefore="true">
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+<rich:column styleClass="left" footerClass="rich-table-footercell">
+    <h:outputText value="#{element.month}"/>
+    <f:facet name="footer">
+        #{messages['Dashboard.rowTitle.subTotal']}
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.requiredServiceBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['requiredServiceBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.requiredServiceUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['requiredServiceUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.optionalServiceBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['optionalServiceBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.optionalServiceUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['optionalServiceUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.soldProductBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['soldProductBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.soldProductUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['soldProductUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.rentalBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['rentalBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.rentalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['rentalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.totalBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.totalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.finalTotalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['finalTotalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.exchangeRate}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="left">
+            #{messages['Dashboard.rowTitle.total']}
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalRequiredServiceUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalOptionalServiceUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalSoldProductUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['totalRentalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByInvoiceByCategoryAction.totals['mainTotalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2">
+            <rich:spacer/>
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+</rich:dataTable>
+</s:div>
+
+</rich:panel>
+
+</ui:composition>

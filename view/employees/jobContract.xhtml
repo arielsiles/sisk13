@@ -1,0 +1,387 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{jobContractAction.managed}">
+            #{messages['JobContract.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['JobContract.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="jobContractForm">
+
+<div class="buttons">
+
+    <h:commandButton action="#{jobContractAction.enableContractModification}"
+                     value="#{messages['Contract.enableContractModification']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and
+                     !jobContract.contract.contractModificationAuthorization
+                      and s:hasPermission('CONTRACTMODIFICATIONAUTHORIZATION','VIEW')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobContractAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!jobContractAction.managed and s:hasPermission('JOBCONTRACT','CREATE')}"
+                     tabindex="2">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobContractAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','UPDATE')}"
+                     tabindex="3"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','DELETE')}"
+                     tabindex="4">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobContractAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="5">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{jobContractAction.managed}">
+                #{messages['JobContract.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['JobContract.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+
+    <ui:include src="employeeFragment.xhtml">
+        <ui:param name="action" value="${jobContractAction}"/>
+    </ui:include>
+    <ui:include src="contractFragment.xhtml">
+        <ui:param name="action" value="${jobContractAction}"/>
+        <ui:param name="contract" value="${jobContractAction.contract}"/>
+        <ui:param name="charge" value="${jobContractAction.charge}"/>
+        <ui:param name="showCharge" value="${true}"/>
+
+        <!--CONTROLA EDICION DE LOS CONTRATOS PUESTO-->
+        <!--<c:set var="editable" value="#{!jobContractAction.managed or jobContractAction.contractEditable}"/>-->
+        <c:set var="editable" value="#{!jobContractAction.managed}"/>
+    </ui:include>
+
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <app:fieldset id="organizationalUnitFielset" title="#{messages['JobContract.organizationalUnit']}">
+
+            <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobContract.businessUnit']}</ui:define>
+                <h:outputText styleClass="input" value="#{jobContractAction.businessUnitName}"/>
+            </s:decorate>
+
+            <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobContract.organizationalUnit']}</ui:define>
+                <h:inputText required="true" styleClass="input" readonly="true"
+                             value="#{jobContractAction.organizationalUnitName}" tabindex="33"/>
+                <a4j:commandLink id="selectOrganizationUnit"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 tabindex="34"
+                                 title="#{messages['JobContract.selectOrganizationalUnit']}"
+                                 action="#{organizationalUnitTreeAction.clearSelectedOrganizationalUnit()}"
+                                 reRender="organizationalUnitTreeModalPanelContainer"
+                                 oncomplete="Richfaces.showModalPanel('organizationalUnitTreeModalPanel');">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="35"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{jobContractAction.clearOrganizationalUnit()}"
+                                 reRender="jobCategoryFielset, organizationalUnitFielset, salaryTypeField">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+
+        </app:fieldset>
+
+        <app:fieldset id="jobCategoryFielset" title="#{messages['JobContract.jobCategory']}">
+
+            <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Job.sector']}</ui:define>
+                <h:outputText styleClass="input" value="#{jobContractAction.sectorName}"/>
+            </s:decorate>
+
+            <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobContract.jobCategory']}</ui:define>
+                <h:selectOneMenu id="jobCategory" styleClass="input"
+                                 value="#{jobContractAction.jobCategory}" required="true" tabindex="36">
+                    <s:selectItems value="#{jobContractAction.jobCategoryList}" var="jobCategory"
+                                   label="#{jobCategory.acronym} - #{jobCategory.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+        </app:fieldset>
+    </h:panelGrid>
+    <app:fieldset id="salaryFielset" title="#{messages['JobContract.salary']}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="salaryTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['KindOfSalary.type']}</ui:define>
+                    <h:selectOneMenu id="kindOfSalary" value="#{jobContractAction.salary.kindOfSalary}"
+                                     styleClass="input"
+                                     rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"
+                                     required="true" tabindex="37">
+                                     <!--rendered="#{!jobContractAction.contractBlocked or s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"-->
+                        <s:selectItems value="#{jobContractAction.kindOfSalaryList}" var="kindOfSalary"
+                                       label="#{kindOfSalary.type}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{jobContractAction.salary.kindOfSalary.type}"
+                                  rendered="#{!s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"/>
+                </s:decorate>
+            </s:div>
+
+            <s:div>
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Salary.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{jobContractAction.salary.currency}" styleClass="input"
+                                     rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"
+                                     required="true" tabindex="39">
+                                     <!--rendered="#{!jobContractAction.contractBlocked or s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"-->
+                        <s:selectItems value="#{currencyList}" var="currency"
+                                       label="#{currency.nameSymbol}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{jobContractAction.salary.currency.nameSymbol}"
+                                  rendered="#{!s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"/>
+                                  <!--rendered="#{jobContractAction.contractBlocked and !s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"-->
+                </s:decorate>
+
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Salary.amount']}</ui:define>
+                    <h:inputText id="amount" value="#{jobContractAction.salary.amount}" required="true"
+                                 maxlength="100" styleClass="input"
+                                 rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"
+                                 tabindex="40">
+                                 <!--rendered="#{!jobContractAction.contractBlocked or s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"-->
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                        <f:validateDoubleRange maximum="#{messages['validator.maxDoubleRange']}"
+                                               minimum="#{messages['validator.minDoubleRange']}"/>
+                    </h:inputText>
+                    <h:outputText value="#{jobContractAction.salary.amount}"
+                                  rendered="#{!s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}">
+                                  <!--rendered="#{jobContractAction.contractBlocked and !s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}"-->
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+
+    <s:div id="blockCodeDiv">
+        <app:fieldset id="blockCodeFS" title="#{messages['JobContract.blockCode']}"
+                      rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW') or jobContractAction.contractBlocked}">
+            <s:decorate id="blockCodeField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}">
+                <ui:define name="label">#{messages['JobContract.blockCode']}</ui:define>
+                <h:inputText id="blockCode" value="#{jobContractAction.contract.modificationCode}"
+                             styleClass="input"
+                             maxlength="6"
+                             tabindex="41"/>
+                <a4j:commandButton action="#{jobContractAction.generateContractModificationCode()}"
+                                   value="#{messages['Common.generate']}"
+                                   styleClass="button"
+                                   tabindex="42"
+                                   ajaxSingle="true"
+                                   reRender="blockCodeFS"
+                                   immediate="true"/>
+            </s:decorate>
+            <s:decorate id="unlockCodeField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{!s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW') and jobContractAction.contractBlocked}">
+                <ui:define name="label">#{messages['JobContract.blockCode']}</ui:define>
+                <h:inputText id="unlockCode" value="#{jobContractAction.inputModificationCode}"
+                             styleClass="input"
+                             maxlength="6"
+                             tabindex="43">
+                    <a4j:support event="onblur"
+                                 ajaxSingle="true"
+                                 reRender="unlockCodeField"/>
+                </h:inputText>
+                <a4j:commandButton action="#{jobContractAction.unlockContractModificationCode()}"
+                                   value="#{messages['JobContract.unLock']}"
+                                   styleClass="button"
+                                   tabindex="44"
+                                   reRender="blockCodeDiv,controlFlagField,retentionFlagField,salaryFielset"
+                                   immediate="true"/>
+            </s:decorate>
+        </app:fieldset>
+    </s:div>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{jobContractAction.enableContractModification}"
+                     value="#{messages['Contract.enableContractModification']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and
+                     !jobContract.contract.contractModificationAuthorization
+                      and s:hasPermission('CONTRACTMODIFICATIONAUTHORIZATION','VIEW')}"
+                     tabindex="41">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{jobContractAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!jobContractAction.managed and s:hasPermission('JOBCONTRACT','CREATE')}"
+                     tabindex="42"/>
+
+    <h:commandButton action="#{jobContractAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','UPDATE')}"
+                     tabindex="43"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','DELETE')}"
+                     tabindex="44">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobContractAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="45">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['JobContract.delete.confirmation']}"/>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{jobContractAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"
+                           rendered="#{jobContractAction.managed and s:hasPermission('JOBCONTRACT','DELETE')}"
+                           tabindex="1000"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="organizationalUnitTreeModalPanelContainer" template="/employees/organizationalUnitTreeModalPanel.xhtml">
+    <ui:param name="selectAnyElement" value="false"/>
+    <ui:define name="selectOption">
+        <a4j:commandButton id="selectButton" value="#{messages['Common.choose']}"
+                           action="#{jobContractAction.assignOrganizationalUnit(organizationalUnitTreeAction.selectedOrganizationalUnit)}"
+                           ajaxSingle="true" reRender="organizationalUnitFielset, jobCategoryFielset, salaryTypeField"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml"
+            rendered="#{!jobContractAction.managed}">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{jobContractAction.assignEmployee(employeeItem)}"
+                           image="/img/active.gif" style="border:0" ajaxSingle="true"
+                           reRender="employeeFieldset"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="chargeListModalPanelContainer"
+            template="/employees/chargeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="chargeListModalPanel"/>
+    <ui:param name="createNewDialogId" value="chargeModalPanel"/>
+    <ui:param name="dataModel" value="#{chargeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{jobContractAction.setCharge(chargeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="chargeField"
+                           focus="selectCharge"
+                           oncomplete="Richfaces.hideModalPanel('chargeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="chargeModalPanelContainer"
+            template="/employees/chargeModalPanel.xhtml">
+    <ui:param name="dialogId" value="chargeModalPanel"/>
+    <ui:param name="reRender" value="chargeField"/>
+</s:decorate>
+
+<s:div id="pensionFundOrganizationListModalPanelDiv">
+    <s:decorate id="pensionFundOrganizationListModalPanelContainer"
+                template="/employees/socialWelfareEntityListModalPanel.xhtml"
+                rendered="#{jobContractAction.contract.activePensionFund}">
+        <ui:param name="dialogId" value="pensionFundOrganizationListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{jobContractAction.assignPensionFundOrganization(socialWelfareEntityItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="pensionFundOrganizationField"
+                               oncomplete="Richfaces.hideModalPanel('pensionFundOrganizationListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+<s:div id="socialSecurityOrganizationListModalPanelDiv">
+    <s:decorate id="socialSecurityOrganizationListModalPanelContainer"
+                template="/employees/socialWelfareEntityListModalPanel.xhtml"
+                rendered="#{jobContractAction.contract.activePensionFund}">
+        <ui:param name="dialogId" value="socialSecurityOrganizationListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{jobContractAction.assignSocialSecurityOrganization(socialWelfareEntityItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="socialSecurityOrganizationField"
+                               oncomplete="Richfaces.hideModalPanel('socialSecurityOrganizationListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+
+<s:fragment rendered="#{!jobContractAction.managed}">
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</s:fragment>
+<s:fragment rendered="#{jobContractAction.managed}">
+    <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+</s:fragment>
+
+</ui:define>
+</ui:composition>
+

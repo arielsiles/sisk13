@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--created by -->
+<jasperReport
+        xmlns="http://jasperreports.sourceforge.net/jasperreports"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+
+        name="fixedAssetByCustodianReport"
+        columnCount="1"
+        pageWidth="612"
+        pageHeight="792"
+        columnWidth="742"
+        columnSpacing="0"
+        leftMargin="30"
+        rightMargin="20"
+        topMargin="30"
+        bottomMargin="30"
+        whenNoDataType="AllSectionsNoDetail"
+        isTitleNewPage="false"
+        isSummaryNewPage="false"
+        scriptletClass="com.encens.khipus.action.fixedassets.EvolutionByGroupSummaryReportScriptlet">
+
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+
+    <field name="fixedAssetGroup.id" class="com.encens.khipus.model.fixedassets.FixedAssetGroupPk">
+        <fieldDescription>COLUMN_1</fieldDescription>
+    </field>
+    <field name="fixedAssetGroup.description" class="java.lang.String">
+        <fieldDescription>COLUMN_2</fieldDescription>
+    </field>
+
+    <variable name="ufvPreviousRemainder" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="ufvPositiveMovementsAmount" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="ufvNegativeMovementsAmount" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="ufvTotalAmount" class="java.math.BigDecimal" calculation="System"/>
+
+    <variable name="bsPreviousRemainder" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="bsPositiveMovementsAmount" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="bsNegativeMovementsAmount" class="java.math.BigDecimal" calculation="System"/>
+    <variable name="bsTotalAmount" class="java.math.BigDecimal" calculation="System"/>
+
+    <variable name="ufvTotalPreviousRemainder" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{ufvPreviousRemainder}</variableExpression>
+    </variable>
+    <variable name="ufvTotalPositiveMovementsAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{ufvPositiveMovementsAmount}</variableExpression>
+    </variable>
+    <variable name="ufvTotalNegativeMovementsAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{ufvNegativeMovementsAmount}</variableExpression>
+    </variable>
+    <variable name="ufvTotalTotalAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{ufvTotalAmount}</variableExpression>
+    </variable>
+
+    <variable name="bsTotalPreviousRemainder" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{bsPreviousRemainder}</variableExpression>
+    </variable>
+    <variable name="bsTotalPositiveMovementsAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{bsPositiveMovementsAmount}</variableExpression>
+    </variable>
+    <variable name="bsTotalNegativeMovementsAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{bsNegativeMovementsAmount}</variableExpression>
+    </variable>
+    <variable name="bsTotalTotalAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression>$V{bsTotalAmount}</variableExpression>
+    </variable>
+    <!--*************TITLE******************-->
+    <title>
+        <band height="80" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon" isLazy="false">
+                <reportElement x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"
+                               key="COMPANY_LOGO_ELEMENT"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"
+                       hyperlinkTarget="Self">
+                <reportElement
+                        style="titleStyle"
+                        x="72"
+                        y="0"
+                        width="450"
+                        height="58"
+                        key="date_text"
+                        positionType="Float"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]>
+                </textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"
+                       hyperlinkTarget="Self">
+                <reportElement
+                        style="detailStyle"
+                        x="0"
+                        y="63"
+                        width="480"
+                        height="12"
+                        positionType="Float"/>
+                <box padding="1"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{dateRangeParam}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="0" splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="12" splitType="Stretch">
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="0" y="0" width="80" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.groupCode}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="80" y="0" width="150" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.groupDescription}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="230" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.ufvPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="294" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.ufvPositiveMovements}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="358" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.ufvNegativeMovements}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="422" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.ufvTotalAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="486" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.bsPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="550" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.bsPositiveMovements}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="614" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.bsNegativeMovements}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="678" y="0" width="64" height="12" style="headerStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{FixedAssetEvolutionSummary.report.bsTotalAmount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="12" splitType="Stretch">
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="0" y="0" width="80" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAssetGroup.id}.getGroupCode()]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                <reportElement x="80" y="0" width="150" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAssetGroup.description}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="230" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="294" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvPositiveMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="358" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvNegativeMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="422" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvTotalAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="486" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="550" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsPositiveMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="614" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsNegativeMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="678" y="0" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <pen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsTotalAmount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="0" splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement x="0" y="0" width="742" height="12" style="detailStyle"
+                               positionType="Float" mode="Opaque"/>
+                <box padding="0">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1"/>
+                </box>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm">
+                    <reportElement x="0" y="0" width="100" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <box padding="1">
+                        <pen lineColor="#000000" lineStyle="Solid"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date">
+                        <![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="650" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer">
+                        <![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true">
+                    <reportElement x="690" y="0" width="10" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true" isStretchWithOverflow="true" evaluationTime="Report">
+                    <reportElement x="700" y="0" width="40" height="12" style="detailStyle"
+                                   stretchType="RelativeToTallestObject" mode="Opaque"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="20" splitType="Stretch">
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="230" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvTotalPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="294" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvTotalPositiveMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="358" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvTotalNegativeMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="422" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{ufvTotalTotalAmount}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="486" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsTotalPreviousRemainder}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="550" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsTotalPositiveMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="614" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsTotalNegativeMovementsAmount}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true" isStretchWithOverflow="true" pattern="#,##0.00">
+                <reportElement x="678" y="7" width="64" height="12" style="detailStyle"
+                               stretchType="RelativeToTallestObject" mode="Opaque"/>
+                <box padding="1">
+                    <topPen lineColor="#000000" lineStyle="Solid" lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$V{bsTotalTotalAmount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <h:form>
+        <s:div id="meterDataGridDiv">
+            <h:panelGrid columns="1" width="1232px">
+                <h:panelGroup>
+                    <div id="statusBar" style="width: 100%">
+                        <div style="padding: 0 7px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr style="height: 8px;float: left;list-style: none;margin: 0;padding: 0; width: 100%">
+                                    <c:forEach items="#{financesAgileWidgetAction.rangeMeterWidgetActionMap}"
+                                               var="items">
+                                        <td style="width:#{financesAgileWidgetAction.percent(items.key)}%;"
+                                            class="li-background-color-#{items.key} li-agile"
+                                            title="#{messages[financesAgileWidgetAction.color(items.key)]} #{financesAgileWidgetAction.percent(items.key)}%">
+                                            #{messages[financesAgileWidgetAction.color(items.key)]} : #{items.key}
+                                        </td>
+                                    </c:forEach>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </h:panelGroup>
+                <h:panelGrid columns="3" columnClasses="width33percent, width33percent, width33percent">
+                    <c:forEach items="#{financesAgileWidgetAction.rangeMeterWidgetActionMap}" var="ranges">
+                        <h:panelGrid>
+                            <h:outputText
+                                    value="#{messages[financesAgileWidgetAction.color(ranges.key)]}: #{financesAgileWidgetAction.size(ranges.value)}"
+                                    style="font-size: large;font-weight: bold;"/>
+                            <rich:dataGrid value="#{ranges.value}" var="range" columns="2" elements="4"
+                                           width="400px" columnClasses="width50percent, width50percent">
+                                <rich:panel bodyClass="height60percent" style="cursor:pointer;height:120px"
+                                            styleClass="rich-panel-border-round"
+                                            headerClass="height40percent custom-rich-panel-header-#{ranges.key} rich-panel-header-top-border-round rich-panel-header-font-agile">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{range.widget.title}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{range.widget.filters[ranges.key].description}"/>
+                                    <h:panelGrid columns="4">
+                                        <h:outputText value="#{messages['Common.value']}:" styleClass="bold"/>
+                                        <h:outputText value="#{range.stateMetricValue}"/>
+                                        <h:outputFormat value="#{messages['Common.parenthesis']}">
+                                            <f:param value="#{messages[range.widget.unit.resourceKey]}"/>
+                                        </h:outputFormat>
+                                        <h:outputFormat value="#{messages['Common.percentage']}"
+                                                        rendered="#{not empty range.stateMetricPercentage}">
+                                            <f:param value="#{range.stateMetricPercentage}"/>
+                                        </h:outputFormat>
+                                    </h:panelGrid>
+                                    <a4j:support id="selectLinkId"
+                                                 event="onclick"
+                                                 oncomplete="Richfaces.showModalPanel('#{range.widgetName}ModalPanel');"
+                                                 reRender="#{range.widgetName}ModalPanel"
+                                                 ajaxSingle="true"
+                                                 immediate="true"/>
+                                </rich:panel>
+                                <c:if test="#{financesAgileWidgetAction.size(ranges.value) gt 0}">
+                                    <f:facet name="footer">
+                                        <rich:datascroller/>
+                                    </f:facet>
+                                </c:if>
+                            </rich:dataGrid>
+                        </h:panelGrid>
+                    </c:forEach>
+                </h:panelGrid>
+            </h:panelGrid>
+        </s:div>
+    </h:form>
+
+    <s:decorate id="officialPayrollGenerationWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="officialPayrollGenerationWidgetModalPanel"/>
+        <ui:param name="action" value="#{officialPayrollGenerationWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/officialPayrollGenerationWidget.xhtml"
+                           permission="#{s:hasPermission('OFFICIALPAYROLLGENERATIONWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="dischargeBeforeLifetimeWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="dischargeBeforeLifetimeWidgetModalPanel"/>
+        <ui:param name="action" value="#{dischargeBeforeLifetimeWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/dischargeBeforeLifetimeWidget.xhtml"
+                           permission="#{s:hasPermission('DISCHARGEBEFORELIFETIMEWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="warehouseMonthlyCloseWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="warehouseMonthlyCloseWidgetModalPanel"/>
+        <ui:param name="action" value="#{warehouseMonthlyCloseWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/warehouseMonthlyCloseWidget.xhtml"
+                           permission="#{s:hasPermission('WAREHOUSEMONTHLYCLOSEWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="fixedAssetWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="fixedAssetWidgetModalPanel"/>
+        <ui:param name="action" value="#{fixedAssetWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/fixedAssetWidget.xhtml"
+                           permission="#{s:hasPermission('FIXEDASSETWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="expiredReceivablesWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="expiredReceivablesWidgetModalPanel"/>
+        <ui:param name="action" value="#{expiredReceivablesWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/expiredReceivablesWidget.xhtml"
+                           permission="#{s:hasPermission('EXPIREDRECEIVABLESWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="checkDeliveryWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="checkDeliveryWidgetModalPanel"/>
+        <ui:param name="action" value="#{checkDeliveryWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/checkDeliveryWidget.xhtml"
+                           permission="#{s:hasPermission('CHECKDELIVERYWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="maxProductItemControlWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="maxProductItemControlWidgetModalPanel"/>
+        <ui:param name="action" value="#{maxProductItemControlWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/maxProductItemControlWidget.xhtml"
+                           permission="#{s:hasPermission('MAXPRODUCTITEMCONTROLWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="minProductItemControlWidgetModalPanelContainer"
+                template="/dashboard/agileWidgetModalPanel.xhtml">
+        <ui:param name="dialogId" value="minProductItemControlWidgetModalPanel"/>
+        <ui:param name="action" value="#{minProductItemControlWidgetAction}"/>
+        <ui:define name="content">
+            <app:includeIf src="/dashboard/minProductItemControlWidget.xhtml"
+                           permission="#{s:hasPermission('MINPRODUCTITEMCONTROLWIDGET','VIEW')}"/>
+        </ui:define>
+    </s:decorate>
+
+
+</ui:composition>

@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['taxPayrollGeneration.reports.101FormRecordReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="formRecordReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['taxPayrollGeneration.reports.101FormRecordReport']}
+                </f:facet>
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.101FormRecordReport.employee']}</ui:define>
+                    <h:inputText styleClass="input" readonly="true"
+                                 value="#{formRecordReportAction.employee.fullName}" tabindex="1"/>
+                    <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="2"
+                                     title="#{messages['FixedAsset.selectEmployee']}"
+                                     reRender="employeeField"
+                                     onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true" tabindex="3"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{formRecordReportAction.clearEmployee}"
+                                     reRender="employeeField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+                <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAsset.executorUnit']}</ui:define>
+                    <h:selectOneMenu id="executorUnit"
+                                     value="#{formRecordReportAction.executorUnitCode}"
+                                     styleClass="input"
+                                     tabindex="4">
+                        <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       itemValue="#{businessUnit.executorUnitCode}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAsset.costCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="formRecordReportAction.costCenter.code"
+                                     value="#{formRecordReportAction.costCenter}"
+                                     searchField="code"
+                                     reRender="costCenterField"
+                                     tabindex="5"/>
+                    <app:selectPopUp id="costCenter"
+                                     textValue="#{formRecordReportAction.costCenter.fullName}"
+                                     value="#{formRecordReportAction.costCenter}"
+                                     clearAction="formRecordReportAction.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+                <s:decorate id="initDateRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.101FormRecordReport.presentationDate']}</ui:define>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+                    <rich:calendar id="initDateRange"
+                                   value="#{formRecordReportAction.initDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+                    <rich:calendar id="endDateRange"
+                                   value="#{formRecordReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="7">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="initDateRange"
+                                                forLabel="#{messages['Fixedassets.report.registrationDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{formRecordReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"
+                                      tabIndex="8"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{formRecordReportAction.generateReport}"
+                                 styleClass="button" tabindex="9"
+                                 value="#{messages['Common.generate']}" id="searchButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{formRecordReportAction.setCostCenter(costCenterItem)}"
+                                   image="/img/active.gif" styleClass="select-image" immediate="true"
+                                   reRender="costCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{formRecordReportAction.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>
+
+

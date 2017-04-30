@@ -1,0 +1,302 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{warehousePurchaseOrderDetailAction.managed}">
+            <h:outputText value="#{messages['WarehousePurchaseOrderDetail.edit']}"/>
+        </c:when>
+        <c:otherwise>
+            <h:outputText value="#{messages['WarehousePurchaseOrderDetail.new']}"/>
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="65%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<c:set var="isPurchaseOrderPending" value="#{warehousePurchaseOrderAction.purchaseOrderPending}"/>
+<c:set var="isPurchaseOrderApproved" value="#{warehousePurchaseOrderAction.purchaseOrderApproved}"/>
+<c:set var="isPurchaseOrderFinalized" value="#{warehousePurchaseOrderAction.purchaseOrderFinalized}"/>
+<c:set var="selectProductItemButtonId" value="selectProductItemButton"/>
+<c:set var="requestedQuantityId" value="requestedQuantity"/>
+
+
+<h:form id="warehousePurchaseOrderDetailForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{warehousePurchaseOrderDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{warehousePurchaseOrderDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderDetailAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','UPDATE') and  (isPurchaseOrderPending)}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{warehousePurchaseOrderDetailAction.managed}">
+                <h:outputText value="#{messages['WarehousePurchaseOrderDetail.edit']}"/>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{messages['WarehousePurchaseOrderDetail.new']}"/>
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{warehousePurchaseOrderDetailAction.managed}">
+        <ui:define name="label">#{messages['WarehousePurchaseOrderDetail.detailNumber']}</ui:define>
+        <h:outputText value="#{warehousePurchaseOrderDetail.detailNumber}"/>
+    </s:decorate>
+
+    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrderDetail.productItem']}"/>
+        </ui:define>
+        <app:quickSearch id="productItemSearch"
+                         textValue="warehousePurchaseOrderDetail.productItem.productItemCode"
+                         value="#{warehousePurchaseOrderDetail.productItem}"
+                         namedQuery="productItemQuickSearchList"
+                         postSearchAction="warehousePurchaseOrderDetailAction.updateProperties()"
+                         reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                         rendered="#{isPurchaseOrderPending}"
+                         tabindex="1"/>
+        <app:selectPopUp id="productItem"
+                         required="true"
+                         textValue="#{warehousePurchaseOrderDetail.productItem.fullName}"
+                         value="#{warehousePurchaseOrderDetail.productItem}"
+                         clearAction="warehousePurchaseOrderDetailAction.clearProductItem()"
+                         searchModalPanel="productItemByProviderListModalPanel"
+                         dataModel="#{provideSearchDataModel}"
+                         reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                         selectLinkId="selectProductItemButton"
+                         readOnly="#{not isPurchaseOrderPending}"
+                         hotKeySelect="alt+1">
+            <ui:define name="criteriaValues">
+                <app:criteriaValue fieldName="providerCode"
+                                   value="#{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}"/>
+            </ui:define>
+        </app:selectPopUp>
+    </s:decorate>
+    <s:div id="purchaseMeasureUnitPanel">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehousePurchaseOrderDetail.purchaseMeasureUnit']}"/>
+            </ui:define>
+            <h:outputText value="#{warehousePurchaseOrderDetail.purchaseMeasureUnit.fullName}"
+                          rendered="#{not empty warehousePurchaseOrderDetail.purchaseMeasureUnit}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="unitPricePanel">
+        <s:decorate id="unitCostField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <c:choose>
+                    <c:when test="#{warehousePurchaseOrderDetailAction.managed}">
+                        <h:outputText value="#{messages['WarehousePurchaseOrderDetail.unitCost']}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <h:outputText value="#{messages['WarehousePurchaseOrderDetail.providerUnitPrice']}"/>
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+            <c:choose>
+                <c:when test="#{not isPurchaseOrderPending}">
+                    <h:outputText value="#{warehousePurchaseOrderDetail.unitCost}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                    </h:outputText>
+                </c:when>
+                <c:otherwise>
+                    <h:inputText id="unitCost"
+                                 value="#{warehousePurchaseOrderDetail.unitCost}"
+                                 styleClass="input right"
+                                 required="true"
+                                 tabindex="2">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
+                                                 forId="unitCost"/>
+                        <app:keyUpEvent focus="unitCost"
+                                        reRender="totalAmountField, unitCostField, requestedQuantityField"
+                                        rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
+                                        action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>
+                    </h:inputText>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="requestedQuantityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehousePurchaseOrderDetail.requestedQuantity']}</ui:define>
+        <h:inputText id="requestedQuantity"
+                     value="#{warehousePurchaseOrderDetail.requestedQuantity}"
+                     styleClass="input right"
+                     required="true"
+                     rendered="#{isPurchaseOrderPending}"
+                     tabindex="3">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="requestedQuantity"/>
+            <app:keyUpEvent focus="requestedQuantity"
+                            reRender="totalAmountField, unitCostField, requestedQuantityField"
+                            rendered="#{isPurchaseOrderPending}"
+                            action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>
+        </h:inputText>
+        <h:outputText value="#{warehousePurchaseOrderDetail.requestedQuantity}"
+                      rendered="#{not isPurchaseOrderPending}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="totalAmountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrderDetail.totalAmount']}"/>
+        </ui:define>
+        <h:inputText id="totalAmount"
+                     styleClass="input right"
+                     required="true"
+                     value="#{warehousePurchaseOrderDetail.totalAmount}"
+                     rendered="#{isPurchaseOrderPending}"
+                     tabindex="5">
+            <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
+                                     forId="totalAmount"/>
+            <app:keyUpEvent focus="totalAmount"
+                            reRender="totalAmountField, unitCostField, requestedQuantityField, productItemField"
+                            rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
+                            action="warehousePurchaseOrderDetailAction.calculateUnitCost()"/>
+        </h:inputText>
+        <h:outputText value="#{warehousePurchaseOrderDetail.totalAmount}"
+                      rendered="#{isPurchaseOrderApproved or isPurchaseOrderFinalized}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+        </h:outputText>
+        <a4j:commandLink id="calculateTotalAmountButton"
+                         ajaxSingle="true"
+                         immediate="true"
+                         title="#{messages['Common.calculate']}"
+                         reRender="totalAmountField, unitCostField, requestedQuantityField"
+                         rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
+                         action="#{warehousePurchaseOrderDetailAction.calculateTotalAmount}"
+                         tabindex="6">
+            <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
+            <a4j:support event="onclick"
+                         reRender="unitPricePanel, requestedQuantityField, purchaseMeasureUnitPanel, productItemField"/>
+        </a4j:commandLink>
+    </s:decorate>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}"
+                     tabindex="9"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}"
+                     tabindex="10"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderDetailAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','UPDATE') and (isPurchaseOrderPending)}"
+                     tabindex="11"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderDetailAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','DELETE')}"
+                     tabindex="12">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="13"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{warehousePurchaseOrderDetailAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">
+        <h:outputText value="#{messages['Common.delete.confirmation']}"/>
+    </ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['WarehousePurchaseOrderDetail.delete.confirmation']}">
+                <f:param value="#{warehousePurchaseOrderDetail.detailNumber}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{warehousePurchaseOrderDetailAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="productItemByProviderListModalPanelContainer"
+            template="/warehouse/productItemByProviderListModalPanel.xhtml">
+    <ui:param name="containerId" value="productItemByProviderListModalPanelContainer"/>
+    <ui:param name="dialogId" value="productItemByProviderListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderDetailAction.assignProductItem(productItemItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                           oncomplete="Richfaces.hideModalPanel('productItemByProviderListModalPanel');document.getElementById('#{rich:clientId(requestedQuantityId)}').focus();"/>
+    </ui:define>
+</s:decorate>
+
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#productItemSearch" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

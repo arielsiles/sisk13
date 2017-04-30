@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.rrhh.dischargeDocumentsReport.page.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="articlesReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.rrhh.dischargeDocumentsReport.page.title']}
+                </f:facet>
+
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DischargeDocuments.report.employee']}</ui:define>
+                    <h:inputText styleClass="input" readonly="true"
+                                 value="#{dischargeDocumentsReportAction.employee.fullName}" tabindex="1"/>
+                    <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="2"
+                                     title="#{messages['FixedAsset.selectEmployee']}"
+                                     reRender="employeeField"
+                                     onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true" tabindex="3"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{dischargeDocumentsReportAction.clearEmployee}"
+                                     reRender="employeeField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+                <s:decorate id="gestionPayrollId" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DischargeDocument.gestionPayroll']}</ui:define>
+                    <app:selectPopUp id="gestionPayrollSelectPopup"
+                                     textValue="#{dischargeDocumentsReportAction.gestionPayroll.gestionName}"
+                                     value="#{dischargeDocumentsReportAction.gestionPayroll}"
+                                     dataModel="#{gestionPayrollAllSearchDataModel}"
+                                     clearAction="dischargeDocumentsReportAction.clearGestionPayRoll()"
+                                     searchModalPanel="gestionPayRollSearchModalPanel"
+                                     reRender="gestionPayrollId"
+                                     tabindex="4">
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DischargeDocument.date']}</ui:define>
+                    <h:outputText>#{messages['DischargeDocuments.report.date.from']}</h:outputText>
+                    &#160;
+                    <rich:calendar id="initDate"
+                                   value="#{dischargeDocumentsReportAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="5">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                    &#160;
+                    <h:outputText>#{messages['DischargeDocuments.report.date.to']}</h:outputText>
+                    &#160;
+                    <rich:calendar id="endDate"
+                                   value="#{dischargeDocumentsReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="initDate"
+                                                forLabel="#{messages['DischargeDocument.date']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{dischargeDocumentsReportAction}" showPageFormat="false"
+                                      tabIndex="7"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{dischargeDocumentsReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{dischargeDocumentsReportAction.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="gestionPayRollListModalPanelContainer"
+                    template="/employees/gestionPayRollSearchModalPanel.xhtml">
+            <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+            <ui:param name="dataModel" value="#{gestionPayrollAllSearchDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{dischargeDocumentsReportAction.assignGestionPayroll(gestionPayrollItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="gestionPayrollId"
+                                   oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#initDate" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

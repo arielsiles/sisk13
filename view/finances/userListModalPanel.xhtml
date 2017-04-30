@@ -1,0 +1,101 @@
+<rich:modalPanel height="520" width="600" zindex="2000" resizeable="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="userListModalPanel"
+                 onshow="jQuery('#users\\:userListForm\\:firstNameField\\:firstName').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['UserCashBox.users.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="userListForm">
+
+        <rich:simpleTogglePanel label="#{messages['User.search']}" switchType="client"
+                                width="100%">
+
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['User.firstName']}</ui:define>
+                <h:inputText id="firstName" maxlength="80" styleClass="input" tabindex="1"
+                             value="#{userCashBoxDataModel.criteria.employee.firstName}"/>
+                <ui:param name="oneLine" value="true"/>
+            </s:decorate>
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{customerDiscountRuleAction.searchPerson}">
+                <ui:define name="label">#{messages['User.lastName']}</ui:define>
+                <h:inputText id="lastName" maxlength="80" styleClass="input" tabindex="2"
+                             value="#{userCashBoxDataModel.criteria.employee.lastName}"/>
+                <a4j:commandButton action="#{userCashBoxDataModel.search}" reRender="userList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+
+        <br/>
+        <rich:dataTable value="#{userCashBoxDataModel}" var="userItem" id="userList" rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="30%, 25%, 30%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.employee.idNumber" dataModel="#{userCashBoxDataModel}"
+                                               reRender="userList, dataScroller">
+                            <s:conversationPropagation type="join"/>
+                            #{messages['User.idNumber']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.username" dataModel="#{userCashBoxDataModel}"
+                                               reRender="userList, dataScroller">
+                            <s:conversationPropagation type="join"/>
+                            #{messages['User.username']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.employee.lastName" dataModel="#{userCashBoxDataModel}"
+                                               reRender="userList, dataScroller">
+                            <s:conversationPropagation type="join"/>
+                            #{messages['User.fullName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['UserCashBox.users.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{userItem.employee.idNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{userItem.username}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{userItem.employee.fullName}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <a4j:commandButton id="assignButton" action="#{cashBoxAction.setUser(userItem)}"
+                                   image="/img/active.gif" style="border:0" ajaxSingle="true" reRender="userField"/>
+                <rich:componentControl for="userListModalPanel" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="userList" dataModel="#{userCashBoxDataModel}"/>
+
+        <rich:componentControl for="userListModalPanel" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

@@ -1,0 +1,94 @@
+<rich:modalPanel height="320" width="820" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 id="#{dialogId}"
+                 onshow="#{dialogId}focusFirstElement();">
+    <f:facet name="header">
+        <h:outputText>#{financeProviderAction.managed?messages['FinanceProvider.update']:messages['FinanceProvider.create']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage id="closeLink" value="/img/close.png" styleClass="select-image"/>
+    </f:facet>
+    <h:form id="financeProviderAjaxForm">
+        <ui:include src="/include/messages.xhtml"/>
+
+        <div class="buttons">
+            <a4j:commandButton action="#{financeProviderAction.createFinanceProvider()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}financeProviderAjaxForm"
+                               rendered="#{not financeProviderAction.managed}"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postCreateAction}"
+                                             target="#{financeProviderAction.postCreateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton action="#{financeProviderAction.updateFinanceProvider()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}financeProviderAjaxForm"
+                               rendered="#{financeProviderAction.managed}"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postUpdateAction}"
+                                             target="#{financeProviderAction.postUpdateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.cancel']}"
+                               styleClass="button"
+                               action="#{financeProviderAction.cancel}"
+                               immediate="true"
+                               ajaxSingle="true"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+        </div>
+
+        <ui:include src="/finances/financeProviderForm.xhtml">
+            <ui:param name="managed" value="#{financeProviderAction.managed}"/>
+            <ui:param name="providerEntity" value="#{financeProvider}"/>
+        </ui:include>
+
+        <div class="buttons">
+            <a4j:commandButton action="#{financeProviderAction.createFinanceProvider()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}financeProviderAjaxForm"
+                               rendered="#{not financeProviderAction.managed}"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postCreateAction}"
+                                             target="#{financeProviderAction.postCreateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton action="#{financeProviderAction.updateFinanceProvider()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}financeProviderAjaxForm"
+                               rendered="#{financeProviderAction.managed}"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postUpdateAction}"
+                                             target="#{financeProviderAction.postUpdateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.cancel']}"
+                               styleClass="button"
+                               action="#{financeProviderAction.cancel}"
+                               immediate="true"
+                               ajaxSingle="true"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+        </div>
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink"
+                               operation="hide"
+                               event="onclick"/>
+
+        <c:set var="firstInputToFocusId"
+               value="#{financeProviderAction.managed?'nitNumberInputField':'acronymInputField'}"/>
+        <script type="text/javascript">
+            function #{dialogId}focusFirstElement() {
+                document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+            }
+        </script>
+
+    </h:form>
+
+
+</rich:modalPanel>

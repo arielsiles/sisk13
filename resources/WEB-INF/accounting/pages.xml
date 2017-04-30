@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/accounting/*" login-required="true"/>
+
+    <page view-id="/accounting/voucherList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{voucherAction.select(voucherItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucher.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherUpdateAction.select(voucherItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/accounting/voucher.xhtml" no-conversation-view-id="/accounting/voucherList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/accounting/voucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/accounting/voucherUpdate.xhtml" no-conversation-view-id="/accounting/voucherList.xhtml">
+        <navigation from-action="#{voucherUpdateAction.cancel}">
+            <rule>
+                <redirect view-id="/accounting/voucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherUpdateAction.approveVoucher}">
+            <rule if-outcome="Approved">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherUpdateAction.annulVoucher}">
+            <rule if-outcome="Annul">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherUpdateAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/accounting/voucherList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <!-- For Accounting Purchase Document -->
+        <navigation from-action="#{voucherUpdateAction.addPurchaseDocument}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/accountingPurchaseDocument.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherUpdateAction.selectPurchaseDocument(purchaseDocumentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/accountingPurchaseDocument.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <!-- END For Accounting Purchase Document -->
+    </page>
+
+    <page view-id="/accounting/accountingPurchaseDocument.xhtml"
+          no-conversation-view-id="/accounting/voucherList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <!--
+    <page view-id="/warehouse/warehouseVoucherCreate.xhtml" no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">
+        <navigation from-action="#{warehouseVoucherCreateAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    -->
+    <page view-id="/accounting/voucherCreate.xhtml" no-conversation-view-id="/accounting/voucherList.xhtml">
+        <navigation from-action="#{voucherCreateAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherCreateAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/accounting/voucherList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
+</pages>        

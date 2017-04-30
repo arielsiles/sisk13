@@ -1,0 +1,211 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{provideAction.managed}">
+            #{messages['Provide.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Provide.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="55%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="provideForm">
+        <div class="buttons">
+            <h:commandButton id="createButtonId"
+                             action="#{provideAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{provideAction.createAndNew}"
+                             value="#{messages['Common.saveAndNew']}"
+                             styleClass="button"
+                             rendered="#{!provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+
+            <h:commandButton id="updateButtonId"
+                             action="#{provideAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{provideAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{provideAction.managed}">
+                        #{messages['Provide.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['Provide.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+
+            <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Provide.productItem']}</ui:define>
+                <app:quickSearch id="productItemQuickSearch"
+                                 textValue="provideAction.productItem.productItemCode"
+                                 value="#{provideAction.productItem}"
+                                 searchField="productItemCode"
+                                 alias="productItem"
+                                 reRender="productItemField, amountField, groupAmountPanel"
+                                 tabindex="1">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <app:selectPopUp id="productItem"
+                                 required="true"
+                                 textValue="#{provideAction.productItem.name}"
+                                 value="#{provideAction.productItem}"
+                                 clearAction="provideAction.cleanProductItem()"
+                                 searchModalPanel="productItemListModalPanel"
+                                 dataModel="#{productItemSearchDataModel}"
+                                 reRender="productItemField, amountField, groupAmountPanel"/>
+            </s:decorate>
+            <s:div id="groupAmountPanel">
+                <s:decorate id="groupAmountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Provide.groupAmount']}</ui:define>
+                    <h:inputText id="groupAmount"
+                                 value="#{provide.groupAmount}"
+                                 styleClass="input right"
+                                 required="true"
+                                 tabindex="2">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
+                                                 forId="groupAmount"/>
+                    </h:inputText>
+                    &#160;
+                    <h:outputFormat value="#{messages['Provide.byMeasureUnit']}"
+                                    rendered="#{provideAction.productItemSelect}">
+                        <f:param value="#{provideAction.groupMeasureUnit.name}"/>
+                    </h:outputFormat>
+                </s:decorate>
+            </s:div>
+
+            <s:decorate id="deliveryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Provide.delivery']}</ui:define>
+                <h:inputText id="delivery"
+                             value="#{provide.delivery}"
+                             styleClass="input right"
+                             required="true"
+                             tabindex="3">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+                &#160;
+                <h:outputFormat value="#{messages['Common.parenthesis']}">
+                    <f:param value="#{messages['Common.days']}"/>
+                </h:outputFormat>
+            </s:decorate>
+
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{provideAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"
+                             tabindex="7"/>
+
+            <h:commandButton action="#{provideAction.createAndNew}"
+                             value="#{messages['Common.saveAndNew']}"
+                             styleClass="button"
+                             rendered="#{!provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"
+                             tabindex="8"/>
+
+            <h:commandButton action="#{provideAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}"
+                             tabindex="9"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}"
+                             tabindex="10">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{provideAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="11"/>
+        </div>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['Provide.delete.confirmation']}">
+                    <f:param value="#{provide.productItem.name}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{provideAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               rendered="#{provideAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="productItemListModalPanelContainer"
+                template="/warehouse/productItemListModalPanel.xhtml"
+                rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{provideAction.assignProductItem(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField, amountField, groupAmountPanel"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <!--Set selector Id to enable focus-->
+    <rich:jQuery selector="#productItemQuickSearch" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

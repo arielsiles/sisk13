@@ -1,0 +1,387 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['WarehouseVoucher.new']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="75%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="warehouseVoucherForm">
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['menu.customers.sales.cashSales']}
+</f:facet>
+<app:fieldset id="warehouseVoucherFields" title="#{messages['Invoice.customer']}">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+
+<s:div id="leftSidePanel">
+<s:div id="executorUnitLeftSidePanel">
+
+    <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Invoice.customer']}</ui:define>
+        <h:inputText styleClass="input" readonly="true"
+                     value="#{jobContractDataModel.employee.fullName}"
+                     tabindex="3"/>
+        <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
+                         tabindex="4"
+                         title="#{messages['JobContract.selectEmployee']}"
+                         reRender="employeeField"
+                         onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+        <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
+                         tabindex="5"
+                         title="#{messages['Common.clear']}"
+                         action="#{jobContractDataModel.clearEmployee()}"
+                         reRender="employeeField">
+            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+    </s:decorate>
+
+    <s:decorate id="clientOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Invoice.customer']}</ui:define>
+        <h:inputText styleClass="input" readonly="true"
+                     value="#{clientOrderDataModel.clientOrder.numberDoc}"
+                     tabindex="3"/>
+        <a4j:commandLink id="selectClientOrder" ajaxSingle="true" immediate="true"
+                         tabindex="4"
+                         title="#{messages['Invoice.customer']}"
+                         reRender="clientOrderField"
+                         onclick="Richfaces.showModalPanel('clientOrderListModalPanel');">
+            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+        <a4j:commandLink id="clearClientOrder" ajaxSingle="true" immediate="true"
+                         tabindex="5"
+                         title="#{messages['Common.clear']}"
+                         action="#{clientOrderDataModel.clearClientOrder()}"
+                         reRender="clientOrderField">
+            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+    </s:decorate>
+
+</s:div>
+
+<s:div id="contraAccountDiv">
+    <s:decorate id="contraAccountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{not empty warehouseVoucherCreateAction.warehouseVoucher.documentType and (
+                warehouseVoucherCreateAction.warehouseVoucher.documentType.isInputType() or
+                warehouseVoucherCreateAction.warehouseVoucher.documentType.isOutputType()) and
+                warehouseVoucherCreateAction.warehouseVoucher.documentType.isContraAccountDefinedByUser()}">
+        <ui:define name="label">#{messages['WarehouseVoucher.contraAccount']}</ui:define>
+        <app:quickSearch id="quickSearchContraAccount"
+                         textValue="warehouseVoucherCreateAction.warehouseVoucher.contraAccount.accountCode"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.contraAccount}"
+                         searchField="accountCode"
+                         reRender="contraAccountField"
+                         tabindex="6"/>
+        <app:selectPopUp id="contraAccount"
+                         required="true"
+                         textValue="#{warehouseVoucherCreateAction.warehouseVoucher.contraAccount.description}"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.contraAccount}"
+                         dataModel="#{cashAccountDataModel}"
+                         clearAction="warehouseVoucherCreateAction.warehouseVoucher.setContraAccount(null)"
+                         searchModalPanel="cashAccountListModalPanel"
+                         reRender="contraAccountField"
+                         hotKeySelect="alt+5"
+                         tabindex="6"/>
+    </s:decorate>
+
+    <s:decorate id="nitField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">Nit:</ui:define>
+        <h:inputText styleClass="inputSmall" readonly="false" value=""/>
+    </s:decorate>
+    <s:decorate id="razonField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">Nombre:</ui:define>
+        <h:inputText styleClass="input" readonly="false" value=""/>
+    </s:decorate>
+
+</s:div>
+
+</s:div>
+
+<s:div id="rightSidePanel">
+</s:div>
+
+</h:panelGrid>
+</app:fieldset>
+
+<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
+    <h:panelGrid columns="1"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0">
+        <s:div id="movementDetailListPanel">
+            <div class="buttons">
+                    <a4j:commandButton id="addProductItemCommandButton"
+                                       action="#{productItemByWarehouseDataModel.reset()}"
+                                       value="#{messages['WarehouseVoucher.button.addProductItem']}"
+                                       styleClass="button"
+                                       immediate="true"
+                                       oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                                       actionListener="#{selectPopUpAction.select}"
+                                       reRender="productItemsByWarehouseListModalPanel">
+                        <f:attribute name="entityManagerName" value=""/>
+                        <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+                    </a4j:commandButton>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell">
+                        #{messages['MovementDetail.productItem']}
+                    </th>
+                    <th class="rich-table-headercell">
+                        #{messages['MovementDetail.measureUnit']}
+                    </th>
+                    <th class="rich-table-headercell">
+                        #{messages['MovementDetail.quantity']}
+                    </th>
+                    <c:if test="#{warehouseVoucherCreateAction.shownUnitCostField}">
+                        <th class="rich-table-headercell">
+                            #{messages['MovementDetail.unitCost']}
+                        </th>
+                    </c:if>
+                    <c:if test="#{warehouseVoucherCreateAction.shownAmountField}">
+                        <th class="rich-table-headercell">
+                            #{messages['MovementDetail.amount']}
+                        </th>
+                    </c:if>
+                    <th class="rich-table-headercell">
+                        #{messages['Common.action']}
+                    </th>
+                </tr>
+                </thead>
+
+                <c:forEach var="instance" items="#{warehouseVoucherCreateAction.movementDetails}" varStatus="row">
+                    <c:set var="quantityFieldId" value="quantityField_#{row.index}"/>
+                    <c:set var="quantityInputTextId" value="quantityInputText_#{row.index}"/>
+                    <c:set var="unitCostFieldId" value="unitCostField_#{row.index}"/>
+                    <c:set var="unitCostInputFieldId" value="unitCostInputField_#{row.index}"/>
+                    <c:set var="amountFieldId" value="amountField_#{row.index}"/>
+                    <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
+
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{instance.productItem.fullName}"/>
+                        </td>
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{instance.measureUnit.name}"/>
+                        </td>
+                        <td class="rich-table-cell center">
+                            <s:div id="#{quantityFieldId}">
+                                <h:inputText id="#{quantityInputTextId}"
+                                             value="#{instance.quantity}"
+                                             required="true"
+                                             styleClass="inputSmall right">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             forId="#{quantityInputTextId}"/>
+                                    <c:choose>
+                                        <c:when test="#{not warehouseVoucherCreateAction.enabledAmountField and warehouseVoucherCreateAction.shownAmountField}">
+                                            <a4j:support event="onblur"
+                                                         ajaxSingle="true"
+                                                         reRender="#{quantityFieldId}, #{amountFieldId}"
+                                                         action="#{warehouseVoucherCreateAction.updateTotalAmount(instance)}"/>
+                                        </c:when>
+                                        <c:when test="#{warehouseVoucherCreateAction.enabledUnitCostField}">
+                                            <a4j:support event="onblur"
+                                                         ajaxSingle="true"
+                                                         reRender="#{unitCostFieldId}, #{quantityFieldId}, #{amountFieldId}"
+                                                         action="#{warehouseVoucherCreateAction.updateTotalAmount(instance)}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a4j:support event="onblur"
+                                                         ajaxSingle="true"
+                                                         reRender="#{quantityFieldId}"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </h:inputText>
+                                <h:message for="#{quantityInputTextId}"
+                                           styleClass="errors"
+                                           style="display:block;"/>
+                            </s:div>
+                        </td>
+                        <c:if test="#{warehouseVoucherCreateAction.shownUnitCostField}">
+                            <td class="rich-table-cell right">
+                                <s:div id="#{unitCostFieldId}">
+                                    <h:outputText value="#{instance.unitCost}"
+                                                  rendered="#{not warehouseVoucherCreateAction.enabledUnitCostField}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                    </h:outputText>
+                                    <h:inputText id="#{unitCostInputFieldId}"
+                                                 value="#{instance.unitCost}"
+                                                 required="true"
+                                                 styleClass="inputSmall right"
+                                                 rendered="#{warehouseVoucherCreateAction.enabledUnitCostField}">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimal6FNumber']}"
+                                                                 forId="#{unitCostInputFieldId}"/>
+                                        <a4j:support event="onblur"
+                                                     ajaxSingle="true"
+                                                     reRender="#{unitCostFieldId}, #{quantityFieldId}, #{amountFieldId}"
+                                                     action="#{warehouseVoucherCreateAction.updateTotalAmount(instance)}"/>
+                                    </h:inputText>
+                                    <h:message for="#{unitCostInputFieldId}"
+                                               styleClass="errors"
+                                               style="display:block;"
+                                               rendered="#{warehouseVoucherCreateAction.enabledUnitCostField}"/>
+                                </s:div>
+                            </td>
+                        </c:if>
+                        <c:if test="#{warehouseVoucherCreateAction.shownAmountField}">
+                            <td class="rich-table-cell #{warehouseVoucherCreateAction.enabledAmountField ? 'center' : 'right'}">
+                                <s:div id="#{amountFieldId}">
+                                    <h:inputText id="#{amountInputTextId}"
+                                                 value="#{instance.amount}"
+                                                 styleClass="inputSmall right"
+                                                 required="true"
+                                                 rendered="#{warehouseVoucherCreateAction.enabledAmountField}">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimal6FNumber']}"
+                                                                 forId="#{amountInputTextId}"/>
+                                        <c:choose>
+                                            <c:when test="#{warehouseVoucherCreateAction.enabledUnitCostField}">
+                                                <a4j:support event="onblur"
+                                                             ajaxSingle="true"
+                                                             reRender="#{unitCostFieldId}, #{quantityFieldId}, #{amountFieldId}"
+                                                             action="#{warehouseVoucherCreateAction.updateUnitCost(instance)}"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a4j:support event="onblur"
+                                                             ajaxSingle="true"
+                                                             reRender="#{amountFieldId}"/>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </h:inputText>
+                                    <h:message for="#{amountInputTextId}"
+                                               styleClass="errors"
+                                               style="display:block;"
+                                               rendered="#{warehouseVoucherCreateAction.enabledAmountField}"/>
+                                    <h:outputText value="#{instance.amount}"
+                                                  styleClass="input"
+                                                  rendered="#{not warehouseVoucherCreateAction.enabledAmountField}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                    </h:outputText>
+                                </s:div>
+                            </td>
+                        </c:if>
+                        <td class="rich-table-cell center">
+                            <a4j:commandLink immediate="true"
+                                             title="#{messages['Common.remove']}"
+                                             action="#{warehouseVoucherCreateAction.removeMovementDetail(instance)}"
+                                             ajaxSingle="true"
+                                             reRender="movementDetailListPanel">
+                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </s:div>
+    </h:panelGrid>
+</app:fieldset>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{warehouseVoucherCreateAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehouseVoucherCreateAction.managed and s:hasPermission('WAREHOUSEVOUCHER','CREATE')}"
+                     tabindex="40"/>
+
+    <h:commandButton action="#{warehouseVoucherCreateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="41"/>
+</div>
+</h:form>
+
+
+<s:decorate id="productItemsListModalPanelContainer"
+            template="/warehouse/productItemsListModalPanel.xhtml">
+    <ui:param name="containerId" value="productItemsListModalPanelContainer"/>
+    <ui:param name="dialogId" value="productItemsListModalPanel"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{warehouseVoucherCreateAction.addProductItems(productItemSearchDataModel.selectedProductItems)}"
+                           value="#{messages['Common.add']}"
+                           reRender="movementDetailListPanel"
+                           styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('productItemsListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="productItemsByWarehouseListModalPanelContainer"
+            template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
+    <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
+    <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{warehouseVoucherCreateAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                           value="#{messages['Common.add']}"
+                           reRender="movementDetailListPanel"
+                           styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{jobContractDataModel.setEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="clientOrderListModalPanelContainer" template="/customers/clientOrderListModalPanel.xhtml">
+    <ui:param name="dialogId" value="clientOrderListModalPanel"/>
+    <ui:param name="dataModel" value="#{clientOrderDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{clientOrderDataModel.setClientOrder(clientOrderItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="clientOrderField"
+                           oncomplete="Richfaces.hideModalPanel('clientOrderListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{discountPolicyAction.managed}">
+                #{messages['DiscountPolicy.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DiscountPolicy.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+
+        <h:form id="discountPolicyForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{discountPolicyAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{discountPolicyAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountPolicyAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{discountPolicyAction.managed}">
+                            #{messages['DiscountPolicy.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DiscountPolicy.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountPolicy.name']}</ui:define>
+                    <h:inputText id="name" value="#{discountPolicy.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="targetTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountPolicy.target']}</ui:define>
+                    <h:selectOneMenu id="targetType" value="#{discountPolicy.target}" styleClass="input" required="true"
+                                     tabindex="2">
+                        <s:selectItems value="#{discountPolicyTargetType}" var="target" label="#{
+                               target eq 'CUSTOMER' ? messages['DiscountPolicyTargetType.customer'] :
+                               (target eq 'PRODUCT' ? messages['DiscountPolicyTargetType.product'] : messages['DiscountPolicyTargetType.employee'])}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange" reRender="discountPolicyType" ajaxSingle="true"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="discountPolicyTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountPolicy.discountPolicyType']}</ui:define>
+                    <h:selectOneMenu id="discountPolicyType" value="#{discountPolicy.discountPolicyType}"
+                                     styleClass="input"
+                                     required="true" tabindex="3">
+                        <s:selectItems value="#{discountPolicyTypeList.resultList}" var="discountPolicyType"
+                                       label="#{messages[discountPolicyType.resourceKey]}"/>
+                        <a4j:support event="onchange"
+                                     reRender="#{discountPolicy.amount ne null? 'amountField' : 'targetType'}"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountPolicy.amount']}</ui:define>
+                    <h:inputText id="amount" value="#{discountPolicy.amount}" styleClass="input" required="true"
+                                 maxlength="20" tabindex="4" validator="#{discountPolicyAction.validatePercentage}"
+                                 validatorMessage="#{messages['DiscountPolicy.error.percentage']}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        <f:converter converterId="bigDecimalConverter"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="creditorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Creditor.creditor']}</ui:define>
+                    <h:selectOneMenu id="creditor" value="#{discountPolicy.creditor}"
+                                     styleClass="input"
+                                     disabled="#{discountPolicyAction.managed}"
+                                     required="false" tabindex="5">
+                        <s:selectItems value="#{creditorList.resultList}" var="creditor"
+                                       label="#{messages[creditor.name]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{discountPolicyAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','CREATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton action="#{discountPolicyAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','UPDATE')}"
+                                 tabindex="7"/>
+
+                <h:commandButton value="#{messages['Common.delete']}" tabindex="8"
+                                 styleClass="button"
+                                 rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{discountPolicyAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="9"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DiscountPolicy.delete.confirmation']}">
+                        <f:param value="#{discountPolicy.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{discountPolicyAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{discountPolicyAction.managed and s:hasPermission('DISCOUNTPOLICY','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

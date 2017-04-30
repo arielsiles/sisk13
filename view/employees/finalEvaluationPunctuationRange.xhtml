@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{finalEvaluationPunctuationRangeAction.managed}">
+                #{messages['FinalEvaluationPunctuationRange.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['FinalEvaluationPunctuationRange.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="finalEvaluationFormFrom">
+
+            <div class="buttons">
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                                 id="createButtonId"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','UPDATE')}"
+                                 tabindex="3"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','DELETE')}"
+                                 tabindex="4">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="5"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{finalEvaluationPunctuationRangeAction.managed}">
+                            #{messages['FinalEvaluationPunctuationRange.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['FinalEvaluationPunctuationRange.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinalEvaluationPunctuationRange.position']}</ui:define>
+                    <h:inputText id="position"
+                                 value="#{finalEvaluationPunctuationRange.position}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="6">
+                        <app:naturalNumberConverter forId="position"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinalEvaluationPunctuationRange.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{finalEvaluationPunctuationRange.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="250"
+                                 tabindex="7">
+                        <f:validateLength maximum="250"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="interpretationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinalEvaluationPunctuationRange.interpretation']}</ui:define>
+                    <h:inputText id="interpretation"
+                                 value="#{finalEvaluationPunctuationRange.interpretation}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="250"
+                                 tabindex="8">
+                        <f:validateLength maximum="250"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="startRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinalEvaluationPunctuationRange.startRange']}</ui:define>
+                    <h:inputText id="startRange"
+                                 value="#{finalEvaluationPunctuationRange.startRange}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="9">
+                        <app:naturalNumberConverter forId="startRange"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="endRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinalEvaluationPunctuationRange.endRange']}</ui:define>
+                    <h:inputText id="endRange"
+                                 value="#{finalEvaluationPunctuationRange.endRange}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="10">
+                        <app:naturalNumberConverter forId="endRange"/>
+                        <app:numberRangeValidator forId="startRange"
+                                                  forLabel="#{messages['FinalEvaluationPunctuationRange.startRange']}"
+                                                  type="greaterEqual"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                                 tabindex="11"/>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','CREATE')}"
+                                 tabindex="12"/>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','UPDATE')}"
+                                 tabindex="13"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','DELETE')}"
+                                 tabindex="14">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{finalEvaluationPunctuationRangeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="15"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{finalEvaluationPunctuationRangeAction.managed and s:hasPermission('FEPUNCTUATIONRANGE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['FinalEvaluationPunctuationRange.delete.confirmation']}">
+                        <f:param value="#{finalEvaluationPunctuationRange.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{finalEvaluationPunctuationRangeAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#position" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

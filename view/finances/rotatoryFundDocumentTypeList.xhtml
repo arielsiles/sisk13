@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['RotatoryFundDocumentType.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="rotatoryFundDocumentTypeSearch">
+            <rich:simpleTogglePanel label="#{messages['RotatoryFundDocumentType.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RotatoryFundDocumentType.code']}</ui:define>
+                        <h:inputText id="code" value="#{rotatoryFundDocumentTypeDataModel.criteria.code}"
+                                     tabindex="1" styleClass="input">
+                            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RotatoryFundDocumentType.name']}</ui:define>
+                        <h:inputText id="name" value="#{rotatoryFundDocumentTypeDataModel.criteria.name}"
+                                     tabindex="2" styleClass="input">
+                        </h:inputText>
+                        <a4j:commandButton action="#{rotatoryFundDocumentTypeDataModel.search}"
+                                           reRender="rotatoryFundDocumentTypeList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}"
+                                           id="searchButtonId" tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/rotatoryFundDocumentType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{rotatoryFundDocumentTypeDataModel}" var="rotatoryFundDocumentTypeItem"
+                            id="rotatoryFundDocumentTypeList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%, 45%, 25%,  10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rotatoryFundDocumentType.code"
+                                                   dataModel="#{rotatoryFundDocumentTypeDataModel}"
+                                                   reRender="rotatoryFundDocumentTypeList, dataScroller">
+                                #{messages['RotatoryFundDocumentType.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rotatoryFundDocumentType.name"
+                                                   dataModel="#{rotatoryFundDocumentTypeDataModel}"
+                                                   reRender="rotatoryFundDocumentTypeList, dataScroller">
+                                #{messages['RotatoryFundDocumentType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rotatoryFundDocumentType.rotatoryFundType"
+                                                   dataModel="#{rotatoryFundDocumentTypeDataModel}"
+                                                   reRender="rotatoryFundDocumentTypeList, dataScroller">
+                                #{messages['RotatoryFundDocumentType.rotatoryFundType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rotatoryFundDocumentType.active"
+                                                   dataModel="#{rotatoryFundDocumentTypeDataModel}"
+                                                   reRender="rotatoryFundDocumentTypeList, dataScroller">
+                                #{messages['RotatoryFundDocumentType.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{rotatoryFundDocumentTypeItem.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rotatoryFundDocumentTypeItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[rotatoryFundDocumentTypeItem.rotatoryFundType.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:graphicImage value="/img/active.gif" styleClass="select-image-middle"
+                                    rendered="#{rotatoryFundDocumentTypeItem.active}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{rotatoryFundDocumentTypeAction.select(rotatoryFundDocumentTypeItem)}"
+                                   rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="rotatoryFundDocumentTypeList"
+                              dataModel="#{rotatoryFundDocumentTypeDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/rotatoryFundDocumentType.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

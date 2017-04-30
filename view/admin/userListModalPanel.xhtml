@@ -1,0 +1,136 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['UserCashBox.users.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="#{dialogId}-userListForm">
+        <rich:simpleTogglePanel id="searchPanel" label="#{messages['User.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.idNumber']}</ui:define>
+                        <h:inputText id="#{dialogId}-idNumber" value="#{userDataModel.employee.idNumber}"
+                                     tabindex="1" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.firstName']}</ui:define>
+                        <h:inputText id="#{dialogId}-firstName" value="#{userDataModel.employee.firstName}"
+                                     tabindex="2" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.username']}</ui:define>
+                        <h:inputText id="#{dialogId}-username" value="#{userDataModel.criteria.username}"
+                                     tabindex="3" styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.lastName']}</ui:define>
+                        <h:inputText id="#{dialogId}-lastName" value="#{userDataModel.employee.lastName}"
+                                     tabindex="4" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.maidenName']}</ui:define>
+                        <h:inputText id="#{dialogId}-maidenName" value="#{userDataModel.employee.maidenName}"
+                                     tabindex="5" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{userDataModel.search}" reRender="userList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="6">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{userDataModel.clear}"
+                                           reRender="searchPanel, userList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.clear']}" tabindex="7"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{userDataModel}" var="userItem" id="userList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="20%, 30%, 25%, 15%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.username" dataModel="#{userDataModel}"
+                                               reRender="userList, dataScroller">
+                            #{messages['User.username']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.employee.lastName" dataModel="#{userDataModel}"
+                                               reRender="userList, dataScroller">
+                            #{messages['User.fullName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.email" dataModel="#{userDataModel}"
+                                               reRender="userList, dataScroller">
+                            #{messages['User.email']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="user.creationDate" dataModel="#{userDataModel}"
+                                               reRender="userList, dataScroller">
+                            #{messages['User.createdOn']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{userItem.username}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{userItem.employee.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{userItem.email}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{userItem.creationDate}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="userList" dataModel="#{userCashBoxDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+    <c:set var="firstInputToFocusId" value="#{dialogId}-idNumber"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+</rich:modalPanel>
+

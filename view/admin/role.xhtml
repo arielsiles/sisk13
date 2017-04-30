@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{roleAction.managed}">
+                #{messages['Role.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Role.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+
+        <h:form id="roleForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{roleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!roleAction.managed and s:hasPermission('ROLE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{roleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{roleAction.assignPermissions}"
+                                 value="#{messages['Role.assignPermissions']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','VIEW')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{roleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{roleAction.managed}">
+                            #{messages['Role.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Role.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Role.name']}</ui:define>
+                    <h:inputText id="name" value="#{role.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="150"
+                                 tabindex="1"/>
+                </s:decorate>
+
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Role.description']}</ui:define>
+                    <h:inputTextarea id="description"
+                                     value="#{role.description}"
+                                     styleClass="input textarea"
+                                     tabindex="2"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{roleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!roleAction.managed and s:hasPermission('ROLE','CREATE')}"
+                                 tabindex="3"/>
+
+                <h:commandButton action="#{roleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','UPDATE')}"
+                                 tabindex="4"/>
+
+                <h:commandButton action="#{roleAction.assignPermissions}"
+                                 value="#{messages['Role.assignPermissions']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','VIEW')}"
+                                 tabindex="5"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{roleAction.managed and s:hasPermission('ROLE','DELETE')}"
+                                 tabindex="6">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{roleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="7">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{roleAction.managed and s:hasPermission('ROLE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Role.delete.confirmation']}">
+                        <f:param value="#{role.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{roleAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('ROLE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

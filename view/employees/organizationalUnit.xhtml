@@ -1,0 +1,265 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{organizationalUnitAction.managed}">
+            #{messages['OrganizationalUnit.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['OrganizationalUnit.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="organizationalUnitForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{organizationalUnitAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','CREATE')}"
+                         id="createButtonId">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{organizationalUnitAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','UPDATE')}"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{organizationalUnitAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{organizationalUnitAction.managed}">
+                    #{messages['OrganizationalUnit.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['OrganizationalUnit.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.name']}</ui:define>
+            <h:inputText id="name"
+                         value="#{organizationalUnit.name}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="150"
+                         tabindex="1">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.acronym']}</ui:define>
+            <h:inputText id="acronym" value="#{organizationalUnit.acronym}"
+                         styleClass="input"
+                         maxlength="150"
+                         tabindex="2">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="organizationalUnitRootField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.organizationalUnitRoot']}</ui:define>
+            <h:inputText required="false" styleClass="input" readonly="true"
+                         value="#{organizationalUnitAction.organizationalUnitRootName}" tabindex="3"/>
+            <a4j:commandLink id="selectOrganizationUnitRoot" ajaxSingle="true" immediate="true" tabindex="4"
+                             title="#{messages['OrganizationalUnit.organizationalUnitRoot']}"
+                             onclick="Richfaces.showModalPanel('organizationalUnitTreeModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="5"
+                             title="#{messages['Common.clear']}"
+                             action="#{organizationalUnitAction.clearOrganizationalUnitRoot}"
+                             reRender="organizationalUnitRootField, businessUnitField, sectorField">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+            <h:selectOneMenu id="businessUnit"
+                             value="#{organizationalUnit.businessUnit}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="6"
+                             rendered="#{empty organizationalUnitAction.organizationalUnitRootName}">
+                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                               label="#{businessUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:inputText
+                    rendered="#{not empty organizationalUnitAction.organizationalUnitRootName and not empty organizationalUnit.businessUnit}"
+                    styleClass="input"
+                    required="true"
+                    tabindex="6"
+                    readonly="true"
+                    value="#{organizationalUnit.businessUnit.fullName}"/>
+        </s:decorate>
+
+        <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.sector']}</ui:define>
+            <ui:param name="required" value="true"/>
+            <h:selectOneMenu id="sector" value="#{organizationalUnit.sector}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="7"
+                             rendered="#{empty organizationalUnitAction.organizationalUnitRootName}">
+                <s:selectItems value="#{sectorList}" var="sector" label="#{sector.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:inputText
+                    rendered="#{not empty organizationalUnitAction.organizationalUnitRootName and not empty organizationalUnit.sector}"
+                    styleClass="input"
+                    required="true"
+                    tabindex="7"
+                    readonly="true"
+                    value="#{organizationalUnit.sector.name}"/>
+        </s:decorate>
+
+        <s:decorate id="organizationalLevelField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.level']}</ui:define>
+            <h:selectOneMenu id="organizationalLevel"
+                             value="#{organizationalUnit.organizationalLevel}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{organizationalLevelList.resultList}" var="organizationalLevel"
+                               label="#{organizationalLevel.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CostCenter.costCenter']}</ui:define>
+            <h:inputText styleClass="input" readonly="true"
+                         value="#{organizationalUnit.costCenter.fullName}" tabindex="9"/>
+            <a4j:commandLink id="selectCostCenter" ajaxSingle="true" immediate="true" tabindex="10"
+                             title="#{messages['OrganizationalUnit.selectCostCenter']}"
+                             onclick="Richfaces.showModalPanel('costCenterListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true" tabindex="11"
+                             title="#{messages['Common.clear']}"
+                             action="#{organizationalUnitAction.clearCostCenter}"
+                             reRender="costCenterField">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.description']}</ui:define>
+            <h:inputTextarea id="description"
+                             value="#{organizationalUnit.description}"
+                             styleClass="input textarea"
+                             tabindex="12">
+                <f:validateLength maximum="200"/>
+            </h:inputTextarea>
+        </s:decorate>
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{organizationalUnitAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','CREATE')}"
+                         tabindex="13">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{organizationalUnitAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','UPDATE')}"
+                         tabindex="14"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','DELETE')}"
+                         tabindex="15">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{organizationalUnitAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="16"/>
+    </div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{organizationalUnitAction.managed and s:hasPermission('ORGANIZATIONALUNIT','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['OrganizationalUnit.delete.confirmation']}">
+                <f:param value="#{organizationalUnit.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{organizationalUnitAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('ORGANIZATIONALUNIT','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/employees/organizationalUnitTreeModalPanel.xhtml">
+    <ui:param name="selectAnyElement" value="true"/>
+    <ui:define name="selectOption">
+        <a4j:commandButton id="selectButton" value="#{messages['Common.choose']}"
+                           action="#{organizationalUnitAction.assingOrganizationalUnit(organizationalUnitTreeAction.selectedOrganizationalUnit)}"
+                           ajaxSingle="true" reRender="organizationalUnitRootField, businessUnitField, sectorField"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="costCenterListModalPanelContainer"
+            template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="dataModel" value="#{costCenterDataModel}"/>
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{organizationalUnitAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif" style="border:0" immediate="true" reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

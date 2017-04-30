@@ -1,0 +1,149 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Product.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Product.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Product.name']}</ui:define>
+                    <h:inputText id="name" value="#{productDataModel.criteria.name}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Product.code']}</ui:define>
+                    <h:inputText id="code" value="#{productDataModel.criteria.code}"
+                                 maxlength="150" tabindex="2" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productDataModel.search}" reRender="productList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/products/product.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('PRODUCT','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{productDataModel}" var="productItem" id="productList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 17%, 17%, 13%, 13%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.name" dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.code" dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.productType.name"
+                                                   dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.type']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.buyPrice" dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.buyPrice']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.sellPrice" dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.sellPrice']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="product.creationDate" dataModel="#{productDataModel}"
+                                                   reRender="productList, dataScroller">
+                                #{messages['Product.createdOn']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productItem.code}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productItem.productType.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{productItem.buyPrice}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{productItem.sellPrice}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productItem.creationDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{productAction.select(productItem)}"
+                                   rendered="#{s:hasPermission('PRODUCT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productList" dataModel="#{productDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/products/product.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('PRODUCT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

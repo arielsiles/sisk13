@@ -1,0 +1,278 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['FixedAssetTransferenceInventory.report.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="80%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetTransferenceInventoryReportForm">
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['FixedAssetTransferenceInventory.report.title']}
+</f:facet>
+
+<s:div id="fixedAssetGroupDiv">
+    <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAsset.fixedAssetGroup']}</ui:define>
+        <app:quickSearch id="quickSearchFixedAssetGroup"
+                         textValue="fixedAssetTransferenceInventoryReportAction.fixedAssetGroup.groupCode"
+                         value="#{fixedAssetTransferenceInventoryReportAction.fixedAssetGroup}"
+                         searchField="groupCode"
+                         reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv"
+                         tabindex="1"/>
+        <app:selectPopUp id="fixedAssetGroup"
+                         textValue="#{fixedAssetTransferenceInventoryReportAction.fixedAssetGroup.fullName}"
+                         value="#{fixedAssetTransferenceInventoryReportAction.fixedAssetGroup}"
+                         dataModel="#{fixedAssetGroupDataModel}"
+                         clearAction="fixedAssetTransferenceInventoryReportAction.clearFixedAssetGroup()"
+                         searchModalPanel="fixedAssetGroupListModalPanel"
+                         reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel"
+                         hotKeySelect="alt+1"/>
+    </s:decorate>
+</s:div>
+<s:div id="fixedAssetSubGroupDiv">
+    <s:decorate id="fixedAssetSubGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAsset.fixedAssetSubGroup']}</ui:define>
+        <app:quickSearch id="quickSearchFixedAssetSubGroup"
+                         textValue="fixedAssetTransferenceInventoryReportAction.fixedAssetSubGroup.fixedAssetSubGroupCode"
+                         value="#{fixedAssetTransferenceInventoryReportAction.fixedAssetSubGroup}"
+                         searchField="fixedAssetSubGroupCode"
+                         alias="fixedAssetSubGroup"
+                         reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                         tabindex="2">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetTransferenceInventoryReportAction.fixedAssetGroup}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="fixedAssetSubGroup"
+                         textValue="#{fixedAssetTransferenceInventoryReportAction.fixedAssetSubGroup.fullName}"
+                         value="#{fixedAssetTransferenceInventoryReportAction.fixedAssetSubGroup}"
+                         dataModel="#{fixedAssetSubGroupDataModel}"
+                         clearAction="fixedAssetTransferenceInventoryReportAction.clearFixedAssetSubGroup()"
+                         searchModalPanel="fixedAssetSubGroupListModalPanel"
+                         reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                         hotKeySelect="alt+2">
+        </app:selectPopUp>
+
+    </s:decorate>
+</s:div>
+<s:decorate id="fixedAssetLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['FixedAsset.newLocation']}"/>
+    </ui:define>
+    <h:selectOneMenu id="fixedAssetLocation"
+                     value="#{fixedAssetTransferenceInventoryReportAction.fixedAssetLocation}"
+                     styleClass="input"
+                     tabindex="3">
+        <s:selectItems value="#{fixedAssetLocationList}"
+                       var="fixedAssetLocation"
+                       label="#{fixedAssetLocation.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="fixedAssetLastLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['FixedAsset.report.transference.lastLocation']}"/>
+    </ui:define>
+    <h:selectOneMenu id="fixedAssetLocation"
+                     value="#{fixedAssetTransferenceInventoryReportAction.lastFixedAssetLocation}"
+                     styleClass="input"
+                     tabindex="4">
+        <s:selectItems value="#{fixedAssetLocationList}"
+                       var="fixedAssetLocation"
+                       label="#{fixedAssetLocation.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="fixedAssetCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetTransferenceInventory.report.fixedAssetCode']}</ui:define>
+    <h:outputText>#{messages['Common.from']}</h:outputText>
+    &#160;
+    <h:inputText styleClass="inputNumberMedium" id="initFixedAssetCode"
+                 maxlength="12"
+                 value="#{fixedAssetTransferenceInventoryReportAction.initFixedAssetCode}"
+                 tabindex="9">
+        <f:convertNumber/>
+    </h:inputText>
+    &#160;
+    <h:outputText>#{messages['Common.to']}</h:outputText>
+    &#160;
+    <ui:param name="validateId" value="endFixedAssetCode"/>
+    <h:inputText styleClass="inputNumberMedium" id="endFixedAssetCode"
+                 maxlength="12"
+                 value="#{fixedAssetTransferenceInventoryReportAction.endFixedAssetCode}"
+                 tabindex="10">
+        <f:convertNumber/>
+    </h:inputText>
+</s:decorate>
+<s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetTransferenceInventory.report.barCode']}</ui:define>
+    <app:inputBarcode id="barCode"
+                      value="#{fixedAssetTransferenceInventoryReportAction.barCode}"
+                      maxlength="250"
+                      styleClass="input"
+                      tabindex="10"/>
+</s:decorate>
+<s:decorate id="registrationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define
+            name="label">#{messages['FixedAssetTransferenceInventory.report.registrationDate']}</ui:define>
+    <h:outputText>#{messages['Common.dateFrom']}</h:outputText>
+    &#160;
+    <rich:calendar id="initRegistrationDate"
+                   value="#{fixedAssetTransferenceInventoryReportAction.initRegistrationDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="11">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['Common.dateTo']}</h:outputText>
+    &#160;
+    <rich:calendar id="endRegistrationDate"
+                   value="#{fixedAssetTransferenceInventoryReportAction.endRegistrationDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="12">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initRegistrationDate"
+                                forLabel="#{messages['FixedAssetTransferenceInventory.report.registrationDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+<s:decorate id="movementDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define
+            name="label">#{messages['FixedAssetTransferenceInventory.report.movementDate']}</ui:define>
+    <h:outputText>#{messages['Common.dateFrom']}</h:outputText>
+    &#160;
+    <rich:calendar id="initMovementDate"
+                   value="#{fixedAssetTransferenceInventoryReportAction.initMovementDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="13">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['Common.dateTo']}</h:outputText>
+    &#160;
+    <rich:calendar id="endMovementDate"
+                   value="#{fixedAssetTransferenceInventoryReportAction.endMovementDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="14">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initMovementDate"
+                                forLabel="#{messages['FixedAssetTransferenceInventory.report.movementDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+<s:decorate id="originalValueField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetTransferenceInventory.report.originalValue']}</ui:define>
+    <h:outputText>#{messages['Common.dateFrom']}</h:outputText>
+    &#160;
+    <h:inputText id="initOriginalValue"
+                 value="#{fixedAssetTransferenceInventoryReportAction.initOriginalValue}"
+                 styleClass="input1"
+                 maxlength="20"
+                 tabindex="15">
+        <app:realNumberConverter forId="initOriginalValue"/>
+    </h:inputText>
+    &#160;
+    <h:outputText>#{messages['Common.dateTo']}</h:outputText>
+    &#160;
+    <h:inputText id="endOriginalValue"
+                 value="#{fixedAssetTransferenceInventoryReportAction.endOriginalValue}"
+                 styleClass="input1"
+                 maxlength="20"
+                 tabindex="16">
+        <app:realNumberConverter forId="endOriginalValue"/>
+    </h:inputText>
+</s:decorate>
+<s:decorate id="reportOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetTransferenceInventory.report.orderBy']}</ui:define>
+    <h:selectOneMenu id="reportOrder"
+                     value="#{fixedAssetTransferenceInventoryReportAction.reportOrder}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="17">
+        <s:selectItems value="#{fixedAssetTransferenceInventoryReportOrderEnum}"
+                       var="reportOrder"
+                       label="#{messages[reportOrder.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="showAmountsField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetTransferenceInventory.report.showAmounts']}</ui:define>
+    <h:selectBooleanCheckbox id="showAmounts"
+                             value="#{fixedAssetTransferenceInventoryReportAction.showAmounts}"
+                             tabindex="18"/>
+</s:decorate>
+</rich:panel>
+
+<app:reportDefaultOptions reportAction="#{fixedAssetTransferenceInventoryReportAction}"
+                          showPageFormat="false"
+                          showReportTitle="false"
+                          tabIndex="19"/>
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetTransferenceInventoryReportAction.generateReport}"
+                     styleClass="button" tabindex="20"
+                     value="#{messages['Common.generate']}" id="searchButtonId">
+        <s:defaultAction/>
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate id="fixedAssetGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetTransferenceInventoryReportAction.setFixedAssetGroup(fixedAssetGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel "
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="fixedAssetSubGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetSubGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSubGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetTransferenceInventoryReportAction.setFixedAssetSubGroup(fixedAssetSubGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

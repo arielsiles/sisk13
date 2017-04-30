@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{gestionPayrollScheduleAction.managed}">
+                #{messages['GestionPayrollSchedule.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['GestionPayrollSchedule.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="gestionPayrollScheduleForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{gestionPayrollScheduleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{gestionPayrollScheduleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','UPDATE')}"
+                                 tabindex="2">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{gestionPayrollScheduleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{gestionPayrollScheduleAction.managed}">
+                            #{messages['GestionPayrollSchedule.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['GestionPayrollSchedule.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionPayrollSchedule.name']}</ui:define>
+                    <h:inputText id="gestionName" value="#{gestionPayrollSchedule.name}" styleClass="input"
+                                 required="true"
+                                 maxlength="50"
+                                 tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{gestionPayrollSchedule.gestion}"
+                                     styleClass="input"
+                                     required="true"
+                                     rendered="#{!gestionPayrollScheduleAction.managed}"
+                                     tabindex="6">
+                        <s:selectItems value="#{gestionList}"
+                                       var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{gestionPayrollSchedule.gestion.year}"
+                                  rendered="#{gestionPayrollScheduleAction.managed}"/>
+                </s:decorate>
+
+                <s:decorate id="creationDateField"
+                            rendered="#{gestionPayrollScheduleAction.managed}"
+                            template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionPayrollSchedule.creationDate']}</ui:define>
+                    <h:outputText value="#{gestionPayrollSchedule.creationDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </s:decorate>
+                <br/>
+                <c:if test="#{gestionPayrollScheduleAction.managed}">
+                    <rich:tabPanel id="tabPanelDiv" switchType="ajax"
+                                   selectedTab="#{gestionPayrollScheduleAction.activeTabName}">
+                        <c:forEach items="#{gestionPayrollScheduleAction.businessUnitList}" var="businessUnit">
+                            <rich:tab name="#{businessUnit.fullName}"
+                                      label="#{messages[businessUnit.fullName]}"
+                                      action="#{gestionPayrollScheduleAction.enableTab(businessUnit.fullName)}"
+                                      ajaxSingle="true"
+                                      immediate="true">
+                                <ui:include src="/employees/gestionPayrollScheduleActions.xhtml"/>
+                                <ui:include src="/employees/gestionPayrollScheduleData.xhtml"/>
+                            </rich:tab>
+                        </c:forEach>
+                    </rich:tabPanel>
+
+
+                </c:if>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{gestionPayrollScheduleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','CREATE')}"
+                                 tabindex="10">
+                </h:commandButton>
+
+                <h:commandButton action="#{gestionPayrollScheduleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','UPDATE')}"
+                                 tabindex="11"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','DELETE')}"
+                                 tabindex="12">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{gestionPayrollScheduleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="13">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['GestionPayrollSchedule.delete.confirmation']}">
+                        <f:param value="#{gestionPayrollSchedule.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{gestionPayrollScheduleAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   rendered="#{gestionPayrollScheduleAction.managed and s:hasPermission('GESTIONPAYROLLSCHEDULE','DELETE')}"
+                                   tabindex="1"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="gestionPayrollScheduleEditListModalPanelContainer"
+                    template="/employees/gestionPayrollScheduleEditListModalPanel.xhtml">
+            <ui:param name="dialogId" value="gestionPayrollScheduleEditListModalPanel"/>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['User.settings']}
+    </ui:define>
+
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+
+        <h:form id="userSettingForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{userSettingsAction.changePassword}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+            <h:outputText value="#{messages['User.title']}: " styleClass="bold"/>
+            <h:outputText value="#{currentUser.employee.fullName} (#{currentUser.username})"/>
+
+            <rich:tabPanel switchType="ajax">
+                <rich:tab label="#{messages['User.password']}">
+
+                    <s:decorate id="previousPasswordField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.previousPassword']}</ui:define>
+                        <h:inputSecret id="previousPassword"
+                                       value="#{userSettingsAction.temporalUser.previousPassword}"
+                                       required="true"
+                                       maxlength="40"
+                                       redisplay="true"
+                                       styleClass="input"
+                                       tabindex="3"/>
+                    </s:decorate>
+
+                    <s:decorate id="passwordField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.newPassword']}</ui:define>
+                        <h:inputSecret id="password"
+                                       value="#{userSettingsAction.temporalUser.password}"
+                                       required="true"
+                                       maxlength="40"
+                                       redisplay="true"
+                                       styleClass="input"
+                                       tabindex="3"/>
+                    </s:decorate>
+
+                    <s:decorate id="confirmPasswordField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['User.confirmNewPassword']}</ui:define>
+                        <h:inputSecret id="confirmPassword"
+                                       value="#{userSettingsAction.temporalUser.confirmPassword}"
+                                       required="true"
+                                       maxlength="40"
+                                       redisplay="true"
+                                       styleClass="input"
+                                       tabindex="4">
+                            <app:validateEqual forId="password" forLabel="#{messages['User.newPassword']}"/>
+                        </h:inputSecret>
+                    </s:decorate>
+                </rich:tab>
+            </rich:tabPanel>
+
+
+            <div class="buttons">
+                <h:commandButton action="#{userSettingsAction.changePassword}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#previousPassword" query="focus()" timing="onload"/>
+
+
+    </ui:define>
+</ui:composition>
+

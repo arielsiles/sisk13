@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['CashAccountGroup.list']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="cashAccountGroupSearch">
+
+            <rich:simpleTogglePanel label="#{messages['CashAccountGroup.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccountGroup.name']}</ui:define>
+                    <h:inputText id="name" value="#{cashAccountGroupDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{cashAccountGroupDataModel.search}"
+                                       reRender="cashAccountGroupList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button action="#{purchaseOrderRemakePaymentsAction.remakePayments}"
+                          styleClass="button"
+                          value="#{messages['PurchaseOrder.remakesPurchaseOrderPayments']}"
+                          rendered="#{s:hasPermission('ACCOUNTINGRECORD','VIEW')}"
+                          onclick="Richfaces.showModalPanel('remakePaymentsModalPanel');"/>
+                <s:button view="/finances/payableDocumentConverter.xhtml"
+                          styleClass="button"
+                          value="#{messages['menu.finances.payableDocumentConverter']}"
+                          rendered="#{s:hasPermission('ACCOUNTINGRECORD','VIEW')}"
+                          propagation="begin"/>
+                <s:button value="#{messages['Common.new']}" view="/finances/cashAccountGroup.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('CASHACCOUNTGROUP','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{cashAccountGroupDataModel}" var="cashAccountGroupItem" id="cashAccountGroupList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 70%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashAccountGroup.code"
+                                                   dataModel="#{cashAccountGroupDataModel}"
+                                                   reRender="cashAccountGroupList, dataScroller">
+                                #{messages['CashAccountGroup.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashAccountGroup.name"
+                                                   dataModel="#{cashAccountGroupDataModel}"
+                                                   reRender="cashAccountGroupList, dataScroller">
+                                #{messages['CashAccountGroup.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{cashAccountGroupItem.code}">
+                        <f:convertNumber pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cashAccountGroupItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{cashAccountGroupAction.select(cashAccountGroupItem)}"
+                                   rendered="#{s:hasPermission('CASHACCOUNTGROUP','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="cashAccountGroupList" dataModel="#{cashAccountGroupDataModel}"/>
+
+            <div class="buttons">
+                <s:button action="#{purchaseOrderRemakePaymentsAction.remakePayments}"
+                          styleClass="button"
+                          value="#{messages['PurchaseOrder.remakesPurchaseOrderPayments']}"
+                          rendered="#{s:hasPermission('ACCOUNTINGRECORD','VIEW')}"
+                          onclick="Richfaces.showModalPanel('remakePaymentsModalPanel');"/>
+                <s:button view="/finances/payableDocumentConverter.xhtml"
+                          styleClass="button"
+                          value="#{messages['menu.finances.payableDocumentConverter']}"
+                          rendered="#{s:hasPermission('ACCOUNTINGRECORD','VIEW')}"
+                          propagation="begin"/>
+                <s:button value="#{messages['Common.new']}" view="/finances/cashAccountGroup.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('CASHACCOUNTGROUP','CREATE')}"/>
+            </div>
+
+        </h:form>
+        <s:decorate id="remakePaymentsProgressDialog" template="/include/progressDialog.xhtml"
+                    rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+            <ui:param name="dialogId" value="remakePaymentsModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['PurchaseOrder.remakePayments.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['PurchaseOrder.remakePayments.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

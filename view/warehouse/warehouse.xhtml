@@ -1,0 +1,292 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{warehouseAction.managed}">
+            #{messages['Warehouse.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Warehouse.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="isWarehouseInUse" value="#{warehouseAction.inUse}" scope="page"/>
+
+<h:form id="warehouseForm">
+    <div class="buttons">
+        <h:commandButton id="createButtonId"
+                         action="#{warehouseAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!warehouseAction.managed and s:hasPermission('WAREHOUSE','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{warehouseAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!warehouseAction.managed and s:hasPermission('WAREHOUSE','CREATE')}">
+        </h:commandButton>
+
+        <h:commandButton id="updateButtonId"
+                         action="#{warehouseAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{warehouseAction.managed and s:hasPermission('WAREHOUSE','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{warehouseAction.managed and s:hasPermission('WAREHOUSE','DELETE') and !isWarehouseInUse}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{warehouseAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{warehouseAction.managed}">
+                    #{messages['Warehouse.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Warehouse.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.name']}</ui:define>
+            <h:inputText id="name"
+                         value="#{warehouse.name}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="100"
+                         tabindex="1"/>
+        </s:decorate>
+        <c:choose>
+            <c:when test="#{warehouseAction.managed}">
+                <s:decorate id="warehouseCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Warehouse.warehouseCode']}</ui:define>
+                    <h:outputText value="#{warehouse.id.warehouseCode}"/>
+                </s:decorate>
+            </c:when>
+            <c:otherwise>
+                <s:decorate id="warehouseCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Warehouse.warehouseCode']}</ui:define>
+                    <h:inputText id="warehouseCode"
+                                 value="#{warehouse.id.warehouseCode}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="5"
+                                 tabindex="2"/>
+                </s:decorate>
+            </c:otherwise>
+        </c:choose>
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.state']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{warehouse.state}"
+                             styleClass="input"
+                             required="true"
+                             disabled="#{isWarehouseInUse}"
+                             tabindex="3">
+                <s:selectItems value="#{warehouseStates}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.responsible']}</ui:define>
+            <app:selectPopUp id="responsible"
+                             required="true"
+                             textValue="#{warehouse.responsible.fullName}"
+                             value="#{warehouse.responsible}"
+                             clearAction="warehouseAction.cleanResponsible()"
+                             searchModalPanel="generalEmployeeListModalPanel"
+                             dataModel="#{generalEmployeeDataModel}"
+                             reRender="responsibleField"
+                             hotKeySelect="alt+2"/>
+        </s:decorate>
+        <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.executorUnitCode']}</ui:define>
+            <h:selectOneMenu id="executorUnit"
+                             value="#{warehouse.executorUnit}"
+                             styleClass="input"
+                             disabled="#{isWarehouseInUse}"
+                             required="true">
+                <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                               var="executorUnit"
+                               label="#{executorUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             reRender="executorUnitField"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="businessBranchField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.branch']}</ui:define>
+            <h:selectOneMenu id="businessBranch"
+                             disabled="#{isWarehouseInUse}"
+                             value="#{warehouse.branch}"
+                             styleClass="input"
+                             tabindex="8">
+                <s:selectItems value="#{branchList.resultList}"
+                               var="element"
+                               label="#{element.description}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="inventoryAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Warehouse.inventoryAccount']}</ui:define>
+            <h:inputText id="inventoryAccount"
+                         required="true"
+                         styleClass="input"
+                         readonly="true"
+                         value="#{warehouse.cashAccount}"
+                         maxlength="100"
+                         tabindex="3"/>
+            <a4j:commandLink id="selectInventoryAccount"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="4"
+                             title="#{messages['Warehouse.inventoryAccount.select']}"
+                             onclick="Richfaces.showModalPanel('cashAccountListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="5"
+                             title="#{messages['Common.clear']}"
+                             action="#{warehouseAction.clearCashAccount}"
+                             reRender="inventoryAccount">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{warehouseAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!warehouseAction.managed and s:hasPermission('WAREHOUSE','CREATE')}"
+                         tabindex="9"/>
+
+        <h:commandButton action="#{warehouseAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!warehouseAction.managed and s:hasPermission('WAREHOUSE','CREATE')}"
+                         tabindex="10">
+        </h:commandButton>
+
+        <h:commandButton action="#{warehouseAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{warehouseAction.managed and s:hasPermission('WAREHOUSE','UPDATE')}"
+                         tabindex="11"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{warehouseAction.managed and s:hasPermission('WAREHOUSE','DELETE') and !isWarehouseInUse}"
+                         tabindex="12">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{warehouseAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="13"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{warehouseAction.managed and s:hasPermission('WAREHOUSE','DELETE') and !isWarehouseInUse}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Warehouse.delete.confirmation']}">
+                <f:param value="#{warehouse.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{warehouseAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('WAREHOUSE','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehouseAction.assignResponsible(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="responsibleField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{warehouseAction.assignCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="inventoryAccount"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

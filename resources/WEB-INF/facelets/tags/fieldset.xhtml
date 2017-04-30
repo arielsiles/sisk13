@@ -1,0 +1,16 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <h:panelGroup id="#{id}" rendered="#{empty rendered or rendered}">
+        <fieldset class="fieldset-border left">
+            <legend class="fieldset-title">#{title}</legend>
+            <div class="fieldset-container">
+                <ui:insert/>
+            </div>
+        </fieldset>
+    </h:panelGroup>
+</ui:composition>
+

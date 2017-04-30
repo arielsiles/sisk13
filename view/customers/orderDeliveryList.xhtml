@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductDelivery.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="ProductDeliverySearch">
+
+            <rich:simpleTogglePanel label="#{messages['ProductDelivery.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrderDelivery.date']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{orderDeliveryDataModel.criteria.customerOrder.date}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrderDelivery.documentNumber']}</ui:define>
+                    <h:inputText id="invoiceNumber"
+                                 value="#{orderDeliveryDataModel.criteria.invoiceNumber}"
+                                 maxlength="20"
+                                 tabindex="2"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{orderDeliveryDataModel.search}"
+                                       reRender="productDeliveryList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#invoiceNumber" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <rich:dataTable id="productDeliveryList"
+                            value="#{orderDeliveryDataModel}"
+                            var="productDeliveryItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="60%, 30%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productDelivery.invoiceNumber"
+                                                   dataModel="#{orderDeliveryDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['ProductDelivery.documentNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productDelivery.warehouseVoucher.number"
+                                                   dataModel="#{orderDeliveryDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['ProductDelivery.warehouseVoucher']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{productDeliveryItem.invoiceNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productDeliveryItem.warehouseVoucher.number}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{orderDeliveryAction.select(productDeliveryItem)}"
+                                   rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+
+                    &#160;
+                    <h:commandLink action="#{productDeliveryReceiptReportAction.generateReport(productDeliveryItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['ProductDelivery.button.generateDocument']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productDeliveryList" dataModel="#{orderDeliveryDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/productDelivery.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('PRODUCTDELIVERY','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

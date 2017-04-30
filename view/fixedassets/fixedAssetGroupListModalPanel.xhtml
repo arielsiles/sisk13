@@ -1,0 +1,121 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\:fixedAssetGroupListForm#{dialogId}\\:groupCodeField\\:groupCode').focus();">
+
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{fixedAssetGroupDataModel}"/>
+    </c:if>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['FixedAssetGroup.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="fixedAssetGroupListForm#{dialogId}">
+
+        <rich:simpleTogglePanel id="fixedAssetGroupSearchPanel" label="#{messages['FixedAssetGroup.search']}"
+                                switchType="client">
+
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width30percent,width30percent,width40percent">
+                <s:div>
+                    <s:decorate id="groupCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetGroup.groupCode']}</ui:define>
+                        <h:inputText id="groupCode"
+                                     value="#{dataModel.criteria.groupCode}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetGroup.description']}</ui:define>
+                        <h:inputText id="description"
+                                     value="#{dataModel.criteria.description}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        </h:inputText>
+                    </s:decorate>
+
+                    <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+                            <a4j:commandButton action="#{dataModel.search}"
+                                               reRender="fixedAssetGroupSearchPanel, fixedAssetGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}" id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{dataModel.clear}"
+                                               reRender="fixedAssetGroupSearchPanel, fixedAssetGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               id="clearButtonId"
+                                               tabindex="4">
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+
+            <rich:jQuery selector="#groupCode" query="focus()" timing="onload"/>
+        </rich:simpleTogglePanel>
+
+        <rich:dataTable value="#{dataModel}" var="fixedAssetGroupItem" id="fixedAssetGroupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="30%,60%,10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetGroup.groupCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetGroupList, dataScroller">
+                            #{messages['FixedAssetGroup.groupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="fixedAssetGroup.description"
+                                               dataModel="#{dataModel}"
+                                               reRender="fixedAssetGroupList, dataScroller">
+                            #{messages['FixedAssetGroup.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{fixedAssetGroupItem.groupCode}">
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{fixedAssetGroupItem.description}">
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="fixedAssetGroupList" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, addButton"
+                               operation="hide" event="onclick"/>
+
+    </h:form>
+</rich:modalPanel>

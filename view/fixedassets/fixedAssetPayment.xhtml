@@ -1,0 +1,184 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:c="http://java.sun.com/jstl/core"
+              xmlns:rich="http://richfaces.org/rich"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              template="/layout/template.xhtml"
+              id="fixedAssetPaymentFieldset"
+              title="#{messages['FixedAssetPayment.paymentDetail']}">
+    <a4j:region>
+        <s:div id="globalDiv">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent, width50percent">
+                <s:div>
+                    <s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetPayment.paymentType']}</ui:define>
+                        <h:selectOneMenu id="paymentType"
+                                         value="#{fixedAssetPayment.paymentType}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="1000">
+                            <s:selectItems value="#{purchaseOrderPaymentTypeEnum}"
+                                           var="element"
+                                           label="#{messages[element.resourceKey]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange"
+                                         action="#{fixedAssetPaymentAction.paymentTypeChanged}"
+                                         reRender="beneficiaryPanel, cashBoxCashAccountDiv, bankDiv, calculatedAmountDiv"
+                                         ajaxSingle="true"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:div id="beneficiaryPanel">
+                        <s:fragment rendered="#{fixedAssetPaymentAction.enableBeneficiaryFields}">
+                            <s:decorate id="beneficiaryNameField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['FixedAssetPayment.beneficiaryName']}</ui:define>
+                                <h:inputText id="beneficiaryName"
+                                             value="#{fixedAssetPayment.beneficiaryName}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="200"
+                                             tabindex="1001"/>
+                            </s:decorate>
+
+                            <s:decorate id="beneficiaryTypeField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['FixedAssetPayment.beneficiaryType']}</ui:define>
+                                <h:selectOneRadio value="#{fixedAssetPayment.fixedAssetBeneficiaryType}"
+                                                  layout="lineDirection">
+                                    <s:selectItems value="#{fixedAssetBeneficiaryTypes}"
+                                                   var="element"
+                                                   label="#{messages[element.resourceKey]}"/>
+                                    <s:convertEnum/>
+                                </h:selectOneRadio>
+                            </s:decorate>
+                        </s:fragment>
+                    </s:div>
+                    <s:div id="bankDiv">
+                        <s:decorate id="bankAccountField" template="/include/inputField.xhtml" styleClass="formRow"
+                                    rendered="#{fixedAssetPaymentAction.enableBankAccount}">
+                            <ui:define name="label">#{messages['FixedAssetPayment.bankAccount']}</ui:define>
+                            <h:selectOneMenu id="bankAccount"
+                                             value="#{fixedAssetPayment.bankAccount}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="1002">
+                                <s:selectItems value="#{financesBankAccountList}"
+                                               var="element"
+                                               label="#{element.description} #{messages[element.currency.symbolResourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             action="#{fixedAssetPaymentAction.accountChanged}"
+                                             reRender="sourceCurrencyDiv, exchangeRatePanel, payCurrencyField, payAmountField"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div id="cashBoxCashAccountDiv">
+                        <s:decorate id="cashBoxCashAccountField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow"
+                                    rendered="#{fixedAssetPaymentAction.cashBoxPayment}">
+                            <ui:define name="label">#{messages['FixedAssetPayment.cashBoxCashAccount']}</ui:define>
+                            <app:selectPopUp id="cashBoxCashAccount"
+                                             required="true"
+                                             textValue="#{fixedAssetPayment.cashBoxCashAccount.fullName}"
+                                             value="#{fixedAssetPayment.cashBoxCashAccount}"
+                                             dataModel="#{cashAccountDataModel}"
+                                             clearAction="fixedAssetPaymentAction.clearCashBoxCashAccount()"
+                                             searchModalPanel="cashBoxCashAccountListModalPanel"
+                                             reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                                             hotKeySelect="alt+3"
+                                             tabindex="1003">
+                            </app:selectPopUp>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div id="exchangeRatePanel">
+                        <s:decorate id="exchangeRateField"
+                                    template="/include/inputField.xhtml"
+                                    rendered="#{fixedAssetPaymentAction.enableExchangeRateField}"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['FixedAssetPayment.exchangeRate']}</ui:define>
+                            <h:inputText id="exchangeRate"
+                                         value="#{fixedAssetPayment.exchangeRate}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="1004">
+                                <app:realNumberConverter minimum="0.000001"
+                                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                                         forId="exchangeRate"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div id="calculatedAmountDiv">
+                        <s:decorate id="sourceAmountField"
+                                    template="/include/viewField.xhtml"
+                                    styleClass="formRow"
+                                    rendered="#{not empty fixedAssetPayment.sourceAmount}">
+                            <ui:define name="label">
+                                <c:choose>
+                                    <c:when test="#{fixedAssetPaymentAction.checkPayment}">
+                                        #{messages['FixedAssetPayment.sourceCheckAmount']}
+                                    </c:when>
+                                    <c:when test="#{fixedAssetPaymentAction.bankPayment}">
+                                        #{messages['FixedAssetPayment.sourceBankAmount']}
+                                    </c:when>
+                                    <c:otherwise>
+                                        #{messages['FixedAssetPayment.sourceCashBoxAmount']}
+                                    </c:otherwise>
+                                </c:choose>
+                            </ui:define>
+
+                            <ui:param name="required" value="false"/>
+                            <h:outputText value="#{fixedAssetPayment.sourceAmount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </s:decorate>
+                    </s:div>
+
+                </s:div>
+                <s:div>
+                    <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetPayment.description']}</ui:define>
+                        <h:inputTextarea id="description"
+                                         value="#{fixedAssetPayment.description}"
+                                         styleClass="input textarea"
+                                         required="true"
+                                         tabindex="1005">
+                            <f:validateLength maximum="250"/>
+                        </h:inputTextarea>
+                    </s:decorate>
+                    <s:decorate id="computePaymentButton"
+                                template="/include/viewField.xhtml"
+                                styleClass="formRow">
+                        <ui:param name="required" value="falmse"/>
+                        <a4j:commandButton id="calculatePayentValues"
+                                           action="#{mainAction.computePayment}"
+                                           value="#{messages['FixedAsset.ComputePayment']}"
+                                           styleClass="button"
+                                           ajaxSingle="false"
+                                           immediate="false"
+                                           reRender="globalDiv"
+                                           tabindex="1006"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </s:div>
+    </a4j:region>
+</app:fieldset>

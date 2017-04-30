@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/warehouse/*" login-required="true"/>
+
+    <page view-id="/warehouse/groupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{groupAction.select(groupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/group.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/group.xhtml" no-conversation-view-id="/warehouse/groupList.xhtml">
+        <navigation from-action="#{groupAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/group.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{subGroupAction.addSubGroup}">
+            <rule>
+                <redirect view-id="/warehouse/subGroup.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{subGroupAction.select(subGroupItem)}">
+            <rule>
+                <redirect view-id="/warehouse/subGroup.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/groupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/subGroup.xhtml">
+        <navigation from-action="#{subGroupAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/subGroup.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/group.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/warehouseList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{warehouseAction.select(warehouseItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehouse.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/warehouse.xhtml" no-conversation-view-id="/warehouse/warehouseList.xhtml">
+        <navigation from-action="#{warehouseAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehouse.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehouseList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/documentTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{warehouseDocumentTypeAction.select(warehouseDocumentTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/documentType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/documentType.xhtml" no-conversation-view-id="/warehouse/documentTypeList.xhtml">
+        <navigation from-action="#{warehouseDocumentTypeAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/documentType.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/documentTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productItemList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productItemAction.select(productItemItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/productItem.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/productItem.xhtml" no-conversation-view-id="/warehouse/productItemList.xhtml">
+        <navigation from-action="#{productItemAction.createAndNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/productItem.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/productItemList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/warehouseVoucherCreate.xhtml"
+          no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">
+        <navigation from-action="#{warehouseVoucherCreateAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/warehouseVoucherList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{warehouseVoucherUpdateAction.select(warehouseVoucherItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{warehouseVoucherCreateAction.closeCurrentMonthProcess}">
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/warehouseVoucherUpdate.xhtml"
+          no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">
+        <navigation from-action="#{warehouseVoucherUpdateAction.cancel}">
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{movementDetailAction.addMovementDetail}">
+            <rule if-outcome="Approved">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/movementDetail.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{movementDetailAction.select(movementDetailItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/movementDetail.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{warehouseVoucherUpdateAction.approve}">
+            <rule if-outcome="Approved">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{partialWarehouseVoucherAction.addPartialWarehouseVoucher}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/partialWarehouseVoucher.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/partialWarehouseVoucher.xhtml"
+          no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">
+        <navigation from-action="#{partialWarehouseVoucherAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{partialWarehouseVoucherAction.cancel}">
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/movementDetail.xhtml">
+        <navigation>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/inventoryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{inventoryAction.select(warehouseItem)}">
+            <rule>
+                <redirect view-id="/warehouse/inventory.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/inventory.xhtml"
+          no-conversation-view-id="/warehouse/inventoryList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/inventoryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{warehousePurchaseOrderAction.select(purchaseOrderItem)}">
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/warehousePurchaseOrder.xhtml"
+          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <navigation from-action="#{warehousePurchaseOrderAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.specialUpdate}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderDetailAction.addWarehousePurchaseOrderDetail}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrderDetail.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.addWarehousePurchaseOrderDiscountComment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrderDiscountComment.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.select(discountCommentItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrderDiscountComment.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehouseAdvancePaymentAction.addAdvancePayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/advancePayment.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.approveWarehousePurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.nullifyWarehousePurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Approved">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.finalizeWarehousePurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Finalized">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderAction.liquidateWarehousePurchaseOrder}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Liquidated">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseOrderDetailAction.select(warehousePurchaseOrderDetailItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrderDetail.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehouseAdvancePaymentAction.select(purchaseOrderPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/advancePayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehouseAdvancePaymentAction.selectToRemake(purchaseOrderPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/advancePayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{warehousePurchaseDocumentAction.addPurchaseDocument}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseDocument.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{warehousePurchaseDocumentAction.select(purchaseDocumentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseDocument.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/warehousePurchaseOrderDiscountComment.xhtml"
+          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <navigation from-action="#{discountCommentAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.cancel}">
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/warehouse/advancePayment.xhtml"
+          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/warehousePurchaseOrderDetail.xhtml"
+          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/inventoryManagement.xhtml"
+          no-conversation-view-id="/warehouse/inventoryList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/inventoryList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/inventoryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/providerList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{providerAction.select(providerItem)}">
+            <rule>
+                <redirect view-id="/warehouse/provider.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/provider.xhtml"
+          no-conversation-view-id="/warehouse/providerList.xhtml">
+        <navigation from-action="#{provideAction.updateProvider}">
+            <rule>
+                <redirect view-id="/warehouse/provide.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{provideAction.addProvideElement}">
+            <rule>
+                <redirect view-id="/warehouse/provide.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{provideAction.select(provideItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/provide.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/provider.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/providerList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/provide.xhtml"
+          no-conversation-view-id="/warehouse/providerList.xhtml">
+        <navigation>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/providerList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/provider.xhtml"/>
+            </rule>
+
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productDeliveryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productDeliveryAction.select(productDeliveryItem)}">
+            <rule>
+                <redirect view-id="/warehouse/productDelivery.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productDelivery.xhtml"
+          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+        <navigation from-action="#{productDeliveryAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/productDelivery.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productDeliveryVentaDirecta.xhtml"
+          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+        <navigation from-action="#{productDeliveryAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/productDeliveryVentaDirecta.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productDeliveryByDate.xhtml"
+          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+        <navigation from-action="#{productDeliveryAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/warehouse/productDeliveryByDate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/warehousePurchaseDocument.xhtml"
+          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+</pages>        

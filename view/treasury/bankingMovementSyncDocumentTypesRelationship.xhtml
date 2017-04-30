@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        #{messages['BankingMovementSync.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="bankingMovementSynchronizationForm">
+            <div class="buttons">
+                <h:commandButton action="#{bankingMovementSyncAction.previousDocumentTypesRelationship}"
+                                 value="#{messages['Common.previous']}"
+                                 immediate="true"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.finalizeDocumentTypesRelationship}"
+                                 value="#{messages['BankingMovementSync.finalizeRegister']}"
+                                 rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','CREATE')}"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['BankingMovementSync.documentTypesRelationship']}
+                </f:facet>
+
+                <rich:dataTable value="#{bankingMovementSyncAction.documentTypeList}"
+                                var="documentType"
+                                rowKeyVar="rowKeyVar"
+                                id="documentTypeList"
+                                columnsWidth="5%, 55%, 40%"
+                                width="100%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+
+                            </rich:column>
+                            <rich:column>
+                                #{messages['BankingMovementSync.documentTypePosition']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['BankingMovementSync.columnValue']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{rowKeyVar+1}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{documentType}"/>
+                    </rich:column>
+                    <rich:column>
+                        <s:decorate id="bankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:param name="showLabel" value="false"/>
+                            <h:selectOneMenu id="documentTypeMapping"
+                                             value="#{bankingMovementSyncAction.documentTypeMapping[documentType]}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="1">
+                                <s:selectItems value="#{financesDocumentTypeList}"
+                                               var="financesDocumentType"
+                                               label="#{financesDocumentType.fullName}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </rich:column>
+                </rich:dataTable>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{bankingMovementSyncAction.previousDocumentTypesRelationship}"
+                                 value="#{messages['Common.previous']}"
+                                 immediate="true"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.finalizeDocumentTypesRelationship}"
+                                 value="#{messages['BankingMovementSync.finalizeRegister']}"
+                                 rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','CREATE')}"
+                                 styleClass="button"/>
+                <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

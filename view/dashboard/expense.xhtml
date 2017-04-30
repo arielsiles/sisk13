@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:panel rendered="#{s:hasPermission('EXPENSEPANEL','VIEW')}">
+        <f:facet name="header">
+            <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                <s:div styleClass="left">
+                    <h:outputText value="#{messages['Expense.title']} (#{expenseBudgetComponentAction.dateRange})"/>
+                </s:div>
+                <s:div styleClass="right">
+                    <s:link view="/dashboard/expenseBudgetExtended.xhtml"
+                            title="#{messages['Dashboard.link.details']}">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image"/>
+                    </s:link>
+                </s:div>
+            </h:panelGrid>
+        </f:facet>
+        <a4j:region renderRegionOnly="true">
+            <rich:tabPanel switchType="ajax">
+                <rich:tab label="#{messages['Expense.tab.all']}"
+                          action="#{expenseBudgetComponentAction.disableExecutorUnit()}"
+                          ajaxSingle="true">
+                    <ui:include src="/dashboard/expenseList.xhtml"/>
+                </rich:tab>
+                <c:forEach items="#{executorUnitList.resultList}" var="executorUnit">
+                    <rich:tab label="#{executorUnit.description}"
+                              action="#{expenseBudgetComponentAction.enableExecutorUnit(executorUnit.id)}"
+                              ajaxSingle="true">
+                        <ui:include src="/dashboard/expenseList.xhtml"/>
+                    </rich:tab>
+                </c:forEach>
+            </rich:tabPanel>
+            <ui:include src="/dashboard/componentStatus.xhtml"/>
+        </a4j:region>
+    </rich:panel>
+</ui:composition>

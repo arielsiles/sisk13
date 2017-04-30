@@ -1,0 +1,139 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{productItemArticleSearchDataModel}"/>
+    </c:if>
+    <f:facet name="header">
+        <h:outputText>#{messages['ProductItem.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemListForm">
+        <rich:simpleTogglePanel label="#{messages['ProductItem.search']}" switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+                    <h:inputText id="productItemCode"
+                                 value="#{dataModel.criteria.id.productItemCode}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{dataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="2"
+                                 styleClass="input"/>
+                    <a4j:commandButton action="#{dataModel.search}"
+                                       reRender="productItemList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+
+        <div class="buttons">
+            <ui:insert name="addButton"/>
+        </div>
+        <rich:dataTable value="#{dataModel}"
+                        var="productItemItem"
+                        id="productItemList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="5%, 15%, 50%, 15%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column styleClass="center">
+                        <app:selectCheckboxHeader dataModel="#{dataModel}"
+                                                  reRender="productItemList, dataScroller"/>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productItem.productItemCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.productItemCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productItem.name"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productItem.investmentAmount"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.investmentAmount']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productItem.unitCost"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.unitCost']}
+                        </app:commandSortHeader>
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column styleClass="center">
+                <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                         immediate="true"
+                                         value="#{dataModel.selectedList[dataModel.page][productItemItem.id]}">
+                    <a4j:support event="onchange"
+                                 reRender="selectCheckboxItem"/>
+                </h:selectBooleanCheckbox>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productItemItem.productItemCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productItemItem.name}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{productItemItem.investmentAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{productItemItem.unitCost}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller"
+                          for="productItemList"
+                          dataModel="#{dataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, addButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

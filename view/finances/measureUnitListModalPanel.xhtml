@@ -1,0 +1,99 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{dialogId}Container\\:#{dialogId}Form\\:measureUnitCodeField\\:measureUnitCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['MeasureUnit.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="#{dialogId}Form">
+        <rich:simpleTogglePanel label="#{messages['MeasureUnit.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="measureUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MeasureUnit.measureUnitCode']}</ui:define>
+                    <h:inputText id="measureUnitCode" value="#{measureUnitDataModel.criteria.measureUnitCode}"
+                                 maxlength="6" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MeasureUnit.name']}</ui:define>
+                    <h:inputText id="name" value="#{measureUnitDataModel.criteria.name}"
+                                 maxlength="150" tabindex="2" styleClass="input"/>
+                    <a4j:commandButton action="#{measureUnitDataModel.search}"
+                                       reRender="measureUnitList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+
+        </rich:simpleTogglePanel>
+
+        <br/>
+
+        <rich:dataTable value="#{measureUnitDataModel}" var="measureUnitItem" id="measureUnitList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="25%, 35%, 30%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="measureUnit.measureUnitCode"
+                                               dataModel="#{measureUnitDataModel}"
+                                               reRender="measureUnitList, dataScroller">
+                            #{messages['MeasureUnit.measureUnitCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="measureUnit.name"
+                                               dataModel="#{measureUnitDataModel}"
+                                               reRender="measureUnitList, dataScroller">
+                            #{messages['MeasureUnit.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="measureUnit.description"
+                                               dataModel="#{measureUnitDataModel}"
+                                               reRender="measureUnitList, dataScroller">
+                            #{messages['MeasureUnit.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{measureUnitItem.measureUnitCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{measureUnitItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{measureUnitItem.description}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="measureUnitList" dataModel="#{measureUnitDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>
+

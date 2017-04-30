@@ -1,0 +1,290 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{cycleAction.managed}">
+            #{messages['Cycle.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Cycle.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="cycleForm">
+
+<div class="buttons">
+    <h:commandButton action="#{cycleAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!cycleAction.managed and s:hasPermission('CYCLE','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{cycleAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{cycleAction.managed and s:hasPermission('CYCLE','UPDATE')}"
+                     tabindex="2"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{cycleAction.managed and s:hasPermission('CYCLE','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{cycleAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{cycleAction.managed}">
+                #{messages['Cycle.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Cycle.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.name']}</ui:define>
+        <h:inputText id="name" value="#{cycle.name}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="150"
+                     tabindex="5">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="startDateField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.startDate']}</ui:define>
+        <rich:calendar id="startDate"
+                       value="#{cycle.startDate}"
+                       rendered="#{!fixedAssetAction.managed}"
+                       styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       required="true"
+                       tabindex="6">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+            <a4j:support event="onchanged"
+                         ajaxSingle="true"
+                         reRender="startDateField"/>
+        </rich:calendar>
+        <h:outputText value="#{cycle.startDate}"
+                      rendered="#{cycleAction.managed}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="endDateField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.endDate']}</ui:define>
+        <rich:calendar id="endDate"
+                       value="#{cycle.endDate}"
+                       rendered="#{!fixedAssetAction.managed}"
+                       styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       required="true"
+                       tabindex="7">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+            <a4j:support event="onchanged"
+                         ajaxSingle="true"
+                         reRender="endDateField"/>
+        </rich:calendar>
+        <h:outputText value="#{cycle.endDate}"
+                      rendered="#{cycleAction.managed}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.sector']}</ui:define>
+        <h:selectOneMenu id="sector"
+                         value="#{cycleAction.sector}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{!cycleAction.managed}"
+                         tabindex="8">
+            <s:selectItems value="#{sectorList}"
+                           var="sector"
+                           label="#{sector.name}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange"
+                         reRender="sectorField, cycleTypeField, cycleType"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{cycle.cycleType.sector.name}"
+                      rendered="#{cycleAction.managed}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="cycleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.cycleType']}</ui:define>
+        <h:selectOneMenu id="cycleType"
+                         value="#{cycle.cycleType}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{!cycleAction.managed}"
+                         tabindex="9">
+            <s:selectItems value="#{cycleTypeList}"
+                           var="cycleType"
+                           label="#{cycleType.name}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:commandLink action="onchange" ajaxSingle="true"
+                             reRender="cycleTypeField">
+            </a4j:commandLink>
+        </h:selectOneMenu>
+        <h:outputText value="#{cycle.cycleType.name}"
+                      rendered="#{cycleAction.managed}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.gestion']}</ui:define>
+        <h:selectOneMenu id="gestion"
+                         value="#{cycle.gestion}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{!cycleAction.managed}"
+                         tabindex="11">
+            <s:selectItems value="#{gestionList}"
+                           var="gestion"
+                           label="#{gestion.year}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:commandLink action="onchange" ajaxSingle="true"
+                             reRender="gestionField">
+            </a4j:commandLink>
+        </h:selectOneMenu>
+        <h:outputText value="#{cycle.gestion.year}"
+                      rendered="#{cycleAction.managed}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="laboralWeeksField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.laboralWeeks']}</ui:define>
+        <h:inputText id="laboralWeeks"
+                     value="#{cycle.laboralWeeks}"
+                     styleClass="input"
+                     maxlength="150"
+                     required="true"
+                     tabindex="12">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="laboralWeeks"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="laboralDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.laboralDays']}</ui:define>
+        <h:inputText id="laboralDays"
+                     value="#{cycle.laboralDays}"
+                     styleClass="input"
+                     maxlength="150"
+                     required="true"
+                     tabindex="12">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}" forId="laboralDays"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="exchangeRateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.exchangeRate']}</ui:define>
+        <h:inputText id="exchangeRate"
+                     value="#{cycle.exchangeRate}"
+                     styleClass="input"
+                     maxlength="150"
+                     required="true"
+                     tabindex="12">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="exchangeRate"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Cycle.active']}</ui:define>
+        <h:selectBooleanCheckbox id="active"
+                                 value="#{cycle.active}"
+                                 tabindex="12"/>
+    </s:decorate>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{cycleAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!cycleAction.managed and s:hasPermission('CYCLE','CREATE')}"
+                     tabindex="13">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{cycleAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{cycleAction.managed and s:hasPermission('CYCLE','UPDATE')}"
+                     tabindex="14"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{cycleAction.managed and s:hasPermission('CYCLE','DELETE')}"
+                     tabindex="15">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{cycleAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="16">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{cycleAction.managed and s:hasPermission('CYCLE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Cycle.delete.confirmation']}">
+                <f:param value="#{cycle.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{cycleAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('CYCLE','DELETE')}"
+                           immediate="true"
+                           styleClass="button"
+                           tabindex="17"/>
+    </ui:define>
+</s:decorate>
+
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

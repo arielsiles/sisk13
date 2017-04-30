@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['IndirectCostconfig.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="indirectCostConfigSearch">
+            <rich:simpleTogglePanel label="#{messages['IndirectcostConfig.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['IndirectcostConfig.acount']}</ui:define>
+                            <h:inputText id="account"
+                                         value="#{indirectCostsConfigDataModel.criteria.account}"
+                                         maxlength="150"
+                                         tabindex="1"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Warehouse.name']}</ui:define>
+                            <h:inputText id="description"
+                                         value="#{indirectCostsConfigDataModel.criteria.description}"
+                                         maxlength="150"
+                                         tabindex="2"
+                                         styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton action="#{indirectCostsConfigDataModel.search}"
+                                               reRender="indirectCostConfigList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#account" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/production/indirectCostConfig.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INDIRECTCOSTCONFIGURATION','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{indirectCostsConfigDataModel}"
+                            var="item"
+                            id="indirectCostConfigList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%,60%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCostsConfig.account"
+                                                   dataModel="#{indirectCostsConfigDataModel}"
+                                                   reRender="indirectCostConfigList, dataScroller">
+                                #{messages['IndirectcostConfig.acount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCostsConfig.description"
+                                                   dataModel="#{indirectCostsConfigDataModel}"
+                                                   reRender="indirectCostConfigList, dataScroller">
+                                #{messages['IndirectcostConfig.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCostsConfig.predefined"
+                                                   dataModel="#{indirectCostsConfigDataModel}"
+                                                   reRender="indirectCostConfigList, dataScroller">
+                                #{messages['IndirectcostConfig.predefined']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{item.account}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.predefined ? 'SI' : 'NO'}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{indirectCostsConfigurationAction.select(item)}"
+                                   rendered="#{s:hasPermission('INDIRECTCOSTCONFIGURATION','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="indirectCostConfigList" dataModel="#{indirectCostsConfigDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/production/indirectCostConfig.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INDIRECTCOSTCONFIGURATION','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

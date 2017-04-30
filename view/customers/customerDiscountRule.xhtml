@@ -1,0 +1,202 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{customerDiscountRuleAction.managed}">
+                #{messages['CustomerDiscountRule.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CustomerDiscountRule.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+
+        <h:form id="customerDiscountRuleForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{customerDiscountRuleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{customerDiscountRuleAction.updateRule}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{customerDiscountRuleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{customerDiscountRuleAction.managed}">
+                            #{messages['CustomerDiscountRule.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CustomerDiscountRule.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.name']}</ui:define>
+                    <h:inputText id="name" value="#{customerDiscountRule.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="discountRuleStateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.discountRuleState']}</ui:define>
+                    <h:selectOneMenu id="discountRuleState"
+                                     value="#{customerDiscountRule.discountRuleState}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="2">
+                        <s:selectItems value="#{discountRuleState}"
+                                       var="state"
+                                       label="#{messages[state.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="discountPolicyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.discountPolicy']}</ui:define>
+                    <h:selectOneMenu id="discountPolicy"
+                                     value="#{customerDiscountRule.discountPolicy}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3"
+                                     disabled="#{customerDiscountRuleAction.managed}">
+                        <s:selectItems value="#{discountPolicyList.resultList}"
+                                       var="discountPolicy"
+                                       label="#{discountPolicy.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" reRender="amount" ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.amount']}</ui:define>
+                    <h:inputText id="amount" value="#{customerDiscountRule.amount}" styleClass="input"
+                                 required="true"
+                                 maxlength="20" tabindex="4">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        <f:converter converterId="bigDecimalConverter"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="notesField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.notes']}</ui:define>
+                    <h:inputTextarea id="notes" value="#{customerDiscountRule.notes}"
+                                     styleClass="input textarea" tabindex="5"/>
+                </s:decorate>
+                <s:decorate id="activationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerDiscountRule.activationDate']}</ui:define>
+                    <rich:calendar id="activationDate"
+                                   value="#{customerDiscountRule.activationDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate id="addCustomersField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{customerDiscountRuleAction.managed}">
+                    <a4j:commandLink value=" #{messages['CustomerDiscountRule.assignCustomers']}" tabindex="7"
+                                     oncomplete="Richfaces.showModalPanel('customerListModalPanel');"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{customerDiscountRuleAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','CREATE')}"
+                                 tabindex="8">
+                </h:commandButton>
+                <h:commandButton action="#{customerDiscountRuleAction.updateRule}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','UPDATE')}"
+                                 tabindex="9"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 tabindex="10"
+                                 styleClass="button"
+                                 rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{customerDiscountRuleAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="11">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CustomerDiscountRule.delete.confirmation']}">
+                        <f:param value="#{customerDiscountRule.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{customerDiscountRuleAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{customerDiscountRuleAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="customers" template="/customers/customerListModalPanel.xhtml"
+                    rendered="#{customerDiscountRuleAction.managed}"/>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

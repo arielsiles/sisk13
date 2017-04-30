@@ -1,0 +1,174 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{finishedGoodsWarehouseAction.managed}">
+                #{messages['FinishedGoodsWarehouse.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['FinishedGoodsWarehouse.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="finishedGoodsWarehouseForm">
+            <div class="buttons">
+                <h:commandButton action="#{finishedGoodsWarehouseAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!finishedGoodsWarehouseAction.managed }" id="createButtonId">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{finishedGoodsWarehouseAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{finishedGoodsWarehouseAction.managed }"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{finishedGoodsWarehouseAction.managed }">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{finishedGoodsWarehouseAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{finishedGoodsWarehouseAction.managed}">
+                            #{messages['FinishedGoodsWarehouse.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['FinishedGoodsWarehouse.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinishedGoodsWarehouse.name']}</ui:define>
+                    <h:inputText id="name" value="#{finishedGoodsWarehouse.name}" styleClass="input" required="true"
+                                 maxlength="200" tabindex="3">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinishedGoodsWarehouse.code']}</ui:define>
+                    <h:inputText id="code" value="#{finishedGoodsWarehouse.code}" styleClass="input" required="true"
+                                 maxlength="100" tabindex="3">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinishedGoodsWarehouse.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{finishedGoodsWarehouse.description}" styleClass="input" required="false"
+                                     rows="7" tabindex="3">
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <rich:spacer height="10"/>
+
+                <a4j:commandButton immediate="true" ajaxSingle="true"
+                                   value="#{messages['WarehouseSlot.button.addWarehouse']}"
+                                   onclick="Richfaces.showModalPanel('processedProductListModalPanel');"/>
+                <rich:dataTable value="#{finishedGoodsWarehouse.warehouseSlotList}" var="warehouseSlotItem" id="warehouseSlotList"
+                                width="100%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['WarehouseSlot.code']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['WarehouseSlot.processedProduct']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['Common.action']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:inputText id="warehouseSlotId" value="#{warehouseSlotItem.code}" required="true" style="width:95%;">
+                            <a4j:support event="onblur" ajaxSingle="single" />
+                        </h:inputText>
+                        <rich:message for="warehouseSlotId" styleClass="errors" />
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{warehouseSlotItem.fullNameOfMetaProduct}" />
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <a4j:commandLink value="#{messages['Common.remove']}"
+                                         action="#{finishedGoodsWarehouseAction.removeWarehouseSlot(warehouseSlotItem)}"
+                                         reRender="warehouseSlotList" ajaxSingle="true">
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{finishedGoodsWarehouseAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!finishedGoodsWarehouseAction.managed }"/>
+                <h:commandButton action="#{finishedGoodsWarehouseAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{finishedGoodsWarehouseAction.managed }"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{finishedGoodsWarehouseAction.managed }">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{finishedGoodsWarehouseAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{finishedGoodsWarehouseAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['FinishedGoodsWarehouse.delete.confirmation']}">
+                        <f:param value="#{finishedGoodsWarehouse.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{finishedGoodsWarehouseAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="processedProductListModalPanelContainer" template="/production/metaProductListModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['ProductComposition.selectProcessedProduct']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['ProductComposition.searchProcessedProduct']}" />
+            <ui:param name="nameSortProperty" value="processedProduct.name" />
+            <ui:param name="codeSortProperty" value="processedProduct.code" />
+            <ui:param name="dialogId" value="processedProductListModalPanel"/>
+            <ui:param name="dataModel" value="#{processedProductDataModel}"/>
+            <ui:param name="showMeasureUnit" value="false"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{finishedGoodsWarehouseAction.selectProduct(dataItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="warehouseSlotList"
+                                   oncomplete="Richfaces.hideModalPanel('processedProductListModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,378 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Reports.rotatoryFundCollectionDetail.page.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="retrieveByDebtorReportForm">
+<rich:simpleTogglePanel label="#{messages['Reports.rotatoryFundCollectionDetail.page.title']}"
+                        switchType="client">
+
+<h:panelGrid id="searchOptionsPanel"
+             columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent,width50percent">
+<s:div id="leftSidePanel">
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFund.documentType']}</ui:define>
+        <h:selectOneMenu id="documentType"
+                         value="#{rotatoryFundCollectionDetailReportAction.documentType}"
+                         styleClass="input"
+                         tabindex="1">
+            <s:selectItems value="#{rotatoryFundDocumentTypeList}" var="documentType"
+                           label="#{documentType.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="rotatoryFundCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.rotatoryFund']}</ui:define>
+        <h:inputText id="rotatoryFundCode"
+                     value="#{rotatoryFundCollectionDetailReportAction.rotatoryFundCode}"
+                     styleClass="inputNumber"
+                     tabindex="2">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="rotatoryFundCollectionCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.collection']}</ui:define>
+        <h:inputText id="rotatoryFundCollectionCode"
+                     value="#{rotatoryFundCollectionDetailReportAction.rotatoryFundCollectionCode}"
+                     styleClass="inputNumber"
+                     tabindex="3">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.gloss']}</ui:define>
+        <h:inputText id="gloss"
+                     value="#{rotatoryFundCollectionDetailReportAction.gloss}"
+                     styleClass="input"
+                     tabindex="4">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.observation']}</ui:define>
+        <h:inputText id="observation"
+                     value="#{rotatoryFundCollectionDetailReportAction.observation}"
+                     styleClass="input"
+                     tabindex="5">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFund.amount']}</ui:define>
+        <h:outputText value="#{messages['Common.from']}"/>
+        &#160;
+        <h:inputText id="startAmount"
+                     value="#{rotatoryFundCollectionDetailReportAction.startAmount}"
+                     styleClass="inputNumberSmall"
+                     tabindex="6">
+            <app:realNumberConverter forId="startAmount" pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:inputText>
+        &#160;
+        <h:outputText value="#{messages['Common.to']}"/>
+        &#160;
+        <h:inputText id="endAmount"
+                     value="#{rotatoryFundCollectionDetailReportAction.endAmount}"
+                     styleClass="inputNumberSmall"
+                     tabindex="6">
+            <app:realNumberConverter forId="endAmount" pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate id="approvalDateField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define
+                name="label">#{messages['Reports.rotatoryFundCollectionDetail.approvalDate']}</ui:define>
+        <h:outputText value="#{messages['Common.dateFrom']}"/>
+        &#160;
+        <rich:calendar id="startApprovalDate"
+                       value="#{rotatoryFundCollectionDetailReportAction.startApprovalDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       inputClass="inputSmall"
+                       tabindex="7">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        &#160;
+        <h:outputText value="#{messages['Common.dateTo']}"/>
+        &#160;
+        <rich:calendar id="endApprovalDate"
+                       value="#{rotatoryFundCollectionDetailReportAction.endApprovalDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       inputClass="inputSmall"
+                       tabindex="7">
+            <app:dateRangeValidator forId="startApprovalDate"
+                                    forLabel="#{messages['Common.dateFrom']}"
+                                    type="greater"/>
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+    </s:decorate>
+    <s:decorate id="documentDateField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define
+                name="label">#{messages['Reports.rotatoryFundCollectionDetail.documentDate']}</ui:define>
+        <h:outputText value="#{messages['Common.dateFrom']}"/>
+        &#160;
+        <rich:calendar id="startDocumentDate"
+                       value="#{rotatoryFundCollectionDetailReportAction.startDocumentDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       inputClass="inputSmall"
+                       tabindex="8">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        &#160;
+        <h:outputText value="#{messages['Common.dateTo']}"/>
+        &#160;
+        <rich:calendar id="endDocumentDate"
+                       value="#{rotatoryFundCollectionDetailReportAction.endDocumentDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       inputClass="inputSmall"
+                       tabindex="8">
+            <app:dateRangeValidator forId="startDocumentDate"
+                                    forLabel="#{messages['Common.dateFrom']}"
+                                    type="greater"/>
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+    </s:decorate>
+</s:div>
+<s:div id="rightSidePanel">
+    <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehousePurchaseOrder.executorUnit']}</ui:define>
+        <h:selectOneMenu id="businessUnit"
+                         value="#{rotatoryFundCollectionDetailReportAction.businessUnit}"
+                         styleClass="input"
+                         tabindex="9">
+            <s:selectItems value="#{businessUnitList.resultList}"
+                           var="businessUnit"
+                           label="#{businessUnit.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehousePurchaseOrder.costCenter']}</ui:define>
+        <app:selectPopUp id="costCenter"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.costCenter.fullName}"
+                         value="#{rotatoryFundCollectionDetailReportAction.costCenter}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setCostCenter(null)"
+                         searchModalPanel="costCenterListModalPanel"
+                         dataModel="#{costCenterDataModel}"
+                         reRender="costCenterField"/>
+    </s:decorate>
+    <s:decorate id="cashAccountField" styleClass="formRow" template="/include/inputField.xhtml">
+        <ui:define
+                name="label">#{messages['Reports.rotatoryFundCollectionDetail.cashAccount']}</ui:define>
+        <app:selectPopUp id="cashAccount"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.cashAccount.fullName}"
+                         value="#{rotatoryFundCollectionDetailReportAction.cashAccount}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setCashAccount(null)"
+                         searchModalPanel="cashAccountListModalPanel"
+                         dataModel="#{cashAccountDataModel}"
+                         reRender="cashAccountField"/>
+    </s:decorate>
+    <s:decorate id="financesEntityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define
+                name="label">#{messages['Reports.rotatoryFundCollectionDetail.serviceProvider']}</ui:define>
+        <app:selectPopUp id="financesEntity"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.financesEntity.acronym}"
+                         value="#{rotatoryFundCollectionDetailReportAction.financesEntity}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setFinancesEntity(null)"
+                         searchModalPanel="financesEntityListModalPanel"
+                         dataModel="#{financesEntityDataModel}"
+                         reRender="financesEntityField"/>
+    </s:decorate>
+    <s:decorate id="collectionDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['CollectionDocument.collectionDocumentType']}</ui:define>
+        <h:selectOneMenu id="collectionDocumentType"
+                         value="#{rotatoryFundCollectionDetailReportAction.collectionDocumentType}"
+                         styleClass="input"
+                         tabindex="10">
+            <s:selectItems value="#{collectionDocumentTypes}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.currency']}</ui:define>
+        <h:selectOneMenu id="currency"
+                         value="#{rotatoryFundCollectionDetailReportAction.currency}"
+                         styleClass="input"
+                         tabindex="11">
+            <s:selectItems value="#{rotatoryFundCollectionDetailReportAction.singleFinancesCurrencyTypes}"
+                           var="currency"
+                           label="#{messages[currency.resourceKey]} - #{messages[currency.symbolResourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="approvedByUserField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.approvedByUser']}</ui:define>
+        <app:selectPopUp id="approvedByUser"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.approvedByUser.employee.fullName}"
+                         value="#{rotatoryFundCollectionDetailReportAction.approvedByUser}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setApprovedByUser(null)"
+                         searchModalPanel="userListModalPanel"
+                         dataModel="#{userDataModel}"
+                         reRender="approvedByUserField"/>
+    </s:decorate>
+    <s:decorate id="receiverEmployeeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.receiver']}</ui:define>
+        <app:selectPopUp id="receiverEmployee"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.receiver.fullName}"
+                         value="#{rotatoryFundCollectionDetailReportAction.receiver}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setReceiver(null)"
+                         searchModalPanel="receiverEmployeeListModalPanel"
+                         dataModel="#{rotatoryFundCollectionDetailReportAction}"
+                         reRender="receiverEmployeeField"/>
+    </s:decorate>
+    <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Reports.rotatoryFundCollectionDetail.employee']}</ui:define>
+        <app:selectPopUp id="employee"
+                         textValue="#{rotatoryFundCollectionDetailReportAction.employee.fullName}"
+                         value="#{rotatoryFundCollectionDetailReportAction.employee}"
+                         dataModel="#{generalEmployeeDataModel}"
+                         clearAction="rotatoryFundCollectionDetailReportAction.setEmployee(null)"
+                         searchModalPanel="generalEmployeeListModalPanel"
+                         reRender="employeeField"/>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+
+<rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<app:reportDefaultOptions reportAction="#{rotatoryFundCollectionDetailReportAction}" showPageFormat="false"
+                          tabIndex="15"
+                          showReportTitle="true"/>
+
+<div class="buttons">
+    <h:commandButton action="#{rotatoryFundCollectionDetailReportAction.generateReport}"
+                     styleClass="button"
+                     value="#{messages['Common.generate']}" id="generateButtonId" tabindex="20">
+        <s:defaultAction/>
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate id="userListModalPanelContainer" template="/admin/userListModalPanel.xhtml">
+    <ui:param name="dialogId" value="userListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="approvedByUserField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setApprovedByUser(userItem)}"
+                           oncomplete="Richfaces.hideModalPanel('userListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="receiverEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="receiverEmployeeListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="receiverEmployeeField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setReceiver(employeeItem)}"
+                           oncomplete="Richfaces.hideModalPanel('receiverEmployeeListModalPanel');"/>
+
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <!--<ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>-->
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setEmployee(employeeItem)}"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="costCenterField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setCostCenter(costCenterItem)}"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="financesEntityListModalPanelContainer"
+            template="/finances/financesEntityListModalPanel.xhtml">
+    <ui:param name="containerId" value="financesEntityListModalPanelContainer"/>
+    <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="financesEntityField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setFinancesEntity(instance)}"
+                           oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="cashAccountField"
+                           action="#{rotatoryFundCollectionDetailReportAction.setCashAccount(cashAccountItem)}"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

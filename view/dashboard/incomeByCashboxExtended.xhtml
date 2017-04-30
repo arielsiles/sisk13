@@ -1,0 +1,325 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['IncomeByCashbox.search']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="95%"/>
+
+<ui:param name="selectedTab" value="home"/>
+<ui:define name="body">
+<h:form id="incomeByCashboxSearchForm">
+
+<rich:simpleTogglePanel label="#{messages['IncomeByCashbox.search']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:div id="leftSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['IncomeByCashbox.startDate']}</ui:define>
+                <rich:calendar id="startDate"
+                               value="#{incomeByCashboxExtendedAction.startDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               required="true">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['IncomeByCashbox.endDate']}</ui:define>
+                <rich:calendar id="endDate"
+                               value="#{incomeByCashboxExtendedAction.endDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               required="true">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{incomeByCashboxExtendedAction.search}"
+                                       reRender="searchOptionsPanel, resultPanel"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}">
+                        <a4j:support event="onclick" reRender="leftSidePanel, rightSidePanel"/>
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#startDate" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<s:div id="resultPanel">
+<br/>
+<rich:panel>
+<f:facet name="header">
+    #{messages['IncomeByCashbox.label']}
+</f:facet>
+<s:div style="overflow: auto;">
+<rich:dataTable width="100%"
+                value="#{incomeByCashboxExtendedAction.resultList}"
+                var="element"
+                footerClass="rich-table-footer">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column rowspan="2">
+            #{messages['IncomeByCashbox.month']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByCashbox.laPaz']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByCashbox.santaCruz']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByCashbox.cochabamba']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByCashbox.oruro']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['IncomeByCashbox.columnTitle.total']}
+        </rich:column>
+        <rich:column rowspan="2">
+            #{messages['Dashboard.columnTitle.total']}
+        </rich:column>
+        <rich:column rowspan="2">
+            #{messages['IncomeByCashbox.exchangeRate']}
+        </rich:column>
+
+        <rich:column breakBefore="true">
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+
+        <rich:column>
+            #{messages['Dashboard.symbol.bs']}
+        </rich:column>
+        <rich:column>
+            #{messages['Dashboard.symbol.usd']}
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+<rich:column styleClass="left" footerClass="rich-table-footercell">
+    <h:outputText value="#{element.month}"/>
+    <f:facet name="footer">
+        #{messages['Dashboard.rowTitle.subTotal']}
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.laPazBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['laPazBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.laPazUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['laPazUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.santaCruzBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['santaCruzBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.santaCruzUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['santaCruzUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.cochabambaBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['cochabambaBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.cochabambaUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['cochabambaUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.oruroBs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['oruroBs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.oruroUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['oruroUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.bs}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['bs']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.usd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['usd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.mainTotalUsd}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <f:facet name="footer">
+        <h:outputText value="#{incomeByCashboxExtendedAction.totals['mainTotalUsd']}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </f:facet>
+</rich:column>
+
+<rich:column styleClass="right" footerClass="right">
+    <h:outputText value="#{element.exchangeRate}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="left">
+            #{messages['Dashboard.rowTitle.total']}
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByCashboxExtendedAction.totals['totalLaPazUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByCashboxExtendedAction.totals['totalSantaCruzUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByCashboxExtendedAction.totals['totalCochabambaUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByCashboxExtendedAction.totals['totalOruroUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2" styleClass="right">
+            <h:outputText value="#{incomeByCashboxExtendedAction.totals['totalUsd']}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column colspan="2">
+            <rich:spacer/>
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+</rich:dataTable>
+</s:div>
+</rich:panel>
+</s:div>
+</h:form>
+</ui:define>
+</ui:composition>

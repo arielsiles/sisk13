@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dashboard xmlns="http://encens.com/products/khipus/dashboard"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://encens.com/products/khipus/dashboard http://encens.com/products/khipus/dashboard/dashboard-1.0.xsd">
+    <widgets>
+        <widget id="1" area="administrative" module="warehouse" function="warehouseMonthlyClose"
+                verification="MONTH_END" title="Widget.resource.warehouseMonthlyClose"
+                componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.warehouseMonthlyClose.first" index="0"
+                          minValue="0" maxValue="3" color="-16711936"/>
+                <interval name="second" description="Interval.warehouseMonthlyClose.second" index="1"
+                          minValue="3" maxValue="7" color="-14336"/>
+                <interval name="third" description="Interval.warehouseMonthlyClose.third" index="2"
+                          minValue="8" maxValue="11" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="2" area="administrative" module="fixedAssets" function="fixedAsset" verification="ON_LINE"
+                title="Widget.resource.fixedAsset" componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.fixedAssetApproved.firstPeriod" index="0"
+                          minValue="0" maxValue="3" color="-16711936"/>
+                <interval name="second" description="Interval.fixedAssetApproved.secondPeriod" index="1"
+                          minValue="4" maxValue="7" color="-14336"/>
+                <interval name="third" description="Interval.fixedAssetApproved.ThirdPeriod" index="2"
+                          minValue="8" maxValue="31" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="3" area="administrative" module="fixedAssets" function="fixedAssetMaintenance"
+                verification="ON_LINE" title="Widget.resource.fixedAssetMaintenance"
+                componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.fixedAssetMaintenance.first" index="0"
+                          minValue="0" maxValue="0" color="-16711936"/>
+                <interval name="second" description="Interval.fixedAssetMaintenance.second" index="1"
+                          minValue="1" maxValue="4" color="-14336"/>
+                <interval name="third" description="Interval.fixedAssetMaintenance.third" index="2"
+                          minValue="5" maxValue="8" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="4" area="administrative" module="fixedAssets" function="dischargeBeforeLifetime"
+                verification="ON_LINE" title="Widget.resource.dischargeBeforeLifetime"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.dischargeBeforeLifetime.first" index="0"
+                          minValue="0" maxValue="1" color="-16711936"/>
+                <interval name="second" description="Interval.dischargeBeforeLifetime.second" index="1"
+                          minValue="1" maxValue="5" color="-14336"/>
+                <interval name="third" description="Interval.dischargeBeforeLifetime.third" index="2"
+                          minValue="5" maxValue="100" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="5" area="administrative" module="fixedAssets" function="pendingFixedAssetMaintenanceRequest"
+                verification="ON_LINE" title="Widget.resource.pendingFixedAssetMaintenanceRequest"
+                componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.pendingFixedAssetMaintenanceRequest.first" index="0"
+                          minValue="0" maxValue="3" color="-16711936"/>
+                <interval name="second" description="Interval.pendingFixedAssetMaintenanceRequest.second" index="1"
+                          minValue="4" maxValue="15" color="-14336"/>
+                <interval name="third" description="Interval.pendingFixedAssetMaintenanceRequest.third" index="2"
+                          minValue="16" maxValue="365" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="7" area="administrative" module="accountsReceivable" function="foundsToPay"
+                verification="ON_LINE" title="Widget.resource.foundsToPay"
+                componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.foundsToPay.first" index="0"
+                          minValue="0" maxValue="0" color="-16711936"/>
+                <interval name="second" description="Interval.foundsToPay.second" index="1"
+                          minValue="1" maxValue="4" color="-14336"/>
+                <interval name="third" description="Interval.foundsToPay.third" index="2"
+                          minValue="4" maxValue="365" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="8" area="administrative" module="purchases" function="pendingInvoices"
+                verification="ON_LINE" title="Widget.resource.pendingInvoices"
+                componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.pendingInvoices.first" index="0"
+                          minValue="0" maxValue="1" color="-16711936"/>
+                <interval name="second" description="Interval.pendingInvoices.second" index="1"
+                          minValue="2" maxValue="5" color="-14336"/>
+                <interval name="third" description="Interval.pendingInvoices.third" index="2"
+                          minValue="6" maxValue="365" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="9" area="administrative" module="humanResources" function="officialPayrollGeneration"
+                verification="ON_LINE" title="Widget.resource.officialPayrollGeneration"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="third" description="Interval.officialPayrollGeneration.third" index="0"
+                          minValue="0" maxValue="70" color="-65536"/>
+                <interval name="second" description="Interval.officialPayrollGeneration.second" index="1"
+                          minValue="70" maxValue="80" color="-14336"/>
+                <interval name="first" description="Interval.officialPayrollGeneration.first" index="2"
+                          minValue="80" maxValue="100" color="-16711936"/>
+            </filters>
+        </widget>
+        <widget id="10" area="academic" module="academics" function="debt"
+                verification="ON_LINE" title="Widget.resource.debt"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.debt.first" index="0"
+                          minValue="100" maxValue="500" color="-16711936"/>
+                <interval name="second" description="Interval.debt.second" index="1"
+                          minValue="600" maxValue="1000" color="-14336"/>
+                <interval name="third" description="Interval.debt.third" index="2"
+                          minValue="1100" maxValue="2000" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="11" area="administrative" module="budget" function="entryExecution"
+                verification="ON_LINE" title="Widget.resource.entryBudgetExecution"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.entryBudgetExecution.first" index="0"
+                          minValue="0" maxValue="4" color="-16711936"/>
+                <interval name="second" description="Interval.entryBudgetExecution.second" index="1"
+                          minValue="5" maxValue="9" color="-14336"/>
+                <interval name="third" description="Interval.entryBudgetExecution.third" index="2"
+                          minValue="10" maxValue="100" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="12" area="academic" module="academics" function="desertion"
+                verification="ON_LINE" title="Widget.resource.desertion"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.desertion.first" index="0"
+                          minValue="0" maxValue="5" color="-16711936"/>
+                <interval name="second" description="Interval.desertion.second" index="1"
+                          minValue="6" maxValue="20" color="-14336"/>
+                <interval name="third" description="Interval.desertion.third" index="2"
+                          minValue="21" maxValue="100" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="14" area="academic" module="academics" function="documentationRegistration"
+                verification="ON_LINE" title="Widget.resource.documentationRegistration"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.documentationRegistration.first" index="0"
+                          minValue="0" maxValue="5" color="-16711936"/>
+                <interval name="second" description="Interval.documentationRegistration.second" index="1"
+                          minValue="6" maxValue="20" color="-14336"/>
+                <interval name="third" description="Interval.documentationRegistration.third" index="2"
+                          minValue="21" maxValue="100" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="15" area="administrative" module="budget" function="expenseExecution"
+                verification="ON_LINE" title="Widget.resource.expenseBudgetExecution"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.expenseBudgetExecution.first" index="0"
+                          minValue="0" maxValue="2" color="-16711936"/>
+                <interval name="second" description="Interval.expenseBudgetExecution.second" index="1"
+                          minValue="3" maxValue="20" color="-14336"/>
+                <interval name="third" description="Interval.expenseBudgetExecution.third" index="2"
+                          minValue="21" maxValue="1000" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="16" area="administrative" module="accountsToPay" function="pendingReceiptAccountsToPay"
+                verification="ON_LINE" title="Widget.resource.pendingReceiptAccountsToPay"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.pendingReceiptAccountToPay.first" index="0"
+                          minValue="0" maxValue="1" color="-16711936"/>
+                <interval name="second" description="Interval.pendingReceiptAccountToPay.second" index="1"
+                          minValue="2" maxValue="5" color="-14336"/>
+                <interval name="third" description="Interval.pendingReceiptAccountToPay.third" index="2"
+                          minValue="6" maxValue="365" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="17" area="administrative" module="budget" function="exceedExpenseExecution"
+                verification="ON_LINE" title="Widget.resource.exceedExpenseBudgetExecution"
+                componentName="widgetAction" unit="PERCENT">
+            <filters>
+                <interval name="first" description="Interval.exceedExpenseBudgetExecution.first" index="0"
+                          minValue="1" maxValue="5" color="-16711936"/>
+                <interval name="second" description="Interval.exceedExpenseBudgetExecution.second" index="1"
+                          minValue="6" maxValue="20" color="-14336"/>
+                <interval name="third" description="Interval.exceedExpenseBudgetExecution.third" index="2"
+                          minValue="21" maxValue="1000" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="18" area="administrative" module="receivables" function="expiredReceivables" verification="ON_LINE"
+                title="Widget.resource.expiredReceivables" componentName="widgetAction" unit="UNITS">
+            <filters>
+                <interval name="first" description="Interval.expiredReceivables.firstPeriod" index="0"
+                          minValue="0" maxValue="3" color="-16711936"/>
+                <interval name="second" description="Interval.expiredReceivables.secondPeriod" index="1"
+                          minValue="4" maxValue="6" color="-14336"/>
+                <interval name="third" description="Interval.expiredReceivables.ThirdPeriod" index="2"
+                          minValue="7" maxValue="1000000" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="19" area="administrative" module="budget" function="checkDelivery" verification="ON_LINE"
+                title="Widget.resource.checkDelivery" componentName="widgetAction" unit="DAYS">
+            <filters>
+                <interval name="first" description="Interval.checkDelivery.firstPeriod" index="0"
+                          minValue="0" maxValue="5" color="-16711936"/>
+                <interval name="second" description="Interval.checkDelivery.secondPeriod" index="1"
+                          minValue="6" maxValue="10" color="-14336"/>
+                <interval name="third" description="Interval.checkDelivery.ThirdPeriod" index="2"
+                          minValue="11" maxValue="1000000" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="20" area="administrative" module="warehouse" function="maxProductItemControl" verification="ON_LINE"
+                title="Widget.resource.maxProductItemControl" componentName="widgetAction" unit="UNITS">
+            <filters>
+                <interval name="first" description="Interval.maxProductItemControl.firstPeriod" index="0"
+                          minValue="0" maxValue="0" color="-16711936"/>
+                <interval name="second" description="Common.withoutValue" index="1"
+                          minValue="0" maxValue="0" color="-14336"/>
+                <interval name="third" description="Interval.maxProductItemControl.ThirdPeriod" index="2"
+                          minValue="0" maxValue="0" color="-65536"/>
+            </filters>
+        </widget>
+        <widget id="21" area="administrative" module="warehouse" function="minProductItemControl" verification="ON_LINE"
+                title="Widget.resource.minProductItemControl" componentName="widgetAction" unit="UNITS">
+            <filters>
+                <interval name="first" description="Interval.minProductItemControl.firstPeriod" index="0"
+                          minValue="0" maxValue="0" color="-16711936"/>
+                <interval name="second" description="Common.withoutValue" index="1"
+                          minValue="0" maxValue="0" color="-14336"/>
+                <interval name="third" description="Interval.minProductItemControl.ThirdPeriod" index="2"
+                          minValue="0" maxValue="0" color="-65536"/>
+            </filters>
+        </widget>
+    </widgets>
+</dashboard>

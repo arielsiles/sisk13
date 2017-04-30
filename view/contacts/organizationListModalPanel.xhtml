@@ -1,0 +1,93 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 id="#{dialogId}"
+                 onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['Organization.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="organizationSearchForm">
+
+        <rich:simpleTogglePanel label="#{messages['Organization.search']}" switchType="client">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Organization.name']}</ui:define>
+                <h:inputText id="name" value="#{organizationDataModel.criteria.name}"
+                             maxlength="100" tabindex="1" styleClass="input">
+                </h:inputText>
+                <a4j:commandButton action="#{organizationDataModel.search}"
+                                   reRender="organizationList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{organizationDataModel}" var="organizationItem" id="organizationList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="50%, 20%, 20%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organization.name" dataModel="#{organizationDataModel}"
+                                               reRender="organizationList, dataScroller">
+                            #{messages['Organization.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organization.idNumber"
+                                               dataModel="#{organizationDataModel}"
+                                               reRender="organizationList, dataScroller">
+                            #{messages['Organization.idNumber']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="organization.anniversary"
+                                               dataModel="#{organizationDataModel}"
+                                               reRender="organizationList, dataScroller">
+                            #{messages['Organization.anniversary']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{organizationItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationItem.idNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{organizationItem.anniversary}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="organizationList" dataModel="#{organizationDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton" operation="hide" event="onclick"/>
+
+        <script type="text/javascript">
+            function focusFirstElement() {
+                document.getElementById("#{rich:clientId('name')}").focus();
+            }
+        </script>
+    </h:form>
+</rich:modalPanel>

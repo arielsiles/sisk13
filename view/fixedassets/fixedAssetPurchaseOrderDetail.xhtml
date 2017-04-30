@@ -1,0 +1,562 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{fixedAssetPurchaseOrderDetailAction.managed}">
+            #{messages['FixedAssetPurchaseOrderDetail.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FixedAssetPurchaseOrderDetail.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<c:set var="isPurchaseOrderPending" value="#{fixedAssetPurchaseOrderAction.purchaseOrderPending}"/>
+<c:set var="isPurchaseOrderApproved" value="#{fixedAssetPurchaseOrderAction.purchaseOrderApproved}"/>
+
+
+<h:form id="fixedAssetPurchaseOrderDetailForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{fixedAssetPurchaseOrderDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="1"
+                     rendered="#{!fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}">
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     tabindex="1"
+                     rendered="#{!fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{fixedAssetPurchaseOrderDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="2"
+                     rendered="#{fixedAssetPurchaseOrderDetailAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved)}">
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     tabindex="3"
+                     rendered="#{fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="4"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{fixedAssetPurchaseOrderDetailAction.managed}">
+            #{messages['FixedAssetPurchaseOrderDetail.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FixedAssetPurchaseOrderDetail.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+<s:div>
+<s:decorate id="detailNumberField" template="/include/inputField.xhtml" styleClass="formRow"
+            rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.detailNumber']}</ui:define>
+    <h:outputText value="#{fixedAssetPurchaseOrderDetail.detailNumber}"
+                  styleClass="input"/>
+</s:decorate>
+
+<a4j:region>
+    <s:div id="valuesPanel">
+        <s:decorate id="requestedQuantityField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.requestedQuantity']}</ui:define>
+            <h:inputText id="requestedQuantity"
+                         value="#{fixedAssetPurchaseOrderDetail.requestedQuantity}"
+                         styleClass="input right"
+                         required="true"
+                         rendered="#{isPurchaseOrderPending}"
+                         tabindex="5">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.requestedQuantity}"
+                          styleClass="input"
+                          rendered="#{not isPurchaseOrderPending}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="bsUnitPriceValueField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}</ui:define>
+            <h:inputText id="bsUnitPriceValue"
+                         value="#{fixedAssetPurchaseOrderDetail.bsUnitPriceValue}"
+                         styleClass="input right"
+                         required="true"
+                         rendered="#{isPurchaseOrderPending}"
+                         tabindex="7">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="bsUnitPriceValue"/>
+
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.bsUnitPriceValue}"
+                          styleClass="input"
+                          rendered="#{not(isPurchaseOrderPending)}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Currency.Bs']}"/>
+        </s:decorate>
+        <s:decorate id="bsSusRateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.rate']}</ui:define>
+            <h:inputText id="bsSusRate"
+                         value="#{fixedAssetPurchaseOrderDetail.bsSusRate}"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                         styleClass="input right"
+                         required="true"
+                         tabindex="8">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="bsSusRate"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.bsSusRate}"
+                          rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['FinancesExchangeRate.bsSusRate']}"/>
+        </s:decorate>
+        <s:decorate id="bsUfvRateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.rate']}</ui:define>
+            <h:inputText id="bsUfvRate"
+                         value="#{fixedAssetPurchaseOrderDetail.bsUfvRate}"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                         styleClass="input right"
+                         required="true"
+                         tabindex="9">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="bsUfvRate"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.bsUfvRate}"
+                          rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['FinancesExchangeRate.bsUfvRate']}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="calculatedValues">
+        <s:fragment rendered="#{fixedAssetPurchaseOrderDetailAction.showCalculatedValues}">
+            <s:decorate id="bsTotalAmountAmountField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{not empty fixedAssetPurchaseOrderDetail.bsTotalAmount}">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}</ui:define>
+                <h:outputText value="#{fixedAssetPurchaseOrderDetail.bsTotalAmount}"
+                              styleClass="input">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Bs']}"
+                              rendered="#{not empty fixedAssetPurchaseOrderDetail.bsTotalAmount}"/>
+            </s:decorate>
+            <s:decorate id="susTotalAmountAmountField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{not empty fixedAssetPurchaseOrderDetail.susTotalAmount}">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}</ui:define>
+                <h:outputText value="#{fixedAssetPurchaseOrderDetail.susTotalAmount}"
+                              styleClass="input">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Sus']}"
+                              rendered="#{not empty fixedAssetPurchaseOrderDetail.susTotalAmount}"/>
+            </s:decorate>
+            <s:decorate id="ufvTotalAmountAmountField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{not empty fixedAssetPurchaseOrderDetail.ufvTotalAmount}">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}</ui:define>
+                <h:outputText value="#{fixedAssetPurchaseOrderDetail.ufvTotalAmount}"
+                              styleClass="input">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Ufv']}"
+                              rendered="#{not empty fixedAssetPurchaseOrderDetail.ufvTotalAmount}"/>
+            </s:decorate>
+            <s:decorate id="susUnitPriceValueField" template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{not empty fixedAssetPurchaseOrderDetail.susUnitPriceValue}">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}</ui:define>
+                <h:outputText value="#{fixedAssetPurchaseOrderDetail.susUnitPriceValue}"
+                              rendered="#{fixedAssetPurchaseOrderDetail.susUnitPriceValue!=null}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Sus']}"
+                              rendered="#{not empty fixedAssetPurchaseOrderDetail.susUnitPriceValue}"/>
+            </s:decorate>
+            <s:decorate id="ufvUnitPriceValueField" template="/include/inputField.xhtml"
+                        rendered="#{not empty fixedAssetPurchaseOrderDetail.ufvUnitPriceValue}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}</ui:define>
+                <h:outputText value="#{fixedAssetPurchaseOrderDetail.ufvUnitPriceValue}"
+                              rendered="#{fixedAssetPurchaseOrderDetail.ufvUnitPriceValue!=null}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Ufv']}"
+                              rendered="#{not empty fixedAssetPurchaseOrderDetail.ufvUnitPriceValue}"/>
+            </s:decorate>
+        </s:fragment>
+
+    </s:div>
+    <s:decorate id="computeButton" template="/include/inputField.xhtml" styleClass="formRow">
+
+        <a4j:commandButton id="calculateValues"
+                           action="#{fixedAssetPurchaseOrderDetailAction.compute()}"
+                           value="#{messages['Common.Compute']}"
+                           styleClass="button"
+                           immediate="true"
+                           tabindex="10"
+                           reRender="calculatedValues"
+                           rendered="#{isPurchaseOrderPending}">
+            <a4j:support event="onclick" reRender="valuesPanel"/>
+        </a4j:commandButton>
+
+
+    </s:decorate>
+</a4j:region>
+
+<s:div id="durationField">
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.totalDuration']}</ui:define>
+        <h:panelGroup>
+            <h:inputText id="totalDuration"
+                         value="#{fixedAssetPurchaseOrderDetail.totalDuration}"
+                         styleClass="inputNumber"
+                         required="true"
+                         tabindex="11">
+                <f:validateLongRange minimum="0" maximum="999"/>
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                            forId="totalDuration"/>
+                <app:keyUpEvent focus="totalDuration"
+                                action="fixedAssetPurchaseOrderDetailAction.updateTotalDuration()"
+                                reRender="durationField"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.usageDuration']}</ui:define>
+        <h:panelGroup>
+            <h:inputText id="usageDuration"
+                         value="#{fixedAssetPurchaseOrderDetail.usageDuration}"
+                         styleClass="inputNumber"
+                         required="true"
+                         tabindex="12">
+                <f:validateLongRange minimum="0" maximum="999"/>
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                            forId="usageDuration"/>
+                <app:keyUpEvent focus="usageDuration"
+                                action="fixedAssetPurchaseOrderDetailAction.updateUsageDuration()"
+                                reRender="durationField"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.netDuration']}</ui:define>
+        <h:panelGroup>
+            <h:inputText id="netDuration"
+                         value="#{fixedAssetPurchaseOrderDetail.netDuration}"
+                         styleClass="inputNumber"
+                         required="true"
+                         tabindex="13">
+                <f:validateLongRange minimum="0" maximum="999"/>
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                            forId="netDuration"/>
+                <app:keyUpEvent focus="netDuration"
+                                action="fixedAssetPurchaseOrderDetailAction.updateNetDuration()"
+                                reRender="durationField"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+    </s:decorate>
+</s:div>
+</s:div>
+<s:div>
+    <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetGroup']}</ui:define>
+        <app:quickSearch id="quickSearchFixedAssetGroup"
+                         textValue="fixedAssetPurchaseOrderDetailAction.fixedAssetGroup.groupCode"
+                         value="#{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"
+                         searchField="groupCode"
+                         postSearchAction="fixedAssetPurchaseOrderDetailAction.cleanFixedAssetSubGroup()"
+                         reRender="fixedAssetGroupField, fixedAssetSubGroupField, purchaseOrderDetailContainer"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                         tabindex="14"/>
+        <app:selectPopUp id="fixedAssetGroupSelectPopup"
+                         textValue="#{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup.fullName}"
+                         value="#{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"
+                         dataModel="#{fixedAssetGroupDataModel}"
+                         clearAction="fixedAssetPurchaseOrderDetailAction.cleanFixedAssetGroup()"
+                         searchModalPanel="fixedAssetGroupListModalPanel"
+                         reRender="fixedAssetGroupField, fixedAssetSubGroupField, purchaseOrderDetailContainer"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                         hotKeySelect="alt+3"/>
+        <h:outputText
+                value="#{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.id.fixedAssetGroupCode} - #{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.fixedAssetGroup.description}"
+                rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+        </h:outputText>
+    </s:decorate>
+
+    <s:div id="fixedAssetSubGroupFieldPanel">
+        <s:decorate id="fixedAssetSubGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.fixedAssetSubGroup']}</ui:define>
+            <app:quickSearch id="quickSearchFixedAssetSubGroup"
+                             textValue="fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.fixedAssetSubGroupCode"
+                             value="#{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup}"
+                             postSearchAction="fixedAssetPurchaseOrderDetailAction.loadSubGroupInfo()"
+                             searchField="fixedAssetSubGroupCode"
+                             alias="fixedAssetSubGroup"
+                             reRender="fixedAssetSubGroupField, rubbishField, detailField, durationField,purchaseOrderDetailContainer"
+                             rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                             disabled="#{empty fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"
+                             tabindex="15">
+                <ui:define name="restrictions">
+                    <app:restriction
+                            condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"/>
+                </ui:define>
+            </app:quickSearch>
+            <app:selectPopUp id="fixedAssetSubGroupSelectPopup"
+                             textValue="#{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.fullName}"
+                             value="#{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup}"
+                             dataModel="#{subGroupListDataModel}"
+                             clearAction="fixedAssetPurchaseOrderDetailAction.cleanFixedAssetSubGroup()"
+                             searchModalPanel="fixedAssetSubGroupListModalPanel"
+                             reRender="fixedAssetSubGroupField, rubbishField, detailField, durationField,purchaseOrderDetailContainer"
+                             rendered="#{!fixedAssetPurchaseOrderDetailAction.managed}"
+                             renderedSelectLink="#{!fixedAssetPurchaseOrderDetailAction.managed and null != fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"
+                             renderedClearLink="#{!fixedAssetPurchaseOrderDetailAction.managed and null != fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"
+                             required="true"
+                             hotKeySelect="alt+4">
+                <ui:define name="criteriaValues">
+                    <app:criteriaValue fieldName="fixedAssetGroup"
+                                       value="#{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}"/>
+                </ui:define>
+            </app:selectPopUp>
+            <h:outputText
+                    value="#{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.id.fixedAssetSubGroupCode} - #{fixedAssetPurchaseOrderDetail.fixedAssetSubGroup.description}"
+                    rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+            </h:outputText>
+        </s:decorate>
+
+
+        <s:decorate id="rubbishField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.rubbish']}</ui:define>
+            <h:inputText id="rubbish"
+                         value="#{fixedAssetPurchaseOrderDetail.rubbish}"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.purchaseOrderFinalized}"
+                         styleClass="input right"
+                         required="true"
+                         tabindex="16">
+                <app:realNumberConverter minimum="1" pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="rubbish"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.rubbish}"
+                          rendered="#{fixedAssetPurchaseOrderDetailAction.purchaseOrderFinalized}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Currency.Ufv']}"/>
+        </s:decorate>
+
+        <s:decorate id="monthsGuarantyField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.monthsGuaranty']}</ui:define>
+            <h:inputText id="monthsGuaranty"
+                         value="#{fixedAssetPurchaseOrderDetail.monthsGuaranty}"
+                         rendered="#{!fixedAssetPurchaseOrderDetailAction.purchaseOrderFinalized}"
+                         styleClass="input right"
+                         required="true"
+                         tabindex="17">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetPurchaseOrderDetail.monthsGuaranty}"
+                          rendered="#{fixedAssetPurchaseOrderDetailAction.purchaseOrderFinalized}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </s:decorate>
+
+
+        <s:decorate id="trademarkField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.trademark']}</ui:define>
+            <app:suggestionBox id="trademarkSuggestionBox"
+                               value="#{fixedAssetPurchaseOrderDetail.trademarkName}"
+                               entity="#{fixedAssetPurchaseOrderDetail.trademarkEntity}"
+                               styleClass="input"
+                               entityAlias="trademark"
+                               searchField="name"
+                               required="true"
+                               tabindex="18">
+                <ui:define name="columns">
+                    <h:column>
+                        <h:outputText value="#{entityItem.name}"/>
+                    </h:column>
+                </ui:define>
+            </app:suggestionBox>
+        </s:decorate>
+        <s:decorate id="modelField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.model']}</ui:define>
+            <app:suggestionBox id="modelSuggestionBox"
+                               value="#{fixedAssetPurchaseOrderDetail.modelName}"
+                               entity="#{fixedAssetPurchaseOrderDetail.modelEntity}"
+                               styleClass="input"
+                               entityAlias="model"
+                               searchField="name"
+                               required="true"
+                               tabindex="19">
+                <ui:define name="columns">
+                    <h:column>
+                        <h:outputText value="#{entityItem.name}"/>
+                    </h:column>
+                </ui:define>
+            </app:suggestionBox>
+        </s:decorate>
+
+        <s:decorate id="detailField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.detail']}</ui:define>
+            <h:inputTextarea id="detail" value="#{fixedAssetPurchaseOrderDetail.detail}"
+                             styleClass="input textarea"
+                             required="true"
+                             tabindex="20">
+                <f:validateLength maximum="250"/>
+            </h:inputTextarea>
+        </s:decorate>
+        <s:decorate id="measurementField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.measurement']}</ui:define>
+            <h:inputTextarea id="measurement" value="#{fixedAssetPurchaseOrderDetail.measurement}"
+                             styleClass="input textarea"
+                             required="true"
+                             tabindex="21">
+                <f:validateLength maximum="250"/>
+            </h:inputTextarea>
+        </s:decorate>
+    </s:div>
+</s:div>
+</h:panelGrid>
+<s:div id="purchaseOrderDetailContainer">
+    <s:div rendered="#{not empty fixedAssetPurchaseOrderDetailAction.instance.fixedAssetSubGroup and
+                        fixedAssetPurchaseOrderDetailAction.instance.fixedAssetSubGroup.requireParts}">
+        <ui:include src="purchaseOrderDetailPart.xhtml"/>
+    </s:div>
+</s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}"
+                     tabindex="22"/>
+
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     tabindex="23"
+                     rendered="#{!fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}"/>
+
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetPurchaseOrderDetailAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved)}"
+                     tabindex="24"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetPurchaseOrderDetailAction.managed and isPurchaseOrderPending}"
+                     tabindex="25">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetPurchaseOrderDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="26"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{fixedAssetPurchaseOrderDetailAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['FixedAssetPurchaseOrderDetail.delete.confirmation']}">
+                <f:param value="#{fixedAssetPurchaseOrderDetail.detailNumber}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{fixedAssetPurchaseOrderDetailAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="fixedAssetGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetPurchaseOrderDetailAction.putFixedAssetGroup(fixedAssetGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetGroupField, fixedAssetSubGroupField"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="fixedAssetSubGroupListModalPanelContainer"
+            template="/fixedassets/subGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSubGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetPurchaseOrderDetailAction.putFixedAssetSubGroup(element)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetSubGroupField, rubbishField, detailField, durationField, purchaseOrderDetailContainer"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#productItem" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

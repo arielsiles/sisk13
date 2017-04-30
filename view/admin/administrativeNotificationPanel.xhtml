@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:app="http://encens.com/products/khipus/facelets">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <a4j:loadScript src="resource://jquery.js"/>
+    <a4j:loadStyle src="/stylesheet/theme.css"/>
+    <style type="text/css">
+        body {
+            color: #616161;
+            background-color: transparent;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<c:if test="#{identity.loggedIn}">
+    <a4j:region>
+        <h:form>
+            <a4j:poll id="notificationPoll" interval="50000" timeout="50000" limitToList="true" immediate="true"
+                      enabled="#{notificationAction.pollEnabled}"
+                      oncomplete="if (!#{notificationAction.pollEnabled}) showAdministrativeNotification();"
+                      reRender="notificationPoll, mp"/>
+            <script type="text/javascript">
+                var iFrame = parent.document.getElementById('administrativeNotificationPanelFrame');
+                var body = parent.document.getElementById('body');
+                var footer = parent.document.getElementById('footer');
+                var bodyContainer = parent.document.getElementById('bodyContainer');
+
+                var showIFrame = function(owner) {
+                    iFrame.style.zIndex = 5000;
+                    iFrame.style.visibility = 'visible';
+                    iFrame.width = jQuery(owner).width();
+                    iFrame.height = jQuery(owner).height() + jQuery(footer).height();
+                };
+
+                var hideIFrame = function() {
+                    iFrame.style.zIndex = -1;
+                    iFrame.style.visibility = 'hidden';
+                    iFrame.width = iFrame.height = 0;
+                };
+
+                var showAdministrativeNotification = function() {
+                    showIFrame(body);
+                    Richfaces.showModalPanel('mp');
+                    showIFrame(bodyContainer);
+                };
+
+                setTimeout(function() {
+                    if (!#{notificationAction.pollEnabled}) {
+                        showIFrame(bodyContainer);
+                        Richfaces.showModalPanel('mp');
+                        showIFrame(bodyContainer);
+                    }
+                }, 100);
+            </script>
+        </h:form>
+    </a4j:region>
+    <h:form>
+        <rich:modalPanel id="mp" minWidth="420" minHeight="400" autosized="true" zindex="5001">
+            <f:facet name="header">
+                <h:outputText
+                        value="#{messages[notificationAction.administrativeNotification.administrativeEventType.resourceKey]}"/>
+            </f:facet>
+            <f:facet name="controls">
+                <a4j:commandButton value="#{messages['Common.close']}"
+                                   reRender="notificationPoll"
+                                   action="#{notificationAction.markAsRead}"
+                                   image="/img/close.png"
+                                   styleClass="select-image"
+                                   onclick="hideIFrame();#{rich:component('mp')}.hide();"/>
+            </f:facet>
+            <s:decorate id="titleField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.title']}</ui:define>
+                <h:outputText value="#{notificationAction.administrativeNotification.title}"/>
+            </s:decorate>
+
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    #{messages['AdministrativeNotification.createdBy']}
+                </ui:define>
+                <h:outputText
+                        value="#{notificationAction.administrativeNotification.createdBy.employee.fullName}"/>
+            </s:decorate>
+
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    #{messages['AdministrativeNotification.publishDate']}
+                </ui:define>
+                <h:outputText value="#{notificationAction.administrativeNotification.publishDate}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </s:decorate>
+
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">
+                    #{messages['AdministrativeNotification.expirationDate']}
+                </ui:define>
+                <h:outputText value="#{notificationAction.administrativeNotification.expirationDate}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/viewField.xhtml" styleClass="formRow">
+                <div style="width:400px; height:300px; overflow: scroll; background-color:white; padding-left:10px; padding-right:10px;">
+                    <h:outputText value="#{notificationAction.administrativeNotification.description}"
+                                  escape="false"/>
+                </div>
+            </s:decorate>
+
+            <div class="buttons">
+                <a4j:commandButton value="#{messages['Common.close']}"
+                                   reRender="notificationPoll"
+                                   action="#{notificationAction.markAsRead}"
+                                   onclick="hideIFrame();#{rich:component('mp')}.hide();"/>
+            </div>
+        </rich:modalPanel>
+        #{notificationAction.logUserAction()}
+    </h:form>
+</c:if>
+</body>
+</html>

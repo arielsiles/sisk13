@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductiveZone.list']}</ui:define>
+    <style type="text/css">
+        .special tr[id] {
+            display: none;
+        }
+    </style>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productiveZoneSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductiveZone.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
+                    <h:inputText id="number" value="#{productiveZoneDataModel.criteria.number}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
+                    <h:inputText id="group" value="#{productiveZoneDataModel.criteria.group}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                    <h:inputText id="name" value="#{productiveZoneDataModel.criteria.name}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productiveZoneDataModel.search}"
+                                       reRender="productiveZoneList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/productiveZone.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('PRODUCTIVEZONE','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{productiveZoneDataModel}" var="productiveZoneItem" id="productiveZoneList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="40%, 40%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productiveZone.name"
+                                                   dataModel="#{productiveZoneDataModel}"
+                                                   reRender="productiveZoneList, dataScroller">
+                                #{messages['ProductiveZone.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productiveZone.number"
+                                                   dataModel="#{productiveZoneDataModel}"
+                                                   reRender="productiveZoneList, dataScroller">
+                                #{messages['ProductiveZone.number']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productiveZoneItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productiveZoneItem.number}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{productiveZoneAction.select(productiveZoneItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productiveZoneList" dataModel="#{productiveZoneDataModel}"/>
+
+
+            <rich:jQuery selector="#productiveZoneList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#productiveZoneList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/productiveZone.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('PRODUCTIVEZONE','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+        <a4j:include viewId="/production/productiveZoneModalPanel.xhtml"/>
+
+    </ui:define>
+</ui:composition>

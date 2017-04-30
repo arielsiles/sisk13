@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.finances.creditDebitComparative']}</ui:define>
+
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="reports"/>
+    <ui:define name="body">
+        <h:form id="creditDebitComparativeReportActionForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.finances.creditDebitComparative']}
+                </f:facet>
+                <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.finances.creditDebitComparative.seat']}</ui:define>
+                    <h:selectOneMenu id="executorUnit"
+                                     value="#{creditDebitComparativeReportAction.executorUnitCode}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       itemValue="#{businessUnit.executorUnitCode}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define
+                            name="label">#{messages['Reports.finances.creditDebitComparative.costCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="creditDebitComparativeReportAction.costCenter.code"
+                                     value="#{creditDebitComparativeReportAction.costCenter}"
+                                     searchField="code"
+                                     reRender="costCenterField"
+                                     tabindex="2"/>
+                    <app:selectPopUp id="costCenter"
+                                     textValue="#{creditDebitComparativeReportAction.costCenter.fullName}"
+                                     value="#{creditDebitComparativeReportAction.costCenter}"
+                                     clearAction="creditDebitComparativeReportAction.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.finances.creditDebitComparative.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{creditDebitComparativeReportAction.gestion}"
+                                     styleClass="input"
+                                     tabindex="5"
+                                     required="true">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </rich:panel>
+            <app:reportDefaultOptions reportAction="#{creditDebitComparativeReportAction}" showPageFormat="false"
+                                      showReportTitle="false" tabIndex="10"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{creditDebitComparativeReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="1000">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{creditDebitComparativeReportAction.assignCostCenter(costCenterItem)}"
+                                   image="/img/active.gif" styleClass="select-image" immediate="true"
+                                   reRender="costCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

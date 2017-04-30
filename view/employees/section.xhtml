@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{sectionAction.managed}">
+                #{messages['Section.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Section.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="sectionForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{sectionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!sectionAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{sectionAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!sectionAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"/>
+
+                <h:commandButton action="#{sectionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{sectionAction.managed and s:hasPermission('POLLFORMSECTION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{sectionAction.managed and s:hasPermission('POLLFORMSECTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{sectionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{sectionAction.managed}">
+                            #{messages['Section.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Section.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="sequenceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Section.sequence']}</ui:define>
+                    <h:inputText id="sequence" value="#{section.sequence}" styleClass="input" required="true"
+                                 tabindex="1">
+                        <f:validateLongRange minimum="1" maximum="100"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Section.title']}</ui:define>
+                    <h:inputText id="title" value="#{section.title}" styleClass="input" required="true"
+                                 maxlength="250" tabindex="2"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{sectionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!sectionAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"/>
+
+                <h:commandButton action="#{sectionAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!sectionAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"/>
+
+                <h:commandButton action="#{sectionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{sectionAction.managed and s:hasPermission('POLLFORMSECTION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{sectionAction.managed and s:hasPermission('POLLFORMSECTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{sectionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{sectionAction.managed and s:hasPermission('POLLFORMSECTION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Section.delete.confirmation']}">
+                        <f:param value="#{section.title}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{sectionAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#index" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

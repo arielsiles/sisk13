@@ -1,0 +1,112 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:soldProductListForm\\\\:invoiceNumberField\\\\:invoiceNumber').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['SoldProduct.available.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" styleClass="select-image" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="soldProductListForm">
+        <rich:simpleTogglePanel label="#{messages['SoldProduct.search']}" switchType="client">
+            <s:decorate id="invoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SoldProduct.invoiceNumber']}</ui:define>
+                <h:inputText id="invoiceNumber"
+                             value="#{soldProductDataModel.criteria.invoiceNumber}"
+                             maxlength="150"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+                <a4j:commandButton id="searchButtonId"
+                                   action="#{soldProductDataModel.search}"
+                                   reRender="soldProductList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   tabindex="2">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+            <rich:jQuery selector="#invoiceNumberField" query="focus()" timing="onload"/>
+        </rich:simpleTogglePanel>
+
+        <br/>
+
+        <rich:dataTable id="soldProductList"
+                        value="#{soldProductDataModel}"
+                        var="soldProductItem"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="20%, 30%, 20%, 20%, 10%">
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="soldProduct.invoiceNumber"
+                                               dataModel="#{soldProductDataModel}"
+                                               reRender="soldProductList, dataScroller">
+                            #{messages['SoldProduct.invoiceNumber']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="soldProduct.names"
+                                               dataModel="#{soldProductDataModel}"
+                                               reRender="soldProductList, dataScroller">
+                            #{messages['SoldProduct.names']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="soldProduct.firstName"
+                                               dataModel="#{soldProductDataModel}"
+                                               reRender="soldProductList, dataScroller">
+                            #{messages['SoldProduct.firstName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="soldProduct.secondName"
+                                               dataModel="#{soldProductDataModel}"
+                                               reRender="soldProductList, dataScroller">
+                            #{messages['SoldProduct.secondName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{soldProductItem.invoiceNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{soldProductItem.names}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{soldProductItem.firstName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{soldProductItem.secondName}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="soldProductList" dataModel="#{soldProductDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, assignButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

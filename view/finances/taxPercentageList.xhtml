@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['TaxPercentage.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="taxPercentageSearch">
+            <rich:simpleTogglePanel label="#{messages['TaxPercentage.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['TaxPercentage.name']}</ui:define>
+                    <h:inputText id="name" value="#{taxPercentageDataModel.criteria.description}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{taxPercentageDataModel.search}"
+                                       reRender="taxPercentageList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/taxPercentage.xhtml" styleClass="button"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{taxPercentageDataModel}" var="taxPercentageItem" id="taxPercentageList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="80%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="taxPercentage.taxPercentageType.name"
+                                                   dataModel="#{taxPercentageDataModel}"
+                                                   reRender="taxPercentageList, dataScroller">
+                                #{messages['TaxPercentage.taxPercentageType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="taxPercentage.percentage"
+                                                   dataModel="#{taxPercentageDataModel}"
+                                                   reRender="taxPercentageList, dataScroller">
+                                #{messages['TaxPercentage.percentage']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="taxPercentage.description"
+                                                   dataModel="#{taxPercentageDataModel}"
+                                                   reRender="taxPercentageList, dataScroller">
+                                #{messages['TaxPercentage.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{taxPercentageItem.taxPercentageType.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{taxPercentageItem.percentage}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{taxPercentageItem.description}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{taxPercentageAction.select(taxPercentageItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="taxPercentageList" dataModel="#{taxPercentageDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/taxPercentage.xhtml" styleClass="button"
+                          propagation="begin"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

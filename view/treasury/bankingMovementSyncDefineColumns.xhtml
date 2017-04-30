@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['BankingMovementSync.title']}
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="bankingMovementSynchronizationForm">
+        <div class="buttons">
+            <h:commandButton action="#{bankingMovementSyncAction.previousDefineColumns}"
+                             value="#{messages['Common.previous']}"
+                             immediate="true"
+                             styleClass="button"/>
+            <h:commandButton action="#{bankingMovementSyncAction.nextDefineColumns}"
+                             value="#{messages['Common.next']}"
+                             styleClass="button"/>
+            <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['BankingMovementSync.defineColumns']}
+            </f:facet>
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+
+                <app:fieldset id="columnMapping" title="#{messages['BankingMovementSync.columnMapping']}">
+
+                    <s:decorate id="accountNumberPositionField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.accountNumberPosition']}</ui:define>
+                        <h:selectOneMenu id="accountNumberPosition"
+                                         value="#{bankingMovementSync.accountNumberPosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="1">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="glossPositionField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.glossPosition']}</ui:define>
+                        <h:selectOneMenu id="glossPosition"
+                                         value="#{bankingMovementSync.glossPosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="2">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="documentTypePositionField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.documentTypePosition']}</ui:define>
+                        <h:selectOneMenu id="accountNumberPosition"
+                                         value="#{bankingMovementSync.documentTypePosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="3">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="documentNumberPositionField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['BankingMovementSync.documentNumberPosition']}</ui:define>
+                        <h:selectOneMenu id="documentNumberPosition"
+                                         value="#{bankingMovementSync.documentNumberPosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="4">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="datePositionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.datePosition']}</ui:define>
+                        <h:selectOneMenu id="datePosition"
+                                         value="#{bankingMovementSync.datePosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="5">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="datePatternField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.datePattern']}</ui:define>
+                        <h:inputText id="datePattern"
+                                     value="#{bankingMovementSync.datePattern}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="6">
+                            <s:validateFormattedText/>
+                        </h:inputText>
+                    </s:decorate>
+
+                    <s:decorate id="amountPositionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.amountPosition']}</ui:define>
+                        <h:selectOneMenu id="amountPosition"
+                                         value="#{bankingMovementSync.amountPosition}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="7">
+                            <s:selectItems value="#{bankingMovementSyncAction.columnPositionList}"
+                                           var="columnPosition"
+                                           itemValue="#{columnPosition.value}"
+                                           label="#{columnPosition.label}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="magnitudeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['BankingMovementSync.magnitude']}</ui:define>
+                        <h:inputText id="magnitude"
+                                     value="#{bankingMovementSync.magnitude}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="8">
+                            <app:naturalNumberConverter forId="magnitude"/>
+                        </h:inputText>
+                    </s:decorate>
+                </app:fieldset>
+
+                <app:fieldset id="columnDescription" title="#{messages['BankingMovementSync.columnDescription']}">
+                    <rich:dataTable value="#{bankingMovementSyncAction.columnPositionList}"
+                                    var="columnPosition"
+                                    id="columnsList"
+                                    width="100%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['BankingMovementSync.columnTitle']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['BankingMovementSync.columnValue']}
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{columnPosition.label}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText
+                                    value="#{bankingMovementSyncAction.getDefaultColumnValue(columnPosition.value)}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </app:fieldset>
+
+            </h:panelGrid>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{bankingMovementSyncAction.previousDefineColumns}"
+                             value="#{messages['Common.previous']}"
+                             immediate="true"
+                             styleClass="button"/>
+            <h:commandButton action="#{bankingMovementSyncAction.nextDefineColumns}"
+                             value="#{messages['Common.next']}"
+                             styleClass="button"/>
+            <h:commandButton action="#{bankingMovementSyncAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+    </h:form>
+    <!--Set selector Id to enable focus-->
+    <rich:jQuery selector="#accountNumberPosition" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

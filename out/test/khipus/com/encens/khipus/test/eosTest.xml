@@ -1,0 +1,35 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<suite name="KHIPUS Test Suite" verbose="2" parallel="false">
+
+    <test name="LoginTest">
+        <classes>
+            <class name="com.encens.khipus.test.admin.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="UserListTest">
+        <classes>
+            <class name="com.encens.khipus.test.admin.UserListTest"/>
+        </classes>
+    </test>
+
+    <test name="UserActionTest">
+        <classes>
+            <class name="com.encens.khipus.test.admin.UserActionTest"/>
+        </classes>
+    </test>
+
+    <test name="CompanyListenerTest">
+        <classes>
+            <class name="com.encens.khipus.test.common.CompanyListenerTest"/>
+        </classes>
+    </test>
+
+    <test name="TableGeneratorTest">
+        <classes>
+            <class name="com.encens.khipus.test.common.TableGeneratorTest"/>
+        </classes>
+    </test>
+
+</suite>

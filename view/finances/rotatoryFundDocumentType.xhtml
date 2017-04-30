@@ -1,0 +1,355 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{rotatoryFundDocumentTypeAction.managed}">
+            #{messages['RotatoryFundDocumentType.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['RotatoryFundDocumentType.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="rotatoryFundDocumentTypeForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId" action="#{rotatoryFundDocumentTypeAction.create}"
+                     value="#{messages['Common.save']}" styleClass="button"
+                     rendered="#{!rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}" styleClass="button"
+                     rendered="#{!rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}"/>
+    <h:commandButton id="updateButtonId" action="#{rotatoryFundDocumentTypeAction.update}"
+                     value="#{messages['Common.save']}" styleClass="button"
+                     rendered="#{rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                     rendered="#{rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick"
+                               disableDefault="true" operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.cancel}"
+                     value="#{messages['Common.cancel']}" styleClass="button" immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{rotatoryFundDocumentTypeAction.managed}">
+                #{messages['RotatoryFundDocumentType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RotatoryFundDocumentType.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{rotatoryFundDocumentTypeAction.managed}">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.code']}</ui:define>
+        <h:outputText id="code" value="#{rotatoryFundDocumentType.code}">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.name']}</ui:define>
+        <h:inputText id="name"
+                     value="#{rotatoryFundDocumentType.name}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="250"
+                     tabindex="1"/>
+    </s:decorate>
+    <s:decorate id="rotatoryFundTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.rotatoryFundType']}</ui:define>
+        <ui:param name="required" value="true"/>
+        <h:selectOneMenu id="rotatoryFundType"
+                         value="#{rotatoryFundDocumentType.rotatoryFundType}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{not rotatoryFundDocumentTypeAction.managed}"
+                         tabindex="2">
+            <s:selectItems value="#{rotatoryFundTypeEnumList}" var="rotatoryFundType"
+                           label="#{messages[rotatoryFundType.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+            <a4j:support event="onchange"
+                         reRender="payrollColumnTypeDiv,adjustmentNationalCashAccountDiv,adjustmentForeignCashAccountDiv"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{messages[rotatoryFundDocumentType.rotatoryFundType.resourceKey]}"
+                      rendered="#{rotatoryFundDocumentTypeAction.managed}"/>
+    </s:decorate>
+    <s:div id="financeUserDiv">
+        <s:decorate id="financeUserId"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.financeUser']}</ui:define>
+
+            <app:selectPopUp id="financeUserSelectPopup"
+                             textValue="#{rotatoryFundDocumentType.financeUser.name}"
+                             value="#{rotatoryFundDocumentType.financeUser}"
+                             clearAction="rotatoryFundDocumentTypeAction.cleanFinanceUser()"
+                             searchModalPanel="financeUserListModalPanel"
+                             dataModel="#{financeUserDataModel}"
+                             reRender="financeUserDiv"
+                             hotKeySelect="alt+1"
+                             tabindex="3"/>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="payrollColumnTypeDiv">
+        <s:decorate id="payrollColumnTypeField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{rotatoryFundDocumentTypeAction.otherReceivables}">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.payrollColumnType']}</ui:define>
+            <ui:param name="required" value="true"/>
+            <h:selectOneMenu id="payrollColumn"
+                             value="#{rotatoryFundDocumentType.payrollColumnType}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{not rotatoryFundDocumentTypeAction.managed}"
+                             tabindex="3">
+                <s:selectItems value="#{payrollColumnTypeEnumList}" var="payrollColumnType"
+                               label="#{messages[payrollColumnType.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+            <h:outputText value="#{messages[rotatoryFundDocumentType.payrollColumnType.resourceKey]}"
+                          rendered="#{rotatoryFundDocumentTypeAction.managed}"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="fieldRestrictionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.fieldRestriction']}</ui:define>
+        <h:selectOneMenu id="fieldRestriction"
+                         value="#{rotatoryFundDocumentType.fieldRestriction}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="4">
+            <s:selectItems value="#{rotatoryFundDocumentTypeFieldRestrictionEnumList}"
+                           var="fieldRestriction"
+                           label="#{messages[fieldRestriction.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         reRender="fieldRestrictionField, nationalCashAccountDiv, foreignCashAccountDiv, cashAccountListModalPanelDiv,adjustmentNationalCashAccountDiv,adjustmentForeignCashAccountDiv"
+                         ajaxSingle="true"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:div id="nationalCashAccountDiv">
+        <s:decorate id="nationalCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.nationalCashAccount']}</ui:define>
+            <app:selectPopUp id="nationalCashAccount"
+                             required="true"
+                             textValue="#{rotatoryFundDocumentType.nationalCashAccount.fullName}"
+                             value="#{rotatoryFundDocumentType.nationalCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             clearAction="rotatoryFundDocumentTypeAction.clearNationalCashAccountAccount()"
+                             searchModalPanel="nationalCashAccountListModalPanel"
+                             reRender="nationalCashAccountField"
+                             hotKeySelect="alt+2"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="foreignCashAccountDiv">
+        <s:decorate id="foreignCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.foreignCashAccount']}</ui:define>
+            <app:selectPopUp id="foreignCashAccount"
+                             required="true"
+                             textValue="#{rotatoryFundDocumentType.foreignCashAccount.fullName}"
+                             value="#{rotatoryFundDocumentType.foreignCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('D')"
+                             clearAction="rotatoryFundDocumentTypeAction.clearForeignCashAccountAccount()"
+                             searchModalPanel="foreignCashAccountListModalPanel"
+                             reRender="foreignCashAccountField"
+                             hotKeySelect="alt+3"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="adjustmentNationalCashAccountDiv">
+        <s:decorate id="adjustmentNationalCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault() and rotatoryFundDocumentTypeAction.otherReceivables}">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.adjustmentNationalCashAccount']}</ui:define>
+            <app:selectPopUp id="adjustmentNationalCashAccount"
+                             required="true"
+                             textValue="#{rotatoryFundDocumentType.adjustmentNationalCashAccount.fullName}"
+                             value="#{rotatoryFundDocumentType.adjustmentNationalCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             clearAction="rotatoryFundDocumentTypeAction.clearAdjustmentNationalCashAccountAccount()"
+                             searchModalPanel="adjustmentNationalCashAccountListModalPanel"
+                             reRender="adjustmentNationalCashAccountField"
+                             hotKeySelect="alt+4"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="adjustmentForeignCashAccountDiv">
+        <s:decorate id="adjustmentForeignCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault() and rotatoryFundDocumentTypeAction.otherReceivables}">
+            <ui:define name="label">#{messages['RotatoryFundDocumentType.adjustmentForeignCashAccount']}</ui:define>
+            <app:selectPopUp id="adjustmentForeignCashAccount"
+                             required="true"
+                             textValue="#{rotatoryFundDocumentType.adjustmentForeignCashAccount.fullName}"
+                             value="#{rotatoryFundDocumentType.adjustmentForeignCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('D')"
+                             clearAction="rotatoryFundDocumentTypeAction.clearAdjustmentForeignCashAccountAccount()"
+                             searchModalPanel="adjustmentForeignCashAccountListModalPanel"
+                             reRender="adjustmentForeignCashAccountField"
+                             hotKeySelect="alt+5"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.description']}</ui:define>
+        <h:inputTextarea id="description" value="#{rotatoryFundDocumentType.description}"
+                         styleClass="input textarea"
+                         tabindex="5">
+            <f:validateLength maximum="1000"/>
+        </h:inputTextarea>
+    </s:decorate>
+    <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundDocumentType.active']}</ui:define>
+        <h:selectBooleanCheckbox id="active"
+                                 value="#{rotatoryFundDocumentType.active}"
+                                 tabindex="6"/>
+    </s:decorate>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.create}"
+                     value="#{messages['Common.save']}" styleClass="button"
+                     rendered="#{!rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}"/>
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}" styleClass="button"
+                     rendered="#{!rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','CREATE')}"/>
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.update}"
+                     value="#{messages['Common.save']}" styleClass="button"
+                     rendered="#{rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                     rendered="#{rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick"
+                               disableDefault="true" operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundDocumentTypeAction.cancel}"
+                     value="#{messages['Common.cancel']}" styleClass="button" immediate="true"/>
+</div>
+
+</h:form>
+
+<s:div id="cashAccountListModalPanelDiv">
+    <s:decorate id="nationalCashAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml"
+                rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+        <ui:param name="containerId" value="nationalCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="nationalCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{rotatoryFundDocumentTypeAction.assignNationalCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="nationalCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('nationalCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="foreignCashAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml"
+                rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+        <ui:param name="containerId" value="foreignCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="foreignCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{rotatoryFundDocumentTypeAction.assignForeignCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="foreignCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('foreignCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="adjustmentNationalCashAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml"
+                rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+        <ui:param name="containerId" value="adjustmentNationalCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="adjustmentNationalCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{rotatoryFundDocumentTypeAction.assignAdjustmentNationalCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="adjustmentNationalCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('adjustmentNationalCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="adjustmentForeignCashAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml"
+                rendered="#{rotatoryFundDocumentType.isFieldRestrictionCashAccountDefinedByDefault()}">
+        <ui:param name="containerId" value="adjustmentForeignCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="adjustmentForeignCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{rotatoryFundDocumentTypeAction.assignAdjustmentForeignCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="adjustmentForeignCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('adjustmentForeignCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{rotatoryFundDocumentTypeAction.managed and s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['RotatoryFundDocumentType.delete.confirmation']}">
+                <f:param value="#{rotatoryFundDocumentType.fullName}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rotatoryFundDocumentTypeAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="financeUserListModalPanelContainer"
+            template="/finances/financeUserListModalPanel.xhtml">
+    <ui:param name="containerId" value="financeUserListModalPanelContainer"/>
+    <ui:param name="dialogId" value="financeUserListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{rotatoryFundDocumentTypeAction.assignFinanceUser(financeUserItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="financeUserDiv"
+                           oncomplete="Richfaces.hideModalPanel('financeUserListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

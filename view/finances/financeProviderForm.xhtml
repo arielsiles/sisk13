@@ -1,0 +1,209 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent"
+             rendered="#{not empty providerEntity.entity}">
+    <s:div id="leftSidePanel">
+        <s:decorate id="idField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{managed}">
+            <ui:param name="required" value="true"/>
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.id']}"/>
+            </ui:define>
+            <h:outputText value="#{providerEntity.entity.id}"/>
+        </s:decorate>
+        <s:decorate id="acronymField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="required" value="true"/>
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.acronym']}"/>
+            </ui:define>
+            <h:inputText id="acronymInputField"
+                         value="#{providerEntity.entity.acronym}"
+                         styleClass="input"
+                         required="true"
+                         immediate="true"
+                         maxlength="100"/>
+        </s:decorate>
+        <s:decorate id="nitNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.nitNumber']}"/>
+            </ui:define>
+            <h:inputText id="nitNumberInputField"
+                         value="#{providerEntity.entity.nitNumber}"
+                         styleClass="input"
+                         immediate="true"
+                         required="true"
+                         maxlength="20"/>
+
+        </s:decorate>
+        <s:decorate id="idNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.idNumber']}"/>
+            </ui:define>
+            <h:inputText id="idNumberInputField"
+                         value="#{providerEntity.entity.idNumber}"
+                         styleClass="input"
+                         immediate="true"
+                         required="true"
+                         maxlength="20"/>
+        </s:decorate>
+        <s:decorate id="phoneNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.phoneNumber']}"/>
+            </ui:define>
+            <h:inputText id="phoneNumberInputField"
+                         value="#{providerEntity.entity.phoneNumber}"
+                         styleClass="input"
+                         required="true"
+                         immediate="true"
+                         maxlength="30"/>
+        </s:decorate>
+        <s:decorate id="faxNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.faxNumber']}"/>
+            </ui:define>
+            <h:inputText id="faxNumberInputField"
+                         value="#{providerEntity.entity.faxNumber}"
+                         styleClass="input"
+                         maxlength="30"/>
+        </s:decorate>
+        <s:decorate id="postOfficeBoxField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.postOfficeBox']}"/>
+            </ui:define>
+            <h:inputText id="postOfficeBoxInputField"
+                         value="#{providerEntity.entity.postOfficeBox}"
+                         styleClass="input"
+                         maxlength="10"/>
+        </s:decorate>
+        <s:decorate id="classField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FinanceProvider.class']}</ui:define>
+            <h:selectOneMenu id="class"
+                             value="#{providerEntity.providerClass}"
+                             required="true"
+                             immediate="true"
+                             styleClass="input">
+                <s:selectItems value="#{providerClassList}"
+                               var="providerClass"
+                               label="#{providerClass.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="stateField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FinanceProvider.entity.state']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{providerEntity.entity.state}"
+                             required="true"
+                             immediate="true"
+                             styleClass="input">
+                <s:selectItems value="#{financesEntityStateEnumList}"
+                               var="financesEntityState"
+                               label="#{messages[financesEntityState.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+    <s:div id="rigthSidePanel">
+        <s:decorate id="mainAddressField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.mainAddress']}"/>
+            </ui:define>
+            <h:inputTextarea id="mainAddressTextArea"
+                             value="#{providerEntity.entity.mainAddress}"
+                             styleClass="textarea"
+                             style="width:200px;height:50px;"
+                             required="true"
+                             immediate="true"/>
+        </s:decorate>
+        <s:decorate id="secondaryAddressField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.secondaryAddress']}"/>
+            </ui:define>
+            <h:inputTextarea id="secondaryAddressTextArea"
+                             value="#{providerEntity.entity.secondaryAddress}"
+                             styleClass="textarea"
+                             style="width:200px;height:50px;"/>
+        </s:decorate>
+        <s:decorate id="observationsField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.entity.observations']}"/>
+            </ui:define>
+            <h:inputTextarea id="observationsTextArea"
+                             value="#{providerEntity.entity.observations}"
+                             styleClass="textarea"
+                             style="width:200px;height:50px;"/>
+        </s:decorate>
+
+        <s:decorate id="cashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="required" value="#{true}"/>
+            <ui:define name="label">
+                <h:outputText value="#{messages['FinanceProvider.cashAccount']}"/>
+            </ui:define>
+            <app:suggestionBox id="payableAccountSuggestionBox"
+                               value="#{providerEntity.payableAccountFullName}"
+                               entity="#{providerEntity.payableAccount}"
+                               styleClass="input"
+                               entityAlias="payableAccount"
+                               searchField="fullName"
+                               searchCompoundFields="payableAccount.accountCode,payableAccount.description"
+                               searchCompoundCondition="concat(concat(payableAccount.accountCode,' - '),payableAccount.description)"
+                               updateFocusOnSelect="true">
+                <ui:define name="columns">
+                    <h:column>
+                        <h:outputText value="#{entityItem.fullName}"/>
+                    </h:column>
+                </ui:define>
+                <ui:define name="restrictions">
+                    <app:restriction condition="payableAccount.active = #{true}"/>
+                    <app:restriction condition="payableAccount.movementAccount = #{true}"/>
+                </ui:define>
+            </app:suggestionBox>
+        </s:decorate>
+
+
+    </s:div>
+</h:panelGrid>
+
+</ui:composition>

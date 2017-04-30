@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://encens.com/products/khipus/dashboard"
+           xmlns:dashboard="http://encens.com/products/khipus/dashboard">
+    <xs:element name="dashboard">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="dashboard:widgets" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="widgets">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="dashboard:widget" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="widget">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="dashboard:filters" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="title" type="xs:string" use="required"/>
+            <xs:attribute name="componentName" type="xs:string" use="required"/>
+            <xs:attribute name="area" type="xs:string"/>
+            <xs:attribute name="module" type="xs:string"/>
+            <xs:attribute name="function" type="xs:string"/>
+            <xs:attribute name="verification" type="dashboard:verification" use="required"/>
+            <xs:attribute name="unit" type="dashboard:unit" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="filters">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="dashboard:interval" minOccurs="3" maxOccurs="3"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="interval">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="description" type="xs:string" use="required"/>
+            <xs:attribute name="index" type="xs:nonNegativeInteger" use="required"/>
+            <xs:attribute name="color" type="xs:integer" use="required"/>
+            <xs:attribute name="minValue" type="xs:nonNegativeInteger" use="required"/>
+            <xs:attribute name="maxValue" type="xs:nonNegativeInteger" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="verification">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="MONTH_END"/>
+            <xs:enumeration value="ON_LINE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="unit">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DAYS"/>
+            <xs:enumeration value="UNITS"/>
+            <xs:enumeration value="PERCENT"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

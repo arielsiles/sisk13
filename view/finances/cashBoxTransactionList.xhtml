@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CashBoxTransaction.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="cashBoxSearch">
+            <rich:simpleTogglePanel label="#{messages['CashBoxTransaction.search']}" switchType="client">
+
+                <s:decorate id="openingDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.openingDate']}</ui:define>
+                    <rich:calendar id="openingDate" value="#{cashBoxTransactionDataModel.criteria.openingDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate id="closingDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.closingDate']}</ui:define>
+                    <rich:calendar value="#{cashBoxTransactionDataModel.criteria.closingDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                    <a4j:commandButton action="#{cashBoxTransactionDataModel.search}" styleClass="button" tabindex="3"
+                                       reRender="cashBoxTransactionList, dataScroller"
+                                       value="#{messages['Common.search']}" id="searchButtonId">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#openingDate" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <br/>
+            <rich:dataTable value="#{cashBoxTransactionDataModel}" var="cashBoxTransactionItem"
+                            id="cashBoxTransactionList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="25%, 20%, 15%, 15%, 15%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader dataModel="#{cashBoxTransactionDataModel}"
+                                                   reRender="cashBoxTransactionList, dataScroller">
+                                #{messages['CashBoxTransaction.cashBox']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader dataModel="#{cashBoxTransactionDataModel}"
+                                                   reRender="cashBoxTransactionList, dataScroller">
+                                #{messages['CashBoxTransaction.user']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashBoxTransaction.openingDate"
+                                                   dataModel="#{cashBoxTransactionDataModel}"
+                                                   reRender="cashBoxTransactionList, dataScroller">
+                                #{messages['CashBoxTransaction.openingDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashBoxTransaction.closingDate"
+                                                   dataModel="#{cashBoxTransactionDataModel}"
+                                                   reRender="cashBoxTransactionList, dataScroller">
+                                #{messages['CashBoxTransaction.closingDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cashBoxTransaction.totalAmount"
+                                                   dataModel="#{cashBoxTransactionDataModel}"
+                                                   reRender="cashBoxTransactionList, dataScroller">
+                                #{messages['CashBoxTransaction.totalAmount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{cashBoxTransactionItem.cashBox.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cashBoxTransactionItem.cashBoxUser.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cashBoxTransactionItem.openingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cashBoxTransactionItem.closingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{cashBoxTransactionItem.totalAmount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{cashBoxTransactionAction.select(cashBoxTransactionItem)}"
+                                   tabindex="4"
+                                   rendered="#{s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="cashBoxTransactionList"
+                              dataModel="#{cashBoxTransactionDataModel}"/>
+
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

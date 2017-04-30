@@ -1,0 +1,392 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<rich:modalPanel height="590" width="950" zindex="2000" resizeable="false" autosized="false"
+                 style="overflow:auto;"
+                 id="#{dialogId}">
+
+<c:set var="createPermission"
+       value="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','CREATE')}"/>
+<c:set var="updatePermission"
+       value="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','UPDATE')}"/>
+<c:set var="deletePermission"
+       value="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','DELETE')}"/>
+<c:set var="gestionPayrollSpecialUpdatePermission"
+       value="#{s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+
+<f:facet name="header">
+    <h:outputText>#{messages['GestionPayroll.list'] }</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+</f:facet>
+
+<ui:include src="/include/messages.xhtml"/>
+
+<h:form id="gestionPayrollListForm#{dialogId}">
+<div class="buttons">
+    <a4j:commandButton action="#{gestionPayrollScheduleAction.saveAll()}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       reRender="gestionPayrollList,tabPanelDiv"
+                       rendered="#{createPermission
+                                or updatePermission
+                                or deletePermission}"
+                       oncomplete="if(#{gestionPayrollScheduleAction.validate() and not functionAction.hasSeverityErrorMessages} ) #{rich:component(dialogId)}.hide();"
+                       tabindex="1">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+    <a4j:commandButton id="cancelTop"
+                       value="#{messages['Common.cancel']}"
+                       title="#{messages['Common.cancel']}"
+                       styleClass="button"
+                       immediate="true"
+                       tabindex="2"/>
+
+</div>
+
+<c:choose>
+    <c:when test="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','DELETE')}">
+        <c:set var="columnsWidthString" value="8%,10%,12%,12%,12%,12%,12%,8%,5%"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="columnsWidthString" value="9%,14%,12%,12%,12%,12%,12%,8%"/>
+    </c:otherwise>
+</c:choose>
+<rich:dataTable value="#{gestionPayrollScheduleAction.gestionPayrollToEditList}"
+                var="gestionPayrollItem"
+                rowKeyVar="row"
+                id="gestionPayrollList"
+                width="100%"
+                columnsWidth="#{columnsWidthString}">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.month']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.gestionName']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.initDate']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.endDate']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.generationBeginning']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.generationDeadline']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['GestionPayroll.officialPayrollDeadline']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader>
+                #{messages['ExchangeRate.rate']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column styleClass="center"
+                     rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','DELETE')}">
+            #{messages['Common.action']}
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+<rich:column id="rowCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="rowField" styleClass="formRow">
+        <h:outputText id="row"
+                      value="#{messages[gestionPayrollScheduleAction.decodeMonth(row).resourceKey]}"
+                      styleClass="inputSmall bold"/>
+    </s:decorate>
+</rich:column>
+<rich:column id="gestionNameCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:div id="gestionNameDiv">
+        <s:decorate id="gestionNameField">
+            <c:set var="renderedValue"
+                   value="#{!gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem)}"/>
+            <c:set var="editable"
+                   value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+            <h:inputText id="gestionName"
+                         value="#{gestionPayrollItem.gestionName}"
+                         styleClass="inputSmall"
+                         maxlength="50"
+                         rendered="#{renderedValue and editable}"
+                         disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                         tabindex="#{(row*7)+3}">
+            </h:inputText>
+            <h:outputText value="#{gestionPayrollItem.gestionName}"
+                          rendered="#{!renderedValue or !editable}"/>
+            <s:div styleClass="entry errors">
+                <h:outputText value="#{messages[gestionPayrollScheduleAction.gestionNameMessageList.get(row)]}"
+                              rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.gestionNameMessageList.get(row)}"/>
+            </s:div>
+        </s:decorate>
+    </s:div>
+</rich:column>
+<rich:column id="initDateCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="initDateField" styleClass="formRow" template="/include/validateField.xhtml">
+        <c:set var="readOnlyField" value="#{!gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem)}"/>
+        <c:set var="editable"
+               value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+        <rich:calendar id="initDate"
+                       value="#{gestionPayrollItem.initDate}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="inputSmall"
+                       inputClass="inputSmall"
+                       direction="#{row>6?'top-right':'bottom-right'}"
+                       enableManualInput="true"
+                       rendered="#{readOnlyField and editable}"
+                       disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                       tabindex="#{(row*7)+4}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        <h:outputText value="#{gestionPayrollItem.initDate}"
+                      rendered="#{!readOnlyField or !editable}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.initDateMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.initDateMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+
+<rich:column id="endDateCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="endDateField" styleClass="formRow" template="/include/validateField.xhtml">
+        <c:set var="readOnlyField" value="#{!gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem)}"/>
+        <c:set var="editable"
+               value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+        <rich:calendar id="endDate"
+                       value="#{gestionPayrollItem.endDate}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="inputSmall"
+                       inputClass="inputSmall"
+                       direction="#{row>6?'top-right':'bottom-right'}"
+                       enableManualInput="true"
+                       rendered="#{readOnlyField and editable}"
+                       disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                       tabindex="#{(row*7)+5}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+            <app:dateRangeValidator forId="initDate"
+                                    forLabel="#{messages['GestionPayroll.initDate']}"
+                                    type="greater"/>
+        </rich:calendar>
+        <h:outputText value="#{gestionPayrollItem.endDate}"
+                      rendered="#{!readOnlyField or !editable}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.endDateMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.endDateMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+<rich:column id="generationBeginningCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="generationBeginningField" styleClass="formRow" template="/include/validateField.xhtml">
+        <c:set var="specialUpdateEnable"
+               value="#{not gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem) or s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+        <c:set var="editable"
+               value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+        <rich:calendar id="generationBeginning"
+                       value="#{gestionPayrollItem.generationBeginning}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="inputSmall"
+                       inputClass="inputSmall"
+                       direction="#{row>6?'top-right':'bottom-right'}"
+                       enableManualInput="true"
+                       rendered="#{specialUpdateEnable and editable}"
+                       disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                       tabindex="#{(row*7)+6}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        <h:outputText value="#{gestionPayrollItem.generationBeginning}"
+                      rendered="#{!specialUpdateEnable or !editable}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.generationBeginningMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.generationBeginningMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+<rich:column id="generationDeadlineCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="generationDeadlineField" styleClass="formRow" template="/include/validateField.xhtml">
+        <c:set var="specialUpdateEnable"
+               value="#{not gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem) or s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+        <c:set var="editable"
+               value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+        <rich:calendar id="generationDeadline"
+                       value="#{gestionPayrollItem.generationDeadline}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="inputSmall"
+                       inputClass="inputSmall"
+                       enableManualInput="true"
+                       direction="#{row>6?'top-right':'bottom-right'}"
+                       rendered="#{specialUpdateEnable and editable}"
+                       disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                       tabindex="#{(row*7)+7}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+            <app:dateRangeValidator forId="generationBeginning"
+                                    forLabel="#{messages['GestionPayroll.generationBeginning']}"
+                                    type="greater"/>
+        </rich:calendar>
+        <h:outputText value="#{gestionPayrollItem.generationDeadline}"
+                      rendered="#{!specialUpdateEnable or !editable}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.generationDeadlineMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.generationDeadlineMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+<rich:column id="officialPayrollDeadlineCol"
+             styleClass="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="officialPayrollDeadlineField" styleClass="formRow" template="/include/validateField.xhtml">
+        <c:set var="specialUpdateEnable"
+               value="#{not gestionPayrollScheduleAction.gestionPayrollReadOnly(gestionPayrollItem) or s:hasPermission('GESTIONPAYROLLSPECIALUPDATE','VIEW')}"/>
+        <c:set var="editable"
+               value="#{((not empty gestionPayrollItem.id and updatePermission) or (empty gestionPayrollItem.id and createPermission))}"/>
+        <rich:calendar id="officialPayrollDeadline"
+                       value="#{gestionPayrollItem.officialPayrollDeadline}"
+                       popup="true"
+                       datePattern="#{messages['patterns.date']}"
+                       styleClass="inputSmall"
+                       inputClass="inputSmall"
+                       direction="#{row>6?'top-right':'bottom-right'}"
+                       enableManualInput="true"
+                       rendered="#{specialUpdateEnable and editable}"
+                       disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                       tabindex="#{(row*7)+8}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+            <app:dateRangeValidator forId="generationDeadline"
+                                    forLabel="#{messages['GestionPayroll.generationDeadline']}"
+                                    type="greater"/>
+        </rich:calendar>
+        <h:outputText value="#{gestionPayrollItem.officialPayrollDeadline}"
+                      rendered="#{!specialUpdateEnable or !editable}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.officialPayrollDeadlineMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.officialPayrollDeadlineMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+<rich:column id="rateCol"
+             styleClass=" right #{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}">
+    <s:decorate id="rateField" styleClass="formRow right" template="/include/validateField.xhtml">
+        <c:set var="editable"
+               value="#{(empty gestionPayrollItem.id and createPermission) or (not empty gestionPayrollItem.id and updatePermission and gestionPayrollSpecialUpdatePermission)}"/>
+
+        <h:inputText id="rate"
+                     value="#{gestionPayrollItem.exchangeRate.rate}"
+                     styleClass="inputSmall right"
+                     maxlength="150"
+                     rendered="#{editable}"
+                     disabled="#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)}"
+                     tabindex="#{(row*7)+9}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+        </h:inputText>
+        <h:outputText value="#{gestionPayrollItem.exchangeRate.rate}"
+                      styleClass="right"
+                      rendered="#{!editable}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <s:div styleClass="entry errors">
+            <h:outputText value="#{messages[gestionPayrollScheduleAction.rateMessageList.get(row)]}"
+                          rendered="#{gestionPayrollScheduleAction.validateRowList.get(row) and not empty gestionPayrollScheduleAction.rateMessageList.get(row)}"/>
+        </s:div>
+    </s:decorate>
+</rich:column>
+<rich:column id="deleteLinkCol"
+             styleClass="center #{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'rich-table-column-Disabled':'rich-table-column-Enabled'}"
+             rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','DELETE')}">
+    <c:set var="editable"
+           value="#{not empty gestionPayrollItem.id or (empty gestionPayrollItem.id and createPermission)}"/>
+    <a4j:commandLink id="deleteLink"
+                     action="#{gestionPayrollScheduleAction.manageItemToDelete(gestionPayrollItem)}"
+                     immediate="true"
+                     ajaxSingle="true"
+                     reRender="rowCol, gestionNameCol, initDateCol, endDateCol, generationBeginningCol, generationDeadlineCol, officialPayrollDeadlineCol, rateCol, deleteLinkCol"
+                     rendered="#{deletePermission and editable}"
+                     title="#{messages['Common.delete']}">
+        <h:graphicImage
+                value="/img/clear#{gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'_off':''}.jpg"
+                styleClass="select-image-middle"
+                alt="#{messages['Common.delete']}"
+                title="#{messages[gestionPayrollScheduleAction.gestionPayrollToDeleteListContainsItem(gestionPayrollItem)?'Common.restore':'Common.delete']}"/>
+    </a4j:commandLink>
+
+</rich:column>
+</rich:dataTable>
+
+<div class="buttons">
+    <a4j:commandButton action="#{gestionPayrollScheduleAction.saveAll()}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       reRender="gestionPayrollListForm#{dialogId}, tabPanelDiv"
+                       rendered="#{createPermission
+                                or updatePermission
+                                or deletePermission}"
+                       oncomplete="if(#{gestionPayrollScheduleAction.validate() and not functionAction.hasSeverityErrorMessages} ) #{rich:component(dialogId)}.hide();"
+                       tabindex="87">
+        <s:defaultAction/>
+    </a4j:commandButton>
+    <a4j:commandButton id="cancelBottom"
+                       value="#{messages['Common.cancel']}"
+                       title="#{messages['Common.cancel']}"
+                       styleClass="button"
+                       immediate="true"
+                       tabindex="88"/>
+</div>
+
+<rich:componentControl for="#{dialogId}"
+                       attachTo="closeLink, editButton, editBottomButton, cancelTop, cancelBottom"
+                       operation="hide" event="onclick"/>
+</h:form>
+</rich:modalPanel>
+</ui:composition>

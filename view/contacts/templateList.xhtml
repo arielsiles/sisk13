@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Template.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="templateSearch">
+            <rich:simpleTogglePanel label="#{messages['Template.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Template.name']}</ui:define>
+                    <h:inputText id="name" value="#{templateDataModel.criteria.name}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{templateDataModel.search}"
+                                       reRender="templateSearch , templateList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/contacts/template.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('TEMPLATE','CREATE')}"
+                          tabindex="3"/>
+            </div>
+
+
+            <rich:dataTable value="#{templateDataModel}" var="templateItem" id="templateList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%,40%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="template.name"
+                                                   dataModel="#{templateDataModel}"
+                                                   reRender="templateList, dataScroller">
+                                #{messages['Template.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="template.templateType"
+                                                   dataModel="#{templateDataModel}"
+                                                   reRender="templateList, dataScroller">
+                                #{messages['Template.type']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{templateItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{templateItem.templateType}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{templateAction.select(templateItem)}"
+                                   rendered="#{s:hasPermission('TEMPLATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                    &#160;
+                    <h:commandLink value="#{messages['Common.download']}"
+                                   immediate="true"
+                                   action="#{templateAction.download(templateItem)}"
+                                   rendered="#{s:hasPermission('TEMPLATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="templateList" dataModel="#{templateDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/contacts/template.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('TEMPLATE','CREATE')}"
+                          tabindex="5"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="${postulantAction.managed}">
+                #{messages['Postulant.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Postulant.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="manager" value="${postulantAction.managerPostulant}"/>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <ui:include src="../public/postulantBody.xhtml"/>
+    </ui:define>
+</ui:composition>
+

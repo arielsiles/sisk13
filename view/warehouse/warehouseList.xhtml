@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Warehouse.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="warehouseSearch">
+            <rich:simpleTogglePanel label="#{messages['Warehouse.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Warehouse.warehouseCode']}</ui:define>
+                            <h:inputText id="warehouseCode"
+                                         value="#{warehouseDataModel.criteria.warehouseCode}"
+                                         maxlength="150"
+                                         tabindex="1"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Warehouse.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{warehouseDataModel.criteria.name}"
+                                         maxlength="150"
+                                         tabindex="2"
+                                         styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton action="#{warehouseDataModel.search}"
+                                               reRender="warehouseList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                                <a4j:actionparam assignTo="#{warehouseDataModel.entityManagerName}"
+                                                 value="businessUnitListEntityManager"/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#warehouseCode" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/warehouse.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('WAREHOUSE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{warehouseDataModel}"
+                            var="warehouseItem"
+                            id="warehouseList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 45%, 15%, 10%, 10%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="warehouse.warehouseCode"
+                                                   dataModel="#{warehouseDataModel}"
+                                                   reRender="warehouseList, dataScroller">
+                                #{messages['Warehouse.warehouseCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="warehouse.name"
+                                                   dataModel="#{warehouseDataModel}"
+                                                   reRender="warehouseList, dataScroller">
+                                #{messages['Warehouse.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="warehouse.state"
+                                                   dataModel="#{warehouseDataModel}"
+                                                   reRender="warehouseList, dataScroller">
+                                #{messages['Warehouse.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="warehouse.executorUnit.organization.name"
+                                                   dataModel="#{warehouseDataModel}"
+                                                   reRender="warehouseList, dataScroller">
+                                #{messages['WarehouseVoucher.executorUnitCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                                #{messages['WarehouseVoucher.cashAccount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{warehouseItem.warehouseCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{warehouseItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[warehouseItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{warehouseItem.executorUnit.organization.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{warehouseItem.cashAccount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{warehouseAction.select(warehouseItem)}"
+                                   rendered="#{s:hasPermission('WAREHOUSE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="warehouseList" dataModel="#{warehouseDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/warehouse.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('WAREHOUSE','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

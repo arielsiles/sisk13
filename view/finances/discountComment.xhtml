@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{discountCommentAction.managed}">
+                #{messages['DiscountComment.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DiscountComment.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="discountCommentForm">
+            <ui:include src="/finances/discountCommentButtons.xhtml"/>
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{discountCommentAction.managed}">
+                            #{messages['DiscountComment.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DiscountComment.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{discountCommentAction.managed}">
+                    <ui:define name="label">#{messages['DiscountComment.code']}</ui:define>
+                    <h:outputLabel styleClass="input" value="#{discountComment.code}"/>
+                </s:decorate>
+
+                <s:decorate id="causeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountComment.cause']}</ui:define>
+                    <h:inputTextarea id="cause" value="#{discountComment.cause}"
+                                     styleClass="input textarea"
+                                     required="true"
+                                     tabindex="1">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
+                </s:decorate>
+                <c:if test="#{discountCommentAction.managed}">
+                    <ui:include src="/common/entityRegistryDetail.xhtml">
+                        <ui:param name="entity" value="#{discountComment}"/>
+                        <ui:param name="oneColumn" value="true"/>
+                    </ui:include>
+                </c:if>
+            </rich:panel>
+            <ui:include src="/finances/discountCommentButtons.xhtml"/>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DiscountComment.delete.confirmation']}">
+                        <f:param value="#{discountComment.code}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{discountCommentAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{discountCommentAction.managed and s:hasPermission('DISCOUNTCOMMENT','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

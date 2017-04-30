@@ -1,0 +1,45 @@
+<!--
+Form Input decorator
+params:
+a) validate: boolean parameters used to skip the validation on the input.
+b) label: the label of the input
+c) oneLine: if true it renders the label in the left place of the input, if false, it renders the label on top and the
+input in the bottom.
+-->
+
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:c="http://java.sun.com/jstl/core"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     class="entry">
+    <c:if test="#{empty showLabel or showLabel}">
+        <div class="#{(empty vertical or !vertical)?'label':'vlabel'} #{(not empty oneLine and !oneLine) ? 'labelTop':''} #{invalid ? 'errors':''}">
+            <s:label styleClass="#{(not empty oneLine and !oneLine) ? 'labelTop':''} #{invalid ? 'errors':''}"
+                     rendered="#{empty showLabel or showLabel}">
+                <ui:insert name="label"/>
+                <s:span styleClass="required" rendered="#{required}">*</s:span>
+            </s:label>
+        </div>
+    </c:if>
+
+    <div class="#{(empty vertical or !vertical)?'data':'vdata'} #{(not empty oneLine and !oneLine) ? 'dataBottom':''} #{invalid ? 'errors':''}">
+        <c:choose>
+            <c:when test="#{not empty validate and !validate}">
+                <ui:insert/>
+            </c:when>
+            <c:otherwise>
+                <s:validateAll>
+                    <ui:insert/>
+                    <s:message styleClass="errors #{errorStyleClass}" style="display:block;"/>
+                    <c:if test="#{not empty validateId}">
+                        <h:message for="#{validateId}" styleClass="errors #{errorStyleClass}" style="display:block;"/>
+                    </c:if>
+                </s:validateAll>
+            </c:otherwise>
+        </c:choose>
+    </div>
+</div>
+
+

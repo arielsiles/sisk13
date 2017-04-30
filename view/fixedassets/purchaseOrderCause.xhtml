@@ -1,0 +1,223 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{purchaseOrderCauseAction.managed}">
+            #{messages['PurchaseOrderCause.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PurchaseOrderCause.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+    <h:form id="purchaseOrderCauseForm">
+
+        <div class="buttons">
+            <h:commandButton action="#{purchaseOrderCauseAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton action="#{purchaseOrderCauseAction.createAndNew}"
+                             value="#{messages['Common.saveAndNew']}"
+                             styleClass="button"
+                             rendered="#{!purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                             tabindex="2">
+            </h:commandButton>
+
+
+            <h:commandButton action="#{purchaseOrderCauseAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','UPDATE')}"
+                             tabindex="3"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','DELETE')}"
+                             tabindex="4">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{purchaseOrderCauseAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="5">
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{purchaseOrderCauseAction.managed}">
+                        #{messages['PurchaseOrderCause.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['PurchaseOrderCause.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+            <s:decorate id="groupCodeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow"
+                        rendered="#{purchaseOrderCauseAction.managed}">
+                <ui:define name="label">#{messages['PurchaseOrderCause.code']}</ui:define>
+                <h:outputText value="#{purchaseOrderCause.code}"/>
+            </s:decorate>
+
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrderCause.name']}</ui:define>
+                <h:inputText id="description"
+                             value="#{purchaseOrderCause.name}"
+                             maxlength="250"
+                             styleClass="input"
+                             required="true"
+                             tabindex="6">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrderCause.description']}</ui:define>
+                <h:inputTextarea id="description"
+                                 value="#{purchaseOrderCause.description}"
+                                 styleClass="input textarea"
+                                 tabindex="7">
+                    <f:validateLength maximum="250"/>
+                </h:inputTextarea>
+            </s:decorate>
+            <s:decorate id="typeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:param name="required" value="true"/>
+                <ui:define name="label">#{messages['PurchaseOrderCause.type']}</ui:define>
+                <h:selectOneMenu id="type"
+                                 value="#{purchaseOrderCause.type}"
+                                 styleClass="input"
+                                 required="true"
+                                 rendered="#{not purchaseOrderCauseAction.managed}"
+                                 tabindex="8">
+                    <s:selectItems value="#{purchaseOrderCauseTypeEnum}"
+                                   var="purchaseOrderCauseType"
+                                   label="#{messages[purchaseOrderCauseType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange"
+                                 action="#{purchaseOrderCauseAction.updateValuesByType}"
+                                 reRender="requiresFixedAssetsField, fixedAssetStatesDiv"
+                                 ajaxSingle="true"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <h:outputText value="#{messages[purchaseOrderCause.type.resourceKey]}"
+                              rendered="#{purchaseOrderCauseAction.managed}"/>
+            </s:decorate>
+            <s:decorate id="requiresFixedAssetsField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrderCause.requiresFixedAssets']}</ui:define>
+                <h:selectBooleanCheckbox id="requiresFixedAssets"
+                                         value="#{purchaseOrderCause.requiresFixedAssets}"
+                                         required="true"
+                                         disabled="#{purchaseOrderCauseAction.managed or purchaseOrderCause.isFixedassetPartsPurchase()}"
+                                         tabindex="9">
+                    <a4j:support event="onchange"
+                                 reRender="requiresFixedAssetsField, fixedAssetStatesDiv"
+                                 ajaxSingle="true"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+            <s:div id="fixedAssetStatesDiv">
+                <s:decorate id="fixedAssetStatesField"
+                            template="/include/inputField.xhtml"
+                            rendered="#{purchaseOrderCause.requiresFixedAssets}"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseOrderCause.assignFixedAssetState']}</ui:define>
+                    <rich:pickList id="fixedAssetStatesPick"
+                                   value="#{purchaseOrderCauseAction.selectedFixedAssetStates}"
+                                   required="#{purchaseOrderCause.requiresFixedAssets}"
+                                   requiredMessage="#{messages['PurchaseOrderCause.error.selectedFixedAssetStateEmpty']}"
+                                   disabled="#{purchaseOrderCause.isFixedassetPartsPurchase()}"
+                                   showButtonsLabel="false">
+                        <ui:define name="label">#{messages['PurchaseOrderCause.assignFixedAssetState']}</ui:define>
+                        <s:selectItems value="#{fixedAssetStates}" var="fixedAssetState"
+                                       label="#{messages[fixedAssetState.resourceKey]}"/>
+                        <s:convertEnum/>
+                    </rich:pickList>
+                </s:decorate>
+            </s:div>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{purchaseOrderCauseAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                             tabindex="10">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{purchaseOrderCauseAction.createAndNew}"
+                             value="#{messages['Common.saveAndNew']}"
+                             styleClass="button"
+                             rendered="#{!purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','CREATE')}"
+                             tabindex="11">
+            </h:commandButton>
+
+            <h:commandButton action="#{purchaseOrderCauseAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','UPDATE')}"
+                             tabindex="12"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','DELETE')}"
+                             tabindex="13">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{purchaseOrderCauseAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="14">
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{purchaseOrderCauseAction.managed and s:hasPermission('FIXEDASSETGROUP','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['PurchaseOrderCause.delete.confirmation']}">
+                    <f:param value="#{purchaseOrderCause.name}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{purchaseOrderCauseAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               rendered="#{s:hasPermission('FIXEDASSETGROUP','DELETE')}"
+                               immediate="true"
+                               styleClass="button"
+                               tabindex="14"/>
+        </ui:define>
+    </s:decorate>
+    <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

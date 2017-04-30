@@ -1,0 +1,461 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+<!--transference and discharge and improvement detail-->
+<s:div id="transferFormDiv">
+<app:fieldset id="fixedAssetTransferenceFieldset" title="#{messages['FixedAssetVoucher.detail']}"
+              rendered="#{fixedAssetVoucherAction.transferenceMovement
+                  or fixedAssetVoucherAction.dischargeMovement
+                  or (fixedAssetVoucherAction.improvementMovement and fixedAssetVoucherAction.managed)}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div rendered="#{fixedAssetVoucherAction.managed}">
+            <s:decorate id="transferenceVoucherCodeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.voucherCode']}</ui:define>
+                <h:outputText value="#{fixedAssetVoucher.voucherCode}" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="transferenceStateField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.state']}</ui:define>
+                <h:outputText value=" #{messages[fixedAssetVoucher.state.resourceKey]}"/>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="newCustodianJobContractDiv"
+               rendered="#{fixedAssetVoucherAction.transferenceMovement}">
+            <s:decorate id="newJobContractField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newCustodian']}</ui:define>
+                <app:selectPopUp id="newCustodianJobContract"
+                                 required="true"
+                                 textValue="#{fixedAssetVoucher.custodianJobContract.contract.employee.fullName}"
+                                 value="#{fixedAssetVoucher.custodianJobContract}"
+                                 dataModel="#{jobContractDataModel}"
+                                 clearAction="fixedAssetVoucherAction.clearCustodianJobContract()"
+                                 searchModalPanel="jobContractListModalPanel"
+                                 readOnly="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                                 reRender="newJobContractField, newDiv"
+                                 hotKeySelect="alt+1"
+                                 tabindex="18"/>
+            </s:decorate>
+
+            <s:decorate id="newBusinessUnitField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newExecutorUnit']}</ui:define>
+                <app:quickSearch id="businessUnitSearch"
+                                 textValue="fixedAssetVoucher.businessUnit.executorUnitCode"
+                                 value="#{fixedAssetVoucher.businessUnit}"
+                                 rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                                 postSearchAction="fixedAssetVoucherAction.assignBusinessUnit()"
+                                 searchField="executorUnitCode"
+                                 reRender="newBusinessUnitField"
+                                 tabindex="19">
+                </app:quickSearch>
+
+                <h:selectOneMenu id="executorUnit"
+                                 value="#{fixedAssetVoucher.businessUnit}"
+                                 rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="20">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <h:outputText value="#{fixedAssetVoucher.businessUnit.fullName}"
+                              rendered="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                              styleClass="input">
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="newCostCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newCostCenter']}</ui:define>
+                <app:quickSearch id="costCenterSearch"
+                                 textValue="fixedAssetVoucher.costCenter.code"
+                                 value="#{fixedAssetVoucher.costCenter}"
+                                 rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                                 postSearchAction="fixedAssetVoucherAction.assignCostCenter()"
+                                 searchField="code"
+                                 reRender="newCostCenterField"
+                                 tabindex="21">
+                </app:quickSearch>
+
+                <app:selectPopUp id="newCostCenter"
+                                 required="true"
+                                 textValue="#{fixedAssetVoucher.costCenter.fullName}"
+                                 value="#{fixedAssetVoucher.costCenter}"
+                                 readOnly="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                                 dataModel="#{costCenterDataModel}"
+                                 clearAction="fixedAssetVoucherAction.clearCostCenter()"
+                                 searchModalPanel="newCostCenterListModalPanel"
+                                 reRender="newCostCenterField"
+                                 hotKeySelect="alt+2"
+                                 tabindex="22"/>
+            </s:decorate>
+
+            <s:decorate id="newFixedAssetLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newLocation']}</ui:define>
+                <h:selectOneMenu id="newFixedAssetLocation"
+                                 value="#{fixedAssetVoucher.fixedAssetLocation}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="14"
+                                 rendered="#{not fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending or empty fixedAssetVoucher.fixedAssetLocation}">
+                    <s:selectItems value="#{fixedAssetLocationList}"
+                                   var="fixedAssetLocation"
+                                   label="#{fixedAssetLocation.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <h:outputText value="#{fixedAssetVoucher.fixedAssetLocation.name}"
+                              rendered="#{not (not fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending or empty fixedAssetVoucher.fixedAssetLocation)}"/>
+            </s:decorate>
+        </s:div>
+        <s:div id="dischargeDetail"
+               rendered="#{fixedAssetVoucherAction.dischargeMovement}">
+            <s:decorate id="dischargeCauseField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetVoucher.cause']}</ui:define>
+                <h:inputTextarea id="cause"
+                                 value="#{fixedAssetVoucher.cause}"
+                                 required="true"
+                                 readonly="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                                 disabled="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                                 styleClass="input textarea"
+                                 tabindex="23">
+                    <f:validateLength maximum="250"/>
+                </h:inputTextarea>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+</app:fieldset>
+<s:div id="improvementPaymentDiv">
+<app:fieldset id="improvementPaymentPanel"
+              title="#{messages['FixedAsset.FixedAssetPayment']}"
+              rendered="#{fixedAssetVoucherAction.improvementMovement}">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width60percent, width40percent">
+<s:div id="paymentLeftPanel">
+<s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetVoucher.paymentType']}</ui:define>
+    <h:selectOneMenu id="paymentType"
+                     value="#{fixedAssetVoucherAction.fixedAssetPayment.paymentType}"
+                     rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="24">
+        <s:selectItems value="#{fixedAssetPaymentTypes}"
+                       var="element"
+                       label="#{messages[element.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <a4j:support event="onchange"
+                     action="#{fixedAssetVoucherAction.paymentTypeChanged()}"
+                     reRender="paymentTypeField, beneficiaryDiv,checkDestinationDiv, bankDiv, cashBoxCashAccountDiv, sourceAmountDiv "
+                     ajaxSingle="true"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+    <h:outputText rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                  value=" #{messages[fixedAssetVoucherAction.fixedAssetPayment.paymentType.resourceKey]}"/>
+</s:decorate>
+<s:div id="beneficiaryDiv">
+    <s:decorate id="beneficiaryNameField"
+                rendered="#{fixedAssetVoucherAction.enableCheckFields}"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPayment.beneficiaryName']}</ui:define>
+        <h:inputText id="beneficiaryName"
+                     value="#{fixedAssetVoucherAction.fixedAssetPayment.beneficiaryName}"
+                     styleClass="input"
+                     rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                     required="true"
+                     maxlength="200"
+                     tabindex="25"/>
+        <h:outputText
+                rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                value=" #{fixedAssetVoucherAction.fixedAssetPayment.beneficiaryName}"/>
+    </s:decorate>
+    <s:decorate id="beneficiaryTypeField"
+                template="/include/inputField.xhtml"
+                rendered="#{fixedAssetVoucherAction.enableBeneficiaryTypeField}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPayment.beneficiaryType']}</ui:define>
+        <h:selectOneRadio value="#{fixedAssetVoucherAction.fixedAssetPayment.fixedAssetBeneficiaryType}"
+                          disabled="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                          layout="lineDirection">
+            <s:selectItems value="#{beneficiaryTypeList}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"/>
+            <s:convertEnum/>
+        </h:selectOneRadio>
+    </s:decorate>
+</s:div>
+<s:div id="checkDestinationDiv">
+    <s:decorate id="checkDestinationField" template="/include/inputField.xhtml"
+                rendered="#{fixedAssetVoucherAction.enableCheckFields and fixedAssetVoucherAction.paymentWithCheck}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFund.checkDestination']}</ui:define>
+        <ui:param name="validateId" value="executorUnit"/>
+        <c:choose>
+            <c:when test="${!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}">
+                <app:quickSearch id="quickSearchCheckDestination"
+                                 textValue="fixedAssetVoucherAction.fixedAssetPayment.checkDestination.executorUnitCode"
+                                 value="#{fixedAssetVoucherAction.fixedAssetPayment.checkDestination}"
+                                 searchField="executorUnitCode"
+                                 reRender="checkDestinationField"
+                                 tabindex="15"/>
+                <h:selectOneMenu id="executorUnit"
+                                 value="#{fixedAssetVoucherAction.fixedAssetPayment.checkDestination}"
+                                 styleClass="inputMedium"
+                                 required="true">
+                    <s:selectItems value="#{businessUnitList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange"
+                                 reRender="checkDestinationField"
+                                 ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{fixedAssetVoucherAction.fixedAssetPayment.checkDestination.fullName}"
+                              styleClass="input"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</s:div>
+<s:div id="valuesDiv">
+    <s:div id="bankDiv">
+        <s:decorate id="bankAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{fixedAssetVoucherAction.enableBankAccountInfo}">
+            <ui:define name="label">#{messages['FixedAssetPayment.bankAccount']}</ui:define>
+            <h:selectOneMenu id="bankAccount"
+                             value="#{fixedAssetVoucherAction.fixedAssetPayment.bankAccount}"
+                             rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="26">
+                <s:selectItems value="#{financesBankAccountList}"
+                               var="element"
+                               label="#{element.description} #{messages[element.currency.symbolResourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{fixedAssetVoucherAction.bankAccountFieldChanged()}"
+                             reRender="bankAccountField, valuesDiv"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText
+                    rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                    value=" #{fixedAssetVoucherAction.fixedAssetPayment.bankAccount.description} #{messages[fixedAssetVoucherAction.fixedAssetPayment.bankAccount.currency.symbolResourceKey]}"/>
+        </s:decorate>
+        <s:div id="bankAccountNumberDiv">
+            <s:decorate id="bankAccountNumberField"
+                        template="/include/inputField.xhtml"
+                        rendered="#{fixedAssetVoucherAction.enableBankAccountInfo and not empty fixedAssetVoucherAction.fixedAssetPayment.bankAccountNumber}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPayment.bankAccountNumber']}</ui:define>
+                <h:outputText id="bankAccountNumber"
+                              value="#{fixedAssetVoucherAction.fixedAssetPayment.bankAccountNumber}"
+                              styleClass="input">
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+    </s:div>
+
+    <s:div id="cashBoxCashAccountDiv">
+        <s:decorate id="cashBoxCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{!fixedAssetVoucherAction.enableBankAccountInfo}">
+            <ui:define name="label">#{messages['FixedAssetPayment.cashBoxCashAccount']}</ui:define>
+            <app:selectPopUp id="cashBoxCashAccount"
+                             required="true"
+                             textValue="#{fixedAssetVoucherAction.fixedAssetPayment.cashBoxCashAccount.fullName}"
+                             value="#{fixedAssetVoucherAction.fixedAssetPayment.cashBoxCashAccount}"
+                             rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="fixedAssetVoucherAction.clearCashBoxCashAccount()"
+                             searchModalPanel="cashBoxCashAccountListModalPanel"
+                             reRender="cashBoxCashAccountField, valuesDiv"
+                             hotKeySelect="alt+3"
+                             tabindex="27">
+            </app:selectPopUp>
+            <a4j:support event="onchange"
+                         action="#{fixedAssetVoucherAction.bankAccountFieldChanged()}"
+                         reRender="cashBoxCashAccountField, valuesDiv"
+                         ajaxSingle="true"/>
+            <h:outputText
+                    rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                    value=" #{fixedAssetVoucherAction.fixedAssetPayment.cashBoxCashAccount.fullName}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="sourceCurrencyDiv">
+        <s:decorate id="sourceCurrencyField" template="/include/inputField.xhtml"
+                    rendered="#{not empty fixedAssetVoucherAction.fixedAssetPayment.sourceCurrency}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPayment.sourceCurrency']}</ui:define>
+            <h:outputText
+                    value="#{messages[fixedAssetVoucherAction.fixedAssetPayment.sourceCurrency.resourceKey]} (#{messages[fixedAssetVoucherAction.fixedAssetPayment.sourceCurrency.symbolResourceKey]})"/>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="sourceAmountDiv">
+        <s:decorate id="paymentSourceAmountField" template="/include/inputField.xhtml"
+                    rendered="#{not empty fixedAssetVoucherAction.fixedAssetPayment.sourceAmount}"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <c:choose>
+                    <c:when test="#{fixedAssetVoucherAction.paymentWithCheck}">
+                        #{messages['FixedAssetPayment.sourceCheckAmount']}
+                    </c:when>
+                    <c:when test="#{fixedAssetVoucherAction.paymentBankAccount}">
+                        #{messages['FixedAssetPayment.sourceBankAmount']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['FixedAssetPayment.sourceCashBoxAmount']}
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+            <h:outputText value="#{fixedAssetVoucherAction.fixedAssetPayment.sourceAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText
+                    value=" #{messages[fixedAssetVoucherAction.fixedAssetPayment.sourceCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="fixedAssetPaymentPaymentCurrencyField" template="/include/inputField.xhtml"
+                rendered="#{not empty fixedAssetPayment.payCurrency}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPayment.paymentCurrency']}</ui:define>
+        <h:outputText
+                value="#{messages[fixedAssetPayment.payCurrency.resourceKey]} (#{messages[fixedAssetPayment.payCurrency.symbolResourceKey]})"/>
+    </s:decorate>
+    <s:div id="paymentExchangeRateDiv">
+        <s:decorate id="paymentExchangeRateField"
+                    template="/include/inputField.xhtml"
+                    rendered="#{fixedAssetVoucherAction.enablePaymentExchangeRateField}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPayment.exchangeRate']}</ui:define>
+            <h:inputText id="paymentExchangeRate"
+                         value="#{fixedAssetVoucherAction.foreignExchangeRate}"
+                         styleClass="inputMedium right"
+                         rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                         required="true"
+                         tabindex="28">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="paymentExchangeRate"/>
+                <app:keyUpEvent focus="paymentExchangeRate"
+                                reRender="paymentExchangeRateField, paymentPaymentAmountDiv, sourceAmountDiv"
+                                action="fixedAssetVoucherAction.updateSourceAmount()"/>
+                <a4j:support event="onchange"
+                             action="#{fixedAssetVoucherAction.updateSourceAmount()}"
+                             reRender="paymentExchangeRateField, paymentPaymentAmountDiv, sourceAmountDiv"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText
+                    rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                    value=" #{fixedAssetVoucherAction.foreignExchangeRate}">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"/>
+            </h:outputText>
+            <h:outputText
+                    value=" #{messages['FinancesExchangeRate.bsSusRate']}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="paymentPaymentAmountDiv">
+        <s:decorate id="paymentPaymentAmountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetPayment.payAmount']}</ui:define>
+            <c:choose>
+                <c:when test="#{not empty fixedAssetVoucher.fixedAssetVoucherType and !fixedAssetVoucherAction.improvementMovement}">
+                    <c:set var="reRenderColumns"
+                           value="paymentPaymentAmountField, paymentPaymentAmountDiv, sourceAmountDiv"/>
+                </c:when>
+                <c:otherwise>
+                    <c:set var="reRenderColumns"
+                           value="paymentPaymentAmountField, paymentPaymentAmountDiv, sourceAmountDiv, selectedToTransferFixedAssetsDiv"/>
+                </c:otherwise>
+            </c:choose>
+            <h:inputText id="paymentPaymentAmount"
+                         value="#{fixedAssetVoucherAction.fixedAssetPayment.payAmount}"
+                         rendered="#{!fixedAssetVoucherAction.managed or fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                         required="true"
+                         styleClass="inputMedium right"
+                         tabindex="29">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" minimum="0.01"
+                                         forId="paymentPaymentAmount"/>
+                <app:keyUpEvent focus="paymentPaymentAmount"
+                                reRender="#{reRenderColumns}"
+                                action="fixedAssetVoucherAction.paymentAmountChanged()"/>
+                <a4j:support event="onchange"
+                             action="#{fixedAssetVoucherAction.paymentAmountChanged()}"
+                             reRender="#{reRenderColumns}"
+                             ajaxSingle="true"/>
+
+            </h:inputText>
+            <h:outputText
+                    rendered="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                    value=" #{fixedAssetVoucherAction.foreignExchangeRate}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" minimum="0.01"/>
+            </h:outputText>
+            <h:outputText
+                    value=" #{messages[fixedAssetVoucherAction.fixedAssetPayment.payCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+    </s:div>
+</s:div>
+</s:div>
+<s:div id="paymentRigthDiv">
+    <s:decorate id="paymentPaymentDateField"
+                template="/include/inputField.xhtml"
+                rendered="#{fixedAssetVoucherAction.managed}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPayment.creationDate']}</ui:define>
+        <h:outputText value="#{fixedAssetVoucherAction.fixedAssetPayment.creationDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetPayment.description']}</ui:define>
+        <h:inputTextarea id="paymentDescription"
+                         value="#{fixedAssetVoucherAction.fixedAssetPayment.description}"
+                         readonly="#{fixedAssetVoucherAction.managed and !fixedAssetVoucherAction.fixedAssetVoucherPending}"
+                         styleClass="input textarea"
+                         required="true"
+                         tabindex="30">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+</app:fieldset>
+</s:div>
+
+</s:div>
+
+</ui:composition>

@@ -1,0 +1,33 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:c="http://java.sun.com/jstl/core"
+     xmlns:app="http://encens.com/products/khipus/facelets"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     style="padding-top:1px; padding-bottom:1px;">
+    <s:div styleClass="#{invalid ? 'errors':''}">
+        <h:panelGrid columns="1" cellpadding="0" cellspacing="0" columnClasses="center">
+            <c:if test="#{not empty showLabel and showLabel}">
+                <s:div>
+                    <ui:insert name="label"/>
+                    <s:span styleClass="required"
+                            rendered="#{required or (not empty showRequired and showRequired)}">*</s:span>
+                </s:div>
+            </c:if>
+            <h:panelGrid columns="2" cellpadding="0" cellspacing="0" border="0">
+                <s:div>
+                    <ui:insert/>
+                </s:div>
+                <s:span styleClass="required"
+                        rendered="#{(empty showLabel or not showLabel) and (not empty showRequired and showRequired)}">*</s:span>
+            </h:panelGrid>
+
+            <c:if test="#{not empty inputId}">
+                <h:message for="#{inputId}"
+                           styleClass="errors"
+                           style="display:block;"/>
+            </c:if>
+        </h:panelGrid>
+    </s:div>
+</div>

@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="pollFormField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.pollForm']}</ui:define>
+                <h:selectOneMenu id="pollForm" value="#{reportAction.pollForm}"
+                                 styleClass="input" required="true"
+                                 tabindex="1">
+                    <s:selectItems value="#{pollFormList}" var="pollForm" label="#{pollForm.title}"
+                                   hideNoSelectionLabel="false" noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="initRevisionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.initRevisionDate']}</ui:define>
+                <rich:calendar id="initRevisionDate"
+                               value="#{reportAction.initRevisionDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="2">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate id="endRevisionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.endRevisionDate']}</ui:define>
+                <rich:calendar id="endRevisionDate"
+                               value="#{reportAction.endRevisionDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="3">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                    <app:dateRangeValidator forId="initRevisionDate"
+                                            forLabel="#{messages['PollCopy.initRevisionDate']}"
+                                            type="greater"/>
+                </rich:calendar>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{!userAction.managed}">
+                <ui:define name="label">#{messages['User.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{reportAction.idNumber}"
+                             maxlength="100" tabindex="4" styleClass="input">
+                    <app:naturalNumberConverter forId="idNumber"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                <h:selectOneMenu id="location" value="#{reportAction.location}"
+                                 styleClass="input"
+                                 tabindex="5">
+                    <s:selectItems value="#{reportAction.locationList}" var="location"
+                                   label="#{location.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <c:choose>
+                        <c:when test="#{empty showCareerField or not showCareerField}">
+                            <a4j:support event="onchange" reRender="facultyField"
+                                         action="#{reportAction.refleshLocation}"
+                                         ajaxSingle="true"/>
+                        </c:when>
+                        <c:when test="#{showCareerField}">
+                            <a4j:support event="onchange" reRender="facultyField, careerField"
+                                         action="#{reportAction.refleshLocation}"
+                                         ajaxSingle="true"/>
+                        </c:when>
+                    </c:choose>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="facultyField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.faculty']}</ui:define>
+                <h:selectOneMenu id="faculty" value="#{reportAction.faculty}"
+                                 styleClass="input"
+                                 tabindex="6">
+                    <s:selectItems value="#{reportAction.facultyList}" var="faculty"
+                                   label="#{faculty.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <c:choose>
+                        <c:when test="#{empty showCareerField or not showCareerField}">
+                            <a4j:support event="onchange" action="#{reportAction.refleshFaculty}"
+                                         ajaxSingle="true"/>
+                        </c:when>
+                        <c:when test="#{showCareerField}">
+                            <a4j:support event="onchange" reRender="careerField"
+                                         action="#{reportAction.refleshFaculty}" ajaxSingle="true"/>
+                        </c:when>
+                    </c:choose>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <c:if test="#{showCareerField}">
+                <s:decorate id="careerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollCopy.career']}</ui:define>
+                    <h:selectOneMenu id="career" value="#{reportAction.career}"
+                                     styleClass="input"
+                                     tabindex="7">
+                        <s:selectItems value="#{reportAction.careerList}" var="career"
+                                       label="#{career.name}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <a4j:support event="onchange"
+                                     action="#{reportAction.refleshCareer}"
+                                     ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <br/>
+            </c:if>
+
+        </s:div>
+        <rich:jQuery selector="#pollForm" query="focus()" timing="onload"/>
+        <ui:insert name="reportFilters"/>
+    </h:panelGrid>
+</ui:composition>

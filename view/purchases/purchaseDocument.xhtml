@@ -1,0 +1,422 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+
+<h:form id="purchaseDocumentFormId">
+<c:set var="isPurchaseDocumentApproved" value="#{purchaseDocument.approved}"/>
+<c:set var="isPurchaseDocumentPending" value="#{purchaseDocument.pending}"/>
+<c:set var="isPurchaseDocumentNullified" value="#{purchaseDocument.nullified}"/>
+
+<c:set var="isReadOnly" value="#{action.managed and (isPurchaseDocumentApproved or isPurchaseDocumentNullified)}"/>
+<c:set var="isPostApprovedUpdate"
+       value="#{action.managed and isPurchaseDocumentApproved and action.isPurchaseOrderPending() and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"/>
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{action.create}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{!action.managed and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
+                     styleClass="button">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{action.approve}"
+                     value="#{messages['PurchaseDocument.button.approve']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"/>
+    <h:commandButton action="#{action.nullify}"
+                     value="#{messages['PurchaseDocument.button.nullify']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"/>
+    <h:commandButton id="updateButtonId"
+                     action="#{action.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton id="postApprovedUpdateButtonId"
+                     action="#{action.postApprovedUpdate}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{isPostApprovedUpdate}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{action.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+<s:div id="mainDivId">
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{action.managed}">
+            #{messages['PurchaseDocument.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PurchaseDocument.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+
+<s:div id="leftDocDiv">
+    <s:decorate id="documentTypeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.documentType']}</ui:define>
+        <h:selectOneMenu id="purchaseDocumentType"
+                         value="#{purchaseDocument.type}"
+                         styleClass="input"
+                         rendered="#{isPurchaseDocumentPending}"
+                         required="true"
+                         tabindex="1">
+            <s:selectItems value="#{action.purchaseDocumentTypeList}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         reRender="mainDivId, cashAccountAdjustmentListModalPanelDiv"
+                         action="#{action.updateDocumentType}"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{messages[purchaseDocument.type.resourceKey]}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{action.managed and purchaseDocument.adjustmentDocument}">
+        <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+        <h:outputText value="#{purchaseDocument.number}"/>
+    </s:decorate>
+    <s:div id="cashAccountAdjustmentDiv">
+        <s:decorate id="cashAccountAdjustmentField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{purchaseDocument.adjustmentDocument}">
+            <ui:define name="label">#{messages['PurchaseDocument.adjustmentAccount']}</ui:define>
+            <app:selectPopUp id="cashAccountAdjustment"
+                             required="true"
+                             textValue="#{purchaseDocument.cashAccountAdjustment.fullName}"
+                             value="#{purchaseDocument.cashAccountAdjustment}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="action.clearCashAccountAdjustment()"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             searchModalPanel="cashAccountAdjustmentListModalPanel"
+                             reRender="mainDivId, cashAccountAdjustmentListModalPanelDiv"
+                             rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                             hotKeySelect="alt+1"
+                             tabindex="2"/>
+            <h:outputText value="#{purchaseDocument.cashAccountAdjustment.fullName}"
+                          rendered="#{isReadOnly and not isPostApprovedUpdate}"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="numberField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{not purchaseDocument.adjustmentDocument}">
+        <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+        <h:inputText id="number"
+                     value="#{purchaseDocument.number}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="2">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.number}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}"/>
+    </s:decorate>
+    <s:decorate id="nameField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{not purchaseDocument.adjustmentDocument}">
+        <ui:define name="label">#{messages['PurchaseDocument.name']}</ui:define>
+        <h:inputText id="name"
+                     value="#{purchaseDocument.name}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     required="true"
+                     styleClass="input"
+                     tabindex="3">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.name}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}"/>
+    </s:decorate>
+    <s:decorate id="documentDateField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.date']}</ui:define>
+        <rich:calendar id="purchaseDocumentDate"
+                       value="#{purchaseDocument.date}"
+                       rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                       styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       required="true"
+                       tabindex="4">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        <h:outputText value="#{purchaseDocument.date}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="amountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.amount']}</ui:define>
+        <h:inputText id="amountInputText"
+                     value="#{purchaseDocument.amount}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="5">
+            <app:realNumberConverter minimum="0"
+                                     pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="amountInputText"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.amount}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+</s:div>
+
+<s:div id="rigthReceiptPanel" rendered="#{purchaseDocument.receiptDocument or purchaseDocument.adjustmentDocument}">
+    <s:decorate id="currencyField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.currency']}</ui:define>
+        <h:selectOneMenu id="currencySelectOne"
+                         value="#{purchaseDocument.currency}"
+                         styleClass="input"
+                         required="true"
+                         rendered="#{isPurchaseDocumentPending and not purchaseDocument.adjustmentDocument}"
+                         tabindex="7">
+            <s:selectItems value="#{purchaseDocumentCurrencies}"
+                           var="element"
+                           label="#{messages[element.resourceKey]} (#{messages[element.symbolResourceKey]})"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         action="#{action.updateExchangeRate}"
+                         reRender="currencyField, exchangeRateField"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText
+                value="#{messages[purchaseDocument.currency.resourceKey]} (#{messages[purchaseDocument.currency.symbolResourceKey]})"
+                rendered="#{not empty purchaseDocument.currency and (not isPurchaseDocumentPending or purchaseDocument.adjustmentDocument)}">
+        </h:outputText>
+    </s:decorate>
+    <h:panelGroup id="exchangeRateField">
+        <s:decorate template="/include/inputField.xhtml"
+                    rendered="#{empty purchaseDocument.currency or not purchaseDocument.isLocalCurrencyUsed()}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.exchangeRate']}</ui:define>
+            <h:inputText id="exchangeRate"
+                         value="#{purchaseDocument.exchangeRate}"
+                         styleClass="input right"
+                         rendered="#{isPurchaseDocumentPending}"
+                         required="true"
+                         tabindex="8">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="exchangeRate"/>
+            </h:inputText>
+            <h:outputText value="#{purchaseDocument.exchangeRate}"
+                          rendered="#{not isPurchaseDocumentPending}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+    </h:panelGroup>
+</s:div>
+
+<s:div id="rigthInvoicePanel" rendered="#{purchaseDocument.invoiceDocument}">
+    <s:div id="financesEntityDiv">
+        <s:decorate id="financesEntityField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.financesEntity']}</ui:define>
+
+            <app:selectPopUp id="financesEntitySelectPopup"
+                             required="true"
+                             textValue="#{purchaseDocument.financesEntity.acronym}"
+                             value="#{purchaseDocument.financesEntity}"
+                             clearAction="#{action.clearFinancesEntity()}"
+                             searchModalPanel="financesEntityListModalPanel"
+                             dataModel="#{financesEntityDataModel}"
+                             reRender="financesEntityField, nitField"
+                             readOnly="#{isReadOnly and not isPostApprovedUpdate}"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="nitField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
+        <h:inputText id="nit"
+                     value="#{purchaseDocument.nit}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="9">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.nit}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="authorizationNumberField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.authorizationNumber']}</ui:define>
+        <h:inputText id="authorizationNumber"
+                     value="#{purchaseDocument.authorizationNumber}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="10">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.authorizationNumber}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="controlCodeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.controlCode']}</ui:define>
+        <h:inputText id="controlCode"
+                     value="#{purchaseDocument.controlCode}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     styleClass="input right"
+                     tabindex="11">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.controlCode}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="exemptField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.exempt']}</ui:define>
+        <h:inputText id="exempt"
+                     value="#{purchaseDocument.exempt}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="12">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     minimum="0"
+                                     forId="exempt"/>
+            <a4j:support event="onchange"
+                         reRender="exemptField"
+                         ajaxSingle="true"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.exempt}"
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>
+    </s:decorate>
+    <s:decorate id="iceField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.ice']}</ui:define>
+        <h:inputText id="ice"
+                     value="#{purchaseDocument.ice}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="13">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     minimum="0"
+                                     forId="ice"/>
+            <a4j:support event="onchange"
+                         reRender="iceField"
+                         ajaxSingle="true"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.ice}"
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+</rich:panel>
+
+</s:div>
+
+<div class="buttons">
+    <h:commandButton action="#{action.create}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{!action.managed and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
+                     styleClass="button"
+                     tabindex="14"/>
+    <h:commandButton action="#{action.approve}"
+                     value="#{messages['PurchaseDocument.button.approve']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"
+                     tabindex="15"/>
+    <h:commandButton action="#{action.nullify}"
+                     value="#{messages['PurchaseDocument.button.nullify']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"
+                     tabindex="16"/>
+    <h:commandButton action="#{action.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"
+                     tabindex="17"/>
+    <h:commandButton action="#{action.postApprovedUpdate}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{isPostApprovedUpdate}"
+                     tabindex="18"/>
+    <h:commandButton action="#{action.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="19"/>
+</div>
+</h:form>
+
+<s:decorate id="financesEntityListModalPanelContainer"
+            template="/finances/financesEntityListModalPanel.xhtml">
+    <ui:param name="containerId" value="financesEntityListModalPanelContainer"/>
+    <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{action.assignFinancesEntity(instance)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="financesEntityField, nitField"
+                           oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:div id="cashAccountAdjustmentListModalPanelDiv">
+    <s:decorate id="cashAccountAdjustmentListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="containerId" value="cashAccountAdjustmentListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountAdjustmentListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{action.assignCashAccountAdjustment(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="mainDivId"
+                               immediate="true"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountAdjustmentListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+</ui:composition>

@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Reports.kardex.page.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="90%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="kardexReportForm">
+
+    <rich:panel>
+        <f:facet name="header">
+            #{messages['Reports.kardex.page.title']}
+        </f:facet>
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.businessUnit']}</ui:define>
+                    <h:selectOneMenu id="businessUnit"
+                                     value="#{kardexReportAction.businessUnit}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.costCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="kardexReportAction.costCenter.code"
+                                     value="#{kardexReportAction.costCenter}"
+                                     searchField="code"
+                                     reRender="costCenterField"
+                                     tabindex="2"/>
+                    <app:selectPopUp id="costCenter"
+                                     textValue="#{kardexReportAction.costCenter.fullName}"
+                                     value="#{kardexReportAction.costCenter}"
+                                     clearAction="kardexReportAction.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+                <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.petitionerIdNumber']}</ui:define>
+                    <h:inputText id="idNumber" value="#{kardexReportAction.petitionerIdNumber}"
+                                 maxlength="100" tabindex="3" styleClass="input">
+                        <app:naturalNumberConverter forId="idNumber"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="chargeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.petitionerCharge']}</ui:define>
+                    <app:quickSearch id="quickSearchCharge"
+                                     textValue="kardexReportAction.charge.id"
+                                     value="#{kardexReportAction.charge}"
+                                     searchField="id"
+                                     reRender="chargeField"
+                                     tabindex="4">
+                        <ui:define name="converters">
+                            <f:convertNumber groupingUsed="false"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="charge"
+                                     textValue="#{kardexReportAction.charge.name}"
+                                     value="#{kardexReportAction.charge}"
+                                     dataModel="#{chargeDataModel}"
+                                     clearAction="kardexReportAction.clearCharge()"
+                                     searchModalPanel="chargeListModalPanel"
+                                     reRender="chargeField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouseField"
+                                     textValue="kardexReportAction.warehouse.warehouseCode"
+                                     value="#{kardexReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="5">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouseSelectPopup"
+                                     textValue="#{kardexReportAction.warehouse.fullName}"
+                                     value="#{kardexReportAction.warehouse}"
+                                     clearAction="kardexReportAction.clearWarehouse()"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+3"/>
+                </s:decorate>
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.productItem']}</ui:define>
+                    <app:quickSearch id="productItemQuickSearch"
+                                     textValue="kardexReportAction.productItem.productItemCode"
+                                     value="#{kardexReportAction.productItem}"
+                                     searchField="productItemCode"
+                                     alias="productItem"
+                                     reRender="productItemField"
+                                     tabindex="5">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="productItem"
+                                     textValue="#{kardexReportAction.productItem.name}"
+                                     value="#{kardexReportAction.productItem}"
+                                     clearAction="kardexReportAction.cleanProductItem()"
+                                     searchModalPanel="productItemListModalPanel"
+                                     dataModel="#{productItemSearchDataModel}"
+                                     reRender="productItemField"
+                                     hotKeySelect="alt+4"/>
+                </s:decorate>
+                <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.page.initDate']}</ui:define>
+                    <rich:calendar id="initDate"
+                                   value="#{kardexReportAction.initDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.page.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{kardexReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="7">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="initDate"
+                                                forLabel="#{messages['Reports.kardex.page.initDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </rich:panel>
+
+    <app:reportDefaultOptions reportAction="#{kardexReportAction}" showPageFormat="false" tabIndex="8"
+                              showReportTitle="false"/>
+
+    <div class="buttons">
+        <h:commandButton action="#{kardexReportAction.generateReport}"
+                         styleClass="button"
+                         value="#{messages['Common.generate']}" id="generateButtonId" tabindex="15">
+            <s:defaultAction/>
+        </h:commandButton>
+    </div>
+
+</h:form>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{kardexReportAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="chargeListModalPanelContainer"
+            template="/employees/chargeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="chargeListModalPanel"/>
+    <ui:param name="createNewDialogId" value="chargeModalPanel"/>
+    <ui:param name="dataModel" value="#{chargeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{kardexReportAction.setCharge(chargeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="chargeField"
+                           focus="selectCharge"
+                           oncomplete="Richfaces.hideModalPanel('chargeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+    <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+    <ui:param name="dialogId" value="warehouseModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{kardexReportAction.assignWarehouse(warehouseItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="warehouseField"
+                           oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{kardexReportAction.assignProductItem(productItemItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="productItemField"
+                           oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#costCenter" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

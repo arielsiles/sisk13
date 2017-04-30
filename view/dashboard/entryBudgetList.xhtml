@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <a4j:region renderRegionOnly="true">
+        <rich:dataTable width="100%"
+                        value="#{entryBudgetComponentAction.resultList}"
+                        var="element"
+                        footerClass="rich-table-footer">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column rowspan="2">
+                        #{messages['EntryBudget.monthName']}
+                    </rich:column>
+                    <rich:column colspan="2">
+                        #{messages['EntryBudget.budget']}
+                    </rich:column>
+                    <rich:column colspan="2">
+                        #{messages['EntryBudget.execution']}
+                    </rich:column>
+                    <rich:column breakBefore="true">
+                        #{messages['EntryBudget.yearBudget']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EntryBudget.monthBudget']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EntryBudget.accruedExecution']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EntryBudget.monthlyExecution']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column styleClass="left">
+                <h:outputText value="#{element.monthName}"/>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.yearlyBudget}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.monthlyBudget}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.accruedExecution}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{element.monthlyExecution}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['EntryBudget.total']}
+                    </rich:column>
+                    <rich:column>
+                        <rich:spacer/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{entryBudgetComponentAction.totals['totalMonthlyBudget']}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <rich:spacer/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{entryBudgetComponentAction.totals['totalMonthlyExecution']}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+        </rich:dataTable>
+    </a4j:region>
+</ui:composition>

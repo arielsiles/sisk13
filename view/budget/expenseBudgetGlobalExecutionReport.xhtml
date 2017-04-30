@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define
+            name="pageTitle">#{messages['ExpenseBudget.report.expenseBudgetGlobalExecutionReport.title']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="expenseBudgetGlobalExecutionReportForm">
+
+            <rich:simpleTogglePanel
+                    label="#{messages['ExpenseBudget.report.expenseBudgetGlobalExecutionReport.title']}"
+                    switchType="client">
+                <s:decorate id="classifierField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['ExpenseBudget.accountingItem']}</ui:define>
+                    <h:selectOneMenu id="classifier"
+                                     value="#{expenseBudgetGlobalExecutionReportAction.classifier}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{accountingItemList}" var="accountingItem"
+                                       label="#{accountingItem.fullName}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{expenseBudgetGlobalExecutionReportAction.gestion}"
+                                     styleClass="input"
+                                     tabindex="4"
+                                     required="true">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define
+                            name="label">#{messages['ExpenseBudget.report.expenseBudgetExecutionReport.month']}</ui:define>
+                    <h:selectOneMenu id="month"
+                                     value="#{expenseBudgetGlobalExecutionReportAction.movementMonth}"
+                                     styleClass="input"
+                                     tabindex="5"
+                                     required="true">
+                        <s:selectItems value="#{months}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <app:reportDefaultOptions reportAction="#{expenseBudgetGlobalExecutionReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{expenseBudgetGlobalExecutionReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="6">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

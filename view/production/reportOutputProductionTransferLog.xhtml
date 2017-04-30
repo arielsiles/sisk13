@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:rich="http://richfaces.org/rich">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <title>
+        #{messages['ProductionTransferLog.report']}
+    </title>
+    <a4j:loadStyle src="/stylesheet/theme.css"/>
+    <style type="text/css">
+        table {
+            font-size: 1em;
+        }
+        .label {
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        td {
+            height: 2.4em;
+        }
+        .data-line {
+            border-bottom: 1px dotted #616161;
+        }
+        .report-container {
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+            background-color: #EDEADD;
+            padding: 10px;
+        }
+        .report-title {
+            text-align: center;
+            color: #578BB8;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        .order-table{
+            border-collapse:collapse;
+            width: 100%;
+        }
+
+        .order-table-header{
+            text-align:left;
+            background:none repeat scroll 0 0 #E5E5E5;
+            border-bottom:1px solid #BBBBBB;
+            padding:16px;
+        }
+        .order-table-row {
+            border-bottom: 1px solid #616161;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="bodyContainer">
+    <div class="body">
+
+        <ui:include src="/include/messages.xhtml"/>
+
+        <div style="width: 1000px;" class="report-container">
+            <div>
+                <div class="report-title">#{messages['ProductionTransferLog.report.outputTitle']}</div>
+            </div>
+            <table style="width:100%;">
+                <tr>
+                    <td><div class="label">#{messages['ProductionTransferLog.report.deliveredDate']}</div></td>
+                    <td><div class="data-line">#{productionTransferLogReporter.productionTransferLog.deliveredDate}</div></td>
+                    <td><div class="label">#{messages['ProductionTransferLog.report.receivedDate']}:</div></td>
+                    <td><div class="data-line">#{productionTransferLogReporter.productionTransferLog.receivedDate}</div></td>
+                </tr>
+                <tr>
+                    <td colspan="4"><div class="label"></div></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <h:dataTable headerClass="order-table-header" styleClass="order-table" rowClasses="order-table-row" width="100%"
+                                     value="#{productionTransferLogReporter.productionTransferLog.incomingProductionOrderList}" var="item">
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.product']}</f:facet>
+                                #{item.outputProductionVoucher.processedProduct.name}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.order']}</f:facet>
+                                #{item.outputProductionVoucher.productionOrder.code}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.producedAmount']}</f:facet>
+                                <h:outputText value="#{item.outputProductionVoucher.producedAmount}" style="margin:0 5px;" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.deliveredAmount']}</f:facet>
+                                <h:outputText value="#{item.deliveredAmount}" style="margin:0 5px;"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.deliveredObservation']}</f:facet>
+                                #{item.deliveredObservation}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.receivedAmount']}</f:facet>
+                                <h:outputText value="#{item.finishedGoodsInventory.amount}" style="margin:0 5px;"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{messages['ProductionTransferLog.report.productionOrder.receivedObservation']}</f:facet>
+                                #{item.receivedObservation}
+                            </h:column>
+                        </h:dataTable>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="spacer">&nbsp;</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:ridch="http://richfaces.ajax4jsf.org/rich"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{productionTransferLogAction.managed}">
+            #{messages['ProductionTransferLog.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductionTransferLog.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+<style type="text/css" >
+    .messageStyle {
+        color: brown;
+        font-size: small;
+        font-style: italic;
+    }
+</style>
+
+<h:form id="productionTransferLogForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{productionTransferLogAction.update}" value="#{messages['ProductionTransferLog.buttons.makeReceiveing']}"
+                         styleClass="button"
+                         rendered="#{productionTransferLogAction.managed
+                                             and (productionTransferLog.state eq 'DELIVERED')}"
+                         tabindex="2"/>
+        <h:commandButton action="#{productionTransferLogAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="4">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{productionTransferLogAction.managed}">
+                    #{messages['ProductionTransferLog.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['ProductionTransferLog.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <h:panelGrid columns="2" width="100%">
+            <s:decorate id="deliveredDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductionTransferLog.deliveredDate']}</ui:define>
+                <h:inputText id="deliveredDate"
+                             value="#{productionTransferLog.deliveredDate}"
+                             required="true" maxlength="200" styleClass="input" tabindex="5" readonly="true">
+                </h:inputText>
+            </s:decorate>
+
+            <c:choose>
+                <c:when test="#{productionTransferLog.state eq 'RECEIVED'}">
+                    <s:decorate id="stateField" template="/include/viewField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductionTransferLog.state']}</ui:define>
+                        <h:outputText value="#{productionTransferLog.state eq 'DRAFT' ? messages['ProductionTransferLogState.draft'] :
+                                                    (productionTransferLog.state eq 'DELIVERED' ? messages['ProductionTransferLogState.delivered'] :
+                                                    messages['ProductionTransferLogState.received'])}"></h:outputText>
+                    </s:decorate>
+                </c:when>
+                <c:otherwise>
+                    <rich:spacer width="50"/>
+                </c:otherwise>
+            </c:choose>
+
+            <s:decorate id="receivedDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductionTransferLog.receivedDate']}</ui:define>
+                <h:inputText id="receivedDate"
+                             value="#{productionTransferLog.receivedDate}" readonly="true"
+                             required="false" maxlength="50" styleClass="input" tabindex="5">
+                </h:inputText>
+            </s:decorate>
+        </h:panelGrid>
+        <c:if test="#{productionTransferLog.state == 'RECEIVED'}">
+            <s:link id="inputProductionTransferLog" target="_blank" view="/warehouse/reportInputProductionTransferLog.xhtml">
+                <f:param name="id" value="#{productionTransferLog.id}"/>
+                <h:graphicImage value="/img/report-icon.png"/>
+            </s:link>
+            <rich:toolTip value="#{messages['ProductionTransferLog.report.inputTooltip']}" for="inputProductionTransferLog"/>
+        </c:if>
+    </rich:panel>
+
+    <rich:spacer height="10"/>
+
+    <rich:dataTable value="#{productionTransferLog.incomingProductionOrderList}" var="incomingProductionOrderItem"
+                    id="incomingProductionOrderList" width="100%" columnsWidth="10%,10%,10%,25%,10%,10%,25%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <ridch:column>
+                    #{messages['IncommingProductionOrder.processedProduct']}
+                </ridch:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.productionOrderCode']}
+                </rich:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.deliveredAmount']}
+                </rich:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.deliveredObservation']}
+                </rich:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.finishedGoodsWarehouse']}
+                </rich:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.receivedAmount']}
+                </rich:column>
+                <rich:column>
+                    #{messages['IncomingProductionOrder.receivedObservation']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{incomingProductionOrderItem.outputProductionVoucher.processedProduct.name}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{incomingProductionOrderItem.outputProductionVoucher.productionOrder.code}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText  value="#{incomingProductionOrderItem.deliveredAmount}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{incomingProductionOrderItem.deliveredObservation}"/>
+        </rich:column>
+        <rich:column>
+            <c:choose>
+                <c:when test="#{productionTransferLog.state eq 'DELIVERED'}">
+                    <h:selectOneMenu id="warehouseSlot" styleClass="input" required="false" tabindex="2"
+                                     value="#{incomingProductionOrderItem.finishedGoodsInventory.warehouseSlot}">
+                        <s:selectItems value="#{productionTransferLogAction.findAvailableWarehouseSlots(incomingProductionOrderItem.outputProductionVoucher.processedProduct)}" var="target"
+                                       label="#{target.fullName}" noSelectionLabel="#{messages['ProductionTransferLogState.rejectedOrder']}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </c:when>
+                <c:otherwise>
+                    <h:outputText value="#{incomingProductionOrderItem.finishedGoodsInventory.warehouseSlot.fullName}" />
+                </c:otherwise>
+            </c:choose>
+        </rich:column>
+        <rich:column>
+            <c:choose>
+                <c:when test="#{productionTransferLog.state eq 'DELIVERED'}">
+                    <h:inputText id="deliveredAmount" required="true" value="#{incomingProductionOrderItem.finishedGoodsInventory.amount}"
+                                 style="width:90%;">
+                        <a4j:support ajaxSingle="true" event="onblur" />
+                    </h:inputText>
+                    <rich:message for="deliveredAmount" styleClass="errors"/>
+                </c:when>
+                <c:otherwise>
+                    <h:outputText  value="#{incomingProductionOrderItem.finishedGoodsInventory.amount}"/>
+                </c:otherwise>
+            </c:choose>
+        </rich:column>
+        <rich:column>
+            <c:choose>
+                <c:when test="#{productionTransferLog.state eq 'DELIVERED'}">
+                    <h:inputTextarea id="deliveredObservation" value="#{incomingProductionOrderItem.receivedObservation}"
+                                     style="width:90%;" required="false">
+                        <a4j:support ajaxSingle="true" event="onblur"/>
+                    </h:inputTextarea>
+                    <rich:message for="deliveredObservation" styleClass="errors"/>
+                </c:when>
+                <c:otherwise>
+                    <h:outputText value="#{incomingProductionOrderItem.receivedObservation}"/>
+                </c:otherwise>
+            </c:choose>
+        </rich:column>
+    </rich:dataTable>
+    <rich:spacer height="10" />
+
+    <div class="buttons">
+        <h:commandButton action="#{productionTransferLogAction.update}" value="#{messages['ProductionTransferLog.buttons.makeReceiveing']}"
+                         styleClass="button"
+                         rendered="#{productionTransferLogAction.managed
+                                             and (productionTransferLog.state eq 'DELIVERED')}"
+                         tabindex="2"/>
+
+        <h:commandButton action="#{productionTransferLogAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" tabindex="21" immediate="true"/>
+    </div>
+</h:form>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>

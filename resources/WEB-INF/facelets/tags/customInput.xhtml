@@ -1,0 +1,13 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <a4j:loadStyle src="/stylesheet/customInput.css"/>
+    <a4j:loadScript src="resource://jquery.js"/>
+    <a4j:loadScript src="/scripts/customInput.jquery.js"/>
+    <script type="text/javascript">
+        // Run the script on DOM ready:
+        jQuery(function() {
+            jQuery('input[type=checkbox], input[type=radio]').customInput();
+        });
+    </script>
+</ui:composition>

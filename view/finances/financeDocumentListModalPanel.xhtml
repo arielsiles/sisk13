@@ -1,0 +1,130 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="#{dialogId}focusFirstElement();">
+    <f:facet name="header">
+        <h:outputText>#{messages['FinanceDocument.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" styleClass="select-image" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="financeDocumentListForm">
+        <rich:simpleTogglePanel label="#{messages['FinanceDocument.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent, width50percent">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinanceDocument.documentNumber']}</ui:define>
+                    <h:inputText id="#{dialogId}documentNumber"
+                                 value="#{financeDocumentDataModel.criteria.documentNumber}"
+                                 tabindex="1"
+                                 styleClass="input"/>
+
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinanceDocument.gloss']}</ui:define>
+                    <h:inputText id="#{dialogId}gloss"
+                                 value="#{financeDocumentDataModel.gloss}"
+                                 tabindex="2"
+                                 styleClass="input"/>
+                    <a4j:commandButton action="#{financeDocumentDataModel.search}"
+                                       reRender="financeDocumentList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{financeDocumentDataModel}"
+                        var="financeDocumentItem"
+                        id="financeDocumentList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="10%, 15%, 55%, 10%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="financeDocument.date"
+                                               dataModel="#{financeDocumentDataModel}"
+                                               reRender="financeDocumentList, dataScroller">
+                            #{messages['FinanceDocument.date']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader
+                                sortProperty="financeDocument.documentTypeCode, financeDocument.documentNumber"
+                                dataModel="#{financeDocumentDataModel}"
+                                reRender="financeDocumentList, dataScroller">
+                            #{messages['FinanceDocument.documentNumber']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="accountingMovement.gloss"
+                                               dataModel="#{financeDocumentDataModel}"
+                                               reRender="financeDocumentList, dataScroller">
+                            #{messages['FinanceDocument.gloss']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="financeDocument.amount"
+                                               dataModel="#{financeDocumentDataModel}"
+                                               reRender="financeDocumentList, dataScroller">
+                            #{messages['FinanceDocument.amount']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{financeDocumentItem.date}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{financeDocumentItem.fullNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{financeDocumentItem.accountingMovement.gloss}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{financeDocumentItem.amount}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputFormat value="#{messages['Common.parenthesis']}">
+                    <f:param value="#{messages[financeDocumentItem.currency.symbolResourceKey]}"/>
+                </h:outputFormat>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="financeDocumentListModalPanel" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="financeDocumentList" dataModel="#{financeDocumentDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+    <a target="_blank"/>
+    <c:set var="firstInputToFocusId" value="#{dialogId}documentNumber"/>
+    <script type="text/javascript">
+        function #{dialogId}focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+
+</rich:modalPanel>

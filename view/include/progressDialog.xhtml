@@ -1,0 +1,49 @@
+<rich:modalPanel id="#{dialogId}"
+                 minHeight="120" minWidth="400" height="140" width="450" zindex="2000"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib">
+
+    <f:facet name="header">
+        <ui:insert name="dialogTitle">Dialog</ui:insert>
+    </f:facet>
+    <h:panelGroup>
+        <div align="center">
+            <h:form>
+                <p>
+                    <ui:insert name="dialogContent">The dialog content</ui:insert>
+                </p>
+                <table cellspacing="0" cellpadding="0" border="0" class="outProgress">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div style="position: relative;" class="outProgressBg">
+                                <h:graphicImage value="/img/progress_active.gif" style="display:none;"/>
+
+                                <div style="position: absolute; width: 100%;" class="progressActive">
+                                    <div style="text-align: center; position: relative; background-color: transparent; width: 100%; z-index: 1;"
+                                         class="outProgressTxt"> 
+                                        <ui:insert name="progressTitle">On progress</ui:insert>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h:panelGroup>
+                    <ui:insert name="dialogOption"/>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:panelGroup>
+</rich:modalPanel>
+
+
+
+
+

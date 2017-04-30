@@ -1,0 +1,148 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:warehouseProductItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{warehouseProductItemDataModel}"/>
+    </c:if>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['ProductItem.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="warehouseProductItemListForm">
+        <rich:simpleTogglePanel id="warehouseProductItemSearchPanel"
+                                label="#{messages['ProductItem.search']}" switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+                        <h:inputText id="productItemCode"
+                                     value="#{dataModel.productItemCode}"
+                                     maxlength="150"
+                                     tabindex="1"
+                                     styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+                        <h:inputText id="name"
+                                     value="#{dataModel.productItemName}"
+                                     maxlength="150"
+                                     tabindex="2"
+                                     styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+
+                            <a4j:commandButton action="#{dataModel.search}"
+                                               reRender="productItemList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{dataModel.clear}"
+                                               reRender="warehouseProductItemSearchPanel, productItemList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               id="clearButtonId"
+                                               tabindex="4">
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{dataModel}"
+                        var="inventoryItem"
+                        id="productItemList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="45%, 20%, 20%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventory.productItem.name"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventory.productItem.productItemCode"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.productItemCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventory.unitaryBalance"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['Inventory.unitaryBalance']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventory.productItem.unitCost"
+                                               dataModel="#{dataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['ProductItem.unitCost']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{inventoryItem.productItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{inventoryItem.productItem.productItemCode}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{inventoryItem.unitaryBalance}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{inventoryItem.productItem.unitCost}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="productItemList" dataModel="#{dataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, assignButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

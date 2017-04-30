@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.warehouse.EstimationStockReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="estimationStockReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['menu.production.supplierPayments.productionBalanceReport']}
+                </f:facet>
+
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.date']}</ui:define>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="startDate"
+                                       value="#{productionBalanceReportAction.date}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       required="true"
+                                       tabindex="1">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </s:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{productionBalanceReportAction}" showPageFormat="false"
+                                      tabIndex="3"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{productionBalanceReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,16 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <a4j:support event="onkeyup"
+                 focus="#{focus}"
+                 requestDelay="500"
+                 ignoreDupResponses="true"
+                 ajaxSingle="true"
+                 onsubmit="if((event.keyCode&gt;=9 &amp;&amp; event.keyCode&lt;=45)||(event.keyCode&gt;=91 &amp;&amp; event.keyCode&lt;=93)||(event.keyCode&gt;=112 &amp;&amp; event.keyCode&lt;=187))return"
+                 rendered="#{(not empty rendered ? rendered : true)}"
+                 reRender="#{reRender}"
+                 action="#{elEvaluator.evaluateMethodBinding(action)}"/>
+</ui:composition>

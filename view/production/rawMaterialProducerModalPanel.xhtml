@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="productiveZoneModalPanel" autosized="true" width="450">
+        <f:facet name="header">
+            <h:outputText value="#{messages['ProductiveZone.beginCollectionRawMaterialTitle']}" />
+        </f:facet>
+        <f:facet name="controls">
+            <h:panelGroup>
+                <h:graphicImage value="/img/close.png" id="hidelink" styleClass="hidelink" />
+                <rich:componentControl for="productiveZoneModalPanel" attachTo="hidelink" operation="hide" event="onclick" />
+            </h:panelGroup>
+        </f:facet>
+
+        <h:form id="dateCollectionForm" >
+            <a4j:outputPanel ajaxRendered="true">
+                <h:inputHidden value="#{collectedRawMaterialAction.idProductiveZone}" />
+
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
+                    <h:outputText value="#{collectedRawMaterialAction.productiveZone.number}" />
+                </s:decorate>
+
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
+                    <h:outputText value="#{collectedRawMaterialAction.productiveZone.group}" />
+                </s:decorate>
+
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                    <h:outputText value="#{collectedRawMaterialAction.productiveZone.name}" />
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectedRawMaterial.date']}</ui:define>
+                    <rich:calendar value="#{collectedRawMaterialAction.date}"
+                                   popup="true"
+                                   showApplyButton="false"/>
+                </s:decorate>
+
+                <h:commandButton value="#{messages['CollectedRawMaterial.beginCollectionRawMaterial']}"
+                                 action="#{collectedRawMaterialAction.beginCollectionRawMaterial}"
+                                 styleClass="button"
+                                 id="beginRecordingCollectedRawMaterialButton">
+                </h:commandButton>
+            </a4j:outputPanel>
+        </h:form>
+
+    </rich:modalPanel>
+</ui:composition>

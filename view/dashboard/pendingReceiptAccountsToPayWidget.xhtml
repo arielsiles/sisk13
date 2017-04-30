@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <rich:panel>
+        <f:facet name="header">
+            <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                <s:div styleClass="left">
+                    #{pendingReceiptAccountsToPayWidgetAction.widget.title}
+                </s:div>
+                <s:div styleClass="right">
+                    <s:link view="/dashboard/widget.xhtml"
+                            title="#{messages['Common.configure']}"
+                            action="#{widgetAction.selectWidget(pendingReceiptAccountsToPayWidgetAction.widget.xmlId)}">
+                        <h:graphicImage value="/img/config.png" styleClass="select-image"/>
+                    </s:link>
+                </s:div>
+            </h:panelGrid>
+        </f:facet>
+        <h:panelGrid cellpadding="3" cellspacing="0" border="0" columns="2" width="100%"
+                     columnClasses="width50percent,width50percent">
+            <s:div styleClass="left">
+                <h:outputFormat value="#{messages['Dashboard.area']}">
+                    <f:param value="#{messages[pendingReceiptAccountsToPayWidgetAction.widget.area]}"/>
+                </h:outputFormat>
+            </s:div>
+            <s:div styleClass="left">
+                <h:outputFormat value="#{messages['Dashboard.module']}">
+                    <f:param value="#{messages[pendingReceiptAccountsToPayWidgetAction.widget.module]}"/>
+                </h:outputFormat>
+            </s:div>
+        </h:panelGrid>
+        <a4j:region renderRegionOnly="true">
+            <rich:tabPanel id="pendingReceiptAccountsToPayTabPanel" switchType="ajax">
+                <rich:tab label="#{messages['Dashboard.tab.all']}"
+                          action="#{pendingReceiptAccountsToPayWidgetAction.disableExecutorUnit()}"
+                          ajaxSingle="true"
+                          styleClass="center">
+                    <a4j:actionparam value="#{rich:element('pendingReceiptAccountsToPayTabPanel')}.offsetWidth"
+                                     assignTo="#{pendingReceiptAccountsToPayWidgetAction.containerWidth}"
+                                     noEscape="true"/>
+
+                    <s:graphicImage value="#{pendingReceiptAccountsToPayWidgetAction.createChart()}"
+                                    usemap="#toolTipMap_#{pendingReceiptAccountsToPayWidgetAction.widget.xmlId}"/>
+                    <h:outputText value="#{pendingReceiptAccountsToPayWidgetAction.toolTipMap}" escape="false"/>
+                </rich:tab>
+                <c:forEach items="#{executorUnitList.resultList}" var="executorUnit">
+                    <rich:tab label="#{executorUnit.description}"
+                              action="#{pendingReceiptAccountsToPayWidgetAction.enableExecutorUnit(executorUnit.id)}"
+                              ajaxSingle="true">
+                        <a4j:actionparam value="#{rich:element('pendingReceiptAccountsToPayTabPanel')}.offsetWidth"
+                                         assignTo="#{pendingReceiptAccountsToPayWidgetAction.containerWidth}"
+                                         noEscape="true"/>
+                        <s:graphicImage value="#{pendingReceiptAccountsToPayWidgetAction.createChart()}"
+                                        usemap="#toolTipMap_#{pendingReceiptAccountsToPayWidgetAction.widget.xmlId}"/>
+                        <h:outputText value="#{pendingReceiptAccountsToPayWidgetAction.toolTipMap}" escape="false"/>
+                    </rich:tab>
+                </c:forEach>
+            </rich:tabPanel>
+            <ui:include src="/dashboard/componentStatus.xhtml"/>
+        </a4j:region>
+    </rich:panel>
+</ui:composition>

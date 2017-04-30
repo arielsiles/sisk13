@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ScheduleEvaluation.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="scheduleEvaluationSearch">
+            <rich:simpleTogglePanel id="searchPanelId"
+                                    label="#{messages['ScheduleEvaluation.search']}"
+                                    switchType="client">
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleEvaluation.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{scheduleEvaluationDataModel.criteria.name}"
+                                 maxlength="250"
+                                 styleClass="input"
+                                 tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleEvaluation.cycle']}</ui:define>
+
+                    <h:selectOneMenu id="cycle" value="#{scheduleEvaluationDataModel.criteria.cycle}"
+                                     styleClass="input">
+                        <s:selectItems value="#{cycleList}"
+                                       var="cycle"
+                                       label="#{cycle.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+
+                    <a4j:commandButton action="#{scheduleEvaluationDataModel.search}"
+                                       reRender="searchPanelId, scheduleEvaluationList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/scheduleEvaluation.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+            </div>
+
+
+            <rich:dataTable id="scheduleEvaluationList"
+                            value="#{scheduleEvaluationDataModel}"
+                            var="scheduleEvaluationItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%, 30%, 30%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="scheduleEvaluation.name"
+                                                   dataModel="#{scheduleEvaluationDataModel}"
+                                                   reRender="scheduleEvaluationList, dataScroller">
+                                #{messages['ScheduleEvaluation.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="scheduleEvaluation.cycle.name"
+                                                   dataModel="#{scheduleEvaluationDataModel}"
+                                                   reRender="scheduleEvaluationList, dataScroller">
+                                #{messages['ScheduleEvaluation.cycle']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="scheduleEvaluation.state"
+                                                   dataModel="#{scheduleEvaluationDataModel}"
+                                                   reRender="scheduleEvaluationList, dataScroller">
+                                #{messages['ScheduleEvaluation.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{scheduleEvaluationItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{scheduleEvaluationItem.cycle.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{messages[scheduleEvaluationItem.state.resourceKey]}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{scheduleEvaluationAction.select(scheduleEvaluationItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('SALARYMOVEMENT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="scheduleEvaluationList"
+                              dataModel="#{scheduleEvaluationDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/scheduleEvaluation.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

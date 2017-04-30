@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<rich:panel>
+<f:facet name="header">
+    <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+        <s:div styleClass="left">
+            #{documentationRegistrationWidgetAction.widget.title}
+        </s:div>
+        <s:div styleClass="right">
+            <s:link view="/dashboard/widget.xhtml"
+                    title="#{messages['Common.configure']}"
+                    action="#{widgetAction.selectWidget(documentationRegistrationWidgetAction.widget.xmlId)}">
+                <h:graphicImage value="/img/config.png" styleClass="select-image"/>
+            </s:link>
+        </s:div>
+    </h:panelGrid>
+</f:facet>
+<h:panelGrid cellpadding="3" cellspacing="0" border="0" columns="2" width="100%"
+             columnClasses="width50percent,width50percent">
+    <s:div styleClass="left">
+        <h:outputFormat value="#{messages['Dashboard.area']}">
+            <f:param value="#{messages[documentationRegistrationWidgetAction.widget.area]}"/>
+        </h:outputFormat>
+    </s:div>
+    <s:div styleClass="left">
+        <h:outputFormat value="#{messages['Dashboard.module']}">
+            <f:param value="#{messages[documentationRegistrationWidgetAction.widget.module]}"/>
+        </h:outputFormat>
+    </s:div>
+</h:panelGrid>
+<a4j:region renderRegionOnly="true">
+    <rich:tabPanel id="documentationRegistrationWidgetTabPanel" switchType="ajax">
+        <rich:tab label="#{messages['Dashboard.tab.all']}"
+                  action="#{documentationRegistrationWidgetAction.disableExecutorUnit()}"
+                  ajaxSingle="true"
+                  styleClass="center">
+            <a4j:form id="documentationRegistrationAjaxFormAll" ajaxSubmit="true"
+                      reRender="documentationRegistrationGraphicAll">
+                <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%" columns="1">
+                    <s:div id="documentationRegistrationSelectBoxAll">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['DocumentRegistrationWidget.career']}
+                            </ui:define>
+                            <h:selectOneMenu id="documentationRegistrationCareerId"
+                                             value="#{documentationRegistrationWidgetAction.career}"
+                                             styleClass="input" tabindex="1">
+                                <s:selectItems value="#{academicCareerList.resultList}"
+                                               var="career"
+                                               label="#{career.name}"
+                                               noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             reRender="documentationRegistrationSelectBoxAll"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['DocumentRegistrationWidget.gestion']}
+                            </ui:define>
+                            <h:selectOneMenu value="#{documentationRegistrationWidgetAction.gestion}"
+                                             styleClass="input" tabindex="2">
+                                <s:selectItems value="#{gestionList}" var="gestion"
+                                               label="#{gestion.year}"
+                                               noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             reRender="documentationRegistrationSelectBoxAll"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['DocumentRegistrationWidget.period']}
+                            </ui:define>
+                            <h:selectOneMenu value="#{documentationRegistrationWidgetAction.cycle}"
+                                             disabled="#{empty documentationRegistrationWidgetAction.gestion}"
+                                             styleClass="input" tabindex="3">
+                                <s:selectItems value="#{cycleListByGestion}" var="cycle"
+                                               label="#{cycle.cycleType.name}"
+                                               noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             reRender="documentationRegistrationSelectBoxAll"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['DocumentRegistrationWidget.ingressDocumentType']}</ui:define>
+                            <h:selectOneMenu id="ingressDocumentType"
+                                             value="#{documentationRegistrationWidgetAction.ingressDocumentType}"
+                                             styleClass="input" tabindex="4">
+                                <s:selectItems value="#{ingressDocumentTypeList.resultList}"
+                                               var="ingressDocumentType"
+                                               label="#{ingressDocumentType.description}"
+                                               hideNoSelectionLabel="true"/>
+                                <a4j:support event="onchange"
+                                             reRender="documentationRegistrationSelectBoxAll"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div id="documentationRegistrationGraphicAll">
+                        <a4j:actionparam
+                                value="#{rich:element('documentationRegistrationWidgetTabPanel')}.offsetWidth"
+                                assignTo="#{documentationRegistrationWidgetAction.containerWidth}"
+                                noEscape="true"/>
+                        <s:graphicImage value="#{documentationRegistrationWidgetAction.createChart()}"
+                                        usemap="#toolTipMap_#{documentationRegistrationWidgetAction.widget.xmlId}"/>
+                        <h:outputText value="#{documentationRegistrationWidgetAction.toolTipMap}"
+                                      escape="false"/>
+                    </s:div>
+                </h:panelGrid>
+            </a4j:form>
+        </rich:tab>
+        <c:forEach items="#{executorUnitList.resultList}" var="executorUnit">
+            <rich:tab label="#{executorUnit.description}"
+                      action="#{documentationRegistrationWidgetAction.enableExecutorUnit(executorUnit.id)}"
+                      ajaxSingle="true"
+                      styleClass="center">
+                <a4j:form id="documentationRegistrationAjaxForm_#{executorUnit.id}" ajaxSubmit="true"
+                          reRender="documentationRegistrationGraphic_#{executorUnit.id}">
+                    <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%" columns="1">
+                        <s:div id="documentationRegistrationSelectBox_#{executorUnit.id}">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['DocumentRegistrationWidget.career']}
+                                </ui:define>
+                                <h:selectOneMenu id="documentationRegistrationCareerId"
+                                                 value="#{documentationRegistrationWidgetAction.career}"
+                                                 styleClass="input" tabindex="1">
+                                    <s:selectItems value="#{academicCareerList.resultList}"
+                                                   var="career"
+                                                   label="#{career.name}"
+                                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <a4j:support event="onchange"
+                                                 reRender="documentationRegistrationSelectBox_#{executorUnit.id}"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['DocumentRegistrationWidget.gestion']}
+                                </ui:define>
+                                <h:selectOneMenu value="#{documentationRegistrationWidgetAction.gestion}"
+                                                 styleClass="input" tabindex="2">
+                                    <s:selectItems value="#{gestionList}" var="gestion"
+                                                   label="#{gestion.year}"
+                                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <a4j:support event="onchange"
+                                                 reRender="documentationRegistrationSelectBox_#{executorUnit.id}"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['DocumentRegistrationWidget.period']}
+                                </ui:define>
+                                <h:selectOneMenu value="#{documentationRegistrationWidgetAction.cycle}"
+                                                 disabled="#{empty documentationRegistrationWidgetAction.gestion}"
+                                                 styleClass="input" tabindex="3">
+                                    <s:selectItems value="#{cycleListByGestion}" var="cycle"
+                                                   label="#{cycle.cycleType.name}"
+                                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <a4j:support event="onchange"
+                                                 reRender="documentationRegistrationSelectBox_#{executorUnit.id}"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define
+                                        name="label">#{messages['DocumentRegistrationWidget.ingressDocumentType']}</ui:define>
+                                <h:selectOneMenu id="ingressDocumentType"
+                                                 value="#{documentationRegistrationWidgetAction.ingressDocumentType}"
+                                                 styleClass="input" tabindex="4">
+                                    <s:selectItems value="#{ingressDocumentTypeList.resultList}"
+                                                   var="ingressDocumentType"
+                                                   label="#{ingressDocumentType.description}"
+                                                   hideNoSelectionLabel="true"/>
+                                    <a4j:support event="onchange"
+                                                 reRender="documentationRegistrationSelectBoxAll"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </s:div>
+                        <s:div id="documentationRegistrationGraphic_#{executorUnit.id}">
+                            <a4j:actionparam
+                                    value="#{rich:element('documentationRegistrationWidgetTabPanel')}.offsetWidth"
+                                    assignTo="#{documentationRegistrationWidgetAction.containerWidth}"
+                                    noEscape="true"/>
+                            <s:graphicImage value="#{documentationRegistrationWidgetAction.createChart()}"
+                                            usemap="#toolTipMap_#{documentationRegistrationWidgetAction.widget.xmlId}"/>
+                            <h:outputText value="#{documentationRegistrationWidgetAction.toolTipMap}"
+                                          escape="false"/>
+                        </s:div>
+                    </h:panelGrid>
+                </a4j:form>
+            </rich:tab>
+        </c:forEach>
+    </rich:tabPanel>
+    <ui:include src="/dashboard/componentStatus.xhtml"/>
+</a4j:region>
+</rich:panel>
+</ui:composition>

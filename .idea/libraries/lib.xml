@@ -1,0 +1,77 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/persistence-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-entitymanager.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-el-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-seam-debug.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-embedded-all.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xercesImpl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mime-util-2.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-5.0.8-bin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/urlrewritefilter.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/htmlparser.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/testng.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javase-1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/richfaces-ui.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/velocity-dep-1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jsf-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/richfaces-impl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jasperreports-3.7.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-validator.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ojdbc14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jsf-facelets.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/poi-3.5-FINAL-20090928.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/envers-1.2.2.ga-hibernate-3.3-jatun.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ant-contrib-1.0b2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/laguna-3.3.4.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/servlet-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ant-antlr.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-beanutils-1.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xml-apis.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-annotations.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-core-2.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/itext-rtf.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/glassX-3.3.4.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jsf-impl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/rtftemplate-1.0.1-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/barcode4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jatun-commons-fonts-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/facturas 1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javacsv.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jasperreports-fonts-3.7.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/core-1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/titus-report.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/exp4j-0.3.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hsqldb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-seam-pdf.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jstl-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdt-compiler-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jgroups.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-commons-annotations.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-seam.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/richfaces-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/antlr-3.0b7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/iText-2.1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/joda-time-1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-digester-1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ejb-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/darkX-3.3.3.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-cache-jdk50.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/avalon-framework-4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-embedded-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-el.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-ejb3-ext-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-beans-2.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/literal.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-seam-ui.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

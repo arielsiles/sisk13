@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <h:panelGrid columns="1"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0">
+        <s:div id="purchaseOrderDetailsPanel">
+            <div class="buttons">
+                <a4j:commandButton id="addProductItemCommandButton"
+                                   action="#{provideSearchDataModel.reset()}"
+                                   value="#{messages['PurchaseOrderDetail.button.addProductItem']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('productItemsByProviderListModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   rendered="#{not empty warehousePurchaseOrderAction.instance.provider}"
+                                   reRender="productItemsByProviderListModalPanel">
+                    <f:attribute name="entityManagerName" value=""/>
+                    <f:attribute name="dataModelObject" value="#{provideSearchDataModel}"/>
+                    <app:criteriaValue fieldName="providerCode"
+                                       value="#{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}"/>
+                </a4j:commandButton>
+            </div>
+
+            <rich:dataTable value="#{warehousePurchaseOrderDetailListCreateAction.instances}"
+                            var="instance"
+                            id="instancesList"
+                            rows="#{warehousePurchaseOrderDetailListCreateAction.rows}"
+                            width="100%"
+                            columnsWidth="30%, 20%, 15%, 15%, 15%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column styleClass="center">
+                            #{messages['WarehousePurchaseOrderDetail.productItem']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['WarehousePurchaseOrderDetail.purchaseMeasureUnit']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['WarehousePurchaseOrderDetail.providerUnitPrice']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['WarehousePurchaseOrderDetail.requestedQuantity']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['WarehousePurchaseOrderDetail.totalAmount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{instance.productItem.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{instance.purchaseMeasureUnit.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <s:div id="unitCostDivId">
+                        <h:inputText id="unitCostInputTextId"
+                                     value="#{instance.unitCost}"
+                                     styleClass="inputSmall right"
+                                     required="true">
+                            <app:realNumberConverter minimum="0"
+                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     forId="unitCostInputTextId"/>
+                            <a4j:support event="onblur"
+                                         ajaxSingle="true"
+                                         action="#{warehousePurchaseOrderDetailListCreateAction.updateTotalAmount(instance)}"
+                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId"/>
+                        </h:inputText>
+                        <h:message for="unitCostInputTextId"
+                                   styleClass="errors"
+                                   style="display:block;"/>
+                    </s:div>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <s:div id="quantityDivId">
+                        <h:inputText id="quantityInputTextId"
+                                     value="#{instance.requestedQuantity}"
+                                     styleClass="inputSmall right"
+                                     required="true">
+                            <app:realNumberConverter minimum="0.001"
+                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     forId="quantityInputTextId"/>
+                            <a4j:support event="onblur"
+                                         ajaxSingle="true"
+                                         action="#{warehousePurchaseOrderDetailListCreateAction.updateTotalAmount(instance)}"
+                                         reRender="quantityDivId, totalAmountDivId"/>
+                        </h:inputText>
+                        <h:message for="quantityInputTextId"
+                                   styleClass="errors"
+                                   style="display:block;"/>
+                    </s:div>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <s:div id="totalAmountDivId">
+                        <h:inputText id="totalAmountInputTextId"
+                                     value="#{instance.totalAmount}"
+                                     styleClass="inputSmall right"
+                                     required="true">
+                            <app:realNumberConverter minimum="0"
+                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     forId="totalAmountInputTextId"/>
+                            <a4j:support event="onblur"
+                                         ajaxSingle="true"
+                                         action="#{warehousePurchaseOrderDetailListCreateAction.updateUnitCost(instance)}"
+                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId"/>
+                        </h:inputText>
+                        <h:message for="totalAmountInputTextId"
+                                   styleClass="errors"
+                                   style="display:block;"/>
+                    </s:div>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <s:div id="removeLinkId">
+                        <a4j:commandLink ajaxSingle="true"
+                                         immediate="true"
+                                         title="#{messages['Common.remove']}"
+                                         action="#{warehousePurchaseOrderDetailListCreateAction.removeInstance(instance)}"
+                                         reRender="purchaseOrderDetailsPanel">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </s:div>
+                </rich:column>
+            </rich:dataTable>
+        </s:div>
+    </h:panelGrid>
+</ui:composition>

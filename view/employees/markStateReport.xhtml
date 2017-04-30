@@ -1,0 +1,165 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.markState.title']}</ui:define>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="reports"/>
+    <ui:define name="body">
+        <h:form id="markStateReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.markState.title']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <ui:insert name="searchOptions"/>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.startDate']}</ui:define>
+                            <rich:calendar id="startDate"
+                                           value="#{markStateReportAction.startDate}"
+                                           styleClass="input"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="1">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.endDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{markStateReportAction.endDate}"
+                                           styleClass="input"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="2">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.businessUnit']}</ui:define>
+                            <h:selectOneMenu id="executorUnitCode"
+                                             value="#{markStateReportAction.businessUnit}"
+                                             styleClass="input"
+                                             tabindex="5">
+                                <s:selectItems value="#{businessUnitList}"
+                                               var="businessUnit"
+                                               label="#{businessUnit.fullName}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.costCenter']}</ui:define>
+                            <app:selectPopUp id="costCenter"
+                                             textValue="#{markStateReportAction.costCenter.fullName}"
+                                             value="#{markStateReportAction.costCenter}"
+                                             dataModel="#{costCenterDataModel}"
+                                             clearAction="markStateReportAction.clearCostCenter()"
+                                             searchModalPanel="costCenterListModalPanel"
+                                             tabindex="6"
+                                             hotKeySelect="alt+1"/>
+                        </s:decorate>
+                        <s:decorate id="employeeField"
+                                    template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.employee']}</ui:define>
+                            <app:selectPopUp id="employee"
+                                             textValue="#{markStateReportAction.employee.fullName}"
+                                             value="#{markStateReportAction.employee}"
+                                             dataModel="#{generalEmployeeDataModel}"
+                                             clearAction="markStateReportAction.clearEmployee()"
+                                             searchModalPanel="generalEmployeeListModalPanel"
+                                             tabindex="7"
+                                             hotKeySelect="alt+2"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.jobCategory']}</ui:define>
+                            <h:selectManyMenu id="jobCategory"
+                                              value="#{markStateReportAction.jobCategoryList}"
+                                              styleClass="input textarea"
+                                              tabindex="3">
+                                <s:selectItems value="#{activeJobCategoryList}" var="jobCategory"
+                                               label="#{jobCategory.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyMenu>
+                        </s:decorate>
+                        <s:decorate id="stateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.markState.state']}</ui:define>
+                            <h:selectManyMenu id="stateType"
+                                              value="#{markStateReportAction.markStateReportTypeList}"
+                                              styleClass="input textarea"
+                                              tabindex="4">
+                                <s:selectItems value="#{markStateReportTypeEnum}"
+                                               var="enum"
+                                               label="#{messages[enum.resourceKey]}"/>
+                                <s:convertEnum/>
+                            </h:selectManyMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{markStateReportAction}"
+                                      tabindex="8"
+                                      showPageFormat="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{markStateReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" tabindex="9">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+            <rich:jQuery selector="#startDate" query="focus()" timing="onload"/>
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{markStateReportAction.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{markStateReportAction.setCostCenter(costCenterItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   immediate="true"
+                                   reRender="costCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

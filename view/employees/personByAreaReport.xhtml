@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['PersonByAreaReport.report']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="personByAreaReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['PersonByAreaReport.report']}
+                </f:facet>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{personByAreaReportAction.gestion}"
+                                     styleClass="input"
+                                     tabindex="3"
+                                     required="true">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{personByAreaReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"
+                                      tabindex="15"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{personByAreaReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+
+

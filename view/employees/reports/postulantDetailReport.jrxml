@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="562" leftMargin="30" rightMargin="20" topMargin="30" bottomMargin="30">
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+    <field name="postulant.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="postulant.lastName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="postulant.maidenName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="postulant.firstName" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="postulant.email" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="postulant.cellPhoneNumber" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="postulant.phoneNumber" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="postulant.birthDay" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="postulant.birthPlace" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <field name="postulant.idNumber" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+    </field>
+    <field name="postulant.expendedPlace" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+    </field>
+    <field name="postulant.gender" class="com.encens.khipus.model.contacts.Gender">
+        <fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+    </field>
+    <field name="postulant.nationalPrise" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+    </field>
+    <field name="postulant.internationalPrise" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+    </field>
+    <field name="postulant.books" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+    </field>
+    <field name="postulant.nationalArticles" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_16]]></fieldDescription>
+    </field>
+    <field name="postulant.internationalArticles" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_17]]></fieldDescription>
+    </field>
+    <field name="postulant.postulantType" class="com.encens.khipus.model.employees.PostulantType">
+        <fieldDescription><![CDATA[COLUMN_18]]></fieldDescription>
+    </field>
+    <title>
+        <band height="80">
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58"
+                               isRemoveLineWhenBlank="true"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="date_text" style="titleStyle" positionType="Float" x="72" y="0" width="490"
+                               height="58"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$R{Reports.postulantDetailReport.title}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band/>
+    </pageHeader>
+    <detail>
+        <band height="500">
+            <elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="534"
+                                       height="12"/>
+                        <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                            <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                            <topPen lineWidth="0.0"/>
+                            <leftPen lineWidth="0.0"/>
+                            <bottomPen lineWidth="0.0"/>
+                            <rightPen lineWidth="0.0"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.ownInformation}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="12" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.lastName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="12" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.lastName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="284" y="12" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.birthDate}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="399" y="12" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.util.Date">
+                            <![CDATA[$F{postulant.birthDay}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="24" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.maidenName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="24" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.maidenName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="284" y="24" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.birthPlace}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="399" y="24" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.birthPlace}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="36" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.firstName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="36" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.firstName}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="284" y="36" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.idNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="399" y="36" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.Integer">
+                            <![CDATA[$F{postulant.idNumber}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="48" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.email}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="48" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.email}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="284" y="48" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.expendedPlace}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="399" y="48" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.expendedPlace}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="60" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.cellPhoneNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="60" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.Integer">
+                            <![CDATA[$F{postulant.cellPhoneNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="284" y="60" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.gender}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="399" y="60" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[str($F{postulant.gender}.getResourceKey())]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="72" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.phoneNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="72" width="135" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.Integer">
+                            <![CDATA[$F{postulant.phoneNumber}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+            </elementGroup>
+            <elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="99" width="534"
+                                       height="12"/>
+                        <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                            <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                            <topPen lineWidth="0.0"/>
+                            <leftPen lineWidth="0.0"/>
+                            <bottomPen lineWidth="0.0"/>
+                            <rightPen lineWidth="0.0"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.awardAnddistinction}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="111" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.nationals}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="111" width="419" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.nationalPrise}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="123" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.internationals}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="123" width="419" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.internationalPrise}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="147" width="534"
+                                       height="12"/>
+                        <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                            <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                            <topPen lineWidth="0.0"/>
+                            <leftPen lineWidth="0.0"/>
+                            <bottomPen lineWidth="0.0"/>
+                            <rightPen lineWidth="0.0"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.intellectualProduction}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="159" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.books}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="159" width="419" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.books}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="171" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.nationalMagazineArticles}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="171" width="419" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.nationalArticles}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+                <elementGroup>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyleBlank" positionType="Float"
+                                       stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="183" width="115"
+                                       height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{Postulant.internationalMagazineArticles}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="115" y="183" width="419" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{postulant.internationalArticles}]]></textFieldExpression>
+                    </textField>
+                </elementGroup>
+            </elementGroup>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="211" width="562" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{ACADEMICFORMATION_SUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="269" width="562" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="isLaboralExperienceParam">
+                    <subreportParameterExpression><![CDATA["true"]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{LABORALEXPERIENCESUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="327" width="562" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="isLaboralExperienceParam">
+                    <subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{PROFESSOREXPERIENCESUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="386" width="562" height="36">
+                    <printWhenExpression>
+                        com.encens.khipus.model.employees.PostulantType.PROFESSOR==$F{postulant.postulantType}
+                    </printWhenExpression>
+                </reportElement>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{SUBJECTPOSTULATESUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="386" width="562" height="36">
+                    <printWhenExpression>
+                        com.encens.khipus.model.employees.PostulantType.MANAGER==$F{postulant.postulantType}
+                    </printWhenExpression>
+                </reportElement>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{CHARGEPOSTULATESUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="444" width="562" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="postulantIdParam">
+                    <subreportParameterExpression><![CDATA[$F{postulant.id}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{HOURAVAILABLESUBREPORT}]]></subreportExpression>
+            </subreport>
+        </band>
+    </detail>
+    <columnFooter>
+        <band/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="0" width="562"
+                               height="12"/>
+                <box padding="0">
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                   width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="470" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="510" y="0"
+                                   width="10" height="12"/>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band/>
+    </summary>
+</jasperReport>

@@ -1,0 +1,170 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:c="http://java.sun.com/jstl/core"
+              xmlns:rich="http://richfaces.org/rich"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              id="purchaseOrderDetailFieldset"
+              title="#{messages['PurchaseOrderDetailPart.fieldset.title']}">
+    <a4j:region>
+        <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%" columns="1">
+            <h:panelGrid border="0" cellpadding="0" cellspacing="0" columnClasses="right" width="100%">
+                <a4j:commandLink title="#{messages['Common.add']}"
+                                 action="#{purchaseOrderDetailPartAction.add}"
+                                 reRender="purchaseOrderDetailPartPartOptionPanel"
+                                 rendered="#{purchaseOrderDetailPartAction.enabledOptions}">
+                    <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </h:panelGrid>
+
+            <s:div id="purchaseOrderDetailPartPartOptionPanel">
+                <rich:dataTable value="#{purchaseOrderDetailPartAction.instances}"
+                                var="instance"
+                                border="0"
+                                cellpadding="0"
+                                cellspacing="0"
+                                width="100%"
+                                columnsWidth="10%, 35%, 20%, 15%, 15%, 5%">
+                    <rich:column styleClass="right">
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.number']}
+                        </f:facet>
+                        <h:outputText value="#{instance.number}"/>
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.description']}
+                        </f:facet>
+                        <c:choose>
+                            <c:when test="#{purchaseOrderDetailPartAction.enabledOptions}">
+                                <s:decorate template="/include/inputField.xhtml"
+                                            styleClass="formRow">
+                                    <ui:param name="showLabel" value="false"/>
+                                    <ui:param name="vertical" value="true"/>
+                                    <h:inputText value="#{instance.description}"
+                                                 styleClass="input"
+                                                 style="width:90%;"
+                                                 required="true"
+                                                 maxlength="250"
+                                                 tabindex="#{purchaseOrderDetailPartAction.nextIndex}"/>
+                                </s:decorate>
+                            </c:when>
+                            <c:otherwise>
+                                <h:outputText value="#{instance.description}"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.measureUnit']}
+                        </f:facet>
+                        <c:choose>
+                            <c:when test="#{purchaseOrderDetailPartAction.enabledOptions}">
+                                <s:decorate id="measureUnitField"
+                                            template="/include/inputField.xhtml"
+                                            styleClass="formRow"
+                                            style="width:94%;">
+                                    <ui:param name="showLabel" value="false"/>
+                                    <ui:param name="vertical" value="true"/>
+                                    <app:quickSearch id="quickSearchMeasureUnit"
+                                                     textValue="instance.measureUnit.measureUnitCode"
+                                                     value="#{instance.measureUnit}"
+                                                     searchField="measureUnitCode"
+                                                     reRender="measureUnitField"
+                                                     tabindex="#{purchaseOrderDetailPartAction.nextIndex}"/>
+                                    <h:selectOneMenu id="measureUnit"
+                                                     value="#{instance.measureUnit}"
+                                                     styleClass="inputSmall"
+                                                     required="true">
+                                        <s:selectItems value="#{measureUnitList}"
+                                                       var="element"
+                                                       label="#{element.fullName}"
+                                                       noSelectionLabel=""
+                                                       hideNoSelectionLabel="false"/>
+                                        <s:convertEntity/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </c:when>
+                            <c:otherwise>
+                                <h:outputText value="#{instance.measureUnit.description}"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.unitPrice']}
+                        </f:facet>
+                        <c:choose>
+                            <c:when test="#{purchaseOrderDetailPartAction.enabledOptions}">
+                                <s:decorate template="/include/inputField.xhtml"
+                                            styleClass="formRow">
+                                    <ui:param name="showLabel" value="false"/>
+                                    <ui:param name="vertical" value="true"/>
+                                    <h:inputText id="unitPriceId"
+                                                 value="#{instance.unitPrice}"
+                                                 styleClass="inputNumberSmall"
+                                                 required="true"
+                                                 tabindex="#{purchaseOrderDetailPartAction.nextIndex}">
+                                        <f:validateDoubleRange minimum="0.01"/>
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="unitPriceId"/>
+                                    </h:inputText>
+                                    &#160;
+                                    <h:outputText value="#{messages['Currency.Bs']}"/>
+                                </s:decorate>
+                            </c:when>
+                            <c:otherwise>
+                                <h:outputText value="#{instance.unitPrice}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                                &#160;
+                                <h:outputText value="#{messages['Currency.Bs']}"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.totalPrice']}
+                        </f:facet>
+                        <h:outputText value="#{instance.totalPrice}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <c:if test="#{not empty instance.totalPrice}">
+                            &#160;
+                            <h:outputText value="#{messages['Currency.Bs']}"/>
+                        </c:if>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <a4j:commandLink immediate="true"
+                                         title="#{messages['Common.remove']}"
+                                         action="#{purchaseOrderDetailPartAction.remove(instance)}"
+                                         reRender="purchaseOrderDetailPartPartOptionPanel"
+                                         rendered="#{purchaseOrderDetailPartAction.enabledOptions}">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+                <c:if test="#{purchaseOrderDetailPartAction.emptyInstanceList}">
+                    <h:panelGrid columns="1"
+                                 width="100%"
+                                 styleClass="datascroller" cellpadding="0" cellspacing="0">
+                        <h:outputText value="#{messages['PurchaseOrderDetailPart.emptyInstances']}"/>
+                    </h:panelGrid>
+                </c:if>
+
+            </s:div>
+
+            <h:panelGrid border="0" cellpadding="0" cellspacing="0" columnClasses="right" width="100%">
+                <a4j:commandLink title="#{messages['Common.add']}"
+                                 action="#{purchaseOrderDetailPartAction.add}"
+                                 reRender="purchaseOrderDetailPartPartOptionPanel"
+                                 rendered="#{purchaseOrderDetailPartAction.enabledOptions}">
+                    <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </h:panelGrid>
+        </h:panelGrid>
+    </a4j:region>
+</app:fieldset>

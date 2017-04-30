@@ -1,0 +1,335 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{pollCopyAction.managed}">
+            #{messages['PollCopy.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PollCopy.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="pollCopyForm">
+
+<div class="buttons">
+    <h:commandButton action="#{pollCopyAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!pollCopyAction.managed and s:hasPermission('POLLCOPY','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollCopyAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!pollCopyAction.managed and s:hasPermission('POLLCOPY','CREATE')}"/>
+
+    <h:commandButton action="#{pollCopyAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{pollCopyAction.managed and s:hasPermission('POLLCOPY','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{pollCopyAction.managed and s:hasPermission('POLLCOPY','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollCopyAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="pollCopyPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{pollCopyAction.managed}">
+                #{messages['PollCopy.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['PollCopy.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <app:fieldset id="pollFormDetailFielset" title="#{messages['PollForm.detail']}">
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.code']}</ui:define>
+                <h:outputText id="code" value="#{pollCopy.pollForm.code}"/>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.description']}</ui:define>
+                <h:outputText id="description" value="#{pollCopy.pollForm.description}"/>
+            </s:decorate>
+
+            <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.title']}</ui:define>
+                <h:outputText id="title" value="#{pollCopy.pollForm.title}"/>
+            </s:decorate>
+
+            <s:decorate id="subTitleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.subTitle']}</ui:define>
+                <h:outputText id="subTitle" value="#{pollCopy.pollForm.subTitle}"/>
+            </s:decorate>
+        </app:fieldset>
+
+        <app:fieldset id="pollCopyDetailFielset" title="#{messages['PollCopy.detail']}">
+
+            <s:decorate id="revisionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.revisionDate']}</ui:define>
+                <rich:calendar value="#{pollCopy.revisionDate}" styleClass="input"
+                               datePattern="#{messages['patterns.date']}" required="true"/>
+            </s:decorate>
+
+            <s:decorate id="revisionNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollCopy.revisionNumber']}</ui:define>
+                <h:inputText id="revisionNumber" value="#{pollCopy.revisionNumber}" styleClass="input"
+                             required="true" maxlength="10" tabindex="1">
+                    <f:validateLongRange minimum="1" maximum="9999999999"/>
+                    <f:validateLength maximum="10"/>
+                    <a4j:support event="onblur" reRender="revisionNumberField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{pollFormAction.isVisible(pollCopy.pollForm.cycleRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.cycle']}</ui:define>
+                <h:selectOneMenu id="cycle" value="#{pollCopy.cycle}" styleClass="input" tabindex="2"
+                                 required="#{pollFormAction.isRequired(pollCopy.pollForm.cycleRestriction)}">
+                    <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="academicPeriodField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{pollFormAction.isVisible(pollCopy.pollForm.academicPeriodRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.academicPeriod']}</ui:define>
+                <h:selectOneMenu id="academicPeriod" value="#{pollCopy.academicPeriod}" styleClass="input" tabindex="3"
+                                 required="#{pollFormAction.isRequired(pollCopy.pollForm.academicPeriodRestriction)}">
+                    <s:selectItems value="#{academicPeriodList}" var="academicPeriod" label="#{academicPeriod.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="locationField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{pollFormAction.isVisible(pollCopy.pollForm.gruppingRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.location']}</ui:define>
+                <h:selectOneMenu id="location" value="#{pollCopyAction.location}" styleClass="input" tabindex="4">
+                    <s:selectItems value="#{pollCopyAction.locationList}" var="location" label="#{location.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="facultyField, careerField, subjectField"
+                                 action="#{pollCopyAction.refleshLocation}" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="facultyField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{(pollFormAction.isCareerGrouppingType(pollCopy.pollForm.pollFormGrouppingType) or pollFormAction.isSubjectGrouppingType(pollCopy.pollForm.pollFormGrouppingType) or pollFormAction.isFacultyGrouppingType(pollCopy.pollForm.pollFormGrouppingType)) and pollFormAction.isVisible(pollCopy.pollForm.gruppingRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.faculty']}</ui:define>
+                <h:selectOneMenu id="faculty" value="#{pollCopyAction.faculty}" styleClass="input" tabindex="5"
+                                 required="#{pollFormAction.isFacultyGrouppingType(pollCopy.pollForm.pollFormGrouppingType) and pollFormAction.isRequired(pollCopy.pollForm.gruppingRestriction)}">
+                    <s:selectItems value="#{pollCopyAction.facultyList}" var="faculty" label="#{faculty.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="careerField, subjectField"
+                                 action="#{pollCopyAction.refleshFaculty}" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="careerField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{(pollFormAction.isCareerGrouppingType(pollCopy.pollForm.pollFormGrouppingType) or pollFormAction.isSubjectGrouppingType(pollCopy.pollForm.pollFormGrouppingType)) and pollFormAction.isVisible(pollCopy.pollForm.gruppingRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.career']}</ui:define>
+                <h:selectOneMenu id="career" value="#{pollCopyAction.career}" styleClass="input" tabindex="6"
+                                 required="#{pollFormAction.isCareerGrouppingType(pollCopy.pollForm.pollFormGrouppingType) and pollFormAction.isRequired(pollCopy.pollForm.gruppingRestriction)}">
+                    <s:selectItems value="#{pollCopyAction.careerList}" var="career" label="#{career.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" reRender="subjectField"
+                                 action="#{pollCopyAction.refleshCareer}" ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="subjectField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{pollFormAction.isSubjectGrouppingType(pollCopy.pollForm.pollFormGrouppingType) and pollFormAction.isVisible(pollCopy.pollForm.gruppingRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.subject']}</ui:define>
+                <h:selectOneMenu id="subject" value="#{pollCopyAction.subject}" styleClass="input" tabindex="7"
+                                 required="#{pollFormAction.isSubjectGrouppingType(pollCopy.pollForm.pollFormGrouppingType) and pollFormAction.isRequired(pollCopy.pollForm.gruppingRestriction)}">
+                    <s:selectItems value="#{pollCopyAction.subjectList}" var="subject" label="#{subject.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow"
+                        rendered="#{pollFormAction.isVisible(pollCopy.pollForm.personRestriction)}">
+                <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
+
+                <app:selectPopUp id="person"
+                                 required="#{pollFormAction.isRequired(pollCopy.pollForm.personRestriction)}"
+                                 textValue="#{pollCopyAction.personFullName}"
+                                 value="#{pollCopy.person}"
+                                 clearAction="pollCopyAction.clearPerson()"
+                                 searchModalPanel="personListModalPanel"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 reRender="personField"
+                                 readOnly="#{not pollFormAction.isVisible(pollCopy.pollForm.personRestriction)}"
+                                 renderedSelectLink="#{pollFormAction.isVisible(pollCopy.pollForm.personRestriction)}"
+                                 renderedClearLink="#{pollFormAction.isVisible(pollCopy.pollForm.personRestriction)}"
+                                 hotKeySelect="alt+1"
+                                 tabindex="23"/>
+            </s:decorate>
+        </app:fieldset>
+    </h:panelGrid>
+</rich:panel>
+
+<c:set var="evaluationCriteriaList" value="#{pollCopyAction.evaluationCriteriaList}"/>
+
+<rich:panel rendered="#{not empty evaluationCriteriaList}">
+    <f:facet name="header">
+        #{messages['PollCopy.evaluationCriterias']}
+    </f:facet>
+    <c:forEach items="#{evaluationCriteriaList}" var="evaluationCriteria">
+        <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{evaluationCriteria.name}</ui:define>
+            <app:dataTable cellspacing="0" cellpadding="0" border="0" width="100%"
+                           id="horizontalDataTable#{evaluationCriteria.id}"
+                           value="#{evaluationCriteria.evaluationCriteriaValueList}" var="ecValue"
+                           layout="horizontal">
+                <h:outputText value="#{ecValue.sequence} : #{ecValue.title}"/>
+            </app:dataTable>
+        </s:decorate>
+    </c:forEach>
+</rich:panel>
+
+<c:forEach items="#{pollCopy.pollForm.sectionList}" var="section">
+    <c:if test="#{not empty section.questionList}">
+        <rich:panel id="selctionPanel#{section.sequence}">
+            <f:facet name="header">
+                #{section.fullName}
+            </f:facet>
+            <rich:dataTable value="#{section.questionList}" var="questionItem"
+                            id="questionListForSection#{section.sequence}"
+                            width="100%" columnClasses="width5percent,width65percent,width30percent">
+                <rich:column>
+                    <h:outputText value="#{questionItem.sequence}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{questionItem.content}"/>
+                </rich:column>
+                <rich:column>
+                    <s:decorate id="question#{questionItem.sequence}Field" template="/include/validateField.xhtml"
+                                styleClass="formRow">
+                        <h:selectOneRadio id="question#{questionItem.sequence}"
+                                          value="#{pollCopyAction.evaluationCriteriaValueResult[questionItem]}"
+                                          styleClass="input" tabindex="2" required="true">
+                            <s:selectItems
+                                    value="#{questionItem.evaluationCriteria.evaluationCriteriaValueList}"
+                                    var="eCValue" label="#{eCValue.sequence}"/>
+                            <s:convertEntity/>
+                        </h:selectOneRadio>
+                    </s:decorate>
+                </rich:column>
+            </rich:dataTable>
+        </rich:panel>
+    </c:if>
+</c:forEach>
+
+<div class="buttons">
+    <h:commandButton action="#{pollCopyAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!pollCopyAction.managed and s:hasPermission('POLLCOPY','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollCopyAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!pollCopyAction.managed and s:hasPermission('POLLCOPY','CREATE')}"/>
+
+    <h:commandButton action="#{pollCopyAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{pollCopyAction.managed and s:hasPermission('POLLCOPY','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{pollCopyAction.managed and s:hasPermission('POLLCOPY','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollCopyAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{pollCopyAction.managed and s:hasPermission('POLLCOPY','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['PollCopy.delete.confirmation']}">
+                <f:param value="#{pollCopy.pollForm.code}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{pollCopyAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<!--
+
+<s:decorate id="personListModalPanelContainer" template="/employees/personListModalPanel.xhtml"
+            rendered="#{pollFormAction.isVisible(pollCopy.pollForm.personRestriction)}">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action=""
+                           image="/img/active.gif" style="border:0" ajaxSingle="true" reRender="personField"/>
+        <rich:componentControl for="personListModalPanel" attachTo="assignButton" operation="hide"
+                               event="onclick"/>
+    </ui:define>
+</s:decorate>
+-->
+
+
+<s:decorate id="personListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="personListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{pollCopyAction.assignPerson(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="personField"
+                           focus="selectPetitioner"
+                           oncomplete="Richfaces.hideModalPanel('personListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#code" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

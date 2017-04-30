@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['SummaryPayrollByPaymentMethod.report']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="pollFormSearch">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['SummaryPayrollByPaymentMethod.report']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate id="summaryReportTitleField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['SummaryPayrollByPaymentMethod.summaryReportTitle']}</ui:define>
+                        <h:inputText id="summaryReportTitle"
+                                     value="#{summaryPayrollByPaymentMethodReportAction.summaryReportTitle}"
+                                     styleClass="input"
+                                     maxlength="250"
+                                     required="true"
+                                     tabindex="1"/>
+                    </s:decorate>
+                    <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                        <h:selectOneMenu id="gestion"
+                                         value="#{summaryPayrollByPaymentMethodReportAction.gestion}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="2">
+                            <s:selectItems value="#{gestionList}" var="gestion"
+                                           label="#{gestion.year}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange"
+                                         action="#{summaryPayrollByPaymentMethodReportAction.cleanGestionList}"
+                                         reRender="gestionField, gestionPayrollListField" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="gestionTitleField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['SummaryPayrollByPaymentMethod.gestionTitle']}</ui:define>
+                        <h:inputText id="gestionTitle"
+                                     value="#{summaryPayrollByPaymentMethodReportAction.gestionTitle}"
+                                     styleClass="input"
+                                     maxlength="250"
+                                     required="true"
+                                     tabindex="2"/>
+                    </s:decorate>
+
+                    <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Month.month']}</ui:define>
+                        <h:selectOneMenu id="month"
+                                         value="#{summaryPayrollByPaymentMethodReportAction.month}"
+                                         styleClass="input" required="true">
+                            <s:selectItems value="#{monthEnum}" var="month"
+                                           label="#{messages[month.resourceKey]}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                            <a4j:support event="onchange"
+                                         action="#{summaryPayrollByPaymentMethodReportAction.cleanGestionList}"
+                                         reRender="monthField, gestionPayrollListField" ajaxSingle="true"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+
+                    <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Job.sector']}</ui:define>
+                        <h:selectOneMenu id="sector"
+                                         value="#{summaryPayrollByPaymentMethodReportAction.sector}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="3">
+                            <s:selectItems value="#{sectorList}"
+                                           var="sector"
+                                           label="#{sector.name}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange"
+                                         action="#{summaryPayrollByPaymentMethodReportAction.cleanGestionList}"
+                                         reRender="sectorField,gestionPayrollListField" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="gestionPayrollListField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['SummaryPayrollByPaymentMethod.gestionPayrollList']}</ui:define>
+                        <h:selectManyCheckbox id="gestionPayrollList"
+                                              value="#{summaryPayrollByPaymentMethodReportAction.gestionPayrollList}"
+                                              styleClass="panel-border panel-select-multiple"
+                                              layout="pageDirection"
+                                              required="true"
+                                              tabindex="6"
+                                              disabled="#{empty summaryPayrollByPaymentMethodReportAction.sector
+                                              or empty summaryPayrollByPaymentMethodReportAction.gestion
+                                              or empty summaryPayrollByPaymentMethodReportAction.month}">
+                            <s:selectItems value="#{gestionPayrollFilteredList}" var="gestionPayroll"
+                                           label="#{gestionPayroll.gestionName}"/>
+                            <a4j:support event="onchange"
+                                         reRender="gestionPayrollListField" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectManyCheckbox>
+                    </s:decorate>
+
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{summaryPayrollByPaymentMethodReportAction}" showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{summaryPayrollByPaymentMethodReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

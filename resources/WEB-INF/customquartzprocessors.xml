@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.6.0_23" class="java.beans.XMLDecoder">
+    <object class="com.encens.khipus.initialize.CustomQuartzProcessorSetting">
+        <void property="customQuartzProcessorMap">
+            <object class="java.util.HashMap">
+                <void method="put">
+                    <string>markProcessorService</string>
+                    <object class="com.encens.khipus.initialize.CustomQuartzProcessor">
+                        <void property="customQuartzProcessorType">
+                            <object class="com.encens.khipus.initialize.CustomQuartzProcessorType" method="valueOf">
+                                <string>INTERVAL_CRON</string>
+                            </object>
+                        </void>
+                        <void property="intervalCron">
+                            <string>0 00 18 * * ?</string>
+                        </void>
+                        <void property="serviceSeamName">
+                            <string>markProcessorService</string>
+                        </void>
+                    </object>
+                </void>
+            </object>
+        </void>
+    </object>
+</java>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<integrations xmlns="http://encens.com/products/khipus/integrations"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://encens.com/products/khipus/integrations http://encens.com/products/khipus/migrations/datamigration-1.0.xsd"
+              timer-interval="120000"
+              local-data-source="java:/khipusDatasource">
+
+    <integration application-id="WISE"
+                 service-seam-name="wiseIntegrationService"
+                 data-source="java:/sisDatasource">
+        <sourceTable db-table-name="HR_KHIPUS" alias="wiseSourceTable" db-schema-name="SISDEV">
+            <column db-column-name="UNIDAD_ACAD_ADM" alias="UNIDAD_ACAD_ADM"/>
+            <column db-column-name="SIGLA" alias="SIGLA"/>
+            <column db-column-name="DESCRIPCION_UND" alias="DESCRIPCION_UND"/>
+            <column db-column-name="HORARIO" alias="HORARIO"/>
+            <column db-column-name="EMPLEADO" alias="EMPLEADO"/>
+            <column db-column-name="DOCUMENTO" alias="DOCUMENTO"/>
+            <column db-column-name="TIPO_DOCUMENTO" alias="TIPO_DOCUMENTO"/>
+            <column db-column-name="APELLIDO_PATERNO" alias="APELLIDO_PATERNO"/>
+            <column db-column-name="APELLIDO_MATERNO" alias="APELLIDO_MATERNO"/>
+            <column db-column-name="NOMBRES" alias="NOMBRES"/>
+            <column db-column-name="SEXO" alias="SEXO"/>
+            <column db-column-name="UNIDAD" alias="UNIDAD"/>
+            <column db-column-name="SIGLA_U" alias="SIGLA_U"/>
+            <column db-column-name="DESCRIPCION_U" alias="DESCRIPCION_U"/>
+            <column db-column-name="PLAN_ESTUDIO" alias="PLAN_ESTUDIO"/>
+            <column db-column-name="DESC_PLAN" alias="DESC_PLAN"/>
+            <column db-column-name="ASIGNATURA" alias="ASIGNATURA"/>
+            <column db-column-name="NOMBRE" alias="NOMBRE"/>
+            <column db-column-name="SIGLA_AS" alias="SIGLA_AS"/>
+            <column db-column-name="CUOTA" alias="CUOTA"/>
+            <column db-column-name="CARGA_HORARIA" alias="CARGA_HORARIA"/>
+            <column db-column-name="CARGA_HTEORICA" alias="CARGA_HTEORICA"/>
+            <column db-column-name="CARGA_HPRACTICA" alias="CARGA_HPRACTICA"/>
+            <column db-column-name="GRUPO_ASIGNATURA" alias="GRUPO_ASIGNATURA"/>
+            <column db-column-name="TIPO_GRUPO" alias="TIPO_GRUPO"/>
+            <column db-column-name="TIEMPO_PERIODO_HORA" alias="TIEMPO_PERIODO_HORA"/>
+            <column db-column-name="DIA" alias="DIA"/>
+            <column db-column-name="HORA_PERIODO_INICIAL" alias="HORA_PERIODO_INICIAL"/>
+            <column db-column-name="HORA_PERIODO_FINAL" alias="HORA_PERIODO_FINAL"/>
+            <column db-column-name="DURACION" alias="DURACION"/>
+            <column db-column-name="FECHA_INICIO_HR" alias="FECHA_INICIO_HR" data-type="TIMESTAMP"/>
+            <column db-column-name="FECHA_FIN_HR" alias="FECHA_FIN_HR" data-type="TIMESTAMP"/>
+            <column db-column-name="ACTIVO_HR" alias="ACTIVO_HR"/>
+            <column db-column-name="FECHA_BAJA" alias="FECHA_BAJA" data-type="TIMESTAMP"/>
+            <column db-column-name="COMPARTIDO" alias="COMPARTIDO"/>
+            <column db-column-name="CICLO_HORARIO" alias="CICLO_HORARIO"/>
+            <column db-column-name="TIPO_CICLO" alias="TIPO_CICLO"/>
+            <column db-column-name="DESC_CHRRO" alias="DESC_CHRRO"/>
+            <column db-column-name="FECHA_INI_CICLO_HR" alias="FECHA_INI_CICLO_HR" data-type="TIMESTAMP"/>
+            <column db-column-name="FECHA_FIN_CICLO_HR" alias="FECHA_FIN_CICLO_HR" data-type="TIMESTAMP"/>
+            <column db-column-name="TIPO_CICLO_PADRE" alias="TIPO_CICLO_PADRE"/>
+            <column db-column-name="GESTION" alias="GESTION"/>
+            <column db-column-name="PERIODO" alias="PERIODO"/>
+            <column db-column-name="NOMBRE_P" alias="NOMBRE_P"/>
+            <column db-column-name="SIGLA_P" alias="SIGLA_P"/>
+            <column db-column-name="TIPO_HORA" alias="TIPO_HORA"/>
+            <column db-column-name="FECHA_REGISTRO" alias="FECHA_REGISTRO" data-type="TIMESTAMP"/>
+            <column db-column-name="ID_HR" alias="ID_HR" is-primary-key="true"/>
+            <column db-column-name="COSTO_REAL" alias="COSTO_REAL" data-type="DECIMAL"/>
+            <column db-column-name="TIPO_CONTRATO" alias="TIPO_CONTRATO"/>
+            <column db-column-name="DOMICILIO" alias="DOMICILIO"/>
+            <column db-column-name="ESTADO_CIVIL" alias="ESTADO_CIVIL"/>
+            <column db-column-name="EDIFICIO" alias="EDIFICIO"/>
+            <column db-column-name="AMBIENTE" alias="AMBIENTE"/>
+        </sourceTable>
+
+        <targetTable db-table-name="HRKHIPUS" alias="wiseTargetTable" db-schema-name="KHIPUSDEV">
+            <mappedColumn db-column-name="UNIDAD_ACAD_ADM" alias="UNIDAD_ACAD_ADM"
+                          source-column-alias="UNIDAD_ACAD_ADM"/>
+            <mappedColumn db-column-name="SIGLA" alias="SIGLA" source-column-alias="SIGLA"/>
+            <mappedColumn db-column-name="DESCRIPCION_UND" alias="DESCRIPCION_UND"
+                          source-column-alias="DESCRIPCION_UND"/>
+            <mappedColumn db-column-name="HORARIO" alias="HORARIO" source-column-alias="HORARIO"/>
+            <mappedColumn db-column-name="EMPLEADO" alias="EMPLEADO" source-column-alias="EMPLEADO"/>
+            <mappedColumn db-column-name="DOCUMENTO" alias="DOCUMENTO" source-column-alias="DOCUMENTO"/>
+            <mappedColumn db-column-name="TIPO_DOCUMENTO" alias="TIPO_DOCUMENTO" source-column-alias="TIPO_DOCUMENTO"/>
+            <mappedColumn db-column-name="APELLIDO_PATERNO" alias="APELLIDO_PATERNO"
+                          source-column-alias="APELLIDO_PATERNO"/>
+            <mappedColumn db-column-name="APELLIDO_MATERNO" alias="APELLIDO_MATERNO"
+                          source-column-alias="APELLIDO_MATERNO"/>
+            <mappedColumn db-column-name="NOMBRES" alias="NOMBRES" source-column-alias="NOMBRES"/>
+            <mappedColumn db-column-name="SEXO" alias="SEXO" source-column-alias="SEXO"/>
+            <mappedColumn db-column-name="UNIDAD" alias="UNIDAD" source-column-alias="UNIDAD"/>
+            <mappedColumn db-column-name="SIGLA_U" alias="SIGLA_U" source-column-alias="SIGLA_U"/>
+            <mappedColumn db-column-name="DESCRIPCION_U" alias="DESCRIPCION_U" source-column-alias="DESCRIPCION_U"/>
+            <mappedColumn db-column-name="PLAN_ESTUDIO" alias="PLAN_ESTUDIO" source-column-alias="PLAN_ESTUDIO"/>
+            <mappedColumn db-column-name="DESC_PLAN" alias="DESC_PLAN" source-column-alias="DESC_PLAN"/>
+            <mappedColumn db-column-name="ASIGNATURA" alias="ASIGNATURA" source-column-alias="ASIGNATURA"/>
+            <mappedColumn db-column-name="NOMBRE" alias="NOMBRE" source-column-alias="NOMBRE"/>
+            <mappedColumn db-column-name="SIGLA_AS" alias="SIGLA_AS" source-column-alias="SIGLA_AS"/>
+            <mappedColumn db-column-name="CUOTA" alias="CUOTA" source-column-alias="CUOTA"/>
+            <mappedColumn db-column-name="CARGA_HORARIA" alias="CARGA_HORARIA" source-column-alias="CARGA_HORARIA"/>
+            <mappedColumn db-column-name="CARGA_HTEORICA" alias="CARGA_HTEORICA" source-column-alias="CARGA_HTEORICA"/>
+            <mappedColumn db-column-name="CARGA_HPRACTICA" alias="CARGA_HPRACTICA"
+                          source-column-alias="CARGA_HPRACTICA"/>
+            <mappedColumn db-column-name="GRUPO_ASIGNATURA" alias="GRUPO_ASIGNATURA"
+                          source-column-alias="GRUPO_ASIGNATURA"/>
+            <mappedColumn db-column-name="TIPO_GRUPO" alias="TIPO_GRUPO" source-column-alias="TIPO_GRUPO"/>
+            <mappedColumn db-column-name="TIEMPO_PERIODO_HORA" alias="TIEMPO_PERIODO_HORA"
+                          source-column-alias="TIEMPO_PERIODO_HORA"/>
+            <mappedColumn db-column-name="DIA" alias="DIA" source-column-alias="DIA"/>
+            <mappedColumn db-column-name="HORA_PERIODO_INICIAL" alias="HORA_PERIODO_INICIAL"
+                          source-column-alias="HORA_PERIODO_INICIAL"/>
+            <mappedColumn db-column-name="HORA_PERIODO_FINAL" alias="HORA_PERIODO_FINAL"
+                          source-column-alias="HORA_PERIODO_FINAL"/>
+            <mappedColumn db-column-name="DURACION" alias="DURACION" source-column-alias="DURACION"/>
+            <mappedColumn db-column-name="FECHA_INICIO_HR" alias="FECHA_INICIO_HR" source-column-alias="FECHA_INICIO_HR"
+                          data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="FECHA_FIN_HR" alias="FECHA_FIN_HR" source-column-alias="FECHA_FIN_HR"
+                          data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="ACTIVO_HR" alias="ACTIVO_HR" source-column-alias="ACTIVO_HR"/>
+            <mappedColumn db-column-name="FECHA_BAJA" alias="FECHA_BAJA" source-column-alias="FECHA_BAJA"
+                          data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="COMPARTIDO" alias="COMPARTIDO" source-column-alias="COMPARTIDO"/>
+            <mappedColumn db-column-name="CICLO_HORARIO" alias="CICLO_HORARIO" source-column-alias="CICLO_HORARIO"/>
+            <mappedColumn db-column-name="TIPO_CICLO" alias="TIPO_CICLO" source-column-alias="TIPO_CICLO"/>
+            <mappedColumn db-column-name="DESC_CHRRO" alias="DESC_CHRRO" source-column-alias="DESC_CHRRO"/>
+            <mappedColumn db-column-name="FECHA_INI_CICLO_HR" alias="FECHA_INI_CICLO_HR"
+                          source-column-alias="FECHA_INI_CICLO_HR" data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="FECHA_FIN_CICLO_HR" alias="FECHA_FIN_CICLO_HR"
+                          source-column-alias="FECHA_FIN_CICLO_HR" data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="TIPO_CICLO_PADRE" alias="TIPO_CICLO_PADRE"
+                          source-column-alias="TIPO_CICLO_PADRE"/>
+            <mappedColumn db-column-name="GESTION" alias="GESTION" source-column-alias="GESTION"/>
+            <mappedColumn db-column-name="PERIODO" alias="PERIODO" source-column-alias="PERIODO"/>
+            <mappedColumn db-column-name="NOMBRE_P" alias="NOMBRE_P" source-column-alias="NOMBRE_P"/>
+            <mappedColumn db-column-name="SIGLA_P" alias="SIGLA_P" source-column-alias="SIGLA_P"/>
+            <mappedColumn db-column-name="TIPO_HORA" alias="TIPO_HORA" source-column-alias="TIPO_HORA"/>
+            <mappedColumn db-column-name="FECHA_REGISTRO" alias="FECHA_REGISTRO" source-column-alias="FECHA_REGISTRO"
+                          data-type="TIMESTAMP"/>
+            <mappedColumn db-column-name="ID_HR" alias="ID_HR" source-column-alias="ID_HR" is-primary-key="true"/>
+            <mappedColumn db-column-name="COSTO_REAL" alias="COSTO_REAL" source-column-alias="COSTO_REAL"
+                          data-type="DECIMAL"/>
+            <mappedColumn db-column-name="TIPO_CONTRATO" alias="TIPO_CONTRATO" source-column-alias="TIPO_CONTRATO"/>
+            <mappedColumn db-column-name="DOMICILIO" alias="DOMICILIO" source-column-alias="DOMICILIO"/>
+            <mappedColumn db-column-name="ESTADO_CIVIL" alias="ESTADO_CIVIL" source-column-alias="ESTADO_CIVIL"/>
+            <mappedColumn db-column-name="EDIFICIO" alias="EDIFICIO" source-column-alias="EDIFICIO"/>
+            <mappedColumn db-column-name="AMBIENTE" alias="AMBIENTE" source-column-alias="AMBIENTE"/>
+        </targetTable>
+    </integration>
+
+</integrations>

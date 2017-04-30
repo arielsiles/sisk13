@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+
+    <factory name="branchList" value="#{branchQuery}"/>
+    <framework:entity-query name="branchQuery"
+                            ejbql="select branch from Branch branch"/>
+
+    <factory name="cashboxAccountList" value="#{cashboxAccountQuery}"/>
+    <framework:entity-query name="cashboxAccountQuery"
+                            ejbql="select account from CashboxAccount account">
+        <framework:restrictions>
+            <value>account.id in (#{debtByStudentFiltersAction.accountIds})</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="entryList" value="#{entryQuery}"/>
+    <framework:entity-query name="entryQuery"
+                            ejbql="select entry from Entry entry"/>
+
+    <factory name="categoryList" value="#{categoryQuery}"/>
+    <framework:entity-query name="categoryQuery"
+                            ejbql="select category from Category category"/>
+</components>

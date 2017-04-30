@@ -1,0 +1,187 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.rotatoryFundByAccount.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="rotatoryFundByAccountReport">
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.rotatoryFundByAccount.title']}
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RotatoryFund.code']}</ui:define>
+                    <h:inputText id="code"
+                                 value="#{rotatoryFundByAccountReportAction.code}"
+                                 styleClass="inputNumber"
+                                 tabindex="1">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAsset.executorUnit']}</ui:define>
+                    <h:selectOneMenu id="executorUnit"
+                                     value="#{rotatoryFundByAccountReportAction.executorUnitCode}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       itemValue="#{businessUnit.executorUnitCode}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAsset.costCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="rotatoryFundByAccountReportAction.costCenter.code"
+                                     value="#{rotatoryFundByAccountReportAction.costCenter}"
+                                     searchField="code"
+                                     reRender="costCenterField"
+                                     tabindex="3"/>
+                    <app:selectPopUp id="costCenter"
+                                     textValue="#{rotatoryFundByAccountReportAction.costCenter.fullName}"
+                                     value="#{rotatoryFundByAccountReportAction.costCenter}"
+                                     clearAction="rotatoryFundByAccountReportAction.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+                <s:decorate id="cashAccountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['SpendDistribution.cashAccount']}</ui:define>
+                    <app:quickSearch id="quickCashAccount"
+                                     textValue="rotatoryFundByAccountReportAction.cashAccount.accountCode"
+                                     value="#{rotatoryFundByAccountReportAction.cashAccount}"
+                                     searchField="accountCode"
+                                     reRender="cashAccountField"
+                                     tabindex="4"/>
+                    <app:selectPopUp id="cashAccount"
+                                     textValue="#{rotatoryFundByAccountReportAction.cashAccount.description}"
+                                     value="#{rotatoryFundByAccountReportAction.cashAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="rotatoryFundByAccountReportAction.clearCashAccount()"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     reRender="cashAccountField"
+                                     hotKeySelect="alt+2"
+                                     tabindex="4">
+                    </app:selectPopUp>
+                </s:decorate>
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.rotatoryFundByAccount.employee']}</ui:define>
+                    <app:quickSearch id="quickSearchEmployee"
+                                     textValue="rotatoryFundByAccountReportAction.employee.idNumber"
+                                     value="#{rotatoryFundByAccountReportAction.employee}"
+                                     searchField="idNumber"
+                                     reRender="employeeField"
+                                     tabindex="5"/>
+                    <app:selectPopUp id="employee"
+                                     textValue="#{rotatoryFundByAccountReportAction.employee.fullName}"
+                                     value="#{rotatoryFundByAccountReportAction.employee}"
+                                     dataModel="#{generalEmployeeDataModel}"
+                                     clearAction="rotatoryFundByAccountReportAction.clearEmployee()"
+                                     searchModalPanel="generalEmployeeListModalPanel"
+                                     reRender="employeeField"
+                                     hotKeySelect="alt+3"/>
+                </s:decorate>
+                <s:div>
+                    <div id="datesContainer">
+                        <s:decorate id="initRevisionDateField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['RotatoryFund.date']}</ui:define>
+                            <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+                            <rich:calendar id="initDateField"
+                                           value="#{rotatoryFundByAccountReportAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                            <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+                            <rich:calendar id="endDateField"
+                                           value="#{rotatoryFundByAccountReportAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                                <app:dateRangeValidator forId="initDateField"
+                                                        forLabel="#{messages['GeneralValuedEvolutionReport.report.movementDate']}"
+                                                        type="greater"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </div>
+                </s:div>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{rotatoryFundByAccountReportAction}" showPageFormat="false"
+                                      tabIndex="15"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{rotatoryFundByAccountReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+        <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{rotatoryFundByAccountReportAction.setCostCenter(costCenterItem)}"
+                                   image="/img/active.gif" styleClass="select-image" immediate="true"
+                                   reRender="costCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{rotatoryFundByAccountReportAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{rotatoryFundByAccountReportAction.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

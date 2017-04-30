@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/contacts/*" login-required="true"/>
+
+    <page view-id="/contacts/titleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{titleAction.select(titleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/title.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/title.xhtml" no-conversation-view-id="/contacts/titleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/titleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/salutationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salutationAction.select(salutationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/salutation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/salutation.xhtml" no-conversation-view-id="/contacts/salutationList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/salutationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/maritalStatusList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{maritalStatusAction.select(maritalStatusItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/maritalStatus.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/maritalStatus.xhtml" no-conversation-view-id="/contacts/maritalStatusList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/maritalStatusList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/cityList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cityAction.select(cityItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/city.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/city.xhtml" no-conversation-view-id="/contacts/cityList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/cityList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/zoneList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{zoneAction.select(zoneItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/zone.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/zone.xhtml" no-conversation-view-id="/contacts/zoneList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/zoneList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/countryList.xhtml">
+        <!--<rewrite pattern="/contacts/countryList/{cid}"/>
+        <rewrite pattern="/contacts/countryList"/>-->
+        <end-conversation/>
+        <navigation from-action="#{countryAction.select(countryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/country.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/country.xhtml" no-conversation-view-id="/contacts/countryList.xhtml">
+        <!--<rewrite pattern="/contacts/country/{cid}"/>
+        <rewrite pattern="/contacts/country"/>-->
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/countryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/departmentList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{departmentAction.select(departmentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/department.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/department.xhtml" no-conversation-view-id="/contacts/departmentList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/departmentList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/contacts/districtList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{districtAction.select(districtItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/district.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/district.xhtml" no-conversation-view-id="/contacts/districtList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/districtList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/streetList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{streetAction.select(streetItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/street.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/street.xhtml" no-conversation-view-id="/contacts/streetList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/streetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/templateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{templateAction.select(templateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/template.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/contacts/template.xhtml" no-conversation-view-id="/contacts/templateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/templateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/bankList.xhtml">
+        <navigation from-action="#{bankAction.select(bankItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/bank.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/bank.xhtml" no-conversation-view-id="/contacts/bankList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/bankList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/organizationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{organizationAction.select(organizationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/contacts/organization.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/contacts/organization.xhtml" no-conversation-view-id="/contacts/organizationList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/contacts/organizationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+</pages>

@@ -1,0 +1,11 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <c:if test="#{functionAction.hasSeverityErrorMessages}">
+        <div style="display:block;">
+            <h:outputText styleClass="messageError boldErrors" value="#{messages['Common.requiredFields']}"/>
+        </div>
+    </c:if>
+</ui:composition>

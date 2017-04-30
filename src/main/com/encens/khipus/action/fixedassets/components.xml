@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xmlns:ui="http://jboss.com/products/seam/ui"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+    <factory name="jobContractByLoggedUser" value="#{jobContractByLoggedUserQuery}"/>
+    <framework:entity-query name="jobContractByLoggedUserQuery"
+                            ejbql="select jc from JobContract jc">
+        <framework:restrictions>
+            <value>
+                contract.employee.id=#{currentUser.employee.id}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            jc.job.charge.name
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="fixedAssetMaintenanceReceiptStateList" value="#{fixedAssetMaintenanceReceiptStateListQuery}"/>
+    <framework:entity-query name="fixedAssetMaintenanceReceiptStateListQuery"
+                            ejbql="select maintReceiptState from FixedAssetMaintenanceReceiptState maintReceiptState"/>
+
+    <factory name="fixedAssetGroupList" value="#{fixedAssetGroupListQuery}"/>
+    <framework:entity-query name="fixedAssetGroupListQuery"
+                            ejbql="select c from FixedAssetGroup c order by c.id.groupCode asc"/>
+
+    <factory name="fixedAssetSubGroupList" value="#{fixedAssetSubGroupListQuery}"/>
+    <framework:entity-query name="fixedAssetSubGroupListQuery"
+                            ejbql="select c from FixedAssetSubGroup c">
+        <framework:restrictions>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetAction.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetDataModel.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetsReportAction.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetGroupsReportAction.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{depreciatedFixedAssetsReportAction.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetFileReportAction.fixedAssetGroup}
+            </value>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetByCustodianReportAction.fixedAssetGroup}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            c.id.fixedAssetSubGroupCode
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="purchaseOrderDetailFixedAssetSubGroupList" value="#{purchaseOrderDetailFixedAssetSubGroupQuery}"/>
+    <framework:entity-query name="purchaseOrderDetailFixedAssetSubGroupQuery"
+                            ejbql="select c from FixedAssetSubGroup c">
+        <framework:restrictions>
+            <value>
+                c.fixedAssetGroup=#{fixedAssetPurchaseOrderDetailAction.fixedAssetGroup}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            c.id.fixedAssetSubGroupCode
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="registrationTypeList" value="#{registrationTypeQuery}"/>
+    <framework:entity-query name="registrationTypeQuery"
+                            ejbql="select o from FixedAssetMovementType o">
+        <framework:restrictions>
+            <value>o.fixedAssetMovementTypeEnum =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.fixedassets.FixedAssetMovementTypeEnum', 'ALT')}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            o.description
+        </framework:order>
+    </framework:entity-query>
+    <factory name="movementTypeList" value="#{movementTypeQuery}"/>
+    <framework:entity-query name="movementTypeQuery"
+                            ejbql="select o from FixedAssetMovementType o">
+        <framework:restrictions>
+            <value>o.fixedAssetMovementTypeEnum !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.fixedassets.FixedAssetMovementTypeEnum', 'ALT')}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            o.description
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="fixedAssetMovementTypeList" value="#{fixedAssetMovementTypeQuery}"/>
+    <framework:entity-query name="fixedAssetMovementTypeQuery"
+                            ejbql="select o from FixedAssetMovementType o">
+        <framework:order>
+            o.description
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="fixedAssetLocationList" value="#{fixedAssetLocationQuery}"/>
+    <framework:entity-query name="fixedAssetLocationQuery"
+                            ejbql="select o from FixedAssetLocation o">
+        <framework:order>
+            o.name
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="purchaseOrderCauseList" value="#{purchaseOrderCauseListQuery}"/>
+    <framework:entity-query name="purchaseOrderCauseListQuery"
+                            ejbql="select o from PurchaseOrderCause o order by o.code"/>
+
+
+    <factory name="purchaseOrderCauseByCodeQuickSearch" value="#{purchaseOrderCauseByCodeQuickSearchQuery}"/>
+    <framework:entity-query name="purchaseOrderCauseByCodeQuickSearchQuery"
+                            ejbql="select o from PurchaseOrderCause o ">
+        <framework:restrictions>
+            <value>
+                o.code = #{quickSearchAction.searchValue}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="fixedAssetByBarCodeQuickSearch" value="#{fixedAssetByBarCodeQuickSearchQuery}"/>
+    <framework:entity-query name="fixedAssetByBarCodeQuickSearchQuery"
+                            ejbql="select fixedAsset from FixedAsset fixedAsset ">
+        <framework:restrictions>
+            <value>
+                fixedAsset.barCode = #{quickSearchAction.searchValue}
+            </value>
+            <value>
+                fixedAsset.id not in (#{fixedAssetVoucherAction.selectedFixedAssetIdList})
+            </value>
+            <value>
+                fixedAsset.state in (#{fixedAssetVoucherAction.stateRestrictionList})
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <!--Enumerations-->
+
+    <factory name="fixedAssetVoucherStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.fixedassets.FixedAssetVoucherState')}"/>
+
+    <factory name="fixedAssetTransferenceInventoryReportOrderEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.util.fixedassets.FixedAssetTransferenceInventoryReportOrder')}"/>
+
+    <factory name="purchaseOrderCauseTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.fixedassets.PurchaseOrderCauseType')}"/>
+
+</components>    

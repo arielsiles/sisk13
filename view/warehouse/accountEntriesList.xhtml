@@ -1,0 +1,285 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['AccountEntries.list']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="97%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="accountEntriesSearch">
+<rich:simpleTogglePanel id="accountEntriesSearchPanelId"
+                        label="#{messages['AccountEntries.search']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div id="leftSidePanel">
+            <s:decorate id="numberTransactionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define
+                        name="label">#{messages['AccountEntries.voucher.numberTransaction']}
+                </ui:define>
+                <h:inputText id="numberTransaction"
+                             value="#{accountEntriesDataModel.transactionNumber}"
+                             styleClass="input"
+                             maxlength="10"
+                             tabindex="1"/>
+            </s:decorate>
+            <!--<s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AccountEntries.voucher.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{accountEntriesDataModel.state}"
+                                 styleClass="input"
+                                 tabindex="2">
+                    <s:selectItems value="#{warehouseVoucherStates}"
+                                   var="elementState"
+                                   label="#{messages[elementState.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>-->
+            <!--<s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AccountEntries.voucher.provider']}</ui:define>
+                <app:selectPopUp id="provider"
+                                 required="false"
+                                 textValue="#{accountEntriesDataModel.provider.fullName}"
+                                 value="#{accountEntriesDataModel.provider}"
+                                 clearAction="warehousePurchaseOrderDataModel.cleanProvider()"
+                                 searchModalPanel="providerListModalPanel"
+                                 dataModel="#{providerDataModel}"
+                                 reRender="providerField"
+                                 tabindex="3">
+                    <ui:define name="dataModelStaticProperties">
+                        <f:setPropertyActionListener
+                                value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
+                                target="#{providerDataModel.financesEntityState}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </s:decorate>-->
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AccountEntries.voucher.executorUnit']}</ui:define>
+                <ui:param name="validate" value="false"/>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{voucherEntriesApproveAction.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="6" immediate="true">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AccountEntries.voucher.modules']}</ui:define>
+                <ui:param name="validate" value="false"/>
+                <h:selectOneMenu id="module"
+                                 value="#{voucherEntriesApproveAction.financesModule}"
+                                 styleClass="input"
+                                 tabindex="4" immediate="true">
+                    <s:selectItems value="#{modulesFinancesList.resultList}"
+                                   var="modulesFinance"
+                                   label="#{modulesFinance.description}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+        </s:div>
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AccountEntries.voucher.date']}</ui:define>
+                <h:panelGrid columns="4" width="100%"
+                             columnClasses="top,top,top,top">
+                    <h:outputText value="#{messages['Common.dateFrom']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="startDate"
+                                       value="#{accountEntriesDataModel.startDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                    <h:outputText value="#{messages['Common.dateTo']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="endDate"
+                                       value="#{accountEntriesDataModel.endDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </h:panelGrid>
+            </s:decorate>
+
+            <s:div id="financeUserDiv">
+                <s:decorate id="financeUserId"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['RotatoryFundDocumentType.financeUser']}</ui:define>
+
+                    <app:selectPopUp id="financeUserSelectPopup"
+                                     textValue="#{voucherEntriesApproveAction.financeUser.name}"
+                                     value="#{voucherEntriesApproveAction.financeUser}"
+                                     clearAction="voucherEntriesApproveAction.cleanFinanceUser()"
+                                     searchModalPanel="financeUserListModalPanel"
+                                     dataModel="#{financeUserDataModel}"
+                                     reRender="financeUserDiv"
+                                     tabindex="7"/>
+                </s:decorate>
+            </s:div>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <!--<a4j:commandButton action="#{accountEntriesDataModel.search}"
+                                       reRender="accountEntriesSearchPanelId, voucherList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="8">
+                        <s:defaultAction/>
+                    </a4j:commandButton>-->
+                    <a4j:commandButton action="#{accountEntriesDataModel.clear}"
+                                       reRender="accountEntriesSearchPanelId, voucherList, dataScroller"
+                                       ajaxSingle="true"
+                                       immediate="true"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       tabindex="9"/>
+                </s:div>
+            </s:decorate>
+
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#invoiceNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <h:commandButton action="#{voucherEntriesApproveAction.approvedAllVoucherEntries(accountEntriesDataModel.startDate,accountEntriesDataModel.endDate,accountEntriesDataModel.transactionNumber,accountEntriesDataModel)}"
+                     value="#{messages['AccountEntries.voucher.approvedAllVoucherEntries']}"
+                     styleClass="button"/>
+</div>
+<rich:dataTable id="voucherList"
+                value="#{accountEntriesDataModel}"
+                var="voucherItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%, 10%, 10%, 60%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.transactionNumber"
+                                       dataModel="#{accountEntriesDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['AccountEntries.voucher.numberTransactionAB']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.date"
+                                       dataModel="#{accountEntriesDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['AccountEntries.voucher.date']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.state"
+                                       dataModel="#{accountEntriesDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['AccountEntries.voucher.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                    #{messages['AccountEntries.voucher.gloss']}
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['AccountEntries.showDetailError']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{voucherItem.transactionNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.date}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.state == 'PEN'? messages['VoucherState.PEN'] :(voucherItem.state == 'APR'? messages['VoucherState.APR'] : messages['VoucherState.ANL'])}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.gloss}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+
+        <a4j:commandLink title="#{messages['Common.help']}"
+                         oncomplete="Richfaces.showModalPanel('accountEntriesErrorListModalPanel');" action="#{voucherEntriesApproveAction.setNumberTransaction(voucherItem.transactionNumber)}">
+            <h:graphicImage value="/img/errorIcon.gif" style="cursor:pointer;border:0px;"/>
+        </a4j:commandLink>
+
+        <!--<h:commandLink value="#{messages['AccountEntries.showDetailError']}"
+                       immediate="true"
+                       action="#{voucherEntriesApproveAction.showDetailError(voucherItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>-->
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="voucherList" dataModel="#{accountEntriesDataModel}"/>
+</h:form>
+
+<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{accountEntriesDataModel.setProvider(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="providerField"
+                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="financeUserListModalPanelContainer"
+            template="/finances/financeUserListModalPanel.xhtml">
+    <ui:param name="containerId" value="financeUserListModalPanelContainer"/>
+    <ui:param name="dialogId" value="financeUserListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{voucherEntriesApproveAction.setFinanceUser(financeUserItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="financeUserDiv"
+                           oncomplete="Richfaces.hideModalPanel('financeUserListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<a4j:outputPanel ajaxRendered="true">
+    <s:decorate id="accountEntriesErrorListModalPanelContainer" template="/warehouse/accountEntriesErrorListModalPanel.xhtml"/>
+</a4j:outputPanel>
+
+</ui:define>
+
+</ui:composition>

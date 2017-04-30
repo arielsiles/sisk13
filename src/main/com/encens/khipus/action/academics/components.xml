@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+    <factory name="executorUnitList" value="#{executorUnitQuery}"/>
+    <framework:entity-query name="executorUnitQuery" ejbql="select executorUnit from ExecutorUnit executorUnit"
+                            order="executorUnit.position asc"/>
+
+    <factory name="academicFacultyList" value="#{academicFacultyQuery}"/>
+    <framework:entity-query name="academicFacultyQuery" ejbql="select faculty from AcademicFaculty faculty">
+        <framework:restrictions>
+            <value>faculty.executorUnitId = #{headquartersAction.executorUnit.id}</value>
+            <value>faculty.executorUnitId = #{debtByStudentFiltersAction.executorUnit.id}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="academicCareerList" value="#{academicCareerQuery}"/>
+    <framework:entity-query name="academicCareerQuery" ejbql="select carrer from Carrer carrer">
+        <framework:restrictions>
+            <value>carrer.facultyId = #{headquartersAction.faculty.id}</value>
+            <value>carrer.executorUnitId = #{headquartersAction.executorUnit.id}</value>
+            <value>carrer.facultyId = #{debtByStudentFiltersAction.faculty.id}</value>
+            <value>carrer.executorUnitId = #{debtByStudentFiltersAction.executorUnit.id}</value>
+            <value>carrer.executorUnitId = #{debtWidgetAction.executorUnitId}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="periodIdList" value="#{periodIdQuery}"/>
+    <framework:entity-query name="periodIdQuery"
+                            ejbql="select distinct p.periodId from Period p order by p.periodId"/>
+
+    <factory name="ingressDocumentTypeList" value="#{ingressDocumentTypeQuery}"/>
+    <framework:entity-query name="ingressDocumentTypeQuery"
+                            ejbql="select i from IngressDocumentType i order by i.ingressDocumentTypeId"/>
+</components>

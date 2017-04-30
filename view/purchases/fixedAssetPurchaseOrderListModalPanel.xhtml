@@ -1,0 +1,294 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\:fixedAssetPurchaseOrderListForm#{dialogId}\\:accountCodeField\\:orderNumber').focus();">
+<c:if test="#{empty dataModel}">
+    <c:set var="dataModel" value="#{fixedAssetPurchaseOrderDataModel}"/>
+</c:if>
+<c:if test="#{empty enableStateFilter}">
+    <c:set var="enableStateFilter" value="true"/>
+</c:if>
+
+<f:facet name="header">
+    <h:outputText>#{messages['FixedAssetPurchaseOrder.list']}</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+</f:facet>
+<h:form id="fixedAssetPurchaseOrderListForm#{dialogId}">
+
+<rich:simpleTogglePanel label="#{messages['FixedAssetPurchaseOrder.search']}" switchType="client">
+
+    <h:panelGrid id="searchOptionsPanel"
+                 columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.orderNumber']}</ui:define>
+                <h:inputText id="orderNumber"
+                             value="#{dataModel.criteria.orderNumber}"
+                             maxlength="10"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.invoiceNumber']}</ui:define>
+                <h:inputText id="invoiceNumber"
+                             value="#{dataModel.criteria.invoiceNumber}"
+                             maxlength="150"
+                             tabindex="2"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.responsible']}</ui:define>
+                <h:inputText id="responsibleIdNumber" value="#{dataModel.responsibleIdNumber}"
+                             maxlength="100"
+                             tabindex="3"
+                             styleClass="input">
+                    <app:naturalNumberConverter forId="idNumber"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="petitionerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.petitioner']}</ui:define>
+                <h:inputText id="petitionerIdNumber" value="#{dataModel.petitionerIdNumber}"
+                             maxlength="100"
+                             tabindex="4"
+                             styleClass="input">
+                    <app:naturalNumberConverter forId="idNumber"/>
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+
+        <s:div>
+            <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.provider']}</ui:define>
+                <h:inputText id="provider"
+                             value="#{dataModel.criteria.providerCode}"
+                             maxlength="6"
+                             tabindex="4"
+                             styleClass="input">
+                    <f:validateLength maximum="6"/>
+                </h:inputText>
+
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml"
+                        rendered="#{enableStateFilter}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrder.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{dataModel.criteria.state}"
+                                 styleClass="input"
+                                 tabindex="13">
+                    <s:selectItems value="#{purchaseOrderStateEnum}"
+                                   var="purchaseOrderState"
+                                   label="#{messages[purchaseOrderState.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="validate" value="false"/>
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.executorUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{dataModel.criteria.executorUnit}"
+                                 styleClass="input"
+                                 tabindex="14">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.costCenter']}</ui:define>
+                <h:inputText styleClass="costCenter"
+                             value="#{dataModel.criteria.costCenterCode}"
+                             tabindex="15">
+                    <f:validateLength maximum="6"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrder.startDate']}</ui:define>
+                <rich:calendar id="startDate"
+                               value="#{dataModel.startDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="18">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{dataModel.search()}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="20">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{dataModel.clear()}"
+                                       reRender="searchOptionsPanel, fixedAssetPurchaseOrderList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       id="clearButtonId"
+                                       tabindex="21">
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#orderNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<br/>
+
+<rich:dataTable id="fixedAssetPurchaseOrderList"
+                value="#{dataModel}"
+                var="fixedAssetPurchaseOrderItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="5%, 8%, 8%, 15%, 15%, 15%, 8%, 14%, 5%,5%">
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.orderNumber"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.orderNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.invoiceNumber"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.invoiceNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.date"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.date']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.petitioner']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.responsible"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.responsible']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.provider"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.provider']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.executorUnit.executorUnitCode"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.executorUnitCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.costCenter"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.costCenter']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.state"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
+                    #{messages['FixedAssetPurchaseOrder.state'
+                        ]}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.orderNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.invoiceNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.petitionerJobContract.contract.employee.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.responsible.fullName}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.provider.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText
+                value="#{fixedAssetPurchaseOrderItem.executorUnit.executorUnitCode} - #{fixedAssetPurchaseOrderItem.executorUnit.descriptionBU}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.costCenter.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[fixedAssetPurchaseOrderItem.state.resourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <ui:insert name="assignButton"/>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="fixedAssetPurchaseOrderList" dataModel="#{dataModel}"/>
+<rich:componentControl for="fixedAssetPurchaseOrderListModalPanel" attachTo="closeLink, assignButton"
+                       operation="hide" event="onclick"/>
+<script type="text/javascript">
+    function focusFirstElement() {
+        document.getElementById("#{rich:clientId('orderNumber')}").focus();
+    }
+</script>
+
+</h:form>
+
+</rich:modalPanel>

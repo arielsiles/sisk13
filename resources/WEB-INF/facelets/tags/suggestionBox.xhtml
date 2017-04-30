@@ -1,0 +1,100 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <c:if test="#{empty rendered}">
+        <c:set var="rendered" value="true"/>
+    </c:if>
+    <c:if test="#{empty tabindex}">
+        <c:set var="tabindex" value="0"/>
+    </c:if>
+    <c:if test="#{empty required}">
+        <c:set var="required" value="false"/>
+    </c:if>
+    <c:if test="#{empty reRender}">
+        <c:set var="reRender" value=""/>
+    </c:if>
+    <c:if test="#{empty updateFocusOnSelect}">
+        <c:set var="updateFocusOnSelect" value="false"/>
+    </c:if>
+
+    <c:if test="#{not empty cleanInputValue and cleanInputValue}">
+        #{suggestionBoxAction.cleanInputText(rich:findComponent(id))}
+    </c:if>
+
+    <c:set var="suggestionBoxId" value="suggestionBox_#{id}"/>
+    <c:set var="inputHiddenId" value="inputHiddenId_#{id}"/>
+    <c:set var="a4jSupportId" value="a4jSupportId_#{id}"/>
+    <c:set var="fetchValue" value="entityItem.#{searchField}"/>
+    <c:set var="updateFocusField" value="updateFocusField_#{id}"/>
+    <a4j:region>
+        <h:inputText id="#{id}"
+                     value="#{value}"
+                     title="#{value}"
+                     styleClass="#{styleClass}"
+                     maxlength="30"
+                     valueChangeListener="#{suggestionBoxAction.onValueChange}"
+                     immediate="true"
+                     rendered="#{rendered}"
+                     required="#{required}"
+                     tabindex="#{tabindex}">
+            <a4j:support id="#{a4jSupportId}"
+                         event="onfocus"
+                         ajaxSingle="true"
+                         immediate="true">
+                <f:setPropertyActionListener value="#{rich:findComponent(id)}"
+                                             target="#{suggestionBoxAction.inputText}"/>
+                <f:setPropertyActionListener value="#{rich:findComponent(inputHiddenId)}"
+                                             target="#{suggestionBoxAction.inputHidden}"/>
+                <f:setPropertyActionListener value="#{rich:findComponent(a4jSupportId)}"
+                                             target="#{suggestionBoxAction.a4jSupport}"/>
+                <f:setPropertyActionListener value="#{rich:findComponent(suggestionBoxId)}"
+                                             target="#{suggestionBoxAction.suggestionBox}"/>
+                <f:setPropertyActionListener value="#{entityAlias}"
+                                             target="#{suggestionBoxAction.entityAlias}"/>
+                <f:setPropertyActionListener value="#{searchField}"
+                                             target="#{suggestionBoxAction.searchField}"/>
+                <f:setPropertyActionListener value="#{dataProcessorComponentName}"
+                                             target="#{suggestionBoxAction.dataProcessorComponentName}"/>
+                <f:setPropertyActionListener value="#{searchCompoundFields}"
+                                             target="#{suggestionBoxAction.searchCompoundFields}"/>
+                <f:setPropertyActionListener value="#{searchCompoundCondition}"
+                                             target="#{suggestionBoxAction.searchCompoundCondition}"/>
+                <ui:insert name="restrictions"/>
+            </a4j:support>
+            <a4j:support event="onblur"
+                         immediate="true"
+                         ajaxSingle="true"
+                         reRender="#{inputHiddenId}, #{reRender}"/>
+        </h:inputText>
+
+
+        <rich:suggestionbox id="#{suggestionBoxId}"
+                            for="#{id}"
+                            minChars="1"
+                            suggestionAction="#{suggestionBoxAction.search}"
+                            ignoreDupResponses="true"
+                            ajaxSingle="true"
+                            immediate="true"
+                            style="z-index:5000"
+                            fetchValue="#{elEvaluator.getValue(fetchValue)}"
+                            onselect="if(#{updateFocusOnSelect}){#{rich:element(updateFocusField)}.value=1;#{rich:element(updateFocusField)}.focus();}"
+                            var="entityItem">
+            <ui:insert name="columns"/>
+        </rich:suggestionbox>
+
+        <h:inputHidden id="#{inputHiddenId}"
+                       value="#{entity}">
+            <s:convertEntity/>
+        </h:inputHidden>
+        <h:message for="#{inputHiddenId}" styleClass="errors" style="display:block;"/>
+        <h:inputText id="#{updateFocusField}" rendered="#{updateFocusOnSelect}"
+                     style="width: 0;height: 0;z-index: -1;float: left;position: absolute;opacity: 0;"
+                     onfocus="if(this.value==1){this.value=0;#{rich:element(id)}.focus();}" immediate="true"
+                     tabindex="#{tabindex}"/>
+    </a4j:region>
+</ui:composition>

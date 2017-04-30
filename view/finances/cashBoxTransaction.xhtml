@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['CashBoxTransaction.edit']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="cashBoxTransactionForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{cashBoxTransactionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashBoxTransactionAction.managed and s:hasPermission('CASHBOXTRANSACTION','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxTransactionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    #{messages['CashBoxTransaction.edit']}
+                </f:facet>
+
+                <s:decorate id="cashBoxField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.cashBox']}</ui:define>
+                    <h:outputText value="#{cashBoxTransaction.cashBox.description}"/>
+                </s:decorate>
+
+                <s:decorate id="userField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.user']}</ui:define>
+                    <h:outputText value="#{cashBoxTransaction.cashBoxUser.name}"/>
+                </s:decorate>
+
+                <s:decorate id="openingDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.openingDate']}</ui:define>
+                    <h:outputText value="#{cashBoxTransaction.openingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="closingDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.closingDate']}</ui:define>
+                    <h:outputText value="#{cashBoxTransaction.closingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="totalAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.totalAmount']}</ui:define>
+                    <h:outputText value="#{cashBoxTransaction.totalAmount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="faultAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.faultAmount']}</ui:define>
+                    <h:inputText id="faultAmount" value="#{cashBoxTransaction.faultAmount}" tabindex="1"
+                                 styleClass="input">
+                        <app:realNumberConverter forId="faultAmount"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.faultDescription']}</ui:define>
+                    <h:inputTextarea id="description" value="#{cashBoxTransaction.faultDescription}"
+                                     styleClass="input textarea" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="modifiedAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBoxTransaction.modifiedAmount']}</ui:define>
+                    <h:inputText id="modifiedAmount" value="#{cashBoxTransaction.modifiedAmount}" tabindex="3"
+                                 styleClass="input">
+                        <app:realNumberConverter forId="modifiedAmount"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{cashBoxTransactionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashBoxTransactionAction.managed and s:hasPermission('CASHBOXTRANSACTION','UPDATE')}"
+                                 tabindex="4"/>
+                <h:commandButton action="#{cashBoxTransactionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="5"/>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#faultAmount" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

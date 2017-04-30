@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.salaryMovement.page.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.salaryMovement.page.title']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div>
+                        <s:decorate id="bussinesUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salaryMovement.sede']}</ui:define>
+                            <h:selectOneMenu id="bussinesUnit" value="#{salaryMovementReportAction.businessUnit}"
+                                             styleClass="input" required="false"
+                                             tabindex="2">
+                                <s:selectItems value="#{sedeList.resultList}" var="sede"
+                                               label="#{sede.organization.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salaryMovement.jobCategory']}</ui:define>
+                            <h:selectOneMenu id="jobCategory" value="#{salaryMovementReportAction.jobCategory}"
+                                             styleClass="input"
+                                             required="false" tabindex="3">
+                                <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                               label="#{jobCategory.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['SalaryMovement.salaryMovementType']}</ui:define>
+                            <h:selectOneMenu id="salaryMovementType"
+                                             value="#{salaryMovementReportAction.salaryMovementType}"
+                                             styleClass="input" tabindex="4"
+                                             required="false">
+                                <s:selectItems value="#{salaryMovementTypeList}" var="salaryMovementType"
+                                               label="#{salaryMovementType.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salaryMovement.initDate']}</ui:define>
+                            <rich:calendar id="initDate"
+                                           value="#{salaryMovementReportAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.salaryMovement.endDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{salaryMovementReportAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                                <app:dateRangeValidator forId="initDate"
+                                                        forLabel="#{messages['Reports.salaryMovement.initDate']}"
+                                                        type="greater"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{salaryMovementReportAction}" showPageFormat="false" tabIndex="10"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{salaryMovementReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="15">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

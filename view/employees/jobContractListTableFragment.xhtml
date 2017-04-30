@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <app:fieldset id="jobContractListFieldset" title="#{messages['JobContract.list']}">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width100percent">
+            <rich:dataTable value="#{jobContractDataModel}" var="jobContractItem"
+                            id="jobContractList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%,10%,15%, 10%, 10%, 10%, 5%, 5%, 10%, 10%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="employee.idNumber"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['Person.idNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="employee.markCode"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['Employee.markCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="employee.lastName,employee.maidenName,employee.firstName"
+                                    dataModel="#{jobContractDataModel}"
+                                    reRender="jobContractList, dataScroller">
+                                #{messages['JobContract.employee']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="organizationalUnit.name"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['JobContract.organizationalUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="charge.name"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['Job.charge']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobCategory.acronym"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['Job.jobCategory']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobCategory.job.salary.amount"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['Job.salary']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="jobContract.contract.cycle.gestion"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['JobContract.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contract.initDate"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['JobContract.initDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="contract.endDate"
+                                                   dataModel="#{jobContractDataModel}"
+                                                   reRender="jobContractList, dataScroller">
+                                #{messages['JobContract.endDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.employee.idNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.employee.markCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.employee.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.organizationalUnit.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.charge.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.jobCategory.acronym}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.job.salary.amount}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.cycle.gestion.year}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.initDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{jobContractItem.contract.endDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{jobContractAction.selectJobContract(jobContractItem)}"
+                                   rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}">
+                        <s:conversationPropagation type="none"/>
+                    </h:commandLink>
+
+                    &#160;
+                    <h:commandLink immediate="true"
+                                   action="#{generateEmployeeContractAction.generateForwad(jobContractItem.contract.employee,jobContractItem)}"
+                                   rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}">
+                        <h:graphicImage value="/img/rtfIcon.gif" styleClass="select-image-middle"
+                                        title="#{messages['GenerateContract.generateContractDocument']}"/>
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="jobContractList" dataModel="#{jobContractDataModel}"/>
+        </h:panelGrid>
+    </app:fieldset>
+</ui:composition>

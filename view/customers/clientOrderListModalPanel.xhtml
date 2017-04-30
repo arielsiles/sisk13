@@ -1,0 +1,145 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['Employee.list']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{clientOrderDataModel}"/>
+    </c:if>
+    <h:form id="#{dialogId}_clientOrderListForm">
+        <rich:simpleTogglePanel label="#{messages['Employee.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <ui:insert name="searchOptions"/>
+                <!--<s:div>
+                    <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                        <h:inputText id="#{dialogId}-idNumber" value="#{dataModel.criteria.idNumber}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="1">
+                            <app:naturalNumberConverter forId="#{dialogId}-idNumber"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                        <h:inputText id="firstName" value="#{dataModel.criteria.firstName}"
+                                     maxlength="100" styleClass="input"
+                                     tabindex="2"/>
+                    </s:decorate>
+                </s:div>-->
+                <s:div>
+                    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                        <h:inputText id="lastName" value="#{dataModel.criteria.id}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="3"/>
+                    </s:decorate>
+                    <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                        <h:inputText id="maidenName" value="#{dataModel.criteria.numberDoc}"
+                                     maxlength="100"
+                                     styleClass="input"
+                                     tabindex="4"/>
+                        <a4j:commandButton action="#{dataModel.search}"
+                                           reRender="clientOrderList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{dataModel}" var="clientOrderItem" id="clientOrderList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="20%, 20%, 20%, 30%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="clientOrder.id"
+                                               dataModel="#{dataModel}"
+                                               reRender="clientOrderList, dataScroller">
+                            #{messages['Person.idNumber']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="clientOrder.numberDoc"
+                                               dataModel="#{dataModel}"
+                                               reRender="clientOrderList, dataScroller">
+                            #{messages['Person.lastName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{clientOrderItem.type}"/>
+            </rich:column>
+
+            <rich:column>
+                <h:outputText value="#{clientOrderItem.fullName}"/>
+            </rich:column>
+
+
+            <!--<c:choose>
+                <c:when test="#{clientOrderItem.type == 'P'}">
+                    <rich:column>
+                        <h:outputText value="#{clientOrderItem.clientPerson.name}"/>
+                    </rich:column>
+                </c:when>
+                <c:when test="#{clientOrderItem.type == 'I'}">
+                    <rich:column>
+                        <h:outputText value="#{clientOrderItem.clientInstitution.name}"/>
+                    </rich:column>
+                </c:when>
+                <c:otherwise>
+                    <rich:column>
+                        <h:outputText value="AS"/>
+                    </rich:column>
+                </c:otherwise>
+            </c:choose>-->
+
+
+            <!--<c:if test="#{clientOrderItem.type == 'P' }">
+            <rich:column>
+                <h:outputText value="#{clientOrderItem.clientPerson.name }"/>
+            </rich:column>
+            </c:if>-->
+
+            <!--<c:if test="#{clientOrderItem.type == 'I' }">
+                <rich:column>
+                    <h:outputText value="#{clientOrderItem.clientInstitution.name }"/>
+                </rich:column>
+            </c:if>-->
+
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="clientOrderList" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+    <c:set var="firstInputToFocusId" value="#{dialogId}-idNumber"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+
+</rich:modalPanel>
+

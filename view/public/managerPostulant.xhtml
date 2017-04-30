@@ -1,0 +1,11 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Postulant.new']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="showPowered" value="true"/>
+    <ui:param name="manager" value="true"/>
+    <ui:define name="body">
+        <ui:include src="postulantBody.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,254 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{scheduleEvaluationAction.managed}">
+            #{messages['ScheduleEvaluation.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ScheduleEvaluation.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="scheduleEvaluationForm">
+
+<div class="buttons">
+
+    <h:commandButton action="#{scheduleEvaluationAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{scheduleEvaluationAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','CREATE')}"/>
+
+    <h:commandButton action="#{scheduleEvaluationAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{scheduleEvaluationAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="scheduleEvaluationPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{scheduleEvaluationAction.managed}">
+                #{messages['ScheduleEvaluation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ScheduleEvaluation.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ScheduleEvaluation.name']}</ui:define>
+        <h:inputText id="name" value="#{scheduleEvaluation.name}" styleClass="input"
+                     required="true" maxlength="250"/>
+    </s:decorate>
+
+    <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ScheduleEvaluation.cycle']}</ui:define>
+        <h:selectOneMenu id="cycle" value="#{scheduleEvaluation.cycle}" styleClass="input"
+                         required="true">
+            <s:selectItems value="#{cycleList}"
+                           var="cycle"
+                           label="#{cycle.name}"
+                           hideNoSelectionLabel="false"
+                           noSelectionLabel=""/>
+            <s:convertEntity/>
+            <a4j:support event="onchange"
+                         ajaxSingle="true"
+                         reRender="scheduleEvaluationFormFieldSet"/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ScheduleEvaluation.state']}</ui:define>
+        <h:selectOneMenu id="state" value="#{scheduleEvaluation.state}" styleClass="input"
+                         required="true">
+            <s:selectItems value="#{scheduleEvaluationStateEnum}"
+                           var="state"
+                           label="#{messages[state.resourceKey]}"
+                           hideNoSelectionLabel="false"
+                           noSelectionLabel=""/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <app:fieldset id="scheduleEvaluationFormFieldSet" title="#{messages['ScheduleEvaluation.forms']}">
+        <rich:dataTable value="#{scheduleEvaluation.scheduleEvaluationFormList}"
+                        var="scheduleEvaluationFormItem"
+                        width="100%"
+                        columnsWidth="20%, 20%, 20%, 20%, 20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <h:outputText value="#{messages['ScheduleEvaluationForm.pollFormType']}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages['ScheduleEvaluationForm.pollForm']}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages['ScheduleEvaluationForm.startDateTime']}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages['ScheduleEvaluationForm.endDateTime']}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages['ScheduleEvaluationForm.samplePopulation']}"/>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{messages[scheduleEvaluationFormItem.type.resourceKey]}"/>
+            </rich:column>
+            <rich:column>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="showLabel" value="false"/>
+                    <h:selectOneMenu id="pollForm"
+                                     value="#{scheduleEvaluationFormItem.pollForm}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{pollFormListByCycle}" var="pollForm"
+                                       label="#{pollForm.title} - #{pollForm.subTitle}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""
+                                       disabled="#{empty scheduleEvaluation.cycle}"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </rich:column>
+            <rich:column>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="showLabel" value="false"/>
+                    <rich:calendar id="startDateTime"
+                                   value="#{scheduleEvaluationFormItem.startDateTime}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.dateTime']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="4">
+                        <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="dateTime"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:column>
+            <rich:column>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="showLabel" value="false"/>
+                    <rich:calendar id="endDateTime"
+                                   value="#{scheduleEvaluationFormItem.endDateTime}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.dateTime']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="4">
+                        <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="dateTime"/>
+                        <app:dateRangeValidator forId="startDateTime"
+                                                forLabel="#{messages['ScheduleEvaluationForm.startDateTime']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:column>
+            <rich:column>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="showLabel" value="false"/>
+                    <h:inputText id="samplePopulation"
+                                 value="#{scheduleEvaluationFormItem.samplePopulation}"
+                                 maxlength="50"
+                                 tabindex="12"
+                                 styleClass="input"
+                                 required="true">
+                        <app:naturalNumberConverter forId="samplePopulation"
+                                                    pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+            </rich:column>
+        </rich:dataTable>
+    </app:fieldset>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{scheduleEvaluationAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{scheduleEvaluationAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','CREATE')}"/>
+
+    <h:commandButton action="#{scheduleEvaluationAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{scheduleEvaluationAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['ScheduleEvaluation.delete.confirmation']}">
+                <f:param value="#{scheduleEvaluation.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{scheduleEvaluationAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{scheduleEvaluationAction.managed and s:hasPermission('SCHEDULEEVALUATION','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#code" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

@@ -1,0 +1,372 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{dischargeDocumentAction.managed}">
+            #{messages['DischargeDocument.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['DischargeDocument.create']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="93%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<c:set var="isDischargeDocumentApproved" value="#{dischargeDocument.approved}"/>
+<c:set var="isDischargeDocumentPending" value="#{dischargeDocument.pending}"/>
+<c:set var="isDischargeDocumentNullified" value="#{dischargeDocument.nullified}"/>
+
+<c:set var="isReadOnly"
+       value="#{dischargeDocumentAction.managed and (isDischargeDocumentApproved or isDischargeDocumentNullified)}"/>
+
+<c:set var="gestionPayrollSelectPopupId" value="select_link_gestionPayrollSelectPopup"/>
+
+<h:form id="dischargeDocumentForm">
+<div class="buttons">
+    <h:commandButton action="#{dischargeDocumentAction.create}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{!dischargeDocumentAction.managed and s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"
+                     styleClass="button">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{dischargeDocumentAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!dischargeDocumentAction.managed and s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"/>
+    <h:commandButton action="#{dischargeDocumentAction.update}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{dischargeDocumentAction.approve}"
+                     value="#{messages['DischargeDocument.button.approve']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button"/>
+    <h:commandButton action="#{dischargeDocumentAction.nullify}"
+                     value="#{messages['DischargeDocument.button.nullify']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button"/>
+    <h:commandButton action="#{dischargeDocumentAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+<rich:panel id="dischargeDocumentPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{dischargeDocumentAction.managed}">
+            #{messages['DischargeDocument.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['DischargeDocument.create']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="leftPanel">
+    <s:decorate id="gestionPayrollId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.gestionPayroll']}</ui:define>
+        <app:selectPopUp id="gestionPayrollSelectPopup"
+                         textValue="#{dischargeDocument.gestionPayroll.gestionName}"
+                         value="#{dischargeDocument.gestionPayroll}"
+                         dataModel="#{gestionPayRollSearchDataModel}"
+                         clearAction="dischargeDocumentAction.cleanGestionPayroll()"
+                         searchModalPanel="gestionPayRollSearchModalPanel"
+                         rendered="#{isDischargeDocumentPending}"
+                         required="true"
+                         reRender="gestionPayrollId, jobContractId"
+                         hotKeySelect="alt+1"/>
+        <h:outputText value="#{dischargeDocument.gestionPayroll.gestionName}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+    <s:div id="jobContractId">
+        <s:decorate id="jobContractDecorator"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['DischargeDocument.jobContract']}</ui:define>
+            <app:selectPopUp id="jobContractSelectPopup"
+                             required="true"
+                             textValue="#{dischargeDocument.jobContract.contract.employee.fullName}"
+                             value="#{dischargeDocument.jobContract}"
+                             dataModel="#{jobContractDataModel}"
+                             clearAction="dischargeDocumentAction.cleanJobContract()"
+                             searchModalPanel="jobContractListModalPanel"
+                             reRender="jobContractId"
+                             rendered="#{null != dischargeDocument.gestionPayroll}"
+                             readOnly="#{isReadOnly}"
+                             hotKeySelect="alt+2">
+                <ui:define name="dataModelStaticProperties">
+                    <f:setPropertyActionListener value="#{true}"
+                                                 target="#{jobContractDataModel.retentionFlag}"/>
+                    <f:setPropertyActionListener value="#{false}"
+                                                 target="#{jobContractDataModel.enableBusinessUnitFilter}"/>
+                    <f:setPropertyActionListener value="#{false}"
+                                                 target="#{jobContractDataModel.enableJobCategoryFilter}"/>
+                    <f:setPropertyActionListener value="#{dischargeDocument.gestionPayroll.businessUnit}"
+                                                 target="#{jobContractDataModel.businessUnit}"/>
+                    <f:setPropertyActionListener value="#{dischargeDocument.gestionPayroll.jobCategory}"
+                                                 target="#{jobContractDataModel.jobCategory}"/>
+                </ui:define>
+            </app:selectPopUp>
+        </s:decorate>
+        <s:decorate id="chargeId"
+                    template="/include/inputField.xhtml"
+                    rendered="#{null != dischargeDocument.jobContract}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['DischargeDocument.jobContract.charge']}</ui:define>
+            <h:outputText value="#{dischargeDocument.jobContract.job.charge.name}"
+                          styleClass="input"/>
+        </s:decorate>
+        <s:decorate id="organizationalUnitId"
+                    template="/include/inputField.xhtml"
+                    rendered="#{null != dischargeDocument.jobContract}"
+                    styleClass="formRow">
+            <ui:define name="label">
+                #{messages['DischargeDocument.jobContract.organizationalUnit']}
+            </ui:define>
+            <h:outputText value="#{dischargeDocument.jobContract.job.organizationalUnit.fullName}"
+                          styleClass="input"/>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="numberId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.number']}</ui:define>
+        <h:inputText id="numberInputText"
+                     value="#{dischargeDocument.number}"
+                     rendered="#{isDischargeDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="1"/>
+        <h:outputText value="#{dischargeDocument.number}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+    <s:decorate id="nameId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.name']}</ui:define>
+        <h:inputText id="nameInputText"
+                     value="#{dischargeDocument.name}"
+                     rendered="#{isDischargeDocumentPending}"
+                     required="true"
+                     styleClass="input"
+                     tabindex="2"/>
+        <h:outputText value="#{dischargeDocument.name}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+    <s:decorate id="dateId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.date']}</ui:define>
+        <rich:calendar id="dateCalendar"
+                       value="#{dischargeDocument.date}"
+                       rendered="#{isDischargeDocumentPending}"
+                       styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       required="true"
+                       tabindex="3">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        <h:outputText value="#{dischargeDocument.date}"
+                      rendered="#{isReadOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="amountId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.amount']}</ui:define>
+        <h:inputText id="amountInputText"
+                     value="#{dischargeDocument.amount}"
+                     rendered="#{isDischargeDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="4">
+            <app:realNumberConverter minimum="0"
+                                     pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="amountInputText"/>
+        </h:inputText>
+        <h:outputText value="#{dischargeDocument.amount}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+</s:div>
+<s:div id="rightPanel">
+    <s:decorate id="financesEntityId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.financesEntity']}</ui:define>
+
+        <app:selectPopUp id="financesEntitySelectPopup"
+                         required="true"
+                         textValue="#{dischargeDocument.financesEntity.acronym}"
+                         value="#{dischargeDocument.financesEntity}"
+                         clearAction="dischargeDocumentAction.cleanFinancesEntity()"
+                         searchModalPanel="financesEntityListModalPanel"
+                         dataModel="#{financesEntityDataModel}"
+                         reRender="financesEntityId, nitId"
+                         rendered="#{isDischargeDocumentPending}"
+                         hotKeySelect="alt+3"/>
+        <h:outputText value="#{dischargeDocument.financesEntity.acronym}"
+                      rendered="#{isReadOnly}"/>
+    </s:decorate>
+    <s:decorate id="nitId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.nit']}</ui:define>
+        <h:inputText id="nitInputText"
+                     value="#{dischargeDocument.nit}"
+                     rendered="#{isDischargeDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="5"/>
+        <h:outputText value="#{dischargeDocument.nit}"
+                      rendered="#{isReadOnly}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="authorizationNumberId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.authorizationNumber']}</ui:define>
+        <h:inputText id="authorizationNumberInputText"
+                     value="#{dischargeDocument.authorizationNumber}"
+                     rendered="#{isDischargeDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="6"/>
+        <h:outputText value="#{dischargeDocument.authorizationNumber}"
+                      rendered="#{isReadOnly}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="controlCodeId"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.controlCode']}</ui:define>
+        <h:inputText id="controlCodeInputText"
+                     required="true"
+                     value="#{dischargeDocument.controlCode}"
+                     rendered="#{isDischargeDocumentPending}"
+                     styleClass="input right"
+                     tabindex="7"/>
+        <h:outputText value="#{dischargeDocument.controlCode}"
+                      rendered="#{isReadOnly}">
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="stateId"
+                template="/include/inputField.xhtml"
+                rendered="#{dischargeDocumentAction.managed}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['DischargeDocument.state']}</ui:define>
+        <h:outputText value="#{messages[dischargeDocument.state.resourceKey]}"/>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{dischargeDocumentAction.create}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{!dischargeDocumentAction.managed and s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"
+                     styleClass="button"
+                     tabindex="10"/>
+    <h:commandButton action="#{dischargeDocumentAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!dischargeDocumentAction.managed and s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"
+                     tabindex="11"/>
+    <h:commandButton action="#{dischargeDocumentAction.update}"
+                     value="#{messages['Common.save']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button"
+                     tabindex="12"/>
+    <h:commandButton action="#{dischargeDocumentAction.approve}"
+                     value="#{messages['DischargeDocument.button.approve']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button"
+                     tabindex="13"/>
+    <h:commandButton action="#{dischargeDocumentAction.nullify}"
+                     value="#{messages['DischargeDocument.button.nullify']}"
+                     rendered="#{dischargeDocumentAction.managed and isDischargeDocumentPending and s:hasPermission('DISCHARGEDOCUMENT','UPDATE')}"
+                     styleClass="button"
+                     tabindex="14"/>
+    <h:commandButton action="#{dischargeDocumentAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="15"/>
+</div>
+</h:form>
+<s:decorate id="jobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:param name="dialogId" value="jobContractListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{dischargeDocumentAction.assignJobContract(jobContractItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="jobContractId, nameId"
+                           oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="financesEntityListModalPanelContainer"
+            template="/finances/financesEntityListModalPanel.xhtml">
+    <ui:param name="containerId" value="financesEntityListModalPanelContainer"/>
+    <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{dischargeDocumentAction.assignFinancesEntity(instance)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="financesEntityId, nitId"
+                           oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="gestionPayRollListModalPanelContainer"
+            template="/employees/gestionPayRollSearchModalPanel.xhtml">
+    <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{dischargeDocumentAction.assignGestionPayroll(gestionPayrollItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="gestionPayrollId, jobContractId"
+                           oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<c:if test="#{not functionAction.hasSeverityErrorMessages and not dischargeDocumentAction.managed and not dischargeDocumentAction.createdAndNewOption}">
+    <script type="text/javascript">
+        document.getElementById('#{rich:clientId(gestionPayrollSelectPopupId)}').onclick();
+    </script>
+</c:if>
+
+<rich:jQuery selector="#numberInputText" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

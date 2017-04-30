@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/finances/*" login-required="true"/>
+
+    <page view-id="/finances/cashBoxStatusTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashBoxStatusTypeAction.select(cashBoxStatusTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashBoxStatusType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxStatusType.xhtml" no-conversation-view-id="/finances/cashBoxStatusTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashBoxStatusTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashBoxTypeAction.select(cashBoxTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashBoxType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxType.xhtml" no-conversation-view-id="/finances/cashBoxTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashBoxTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxPercentageTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{taxPercentageTypeAction.select(taxPercentageTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/taxPercentageType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxPercentageType.xhtml" no-conversation-view-id="/finances/taxPercentageTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/taxPercentageTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxPercentageList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{taxPercentageAction.select(taxPercentageItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/taxPercentage.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxPercentage.xhtml" no-conversation-view-id="/finances/taxPercentageList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/taxPercentageList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/exchangeRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{exchangeRateAction.select(exchangeRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/exchangeRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/exchangeRate.xhtml" no-conversation-view-id="/finances/exchangeRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/exchangeRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/dosageTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{dosageTypeAction.select(dosageTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/dosageType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/dosageType.xhtml" no-conversation-view-id="/finances/dosageTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/dosageTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/preBookEntryPeriodTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{preBookEntryPeriodTypeAction.select(preBookEntryPeriodTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/preBookEntryPeriodType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/preBookEntryPeriodType.xhtml"
+          no-conversation-view-id="/finances/preBookEntryPeriodTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/preBookEntryPeriodTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/accountingStateTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{accountingStateTypeAction.select(accountingStateTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/accountingStateType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/accountingStateType.xhtml"
+          no-conversation-view-id="/finances/accountingStateTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/accountingStateTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashBoxAction.select(cashBoxItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashBox.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBox.xhtml" no-conversation-view-id="/finances/cashBoxList.xhtml">
+        <navigation from-action="#{cashBoxAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true" flush-mode="manual"/>
+                <redirect view-id="/finances/cashBox.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{cashBoxAction.selectUserCashBox}">
+            <begin-conversation join="true" flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/userCashBox.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashBoxList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/userCashBox.xhtml" no-conversation-view-id="/finances/cashBoxList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashBoxList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxTransactionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashBoxTransactionAction.select(cashBoxTransactionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashBoxTransaction.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashBoxTransaction.xhtml"
+          no-conversation-view-id="/finances/cashBoxTransactionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashBoxTransactionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{taxRuleAction.select(taxRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/taxRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/taxRule.xhtml" no-conversation-view-id="/finances/taxRuleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/taxRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/costCenterGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{costCenterGroupAction.select(costCenterGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/costCenterGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/costCenterGroup.xhtml" no-conversation-view-id="/finances/costCenterGroupList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/costCenterGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/costCenterList.xhtml" action="#{costCenterDataModel.enableShowAll}">
+        <end-conversation/>
+        <navigation from-action="#{costCenterAction.select(costCenterItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/costCenter.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/costCenter.xhtml" no-conversation-view-id="/finances/costCenterList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/costCenterList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/measureUnitList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{measureUnitAction.select(measureUnitItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/measureUnit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/measureUnit.xhtml" no-conversation-view-id="/finances/measureUnitList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/measureUnitList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/advanceList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{advanceAction.select(advanceItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/advance.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/advance.xhtml" no-conversation-view-id="/finances/advanceList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/advanceList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/rotatoryFundList.xhtml">
+        <!--<end-conversation/>-->
+        <navigation from-action="#{rotatoryFundAction.select(rotatoryFundItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{rotatoryFundAction.newRotatoryFund}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+    <page view-id="/finances/rotatoryFund.xhtml" no-conversation-view-id="/finances/rotatoryFundList.xhtml">
+        <navigation from-action="#{rotatoryFundAction.create}">
+            <rule if-outcome="Success">
+                <!--<begin-conversation flush-mode="MANUAL"/>-->
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true" flush-mode="MANUAL"/>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{quotaAction.addQuota}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/quota.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{spendDistributionAction.addSpendDistribution}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/spendDistribution.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.addRotatoryFundDiscountComment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundDiscountComment.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{discountCommentAction.select(discountCommentItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundDiscountComment.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{spendDistributionAction.select(spendDistributionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/spendDistribution.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.select(rotatoryFundPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundPayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.selectToRemake(rotatoryFundPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundPayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.addRotatoryFundPayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundPayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{rotatoryFundCollectionAction.select(rotatoryFundCollectionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundCollectionAction.addRotatoryFundCollection}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{quotaAction.select(quotaItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/quota.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundAction.newRotatoryFund}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/rotatoryFundDiscountComment.xhtml"
+          no-conversation-view-id="/finances/rotatoryFundList.xhtml">
+        <navigation from-action="#{discountCommentAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountCommentAction.cancel}">
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/quota.xhtml" no-conversation-view-id="/finances/rotatoryFund.xhtml">
+        <navigation from-action="#{quotaAction.create}">
+            <rule if-outcome="Success">
+                <!--<begin-conversation flush-mode="MANUAL"/>-->
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{quotaAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{quotaAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/rotatoryFundCollection.xhtml" no-conversation-view-id="/finances/rotatoryFund.xhtml">
+        <navigation from-action="#{rotatoryFundCollectionAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation
+                from-action="#{rotatoryFundCollectionSpendDistributionAction.addRotatoryFundCollectionSpendDistribution}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundCollectionSpendDistribution.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation
+                from-action="#{rotatoryFundCollectionSpendDistributionAction.select(rotatoryFundCollectionSpendDistributionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundCollectionSpendDistribution.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundCollectionAction.approveRotatoryFundCollection}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundCollectionAction.annulRotatoryFundCollection}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/rotatoryFundPayment.xhtml" no-conversation-view-id="/finances/rotatoryFund.xhtml">
+        <navigation from-action="#{rotatoryFundPaymentAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.approveRotatoryFundPayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.annulRotatoryFundPayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundPaymentAction.remake}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/spendDistribution.xhtml" no-conversation-view-id="/finances/rotatoryFund.xhtml">
+        <navigation from-action="#{spendDistributionAction.create}">
+            <rule if-outcome="Success">
+                <!--<begin-conversation flush-mode="MANUAL"/>-->
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{spendDistributionAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{spendDistributionAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFund.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/finances/rotatoryFundCollectionSpendDistribution.xhtml"
+          no-conversation-view-id="/finances/rotatoryFundCollection.xhtml">
+        <navigation from-action="#{rotatoryFundCollectionSpendDistributionAction.create}">
+            <rule if-outcome="Success">
+                <!--<begin-conversation flush-mode="MANUAL"/>-->
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundCollectionSpendDistributionAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rotatoryFundCollectionSpendDistributionAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundCollection.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashAccountGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashAccountGroupAction.select(cashAccountGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashAccountGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashAccountGroup.xhtml" no-conversation-view-id="/finances/cashAccountGroupList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashAccountGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/rotatoryFundDocumentTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rotatoryFundDocumentTypeAction.select(rotatoryFundDocumentTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/rotatoryFundDocumentType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/rotatoryFundDocumentType.xhtml"
+          no-conversation-view-id="/finances/rotatoryFundDocumentTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/rotatoryFundDocumentTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/payableDocumentConverter.xhtml"
+          no-conversation-view-id="/finances/cashAccountGroupList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/cashAccountGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+</pages>

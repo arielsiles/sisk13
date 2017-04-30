@@ -1,0 +1,174 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['PurchaseOrderCause.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="purchaseOrderCauseSearch">
+
+            <rich:simpleTogglePanel id="purchaseOrderCauseSearchPanel" label="#{messages['PurchaseOrderCause.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PurchaseOrderCause.code']}</ui:define>
+                            <h:inputText id="code" value="#{purchaseOrderCauseDataModel.criteria.code}"
+                                         styleClass="input"
+                                         tabindex="1">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PurchaseOrderCause.name']}</ui:define>
+                            <h:inputText id="name" value="#{purchaseOrderCauseDataModel.criteria.name}"
+                                         styleClass="input"
+                                         tabindex="2">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PurchaseOrderCause.description']}</ui:define>
+                            <h:inputText id="description" value="#{purchaseOrderCauseDataModel.criteria.description}"
+                                         styleClass="input"
+                                         tabindex="3">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="requiresFixedAssetsField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['PurchaseOrderCause.requiresFixedAssets']}</ui:define>
+                            <h:selectBooleanCheckbox id="requiresFixedAssets"
+                                                     value="#{purchaseOrderCauseDataModel.criteria.requiresFixedAssets}"
+                                                     tabindex="4">
+                                <a4j:support event="onchange"
+                                             reRender="requiresFixedAssetsField"
+                                             ajaxSingle="true"/>
+                            </h:selectBooleanCheckbox>
+                        </s:decorate>
+                        <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <s:div styleClass="right input">
+                                <a4j:commandButton action="#{purchaseOrderCauseDataModel.search()}"
+                                                   reRender="purchaseOrderCauseList, dataScroller"
+                                                   styleClass="button"
+                                                   value="#{messages['Common.search']}"
+                                                   id="searchButtonId"
+                                                   tabindex="5">
+                                    <s:defaultAction/>
+                                </a4j:commandButton>
+                                <a4j:commandButton action="#{purchaseOrderCauseDataModel.clear()}"
+                                                   reRender="searchOptionsPanel, purchaseOrderCauseList, dataScroller"
+                                                   styleClass="button"
+                                                   value="#{messages['Common.clear']}"
+                                                   id="clearButtonId"
+                                                   tabindex="6">
+                                </a4j:commandButton>
+                            </s:div>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/fixedassets/purchaseOrderCause.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('PURCHASEORDERCAUSE','CREATE')}"
+                          propagation="begin"
+                          tabindex="7"/>
+            </div>
+
+            <rich:dataTable value="#{purchaseOrderCauseDataModel}" var="purchaseOrderCauseItem"
+                            id="purchaseOrderCauseList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%,30%, 15%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="purchaseOrderCause.code"
+                                                   dataModel="#{purchaseOrderCauseDataModel}"
+                                                   reRender="purchaseOrderCauseList, dataScroller">
+                                #{messages['PurchaseOrderCause.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="purchaseOrderCause.name"
+                                                   dataModel="#{purchaseOrderCauseDataModel}"
+                                                   reRender="purchaseOrderCauseList, dataScroller">
+                                #{messages['PurchaseOrderCause.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="purchaseOrderCause.description"
+                                                   dataModel="#{purchaseOrderCauseDataModel}"
+                                                   reRender="purchaseOrderCauseList, dataScroller">
+                                #{messages['PurchaseOrderCause.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="purchaseOrderCause.requiresFixedAssets"
+                                                   dataModel="#{purchaseOrderCauseDataModel}"
+                                                   reRender="purchaseOrderCauseList, dataScroller">
+                                #{messages['PurchaseOrderCause.requiresFixedAssets']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{purchaseOrderCauseItem.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{purchaseOrderCauseItem.name}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{purchaseOrderCauseItem.description}">
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:graphicImage value="/img/active.gif"
+                                    styleClass="select-image-middle"
+                                    rendered="#{purchaseOrderCauseItem.requiresFixedAssets}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{purchaseOrderCauseAction.select(purchaseOrderCauseItem)}"
+                                   rendered="#{s:hasPermission('PURCHASEORDERCAUSE','VIEW')}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="purchaseOrderCauseList"
+                              dataModel="#{purchaseOrderCauseDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/fixedassets/purchaseOrderCause.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('PURCHASEORDERCAUSE','CREATE')}"
+                          propagation="begin"
+                          tabindex="8"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

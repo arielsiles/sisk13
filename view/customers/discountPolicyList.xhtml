@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DiscountPolicy.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="discountPolicySearch">
+
+            <rich:simpleTogglePanel label="#{messages['DiscountPolicy.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DiscountPolicy.name']}</ui:define>
+                    <h:inputText id="name" value="#{discountPolicyDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{discountPolicyDataModel.search}"
+                                       reRender="discountPolicyList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/discountPolicy.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('DISCOUNTPOLICY','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{discountPolicyDataModel}" var="discountPolicyItem" id="discountPolicyList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="40%, 15%, 15%, 15%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountPolicy.name"
+                                                   dataModel="#{discountPolicyDataModel}"
+                                                   reRender="discountPolicyList, dataScroller">
+                                #{messages['DiscountPolicy.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountPolicy.discountPolicyType.target"
+                                                   dataModel="#{discountPolicyDataModel}"
+                                                   reRender="discountPolicyList, dataScroller">
+                                #{messages['DiscountPolicy.target']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountPolicy.discountPolicyType.measurement"
+                                                   dataModel="#{discountPolicyDataModel}"
+                                                   reRender="discountPolicyList, dataScroller">
+                                #{messages['DiscountPolicy.discountPolicyType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="discountPolicy.amount"
+                                                   dataModel="#{discountPolicyDataModel}"
+                                                   reRender="discountPolicyList, dataScroller">
+                                #{messages['DiscountPolicy.amount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{discountPolicyItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <!--
+                    <h:outputText value="#{discountPolicyItem.discountPolicyType.target eq 'CUSTOMER' ?
+                    messages['DiscountPolicyTargetType.customer'] : messages['DiscountPolicyTargetType.product']}"/>
+                    -->
+                    <h:outputText
+                            value="#{discountPolicyItem.discountPolicyType.target eq 'CUSTOMER' ? messages['DiscountPolicyTargetType.customer'] : (discountPolicyItem.discountPolicyType.target eq 'PRODUCT' ? messages['DiscountPolicyTargetType.product'] : messages['DiscountPolicyTargetType.employee'])}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[discountPolicyItem.discountPolicyType.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{discountPolicyItem.amount}">
+                        <!--<f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>-->
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{discountPolicyAction.select(discountPolicyItem)}"
+                                   rendered="#{s:hasPermission('DISCOUNTPOLICY','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="discountPolicyList" dataModel="#{discountPolicyDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/discountPolicy.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('DISCOUNTPOLICY','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,209 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{invoicesFormAction.managed}">
+            #{messages['InvoicesForm.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['InvoicesForm.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+    <h:form id="invoicesFormForm">
+        <div class="buttons">
+            <h:commandButton action="#{invoicesFormAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{not invoicesFormAction.managed}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton action="#{invoicesFormAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{invoicesFormAction.managed and not invoicesFormAction.readOnly}"
+                             tabindex="2"/>
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{invoicesFormAction.managed and not invoicesFormAction.readOnly}"
+                             tabindex="3">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+            <h:commandButton action="#{invoicesFormAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="4">
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{invoicesFormAction.managed}">
+                        #{messages['InvoicesForm.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['InvoicesForm.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width100percent">
+                <s:div id="invoicesFormDiv">
+                    <c:choose>
+                        <c:when test="#{invoicesFormAction.managed}">
+                            <s:decorate id="jobContractField" template="/include/viewField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['InvoicesForm.employee']}</ui:define>
+                                <h:outputText
+                                        value="#{invoicesForm.jobContract.contract.employee.fullName} - #{invoicesForm.jobContract.job.charge.name}"/>
+                            </s:decorate>
+                        </c:when>
+                        <c:otherwise>
+                            <s:decorate id="jobContractField" template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['InvoicesForm.employee']}</ui:define>
+                                <app:selectPopUp id="jobContract"
+                                                 textValue="#{invoicesForm.jobContract.contract.employee.fullName}"
+                                                 value="#{invoicesForm.jobContract}"
+                                                 required="true"
+                                                 dataModel="#{jobContractForPayrollDataModel}"
+                                                 searchModalPanel="jobContractListModalPanel"
+                                                 renderedSelectLink="true"
+                                                 renderedClearLink="true"
+                                                 clearAction="invoicesFormAction.clearJobContract()"
+                                                 reRender="jobContractField, invoicesFormDiv"
+                                                 hotKeySelect="alt+1">
+                                    <ui:define name="dataModelStaticProperties">
+                                        <f:setPropertyActionListener
+                                                value="#{payrollGenerationCycleAction.instance.startDate}"
+                                                target="#{jobContractForPayrollDataModel.startDate}"/>
+                                        <f:setPropertyActionListener
+                                                value="#{payrollGenerationCycleAction.instance.endDate}"
+                                                target="#{jobContractForPayrollDataModel.endDate}"/>
+                                        <f:setPropertyActionListener
+                                                value="#{payrollGenerationCycleAction.instance.businessUnit}"
+                                                target="#{jobContractForPayrollDataModel.businessUnit}"/>
+                                        <f:setPropertyActionListener
+                                                value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.PayrollGenerationType', 'GENERATION_BY_TIME')}"
+                                                target="#{jobContractForPayrollDataModel.payrollGenerationType}"/>
+                                    </ui:define>
+                                </app:selectPopUp>
+                            </s:decorate>
+                        </c:otherwise>
+                    </c:choose>
+                    <s:decorate id="presentationDateField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['InvoicesForm.presentationDate']}</ui:define>
+                        <rich:calendar id="presentationDate"
+                                       value="#{invoicesForm.presentationDate}"
+                                       popup="true"
+                                       datePattern="#{messages['patterns.date']}"
+                                       styleClass="input"
+                                       enableManualInput="true"
+                                       rendered="#{not invoicesFormAction.readOnly}"
+                                       required="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                        <h:outputText value="#{invoicesForm.presentationDate}"
+                                      rendered="#{invoicesFormAction.readOnly}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="invoicingAmountField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['InvoicesForm.invoicingAmount']}</ui:define>
+                        <h:inputText id="invoicingAmount"
+                                     value="#{invoicesForm.fiscalCredit}"
+                                     required="true"
+                                     maxlength="255"
+                                     rendered="#{not invoicesFormAction.readOnly}"
+                                     styleClass="input"
+                                     tabindex="6">
+                            <app:naturalNumberConverter forId="invoicingAmount"/>
+                        </h:inputText>
+                        <h:outputText value="#{invoicesForm.fiscalCredit}"
+                                      rendered="#{invoicesFormAction.readOnly}"/>
+                        <h:outputText value=" #{messages['Currency.Bs']}"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{invoicesFormAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{not invoicesFormAction.managed}"
+                             tabindex="7"/>
+            <h:commandButton action="#{invoicesFormAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{invoicesFormAction.managed and not invoicesFormAction.readOnly}"
+                             tabindex="8"/>
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{invoicesFormAction.managed and not invoicesFormAction.readOnly}"
+                             tabindex="9">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+            <h:commandButton action="#{invoicesFormAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             tabindex="10"
+                             immediate="true"/>
+        </div>
+    </h:form>
+    <rich:jQuery selector="#jobContract" query="focus()" timing="onload"/>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{invoicesFormAction.managed}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['InvoicesForm.delete.confirmation']}">
+                    <f:param value="#{invoicesForm.jobContract.contract.employee.fullName}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{invoicesFormAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               tabindex="1000"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="jobContractListModalPanelContainer"
+                template="/employees/jobContractListForPayrollModalPanel.xhtml">
+        <ui:param name="dialogId" value="jobContractListModalPanel"/>
+        <ui:param name="dataModel" value="#{jobContractForPayrollDataModel}"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{invoicesFormAction.assignJobContract(jobContractItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="jobContractField"
+                               oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</ui:define>
+</ui:composition>

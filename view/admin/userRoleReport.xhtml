@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.userRole.page.title']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+        <h:form id="userRoleReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.userRole.page.title']}
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent">
+                    <s:div>
+                        <s:decorate id="groupingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.userRole.page.groupingType']}</ui:define>
+                            <h:selectOneMenu id="groupingType"
+                                             value="#{userRoleReportAction.groupingType}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="1">
+                                <s:selectItems value="#{userRoleGroupingTypeEnum}"
+                                               var="groupingType"
+                                               label="#{messages[groupingType.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{userRoleReportAction}"
+                                      showPageFormat="false"
+                                      tabIndex="5"
+                                      showReportTitle="true"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{userRoleReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}"
+                                 id="generateButtonId"
+                                 tabindex="10"
+                                 rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#groupingType" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,107 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{dialogId}_templateCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['AccountingTemplate.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" styleClass="select-image" id="closeLink"/>
+    </f:facet>
+    <h:form id="accountingTemplateListForm">
+        <rich:simpleTogglePanel label="#{messages['AccountingTemplate.search']}" switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="templateCodeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingTemplate.templateCode']}</ui:define>
+                    <h:inputText id="#{dialogId}_templateCode"
+                                 value="#{accountingTemplateDataModel.criteria.templateCode}"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="nameField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingTemplate.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{accountingTemplateDataModel.criteria.name}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{accountingTemplateDataModel.search}"
+                                       reRender="accountingTemplateList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable id="accountingTemplateList"
+                        value="#{accountingTemplateDataModel}"
+                        var="accountingTemplateItem"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="25%, 65%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="accountingTemplate.templateCode"
+                                               dataModel="#{accountingTemplateDataModel}"
+                                               reRender="accountingTemplateList, dataScroller">
+                            #{messages['AccountingTemplate.templateCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="accountingTemplate.name"
+                                               dataModel="#{accountingTemplateDataModel}"
+                                               reRender="accountingTemplateList, dataScroller">
+                            #{messages['AccountingTemplate.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{accountingTemplateItem.templateCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{accountingTemplateItem.name}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller"
+                          for="accountingTemplateList"
+                          dataModel="#{accountingTemplateDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, assignButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

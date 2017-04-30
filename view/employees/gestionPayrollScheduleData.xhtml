@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <s:div>
+        <c:forEach items="#{monthEnumeration}" var="month">
+            <app:fieldset id="month#{businessUnit.executorUnitCode}#{month.value}"
+                          title="#{messages[month.resourceKey]}">
+                <rich:dataTable value="#{gestionPayrollScheduleAction.gestionPayrollList(businessUnit,month)}"
+                                var="gestionPayrollItem"
+                                rows="0"
+                                width="100%"
+                                columnsWidth="15%,15%,12%,12%,12%,12%,12%,10%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['GestionPayroll.jobCategory']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.gestionName']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.initDate']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.endDate']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.generationBeginning']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.generationDeadline']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['GestionPayroll.officialPayrollDeadline']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['ExchangeRate.rate']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.jobCategory.fullName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.gestionName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.initDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.endDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.generationBeginning}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.generationDeadline}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{gestionPayrollItem.officialPayrollDeadline}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{gestionPayrollItem.exchangeRate.rate}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </rich:column>
+                </rich:dataTable>
+            </app:fieldset>
+        </c:forEach>
+    </s:div>
+</ui:composition>

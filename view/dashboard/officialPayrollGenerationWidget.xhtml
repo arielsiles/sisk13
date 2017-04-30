@@ -1,0 +1,141 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <rich:panel>
+        <f:facet name="header">
+            <h:panelGrid cellpadding="0" cellspacing="0" border="0" columns="2" width="100%">
+                <s:div styleClass="left">
+                    #{officialPayrollGenerationWidgetAction.widget.title}
+                </s:div>
+                <s:div styleClass="right">
+                    <s:link view="/dashboard/widget.xhtml"
+                            title="#{messages['Common.configure']}"
+                            action="#{widgetAction.selectWidget(officialPayrollGenerationWidgetAction.widget.xmlId)}">
+                        <h:graphicImage value="/img/config.png" styleClass="select-image"/>
+                    </s:link>
+                </s:div>
+            </h:panelGrid>
+        </f:facet>
+        <h:panelGrid cellpadding="3" cellspacing="0" border="0" columns="2" width="100%"
+                     columnClasses="width50percent,width50percent">
+            <s:div styleClass="left">
+                <h:outputFormat value="#{messages['Dashboard.area']}">
+                    <f:param value="#{messages[officialPayrollGenerationWidgetAction.widget.area]}"/>
+                </h:outputFormat>
+            </s:div>
+            <s:div styleClass="left">
+                <h:outputFormat value="#{messages['Dashboard.module']}">
+                    <f:param value="#{messages[officialPayrollGenerationWidgetAction.widget.module]}"/>
+                </h:outputFormat>
+            </s:div>
+        </h:panelGrid>
+        <a4j:region renderRegionOnly="true">
+            <rich:tabPanel id="officialPayrollGenerationWidgetTabPanel" switchType="ajax">
+                <rich:tab label="#{messages['Dashboard.tab.all']}"
+                          action="#{officialPayrollGenerationWidgetAction.disableExecutorUnit()}"
+                          ajaxSingle="true"
+                          styleClass="center">
+                    <a4j:form id="officialPayrollGenerationAjaxFormAll" ajaxSubmit="true"
+                              reRender="officialPayrollGenerationGraphicAll">
+                        <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%" columns="1">
+                            <s:div id="documentationRegistrationSelectBoxAll">
+                                <h:panelGrid columns="5">
+                                    <h:outputLabel value="#{messages['Common.year']}"/>
+                                    <h:selectOneMenu
+                                            value="#{officialPayrollGenerationWidgetAction.gestion}"
+                                            styleClass="inputMedium">
+                                        <s:selectItems value="#{gestionList}" var="gestion"
+                                                       label="#{gestion.year}"
+                                                       hideNoSelectionLabel="true"/>
+                                        <s:convertEntity/>
+                                    </h:selectOneMenu>
+                                    <h:outputLabel value="#{messages['Common.month']}"/>
+                                    <h:selectOneMenu id="month"
+                                                     value="#{officialPayrollGenerationWidgetAction.month}"
+                                                     styleClass="inputMedium">
+                                        <s:selectItems value="#{months}" var="month"
+                                                       label="#{messages[month.resourceKey]}"
+                                                       hideNoSelectionLabel="true"/>
+                                        <s:convertEnum/>
+                                    </h:selectOneMenu>
+                                    <a4j:commandButton value="#{messages['Common.refresh']}"
+                                                       action="#{officialPayrollGenerationWidgetAction.refresh()}"
+                                                       reRender="documentationRegistrationSelectBoxAll"
+                                                       styleClass="button"/>
+                                </h:panelGrid>
+                            </s:div>
+                            <s:div id="officialPayrollGenerationGraphicAll">
+                                <a4j:actionparam
+                                        value="#{rich:element('officialPayrollGenerationWidgetTabPanel')}.offsetWidth"
+                                        assignTo="#{officialPayrollGenerationWidgetAction.containerWidth}"
+                                        noEscape="true"/>
+                                <h:outputText value="#{officialPayrollGenerationWidgetAction.title}"/>
+                                <s:graphicImage value="#{officialPayrollGenerationWidgetAction.createChart()}"
+                                                usemap="#toolTipMap_#{officialPayrollGenerationWidgetAction.widget.xmlId}"/>
+                                <h:outputText value="#{officialPayrollGenerationWidgetAction.toolTipMap}"
+                                              escape="false"/>
+                            </s:div>
+                        </h:panelGrid>
+                    </a4j:form>
+                </rich:tab>
+                <c:forEach items="#{sedeList.resultList}" var="businessUnit">
+                    <rich:tab label="#{businessUnit.organization.name}"
+                              action="#{officialPayrollGenerationWidgetAction.enableExecutorUnit(businessUnit.id)}"
+                              ajaxSingle="true"
+                              styleClass="center">
+                        <a4j:form id="officialPayrollGenerationAjaxForm_#{businessUnit.id}" ajaxSubmit="true"
+                                  reRender="officialPayrollGenerationGraphic_#{businessUnit.id}">
+                            <h:panelGrid border="0" cellpadding="0" cellspacing="0" width="100%" columns="1">
+                                <s:div id="documentationRegistrationSelectBox_#{businessUnit.id}">
+                                    <h:panelGrid columns="5">
+                                        <h:outputLabel value="#{messages['Common.year']}"/>
+                                        <h:selectOneMenu
+                                                value="#{officialPayrollGenerationWidgetAction.gestion}"
+                                                styleClass="inputMedium">
+                                            <s:selectItems value="#{gestionList}" var="gestion"
+                                                           label="#{gestion.year}"
+                                                           hideNoSelectionLabel="true"/>
+                                            <s:convertEntity/>
+                                        </h:selectOneMenu>
+                                        <h:outputLabel value="#{messages['Common.month']}"/>
+                                        <h:selectOneMenu id="month"
+                                                         value="#{officialPayrollGenerationWidgetAction.month}"
+                                                         styleClass="inputMedium">
+                                            <s:selectItems value="#{months}" var="month"
+                                                           label="#{messages[month.resourceKey]}"
+                                                           hideNoSelectionLabel="true"/>
+                                            <s:convertEnum/>
+                                        </h:selectOneMenu>
+                                        <a4j:commandButton value="#{messages['Common.refresh']}"
+                                                           action="#{officialPayrollGenerationWidgetAction.refresh()}"
+                                                           reRender="documentationRegistrationSelectBox_#{businessUnit.id}"
+                                                           styleClass="button"/>
+                                    </h:panelGrid>
+                                </s:div>
+                                <s:div id="officialPayrollGenerationGraphic_#{businessUnit.id}">
+                                    <a4j:actionparam
+                                            value="#{rich:element('officialPayrollGenerationWidgetTabPanel')}.offsetWidth"
+                                            assignTo="#{officialPayrollGenerationWidgetAction.containerWidth}"
+                                            noEscape="true"/>
+                                    <h:outputText value="#{officialPayrollGenerationWidgetAction.title}"/>
+                                    <s:graphicImage value="#{officialPayrollGenerationWidgetAction.createChart()}"
+                                                    usemap="#toolTipMap_#{officialPayrollGenerationWidgetAction.widget.xmlId}"/>
+                                    <h:outputText value="#{officialPayrollGenerationWidgetAction.toolTipMap}"
+                                                  escape="false"/>
+                                </s:div>
+                            </h:panelGrid>
+                        </a4j:form>
+                    </rich:tab>
+                </c:forEach>
+            </rich:tabPanel>
+            <ui:include src="/dashboard/componentStatus.xhtml"/>
+        </a4j:region>
+    </rich:panel>
+</ui:composition>

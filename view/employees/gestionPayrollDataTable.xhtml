@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:dataTable value="#{dataModel}" var="gestionPayrollItem" id="gestionPayrollList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="8%,10%, 23%,8%, 5%, 7%, 8%, 8%, 5%, 5%, 13%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.businessUnit.organization.name"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['Sede.sede']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.jobCategory.name"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.jobCategory']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.gestionName"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.gestionName']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.gestionPayrollType"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.gestionPayrollType']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.gestion.year"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['Gestion.year']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.month"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.month']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.initDate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.initDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.endDate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['GestionPayroll.endDate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column>
+                    <app:commandSortHeader sortProperty="gestionPayroll.exchangeRate.rate"
+                                           dataModel="#{dataModel}"
+                                           reRender="gestionPayrollList, #{dataScrollerId}">
+                        #{messages['ExchangeRate.rate']}
+                    </app:commandSortHeader>
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['GestionPayroll.officialGeneration']}
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.businessUnit.organization.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.jobCategory.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.gestionName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[gestionPayrollItem.gestionPayrollType.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.gestion.year}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[gestionPayrollItem.month.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.initDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.endDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{gestionPayrollItem.exchangeRate.rate}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:graphicImage value="/img/active.gif" styleClass="select-image-middle"
+                            rendered="#{gestionPayrollAction.hasOfficialGeneration(gestionPayrollItem)}"/>
+        </rich:column>
+        <rich:column styleClass="left">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('GESTIONPAYROLL','VIEW')}"
+                           action="#{gestionPayrollAction.select(gestionPayrollItem)}">
+            </h:commandLink>
+            &#160;
+            <h:commandLink action="#{gestionPayrollAction.viewPayroll(gestionPayrollItem)}"
+                           immediate="true" title="#{messages['GestionPayroll.action.view']}">
+                <h:graphicImage value="/img/payroll.jpg" styleClass="select-image-middle"
+                                alt="#{messages['GestionPayroll.action.view']}"
+                                title="#{messages['GestionPayroll.action.view']}"/>
+            </h:commandLink>
+            &#160;
+            <h:commandLink action="#{gestionPayrollAction.generatePayroll(gestionPayrollItem)}"
+                           immediate="true" title="#{messages['GestionPayroll.action.generate']}"
+                           rendered="#{gestionPayrollService.hasValidGenerationDateRange(gestionPayrollItem)}">
+                <h:graphicImage value="/img/tournicoti.gif" styleClass="select-image-middle"
+                                alt="#{messages['GestionPayroll.action.generate']}"
+                                title="#{messages['GestionPayroll.action.generate']}"/>
+            </h:commandLink>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="#{dataScrollerId}" for="gestionPayrollList" dataModel="#{dataModel}"/>
+</ui:composition>

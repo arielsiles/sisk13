@@ -1,0 +1,187 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{documentTypeAction.managed}">
+                #{messages['DocumentType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DocumentType.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="documentTypeForm">
+            <div class="buttons">
+                <a4j:commandButton id="newExtensionId"
+                                   action="#{extensionAction.addExtension}"
+                                   value="#{messages['DocumentType.addExtension']}"
+                                   rendered="#{documentTypeAction.managed and s:hasPermission('EXTENSION','CREATE')}"
+                                   styleClass="button"
+                                   immediate="true"/>
+
+                <h:commandButton id="createButtonId"
+                                 action="#{documentTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{documentTypeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{documentTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{documentTypeAction.managed}">
+                            #{messages['DocumentType.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DocumentType.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DocumentType.name']}</ui:define>
+                    <h:inputText id="name" value="#{documentType.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1"/>
+                </s:decorate>
+                <s:decorate id="entityTypeEnumField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['DocumentType.entityType']}</ui:define>
+                    <h:selectOneMenu id="entityTypeEnum"
+                                     value="#{documentType.entityType}"
+                                     styleClass="input"
+                                     required="true"
+                                     rendered="#{!documentTypeAction.managed}"
+                                     tabindex="2">
+                        <s:selectItems value="#{documentTypeEntityTypeList}"
+                                       var="types"
+                                       label="#{messages[types.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{messages[documentType.entityType.resourceKey]}"
+                                  rendered="#{documentTypeAction.managed}">
+                    </h:outputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <a4j:commandButton action="#{extensionAction.addExtension}"
+                                   value="#{messages['DocumentType.addExtension']}"
+                                   rendered="#{documentTypeAction.managed and s:hasPermission('EXTENSION','CREATE')}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   tabindex="3"/>
+
+                <h:commandButton action="#{documentTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','CREATE')}"
+                                 tabindex="4"/>
+
+                <h:commandButton action="#{documentTypeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','UPDATE')}"
+                                 tabindex="5"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','DELETE')}"
+                                 tabindex="6">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{documentTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="7"/>
+            </div>
+
+            <c:if test="#{documentTypeAction.managed and s:hasPermission('EXTENSION','VIEW')}">
+                <rich:dataTable value="#{extensionDataModel}"
+                                var="extensionItem"
+                                id="extensionList"
+                                rows="#{sessionUser.rowsPerPage}"
+                                align="center"
+                                width="100%"
+                                columnsWidth="90%,10%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['Extension.extension']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['Common.action']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{extensionItem.extension}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:commandLink value="#{messages['Common.select']}"
+                                       immediate="true"
+                                       rendered="#{s:hasPermission('EXTENSION','VIEW')}"
+                                       action="#{extensionAction.select(extensionItem)}"/>
+                    </rich:column>
+                </rich:dataTable>
+                <app:dataScroller id="dataScroller"
+                                  for="extensionList"
+                                  dataModel="#{extensionDataModel}"/>
+            </c:if>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DocumentType.delete.confirmation']}">
+                        <f:param value="#{documentType.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{documentTypeAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{documentTypeAction.managed and s:hasPermission('DOCUMENTTYPE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

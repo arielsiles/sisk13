@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="0" rightMargin="50" topMargin="0" bottomMargin="0" scriptletClass="com.encens.khipus.action.employees.reports.CriteriaValueEvaluationSubReportScriptlet">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="titleStyle" isDefault="true" fontName="Verdana" fontSize="20" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+	<style name="detailStyle" isDefault="true" fontName="Verdana" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+	<style name="headerStyle" isDefault="true" backcolor="#C0C0C0" fontName="Verdana" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+	<style name="headerStyleBlank" isDefault="true" fontName="Verdana" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+	<parameter name="evaluationCriteriaIdParam" class="java.lang.Long"/>
+	<parameter name="personIdParam" class="java.lang.Long"/>
+	<parameter name="pollFormIdParam" class="java.lang.Long"/>
+	<parameter name="questionIdParam" class="java.lang.Long"/>
+	<parameter name="facultyIdParam" class="java.lang.Long"/>
+	<parameter name="careerIdParam" class="java.lang.Long"/>
+	<parameter name="isRenderImageParam" class="java.lang.String"/>
+	<field name="evaluationCriteriaValue.id" class="java.lang.Long">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="evaluationCriteriaValue.sequence" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="evaluationCriteriaValue.title" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<variable name="criteriaEvaluationVar" class="java.lang.Long" calculation="System">
+		<initialValueExpression><![CDATA[new java.lang.Long(0)]]></initialValueExpression>
+	</variable>
+	<variable name="criteriaEvaluationListVar" class="java.util.List" calculation="System">
+		<initialValueExpression><![CDATA[new java.util.ArrayList()]]></initialValueExpression>
+	</variable>
+	<variable name="criteriaValueTitleListVar" class="java.util.List" calculation="System">
+		<initialValueExpression><![CDATA[new java.util.ArrayList()]]></initialValueExpression>
+	</variable>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band height="12">
+			<printWhenExpression><![CDATA[java.lang.Boolean.valueOf($P{isRenderImageParam} == null || "false".equals($P{isRenderImageParam}))]]></printWhenExpression>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="170" y="0" width="50" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$V{criteriaEvaluationVar}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="170" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{evaluationCriteriaValue.sequence}.toString() + " " + $F{evaluationCriteriaValue.title}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+	<summary>
+		<band height="150">
+			<printWhenExpression><![CDATA[java.lang.Boolean.valueOf("true".equals($P{isRenderImageParam}))]]></printWhenExpression>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" hyperlinkType="Reference">
+				<reportElement x="0" y="0" width="280" height="140"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<imageExpression class="net.sf.jasperreports.engine.JRRenderable"><![CDATA[com.encens.khipus.action.employees.reports.CriteriaValueEvaluationSubReportScriptlet.renderPieImage($V{criteriaEvaluationListVar},$V{criteriaValueTitleListVar})]]></imageExpression>
+			</image>
+		</band>
+	</summary>
+</jasperReport>

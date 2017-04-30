@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductDelivery.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="ProductDeliverySearch">
+
+            <rich:simpleTogglePanel label="#{messages['ProductDelivery.search']}" switchType="client">
+
+                <s:decorate id="invoiceTypeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <h:selectOneRadio value="#{printInvoiceReportAction.invoicePrintType}"
+                                      layout="lineDirection"
+                                      rendered="#{printInvoiceReportAction.imprimirCopia}">
+                        <s:selectItems value="#{invoicePrintTypes}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"/>
+                        <s:convertEnum/>
+                    </h:selectOneRadio>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Order.report.dateInvoice']}</ui:define>
+                    <rich:calendar id="dateDelivery"
+                                   value="#{printInvoiceReportAction.printInvoiceDataModel.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                    <a4j:commandButton action="#{printInvoiceReportAction.search}"
+                                       reRender="productDeliveryList, dataScroller,invoiceTypeField"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#invoiceNumber" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+
+                <a4j:commandLink action="#{printInvoiceReportAction.generateReport()}"
+                               immediate="true"
+                               reRender="invoiceTypeField"
+                               value="Generar Facturas"
+                               rendered="#{s:hasPermission('PRINTINVOICE','VIEW')}">
+                </a4j:commandLink>
+
+            </div>
+
+            <div class="buttons">
+           <!-- &lt;!&ndash;Todo: este boton debe ser eliminado&ndash;&gt;
+            <h:commandButton id="generateAllButtonId"
+                             action="#{productDeliveryAction.myCreate}"
+                             value="generar todos"
+                             styleClass="button"
+                             immediate="true"
+                             rendered="true">
+                <s:defaultAction/>
+            </h:commandButton>-->
+
+            </div>
+            <rich:dataTable id="productDeliveryList"
+                            value="#{printInvoiceReportAction.printInvoiceDataModel}"
+                            var="customerOrderItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="60%, 15%, 15%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['ProductDelivery.nameClient']}
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="customerOrder.order"
+                                                   dataModel="#{printInvoiceReportAction.printInvoiceDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['ProductDelivery.documentNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="customerOrder.total"
+                                                   dataModel="#{printInvoiceReportAction.printInvoiceDataModel}"
+                                                   reRender="productDeliveryList, dataScroller">
+                                #{messages['CustomerOrder.total']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{customerOrderItem.clientOrder.hst}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{customerOrderItem.id}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{customerOrderItem.total}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{printInvoiceReportAction.select(customerOrderItem)}"
+                                   rendered="#{s:hasPermission('PRINTINVOICE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+
+                    &#160;
+                    <h:commandLink action="#{printInvoiceReportAction.generateReport(customerOrderItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('PRINTINVOICE','CREATE')}">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['ProductDelivery.button.generateDocument']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productDeliveryList" dataModel="#{printInvoiceReportAction.printInvoiceDataModel}"/>
+
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

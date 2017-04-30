@@ -1,0 +1,70 @@
+<rich:modalPanel id="fixAmountModalPanel" minHeight="150" minWidth="400" autosized="true" zindex="2000"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 xmlns:s="http://jboss.com/products/seam/taglib">
+    <f:facet name="header">
+        <ui:insert name="dialogTitle"/>
+    </f:facet>
+    <h:panelGroup>
+        <div align="center">
+            <h:form id="fixAmountForm">
+
+                <s:decorate id="maximumAmountField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingRecord.maximumAmount']}</ui:define>
+                    <h:inputText id="maximumAmount"
+                                 value="#{accountingRecordAction.accountingRecordFixData.maximumAmount}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="25">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="maximumAmount"/>
+                    </h:inputText>
+                    &#160;
+                    <h:outputText
+                            value="#{messages[accountingRecordAction.accountingRecordFixData.sourceBankAccount.currency.symbolResourceKey]}"/>
+                </s:decorate>
+
+                <s:decorate id="financesBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingRecord.targetBankAccount']}</ui:define>
+                    <h:selectOneMenu id="financesBankAccount"
+                                     value="#{accountingRecordAction.accountingRecordFixData.targetBankAccount}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{financesBankAccountList.resultList}" var="financesBankAccount"
+                                       label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <h:panelGroup>
+                    <a4j:commandButton action="#{accountingRecordAction.performFixAmount}"
+                                       reRender="fixAmountForm#{facesContext.maximumSeverity==null?', accountingRecordForm':''}"
+                                       styleClass="button"
+                                       value="#{messages['AccountingRecord.fixAmount']}"
+                                       oncomplete="if(#{facesContext.maximumSeverity==null})Richfaces.hideModalPanel('fixAmountModalPanel');"/>
+
+                    <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                        <rich:componentControl for="fixAmountModalPanel" event="onclick"
+                                               disableDefault="true"
+                                               operation="hide"/>
+                    </h:commandButton>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:panelGroup>
+</rich:modalPanel>
+
+
+
+
+

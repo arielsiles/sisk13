@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle"> #{messages['UserCashBox.edit']}</ui:define>
+
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="userCashBoxForm">
+
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{cashBoxAction.updateUserCashBox}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashBoxAction.managed}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    #{messages['UserCashBox.edit']}
+                </f:facet>
+                <s:decorate id="cashBoxField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['UserCashBox.cashBox']}</ui:define>
+                    <h:outputText id="cashBox" value="#{cashBox.description}" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="userField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['UserCashBox.user']}</ui:define>
+                    <h:outputText id="user" value="#{cashBoxAction.user.employee.fullName}" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="assignCustomerField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <a4j:commandLink value=" #{messages['UserCashBox.selectUser']}"
+                                     tabindex="1"
+                                     oncomplete="Richfaces.showModalPanel('userListModalPanel');"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{cashBoxAction.updateUserCashBox}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{cashBoxAction.managed}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{cashBoxAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="3"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="users" template="/finances/userListModalPanel.xhtml"/>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,278 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['Employee.list']}</ui:define>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="employeeSearch">
+<rich:simpleTogglePanel label="#{messages['Employee.search']}" switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Employee.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{employeeDataModel.criteria.lastName}"
+                             maxlength="80"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Employee.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{employeeDataModel.criteria.maidenName}"
+                             maxlength="80"
+                             tabindex="2"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Employee.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{employeeDataModel.criteria.firstName}"
+                             maxlength="80"
+                             tabindex="3"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="academicFormationNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AcademicFormation.name']}</ui:define>
+                <h:inputText id="academicFormationName" value="#{employeeDataModel.academicFormationName}"
+                             styleClass="input" maxlength="250"
+                             tabindex="4"/>
+            </s:decorate>
+
+            <s:decorate id="academicFormationUniversityField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AcademicFormation.university']}</ui:define>
+                <h:inputText id="academicFormationUniversity" value="#{employeeDataModel.academicFormationUniversity}"
+                             styleClass="input" maxlength="250"
+                             tabindex="5"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Employee.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{employeeDataModel.criteria.idNumber}"
+                             maxlength="80"
+                             tabindex="6"
+                             styleClass="input">
+                    <app:naturalNumberConverter forId="idNumber"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="employeeCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Employee.employeeCode']}</ui:define>
+                <h:inputText id="idNumber" value="#{employeeDataModel.criteria.employeeCode}"
+                             maxlength="80"
+                             tabindex="7"
+                             styleClass="input">
+                    <app:naturalNumberConverter forId="idNumber"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CostCenter.costCenter']}</ui:define>
+                <h:inputText id="costCenter"
+                             styleClass="input"
+                             readonly="true"
+                             value="#{employeeDataModel.costCenter.fullName}"
+                             tabindex="8"/>
+                <a4j:commandLink id="selectCostCenter"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{messages['Common.choose']}"
+                                 onclick="Richfaces.showModalPanel('costCenterListModalPanel');"
+                                 tabindex="8">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="clearButton"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{employeeDataModel.clearCostCenter()}"
+                                 reRender="costCenterField"
+                                 tabindex="8">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+            <s:decorate id="academicFormationTypeField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['AcademicFormation.type']}</ui:define>
+                <h:selectOneMenu id="academicFormationType"
+                                 value="#{employeeDataModel.academicFormationType}"
+                                 styleClass="input"
+                                 tabindex="9">
+                    <s:selectItems value="#{academicFormationTypeEnum}" var="aft"
+                                   label="#{messages[aft.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
+                <a4j:commandButton action="#{employeeDataModel.search}"
+                                   reRender="employeeSearch , employeeList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="10">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <a4j:commandButton action="#{employeeDataModel.clear}"
+                                   reRender="employeeSearch , employeeList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.clear']}"
+                                   tabindex="11"/>
+            </s:decorate>
+
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#lastName" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/employee.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('EMPLOYEE','CREATE')}"
+              tabindex="10"/>
+</div>
+
+
+<rich:dataTable value="#{employeeDataModel}" var="employeeItem" id="employeeList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="15%,15%, 20%, 10%, 10%,10%,10%,10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.lastName"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.lastName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.maidenName"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.maidenName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.firstName"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.firstName']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.idNumber"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.idNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.markCode"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.markCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.employeeCode"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.employeeCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.paymentType"
+                                       dataModel="#{employeeDataModel}"
+                                       reRender="employeeList, dataScroller">
+                    #{messages['Employee.paymentType']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{employeeItem.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{employeeItem.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{employeeItem.firstName}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{employeeItem.idNumber}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{employeeItem.markCode}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{employeeItem.employeeCode}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{messages[employeeItem.paymentType.resourceKey]}"/>
+        <h:graphicImage value="/img/warnIcon.gif" styleClass="select-image-middle"
+                        rendered="#{employeeAction.isBankAccountPaymentType(employeeItem) and not employeeAction.hasBankAccount(employeeItem)}"
+                        title="#{messages['Employee.warn.hasBankAccount']}"
+                        alt="#{messages['Employee.warn.hasBankAccount']}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{employeeAction.select(employeeItem)}"
+                       rendered="#{s:hasPermission('EMPLOYEE','VIEW')}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="employeeList" dataModel="#{employeeDataModel}"/>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/employee.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('EMPLOYEE','CREATE')}"
+              tabindex="11"/>
+</div>
+</h:form>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton1" title="#{messages['Common.choose']}"
+                           action="#{employeeDataModel.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+
+</ui:composition>

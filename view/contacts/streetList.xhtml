@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Street.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="streetSearch">
+            <rich:simpleTogglePanel label="#{messages['Street.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Street.name']}</ui:define>
+                    <h:inputText id="name" value="#{streetDataModel.criteria.name}"
+                                 maxlength="200" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{streetDataModel.search}"
+                                       reRender="streetList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/street.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('STREET','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{streetDataModel}" var="streetItem" id="streetList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%, 15%, 15%, 15%, 15%, 15%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.name" dataModel="#{streetDataModel}"
+                                                   reRender="streetList, dataScroller">
+                                #{messages['Street.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.district.name" dataModel="#{streetDataModel}"
+                                                   reRender="streetList, dataScroller">
+                                #{messages['Street.district']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.district.zone.name"
+                                                   dataModel="#{streetDataModel}"
+                                                   reRender="streetList, dataScroller">
+                                #{messages['Street.zone']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.district.zone.city.name"
+                                                   dataModel="#{streetDataModel}"
+                                                   reRender="streetList, dataScroller">
+                                #{messages['Street.city']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.district.zone.city.department.name"
+                                                   dataModel="#{streetDataModel}"
+                                                   reRender="streettList, dataScroller">
+                                #{messages['Street.department']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="street.district.zone.city.department.country.name"
+                                                   dataModel="#{streetDataModel}"
+                                                   reRender="streetList, dataScroller">
+                                #{messages['Street.country']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{streetItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{streetItem.district.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{streetItem.district.zone.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{streetItem.district.zone.city.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{streetItem.district.zone.city.department.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{streetItem.district.zone.city.department.country.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{streetAction.select(streetItem)}"
+                                   rendered="#{s:hasPermission('STREET','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="streetList" dataModel="#{streetDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/street.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('STREET','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

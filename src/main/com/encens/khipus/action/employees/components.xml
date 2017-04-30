@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+    <factory name="employeeList" value="#{employeeQuery}"/>
+    <framework:entity-query name="employeeQuery" ejbql="select e from Employee e order by e.firstName ASC"/>
+
+    <factory name="jobList" value="#{jobQuery}"/>
+    <framework:entity-query name="jobQuery" ejbql="select j from Job j order by j.name ASC"/>
+
+    <factory name="contractStateList" value="#{contractStateQuery}"/>
+    <framework:entity-query name="contractStateQuery" ejbql="select c from ContractState c order by c.name ASC"/>
+
+    <factory name="organizationalLevelList" value="#{organizationalLevelQuery}"/>
+    <framework:entity-query name="organizationalLevelQuery"
+                            ejbql="select o from OrganizationalLevel o order by o.name ASC"/>
+
+    <factory name="organizationalUnitList" value="#{organizationalUnitQuery}"/>
+    <framework:entity-query name="organizationalUnitQuery"
+                            ejbql="select distinct object(o) from OrganizationalUnit o order by o.name ASC"/>
+
+    <factory name="contractModeList" value="#{contractModeQuery}"/>
+    <framework:entity-query name="contractModeQuery"
+                            ejbql="select c from ContractMode c order by c.name ASC"/>
+
+    <factory name="kindOfSalaryList" value="#{kindOfSalaryQuery}"/>
+    <framework:entity-query name="kindOfSalaryQuery"
+                            ejbql="select k from KindOfSalary k order by k.type ASC"/>
+
+    <factory name="discountPolicyListforEmployees" value="#{discountPolicyQueryforEmployees}"/>
+    <framework:entity-query name="discountPolicyQueryforEmployees"
+                            ejbql="select d from DiscountPolicy d where d.discountPolicyType.target = 'EMPLOYEE' order by d.name"/>
+
+    <factory name="salaryList" value="#{salaryQuery}"/>
+    <framework:entity-query name="salaryQuery"
+                            ejbql="select o from Salary o order by o.amount ASC"/>
+
+    <factory name="contractList" value="#{contractQuery}"/>
+    <framework:entity-query name="contractQuery"
+                            ejbql="select o from Contract o order by o.numberOfContract ASC"/>
+
+    <factory name="gestionPayrollList" value="#{gestionPayrollQuery}"/>
+    <framework:entity-query name="gestionPayrollQuery"
+                            ejbql="select o from GestionPayroll o order by o.gestionName ASC"/>
+
+    <factory name="gestionPayrollFilteredList" value="#{gestionPayrollFilteredQuery}"/>
+    <framework:entity-query name="gestionPayrollFilteredQuery"
+                            ejbql="select gp.gestionPayroll from GeneratedPayroll gp ">
+        <framework:restrictions>
+            <value>gp.gestionPayroll.jobCategory.sector = #{summaryPayrollByPaymentMethodReportAction.sector}</value>
+            <value>gp.gestionPayroll.gestion = #{summaryPayrollByPaymentMethodReportAction.gestion}</value>
+            <value>gp.gestionPayroll.month = #{summaryPayrollByPaymentMethodReportAction.month}</value>
+            <value>gp.generatedPayrollType = #{summaryPayrollByPaymentMethodReportAction.generatedPayrollType}</value>
+        </framework:restrictions>
+        <framework:order>gp.gestionPayroll.gestionName ASC</framework:order>
+    </framework:entity-query>
+
+
+    <factory name="gestionPayrollToManagersSummaryList" value="#{gestionPayrollToManagersSummaryQuery}"/>
+    <framework:entity-query name="gestionPayrollToManagersSummaryQuery"
+                            ejbql="select gp.gestionPayroll from GeneratedPayroll gp ">
+        <framework:restrictions>
+            <value>gp.gestionPayroll.jobCategory = #{managersPayrollSummaryReportAction.jobCategory}</value>
+            <value>gp.gestionPayroll.gestion = #{managersPayrollSummaryReportAction.gestion}</value>
+            <value>gp.gestionPayroll.month = #{managersPayrollSummaryReportAction.month}</value>
+            <value>gp.generatedPayrollType = #{managersPayrollSummaryReportAction.generatedPayrollType}</value>
+        </framework:restrictions>
+        <framework:order>gp.gestionPayroll.gestionName ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="gestionPayrollToAcademicSummaryList" value="#{gestionPayrollToAcademicSummaryQuery}"/>
+    <framework:entity-query name="gestionPayrollToAcademicSummaryQuery"
+                            ejbql="select gp.gestionPayroll from GeneratedPayroll gp ">
+        <framework:restrictions>
+            <value>gp.gestionPayroll.jobCategory = #{academicPayrollSummaryReportAction.jobCategory}</value>
+            <value>gp.gestionPayroll.gestion = #{academicPayrollSummaryReportAction.gestion}</value>
+            <value>gp.gestionPayroll.month = #{academicPayrollSummaryReportAction.month}</value>
+            <value>gp.generatedPayrollType = #{academicPayrollSummaryReportAction.generatedPayrollType}</value>
+        </framework:restrictions>
+        <framework:order>gp.gestionPayroll.gestionName ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="gestionPayrollToLaboralProfessorSummaryList"
+             value="#{gestionPayrollToLaboralProfessorSummaryQuery}"/>
+    <framework:entity-query name="gestionPayrollToLaboralProfessorSummaryQuery"
+                            ejbql="select gp.gestionPayroll from GeneratedPayroll gp ">
+        <framework:restrictions>
+            <value>gp.gestionPayroll.jobCategory = #{laboralProfessorPayrollSummaryReportAction.jobCategory}</value>
+            <value>gp.gestionPayroll.gestion = #{laboralProfessorPayrollSummaryReportAction.gestion}</value>
+            <value>gp.gestionPayroll.month = #{laboralProfessorPayrollSummaryReportAction.month}</value>
+            <value>gp.generatedPayrollType = #{laboralProfessorPayrollSummaryReportAction.generatedPayrollType}</value>
+        </framework:restrictions>
+        <framework:order>gp.gestionPayroll.gestionName ASC</framework:order>
+    </framework:entity-query>
+
+    <!--gestion payroll list to christmas national summary -->
+    <factory name="gestionPayrollToChristmasSummaryList" value="#{gestionPayrollToChristmasSummaryQuery}"/>
+    <framework:entity-query name="gestionPayrollToChristmasSummaryQuery"
+                            ejbql="select gp.gestionPayroll from GeneratedPayroll gp ">
+        <framework:restrictions>
+            <value>gp.gestionPayroll.jobCategory = #{christmasNationalSummaryReportAction.jobCategory}</value>
+            <value>gp.gestionPayroll.gestion = #{christmasNationalSummaryReportAction.gestion}</value>
+            <value>gp.gestionPayroll.gestionPayrollType = #{christmasNationalSummaryReportAction.gestionPayrollType}
+            </value>
+            <value>gp.generatedPayrollType = #{christmasNationalSummaryReportAction.generatedPayrollType}</value>
+        </framework:restrictions>
+        <framework:order>gp.gestionPayroll.gestionName ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="creditorList" value="#{creditorQuery}"/>
+    <framework:entity-query name="creditorQuery"
+                            ejbql="select c from Creditor c order by c.name ASC"/>
+
+    <factory name="creditor4EmpoyeeList" value="#{creditor4EmployeeQuery}"/>
+    <framework:entity-query name="creditor4EmployeeQuery"
+                            ejbql="select c from Creditor4Employee c order by c.name ASC"/>
+
+    <factory name="check4EmpoyeeList" value="#{check4EmployeeQuery}"/>
+    <framework:entity-query name="check4EmployeeQuery"
+                            ejbql="select c from Check4Employee c order by c.name ASC"/>
+
+    <factory name="rHMarkList" value="#{rHMarkQuery}"/>
+    <framework:entity-query name="rHMarkQuery"
+                            ejbql="select c from RHMark c order by c.marDate ASC"/>
+
+    <factory name="horaryBandContractList" value="#{horaryBandContractQuery}"/>
+    <framework:entity-query name="horaryBandContractQuery"
+                            ejbql="select c from HoraryBandContract c order by c.initDate ASC"/>
+
+    <factory name="horaryBandList" value="#{horaryBandQuery}"/>
+    <framework:entity-query name="horaryBandQuery"
+                            ejbql="select c from HoraryBand c order by c.initHour ASC"/>
+
+    <factory name="horaryBandInitDayList" value="#{horaryBandInitDayQuery}"/>
+    <framework:entity-query name="horaryBandInitDayQuery"
+                            ejbql="select distinct c.initDay from HoraryBand c order by c.initDay ASC"/>
+
+    <factory name="horaryBandEndDayList" value="#{horaryBandEndDayQuery}"/>
+    <framework:entity-query name="horaryBandEndDayQuery"
+                            ejbql="select distinct c.endDay from HoraryBand c order by c.endDay ASC"/>
+
+    <factory name="toleranceList" value="#{toleranceQuery}"/>
+    <framework:entity-query name="toleranceQuery"
+                            ejbql="select c from Tolerance c order by c.beforeInit ASC"/>
+
+    <factory name="limitList" value="#{limitQuery}"/>
+    <framework:entity-query name="limitQuery"
+                            ejbql="select l from Limit l order by l.beforeInit ASC"/>
+
+    <factory name="periodList" value="#{periodQuery}"/>
+    <framework:entity-query name="periodQuery"
+                            ejbql="select c from Period c order by c.name ASC"/>
+
+    <factory name="horaryCycleList" value="#{horaryCycleQuery}"/>
+    <framework:entity-query name="horaryCycleQuery"
+                            ejbql="select c from HoraryCycle c order by c.cycleHrInitDate ASC"/>
+
+    <factory name="sectorList" value="#{sectorQuery}"/>
+    <framework:entity-query name="sectorQuery"
+                            ejbql="select c from Sector c order by c.name ASC"/>
+
+    <factory name="bankEntityList" value="#{bankEntityQuery}"/>
+    <framework:entity-query name="bankEntityQuery"
+                            ejbql="select c from BankEntity c order by c.name ASC"/>
+
+    <factory name="subjectList" value="#{subjectQuery}"/>
+    <framework:entity-query name="subjectQuery"
+                            ejbql="select c from Subject c order by c.name ASC"/>
+
+    <factory name="subjectGroupList" value="#{subjectGroupQuery}"/>
+    <framework:entity-query name="subjectGroupQuery"
+                            ejbql="select c from SubjectGroup c order by c.name ASC"/>
+
+    <factory name="jobCategoryList" value="#{jobCategoryQuery}"/>
+    <framework:entity-query name="jobCategoryQuery"
+                            ejbql="select c from JobCategory c">
+        <framework:restrictions>
+            <value>c.sector = #{jobContractDataModel.sector}</value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="activeJobCategoryList" value="#{activeJobCategoryQuery}"/>
+    <framework:entity-query name="activeJobCategoryQuery" ejbql="select c from JobCategory c">
+        <framework:restrictions>
+            <value>c.active = #{true}</value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="academicJobCategoryList" value="#{academicJobCategoryQuery}"/>
+    <framework:entity-query name="academicJobCategoryQuery" ejbql="select c from JobCategory c">
+        <framework:restrictions>
+            <value>c.active = #{true}</value>
+            <value>c.payrollGenerationType =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.PayrollGenerationType', 'GENERATION_BY_TIME')}
+            </value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="administrativeJobCategoryList" value="#{administrativeJobCategoryQuery}"/>
+    <framework:entity-query name="administrativeJobCategoryQuery" ejbql="select c from JobCategory c">
+        <framework:restrictions>
+            <value>c.active = #{true}</value>
+            <value>c.payrollGenerationType =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.PayrollGenerationType', 'GENERATION_BY_SALARY')}
+            </value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="salaryPeriodJobCategoryList" value="#{salaryPeriodJobCategoryQuery}"/>
+    <framework:entity-query name="salaryPeriodJobCategoryQuery" ejbql="select c from JobCategory c">
+        <framework:restrictions>
+            <value>c.active = #{true}</value>
+            <value>c.payrollGenerationType =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.PayrollGenerationType', 'GENERATION_BY_PERIODSALARY')}
+            </value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="controlReportList" value="#{controlReportQuery}"/>
+    <framework:entity-query name="controlReportQuery"
+                            ejbql="select c from ControlReport c order by c.idNumber ASC, c.date ASC, c.day ASC, c.initHour ASC, c.endHour ASC"/>
+
+    <factory name="generalPayrollList" value="#{generalPayrollQuery}"/>
+    <framework:entity-query name="generalPayrollQuery"
+                            ejbql="select c from GeneralPayroll c order by c.liquid ASC"/>
+
+    <factory name="generatedPayrollList" value="#{generstedPayrollQuery}"/>
+    <framework:entity-query name="generatedPayrollQuery"
+                            ejbql="select c from GeneratedPayroll c order by c.name ASC"/>
+
+    <factory name="evaluationCriteriaList" value="#{evaluationCriteriaQuery}"/>
+    <framework:entity-query name="evaluationCriteriaQuery"
+                            ejbql="select ec from EvaluationCriteria ec order by ec.name ASC"/>
+
+    <factory name="sectionList" value="#{sectionQuery}"/>
+    <framework:entity-query name="sectionQuery" ejbql="select s from Section s">
+        <framework:restrictions>
+            <value>s.pollForm = #{pollForm}</value>
+        </framework:restrictions>
+        <framework:order>s.sequence ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="locationList" value="#{locationQuery}"/>
+    <framework:entity-query name="locationQuery" ejbql="select l from Location l order by l.name asc"/>
+
+    <factory name="facultyList" value="#{facultyQuery}"/>
+    <framework:entity-query name="facultyQuery" ejbql="select f from Faculty f">
+        <framework:restrictions>
+            <value>f.location = #{pollCopyAction.location}</value>
+        </framework:restrictions>
+        <framework:order>f.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="careerList" value="#{careerQuery}"/>
+    <framework:entity-query name="careerQuery" ejbql="select c from Career c">
+        <framework:restrictions>
+            <value>c.faculty =#{pollCopyAction.faculty}</value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="subjectListByCareer" value="#{subjectQueryByCareer}"/>
+    <framework:entity-query name="subjectQueryByCareer" ejbql="select s from Subject s">
+        <framework:restrictions>
+            <value>s.career =#{pollCopyAction.career}</value>
+        </framework:restrictions>
+        <framework:order>s.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="cycleList" value="#{cycleQuery}"/>
+    <framework:entity-query name="cycleQuery" ejbql="select c from Cycle c order by c.name asc"/>
+
+    <factory name="cycleListByGestion" value="#{cycleQueryByGestion}"/>
+    <framework:entity-query name="cycleQueryByGestion" ejbql="select c from Cycle c">
+        <framework:restrictions>
+            <value>c.gestion = #{desertionWidgetAction.gestion}</value>
+        </framework:restrictions>
+        <framework:order>c.name ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="academicPeriodList" value="#{academicPeriodQuery}"/>
+    <framework:entity-query name="academicPeriodQuery" ejbql="select a from AcademicPeriod a order by a.sequence asc"/>
+
+    <factory name="postulantList" value="#{postulantQuery}"/>
+    <framework:entity-query name="postulantQuery"
+                            ejbql="select c from Postulant c order by c.lastName ASC"/>
+    <factory name="degreeList" value="#{degreeQuery}"/>
+    <framework:entity-query name="degreeQuery"
+                            ejbql="select c from Degree c "/>
+    <factory name="currencyList" value="#{currencyListQuery}"/>
+    <framework:entity-query name="currencyListQuery" ejbql="select c from Currency c order by c.name asc"/>
+
+    <factory name="salaryMovementTypeList" value="#{salaryMovementTypeListQuery}"/>
+    <framework:entity-query name="salaryMovementTypeListQuery"
+                            ejbql="select smt from SalaryMovementType smt order by smt.name asc"/>
+
+    <factory name="salaryMovementTypeByAccessRightList" value="#{salaryMovementTypeListByAccessRightQuery}"/>
+    <framework:entity-query name="salaryMovementTypeListByAccessRightQuery"
+                            ejbql="select smt from SalaryMovementType smt">
+        <framework:restrictions>
+            <value>smt.movementType in (#{salaryMovementAction.salaryMovementTypeByAccessRight})</value>
+        </framework:restrictions>
+        <framework:order>smt.name asc</framework:order>
+    </framework:entity-query>
+
+    <factory name="sedeList" value="#{sedeListQuery}"/>
+    <framework:entity-query name="sedeListQuery"
+                            ejbql="select o from BusinessUnit o order by o.position ASC"/>
+
+    <factory name="pollFormList" value="#{pollFormListQuery}"/>
+    <framework:entity-query name="pollFormListQuery"
+                            ejbql="select pollForm from PollForm pollForm order by pollForm.title ASC"/>
+
+    <factory name="pollFormListByCycle" value="#{pollFormListByCycleQuery}"/>
+    <framework:entity-query name="pollFormListByCycleQuery"
+                            ejbql="select pollForm from PollForm pollForm">
+        <framework:restrictions>
+            <value>pollForm.cycle =#{scheduleEvaluation.cycle}</value>
+        </framework:restrictions>
+        <framework:order>pollForm.title ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="pollFormByGrouppingTypeList" value="#{pollFormByGrouppingTypeListQuery}"/>
+    <framework:entity-query name="pollFormByGrouppingTypeListQuery"
+                            ejbql="select pollForm from PollForm pollForm">
+        <framework:restrictions>
+            <value>pollForm.pollFormGrouppingType =#{pollByPersonReportAction.pollFormGrouppingType}</value>
+            <value>pollForm.pollFormGrouppingType =#{careerManagerEvaluationReportAction.pollFormGrouppingType}</value>
+        </framework:restrictions>
+        <framework:order>pollForm.title ASC</framework:order>
+    </framework:entity-query>
+
+    <framework:entity-query name="countEvaluationCriteriaValueQuery"
+                            ejbql="select count(o) from EvaluationCriteriaValue o">
+        <framework:restrictions>
+            <value>o.evaluationCriteria = #{evaluationCriteriaValueAction.evaluationCriteria}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+    <framework:entity-query name="maxEvaluationCriteriaValueSequence"
+                            ejbql="select max(o.sequence) from EvaluationCriteriaValue o">
+        <framework:restrictions>
+            <value>o.evaluationCriteria = #{evaluationCriteriaValueAction.evaluationCriteria}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="gestionList" value="#{gestionQuery}"/>
+    <framework:entity-query name="gestionQuery"
+                            ejbql="select o from Gestion o order by o.year desc"/>
+
+    <factory name="cycleTypeList" value="#{cycleTypeQuery}"/>
+    <framework:entity-query name="cycleTypeQuery"
+                            ejbql="select distinct c from CycleType c">
+        <framework:restrictions>
+            <value>
+                c.sector=#{cycleAction.sector}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            c.name ASC
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="questionsByPollFormList" value="#{questionsByPollFormQuery}"/>
+    <framework:entity-query name="questionsByPollFormQuery"
+                            ejbql="SELECT question FROM Question question left join fetch question.section section left join section.pollForm pollForm">
+        <framework:restrictions>
+            <value>
+                pollForm=#{studentScheduleEvaluationFormAction.pollForm}
+            </value>
+            <value>
+                pollForm=#{academicEmployeeScheduleEvaluationFormAction.pollForm}
+            </value>
+            <value>
+                pollForm=#{teacherScheduleEvaluationFormAction.pollForm}
+            </value>
+            <value>
+                pollForm=#{careerManagerScheduleEvaluationFormAction.pollForm}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            section.sequence ASC, question.sequence ASC
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="chargeList" value="#{chargeListQuery}"/>
+    <framework:entity-query name="chargeListQuery" ejbql="select c from Charge c order by c.name asc"/>
+
+    <framework:entity-query name="employeeAcademicFormationCountByNameQuery"
+                            ejbql="select count(eaf) from EmployeeAcademicFormation eaf">
+        <framework:restrictions>
+            <value>
+                eaf.employee=#{empployee}
+            </value>
+            <value>
+                lower(eaf.name)=lower(#{employeeAcademicFormation.name})
+            </value>
+            <value>
+                lower(eaf.university)=lower(#{employeeAcademicFormation.university})
+            </value>
+            <value>
+                eaf.id!=#{employeeAcademicFormation.id}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="bonusList" value="#{bonusListQuery}"/>
+    <framework:entity-query name="bonusListQuery" ejbql="select o from Bonus o ">
+        <framework:restrictions>
+            <value>
+                o.bonusType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.BonusType', 'REGULAR_BONUS')}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            o.name asc
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="activeBonusList" value="#{activeBonusListQuery}"/>
+    <framework:entity-query name="activeBonusListQuery" ejbql="select o from Bonus o ">
+        <framework:restrictions>
+            <value>
+                o.bonusType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.BonusType', 'REGULAR_BONUS')}
+            </value>
+            <value>
+                o.active=#{true}
+            </value>
+        </framework:restrictions>
+        <framework:order>
+            o.name asc
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="jobContractByEmployeeIdNumberQuickSearch" value="#{jobContractByEmployeeIdNumberQuickSearchQuery}"/>
+    <framework:entity-query name="jobContractByEmployeeIdNumberQuickSearchQuery"
+                            ejbql="select jc from JobContract jc left join jc.contract ct left join ct.employee emp ">
+        <framework:restrictions>
+            <value>
+                emp.idNumber = #{quickSearchAction.searchValue}
+            </value>
+        </framework:restrictions>
+        <framework:order>jc.id desc</framework:order>
+    </framework:entity-query>
+
+    <factory name="jobContractByEmployeeIdAndNumberAndNotByTimeQuickSearch"
+             value="#{jobContractByEmployeeIdAndNumberAndNotByTimeQuickSearchQuery}"/>
+    <framework:entity-query name="jobContractByEmployeeIdAndNumberAndNotByTimeQuickSearchQuery"
+                            ejbql="select jc from JobContract jc left join jc.contract ct left join jc.job job left join job.jobCategory jobCategory left join ct.employee emp ">
+        <framework:restrictions>
+            <value>
+                emp.idNumber = #{quickSearchAction.searchValue}
+            </value>
+            <value>
+                jobCategory.payrollGenerationType!=#{rotatoryFundAction.excludedPayrollGenerationType}
+            </value>
+        </framework:restrictions>
+        <framework:order>jc.id desc</framework:order>
+    </framework:entity-query>
+
+    <factory name="socialWelfareEntityList" value="#{socialWelfareEntityQuery}"/>
+    <framework:entity-query name="socialWelfareEntityQuery"
+                            ejbql="select swe from SocialWelfareEntity swe order by swe.name"/>
+    <framework:entity-query name="socialWelfareEntityCountQuery"
+                            ejbql="select count(swe) from SocialWelfareEntity swe order by swe.name"/>
+
+    <!--Enumerations-->
+
+    <factory name="pollFormTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.PollFormType')}"/>
+
+    <factory name="scheduleEvaluationStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.ScheduleEvaluationState')}"/>
+
+    <factory name="academicFormationTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.AcademicFormationType')}"/>
+
+    <factory name="movementTypeByAccessRightEnum" value="#{salaryMovementTypeAction.movementTypeByAccessRight}"/>
+
+    <factory name="movementTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.MovementType')}"/>
+
+    <factory name="monthEnumeration" value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.Month')}"/>
+
+    <factory name="horaryBandStateTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.HoraryBandStateType')}"/>
+
+    <factory name="gestionPayrollTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.GestionPayrollType')}"/>
+
+    <factory name="markStateReportTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.util.employees.MarkStateReportType')}"/>
+
+    <factory name="postulantTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.PostulantType')}"/>
+
+    <factory name="vacationStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.VacationState')}"/>
+    <factory name="dismissalRuleTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.DismissalRuleType')}"/>
+    <factory name="amountTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.AmountType')}"/>
+    <factory name="discountRuleRangeTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.DiscountRuleRangeType')}"/>
+    <factory name="discountRuleTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.DiscountRuleType')}"/>
+    <factory name="discountUnitTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.DiscountUnitType')}"/>
+    <factory name="booleanEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.BooleanEnum')}"/>
+    <factory name="socialWelfareEntityTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.SocialWelfareEntityType')}"/>
+    <factory name="dismissalStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.employees.DismissalState')}"/>
+
+</components>

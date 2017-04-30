@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <h:outputText
+                value="#{partialWarehouseVoucherAction.managed?messages['WarehouseVoucher.partialReception.edit']:messages['WarehouseVoucher.partialReception.new']}"/>
+    </ui:define>
+
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <c:set var="warehouseVoucherApproved" value="#{warehouseVoucherUpdateAction.approved}"/>
+
+        <h:form id="warehouseVoucherForm">
+            <div class="buttons">
+                <h:commandButton id="updateButtonId"
+                                 action="#{partialWarehouseVoucherAction.create}"
+                                 value="#{messages['WarehouseVoucher.receptions']}"
+                                 styleClass="button"
+                                 rendered="#{!warehouseVoucherApproved and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{partialWarehouseVoucherAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{partialWarehouseVoucherAction.managed?messages['WarehouseVoucher.partialReception.edit']:messages['WarehouseVoucher.partialReception.new']}"/>
+                </f:facet>
+                <ui:include src="parentWarehouseVoucherInformation.xhtml"/>
+
+
+                <app:fieldset id="fielset" title="#{messages['WarehouseVoucher.details']}"
+                              rendered="#{!partialWarehouseVoucherAction.managed}">
+
+                    <div class="buttons">
+                        <a4j:commandButton id="addProductItemCommandButton"
+                                           action="#{warehouseVoucherProductItemDataModel.reset()}"
+                                           value="#{messages['WarehouseVoucher.button.addProductItem']}"
+                                           styleClass="button"
+                                           immediate="true"
+                                           oncomplete="Richfaces.showModalPanel('productItemsListModalPanel');"
+                                           actionListener="#{selectPopUpAction.select}"
+                                           reRender="productItemsListModalPanel">
+                            <f:attribute name="entityManagerName" value=""/>
+                            <f:attribute name="dataModelObject" value="#{warehouseVoucherProductItemDataModel}"/>
+                        </a4j:commandButton>
+                        <a4j:commandButton id="addAllProductItemCommandButton"
+                                           action="#{partialWarehouseVoucherAction.addAllProductItems()}"
+                                           value="#{messages['WarehouseVoucher.button.addAllProductItem']}"
+                                           styleClass="button"
+                                           immediate="true"
+                                           reRender="partialMovementDetailList"/>
+                    </div>
+
+                    <rich:dataTable value="#{partialWarehouseVoucherAction.selectedMovementDetailList}"
+                                    var="partialMovementDetailItem"
+                                    id="partialMovementDetailList"
+                                    rows="#{sessionUser.rowsPerPage}"
+                                    width="100%"
+                                    columnsWidth="40%, 10%, 10%, 10%, 20%, 10%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    <h:outputText value="#{messages['MovementDetail.productItem']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['MovementDetail.measureUnit']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['MovementDetail.unitCost']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['MovementDetail.quantity']}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{messages['MovementDetail.amount']}"/>
+                                </rich:column>
+                                <rich:column styleClass="center">
+                                    <h:outputText value="#{messages['Common.action']}"/>
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{partialMovementDetailItem.productItem.fullName}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{partialMovementDetailItem.measureUnit.name}"/>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{partialMovementDetailItem.unitCost}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <s:decorate id="quantityField" template="/include/inputField.xhtml" styleClass="right">
+                                <ui:param name="showLabel" value="false"/>
+                                <h:inputText id="quantity"
+                                             value="#{partialMovementDetailItem.quantity}"
+                                             required="true"
+                                             styleClass="inputMedium right">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             minimum="0.000001"
+                                                             forId="quantity"/>
+                                    <a4j:support event="onblur"
+                                                 ajaxSingle="true"
+                                                 reRender="quantityField, amount"
+                                                 action="#{warehouseVoucherCreateAction.updateTotalAmount(partialMovementDetailItem)}"/>
+                                    <app:keyUpEvent focus="quantity"
+                                                    reRender="quantityField, amount"
+                                                    action="warehouseVoucherCreateAction.updateTotalAmount(partialMovementDetailItem)"/>
+                                </h:inputText>
+                            </s:decorate>
+
+                        </rich:column>
+                        <rich:column id="amount" styleClass="right">
+                            <h:outputText value="#{partialMovementDetailItem.amount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <a4j:commandLink value="#{messages['Common.delete']}"
+                                             immediate="true"
+                                             reRender="partialMovementDetailList"
+                                             action="#{partialWarehouseVoucherAction.removeSelected(partialMovementDetailItem)}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </app:fieldset>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{partialWarehouseVoucherAction.create}"
+                                 value="#{messages['WarehouseVoucher.receptions']}"
+                                 styleClass="button"
+                                 rendered="#{!warehouseVoucherApproved and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{partialWarehouseVoucherAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="productItemsListModalPanelContainer"
+                    template="/warehouse/productItemsListModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemsListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemsListModalPanel"/>
+            <ui:param name="dataModel" value="#{warehouseVoucherProductItemDataModel}"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{partialWarehouseVoucherAction.addProductItems(warehouseVoucherProductItemDataModel.selectedProductItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="movementDetailList, partialMovementDetailList"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('productItemsListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

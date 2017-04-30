@@ -1,0 +1,199 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{quotaAction.managed}">
+                #{messages['Quota.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Quota.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="quotaForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{quotaAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 tabindex="1"
+                                 rendered="#{!quotaAction.managed and s:hasPermission('QUOTA','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="updateButtonId"
+                                 action="#{quotaAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 tabindex="2"
+                                 rendered="#{quotaAction.managed and quotaAction.quotaPending and s:hasPermission('QUOTA','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{quotaAction.managed and rotatoryFundAction.rotatoryFundPending and s:hasPermission('QUOTA','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{quotaAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 tabindex="3"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{quotaAction.managed}">
+                            #{messages['Quota.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Quota.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <app:fieldset id="quotaFieldset"
+                              title="#{messages['Quota.quota']}">
+                    <h:panelGrid columns="2"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0"
+                                 columnClasses="width50percent, width50percent">
+
+                        <s:div>
+                            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Quota.amount']}</ui:define>
+                                <h:inputText id="amount"
+                                             value="#{quota.amount}"
+                                             rendered="#{rotatoryFundAction.rotatoryFundPending}"
+                                             required="true"
+                                             styleClass="input right"
+                                             tabindex="4">
+                                    <app:realNumberConverter minimum="1" pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="amount"/>
+                                </h:inputText>
+                                <h:outputText value="#{quota.amount}"
+                                              rendered="#{!rotatoryFundAction.rotatoryFundPending}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                                <h:outputText value=" #{messages[quota.currency.symbolResourceKey]}"/>
+                            </s:decorate>
+                            <s:decorate id="residueField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow"
+                                        rendered="#{quotaAction.managed}">
+                                <ui:define name="label">#{messages['Quota.residue']}</ui:define>
+                                <h:outputText value="#{quota.residue}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                                <h:outputText value=" #{messages[quota.currency.symbolResourceKey]}"/>
+                            </s:decorate>
+
+                            <s:decorate id="expirationDateField" template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['Quota.expirationDate']}</ui:define>
+                                <rich:calendar id="expirationDate"
+                                               value="#{quota.expirationDate}"
+                                               styleClass="input"
+                                               datePattern="#{messages['patterns.date']}"
+                                               enableManualInput="true"
+                                               rendered="#{rotatoryFundAction.enableExpirationDate}"
+                                               required="true"
+                                               tabindex="5">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}"
+                                                       type="date"/>
+                                </rich:calendar>
+                                <h:outputText value="#{quota.expirationDate}"
+                                              rendered="#{!rotatoryFundAction.enableExpirationDate}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}"
+                                                       type="date"/>
+                                </h:outputText>
+                            </s:decorate>
+                            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow"
+                                        rendered="#{quotaAction.managed}">
+                                <ui:define name="label">#{messages['Quota.state']}</ui:define>
+                                <h:outputText id="state"
+                                              value="#{messages[quota.state.resourceKey]}"
+                                              styleClass="input"/>
+                            </s:decorate>
+
+                        </s:div>
+
+                    </h:panelGrid>
+                </app:fieldset>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{quotaAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!quotaAction.managed
+                     and s:hasPermission('QUOTA','VIEW')}">
+                </h:commandButton>
+
+                <h:commandButton action="#{quotaAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{quotaAction.managed and quotaAction.quotaPending}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{quotaAction.managed and rotatoryFundAction.rotatoryFundPending and s:hasPermission('QUOTA','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{quotaAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{quotaAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Quota.delete.confirmation']}">
+                        <f:param value="#{quota.amount}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{quotaAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <!--Set selector Id to enable focus-->
+        <rich:jQuery selector="#discountByPayroll" query="focus()" timing="onload"/>
+
+    </ui:define>
+</ui:composition>

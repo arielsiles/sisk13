@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <h:outputText
+                value="#{contractAction.managed?messages['Contract.edit']:messages['Contract.new']}"/>
+    </ui:define>
+    <ui:param name="bodyWidth" value="98%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="contractForm">
+            <ui:include src="contractFormButtons.xhtml">
+                <ui:param name="formLocation" value="Top"/>
+                <ui:param name="default" value="${true}"/>
+            </ui:include>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{contractAction.managed?messages['Contract.edit']:messages['Contract.new']}"/>
+                </f:facet>
+
+                <ui:include src="employeeFragment.xhtml">
+                    <ui:param name="action" value="${contractAction}"/>
+                    <ui:param name="readOnly" value="${true}"/>
+                </ui:include>
+
+                <ui:include src="contractFragment.xhtml">
+                    <ui:param name="action" value="${contractAction}"/>
+                    <ui:param name="contract" value="${contractAction.instance}"/>
+                    <ui:param name="showCharge" value="${false}"/>
+                    <c:set var="editable" value="${false}"/>
+                </ui:include>
+
+                <s:div id="blockCodeDiv">
+                    <app:fieldset id="blockCodeFS" title="#{messages['JobContract.blockCode']}"
+                                  rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW') or contractAction.contractBlocked}">
+                        <s:decorate id="blockCodeField" template="/include/inputField.xhtml" styleClass="formRow"
+                                    rendered="#{s:hasPermission('CONTRACTMODIFICATIONCODE','VIEW')}">
+                            <ui:define name="label">#{messages['JobContract.blockCode']}</ui:define>
+                            <h:outputText value="#{contractAction.instance.modificationCode}"/>
+                        </s:decorate>
+                    </app:fieldset>
+                </s:div>
+
+                <ui:include src="jobContractListTableFragment.xhtml"/>
+
+            </rich:panel>
+
+            <ui:include src="contractFormButtons.xhtml">
+                <ui:param name="formLocation" value="Button"/>
+            </ui:include>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{contractAction.managed and s:hasPermission('CONTRACT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Contract.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{contractAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"
+                                   rendered="#{contractAction.managed and s:hasPermission('CONTRACT','DELETE')}"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml"
+                    rendered="#{!contractAction.managed}">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" action="#{contractAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif" style="border:0" ajaxSingle="true"
+                                   reRender="employeeFieldset"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:fragment rendered="#{!contractAction.managed}">
+            <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+        </s:fragment>
+        <s:fragment rendered="#{contractAction.managed}">
+            <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+        </s:fragment>
+
+    </ui:define>
+</ui:composition>

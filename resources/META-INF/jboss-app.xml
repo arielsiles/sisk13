@@ -1,0 +1,5 @@
+<jboss-app>
+   <loader-repository> 
+      seam.jboss.org:loader=khipus
+   </loader-repository> 
+</jboss-app> 

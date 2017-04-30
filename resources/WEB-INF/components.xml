@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:security="http://jboss.com/products/seam/security"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:persistence="http://jboss.com/products/seam/persistence"
+            xmlns:web="http://jboss.com/products/seam/web"
+            xmlns:pdf="http://jboss.com/products/seam/pdf"
+            xmlns:navigation="http://jboss.com/products/seam/navigation"
+            xmlns:async="http://jboss.com/products/seam/async" xmlns:ui="http://jboss.com/products/seam/ui"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/security http://jboss.com/products/seam/security-2.2.xsd
+
+                 http://jboss.com/products/seam/persistence http://jboss.com/products/seam/persistence-2.2.xsd
+                  http://jboss.com/products/seam/web http://jboss.com/products/seam/web-2.2.xsd
+                  http://jboss.com/products/seam/pdf http://jboss.com/products/seam/pdf-2.2.xsd
+                  http://jboss.com/products/seam/navigation http://jboss.com/products/seam/navigation-2.2.xsd
+                  http://jboss.com/products/seam/async http://jboss.com/products/seam/async-2.2.xsd">
+
+    <core:init debug="@debug@" jndi-pattern="@jndiPattern@"/>
+
+
+    <pdf:key-store-config/>
+
+    <async:quartz-dispatcher/>
+
+    <core:resource-loader>
+        <core:bundle-names>
+            <value>messages_jsf</value>
+            <value>messages_app</value>
+        </core:bundle-names>
+    </core:resource-loader>
+
+    <web:character-encoding-filter encoding="UTF-8"
+                                   override-client="true"
+                                   url-pattern="*.jsf"/>
+
+    <web:exception-filter url-pattern="/*"/>
+
+
+    <navigation:pages>
+        <navigation:resources>
+
+            <value>/WEB-INF/pages.xml</value>
+            <value>/WEB-INF/admin/pages.xml</value>
+            <value>/WEB-INF/contacts/pages.xml</value>
+            <value>/WEB-INF/customers/pages.xml</value>
+            <value>/WEB-INF/finances/pages.xml</value>
+            <value>/WEB-INF/products/pages.xml</value>
+            <value>/WEB-INF/employees/pages.xml</value>
+            <value>/WEB-INF/public/pages.xml</value>
+            <value>/WEB-INF/warehouse/pages.xml</value>
+            <value>/WEB-INF/budget/pages.xml</value>
+            <value>/WEB-INF/fixedassets/pages.xml</value>
+            <value>/WEB-INF/purchases/pages.xml</value>
+            <value>/WEB-INF/cashbox/pages.xml</value>
+            <value>/WEB-INF/dashboard/pages.xml</value>
+            <value>/WEB-INF/treasury/pages.xml</value>
+            <value>/WEB-INF/production/pages.xml</value>
+            <value>/WEB-INF/accounting/pages.xml</value>
+
+        </navigation:resources>
+    </navigation:pages>
+
+    <core:manager concurrent-request-timeout="10000"
+                  conversation-timeout="1800000"
+                  conversation-id-parameter="cid"
+                  parent-conversation-id-parameter="pid"/>
+
+    <persistence:filter name="companyFilter" enabled="#{not empty currentCompany}">
+        <persistence:name>companyFilter</persistence:name>
+        <persistence:parameters>
+            <key>currentCompanyId</key>
+            <value>#{currentCompany.id}</value>
+        </persistence:parameters>
+    </persistence:filter>
+
+    <persistence:filter name="businessUnitFilter" enabled="#{not empty currentUser}">
+        <persistence:name>businessUnitFilter</persistence:name>
+        <persistence:parameters>
+            <key>executorUnitId</key>
+            <value>#{sessionUser.businessUnitIds}</value>
+        </persistence:parameters>
+    </persistence:filter>
+
+    <persistence:managed-persistence-context name="entityManager" auto-create="true"
+                                             persistence-unit-jndi-name="java:/khipusEntityManagerFactory">
+        <persistence:filters>
+            <value>#{companyFilter}</value>
+        </persistence:filters>
+    </persistence:managed-persistence-context>
+
+    <persistence:managed-persistence-context name="listEntityManager" auto-create="true"
+                                             persistence-unit-jndi-name="java:/khipusEntityManagerFactory"
+                                             scope="EVENT">
+        <persistence:filters>
+            <value>#{companyFilter}</value>
+        </persistence:filters>
+    </persistence:managed-persistence-context>
+
+    <persistence:managed-persistence-context name="businessUnitListEntityManager" auto-create="true"
+                                             persistence-unit-jndi-name="java:/khipusEntityManagerFactory"
+                                             scope="EVENT">
+        <persistence:filters>
+            <value>#{companyFilter}</value>
+            <value>#{businessUnitFilter}</value>
+        </persistence:filters>
+    </persistence:managed-persistence-context>
+
+    <security:identity authenticate-method="#{authenticator.authenticate}"/>
+
+    <event type="org.jboss.seam.security.notLoggedIn">
+        <action execute="#{redirect.captureCurrentView}"/>
+
+    </event>
+    <event type="org.jboss.seam.security.loginSuccessful">
+        <action execute="#{redirect.returnToCapturedView}"/>
+    </event>
+
+
+    <component name="dataIntegrationInitializer">
+        <property name="xmlFilePath">/WEB-INF/dataintegration.xml</property>
+    </component>
+
+    <component name="dashboardConfigurationInitializer">
+        <property name="xmlFilePath">/WEB-INF/dashboard-def.xml</property>
+    </component>
+
+    <component name="customQuartzProcessorInitializer">
+        <property name="xmlFilePath">/WEB-INF/customquartzprocessors.xml</property>
+    </component>
+
+    <web:multipart-filter create-temp-files="true"
+                          max-request-size="10000000"
+                          url-pattern="/*"/>
+
+    <ui:jpa-entity-loader class="com.encens.khipus.framework.ui.CustomJpaEntityLoader"/>
+
+</components>

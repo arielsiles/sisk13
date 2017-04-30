@@ -1,0 +1,13 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <div class="buttons">
+        <h:commandButton
+                action="#{rotatoryFundAction.newRotatoryFund}"
+                value="#{messages['Common.new']}"
+                styleClass="button"
+                immediate="true"
+                rendered="#{s:hasPermission('ROTATORYFUND','CREATE') or s:hasPermission('OTHERRECEIVABLES','CREATE')}"/>
+    </div>
+</ui:composition>

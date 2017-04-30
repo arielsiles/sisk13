@@ -1,0 +1,327 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{bonusAction.managed}">
+            #{messages['Bonus.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Bonus.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="bonusForm">
+<div class="buttons">
+    <h:commandButton action="#{bonusAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!bonusAction.managed and s:hasPermission('BONUS','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{bonusAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{bonusAction.managed and s:hasPermission('BONUS','UPDATE')}"
+                     tabindex="2"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{bonusAction.managed and s:hasPermission('BONUS','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{bonusAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{bonusAction.managed}">
+            #{messages['Bonus.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Bonus.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<app:fieldset id="bonusFieldset" title="#{messages['Bonus.title']}">
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width100percent">
+        <s:div>
+            <s:decorate id="nameField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Bonus.name']}</ui:define>
+                <h:inputText id="name"
+                             value="#{bonus.name}"
+                             required="true"
+                             maxlength="255"
+                             styleClass="input"
+                             tabindex="5">
+                    <a4j:support ajaxSingle="true" event="onblur"/>
+                </h:inputText>
+            </s:decorate>
+            <c:choose>
+                <c:when test="#{bonusAction.managed}">
+                    <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Bonus.bonusType']}</ui:define>
+                        <h:outputText value="#{messages[bonus.bonusType.resourceKey]}"/>
+                    </s:decorate>
+                </c:when>
+                <c:otherwise>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Bonus.bonusType']}</ui:define>
+                        <h:selectOneMenu id="bonusType"
+                                         value="#{bonus.bonusType}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="6">
+                            <s:selectItems value="#{bonusType}" var="type"
+                                           label="#{messages[type.resourceKey]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange" ajaxSingle="true"
+                                         action="#{bonusAction.bonusTypeChangeAction()}"
+                                         reRender="bonusDetailDiv, smnRateDiv, amountDiv, startDateDiv, endDateDiv"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </c:otherwise>
+            </c:choose>
+            <s:div id="smnRateDiv">
+                <s:decorate id="smnRateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{bonusAction.seniorityBonus}">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['Bonus.smnRate']}"/>
+                    </ui:define>
+                    <h:outputText value="#{bonus.smnRate.rate}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+            <s:div id="amountDiv">
+                <s:decorate id="amountField" template="/include/inputField.xhtml"
+                            rendered="#{!bonusAction.seniorityBonus}" styleClass="formRow">
+                    <ui:define name="label">#{messages['Bonus.amount']}</ui:define>
+                    <h:inputText id="amount"
+                                 value="#{bonus.amount}"
+                                 required="true"
+                                 maxlength="255"
+                                 styleClass="input"
+                                 tabindex="7">
+                        <app:realNumberConverter forId="amount"/>
+                        <a4j:support ajaxSingle="true" event="onblur"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['Currency.Bs']}"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="startDateDiv">
+                <s:decorate id="startDateField" template="/include/inputField.xhtml"
+                            rendered="#{bonusAction.seniorityBonus}" styleClass="formRow">
+                    <ui:define name="label">#{messages['SeniorityBonus.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{bonusAction.startDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="8">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <a4j:support ajaxSingle="true" event="onchanged"/>
+                    </rich:calendar>
+                </s:decorate>
+            </s:div>
+            <s:div id="endDateDiv">
+                <s:decorate id="endDateField" template="/include/inputField.xhtml"
+                            rendered="#{bonusAction.seniorityBonus}" styleClass="formRow">
+                    <ui:define name="label">#{messages['SeniorityBonus.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{bonusAction.endDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="9">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <a4j:support ajaxSingle="true" event="onchanged"/>
+                    </rich:calendar>
+                </s:decorate>
+            </s:div>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define
+                        name="label">#{messages['Bonus.description']}</ui:define>
+                <h:inputTextarea id="description"
+                                 value="#{bonusAction.description}"
+                                 styleClass="input textarea"
+                                 tabindex="10">
+                    <f:validateLength maximum="512"/>
+                    <a4j:support ajaxSingle="true" event="onblur"/>
+                </h:inputTextarea>
+            </s:decorate>
+            <s:decorate id="activeField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Bonus.active']}</ui:define>
+                <h:selectBooleanCheckbox
+                        id="active"
+                        value="#{bonus.active}"
+                        disabled="#{bonusAction.readOnlyActive}"
+                        tabindex="11">
+                    <a4j:support ajaxSingle="true" event="onblur"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</app:fieldset>
+<s:div id="bonusDetailDiv">
+    <app:fieldset id="bonusDetailFieldset" title="#{messages['SeniorityBonusDetail.title']}"
+                  rendered="#{bonusAction.seniorityBonus}">
+        <div class="buttons">
+            <a4j:commandButton value="#{messages['Common.add']}"
+                               action="#{seniorityBonusDetailAction.newInstance}"
+                               immediate="true"
+                               rendered="#{s:hasPermission('BONUS','CREATE')}"
+                               tabindex="12"
+                               styleClass="button"/>
+        </div>
+        <rich:dataTable id="seniorityBonusDetailList"
+                        value="#{bonusAction.seniorityBonusDetails}"
+                        var="seniorityBonusDetailItem"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="20%,20%,20%,20%,20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="seniorityBonusDetail.startYear"
+                                               dataModel="#{seniorityBonusDetailDataModel}"
+                                               reRender="seniorityBonusDetailList, dataScroller">
+                            #{messages['SeniorityBonusDetail.startYear']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="seniorityBonusDetail.endYear"
+                                               dataModel="#{seniorityBonusDetailDataModel}"
+                                               reRender="seniorityBonusDetailList, dataScroller">
+                            #{messages['SeniorityBonusDetail.endYear']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="seniorityBonusDetail.percent"
+                                               dataModel="#{seniorityBonusDetailDataModel}"
+                                               reRender="seniorityBonusDetailList, dataScroller">
+                            #{messages['SeniorityBonusDetail.percent']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="seniorityBonusDetail.amount"
+                                               dataModel="#{seniorityBonusDetailDataModel}"
+                                               reRender="seniorityBonusDetailList, dataScroller">
+                            #{messages['SeniorityBonusDetail.amount']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column styleClass="right">
+                <h:outputText value="#{seniorityBonusDetailItem.startYear}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{seniorityBonusDetailItem.endYear}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{seniorityBonusDetailItem.percent}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{seniorityBonusDetailItem.amount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Bs']}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               action="#{seniorityBonusDetailAction.select(seniorityBonusDetailItem)}"
+                               immediate="true"
+                               rendered="#{s:hasPermission('BONUS','VIEW')}">
+                </h:commandLink>
+            </rich:column>
+        </rich:dataTable>
+        <rich:datascroller id="dataScroller" align="right" for="seniorityBonusDetailList" maxPages="10"
+                           renderIfSinglePage="false"/>
+    </app:fieldset>
+</s:div>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{bonusAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!bonusAction.managed and s:hasPermission('BONUS','CREATE')}"
+                     tabindex="13"/>
+    <h:commandButton action="#{bonusAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{bonusAction.managed and s:hasPermission('BONUS','UPDATE')}"
+                     tabindex="14"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{bonusAction.managed and s:hasPermission('BONUS','DELETE')}"
+                     tabindex="15">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{bonusAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="16"
+                     immediate="true"/>
+</div>
+</h:form>
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{bonusAction.managed and s:hasPermission('BONUS','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Bonus.delete.confirmation']}">
+                <f:param value="#{bonus.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{bonusAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('BONUS','DELETE')}"
+                           tabindex="1000"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

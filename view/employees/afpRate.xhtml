@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{afpRateAction.managed}">
+                #{messages['AFPRAte.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['AFPRAte.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="afpRateForm">
+            <div class="buttons">
+                <h:commandButton action="#{afpRateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!afpRateAction.managed and s:hasPermission('AFPRATE','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{afpRateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{afpRateAction.managed and s:hasPermission('AFPRATE','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{afpRateAction.managed and !afpRateAction.readOnlyActive and s:hasPermission('AFPRATE','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{afpRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{afpRateAction.managed}">
+                            #{messages['AFPRAte.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['AFPRAte.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width100percent">
+                    <s:div>
+                        <s:decorate id="rateField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['AFPRAte.rate']}</ui:define>
+                            <h:inputText id="rate"
+                                         value="#{afpRate.rate}"
+                                         required="true"
+                                         maxlength="20"
+                                         styleClass="input"
+                                         tabindex="5">
+                                <app:realNumberConverter forId="rate" minimum="0" maximum="100"/>
+                            </h:inputText>
+                            <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+                        </s:decorate>
+                        <c:choose>
+                            <c:when test="#{afpRateAction.managed}">
+                                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['AFPRAte.afpRateType']}</ui:define>
+                                    <h:outputText value="#{messages[afpRate.afpRateType.resourceKey]}"/>
+                                </s:decorate>
+                            </c:when>
+                            <c:otherwise>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['AFPRAte.afpRateType']}</ui:define>
+                                    <h:selectOneMenu id="afpRateType"
+                                                     value="#{afpRate.afpRateType}"
+                                                     styleClass="input"
+                                                     required="true"
+                                                     tabindex="6">
+                                        <s:selectItems value="#{afpRateType}" var="type"
+                                                       label="#{messages[type.resourceKey]}"
+                                                       noSelectionLabel=""
+                                                       hideNoSelectionLabel="false"/>
+                                        <s:convertEnum/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </c:otherwise>
+                        </c:choose>
+                        <s:decorate id="activeField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['AFPRAte.active']}</ui:define>
+                            <h:selectBooleanCheckbox
+                                    id="active"
+                                    value="#{afpRate.active}"
+                                    disabled="#{afpRateAction.readOnlyActive}"
+                                    tabindex="6"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{afpRateAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!afpRateAction.managed and s:hasPermission('AFPRATE','CREATE')}"
+                                 tabindex="7"/>
+                <h:commandButton action="#{afpRateAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{afpRateAction.managed and s:hasPermission('AFPRATE','UPDATE')}"
+                                 tabindex="8"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{afpRateAction.managed and !afpRateAction.readOnlyActive and s:hasPermission('AFPRATE','DELETE')}"
+                                 tabindex="9">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{afpRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" tabindex="10" immediate="true"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{afpRateAction.managed and s:hasPermission('AFPRATE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['AFPRAte.delete.confirmation']}">
+                        <f:param value="#{afpRate.rate}#{messages['Common.percentageSymbol']}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{afpRateAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('AFPRATE','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,417 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{entryBudgetAction.managed}">
+            #{messages['EntryBudget.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['EntryBudget.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="entryBudgetForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{entryBudgetAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{entryBudgetAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','CREATE')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{entryBudgetAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                             s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                             (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','DELETE') and
+                                            (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton id="verifyButtonId"
+                     action="#{entryBudgetAction.verify}"
+                     value="#{messages['EntryBudget.verify']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                            s:hasPermission('ENTRYBUDGETSCHECK','VIEW') and
+                                            (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton id="approveButtonId"
+                     action="#{entryBudgetAction.approve}"
+                     value="#{messages['EntryBudget.approve']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                           s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                           s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton id="blockButtonId"
+                     action="#{entryBudgetAction.freeze}"
+                     value="#{messages['EntryBudget.freeze']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                            s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{entryBudgetAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{entryBudgetAction.managed}">
+            #{messages['EntryBudget.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['EntryBudget.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+    <s:div>
+        <s:decorate id="creatorUserField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{entryBudgetAction.managed}">
+            <ui:define name="label">#{messages['Common.createdBy']}</ui:define>
+            <h:outputText value="#{entryBudget.creatorUser.employee.fullName}" styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="creationDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{entryBudgetAction.managed}">
+            <ui:define name="label">#{messages['Common.creationDate']}</ui:define>
+            <h:outputText value="#{entryBudget.creationDate}" styleClass="input">
+                <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="both"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EntryBudget.seat']}</ui:define>
+            <h:selectOneMenu id="businessUnit"
+                             value="#{entryBudget.businessUnit}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="1">
+                <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                               label="#{businessUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EntryBudget.costCenter']}</ui:define>
+            <app:quickSearch id="quickSearchCostCenterField"
+                             textValue="entryBudget.costCenter.code"
+                             value="#{entryBudget.costCenter}"
+                             searchField="code"
+                             reRender="costCenterField"
+                             tabindex="2"/>
+            <app:selectPopUp id="costCenter"
+                             required="true"
+                             textValue="#{entryBudget.costCenter.fullName}"
+                             value="#{entryBudget.costCenter}"
+                             clearAction="entryBudgetAction.clearCostCenter()"
+                             searchModalPanel="costCenterListModalPanel"
+                             dataModel="#{costCenterDataModel}"
+                             reRender="costCenterField"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+
+        <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EntryBudget.gestion']}</ui:define>
+            <h:selectOneMenu id="gestion"
+                             value="#{entryBudget.gestion}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="5">
+                <s:selectItems value="#{gestionList}" var="gestion"
+                               label="#{gestion.year}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+    <s:div>
+        <s:decorate id="updaterUserField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{entryBudgetAction.managed and not empty entryBudget.updaterUser}">
+            <ui:define name="label">#{messages['Common.updatedBy']}</ui:define>
+            <h:outputText rendered="#{not empty entryBudget.updaterUser}"
+                          value="#{entryBudget.updaterUser.employee.fullName}" styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="updateDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{entryBudgetAction.managed and not empty entryBudget.updaterUser}">
+            <ui:define name="label">#{messages['Common.updateDate']}</ui:define>
+            <h:outputText rendered="#{not empty entryBudget.updaterUser}"
+                          value="#{entryBudget.updateDate}"
+                          styleClass="input">
+                <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="both"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="budgetState" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{entryBudgetAction.managed}">
+            <ui:define name="label">#{messages['EntryBudget.state']}</ui:define>
+            <h:outputText id="budgetStateField" value="#{messages[entryBudget.state.resourceKey]}"
+                          styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="burdenField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EntryBudget.burden']}</ui:define>
+            <h:selectOneMenu id="burden"
+                             value="#{entryBudget.classifier}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="6">
+                <s:selectItems value="#{burdenList}" var="burden"
+                               label="#{burden.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EntryBudget.amount']}</ui:define>
+            <h:inputText id="rate" value="#{entryBudget.amount}" styleClass="input"
+                         required="true" maxlength="150"
+                         tabindex="7">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:div id="includeBudgetDistributionDiv">
+            <s:decorate id="includeBudgetDistributionField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['EntryBudget.includeBudgetDistribution']}</ui:define>
+                <h:selectBooleanCheckbox id="includeBudgetDistribution"
+                                         value="#{entryBudgetAction.includeBudgetDistribution}"
+                                         valueChangeListener="#{entryBudgetAction.changeIncludeBudgetDistribution}"
+                                         tabindex="8">
+                    <a4j:support event="onclick" ajaxSingle="true"
+                                 reRender="includeBudgetDistributionDiv,includeBudgetDistributionFieldSetDiv"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </s:div>
+    </s:div>
+</h:panelGrid>
+
+<s:div id="includeBudgetDistributionFieldSetDiv">
+    <app:fieldset id="createTimePaymentPanel"
+                  title="#{messages['EntryBudget.includeBudgetDistribution']}"
+                  rendered="#{entryBudgetAction.includeBudgetDistribution}">
+        <h:panelGrid columns="1"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0">
+            <s:decorate id="percentDistributionField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['BudgetDistribution.percentDistribution']}</ui:define>
+                <h:inputText id="percentDistribution"
+                             value="#{budgetDistribution.percentDistribution}"
+                             styleClass="inputNumberSmall"
+                             required="true"
+                             tabindex="9">
+                    <app:realNumberConverter forId="percentDistribution"/>
+                    <f:validateDoubleRange minimum="0.01" maximum="100"/>
+                </h:inputText>
+                <h:outputText value="#{messages['Unit.percentage']}"/>
+            </s:decorate>
+
+            <a4j:region>
+                <app:fieldset id="budgetDistributionDetail" title="#{messages['BudgetDistribution.detail']}">
+                    <h:dataTable value="#{month}" var="monthItem" width="100%" cellpadding="0" cellspacing="0"
+                                 border="0">
+                        <h:column>
+                            <s:decorate id="percentDistributionDetailField" template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages[monthItem.resourceKey]}</ui:define>
+                                <h:inputText id="percentDistributionDetail"
+                                             value="#{budgetDistributionAction.percentDistributionDetailMap[monthItem].percentDistribution}"
+                                             styleClass="inputNumberSmall"
+                                             required="true"
+                                             tabindex="10">
+                                    <app:realNumberConverter forId="percentDistributionDetail"/>
+                                    <f:validateDoubleRange minimum="0.01" maximum="100"/>
+                                    <a4j:support event="onblur"
+                                                 ajaxSingle="true"
+                                                 action="#{budgetDistributionAction.performDetailSumPercentAmount()}"
+                                                 reRender="detailSumPercentAmount, percentDistributionDetail"/>
+                                </h:inputText>
+                                <h:outputText value="#{messages['Unit.percentage']}"/>
+                            </s:decorate>
+                        </h:column>
+                        <f:facet name="footer">
+                            <h:column>
+                                <s:decorate id="detailSumPercentAmountField" template="/include/inputField.xhtml"
+                                            styleClass="formRow">
+                                    <ui:define name="label">
+                                        <b>#{messages['BudgetDistribution.total']}</b>
+                                    </ui:define>
+                                    <h:inputText id="detailSumPercentAmount"
+                                                 value="#{budgetDistributionAction.detailSumPercentAmount}"
+                                                 styleClass="inputNumberSmall"
+                                                 readonly="true"
+                                                 tabindex="23">
+                                        <app:realNumberConverter forId="percentDistributionDetail"/>
+                                    </h:inputText>
+                                    <h:outputText value="#{messages['Unit.percentage']}"/>
+                                </s:decorate>
+                            </h:column>
+                        </f:facet>
+                    </h:dataTable>
+                </app:fieldset>
+            </a4j:region>
+
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{entryBudgetAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{entryBudgetAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','CREATE')}"/>
+
+    <h:commandButton action="#{entryBudgetAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                             s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                             (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','DELETE') and
+                                            (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{entryBudgetAction.verify}"
+                     value="#{messages['EntryBudget.verify']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                            s:hasPermission('ENTRYBUDGETSCHECK','VIEW') and
+                                            (entryBudget.editable or s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW'))}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{entryBudgetAction.approve}"
+                     value="#{messages['EntryBudget.approve']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                           s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                           s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{entryBudgetAction.freeze}"
+                     value="#{messages['EntryBudget.freeze']}"
+                     styleClass="button"
+                     rendered="#{entryBudgetAction.managed and
+                                            s:hasPermission('ENTRYBUDGETS','UPDATE') and
+                                            s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{entryBudgetAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="dataModel" value="#{costCenterDataModel}"/>
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{entryBudgetAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif" style="border:0" immediate="true" reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['EntryBudget.delete.confirmation']}">
+                <f:param value="#{entryBudget.amount}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{entryBudgetAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"
+                           rendered="#{entryBudgetAction.managed and s:hasPermission('ENTRYBUDGETS','DELETE')}"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

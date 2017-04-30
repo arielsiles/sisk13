@@ -1,0 +1,193 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{organizationAction.managed}">
+                #{messages['Organization.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Organization.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="bankForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{organizationAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationAction.managed and s:hasPermission('ORGANIZATION','CREATE')}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{organizationAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationAction.managed and s:hasPermission('ORGANIZATION','CREATE')}"/>
+                <h:commandButton id="updateButtonId" action="#{organizationAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{organizationAction.managed and s:hasPermission('ORGANIZATION','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{organizationAction.managed and s:hasPermission('ORGANIZATION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{organizationAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{organizationAction.managed}">
+                            #{messages['Organization.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Organization.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Organization.idNumber']}</ui:define>
+                    <h:inputText id="idNumber"
+                                 value="#{organization.idNumber}"
+                                 required="true"
+                                 maxlength="100"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+
+                <s:div id="documentDiv">
+                    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Organization.documentType']}</ui:define>
+                        <h:selectOneMenu id="documentType"
+                                         value="#{organization.documentType}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="2">
+                            <s:selectItems value="#{organizationDocumentTypeList}"
+                                           var="documentType"
+                                           label="#{documentType.name}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                            <a4j:support event="onchange"
+                                         action="#{organizationAction.updateShowExtension()}"
+                                         reRender="documentDiv"
+                                         ajaxSingle="true"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                                rendered="#{organizationAction.showExtension}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                        <h:selectOneMenu id="extension"
+                                         value="#{organization.extensionSite}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="3">
+                            <s:selectItems value="#{extensionList}"
+                                           var="extension"
+                                           label="#{extension.extension}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </s:div>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Organization.name']}</ui:define>
+                    <h:inputText id="name" value="#{organization.name}" styleClass="input" required="true"
+                                 maxlength="200" tabindex="4"/>
+                </s:decorate>
+
+                <s:decorate id="anniversaryField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Organization.anniversary']}</ui:define>
+                    <rich:calendar value="#{organization.anniversary}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="5">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{organizationAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationAction.managed and s:hasPermission('ORGANIZATION','CREATE')}"
+                                 tabindex="10"/>
+                <h:commandButton action="#{organizationAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationAction.managed and s:hasPermission('ORGANIZATION','CREATE')}"/>
+                <h:commandButton action="#{organizationAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{organizationAction.managed and s:hasPermission('ORGANIZATION','UPDATE')}"
+                                 tabindex="11"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{organizationAction.managed and s:hasPermission('ORGANIZATION','DELETE')}"
+                                 tabindex="12">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{organizationAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true" tabindex="13"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{organizationAction.managed and s:hasPermission('ORGANIZATION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Organization.delete.confirmation']}">
+                        <f:param value="#{organization.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{organizationAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('ORGANIZATION','DELETE')}"
+                                   tabindex="21"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:fragment rendered="#{!organizationAction.managed}">
+            <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+        </s:fragment>
+        <s:fragment rendered="#{organizationAction.managed}">
+            <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+        </s:fragment>
+    </ui:define>
+</ui:composition>

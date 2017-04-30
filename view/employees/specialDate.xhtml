@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{specialDateAction.managed}">
+            #{messages['SpecialDate.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['SpecialDate.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="specialDateForm">
+
+<c:set var="readOnly" value="${specialDateAction.readOnly}"/>
+
+<div class="buttons">
+
+    <h:commandButton action="#{specialDateAction.create}"4
+                     styleClass="button"
+                     rendered="#{!specialDateAction.managed and s:hasPermission('SPECIALDATE','CREATE')}"
+                     id="createButtonId">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{specialDateAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{specialDateAction.managed and not readOnly and s:hasPermission('SPECIALDATE','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{specialDateAction.managed and not readOnly and s:hasPermission('SPECIALDATE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{specialDateAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{specialDateAction.managed}">
+            #{messages['SpecialDate.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['SpecialDate.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+
+<s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.title']}</ui:define>
+    <h:inputText id="title" value="#{specialDate.title}"
+                 styleClass="input"
+                 required="true"
+                 maxlength="150"
+                 rendered="#{not readOnly}"
+                 tabindex="1"/>
+    <h:outputText value="#{specialDate.title}"
+                  rendered="#{readOnly}"/>
+</s:decorate>
+
+<s:decorate id="rolTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.rol']}</ui:define>
+    <h:selectOneMenu id="rol"
+                     value="#{specialDate.rolType}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not readOnly}"
+                     tabindex="2">
+        <s:selectItems value="#{specialDateRol}" var="rolType" label="#{rolType}"
+                       hideNoSelectionLabel="false"
+                       noSelectionLabel=""/>
+        <s:convertEnum/>
+        <a4j:support event="onblur" reRender="rolTypeField"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{specialDate.rolType}" rendered="#{readOnly}"/>
+</s:decorate>
+
+<s:decorate id="specialDateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDateType']}</ui:define>
+    <h:selectOneMenu id="specialDateType"
+                     value="#{specialDate.credit}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not readOnly}"
+                     tabindex="4">
+        <s:selectItems value="#{specialDateType}" var="sdt" label="#{messages[sdt.resourceKey]}"
+                       hideNoSelectionLabel="false"
+                       noSelectionLabel=""/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+    <h:outputText value="#{messages[specialDate.credit.resourceKey]}"
+                  rendered="#{readOnly}"/>
+</s:decorate>
+
+<s:decorate id="initPeriodField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.initPeriod']}</ui:define>
+    <rich:calendar id="initPeriod"
+                   enableManualInput="true"
+                   value="#{specialDate.initPeriod}"
+                   datePattern="#{messages['patterns.date']}"
+                   required="true"
+                   rendered="#{not readOnly}"
+                   tabindex="5">
+        <a4j:support event="oninputchange" immediate="true" reRender="initPeriodField,endPeriodField"/>
+        <a4j:support event="onchanged" immediate="true" reRender="initPeriodField,endPeriodField"/>
+    </rich:calendar>
+    <h:outputText value="#{specialDate.initPeriod}" rendered="#{readOnly}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+    </h:outputText>
+</s:decorate>
+
+<s:decorate id="endPeriodField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.endPeriod']}</ui:define>
+    <rich:calendar id="endPeriod"
+                   enableManualInput="true"
+                   value="#{specialDate.endPeriod}"
+                   required="true"
+                   rendered="#{not readOnly}"
+                   datePattern="#{messages['patterns.date']}"
+                   tabindex="6">
+        <a4j:support event="oninputchange" immediate="true" reRender="initPeriodField,endPeriodField"/>
+        <a4j:support event="onchanged" immediate="true" reRender="initPeriodField,endPeriodField"/>
+        <app:dateRangeValidator forId="initPeriod"
+                                forLabel="#{messages['SpecialDate.initPeriod']}"
+                                type="greater"/>
+    </rich:calendar>
+    <h:outputText value="#{specialDate.endPeriod}" rendered="#{readOnly}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+    </h:outputText>
+</s:decorate>
+
+<s:div id="allDayDiv">
+    <s:decorate id="allDayField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['SpecialDate.allDay']}</ui:define>
+        <h:selectBooleanCheckbox id="allDay"
+                                 value="#{specialDate.allDay}"
+                                 disabled="#{readOnly}"
+                                 tabindex="14">
+            <a4j:support event="onchange"
+                         reRender="allDayField, timeDiv"
+                         ajaxSingle="true"/>
+        </h:selectBooleanCheckbox>
+    </s:decorate>
+</s:div>
+<s:div id="timeDiv">
+    <s:decorate id="startTimeField" template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{!specialDate.allDay}">
+        <ui:define name="label">#{messages['SpecialDate.startTime']}</ui:define>
+        <h:inputText id="startTime"
+                     value="#{specialDate.startTime}"
+                     styleClass="inputMedium"
+                     rendered="#{not readOnly}"
+                     maxlength="150"
+                     tabindex="7">
+            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                               timeZone="#{sessionUser.timeZone}" type="time"/>
+            <a4j:support event="onblur" reRender="startTimeField, endTimeField"/>
+        </h:inputText>
+        <h:outputText value="#{specialDate.startTime}" rendered="#{readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.time']}" type="time"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="endTimeField" template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{!specialDate.allDay}">
+        <ui:define name="label">#{messages['SpecialDate.endTime']}</ui:define>
+        <h:inputText id="endTime"
+                     value="#{specialDate.endTime}"
+                     styleClass="inputMedium"
+                     rendered="#{not readOnly}"
+                     maxlength="150"
+                     tabindex="8">
+            <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                               timeZone="#{sessionUser.timeZone}" type="time"/>
+            <a4j:support event="onblur" reRender="endTimeField, startTimeField"/>
+            <app:timeRangeValidator forId="startTime"
+                                    forLabel="#{messages['SpecialDate.startTime']}"
+                                    type="greater"/>
+
+        </h:inputText>
+        <h:outputText value="#{specialDate.endTime}" rendered="#{readOnly}">
+            <f:convertDateTime pattern="#{messages['patterns.time']}" type="time"/>
+        </h:outputText>
+    </s:decorate>
+</s:div>
+<s:decorate id="specialDateTargetField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.target']}</ui:define>
+    <h:selectOneMenu id="specialDateTarget"
+                     value="#{specialDate.specialDateTarget}"
+                     styleClass="input"
+                     required="true"
+                     rendered="#{not readOnly}"
+                     tabindex="7">
+        <s:selectItems value="#{specialDateTargetEnum}" var="specialDateTarget"
+                       label="#{messages[specialDateTarget.resourceKey]}"
+                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+        <s:convertEnum/>
+        <a4j:support event="onchange" ajaxSingle="true"
+                     reRender="targetEmployee,targetOrganizationalUnit,targetBusinessUnit" focus="specialDateTarget"
+                     immediate="false"/>
+    </h:selectOneMenu>
+    <h:outputText value="#{messages[specialDate.specialDateTarget.resourceKey]}"
+                  rendered="#{readOnly}"/>
+</s:decorate>
+
+<s:div id="targetEmployee">
+    <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow"
+                rendered="#{specialDateAction.isTargetEmployee(specialDate)}">
+        <ui:define name="label">#{messages['SpecialDate.employee']}</ui:define>
+        <app:quickSearch id="quickSearchEmployee"
+                         textValue="specialDate.employee.idNumber"
+                         value="#{specialDate.employee}"
+                         searchField="idNumber"
+                         reRender="employeeField"
+                         rendered="#{not readOnly}"
+                         tabindex="5"/>
+        <app:selectPopUp id="employee"
+                         required="true"
+                         textValue="#{specialDate.employee.fullName}"
+                         value="#{specialDate.employee}"
+                         dataModel="#{generalEmployeeDataModel}"
+                         clearAction="specialDateAction.clearEmployee()"
+                         searchModalPanel="generalEmployeeListModalPanel"
+                         readOnly="#{readOnly}"
+                         reRender="employeeField"
+                         hotKeySelect="alt+1"/>
+    </s:decorate>
+</s:div>
+
+<s:div id="targetOrganizationalUnit">
+    <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{specialDateAction.isTargetOrganizationalUnit(specialDate)}">
+        <ui:define name="label">#{messages['JobContract.organizationalUnit']}</ui:define>
+        <h:inputText required="true" styleClass="input" readonly="true"
+                     value="#{specialDateAction.organizationalUnitName}" tabindex="16"/>
+        <a4j:commandLink id="selectOrganizationUnit" ajaxSingle="true" immediate="true" tabindex="17"
+                         title="#{messages['JobContract.selectOrganizationalUnit']}"
+                         onclick="Richfaces.showModalPanel('organizationalUnitTreeModalPanel');"
+                         rendered="#{not readOnly}">
+            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+        <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="18"
+                         title="#{messages['Common.clear']}"
+                         action="#{specialDateAction.clearOrganizationalUnit}"
+                         reRender="organizationalUnitField"
+                         rendered="#{not readOnly}">
+            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+    </s:decorate>
+</s:div>
+
+<s:div id="targetBusinessUnit">
+    <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{specialDateAction.isTargetBusinessUnit(specialDate)}">
+        <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+        <h:selectOneMenu id="businessUnit"
+                         value="#{specialDate.businessUnit}"
+                         rendered="#{not readOnly}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="1">
+            <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                           label="#{businessUnit.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange"
+                         reRender="businessUnitField"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{specialDate.businessUnit.fullName}"
+                      rendered="#{readOnly}"/>
+    </s:decorate>
+</s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{specialDateAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!specialDateAction.managed and s:hasPermission('SPECIALDATE','CREATE')}"
+                     tabindex="10">
+    </h:commandButton>
+
+    <h:commandButton action="#{specialDateAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{specialDateAction.managed and not readOnly and s:hasPermission('SPECIALDATE','UPDATE')}"
+                     tabindex="11"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{specialDateAction.managed and not readOnly and s:hasPermission('SPECIALDATE','DELETE')}"
+                     tabindex="12">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{specialDateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="13">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{specialDateAction.managed and not readOnly and s:hasPermission('SPECIALDATE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['SpecialDate.delete.confirmation']}">
+                <f:param value="#{specialDate.title}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{specialDateAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('SPECIALDATE','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml"
+            rendered="#{not readOnly}">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{specialDateAction.assignEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/employees/organizationalUnitTreeModalPanel.xhtml" rendered="#{not readOnly}">
+    <ui:define name="selectOption">
+        <a4j:commandButton id="selectButton" value="#{messages['Common.choose']}"
+                           action="#{specialDateAction.assingOrganizationalUnit(organizationalUnitTreeAction.selectedOrganizationalUnit)}"
+                           ajaxSingle="true" reRender="businessUnitField, organizationalUnitField"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#title" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

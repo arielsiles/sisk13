@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['SMNRate.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="smnRateSearch">
+            <rich:simpleTogglePanel label="#{messages['SMNRate.search']}" switchType="client">
+                <h:panelGrid columns="1"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width100percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['SMNRAte.rate']}</ui:define>
+                            <h:inputText id="rate" value="#{smnRateDataModel.criteria.rate}"
+                                         maxlength="80"
+                                         tabindex="1"
+                                         styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{smnRateDataModel.search}"
+                                               value="#{messages['Common.search']}"
+                                               reRender="smnRateSearch, smnRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="2">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{smnRateDataModel.clear}"
+                                               value="#{messages['Common.clear']}"
+                                               reRender="smnRateSearch, smnRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="3"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/smnRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SMNRATE','CREATE')}"
+                          tabindex="4"/>
+            </div>
+
+            <rich:dataTable id="smnRateList"
+                            value="#{smnRateDataModel}" var="smnRateItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%,40%,20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="smnRate.rate"
+                                                   dataModel="#{smnRateDataModel}"
+                                                   reRender="smnRateList, dataScroller">
+                                #{messages['SMNRAte.rate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="smnRate.active"
+                                                   dataModel="#{smnRateDataModel}"
+                                                   reRender="smnRateList, dataScroller">
+                                #{messages['SMNRAte.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{smnRateItem.rate}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    <h:outputText value=" #{messages['Currency.Bs']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{smnRateItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{smnRateAction.select(smnRateItem)}"
+                                   rendered="#{s:hasPermission('SMNRATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="smnRateList" dataModel="#{smnRateDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/smnRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SMNRATE','CREATE')}"
+                          tabindex="5"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

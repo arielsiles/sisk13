@@ -1,0 +1,157 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{providerAction.managed}">
+                #{messages['Provider.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Provider.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="providerForm">
+            <div class="buttons">
+                <h:commandButton action="#{providerAction.updateProvider}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}"/>
+
+                <h:commandButton action="#{provideAction.addProvideElement}"
+                                 value="#{messages['Provider.addProvideElement']}"
+                                 styleClass="button"
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+
+                <h:commandButton action="#{providerAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{providerAction.managed}">
+                            #{messages['Provider.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Provider.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <ui:include src="/finances/financeProviderForm.xhtml">
+                    <ui:param name="managed" value="#{providerAction.managed}"/>
+                    <ui:param name="providerEntity" value="#{provider}"/>
+                </ui:include>
+
+                <app:fieldset id="moduleProviderTypeFieldset" title="#{messages['Provider.moduleProvider']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Provider.moduleProvider']}</ui:define>
+                        <rich:pickList id="moduleProviderTypes" value="#{providerAction.moduleProviderTypeList}"
+                                       showButtonsLabel="false">
+                            <s:selectItems value="#{moduleProviderTypeEnumList}"
+                                           var="moduleProviderType"
+                                           label="#{messages[moduleProviderType.resourceKey]}"/>
+                            <s:convertEnum/>
+                        </rich:pickList>
+                    </s:decorate>
+                </app:fieldset>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{providerAction.updateProvider}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}"/>
+
+                <h:commandButton action="#{provideAction.addProvideElement}"
+                                 value="#{messages['Provider.addProvideElement']}"
+                                 styleClass="button"
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"
+                                 tabindex="1"/>
+
+                <h:commandButton action="#{providerAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="2"/>
+            </div>
+
+            <c:if test="#{providerAction.managed}">
+                <rich:dataTable value="#{provideDataModel}"
+                                var="provideItem"
+                                id="provideList"
+                                rows="#{sessionUser.rowsPerPage}"
+                                width="100%"
+                                columnsWidth="10%, 40%, 20%, 20%, 10%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                #{messages['ProductItem.productItemCode']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['Provide.productItem']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['Provide.amount']}
+                            </rich:column>
+                            <rich:column>
+                                #{messages['Provide.delivery']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['Common.action']}
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{provideItem.productItem.productItemCode}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{provideItem.productItem.name}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{provideItem.groupAmount}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                        </h:outputText>
+                        &#160;
+                        <h:outputFormat value="#{messages['Common.parenthesis']}">
+                            <f:param value="#{provideItem.groupMeasureUnit.name}"/>
+                        </h:outputFormat>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{provideItem.delivery}">
+                            <app:naturalNumberConverter/>
+                        </h:outputText>
+                        &#160;
+                        <h:outputFormat value="#{messages['Common.parenthesis']}">
+                            <f:param value="#{messages['Common.days']}"/>
+                        </h:outputFormat>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:commandLink value="#{messages['Common.select']}"
+                                       immediate="true"
+                                       action="#{provideAction.select(provideItem)}"
+                                       rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}"/>
+                    </rich:column>
+                </rich:dataTable>
+                <app:dataScroller id="dataScroller" for="provideList" dataModel="#{provideDataModel}"/>
+            </c:if>
+        </h:form>
+    </ui:define>
+</ui:composition>

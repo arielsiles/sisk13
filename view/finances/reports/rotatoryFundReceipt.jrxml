@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="creditDebitComparativeReport" pageWidth="710" pageHeight="792" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="660" leftMargin="30" rightMargin="20" topMargin="30" bottomMargin="30"
+              isSummaryWithPageHeaderAndFooter="true" resourceBundle="org.burrosoft.resources">
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    <template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+    <field name="rotatoryFund.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.employee" class="com.encens.khipus.model.employees.Employee">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.amount" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.payCurrency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.businessUnit" class="com.encens.khipus.model.admin.BusinessUnit">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.date" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="rotatoryFund.exchangeRate" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="extensionSite.extension" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <title>
+        <band height="65" splitType="Stretch">
+            <image scaleImage="RetainShape" onErrorType="Icon">
+                <reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58"
+                               isRemoveLineWhenBlank="true"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <imageExpression class="java.io.InputStream">
+                    <![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+            </image>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement key="title_text" style="titleStyle" positionType="Float" x="72" y="0" width="490"
+                               height="58"/>
+                <box padding="1">
+                    <pen lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band splitType="Stretch"/>
+    </columnHeader>
+    <detail>
+        <band height="120" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.employee}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="150" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFund.employee}.getFullName()]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="330" y="0" width="80" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.amount}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="410" y="0" width="70" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.math.BigDecimal">
+                        <![CDATA[$F{rotatoryFund.amount}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="480" y="0" width="20" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[str($F{rotatoryFund.payCurrency}.getSymbolResourceKey())]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="12" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.executorUnit}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="150" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFund.businessUnit}.getFullName()]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="24" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.expireDate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[$F{rotatoryFund.date}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="36" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.changeRate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.math.BigDecimal">
+                        <![CDATA[$F{rotatoryFund.exchangeRate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="330" y="0" width="80" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.residue}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="410" y="0" width="70" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{residueParam}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="48" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="0" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.detail}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="100" y="0" width="300" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFund.description}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </detail>
+    <columnFooter>
+        <band splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="13" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="0" width="562"
+                               height="12"/>
+                <box padding="0">
+                    <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                   width="100" height="12"/>
+                    <box padding="1">
+                        <pen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="472" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Right"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="512" y="0"
+                                   width="10" height="12"/>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="522" y="0"
+                                   width="40" height="12"/>
+                    <textElement textAlignment="Left"/>
+                    <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="180" splitType="Stretch">
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="0" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="80" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <topPen lineWidth="1.0" lineStyle="Dotted" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.registeredBy}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="230" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <topPen lineWidth="1.0" lineStyle="Dotted" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{Reports.rotatoryFunds.receipt.approvedBy}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="380" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <topPen lineWidth="1.0" lineStyle="Dotted" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$F{rotatoryFund.employee}.getFullName()]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="12" width="562"
+                               height="12"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                   mode="Opaque" x="380" y="0" width="100" height="12"/>
+                    <box padding="1">
+                        <topPen lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[com.encens.khipus.reports.ReportFormatter.getPersonIdNumber($F{rotatoryFund.employee}.getIdNumber(),$F{extensionSite.extension})]]></textFieldExpression>
+                </textField>
+            </frame>
+            <subreport>
+                <reportElement key="quotaSubReport" positionType="Float" x="0" y="48" width="350" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{quotaSubReport}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="92" width="660" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{ROTATORYFUNDPAYMENTSUBREPORT}]]></subreportExpression>
+            </subreport>
+            <subreport isUsingCache="true">
+                <reportElement positionType="Float" x="0" y="138" width="562" height="36"/>
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <subreportParameter name="JPA_ENTITY_MANAGER">
+                    <subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+                </subreportParameter>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{ROTATORYFUNDCOLLECTIONSUBREPORT}]]></subreportExpression>
+            </subreport>
+        </band>
+    </summary>
+</jasperReport>

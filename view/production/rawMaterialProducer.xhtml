@@ -1,0 +1,335 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{rawMaterialProducerAction.managed}">
+            #{messages['ProductiveZone.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductiveZone.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+
+<style type="text/css">
+    .special tr[id]{
+        display:none;
+    }
+</style>
+
+<h:form id="rawMaterialProducerForm">
+<div class="buttons">
+    <h:commandButton action="#{rawMaterialProducerAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','CREATE')}"/>
+    <h:commandButton action="#{rawMaterialProducerAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rawMaterialProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{rawMaterialProducerAction.managed}">
+                #{messages['RawMaterialProducer.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RawMaterialProducer.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <app:fieldset id="personalDataFieldSet" title="#{messages['RawMaterialProducer.personalData']}">
+        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+            <h:inputText id="idNumber" value="#{rawMaterialProducer.idNumber}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="idNumberField"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:div id="documentDiv">
+            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.documentType']}</ui:define>
+                <h:selectOneMenu id="documentType"
+                                 value="#{rawMaterialProducer.documentType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="2">
+                    <s:selectItems value="#{personDocumentTypeList}" var="documentType"
+                                   label="#{documentType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange"
+                                 action="#{personAction.updateShowExtension()}"
+                                 reRender="documentDiv"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                        rendered="#{rawMaterialProducerAction.showExtension}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                <h:selectOneMenu id="extension"
+                                 value="#{rawMaterialProducer.extensionSite}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="3">
+                    <s:selectItems value="#{extensionList}"
+                                   var="extension"
+                                   label="#{extension.extension}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+
+        <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.salutation']}</ui:define>
+            <h:selectOneMenu id="salutation"
+                             value="#{rawMaterialProducer.salutation}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="4">
+                <s:selectItems value="#{salutationList.resultList}" var="salutation"
+                               label="#{salutation.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+            <h:inputText id="firstName"
+                         value="#{rawMaterialProducer.firstName}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="150"
+                         tabindex="5">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="firstNameField"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+            <h:inputText id="lastName"
+                         value="#{rawMaterialProducer.lastName}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="150"
+                         tabindex="6">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="lastNameField"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+            <h:inputText id="maidenName"
+                         value="#{rawMaterialProducer.maidenName}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="150"
+                         tabindex="7">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="maidenNameField"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.birthDay']}</ui:define>
+            <rich:calendar value="#{rawMaterialProducer.birthDay}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="8">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.profession']}</ui:define>
+            <h:inputText id="profession"
+                         value="#{rawMaterialProducer.profession}"
+                         styleClass="input"
+                         required="false"
+                         maxlength="150"
+                         tabindex="9">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="professionField"/>
+            </h:inputText>
+        </s:decorate>
+    </app:fieldset>
+    <rich:spacer height="10" />
+
+    <app:fieldset id="taxFieldSet2011" title="#{messages['RawMaterialProducer.taxLicense2011']}">
+        <s:decorate id="codeTaxLicenseField2011" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.codeTaxLicense']}</ui:define>
+            <h:inputText id="codeTaxLicense2011" value="#{rawMaterialProducer.codeTaxLicence2011}"
+                         styleClass="input" disabled="true" required="false" maxlength="150" tabindex="10">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="startDateTaxLicenseField2011" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.startDateTaxLicense']}</ui:define>
+            <rich:calendar showWeekDaysBar="false" showFooter="true" disabled="true"
+                           value="#{rawMaterialProducer.startDateTaxLicence2011}"
+                           popup="true"/>
+        </s:decorate>
+        <s:decorate id="expirationDateTaxLicenseField2011" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.expirationDateTaxLicense']}</ui:define>
+            <rich:calendar showWeekDaysBar="false" showFooter="true" disabled="true"
+                           value="#{rawMaterialProducer.expirationDateTaxLicence2011}"
+                           popup="true"/>
+        </s:decorate>
+    </app:fieldset>
+
+    <app:fieldset id="taxFieldSet" title="#{messages['RawMaterialProducer.taxLicense']}">
+        <!--<s:decorate id="codeTaxLicenseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.codeTaxLicense']}</ui:define>
+            <h:inputText id="codeTaxLicense" value="#{rawMaterialProducer.codeTaxLicence}"
+                         styleClass="input" required="false" maxlength="150" tabindex="10">
+                <a4j:support ajaxSingle="true" event="onblur" reRender="codeTaxLicenseField"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="startDateTaxLicenseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.startDateTaxLicense']}</ui:define>
+            <rich:calendar showWeekDaysBar="false" showFooter="true"
+                           value="#{rawMaterialProducer.startDateTaxLicence}"
+                           popup="true"/>
+        </s:decorate>
+        <s:decorate id="expirationDateTaxLicenseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.expirationDateTaxLicense']}</ui:define>
+            <rich:calendar showWeekDaysBar="false" showFooter="true"
+                           value="#{rawMaterialProducer.expirationDateTaxLicence}"
+                           popup="true"/>
+        </s:decorate>-->
+            <ui:include src="/production/rawMaterialProducerGestionTaxListForm.xhtml"/>
+    </app:fieldset>
+
+    <rich:spacer height="10" />
+
+    <app:fieldset id="productiveZoneFieldSet" title="#{messages['RawMaterialProducer.productiveZone']}">
+        <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.responsible']}</ui:define>
+            <h:selectBooleanCheckbox value="#{rawMaterialProducer.responsible}" />
+        </s:decorate>
+
+        <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+            <h:inputText id="productiveZone" styleClass="input" value="#{rawMaterialProducer.fullNameOfProductiveZone}"
+                         readonly="false" required="true">
+            </h:inputText>
+            <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
+                             title="#{messages['RawMaterialProducer.selectProductiveZone']}"
+                             onclick="Richfaces.showModalPanel('productiveZoneModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+    </app:fieldset>
+
+    <app:fieldset id="productiveZoneFieldOptions" title="#{messages['RawMaterialProducer.productiveZoneOptions']}" >
+
+        <s:decorate id="moveDiscoint"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rawMaterialProducerAction.showOptionsProductiveZone}">
+            <ui:define name="label">#{messages['RawMaterialProducer.moveDiscounts']}</ui:define>
+            <h:selectBooleanCheckbox value="#{rawMaterialProducerAction.moveDiscoints}" />
+        </s:decorate>
+
+        <s:decorate id="moveSessions"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rawMaterialProducerAction.showOptionsProductiveZone}">
+            <ui:define name="label">#{messages['RawMaterialProducer.moveSessions']}</ui:define>
+            <h:selectBooleanCheckbox value="#{rawMaterialProducerAction.moveSessions}" />
+        </s:decorate>
+    </app:fieldset>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{rawMaterialProducerAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','CREATE')}"/>
+    <h:commandButton action="#{rawMaterialProducerAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{rawMaterialProducerAction.managed and s:hasPermission('RAWMATERIALPRODUCER','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rawMaterialProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialProducerAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['RawMaterialProducer.delete.confirmation']}">
+                <f:param value="#{rawMaterialProducer.firstName} #{rawMaterialProducer.lastName} #{rawMaterialProducer.maidenName}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rawMaterialProducerAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true" reRender=""
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+    <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+    <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+    <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{rawMaterialProducerAction.selectProductiveZone(productiveZoneItem)}"
+                           image="/img/active.gif" styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="productiveZoneField,productiveZoneFieldOptions"
+                           oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                           style="width:0.8em"/>
+
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+<s:decorate id="gestionTaxModalPanelContainer"
+            template="/production/gestionTaxListModalPanel.xhtml">
+    <ui:param name="containerId" value="gestionTaxModalPanelContainer"/>
+    <ui:param name="dialogId" value="gestionTaxModalPanel"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{rawMaterialProducerAction.addGestionTaxs(gestionTaxSearchDataModel.getSelectedGestionTaxs())}"
+                           value="#{messages['Common.add']}"
+                           reRender="gestionTaxDetailsPanel"
+                           styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('gestionTaxModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

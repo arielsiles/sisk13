@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.academicPlanning.page.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="reports"/>
+    <ui:define name="body">
+        <h:form id="academicPlanningReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.academicPlanning.page.title']}
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent">
+                    <s:div>
+                        <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.academicPlanning.cycle']}</ui:define>
+                            <h:selectOneMenu id="cycle" value="#{academicPlanningSummaryReportAction.cycle}"
+                                             styleClass="input" tabindex="2" required="true">
+                                <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                                               hideNoSelectionLabel="false"
+                                               noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.academicPlanning.sede']}</ui:define>
+                            <h:selectOneMenu id="businessUnit"
+                                             value="#{academicPlanningSummaryReportAction.businessUnit}"
+                                             styleClass="input" required="true" tabindex="3">
+                                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                               label="#{businessUnit.organization.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             reRender="organizationalLevelField,organizationalUnitField"
+                                             action="#{academicPlanningSummaryReportAction.refreshBusinessUnit}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="organizationalLevelField,organizationalUnitField"
+                                             action="#{academicPlanningSummaryReportAction.refreshBusinessUnit}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="organizationalLevelField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['Reports.academicPlanning.organizationalLevel']}</ui:define>
+                            <h:selectOneMenu id="organizationalLevel"
+                                             value="#{academicPlanningSummaryReportAction.organizationalLevel}"
+                                             styleClass="input"
+                                             required="true" tabindex="4">
+                                <s:selectItems value="#{organizationalLevelList}" var="organizationalLevel"
+                                               label="#{organizationalLevel.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange" reRender="organizationalUnitField"
+                                             action="#{academicPlanningSummaryReportAction.refreshOrganizationalLevel}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="organizationalUnitField"
+                                             action="#{academicPlanningSummaryReportAction.refreshOrganizationalLevel}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['Reports.academicPlanning.organizationalUnit']}</ui:define>
+                            <h:selectOneMenu id="organizationalUnit"
+                                             value="#{academicPlanningSummaryReportAction.organizationalUnit}"
+                                             styleClass="input"
+                                             required="true" tabindex="5">
+                                <s:selectItems value="#{academicPlanningSummaryReportAction.organizationalUnitList}"
+                                               var="organizationalUnit"
+                                               label="#{organizationalUnit.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{academicPlanningSummaryReportAction}" showPageFormat="false"
+                                      tabIndex="12"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{academicPlanningSummaryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

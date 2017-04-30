@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="head">
+        <c:if test="#{empty redirectURL}">
+            <c:set var="defaultRedirectURL" value="#{genericEvaluationFormAction.defaultRedirectURL}"/>
+            <c:set var="redirectURL" value="#{not empty defaultRedirectURL?defaultRedirectURL:request.contextPath}"/>
+        </c:if>
+        <meta http-equiv="Refresh" content="4; URL=#{redirectURL}"/>
+    </ui:define>
+    <ui:define name="pageTitle">
+        <h:outputText value="#{messages['Common.waiting']}"/>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:define name="body">
+        <h:form id="postulantForm">
+            <div align="center" style="vertical-align:middle;" class="messageInfo">
+                <h:panelGroup styleClass="startAjaxCenter">
+                    <h:graphicImage value="/img/spinner.gif" style="border:0;vertical-align:middle;"/>
+                    &#160;#{messages['Common.ajax.request']}
+                </h:panelGroup>
+
+                <div class="center-buttons">
+                    <h:outputText value="#{messages['Common.waiting']}"/>
+                </div>
+                <div class="center-buttons">
+                    <h:outputLink id="redirectButton" value="#{redirectURL}">
+                        <h:outputText value="#{messages['Common.redirect']}"/>
+                    </h:outputLink>
+                    #{session.removeAttribute('redirectURL')}
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

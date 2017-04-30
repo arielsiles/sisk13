@@ -1,0 +1,89 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <c:if test="#{not empty searchByFixedAssetVoucher}">
+        #{dataModel.searchByFixedAssetVoucher()}
+    </c:if>
+    <c:if test="#{not empty searchByFixedAssetPurchaseOrder}">
+        #{dataModel.searchByFixedAssetPurchaseOrder()}
+    </c:if>
+    <c:if test="#{not empty searchByWarehousePurchaseOrder}">
+        #{dataModel.searchByWarehousePurchaseOrder()}
+    </c:if>
+    <c:if test="#{not empty searchByRotatoryFund}">
+        #{dataModel.searchByRotatoryFund()}
+    </c:if>
+
+    <s:div id="discountCommentDivId" rendered="#{dataModel.count gt 0}">
+        <rich:dataTable value="#{dataModel.resultList}"
+                        var="discountCommentItem"
+                        id="discountCommentList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="10%, 50%,20%, 10%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="discountComment.code"
+                                               dataModel="#{dataModel}"
+                                               reRender="discountCommentList, discountCommentDataScroller">
+                            <h:outputText value="#{messages['DiscountComment.code']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="discountComment.cause"
+                                               dataModel="#{dataModel}"
+                                               reRender="discountCommentList, discountCommentDataScroller">
+                            <h:outputText value="#{messages['DiscountComment.cause']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="discountComment.createdBy"
+                                               dataModel="#{dataModel}"
+                                               reRender="discountCommentList, discountCommentDataScroller">
+                            <h:outputText value="#{messages['Common.createdBy']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="discountComment.creationDate"
+                                               dataModel="#{dataModel}"
+                                               reRender="discountCommentList, discountCommentDataScroller">
+                            <h:outputText value="#{messages['Common.creationDate']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{messages['Common.action']}"/>
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{discountCommentItem.code}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{discountCommentItem.cause}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{discountCommentItem.createdBy.employee.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{discountCommentItem.creationDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <a4j:commandLink value="#{messages['Common.select']}"
+                                 action="#{discountCommentAction.select(discountCommentItem)}"
+                                 immediate="true"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="discountCommentDataScroller" for="discountCommentList" dataModel="#{dataModel}"/>
+    </s:div>
+</ui:composition>

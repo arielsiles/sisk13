@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['PayrollGenerationInvestmentRegistration.generateRegistration']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="questionForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{payrollGenerationInvestmentRegistrationCreateAction.generateRegistration}"
+                                 value="#{messages['PayrollGenerationInvestmentRegistration.generateRegistration']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('PAYROLLGENERATIONINVESTMENTREGISTRATION','VIEW')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{payrollGenerationInvestmentRegistrationCreateAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    #{messages['PayrollGenerationInvestmentRegistration.generateRegistration']}
+                </f:facet>
+
+
+                <s:decorate id="payableDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['PayrollGenerationInvestmentRegistration.payableDocumentType']}
+                    </ui:define>
+                    <app:quickSearch id="quickSearchDocumentType"
+                                     textValue="payrollGenerationInvestmentRegistrationCreateAction.payableDocumentType.documentType"
+                                     value="#{payrollGenerationInvestmentRegistrationCreateAction.payableDocumentType}"
+                                     searchField="documentType"
+                                     alias="payableDocumentType"
+                                     reRender="payableDocumentTypeField"
+                                     tabindex="5">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="payableDocumentType.movementType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinanceMovementType','C')}"/>
+                            <app:restriction
+                                    condition="payableDocumentType.documentClass=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentClass','OTR')}"/>
+                            <app:restriction
+                                    condition="payableDocumentType.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentTypeState','VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <h:selectOneMenu id="payableDocumentType"
+                                     required="true"
+                                     value="#{payrollGenerationInvestmentRegistrationCreateAction.payableDocumentType}"
+                                     styleClass="input"
+                                     tabindex="6">
+                        <s:selectItems value="#{creditOtherPayableDocumentTypeList}" var="payableDocumentType"
+                                       label="#{payableDocumentType.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support ajaxSingle="true"
+                                     event="onchange"
+                                     reRender="payableDocumentTypeField"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <app:fieldset id="payableAmountsFieldset"
+                              title="#{messages['PayrollGenerationInvestmentRegistration.payableAmounts']}">
+
+                    <rich:dataTable id="fixedAssetPartList"
+                                    value="#{payrollGenerationInvestmentRegistrationCreateAction.socialWelfareEntityList}"
+                                    var="socialWelfareEntityItem"
+                                    rows="#{payrollGenerationInvestmentRegistrationCreateAction.socialWelfareEntityRowCounter}"
+                                    width="100%"
+                                    columnsWidth="60%, 30%, 10%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    #{messages['PayrollGenerationInvestmentRegistration.socialWelfareEntity']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PayrollGenerationInvestmentRegistration.payableAmount']}
+                                </rich:column>
+                                <rich:column>
+                                    #{messages['PayrollGenerationInvestmentRegistration.payableCurrency']}
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{socialWelfareEntityItem.name}"/>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText
+                                    value="#{payrollGenerationInvestmentRegistrationCreateAction.socialWelfareEntityValues[socialWelfareEntityItem.id]}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['Currency.Bs']}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </app:fieldset>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{payrollGenerationInvestmentRegistrationCreateAction.generateRegistration}"
+                                 value="#{messages['PayrollGenerationInvestmentRegistration.generateRegistration']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('PAYROLLGENERATIONINVESTMENTREGISTRATION','VIEW')}"/>
+
+                <h:commandButton action="#{payrollGenerationInvestmentRegistrationCreateAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <h:outputText value="#{kindOfSalaryAction.managed?messages['KindOfSalary.edit']:messages['KindOfSalary.new']}"/>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="kindOfSalaryForm">
+            <div class="buttons">
+                <h:commandButton action="#{kindOfSalaryAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{kindOfSalaryAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{kindOfSalaryAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{kindOfSalaryAction.managed?messages['KindOfSalary.edit']:messages['KindOfSalary.new']}"/>
+                </f:facet>
+                <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['KindOfSalary.type']}</ui:define>
+                    <h:inputText id="type" value="#{kindOfSalary.type}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="typeField"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Sector.sector']}</ui:define>
+                    <h:selectOneMenu id="sector" value="#{kindOfSalary.sector}" styleClass="input"
+                                     required="true"
+                                     tabindex="2">
+                        <s:selectItems value="#{sectorList.resultList}" var="sector" label="#{sector.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['KindOfSalary.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{kindOfSalary.description}"
+                                     styleClass="input textarea" tabindex="3">
+                        <a4j:support event="onblur" reRender="descriptionField"/>
+                    </h:inputTextarea>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{kindOfSalaryAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','CREATE')}">
+                </h:commandButton>
+                <h:commandButton action="#{kindOfSalaryAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{kindOfSalaryAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+        </h:form>
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{kindOfSalaryAction.managed and s:hasPermission('KINDOFSALARY','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['KindOfSalary.delete.confirmation']}">
+                        <f:param value="#{kindOfSalary.type}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{kindOfSalaryAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   rendered="#{s:hasPermission('KINDOFSALARY','DELETE')}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#type" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

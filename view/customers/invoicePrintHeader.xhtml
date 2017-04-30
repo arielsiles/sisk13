@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+
+    <f:view>
+        <br/>
+
+        <h:outputText value="#{invoicePrintAction.businessUnit.business.name}"/> <br/>
+        <h:outputText
+                value="#{invoicePrintAction.businessUnit.organization.address.street.name} #{invoicePrintAction.businessUnit.organization.address.number}"/>
+        <br/>
+        <h:outputText value="Sucursal: #{invoicePrintAction.businessUnit.organization.name}"/> <br/>
+        <h:outputText value="Cbba - Bolivia"/> <br/>
+
+        <h:outputText value="FACTURA" style="font-size: 12; align:right"/> <br/>
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+        <h:outputText> #{messages['Entity.idNumber']}:
+            #{invoicePrintAction.businessUnit.organization.idNumber}</h:outputText> <br/>
+        <h:outputText value="#{messages['Invoice.number']}: #{invoicePrintAction.invoice.number}"/> <br/>
+
+        <h:outputText value="Numero Orden: #{invoicePrintAction.invoice.taxDocumentNumber}"/> <br/>
+        <h:outputText value="Numero Serie: #{invoicePrintAction.invoice.taxDocumentType}"/> <br/>
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+
+        <h:outputText value="#{messages['Invoice.date']}: "/>
+        <h:outputText value="#{invoicePrintAction.invoice.creationDate}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText> <br/>
+
+        <c:choose>
+            <c:when test="#{empty invoicePrintAction.invoice.organizationName}">
+                <h:outputText
+                        value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.lastName} #{invoicePrintAction.invoice.maidenName} #{invoicePrintAction.invoice.firstName}"/>
+                <br/>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.organizationName}"/>
+                <br/>
+            </c:otherwise>
+        </c:choose>
+
+
+        <h:outputText
+                value="#{messages['Entity.idNumber']}: #{invoicePrintAction.invoice.customer.entity.idNumber}"/> <br/>
+
+
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+        <h:dataTable value="#{invoicePrintAction.invoice.details}" var="detail">
+            <h:column>
+                <f:facet name="header"><h:outputText>
+                    $#{messages['InvoiceDetail.quantity']}$#{messages['InvoiceDetail.product.name']}$#{messages['InvoiceDetail.price']}$#{messages['InvoiceDetail.totalAmount']}$</h:outputText></f:facet>
+            </h:column>
+        </h:dataTable>
+
+    </f:view>
+</ui:composition>
+

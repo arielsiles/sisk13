@@ -1,0 +1,254 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['Budget.entryBudget.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="isStateForVerifyInBlockOperation"
+       value="#{entryBudgetDataModel.stateForVerifyInBlockOperation and s:hasPermission('ENTRYBUDGETS','UPDATE') and s:hasPermission('ENTRYBUDGETSCHECK','VIEW')}"/>
+<c:set var="isStateForApproveInBlockOperation"
+       value="#{entryBudgetDataModel.stateForApproveInBlockOperation and s:hasPermission('ENTRYBUDGETS','UPDATE') and s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}"/>
+<c:set var="isStateForFreezeInBlockOperation"
+       value="#{entryBudgetDataModel.stateForFreezeInBlockOperation and s:hasPermission('ENTRYBUDGETS','UPDATE') and s:hasPermission('ENTRYBUDGETSAPPROVAL','VIEW')}"/>
+
+<h:form id="entryBudgetSearch">
+
+<rich:simpleTogglePanel label="#{messages['Budget.entryBudget.search']}" switchType="client">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EntryBudget.seat']}</ui:define>
+                <h:selectOneMenu id="businessUnit"
+                                 value="#{entryBudgetDataModel.criteria.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="1">
+                    <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                   label="#{businessUnit.organization.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExpenseBudget.costCenter']}</ui:define>
+                <app:quickSearch id="quickSearchCostCenterField"
+                                 textValue="entryBudgetDataModel.criteria.costCenter.code"
+                                 value="#{entryBudgetDataModel.criteria.costCenter}"
+                                 searchField="code"
+                                 reRender="costCenterField"
+                                 tabindex="2"/>
+                <app:selectPopUp id="costCenter"
+                                 textValue="#{entryBudgetDataModel.criteria.costCenter.fullName}"
+                                 value="#{entryBudgetDataModel.criteria.costCenter}"
+                                 clearAction="entryBudgetDataModel.clearCostCenter()"
+                                 searchModalPanel="costCenterListModalPanel"
+                                 dataModel="#{costCenterDataModel}"
+                                 reRender="costCenterField"
+                                 hotKeySelect="alt+1"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EntryBudget.gestion']}</ui:define>
+                <h:selectOneMenu id="gestion"
+                                 value="#{entryBudgetDataModel.criteria.gestion}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{gestionList}" var="gestion"
+                                   label="#{gestion.year}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EntryBudget.state']}</ui:define>
+                <h:selectOneMenu id="state"
+                                 value="#{entryBudgetDataModel.criteria.state}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    <s:selectItems value="#{budgetStatesEnum}" var="entryBudgetState"
+                                   label="#{messages[entryBudgetState.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <a4j:commandButton action="#{entryBudgetDataModel.search}"
+                                   reRender="topOperations,bottomOperations,entryBudgetList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}" id="searchButtonId" tabindex="5">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <h:panelGroup id="topOperations">
+        <h:commandButton action="#{entryBudgetDataModel.verifyInBlock}"
+                         value="#{messages['EntryBudget.verify']}"
+                         styleClass="button"
+                         rendered="#{isStateForVerifyInBlockOperation}"/>
+        <h:commandButton action="#{entryBudgetDataModel.approveInBlock}"
+                         value="#{messages['EntryBudget.approve']}"
+                         styleClass="button"
+                         rendered="#{isStateForApproveInBlockOperation}"/>
+        <h:commandButton action="#{entryBudgetDataModel.freezeInBlock}"
+                         value="#{messages['EntryBudget.freeze']}"
+                         styleClass="button"
+                         rendered="#{isStateForFreezeInBlockOperation}"/>
+    </h:panelGroup>
+    <s:button value="#{messages['Common.new']}"
+              view="/budget/entryBudget.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('ENTRYBUDGETS','CREATE')}"/>
+</div>
+
+<rich:dataTable value="#{entryBudgetDataModel}" var="entryBudgetItem" id="entryBudgetList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="5%, 15%, 20%, 10%, 20%, 10% 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column styleClass="center">
+                <app:selectCheckboxHeader dataModel="#{entryBudgetDataModel}" reRender="entryBudgetList"
+                                          rendered="#{isStateForVerifyInBlockOperation or isStateForApproveInBlockOperation or isStateForFreezeInBlockOperation}"/>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="entryBudget.businessUnit.organization.name"
+                        dataModel="#{entryBudgetDataModel}"
+                        reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.seat']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="entryBudget.costCenter"
+                                       dataModel="#{entryBudgetDataModel}"
+                                       reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.costCenter']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="entryBudget.gestion.year"
+                                       dataModel="#{entryBudgetDataModel}"
+                                       reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.gestion']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="entryBudget.classifier.name"
+                                       dataModel="#{entryBudgetDataModel}"
+                                       reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.burden']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="entryBudget.amount"
+                                       dataModel="#{entryBudgetDataModel}"
+                                       reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.amount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="entryBudget.state"
+                                       dataModel="#{entryBudgetDataModel}"
+                                       reRender="entryBudgetList, dataScroller">
+                    #{messages['EntryBudget.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column styleClass="center">
+        <app:selectCheckboxItem dataModel="#{entryBudgetDataModel}" item="#{entryBudgetItem}"
+                                rendered="#{isStateForVerifyInBlockOperation or isStateForApproveInBlockOperation or isStateForFreezeInBlockOperation}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{entryBudgetItem.businessUnit.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{entryBudgetItem.costCenter.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{entryBudgetItem.gestion.year}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{entryBudgetItem.classifier.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{entryBudgetItem.amount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[entryBudgetItem.state.resourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{entryBudgetAction.select(entryBudgetItem)}"
+                       rendered="#{s:hasPermission('ENTRYBUDGETS','VIEW')}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="entryBudgetList" dataModel="#{entryBudgetDataModel}"/>
+
+<div class="buttons">
+    <h:panelGroup id="bottomOperations">
+        <h:commandButton action="#{entryBudgetDataModel.verifyInBlock}"
+                         value="#{messages['EntryBudget.verify']}"
+                         styleClass="button"
+                         rendered="#{isStateForVerifyInBlockOperation}"/>
+        <h:commandButton action="#{entryBudgetDataModel.approveInBlock}"
+                         value="#{messages['EntryBudget.approve']}"
+                         styleClass="button"
+                         rendered="#{isStateForApproveInBlockOperation}"/>
+        <h:commandButton action="#{entryBudgetDataModel.freezeInBlock}"
+                         value="#{messages['EntryBudget.freeze']}"
+                         styleClass="button"
+                         rendered="#{isStateForFreezeInBlockOperation}"/>
+    </h:panelGroup>
+    <s:button value="#{messages['Common.new']}"
+              view="/budget/entryBudget.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('ENTRYBUDGETS','CREATE')}"/>
+</div>
+
+</h:form>
+<s:decorate id="costCenterListModalPanelContainer"
+            template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="dataModel" value="#{costCenterDataModel}"/>
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{entryBudgetDataModel.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           style="border:0"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

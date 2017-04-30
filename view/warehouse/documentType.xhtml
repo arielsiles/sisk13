@@ -1,0 +1,272 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{warehouseDocumentTypeAction.managed}">
+            #{messages['WarehouseDocumentType.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['WarehouseDocumentType.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="global"/>
+<ui:define name="body">
+<h:form id="warehouseDocumentTypeForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{warehouseDocumentTypeAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseDocumentTypeAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{warehouseDocumentTypeAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseDocumentTypeAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{warehouseDocumentTypeAction.managed}">
+                #{messages['WarehouseDocumentType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['WarehouseDocumentType.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDocumentType.name']}</ui:define>
+        <h:inputText id="name"
+                     value="#{warehouseDocumentType.name}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="100"
+                     tabindex="1"/>
+    </s:decorate>
+    <c:choose>
+        <c:when test="#{warehouseDocumentTypeAction.managed}">
+            <s:decorate id="documentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseDocumentType.documentCode']}</ui:define>
+                <h:outputText value="#{warehouseDocumentType.id.documentCode}"/>
+            </s:decorate>
+        </c:when>
+        <c:otherwise>
+            <s:decorate id="documentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseDocumentType.documentCode']}</ui:define>
+                <h:inputText id="documentCode"
+                             value="#{warehouseDocumentType.id.documentCode}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="3"
+                             tabindex="2"/>
+            </s:decorate>
+        </c:otherwise>
+    </c:choose>
+    <s:decorate id="warehouseVoucherTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDocumentType.warehouseVoucherType']}</ui:define>
+        <h:selectOneMenu id="warehouseVoucherType"
+                         value="#{warehouseDocumentType.warehouseVoucherType}"
+                         styleClass="input"
+                         rendered="#{not warehouseDocumentTypeAction.managed}"
+                         required="true"
+                         tabindex="3">
+            <s:selectItems value="#{warehouseVoucherTypeEnum}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+            <a4j:support event="onchange"
+                         action="#{warehouseDocumentType.setFieldRestriction(null)}"
+                         reRender="fieldRestrictionDiv"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+        <h:outputText value="#{messages[warehouseDocumentType.warehouseVoucherType.resourceKey]}"
+                      rendered="#{warehouseDocumentTypeAction.managed}"/>
+    </s:decorate>
+    <s:div id="fieldRestrictionDiv">
+        <s:decorate id="fieldRestrictionField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseDocumentType.isInputType() or warehouseDocumentType.isOutputType()}">
+            <ui:define name="label">#{messages['WarehouseDocumentType.fieldRestriction']}</ui:define>
+            <h:selectOneMenu id="fieldRestriction"
+                             value="#{warehouseDocumentType.fieldRestriction}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{not warehouseDocumentTypeAction.managed}"
+                             tabindex="4">
+                <s:selectItems value="#{warehouseDocumentTypeFieldRestrictionEnum}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{warehouseDocumentType.setContraAccount(null)}"
+                             reRender="contraAccountListModalPanelDiv, contraAccountDiv"
+                             ajaxSingle="true"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+            <h:outputText value="#{messages[warehouseDocumentType.fieldRestriction.resourceKey]}"
+                          rendered="#{warehouseDocumentTypeAction.managed}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="contraAccountDiv">
+        <s:decorate id="contraAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{warehouseDocumentType.isContraAccountDefinedByDefault()}">
+            <ui:define name="label">#{messages['WarehouseDocumentType.contraAccount']}</ui:define>
+            <app:selectPopUp id="contraAccount"
+                             required="true"
+                             textValue="#{warehouseDocumentType.contraAccount.fullName}"
+                             value="#{warehouseDocumentType.contraAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             clearAction="warehouseDocumentTypeAction.clearContraAccount()"
+                             searchModalPanel="contraAccountListModalPanel"
+                             reRender="contraAccountField"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDocumentType.state']}</ui:define>
+        <h:selectOneMenu id="state"
+                         value="#{warehouseDocumentType.state}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="5">
+            <s:selectItems value="#{documentTypeStateEnum}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="defaultDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.defaultDescription']}"/>
+        </ui:define>
+        <h:inputTextarea id="defaultDescription"
+                         value="#{warehouseDocumentType.defaultDescription}"
+                         styleClass="input textarea"
+                         tabindex="6"/>
+    </s:decorate>
+    <!--Form input fields-->
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{warehouseDocumentTypeAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}"
+                     tabindex="5"/>
+
+    <h:commandButton action="#{warehouseDocumentTypeAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','CREATE')}"
+                     tabindex="6"/>
+
+    <h:commandButton action="#{warehouseDocumentTypeAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','UPDATE')}"
+                     tabindex="7"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','DELETE')}"
+                     tabindex="8">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseDocumentTypeAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="9"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{warehouseDocumentTypeAction.managed and s:hasPermission('WAREHOUSEDOCUMENTTYPE','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['WarehouseDocumentType.delete.confirmation']}">
+                <f:param value="#{warehouseDocumentType.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{warehouseDocumentTypeAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('WAREHOUSEDOCUMENTTYPE','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<s:div id="contraAccountListModalPanelDiv">
+    <s:decorate id="contraAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml"
+                rendered="#{warehouseDocumentType.isContraAccountDefinedByDefault()}">
+        <ui:param name="containerId" value="contraAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="contraAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{warehouseDocumentType.setContraAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="contraAccountField"
+                               oncomplete="Richfaces.hideModalPanel('contraAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

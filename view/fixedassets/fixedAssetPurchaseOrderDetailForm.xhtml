@@ -1,0 +1,672 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<a4j:region>
+<div class="buttons">
+    <a4j:commandButton action="#{fixedAssetPurchaseOrderDetailListCreateAction.addInstance()}"
+                       value="#{messages['Common.add']}"
+                       styleClass="button"
+                       reRender="purchaseOrderDetailFormPanel"/>
+</div>
+
+<s:div id="purchaseOrderDetailFormPanel">
+<rich:panel id="fixedAssetPurchaseOrderDetailFormRichPanel">
+<f:facet name="header">
+    #{messages['FixedAssetPurchaseOrderDetail.creationForm']}
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="leftPanel">
+<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+             columnClasses="width35percent, width65percent">
+    <app:fieldset id="requestedQuantityFieldset"
+                  title="#{messages['FixedAssetPurchaseOrderDetail.requestedQuantity']}">
+        <s:decorate id="requestedQuantityId" template="/include/validateField.xhtml">
+            <ui:param name="styleClass" value="center"/>
+            <ui:param name="showRequired" value="true"/>
+            <h:inputText id="requestedQuantityInputText"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.requestedQuantity}"
+                         styleClass="inputTiny right"
+                         tabindex="30">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                <app:keyUpEvent focus="requestedQuantityFieldset"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpTotalAmountValues()"
+                                reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+            </h:inputText>
+        </s:decorate>
+    </app:fieldset>
+
+    <app:fieldset id="exchangeRatesFieldset"
+                  title="#{messages['FixedAssetPurchaseOrderDetail.title.exchangeRates']}">
+        <h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+                     columnClasses="width50percent, width50percent">
+            <s:div>
+                <s:decorate id="usdExchangeRateId" template="/include/panelGridVerticalInputField.xhtml">
+                    <ui:param name="inputId" value="bsSusRateInputText"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <h:inputText id="bsSusRateInputText"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.bsSusRate}"
+                                     styleClass="inputTiny right"
+                                     tabindex="31">
+                            <app:realNumberConverter minimum="0.000001"
+                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     forId="bsSusRateInputText"/>
+                            <app:keyUpEvent focus="bsUfvRateInputText"
+                                            action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpUnitPriceBs()"
+                                            reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+                        </h:inputText>
+                        &#160;
+                        <h:outputText value=" #{messages['FinancesExchangeRate.bsSusRate']}"/>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="ufvExchangeRateId" template="/include/panelGridVerticalInputField.xhtml">
+                    <ui:param name="inputId" value="bsUfvRateInputText"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <h:inputText id="bsUfvRateInputText"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.bsUfvRate}"
+                                     styleClass="inputTiny right"
+                                     tabindex="32">
+                            <app:realNumberConverter minimum="0.000001"
+                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     forId="bsUfvRateInputText"/>
+                            <app:keyUpEvent focus="bsUnitPriceInputText"
+                                            action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpUnitPriceBs()"
+                                            reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+                        </h:inputText>
+                        &#160;
+                        <h:outputText value="#{messages['FinancesExchangeRate.bsUfvRate']}"/>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</h:panelGrid>
+
+<app:fieldset id="unitPricesFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.unitPrices']}">
+    <h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" width="100%"
+                 columnClasses="width20percent right, width30percent left, width20percent right, width30percent left">
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <ui:param name="required" value="true"/>
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}"/>
+        </s:decorate>
+
+        <s:decorate id="bsUnitPriceId" template="/include/validateField.xhtml">
+            <h:inputText id="bsUnitPriceInputText"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.bsUnitPriceValue}"
+                         styleClass="inputTiny right"
+                         tabindex="33">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="bsUnitPriceInputText"/>
+                <app:keyUpEvent focus="susUnitPriceValueInputText"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpUnitPriceBs()"
+                                reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Currency.Bs']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateField.xhtml">
+            <h:outputText value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.bsTotalAmount}"
+                          styleClass="input">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputText value="#{messages['Currency.Bs']}"
+                          rendered="#{not empty fixedAssetPurchaseOrderDetailListCreateAction.instance.bsTotalAmount}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <ui:param name="required" value="true"/>
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}"/>
+        </s:decorate>
+
+        <s:decorate id="usdUnitPriceId" template="/include/validateField.xhtml">
+            <h:inputText id="susUnitPriceValueInputText"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.susUnitPriceValue}"
+                         styleClass="inputTiny right"
+                         tabindex="34">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="susUnitPriceValueInputText"/>
+                <app:keyUpEvent focus="ufvUnitPriceValueInputText"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpUnitPriceUSD()"
+                                reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Currency.Sus']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateField.xhtml">
+            <h:outputText value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.susTotalAmount}"
+                          styleClass="input">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputText value="#{messages['Currency.Sus']}"
+                          rendered="#{not empty fixedAssetPurchaseOrderDetailListCreateAction.instance.susTotalAmount}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <ui:param name="required" value="true"/>
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}"/>
+        </s:decorate>
+
+        <s:decorate id="ufvUnitPriceId" template="/include/validateField.xhtml">
+            <h:inputText id="ufvUnitPriceValueInputText"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.ufvUnitPriceValue}"
+                         styleClass="inputTiny right"
+                         tabindex="35">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="ufvUnitPriceValueInputText"/>
+                <app:keyUpEvent focus="fixedAssetGroupQuickSearch"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.settingUpUnitPriceUFV()"
+                                reRender="requestedQuantityId, usdExchangeRateId, ufvExchangeRateId, unitPricesFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Currency.Ufv']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            <h:outputText value="#{messages['FixedAssetPurchaseOrderDetail.totalAmount']}"/>
+        </s:decorate>
+
+        <s:decorate template="/include/validateField.xhtml">
+            <h:outputText value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.ufvTotalAmount}"
+                          styleClass="input">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputText value="#{messages['Currency.Ufv']}"
+                          rendered="#{not empty fixedAssetPurchaseOrderDetailListCreateAction.instance.ufvTotalAmount}"/>
+        </s:decorate>
+
+    </h:panelGrid>
+</app:fieldset>
+<app:fieldset id="durationFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.duration']}">
+    <h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" width="100%"
+                 columnClasses="width20percent right, width30percent left, width20percent right, width30percent left">
+        <s:decorate template="/include/validateLabel.xhtml">
+            #{messages['FixedAssetPurchaseOrderDetail.totalDuration']}
+            <ui:param name="required" value="true"/>
+        </s:decorate>
+
+        <h:panelGroup>
+            <h:inputText id="totalDuration"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.totalDuration}"
+                         styleClass="inputTiny right"
+                         tabindex="36">
+                <app:keyUpEvent focus="totalDuration"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.updateTotalDuration()"
+                                reRender="durationFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            #{messages['FixedAssetPurchaseOrderDetail.netDuration']}
+            <ui:param name="required" value="true"/>
+        </s:decorate>
+
+        <h:panelGroup>
+            <h:inputText id="netDuration"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.netDuration}"
+                         styleClass="inputTiny right"
+                         tabindex="37">
+                <app:keyUpEvent focus="netDuration"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.updateNetDuration()"
+                                reRender="durationFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+
+        <s:decorate template="/include/validateLabel.xhtml">
+            #{messages['FixedAssetPurchaseOrderDetail.usageDuration']}
+            <ui:param name="required" value="true"/>
+        </s:decorate>
+
+        <h:panelGroup>
+            <h:inputText id="usageDuration"
+                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.usageDuration}"
+                         styleClass="inputTiny right"
+                         tabindex="38">
+                <app:keyUpEvent focus="usageDuration"
+                                action="fixedAssetPurchaseOrderDetailListCreateAction.updateUsageDuration()"
+                                reRender="durationFieldset"/>
+            </h:inputText>
+            &#160;
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </h:panelGroup>
+    </h:panelGrid>
+</app:fieldset>
+</s:div>
+<s:div id="rightPanel">
+    <app:fieldset id="groupOptionsFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.groupOptions']}">
+        <h:panelGrid columns="1" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <s:decorate id="fixedAssetGroupId" template="/include/panelGridInputField.xhtml">
+                <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetGroup']}</ui:define>
+                <ui:param name="columnClasses" value="width30percent,width70percent"/>
+                <ui:param name="inputId" value="fixedAssetGroupQuickSearch"/>
+                <s:div>
+                    <app:quickSearch id="fixedAssetGroupQuickSearch"
+                                     textValue="fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup.id.groupCode"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"
+                                     postSearchAction="fixedAssetPurchaseOrderDetailListCreateAction.cleanSubGroup()"
+                                     searchField="groupCode"
+                                     reRender="fixedAssetGroupId, fixedAssetSubGroupId, partOptionsContainer"
+                                     tabindex="39"/>
+                    <app:selectPopUp id="fixedAssetGroupSelectPopup"
+                                     textValue="#{fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup.fullName}"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"
+                                     dataModel="#{fixedAssetGroupDataModel}"
+                                     clearAction="fixedAssetPurchaseOrderDetailListCreateAction.cleanGroup()"
+                                     searchModalPanel="fixedAssetGroupListModalPanel"
+                                     reRender="fixedAssetGroupId, fixedAssetSubGroupId, partOptionsContainer"
+                                     hotKeySelect="alt+3"/>
+                </s:div>
+            </s:decorate>
+            <s:decorate id="fixedAssetSubGroupId" template="/include/panelGridInputField.xhtml">
+                <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.fixedAssetSubGroup']}</ui:define>
+                <ui:param name="columnClasses" value="width30percent,width70percent"/>
+                <ui:param name="inputId" value="fixedAssetSubGroupQuickSearch"/>
+                <ui:param name="showRequired" value="true"/>
+                <s:div>
+                    <app:quickSearch id="fixedAssetSubGroupQuickSearch"
+                                     textValue="fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroupCode"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup}"
+                                     postSearchAction="fixedAssetPurchaseOrderDetailListCreateAction.putDefaultValuesForSelectedSubGroup()"
+                                     searchField="fixedAssetSubGroupCode"
+                                     alias="fixedAssetSubGroup"
+                                     reRender="fixedAssetSubGroupId, detailId, rubbishId, durationFieldset, partOptionsContainer"
+                                     rendered="#{null != fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"
+                                     tabindex="40">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="fixedAssetSubGroupSelectPopup"
+                                     textValue="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup.fullName}"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup}"
+                                     dataModel="#{subGroupListDataModel}"
+                                     clearAction="fixedAssetPurchaseOrderDetailListCreateAction.cleanSubGroup()"
+                                     searchModalPanel="fixedAssetSubGroupListModalPanel"
+                                     reRender="fixedAssetSubGroupId, detailId, rubbishId, durationFieldset, partOptionsContainer"
+                                     rendered="#{null != fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"
+                                     hotKeySelect="alt+4">
+                        <ui:define name="criteriaValues">
+                            <app:criteriaValue fieldName="fixedAssetGroup"
+                                               value="#{fixedAssetPurchaseOrderDetailListCreateAction.fixedAssetGroup}"/>
+                        </ui:define>
+                    </app:selectPopUp>
+                </s:div>
+            </s:decorate>
+        </h:panelGrid>
+    </app:fieldset>
+    <app:fieldset id="descriptionOptionsFieldset"
+                  title="#{messages['FixedAssetPurchaseOrderDetail.title.descriptionOptions']}">
+        <h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="measurementId" template="/include/panelGridVerticalInputField.xhtml">
+                    <ui:param name="inputId" value="measurementInputTextArea"/>
+                    <ui:param name="showLabel" value="true"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.measurement']}</ui:define>
+                    <s:div>
+                        <h:inputTextarea id="measurementInputTextArea"
+                                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.measurement}"
+                                         styleClass="inputMedium textarea"
+                                         style="height: 100%; width:150px;"
+                                         tabindex="41">
+                            <f:validateLength maximum="250"/>
+                            <a4j:support event="onblur"
+                                         reRender="measurementId"
+                                         ajaxSingle="true"/>
+                        </h:inputTextarea>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="detailId" template="/include/panelGridVerticalInputField.xhtml">
+                    <ui:param name="inputId" value="detailInputTextArea"/>
+                    <ui:param name="showLabel" value="true"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.detail']}</ui:define>
+                    <s:div>
+                        <h:inputTextarea id="detailInputTextArea"
+                                         value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.detail}"
+                                         styleClass="inputMedium textarea"
+                                         style="height: 100%; width:150px;"
+                                         tabindex="42">
+                            <f:validateLength maximum="250"/>
+                            <a4j:support event="onblur"
+                                         reRender="detailId"
+                                         ajaxSingle="true"/>
+                        </h:inputTextarea>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+    <app:fieldset id="generalOptionsFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.generalOptions']}">
+        <h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="rubbishId" template="/include/panelGridInputField.xhtml">
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.rubbish']}</ui:define>
+                    <ui:param name="inputId" value="rubbishInputText"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <h:inputText id="rubbishInputText"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.rubbish}"
+                                     styleClass="inputTiny right"
+                                     tabindex="43">
+                            <app:realNumberConverter minimum="1"
+                                                     pattern="#{messages['patterns.decimalNumber']}"
+                                                     forId="rubbishInputText"/>
+                            <a4j:support event="onblur"
+                                         reRender="rubbishId"
+                                         ajaxSingle="true"/>
+                        </h:inputText>
+                        &#160;
+                        <h:outputText value=" #{messages['Currency.Ufv']}"/>
+                    </s:div>
+                </s:decorate>
+                <s:decorate id="trademarkEntityId" template="/include/panelGridInputField.xhtml">
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.trademark']}</ui:define>
+                    <ui:param name="inputId" value="trademarkSuggestionBox"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <app:suggestionBox id="trademarkSuggestionBox"
+                                           value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.trademarkName}"
+                                           entity="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.trademarkEntity}"
+                                           styleClass="input1"
+                                           entityAlias="trademark"
+                                           searchField="name"
+                                           tabindex="44">
+                            <ui:define name="columns">
+                                <h:column>
+                                    <h:outputText value="#{entityItem.name}"/>
+                                </h:column>
+                            </ui:define>
+                        </app:suggestionBox>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="monthsGuarantyId" template="/include/panelGridInputField.xhtml">
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.monthsGuaranty']}</ui:define>
+                    <ui:param name="inputId" value="monthsGuarantyInputText"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <h:inputText id="monthsGuarantyInputText"
+                                     value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.monthsGuaranty}"
+                                     styleClass="inputTiny right"
+                                     tabindex="45">
+                            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                            <a4j:support event="onblur"
+                                         reRender="monthsGuarantyId"
+                                         ajaxSingle="true"/>
+                        </h:inputText>
+                        &#160;
+                        <h:outputText value=" #{messages['Unit.month']}"/>
+                    </s:div>
+                </s:decorate>
+                <s:decorate template="/include/panelGridInputField.xhtml">
+                    <ui:define name="label">#{messages['FixedAssetPurchaseOrderDetail.model']}</ui:define>
+                    <ui:param name="inputId" value="modelSuggestionBox"/>
+                    <ui:param name="showRequired" value="true"/>
+                    <s:div>
+                        <app:suggestionBox id="modelSuggestionBox"
+                                           value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.modelName}"
+                                           entity="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.modelEntity}"
+                                           styleClass="input1"
+                                           entityAlias="model"
+                                           searchField="name"
+                                           tabindex="46">
+                            <ui:define name="columns">
+                                <h:column>
+                                    <h:outputText value="#{entityItem.name}"/>
+                                </h:column>
+                            </ui:define>
+                        </app:suggestionBox>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+</h:panelGrid>
+<s:div id="partOptionsContainer">
+    <app:fieldset id="partOptionsFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.partOptions']}"
+                  rendered="#{not empty fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup and
+        fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup.requireParts}">
+        <h:panelGrid columns="6" border="0" cellpadding="0" cellspacing="0" width="100%"
+                     columnClasses="width10percent right, width14percent left,width12percent right, width30percent left, width10percent right, width24percent left">
+            <s:decorate template="/include/validateLabel.xhtml">
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{messages['PurchaseOrderDetailPart.description']}"/>
+            </s:decorate>
+
+            <s:decorate id="partDescriptionId" template="/include/validateField.xhtml">
+                <h:inputTextarea id="partDescriptionInputTextArea"
+                                 value="#{fixedAssetPurchaseOrderDetailListCreateAction.partInstance.description}"
+                                 styleClass="inputMedium textarea"
+                                 style="height: 100%; width:150px;"
+                                 tabindex="47">
+                    <f:validateLength maximum="250"/>
+                    <a4j:support event="onblur"
+                                 reRender="partDescriptionId"
+                                 ajaxSingle="true"/>
+                </h:inputTextarea>
+            </s:decorate>
+
+            <s:decorate template="/include/validateLabel.xhtml">
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{messages['PurchaseOrderDetailPart.measureUnit']}"/>
+            </s:decorate>
+
+            <s:decorate id="partMeasureUnitId" template="/include/validateField.xhtml">
+                <app:quickSearch id="measureUnitQuickSearch"
+                                 textValue="fixedAssetPurchaseOrderDetailListCreateAction.partInstance.measureUnit.measureUnitCode"
+                                 value="#{fixedAssetPurchaseOrderDetailListCreateAction.partInstance.measureUnit}"
+                                 searchField="measureUnitCode"
+                                 reRender="partMeasureUnitId"
+                                 tabindex="48"/>
+                <h:selectOneMenu id="partMeasureUnitSelectOne"
+                                 value="#{fixedAssetPurchaseOrderDetailListCreateAction.partInstance.measureUnit}"
+                                 styleClass="inputSmall"
+                                 style="width:140px;">
+                    <s:selectItems value="#{measureUnitList}"
+                                   var="element"
+                                   label="#{element.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onblur"
+                                 reRender="partMeasureUnitId"
+                                 ajaxSingle="true"/>
+                    <a4j:support event="onchange"
+                                 reRender="partMeasureUnitId"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate template="/include/validateLabel.xhtml">
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{messages['PurchaseOrderDetailPart.unitPrice']}"/>
+            </s:decorate>
+
+            <s:decorate id="partUnitPriceId" template="/include/validateField.xhtml">
+                <h:inputText id="partUnitPriceInputText"
+                             value="#{fixedAssetPurchaseOrderDetailListCreateAction.partInstance.unitPrice}"
+                             styleClass="inputNumberSmall"
+                             tabindex="49">
+                    <f:validateDoubleRange minimum="0.01"/>
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                             forId="partUnitPriceInputText"/>
+                    <a4j:support event="onblur"
+                                 reRender="partUnitPriceId"
+                                 ajaxSingle="true"/>
+                </h:inputText>
+                &#160;
+                <h:outputText value="#{messages['Currency.Bs']}"/>
+                &#160;
+                <a4j:commandLink title="#{messages['FixedAssetPurchaseOrderDetail.add.part']}"
+                                 action="#{fixedAssetPurchaseOrderDetailListCreateAction.addPartInstance()}"
+                                 reRender="partDescriptionId, partUnitPriceId, partMeasureUnitId, partsListPanel"
+                                 ajaxSingle="true">
+                    <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+        </h:panelGrid>
+    </app:fieldset>
+
+    <s:div id="partsListPanel" rendered="#{not empty fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup and
+        fixedAssetPurchaseOrderDetailListCreateAction.instance.fixedAssetSubGroup.requireParts}">
+        <h:panelGrid columns="1"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width100percent">
+            <app:fieldset id="partsFieldset" title="#{messages['FixedAssetPurchaseOrderDetail.title.parts']}">
+                <rich:dataTable id="partInstancesList"
+                                value="#{fixedAssetPurchaseOrderDetailListCreateAction.instance.orderDetailPartList}"
+                                var="fixedAssetPartItem"
+                                rows="#{fixedAssetPurchaseOrderDetailListCreateAction.partListRowCounter}"
+                                width="100%"
+                                columnsWidth="40%, 30%, 20%, 10%">
+                    <rich:column>
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.description']}
+                        </f:facet>
+                        <h:outputText value="#{fixedAssetPartItem.description}"/>
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.measureUnit']}
+                        </f:facet>
+                        <h:outputText value="#{fixedAssetPartItem.measureUnit.fullName}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <f:facet name="header">
+                            #{messages['PurchaseOrderDetailPart.unitPrice']}
+                        </f:facet>
+                        <h:outputText value="#{fixedAssetPartItem.unitPrice}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        &#160;
+                        <h:outputText value="#{messages['Currency.Bs']}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <f:facet name="header">
+                            #{messages['Common.action']}
+                        </f:facet>
+                        <a4j:commandLink immediate="true"
+                                         title="#{messages['Common.remove']}"
+                                         action="#{fixedAssetPurchaseOrderDetailListCreateAction.removePartInstance(fixedAssetPartItem)}"
+                                         reRender="partsListPanel">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+            </app:fieldset>
+        </h:panelGrid>
+    </s:div>
+</s:div>
+
+</rich:panel>
+<br/>
+<rich:dataTable id="instancesList"
+                value="#{fixedAssetPurchaseOrderDetailListCreateAction.instances}"
+                var="instanceItem"
+                rows="#{fixedAssetPurchaseOrderDetailListCreateAction.detailListRowCounter}"
+                width="100%"
+                columnsWidth="10%, 20%, 30%, 15%, 15%, 10%">
+    <rich:column>
+        <f:facet name="header">
+            #{messages['FixedAssetPurchaseOrderDetail.requestedQuantity']}
+        </f:facet>
+        <h:outputText value="#{instanceItem.requestedQuantity}"/>
+    </rich:column>
+    <rich:column>
+        <f:facet name="header">
+            #{messages['FixedAssetPurchaseOrderDetail.fixedAssetSubGroup']}
+        </f:facet>
+        <h:outputText value="#{instanceItem.fixedAssetSubGroup.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <f:facet name="header">
+            #{messages['FixedAssetPurchaseOrderDetail.detail']}
+        </f:facet>
+        <h:outputText value="#{instanceItem.detail}"/>
+    </rich:column>
+    <rich:column>
+        <f:facet name="header">
+            #{messages['FixedAssetPurchaseOrderDetail.unitPriceValue']}
+        </f:facet>
+        <h:outputText value="#{instanceItem.bsUnitPriceValue}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages['Currency.Bs']}"/>
+    </rich:column>
+    <rich:column>
+        <f:facet name="header">
+            #{messages['FixedAssetPurchaseOrderDetail.totalAmount']}
+        </f:facet>
+        <h:outputText value="#{instanceItem.bsTotalAmount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages['Currency.Bs']}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <f:facet name="header">
+            #{messages['Common.action']}
+        </f:facet>
+        <a4j:commandLink ajaxSingle="true"
+                         immediate="true"
+                         title="#{messages['Common.remove']}"
+                         action="#{fixedAssetPurchaseOrderDetailListCreateAction.removeInstance(instanceItem)}"
+                         reRender="instancesList">
+            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+    </rich:column>
+</rich:dataTable>
+</s:div>
+
+<div class="buttons">
+    <a4j:commandButton action="#{fixedAssetPurchaseOrderDetailListCreateAction.addInstance()}"
+                       value="#{messages['Common.add']}"
+                       styleClass="button"
+                       reRender="purchaseOrderDetailFormPanel"/>
+</div>
+</a4j:region>
+</ui:composition>

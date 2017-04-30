@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ExchangeRate.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="exchangeRateSearch">
+
+            <rich:simpleTogglePanel id="exchangeRateSearchPanel" label="#{messages['ExchangeRate.search']}"
+                                    switchType="client">
+
+                <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+                    <h:inputText id="rate" value="#{exchangeRateDataModel.criteria.rate}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+                    </h:inputText>
+                    <a4j:commandButton action="#{exchangeRateDataModel.search}"
+                                       reRender="exchangeRateSearchPanel, exchangeRateList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/exchangeRate.xhtml" styleClass="button"
+                          propagation="none"
+                          tabindex="3"/>
+            </div>
+
+            <rich:dataTable value="#{exchangeRateDataModel}" var="exchangeRateItem" id="exchangeRateList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="30%, 25%, 25%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="exchangeRate.rate" dataModel="#{exchangeRateDataModel}"
+                                                   reRender="exchangeRateList, dataScroller">
+                                #{messages['ExchangeRate.rate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="exchangeRate.purchase"
+                                                   dataModel="#{exchangeRateDataModel}"
+                                                   reRender="exchangeRateList, dataScroller">
+                                #{messages['ExchangeRate.purchase']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="exchangeRate.sale"
+                                                   dataModel="#{exchangeRateDataModel}"
+                                                   reRender="exchangeRateList, dataScroller">
+                                #{messages['ExchangeRate.sale']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="exchangeRate.date"
+                                                   dataModel="#{exchangeRateDataModel}"
+                                                   reRender="exchangeRateList, dataScroller">
+                                #{messages['ExchangeRate.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{exchangeRateItem.rate}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{exchangeRateItem.purchase}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{exchangeRateItem.sale}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{exchangeRateItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{exchangeRateAction.select(exchangeRateItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="exchangeRateList" dataModel="#{exchangeRateDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/exchangeRate.xhtml" styleClass="button"
+                          propagation="none"
+                          tabindex="4"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

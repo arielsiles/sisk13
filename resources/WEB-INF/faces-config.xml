@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<faces-config version="1.2"
+              xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
+    <!--<lifecycle>
+        <phase-listener>com.encens.khipusener.PhaseTrackerListener</phase-listener>
+    </lifecycle>-->
+    <validator>
+        <description>Validates equality between a property and other one</description>
+        <validator-id>equalValidator</validator-id>
+        <validator-class>com.encens.khipus.validator.EqualValidator</validator-class>
+        <property>
+            <property-name>forId</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forLabel</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+    </validator>
+    <validator>
+        <description>A validator for dates range</description>
+        <validator-id>dateRangeValidator</validator-id>
+        <validator-class>com.encens.khipus.validator.DateRangeValidator</validator-class>
+        <property>
+            <property-name>forId</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forLabel</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forValue</property-name>
+            <property-class>java.util.Date</property-class>
+        </property>
+        <property>
+            <property-name>forType</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+    </validator>
+    <validator>
+        <description>A validator for time range</description>
+        <validator-id>timeRangeValidator</validator-id>
+        <validator-class>com.encens.khipus.validator.TimeRangeValidator</validator-class>
+        <property>
+            <property-name>forId</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forLabel</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forValue</property-name>
+            <property-class>java.util.Date</property-class>
+        </property>
+        <property>
+            <property-name>forType</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+    </validator>
+    <validator>
+        <description>A validator for numbers range</description>
+        <validator-id>numberRangeValidator</validator-id>
+        <validator-class>com.encens.khipus.validator.NumberRangeValidator</validator-class>
+        <property>
+            <property-name>forId</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forLabel</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>forValue</property-name>
+            <property-class>java.lang.Number</property-class>
+        </property>
+        <property>
+            <property-name>forType</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+    </validator>
+    <converter>
+        <description>A Converter for natural numbers eg: N={0, 1, 2,...}</description>
+        <converter-id>naturalNumberConverter</converter-id>
+        <converter-class>com.encens.khipus.converter.NaturalNumberConverter</converter-class>
+        <property>
+            <property-name>forId</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <property>
+            <property-name>pattern</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+    </converter>
+    <converter>
+        <description>A Converter for natural numbers eg: N={0, 1, 2,...}</description>
+        <converter-id>realNumberConverter</converter-id>
+        <converter-class>com.encens.khipus.converter.RealNumberConverter</converter-class>
+    </converter>
+</faces-config>

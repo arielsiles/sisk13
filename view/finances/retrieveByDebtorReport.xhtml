@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.retrieveByDebtor.page.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="retrieveByDebtorReportForm">
+            <rich:simpleTogglePanel label="#{messages['Reports.retrieveByDebtor.page.title']}" switchType="client">
+
+                <h:panelGrid id="searchOptionsPanel"
+                             columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftSidePanel">
+                        <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RotatoryFund.employee']}</ui:define>
+                            <h:inputText styleClass="input" readonly="true"
+                                         value="#{retrieveByDebtorReportAction.employee.fullName}"
+                                         tabindex="1"/>
+                            <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
+                                             tabindex="2"
+                                             title="#{messages['RotatoryFund.selectEmployee']}"
+                                             reRender="employeeField"
+                                             onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
+                                             tabindex="3"
+                                             title="#{messages['Common.clear']}"
+                                             action="#{retrieveByDebtorReportAction.clearEmployee()}"
+                                             reRender="employeeField">
+                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </s:decorate>
+
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+
+                        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RotatoryFundCollection.creationDate']}</ui:define>
+                            <h:outputText value="#{messages['Common.dateFrom']}"/>
+                            &#160;
+                            <rich:calendar id="initDate"
+                                           value="#{retrieveByDebtorReportAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="4">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                            &#160;
+                            <h:outputText value="#{messages['Common.dateTo']}"/>
+                            &#160;
+                            <rich:calendar id="endDate"
+                                           value="#{retrieveByDebtorReportAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <app:dateRangeValidator forId="initDate"
+                                                        forLabel="#{messages['Common.dateFrom']}"
+                                                        type="greater"/>
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+
+                <rich:jQuery selector="#selectEmployee" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <app:reportDefaultOptions reportAction="#{retrieveByDebtorReportAction}" showPageFormat="false"
+                                      tabIndex="15"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{retrieveByDebtorReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{retrieveByDebtorReportAction.setEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,307 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{productCompositionAction.managed}">
+            #{messages['ProductComposition.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductComposition.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+
+<h:form id="productCompositionForm">
+
+<div class="buttons">
+    <h:commandButton action="#{productCompositionAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productCompositionAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','UPDATE')}"
+                     tabindex="2"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productCompositionAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{productCompositionAction.managed}">
+                #{messages['ProductComposition.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductComposition.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <fieldset class="fieldset-border">
+        <legend class="fieldset-title">#{messages['ProductComposition.fieldsetBasicData']}</legend>
+        <h:panelGrid width="100%" columns="2">
+            <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.processedProduct']}</ui:define>
+                <h:inputText id="processedProduct"
+                             value="#{productComposition.fullNameOfProcessedProduct}"
+                             maxlength="500" styleClass="input" required="true"/>
+                <a4j:commandLink id="selectProcessedProduct" ajaxSingle="true" immediate="true"
+                                 tabindex="2"
+                                 title="#{messages['ProductComposition.selectProcessedProduct']}"
+                                 onclick="Richfaces.showModalPanel('processedProductListModalPanel');"
+                                 rendered="#{!productCompositionAction.managed}">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.name']}</ui:define>
+                <h:inputText value="#{productComposition.name}" required="true" style="width: 15em;">
+                    <a4j:support event="onblur" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <rich:spacer width="100"/>
+
+            <s:decorate id="rawMaterialAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.producingAmount']}</ui:define>
+                <h:inputText id="name" value="#{productComposition.producingAmount}"
+                             required="true" styleClass="input" tabindex="5" style="width: 15em;">
+                    <a4j:support event="onblur" ajaxSingle="true"
+                                 actionListener="#{productCompositionAction.mathematicalFormulaActionListener}"
+                                 reRender="formPanel"/>
+                </h:inputText>
+                <rich:spacer width="5"/>
+                <h:outputText value=" [#{messages['ProductComposition.defaultProducingAmountVariable']}]"/>
+            </s:decorate>
+        </h:panelGrid>
+        <rich:separator/>
+        <h:panelGrid columns="2" width="100%">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.containerWeight']}</ui:define>
+                <h:inputText value="#{productComposition.containerWeight}" required="true" style="width: 15em;">
+                    <a4j:support event="onblur" ajaxSingle="true"
+                                 actionListener="#{productCompositionAction.mathematicalFormulaActionListener}"
+                                 reRender="formPanel"/>
+                    <!-- <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>-->
+                </h:inputText>
+                <h:outputText value=" [#{messages['ProductComposition.defaultContainerWeight']}]"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.supposedAmount']}</ui:define>
+                <h:inputText value="#{productComposition.supposedAmount}" required="true" style="width: 15em;">
+                    <a4j:support event="onblur" ajaxSingle="true"
+                                 actionListener="#{productCompositionAction.mathematicalFormulaActionListener}"
+                                 reRender="formPanel"/>
+                </h:inputText>
+                <h:outputText value=" [#{messages['ProductComposition.defaultSupposedAmount']}]"/>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductComposition.realWeight']}</ui:define>
+                <h:inputText value="#{productCompositionAction.totalWeight}" required="false" style="width: 15em;"
+                             readonly="true">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:inputText>
+            </s:decorate>
+        </h:panelGrid>
+    </fieldset>
+
+    <h:panelGroup id="panelGroupMathematicalExpressions">
+
+        <rich:spacer height="10"/>
+
+        <fieldset class="fieldset-border">
+            <legend class="fieldset-title">#{messages['ProductComposition.fieldsetInputs']}</legend>
+            <a4j:commandButton id="addMetaProduct" immediate="true" ajaxSingle="true"
+                               value="#{messages['Common.add']}"
+                               onclick="Richfaces.showModalPanel('metaProductListModalPanel');"/>
+
+            <rich:spacer width="10" height="10"/>
+
+            <rich:dataTable value="#{productComposition.productionIngredientList}" var="ingredientItem"
+                            id="productCompositionList"
+                            width="100%" columnsWidth="15%,10%,10%,10%,35%,10%,10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['ProductionIngredient.metaProduct.name']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['MetaProduct.measureUnit']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductionIngredient.metaProduct.code']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductionIngredient.variable']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductionIngredient.mathematicalFormula']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductionIngredient.amount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{ingredientItem.metaProduct.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{ingredientItem.metaProduct.productItem.usageMeasureCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{ingredientItem.metaProduct.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="ING#{ingredientItem.metaProduct.id}"/>
+                </rich:column>
+                <rich:column>
+                    <h:inputText id="mathematicalFormula" value="#{ingredientItem.mathematicalFormula}"
+                                 required="true" style="width:95%;">
+                        <a4j:support event="onblur" ajaxSingle="true"
+                                     actionListener="#{productCompositionAction.mathematicalFormulaActionListener}"
+                                     reRender="formPanel"/>
+                    </h:inputText>
+                    <rich:message for="mathematicalFormula" errorClass="errors"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{ingredientItem.amount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+
+                </rich:column>
+                <rich:column styleClass="center">
+                    <a4j:commandLink ajaxSingle="true" value="#{messages['Common.remove']}"
+                                     action="#{productCompositionAction.removeInputProduction(ingredientItem)}"
+                                     reRender="formPanel">
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+        </fieldset>
+    </h:panelGroup>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{productCompositionAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','CREATE')}"
+                     tabindex="18"/>
+
+    <h:commandButton action="#{productCompositionAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','UPDATE')}"
+                     tabindex="19"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','DELETE')}"
+                     tabindex="20">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productCompositionAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" tabindex="21" immediate="true"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{productCompositionAction.managed and s:hasPermission('PRODUCTCOMPOSITION','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['ProductComposition.delete.confirmation']}">
+                <f:param value="#{productComposition.processedProduct.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{productCompositionAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('PRODUCTCOMPOSITION','DELETE')}"
+                           tabindex="1000"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+<a4j:include viewId="/production/productCompositionModalPanel.xhtml"/>
+
+<s:decorate id="processedProductListModalPanelContainer" template="/production/metaProductListModalPanel.xhtml">
+    <ui:param name="listTitle" value="#{messages['ProductComposition.selectProcessedProduct']}"/>
+    <ui:param name="searchPanelTitle" value="#{messages['ProductComposition.searchProcessedProduct']}"/>
+    <ui:param name="nameSortProperty" value="processedProduct.name"/>
+    <ui:param name="codeSortProperty" value="processedProduct.code"/>
+    <ui:param name="dialogId" value="processedProductListModalPanel"/>
+    <ui:param name="dataModel" value="#{processedProductDataModel}"/>
+    <ui:param name="showMeasureUnit" value="false"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{productCompositionAction.selectProcessedProduct(dataItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="processedProduct"
+                           oncomplete="Richfaces.hideModalPanel('processedProductListModalPanel');"
+                           style="width:0.8em"/>
+
+    </ui:define>
+</s:decorate>
+<s:decorate id="metaProductListModalPanelContainer" template="/production/metaProductListModalPanel.xhtml">
+    <ui:param name="listTitle" value="#{messages['ProductComposition.selectMetaProduct']}"/>
+    <ui:param name="searchPanelTitle" value="#{messages['ProductComposition.searchMetaProduct']}"/>
+    <ui:param name="nameSortProperty" value="meta.name"/>
+    <ui:param name="codeSortProperty" value="meta.code"/>
+    <ui:param name="measureUnitSortProperty" value="meta.measureUnitProduction.name"/>
+    <ui:param name="dialogId" value="metaProductListModalPanel"/>
+    <ui:param name="dataModel" value="#{inputsAndMaterialsDataModel}"/>
+    <ui:param name="showMeasureUnit" value="true"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{productCompositionAction.selectMetaProduct(dataItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="productCompositionList"
+                           oncomplete="Richfaces.hideModalPanel('metaProductListModalPanel');"
+                           style="width:0.8em"/>
+
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>

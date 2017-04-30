@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['FixedAsset.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+
+        <c:choose>
+            <c:when test="#{!fixedAssetAction.pendant}">
+                <rich:tabPanel switchType="ajax">
+                    <rich:tab label="#{messages['FixedAsset.edit']}">
+                        <ui:include src="fixedAssetBody.xhtml"/>
+                    </rich:tab>
+                    <c:if test="#{!fixedAssetAction.dischargeState()}">
+                        <rich:tab label="#{messages['FixedAsset.movements']}">
+                            <ui:include src="fixedAssetMovementsBody.xhtml"/>
+                        </rich:tab>
+                    </c:if>
+                </rich:tabPanel>
+            </c:when>
+            <c:otherwise>
+                <ui:include src="fixedAssetBody.xhtml"/>
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+
+</ui:composition>

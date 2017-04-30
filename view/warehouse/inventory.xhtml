@@ -1,0 +1,223 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['Inventory.view']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="90%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="inventoryForm">
+        <div class="buttons">
+            <h:commandButton action="#{inventoryAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                #{messages['Inventory.view']}
+            </f:facet>
+
+            <h:panelGrid id="searchOptionsPanel" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width40percent,width60percent">
+                <s:div>
+                    <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Inventory.warehouse']}</ui:define>
+                        <h:outputText value="#{inventoryWarehouse.name}"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Inventory.productItem']}</ui:define>
+                        <app:quickSearch id="productItemSearch"
+                                         textValue="inventoryAction.productItem.productItemCode"
+                                         value="#{inventoryAction.productItem}"
+                                         postSearchAction="inventoryAction.assignProductItem()"
+                                         searchField="productItemCode"
+                                         reRender="productItemField"
+                                         alias="productItem"
+                                         tabindex="1">
+                            <ui:define name="restrictions">
+                                <app:restriction
+                                        condition=" productItem in ( select inventory.productItem from Inventory inventory left join inventory.productItem productItem where inventory.warehouse = #{inventoryAction.warehouse}) "/>
+                            </ui:define>
+                        </app:quickSearch>
+                        <app:selectPopUp id="productItem"
+                                         textValue="#{inventoryAction.productItem.name}"
+                                         value="#{inventoryAction.productItem}"
+                                         dataModel="#{warehouseProductItemDataModel}"
+                                         clearAction="inventoryAction.clearProductItem()"
+                                         searchModalPanel="warehouseProductItemListModalPanel"
+                                         reRender="productItemField,inventoryList, dataScroller "
+                                         hotKeySelect="alt+1"
+                                         tabindex="2">
+                        </app:selectPopUp>
+                    </s:decorate>
+                    <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CostCenter.costCenter']}</ui:define>
+                        <app:quickSearch id="costCenterSearch"
+                                         textValue="inventoryAction.costCenter.code"
+                                         value="#{inventoryAction.costCenter}"
+                                         postSearchAction="inventoryAction.assignCostCenter()"
+                                         searchField="code"
+                                         reRender="costCenterField"
+                                         alias="costCenter"
+                                         tabindex="3">
+                            <ui:define name="restrictions">
+                                <app:restriction
+                                        condition=" costCenter.code in (select inventoryDetail.costCenterCode from InventoryDetail inventoryDetail where inventoryDetail.warehouseCode=  #{inventoryAction.warehouse.warehouseCode})"/>
+                            </ui:define>
+                        </app:quickSearch>
+                        <app:selectPopUp id="costCenter"
+                                         textValue="#{inventoryAction.costCenter.fullName}"
+                                         value="#{inventoryAction.costCenter}"
+                                         dataModel="#{inventoryCostCenterDataModel}"
+                                         clearAction="inventoryAction.clearCostCenter()"
+                                         searchModalPanel="costCenterByWarehouseListModalPanel"
+                                         reRender="costCenterField,inventoryList, dataScroller "
+                                         hotKeySelect="alt+2"
+                                         tabindex="4"/>
+                    </s:decorate>
+                    <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+                            <a4j:commandButton action="#{inventoryAction.search()}"
+                                               reRender="inventoryList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="5">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{inventoryAction.clear()}"
+                                               reRender="searchOptionsPanel, inventoryList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               id="clearButtonId"
+                                               tabindex="6">
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+
+                </s:div>
+            </h:panelGrid>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{inventoryAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="7"/>
+        </div>
+
+        <rich:spacer height="15px"/>
+        <rich:dataTable id="inventoryList"
+                        value="#{inventoryDetailDataModel}"
+                        var="inventoryDetailItem"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="40%, 10%, 10%, 30%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader
+                                sortProperty="inventoryDetail.productItem.productItemCode, inventoryDetail.productItem.name"
+                                dataModel="#{inventoryDetailDataModel}"
+                                reRender="inventoryList, dataScroller">
+                            #{messages['InventoryDetail.productItem']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader
+                                sortProperty="inventoryDetail.costCenter.code, inventoryDetail.costCenter.description"
+                                dataModel="#{inventoryDetailDataModel}"
+                                reRender="inventoryList, dataScroller">
+                            #{messages['InventoryDetail.unitCost']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventoryDetail.quantity"
+                                               dataModel="#{inventoryDetailDataModel}"
+                                               reRender="inventoryList, dataScroller">
+                            #{messages['InventoryDetail.quantity']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="inventoryDetail.productItem.usageMeasureUnit.name"
+                                               dataModel="#{inventoryDetailDataModel}"
+                                               reRender="inventoryList, dataScroller">
+                            #{messages['InventoryDetail.usageMeasureUnit']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{inventoryDetailItem.productItem.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <!--<h:outputText value="#{inventoryDetailItem.costCenter.fullName}"/>-->
+                <h:outputText value="#{inventoryDetailItem.productItem.cu}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{inventoryDetailItem.quantity}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{inventoryDetailItem.productItem.usageMeasureUnit.name}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="inventoryList" dataModel="#{inventoryDetailDataModel}"/>
+    </h:form>
+
+    <rich:jQuery selector="#productItem" query="focus()" timing="onload"/>
+
+    <s:decorate id="warehouseProductItemListModalPanelContainer"
+                template="/warehouse/warehouseProductItemListModalPanel.xhtml">
+        <ui:param name="containerId" value="warehouseProductItemListModalPanelContainer"/>
+        <ui:param name="dialogId" value="warehouseProductItemListModalPanel"/>
+        <ui:param name="dataModel" value="#{warehouseProductItemDataModel}"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{inventoryAction.assignProductItem(inventoryItem.productItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField,inventoryList, dataScroller "
+                               oncomplete="Richfaces.hideModalPanel('warehouseProductItemListModalPanel');document.getElementById('#{rich:clientId(productItemCode)}').focus();"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="costCenterByWarehouseListModalPanelContainer"
+                template="/finances/costCenterByWarehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="costCenterByWarehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="costCenterByWarehouseListModalPanel"/>
+        <ui:param name="dataModel" value="#{inventoryCostCenterDataModel}"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                               action="#{inventoryAction.assignCostCenter(costCenterItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="costCenterField,inventoryList, dataScroller "
+                               oncomplete="Richfaces.hideModalPanel('costCenterByWarehouseListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+</ui:define>
+</ui:composition>

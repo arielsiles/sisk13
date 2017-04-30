@@ -1,0 +1,21 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText>#{action.widget.title}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="meterWidgetForm">
+        <ui:insert name="content"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>

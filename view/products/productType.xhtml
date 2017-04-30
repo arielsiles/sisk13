@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productTypeAction.managed}">
+                #{messages['ProductType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductType.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+
+        <h:form id="productTypeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{productTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productTypeAction.managed and s:hasPermission('PRODUCTTYPE','CREATE')}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="updateButtonId"
+                                 action="#{productTypeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{productTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productTypeAction.managed}">
+                            #{messages['ProductType.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductType.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductType.name']}</ui:define>
+                    <h:inputText id="name" value="#{productType.name}" styleClass="input" required="true"
+                                 maxlength="150"
+                                 tabindex="1"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{productTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productTypeAction.managed and s:hasPermission('PRODUCTTYPE','CREATE')}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{productTypeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','UPDATE')}"
+                                 tabindex="3"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','DELETE')}"
+                                 tabindex="4">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{productTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="5"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductType.delete.confirmation']}">
+                        <f:param value="#{productType.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{productTypeAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{productTypeAction.managed and s:hasPermission('PRODUCTTYPE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

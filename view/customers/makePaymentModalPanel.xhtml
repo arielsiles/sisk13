@@ -1,0 +1,90 @@
+<rich:modalPanel height="320" width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+                 <!--onshow="jQuery('##{containerId}\\:cashAccountListForm#{dialogId}\\:accountCodeField\\:accountCode').focus();">-->
+
+<!--    <ui:param name="creditItem" value="#{creditItem}"/>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['Credit.pay']}</h:outputText>
+    </f:facet>
+
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <rich:panel id="formPanel">
+        <h:form id="makePaymentForm">
+
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.credit']}</ui:define>
+                <h:outputText>#{creditAction.credit.code}</h:outputText>
+            </s:decorate>
+
+            <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.name']}</ui:define>
+                <h:outputText>#{creditAction.credit.partner.fullName}</h:outputText>
+            </s:decorate>
+
+            <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
+                <rich:calendar value="#{creditAction.paymentDate}"
+                               popup="true"
+                               required="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               tabindex="7">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.amount']}</ui:define>
+                <h:inputText id="amount" value="#{creditTransaction.amount}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="100"
+                             tabindex="5">
+                    <a4j:support event="onblur" reRender="amountField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.gloss']}</ui:define>
+                <h:inputTextarea id="gloss"
+                                 value="#{creditAction.gloss}"
+                                 styleClass="input textarea"
+                                 tabindex="6">
+                </h:inputTextarea>
+            </s:decorate>
+
+            <div class="center-buttons">
+
+                <a4j:commandButton action="#{creditTransactionAction.create}"
+                                   value="#{messages['Credit.pay']}"
+                                   styleClass="button"
+                                   reRender="amountField"/>
+
+                <a4j:commandButton value="#{messages['Common.cancel']}"
+                                   styleClass="button"
+                                   action="#{creditAction.cancel}"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   oncomplete="Richfaces.hideModalPanel('makePaymentModalPanel');"
+                                   reRender="makePaymentForm" />
+            </div>
+
+        </h:form>
+    </rich:panel>
+    <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton" operation="hide" event="onclick"/>-->
+</rich:modalPanel>
+

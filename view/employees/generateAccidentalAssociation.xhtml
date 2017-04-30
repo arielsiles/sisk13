@@ -1,0 +1,163 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['GenerateAccidentalAssociation.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="generateForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{generateAccidentalAssociationAction.generateDocument}"
+                                 value="#{messages['GenerateAccidentalAssociation.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('ACCIDENTALASSOCIATION','VIEW')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    #{messages['GenerateAccidentalAssociation.title']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateAccidentalAssociation.sede']}</ui:define>
+                            <h:selectOneMenu id="businessUnit"
+                                             value="#{generateAccidentalAssociationAction.businessUnit}"
+                                             styleClass="input"
+                                             required="true" tabindex="2">
+                                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                               label="#{businessUnit.organization.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             reRender="organizationalLevelField,organizationalUnitField"
+                                             action="#{generateAccidentalAssociationAction.refreshBusinessUnit}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="organizationalLevelField,organizationalUnitField"
+                                             action="#{generateAccidentalAssociationAction.refreshBusinessUnit}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="organizationalLevelField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateAccidentalAssociation.organizationalLevel']}</ui:define>
+                            <h:selectOneMenu id="organizationalLevel"
+                                             value="#{generateAccidentalAssociationAction.organizationalLevel}"
+                                             styleClass="input"
+                                             required="true" tabindex="3">
+                                <s:selectItems value="#{organizationalLevelList}" var="organizationalLevel"
+                                               label="#{organizationalLevel.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange" reRender="organizationalUnitField"
+                                             action="#{generateAccidentalAssociationAction.refreshOrganizationalLevel}"
+                                             ajaxSingle="true"/>
+                                <a4j:support event="onkeyup" reRender="organizationalUnitField"
+                                             action="#{generateAccidentalAssociationAction.refreshOrganizationalLevel}"
+                                             ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateAccidentalAssociation.organizationalUnit']}</ui:define>
+                            <h:selectOneMenu id="organizationalUnit"
+                                             value="#{generateAccidentalAssociationAction.organizationalUnit}"
+                                             styleClass="input"
+                                             required="true" tabindex="4">
+                                <s:selectItems value="#{generateAccidentalAssociationAction.organizationalUnitList}"
+                                               var="organizationalUnit"
+                                               label="#{organizationalUnit.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="templateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateAccidentalAssociation.template']}</ui:define>
+                            <h:selectOneMenu id="template" value="#{generateAccidentalAssociationAction.template}"
+                                             styleClass="input"
+                                             required="true" tabindex="5">
+                                <s:selectItems value="#{templateList.resultList}" var="template"
+                                               label="#{template.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateAccidentalAssociation.initContractRangeDate']}</ui:define>
+                            <rich:calendar id="initDate"
+                                           value="#{generateAccidentalAssociationAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateAccidentalAssociation.endContractRangeDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{generateAccidentalAssociationAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="7">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                                <app:dateRangeValidator forId="initDate"
+                                                        forLabel="#{messages['GenerateAccidentalAssociation.initContractRangeDate']}"
+                                                        type="greater"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{generateAccidentalAssociationAction.generateDocument}"
+                                 value="#{messages['GenerateAccidentalAssociation.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('ACCIDENTALASSOCIATION','VIEW')}"
+                                 tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:jQuery selector="#businessUnit" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

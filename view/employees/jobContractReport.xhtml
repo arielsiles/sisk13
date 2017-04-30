@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['JobContract.report']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="productItemReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['JobContract.report']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div>
+                        <s:decorate id="bussinesUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['JobContract.businessUnit']}</ui:define>
+                            <h:selectOneMenu id="bussinesUnit" value="#{jobContractReportAction.businessUnit}"
+                                             styleClass="input" required="false"
+                                             tabindex="2">
+                                <s:selectItems value="#{sedeList.resultList}" var="sede"
+                                               label="#{sede.organization.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Job.sector']}</ui:define>
+                            <h:selectOneMenu id="sector" value="#{jobContractReportAction.sector}" styleClass="input"
+                                             required="false" tabindex="3">
+                                <s:selectItems value="#{sectorList.resultList}" var="sector" label="#{sector.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['JobContract.jobCategory']}</ui:define>
+                            <h:selectOneMenu id="jobCategory" value="#{jobContractReportAction.jobCategory}"
+                                             styleClass="input"
+                                             required="false" tabindex="4">
+                                <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                               label="#{jobCategory.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Contract.initDate']}</ui:define>
+                            <rich:calendar id="initDate"
+                                           value="#{jobContractReportAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{jobContractReportAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="7">
+                                <app:dateRangeValidator forId="initDate"
+                                                        forLabel="#{messages['Contract.initDate']}"
+                                                        type="greater"/>
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{jobContractReportAction}" showPageFormat="false" tabIndex="8"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{jobContractReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#bussinesUnit" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CNSRate.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="cnsRateSearch">
+            <rich:simpleTogglePanel label="#{messages['CNSRate.search']}" switchType="client">
+                <h:panelGrid columns="1"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width100percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CNSRate.rate']}</ui:define>
+                            <h:inputText id="rate" value="#{cnsRateDataModel.criteria.rate}"
+                                         maxlength="80"
+                                         tabindex="1"
+                                         styleClass="input">
+                                <app:realNumberConverter forId="rate" minimum="0" maximum="100"/>
+                            </h:inputText>
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{cnsRateDataModel.search}"
+                                               value="#{messages['Common.search']}"
+                                               reRender="cnsRateSearch, cnsRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="2">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                            <a4j:commandButton action="#{cnsRateDataModel.clear}"
+                                               value="#{messages['Common.clear']}"
+                                               reRender="cnsRateSearch, cnsRateList, dataScroller"
+                                               styleClass="button"
+                                               tabindex="3"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/cnsRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CNSRATE','CREATE')}"
+                          tabindex="4"/>
+            </div>
+
+            <rich:dataTable id="cnsRateList"
+                            value="#{cnsRateDataModel}" var="cnsRateItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%,40%,20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cnsRate.rate"
+                                                   dataModel="#{cnsRateDataModel}"
+                                                   reRender="cnsRateList, dataScroller">
+                                #{messages['CNSRate.rate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cnsRate.active"
+                                                   dataModel="#{cnsRateDataModel}"
+                                                   reRender="cnsRateList, dataScroller">
+                                #{messages['CNSRate.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{cnsRateItem.rate}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{cnsRateItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{cnsRateAction.select(cnsRateItem)}"
+                                   rendered="#{s:hasPermission('CNSRATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="cnsRateList" dataModel="#{cnsRateDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/cnsRate.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CNSRATE','CREATE')}"
+                          tabindex="5"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#rate" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

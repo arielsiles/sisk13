@@ -1,0 +1,90 @@
+<rich:modalPanel height="220" width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{chargeAction.managed}">
+                <h:outputText value="#{messages['Charge.edit']}"/>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{messages['Charge.new']}"/>
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <ui:include src="/include/messages.xhtml"/>
+    <h:form id="chargeForm">
+        <div class="buttons">
+            <a4j:commandButton action="#{chargeAction.create}" value="#{messages['Common.save']}"
+                               styleClass="button"
+                               rendered="#{!chargeAction.managed and s:hasPermission('CHARGE','CREATE')}"
+                               reRender="#{reRender}#{not empty reRender?',':''}chargeForm"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               tabindex="1">
+                <s:defaultAction/>
+            </a4j:commandButton>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" tabindex="2">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true"
+                                       operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{chargeAction.managed}">
+                        #{messages['Charge.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['Charge.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Charge.name']}</ui:define>
+                <h:inputText id="#{dialogId}-idNumber"
+                             value="#{charge.name}"
+                             maxlength="200"
+                             styleClass="input"
+                             required="true"
+                             tabindex="3">
+                </h:inputText>
+            </s:decorate>
+        </rich:panel>
+
+        <div class="buttons">
+            <a4j:commandButton action="#{chargeAction.create}" value="#{messages['Common.save']}"
+                               styleClass="button"
+                               rendered="#{!chargeAction.managed and s:hasPermission('CHARGE','CREATE')}"
+                               reRender="#{reRender}#{not empty reRender?',':''}chargeForm"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               tabindex="4"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" tabindex="5">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true"
+                                       operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <!--strange-->
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+    <c:set var="firstInputToFocusId" value="#{dialogId}-idNumber"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+
+</rich:modalPanel>
+

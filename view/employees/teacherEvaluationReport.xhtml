@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['PollCopy.teacherEvaluationResultReport']}</ui:define>
+    <ui:param name="bodyWidth" value="95%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="teacherEvaluationResultReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['PollCopy.teacherEvaluationResultReport']}
+                </f:facet>
+                <ui:decorate template="genericPollReport.xhtml">
+                    <ui:param name="reportAction" value="#{teacherEvaluationReportAction}"/>
+                    <ui:param name="showCareerField" value="true"/>
+                </ui:decorate>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{teacherEvaluationReportAction}" showReportTitle="false"
+                                      showPageFormat="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{teacherEvaluationReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" tabindex="3">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+
+            <rich:jQuery selector="#pollForm" query="focus()" timing="onload"/>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

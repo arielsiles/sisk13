@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.realCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.realCounter}">
+                <app:naturalNumberConverter/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.paymentCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.paymentCounter}">
+                <app:naturalNumberConverter/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.debtCounter}">
+            <app:naturalNumberConverter/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.debtCounter}">
+                <app:naturalNumberConverter/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.realBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.realBs}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.realUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.realUsd}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.paymentBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.paymentBs}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.paymentUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.paymentUsd}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.debtBs}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.debtBs}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+    <rich:column styleClass="right" footerClass="right rich-table-footercell">
+        <h:outputText value="#{career.debtUsd}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <f:facet name="footer">
+            <h:outputText value="#{debtExtended.debtUsd}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </f:facet>
+    </rich:column>
+</ui:composition>

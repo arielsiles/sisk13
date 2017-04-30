@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Zone.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="zoneSearch">
+            <rich:simpleTogglePanel label="#{messages['Zone.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.name']}</ui:define>
+                    <h:inputText id="name" value="#{zoneDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{zoneDataModel.search}"
+                                       reRender="zoneList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/zone.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('ZONE','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{zoneDataModel}" var="zoneItem" id="zoneList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="25%, 25%, 20%, 20%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="zone.name" dataModel="#{zoneDataModel}"
+                                                   reRender="zoneList, dataScroller">
+                                #{messages['Zone.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="zone.city.name"
+                                                   dataModel="#{zoneDataModel}"
+                                                   reRender="zoneList, dataScroller">
+                                #{messages['Zone.city']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="zone.city.department.name"
+                                                   dataModel="#{zoneDataModel}"
+                                                   reRender="zoneList, dataScroller">
+                                #{messages['Zone.department']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="zone.city.department.country.name"
+                                                   dataModel="#{zoneDataModel}"
+                                                   reRender="zoneList, dataScroller">
+                                #{messages['Zone.country']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{zoneItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{zoneItem.city.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{zoneItem.city.department.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{zoneItem.city.department.country.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{zoneAction.select(zoneItem)}"
+                                   rendered="#{s:hasPermission('ZONE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="zoneList" dataModel="#{zoneDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/contacts/zone.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('ZONE','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

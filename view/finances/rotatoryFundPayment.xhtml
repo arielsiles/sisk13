@@ -1,0 +1,621 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{rotatoryFundPaymentAction.managed}">
+            #{messages['RotatoryFundPayment.edit']}
+        </c:when>
+        <c:when test="#{rotatoryFundPaymentAction.enabledRemakeOptions}">
+            #{messages['RotatoryFundPayment.remake']}
+        </c:when>
+        <c:otherwise>
+            #{messages['RotatoryFundPayment.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="rotatoryFundPaymentForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{rotatoryFundPaymentAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!rotatoryFundPaymentAction.managed and !rotatoryFundPaymentAction.enabledRemakeOptions and s:hasPermission('ROTATORYFUNDPAYMENT','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundPaymentAction.remake}"
+                     value="#{messages['RotatoryFundPayment.button.remake']}"
+                     styleClass="button"
+                     rendered="#{!rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.enabledRemakeOptions and rotatoryFundAction.rotatoryFundApproved and s:hasPermission('REMAKEROTATORYFUNDPAYMENT','VIEW')}"
+                     tabindex="1"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.approveRotatoryFundPayment}"
+                     value="#{messages['RotatoryFundPayment.approve']}"
+                     styleClass="button"
+                     tabindex="2"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundAction.rotatoryFundApproved and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENTAPPROVE','VIEW')}"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.annulRotatoryFundPayment}"
+                     value="#{messages['RotatoryFundPayment.annul']}"
+                     styleClass="button"
+                     tabindex="3"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENTANNUL','VIEW')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{rotatoryFundPaymentAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENT','UPDATE')}"
+                     tabindex="4">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending and s:hasPermission('ROTATORYFUNDPAYMENT','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundPaymentAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="5"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{rotatoryFundPaymentAction.managed}">
+            #{messages['RotatoryFundPayment.edit']}
+        </c:when>
+        <c:when test="#{rotatoryFundPaymentAction.enabledRemakeOptions}">
+            #{messages['RotatoryFundPayment.remake']}
+        </c:when>
+        <c:otherwise>
+            #{messages['RotatoryFundPayment.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="paymentLeftPanel">
+<s:decorate id="rotatoryFundPaymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['RotatoryFundPayment.paymentType']}</ui:define>
+    <h:selectOneMenu id="rotatoryFundPaymentType"
+                     value="#{rotatoryFundPayment.rotatoryFundPaymentType}"
+                     styleClass="input"
+                     rendered="#{rotatoryFundPaymentAction.enableRotatoryFundPaymentType}"
+                     required="true"
+                     tabindex="6">
+        <s:selectItems value="#{manualPaymentTypes}"
+                       var="element"
+                       label="#{messages[element.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <a4j:support event="onchange"
+                     action="#{rotatoryFundPaymentAction.paymentTypeChanged()}"
+                     reRender="rotatoryFundPaymentTypeField, beneficiaryDiv,checkDestinationDiv, valuesDiv, paymentDocumentDiv,tabPanelDiv"
+                     ajaxSingle="true"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+    <h:outputText value="#{messages[rotatoryFundPayment.rotatoryFundPaymentType.resourceKey]}"
+                  rendered="#{!rotatoryFundPaymentAction.enableRotatoryFundPaymentType}"/>
+</s:decorate>
+<s:div id="stateDiv">
+    <s:decorate id="stateField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{rotatoryFundPaymentAction.managed}">
+        <ui:define name="label">#{messages['RotatoryFundPayment.state']}</ui:define>
+        <h:outputText value="#{messages[rotatoryFundPayment.state.resourceKey]}"/>
+    </s:decorate>
+</s:div>
+<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+            rendered="#{rotatoryFundPaymentAction.managed}">
+    <ui:define name="label">#{messages['RotatoryFundPayment.code']}</ui:define>
+    <h:outputText id="code"
+                  value="#{rotatoryFundPayment.code}"
+                  styleClass="input">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+    </h:outputText>
+</s:decorate>
+
+<s:div id="beneficiaryDiv">
+    <s:decorate id="beneficiaryNameField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{not rotatoryFundPaymentAction.paymentCashAccountAdjustment}">
+        <ui:define name="label">#{messages['RotatoryFundPayment.beneficiaryName']}</ui:define>
+        <h:inputText id="beneficiaryName"
+                     value="#{rotatoryFundPayment.beneficiaryName}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="200"
+                     rendered="#{rotatoryFundPaymentAction.rotatoryFundPaymentPending}"
+                     tabindex="7"/>
+        <h:outputText value="#{rotatoryFundPayment.beneficiaryName}"
+                      styleClass="input"
+                      rendered="#{!rotatoryFundPaymentAction.rotatoryFundPaymentPending}"/>
+    </s:decorate>
+
+    <s:decorate id="beneficiaryTypeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{not rotatoryFundPaymentAction.paymentCashAccountAdjustment}">
+        <ui:define name="label">#{messages['RotatoryFundPayment.beneficiaryType']}</ui:define>
+        <h:selectOneRadio value="#{rotatoryFundPayment.beneficiaryType}"
+                          rendered="#{rotatoryFundPaymentAction.rotatoryFundPaymentPending}"
+                          layout="pageDirection">
+            <s:selectItems value="#{beneficiaryTypes}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"/>
+            <s:convertEnum/>
+        </h:selectOneRadio>
+        <h:outputText value="#{messages[rotatoryFundPayment.beneficiaryType.resourceKey]}"
+                      styleClass="input"
+                      rendered="#{!rotatoryFundPaymentAction.rotatoryFundPaymentPending}"/>
+    </s:decorate>
+</s:div>
+<s:div id="checkDestinationDiv">
+    <s:decorate id="checkDestinationField" template="/include/inputField.xhtml"
+                rendered="#{rotatoryFundPaymentAction.paymentWithCheck}"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFund.checkDestination']}</ui:define>
+        <ui:param name="validateId" value="executorUnit"/>
+        <c:choose>
+            <c:when test="${rotatoryFundPaymentAction.rotatoryFundPaymentPending}">
+                <app:quickSearch id="quickSearchCheckDestination"
+                                 textValue="rotatoryFundPayment.checkDestination.executorUnitCode"
+                                 value="#{rotatoryFundPayment.checkDestination}"
+                                 searchField="executorUnitCode"
+                                 reRender="checkDestinationField"
+                                 tabindex="15"/>
+                <h:selectOneMenu id="executorUnit"
+                                 value="#{rotatoryFundPayment.checkDestination}"
+                                 styleClass="inputMedium"
+                                 required="true">
+                    <s:selectItems value="#{businessUnitList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support event="onchange"
+                                 reRender="checkDestinationField"
+                                 ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{rotatoryFundPayment.checkDestination.fullName}"
+                              styleClass="input"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</s:div>
+<s:div id="valuesDiv">
+    <s:div id="bankDiv">
+        <s:decorate id="bankAccountField" template="/include/inputField.xhtml"
+                    rendered="#{rotatoryFundPaymentAction.enableBankAccount}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFundPayment.bankAccount']}</ui:define>
+            <h:selectOneMenu id="bankAccount"
+                             value="#{rotatoryFundPayment.bankAccount}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{rotatoryFundPaymentAction.enableBankAccount}"
+                             tabindex="8">
+                <s:selectItems value="#{financesBankAccountList}"
+                               var="element"
+                               label="#{element.description}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{rotatoryFundPaymentAction.bankAccountFieldChanged()}"
+                             reRender="bankAccountField, valuesDiv"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText
+                    value="#{rotatoryFundPayment.bankAccount.description} #{messages[rotatoryFundPayment.bankAccount.currency.symbolResourceKey]}"
+                    rendered="#{!rotatoryFundPaymentAction.enableBankAccount}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="bankAccountNumberDiv">
+        <s:decorate id="bankAccountNumberField" template="/include/inputField.xhtml"
+                    rendered="#{rotatoryFundPaymentAction.enableBankAccount and not empty rotatoryFundPayment.bankAccountNumber}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFundPayment.bankAccountNumber']}</ui:define>
+            <h:outputText id="bankAccountNumber"
+                          value="#{rotatoryFundPayment.bankAccountNumber}"
+                          styleClass="input">
+            </h:outputText>
+        </s:decorate>
+    </s:div>
+    <s:div id="cashBoxCashAccountDiv">
+        <s:decorate id="cashBoxCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundPaymentAction.paymentCashBox}">
+            <ui:define name="label">#{messages['RotatoryFundPayment.cashBoxCashAccount']}</ui:define>
+            <c:choose>
+                <c:when test="#{!rotatoryFundPaymentAction.rotatoryFundPaymentPending}">
+                    <h:outputText value="#{rotatoryFundPayment.cashBoxCashAccount.fullName}"/>
+                </c:when>
+                <c:otherwise>
+                    <app:selectPopUp id="cashBoxCashAccount"
+                                     required="true"
+                                     textValue="#{rotatoryFundPayment.cashBoxCashAccount.fullName}"
+                                     value="#{rotatoryFundPayment.cashBoxCashAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="rotatoryFundPaymentAction.clearCashBoxCashAccount()"
+                                     searchModalPanel="cashBoxCashAccountListModalPanel"
+                                     reRender="cashBoxCashAccountField, valuesDiv"
+                                     hotKeySelect="alt+3"
+                                     tabindex="9">
+                    </app:selectPopUp>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+    </s:div>
+    <s:div id="cashAccountAdjustmentDiv">
+        <s:decorate id="cashAccountAdjustmentField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{rotatoryFundPaymentAction.paymentCashAccountAdjustment}">
+            <ui:define name="label">#{messages['RotatoryFundPayment.cashAccountAdjustment']}</ui:define>
+            <c:choose>
+                <c:when test="#{!rotatoryFundPaymentAction.rotatoryFundPaymentPending}">
+                    <h:outputText value="#{rotatoryFundPayment.cashAccountAdjustment.fullName}"/>
+                </c:when>
+                <c:otherwise>
+                    <app:selectPopUp id="cashAccountAdjustment"
+                                     required="true"
+                                     textValue="#{rotatoryFundPayment.cashAccountAdjustment.fullName}"
+                                     value="#{rotatoryFundPayment.cashAccountAdjustment}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="rotatoryFundPaymentAction.clearCashAccountAdjustment()"
+                                     searchModalPanel="cashAccountAdjustmentListModalPanel"
+                                     reRender="cashAccountAdjustmentField, valuesDiv"
+                                     hotKeySelect="alt+4"
+                                     tabindex="9">
+                    </app:selectPopUp>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+    </s:div>
+    <s:div id="sourceCurrencyDiv">
+        <s:decorate id="sourceCurrencyField" template="/include/inputField.xhtml"
+                    rendered="#{not empty rotatoryFundPayment.sourceCurrency}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFundPayment.sourceCurrency']}</ui:define>
+            <h:outputText
+                    value="#{messages[rotatoryFundPayment.sourceCurrency.resourceKey]} (#{messages[rotatoryFundPayment.sourceCurrency.symbolResourceKey]})"/>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="sourceAmountDiv">
+        <s:decorate id="sourceAmountField" template="/include/inputField.xhtml"
+                    rendered="#{not empty rotatoryFundPayment.sourceAmount}"
+                    styleClass="formRow">
+            <ui:define name="label">
+                <c:choose>
+                    <c:when test="#{rotatoryFundPaymentAction.paymentWithCheck}">
+                        #{messages['RotatoryFundPayment.sourceCheckAmount']}
+                    </c:when>
+                    <c:when test="#{rotatoryFundPaymentAction.paymentBankAccount}">
+                        #{messages['RotatoryFundPayment.sourceBankAmount']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['RotatoryFundPayment.sourceCashBoxAmount']}
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+            <h:outputText value="#{rotatoryFundPayment.sourceAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText
+                    value=" #{messages[rotatoryFundPayment.sourceCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="payCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFund.payCurrency']}</ui:define>
+        <h:outputText
+                value="#{messages[rotatoryFundPayment.paymentCurrency.resourceKey]} (#{messages[rotatoryFundPayment.paymentCurrency.symbolResourceKey]})"/>
+    </s:decorate>
+    <s:div id="paymentAmountDiv">
+        <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFund.amount']}</ui:define>
+            <h:inputText id="amount"
+                         value="#{rotatoryFundPayment.paymentAmount}"
+                         rendered="#{rotatoryFundPaymentAction.enablePayAmount}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="10">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" minimum="0.01"
+                                         forId="amount"/>
+                <app:keyUpEvent focus="amount"
+                                reRender="amountField, paymentAmountDiv, sourceAmountDiv"
+                                action="rotatoryFundPaymentAction.updateSourceAmount()"/>
+                <a4j:support event="onchange"
+                             action="#{rotatoryFundPaymentAction.updateSourceAmount()}"
+                             reRender="amountField, paymentAmountDiv, sourceAmountDiv"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{rotatoryFundPayment.paymentAmount}"
+                          rendered="#{!rotatoryFundPaymentAction.enablePayAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value="#{messages[rotatoryFundPayment.paymentCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="exchangeRatePanel">
+        <s:decorate id="exchangeRateField"
+                    template="/include/inputField.xhtml"
+                    rendered="#{rotatoryFundPaymentAction.enableExchangeRateField}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFundPayment.exchangeRate']}</ui:define>
+            <h:inputText id="exchangeRate"
+                         value="#{rotatoryFundPayment.exchangeRate}"
+                         styleClass="input right"
+                         rendered="#{rotatoryFundPaymentAction.enableExchangeRate}"
+                         required="true"
+                         tabindex="11">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="exchangeRate"/>
+                <app:keyUpEvent focus="exchangeRate"
+                                reRender="exchangeRateField, paymentAmountDiv, sourceAmountDiv"
+                                action="rotatoryFundPaymentAction.updateSourceAmount()"/>
+                <a4j:support event="onchange"
+                             action="#{rotatoryFundPaymentAction.updateSourceAmount()}"
+                             reRender="exchangeRateField, paymentAmountDiv, sourceAmountDiv"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{rotatoryFundPayment.exchangeRate}"
+                          rendered="#{!rotatoryFundPaymentAction.enableExchangeRate}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+    </s:div>
+</s:div>
+</s:div>
+<s:div id="paymentRigthDiv">
+
+    <s:decorate id="paymentDateField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundPayment.paymentDate']}</ui:define>
+        <rich:calendar id="paymentDate"
+                       value="#{rotatoryFundPayment.paymentDate}"
+                       rendered="#{rotatoryFundPaymentAction.enablePaymentDate}"
+                       styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       enableManualInput="true"
+                       required="true"
+                       reRender="paymentDate"
+                       tabindex="12">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </rich:calendar>
+        <h:outputText value="#{rotatoryFundPayment.paymentDate}"
+                      rendered="#{!rotatoryFundPaymentAction.enablePaymentDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="useOldDocumentField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{rotatoryFundPaymentAction.enabledDocumentNumberOption}">
+        <ui:define name="label">#{messages['RotatoryFundPayment.useOldDocumentNumber']}</ui:define>
+        <h:selectBooleanCheckbox id="useOldDocumentCheckBox" value="#{rotatoryFundPaymentAction.useOldDocumentNumber}"/>
+        &#160;
+        <h:outputFormat value="#{messages['Common.parenthesis']}">
+            <f:param value="#{rotatoryFundPaymentAction.oldDocumentNumber}"/>
+        </h:outputFormat>
+    </s:decorate>
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['RotatoryFundPayment.description']}</ui:define>
+        <h:inputTextarea id="description"
+                         value="#{rotatoryFundPayment.description}"
+                         styleClass="input textarea"
+                         required="true"
+                         tabindex="13"
+                         readonly="#{true}">
+            <f:validateLength maximum="1000"/>
+        </h:inputTextarea>
+    </s:decorate>
+    <s:decorate id="reversionCauseField" template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{(!rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.enabledRemakeOptions and rotatoryFundAction.rotatoryFundApproved and s:hasPermission('REMAKEROTATORYFUNDPAYMENT','VIEW'))
+                or (rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentAnnulled and not empty rotatoryFundPayment.reversionCause) }">
+        <c:set var="maxReversionCauseLength" value="#{rotatoryFundPaymentAction.managed?'1000':'500'}"/>
+        <ui:define name="label">#{messages['RotatoryFundPayment.reversionCause']}</ui:define>
+        <h:inputTextarea id="reversionCause"
+                         value="#{rotatoryFundPayment.reversionCause}"
+                         styleClass="input textarea"
+                         required="true"
+                         tabindex="14"
+                         readonly="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentAnnulled}">
+            <f:validateLength maximum="#{maxReversionCauseLength}"/>
+        </h:inputTextarea>
+    </s:decorate>
+</s:div>
+</h:panelGrid>
+
+<s:div id="documentInformation">
+    <app:fieldset id="documentInformationSet" title="#{messages['RotatoryFundPayment.documentInformation']}"
+                  rendered="#{rotatoryFundPaymentAction.managed}">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent, width50percent">
+            <s:div>
+                <s:decorate id="registerEmployeeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{rotatoryFundPaymentAction.managed}">
+                    <ui:define name="label">#{messages['RotatoryFundPayment.registerEmployee']}</ui:define>
+                    <h:outputText value="#{rotatoryFundPayment.registerEmployee.employee.fullName}">
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="approvedByEmployeeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{rotatoryFundPaymentAction.managed and not empty rotatoryFundPayment.approvedByEmployee}">
+                    <ui:define name="label">#{messages['RotatoryFundPayment.approvedByEmployee']}</ui:define>
+                    <h:outputText value="#{rotatoryFundPayment.approvedByEmployee.employee.fullName}">
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="creationDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{rotatoryFundPaymentAction.managed}">
+                    <ui:define name="label">#{messages['RotatoryFundPayment.creationDate']}</ui:define>
+                    <h:outputText value="#{rotatoryFundPayment.creationDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="approvalDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                            rendered="#{rotatoryFundPaymentAction.managed and not empty rotatoryFundPayment.approvalDate}">
+                    <ui:define name="label">#{messages['RotatoryFundPayment.approvalDate']}</ui:define>
+                    <h:outputText value="#{rotatoryFundPayment.approvalDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+
+
+</rich:panel>
+
+
+<div class="buttons">
+    <h:commandButton action="#{rotatoryFundPaymentAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!rotatoryFundPaymentAction.managed and !rotatoryFundPaymentAction.enabledRemakeOptions and s:hasPermission('ROTATORYFUNDPAYMENT','CREATE')}"
+                     tabindex="15"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.remake}"
+                     value="#{messages['RotatoryFundPayment.button.remake']}"
+                     styleClass="button"
+                     rendered="#{!rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.enabledRemakeOptions and rotatoryFundAction.rotatoryFundApproved and s:hasPermission('REMAKEROTATORYFUNDPAYMENT','VIEW')}"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.approveRotatoryFundPayment}"
+                     value="#{messages['RotatoryFundPayment.approve']}"
+                     styleClass="button"
+                     tabindex="16"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundAction.rotatoryFundApproved and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENTAPPROVE','VIEW')}"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.annulRotatoryFundPayment}"
+                     value="#{messages['RotatoryFundPayment.annul']}"
+                     styleClass="button"
+                     tabindex="17"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENTANNUL','VIEW')}"/>
+    <h:commandButton action="#{rotatoryFundPaymentAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending
+                     and s:hasPermission('ROTATORYFUNDPAYMENT','UPDATE')}"
+                     tabindex="18"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{rotatoryFundPaymentAction.managed and rotatoryFundPaymentAction.rotatoryFundPaymentPending and s:hasPermission('ROTATORYFUNDPAYMENT','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rotatoryFundPaymentAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="19"/>
+</div>
+</h:form>
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{rotatoryFundPaymentAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['RotatoryFundPayment.delete.confirmation']}">
+                <f:param value="#{rotatoryFundPayment.code}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rotatoryFundPaymentAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="accountType" value="A"/>
+    <ui:param name="accountClass" value="A"/>
+    <ui:param name="hasReceivableAccountsPermission" value="true"/>
+    <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{rotatoryFundPaymentAction.assignCashBoxCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashBoxCashAccountField, valuesDiv"
+                           oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="cashAccountAdjustmentListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountAdjustmentListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountAdjustmentListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{rotatoryFundPaymentAction.assignCashAccountAdjustment(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashAccountAdjustmentField, valuesDiv"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountAdjustmentListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#rotatoryFundPaymentType" query="focus()" timing="onload"/>
+</ui:define>
+
+</ui:composition>

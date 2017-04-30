@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['GestionPayrollSchedule.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="gestionPayrollScheduleSearch">
+
+            <rich:simpleTogglePanel id="searchOptionsPanel"
+                                    label="#{messages['GestionPayrollSchedule.search']}"
+                                    switchType="client">
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionPayrollSchedule.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{gestionPayrollScheduleDataModel.criteria.name}"
+                                 maxlength="50"
+                                 tabindex="1"
+                                 styleClass="input">
+                        <f:validateLength maximum="50"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="yearField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Gestion.year']}</ui:define>
+                    <h:inputText id="year"
+                                 value="#{gestionPayrollScheduleDataModel.year}"
+                                 maxlength="5"
+                                 tabindex="2"
+                                 styleClass="input right">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <s:div styleClass="right input">
+                        <a4j:commandButton action="#{gestionPayrollScheduleDataModel.search()}"
+                                           reRender="gestionPayrollScheduleList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{gestionPayrollScheduleDataModel.clear()}"
+                                           reRender="searchOptionsPanel, gestionPayrollScheduleList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.clear']}"
+                                           id="clearButtonId"
+                                           tabindex="4">
+                        </a4j:commandButton>
+                    </s:div>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/gestionPayrollSchedule.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULE','CREATE')}"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable value="#{gestionPayrollScheduleDataModel}"
+                            var="gestionPayrollScheduleItem"
+                            id="gestionPayrollScheduleList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="60%,30%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="gestionPayrollSchedule.name"
+                                                   dataModel="#{gestionPayrollScheduleDataModel}"
+                                                   reRender="gestionPayrollScheduleList, dataScroller">
+                                #{messages['GestionPayrollSchedule.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="gestionPayrollSchedule.gestion.year"
+                                                   dataModel="#{gestionPayrollScheduleDataModel}"
+                                                   reRender="gestionPayrollScheduleList, dataScroller">
+                                #{messages['GestionPayrollSchedule.year']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{gestionPayrollScheduleItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{gestionPayrollScheduleItem.gestion.year}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULE','VIEW')}"
+                                   action="#{gestionPayrollScheduleAction.select(gestionPayrollScheduleItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="gestionPayrollScheduleList"
+                              dataModel="#{gestionPayrollScheduleDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/gestionPayrollSchedule.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULE','CREATE')}"
+                          tabindex="6"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

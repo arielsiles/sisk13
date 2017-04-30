@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{preBookEntryPeriodTypeAction.managed}">
+                #{messages['PreBookEntryPeriodType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['PreBookEntryPeriodType.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="preBookEntryPeriodTypeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!preBookEntryPeriodTypeAction.managed}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{preBookEntryPeriodTypeAction.managed}"
+                                 id="updateButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{preBookEntryPeriodTypeAction.managed}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{preBookEntryPeriodTypeAction.managed}">
+                            #{messages['PreBookEntryPeriodType.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['PreBookEntryPeriodType.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PreBookEntryPeriodType.name']}</ui:define>
+                    <h:inputText id="name" value="#{preBookEntryPeriodType.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1"/>
+                </s:decorate>
+
+            </rich:panel>
+
+
+            <div class="buttons">
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!preBookEntryPeriodTypeAction.managed}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{preBookEntryPeriodTypeAction.managed}"
+                                 tabindex="3"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{preBookEntryPeriodTypeAction.managed}"
+                                 tabindex="4">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{preBookEntryPeriodTypeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="5"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{preBookEntryPeriodTypeAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['PreBookEntryPeriodType.delete.confirmation']}">
+                        <f:param value="#{preBookEntryPeriodType.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{preBookEntryPeriodTypeAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

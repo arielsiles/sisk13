@@ -1,0 +1,166 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['IndirectCosts.list']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="indirectCostsSearch">
+            <rich:simpleTogglePanel label="#{messages['Indirectcosts.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Indirectcosts.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{indirectCostsDataModel.criteria.name}"
+                                         maxlength="150"
+                                         tabindex="1"
+                                         styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                            <h:selectOneMenu id="gestion"
+                                             value="#{indirectCostsDataModel.privateCriteria.gestion}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="2">
+                                <s:selectItems value="#{gestionList}"
+                                               var="gestion"
+                                               label="#{gestion.year}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                            <a4j:commandButton action="#{indirectCostsDataModel.search}"
+                                               reRender="indirectCostsList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="4">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Month.month']}</ui:define>
+                            <h:selectOneMenu id="month"
+                                             value="#{indirectCostsDataModel.privateCriteria.month}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="3">
+
+                                <s:selectItems value="#{monthEnumIndirectCosts}" var="month"
+                                               label="#{messages[month.resourceKey]}"
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/production/indirectCosts.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INDIRECTCOSTS','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable value="#{indirectCostsDataModel}"
+                            var="item"
+                            id="indirectCostsList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            >
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCosts.name"
+                                                   dataModel="#{indirectCostsDataModel}"
+                                                   reRender="indirectCostsList, dataScroller">
+                                #{messages['Indirectcosts.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCosts.amountBs"
+                                                   dataModel="#{indirectCostsDataModel}"
+                                                   reRender="indirectCostsList, dataScroller">
+                                #{messages['IndirectCosts.amount']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCosts.periodIndirectCost.month"
+                                                   dataModel="#{indirectCostsDataModel}"
+                                                   reRender="indirectCostsList, dataScroller">
+                                #{messages['IndirectCosts.month']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="indirectCosts.periodIndirectCost.gestion.year"
+                                                   dataModel="#{indirectCostsDataModel}"
+                                                   reRender="indirectCostsList, dataScroller">
+                                #{messages['IndirectCosts.period']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{item.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.amountBs}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.periodIndirectCost.month}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.periodIndirectCost.gestion.year}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{indirectCostsAction.select(item)}"
+                                   rendered="#{s:hasPermission('INDIRECTCOSTS','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="indirectCostsList" dataModel="#{indirectCostsDataModel}"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/production/indirectCostConfig.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('INDIRECTCOSTCONFIGURATION','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

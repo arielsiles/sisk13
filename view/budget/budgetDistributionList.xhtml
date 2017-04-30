@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['BudgetDistribution.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+
+        <h:form id="budgetDistributionSearch">
+
+            <rich:simpleTogglePanel label="#{messages['BudgetDistribution.search']}" switchType="client">
+
+                <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BudgetDistribution.businessUnit']}</ui:define>
+                    <h:selectOneMenu id="businessUnit"
+                                     value="#{budgetDistributionDataModel.criteria.businessUnit}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                       label="#{businessUnit.organization.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BudgetDistribution.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{budgetDistributionDataModel.criteria.gestion}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{gestionList}" var="gestion" label="#{gestion.year}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BudgetDistribution.type']}</ui:define>
+                    <h:selectOneMenu id="gestitypen"
+                                     value="#{budgetDistributionDataModel.criteria.type}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{budgetTypeEnum}" var="budgetType"
+                                       label="#{messages[budgetType.resourceKey]}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                    <a4j:commandButton action="#{budgetDistributionDataModel.search}"
+                                       reRender="budgetDistributionList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="7">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#businessUnit" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/budgetDistribution.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('BUDGETDISTRIBUTION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{budgetDistributionDataModel}" var="budgetDistributionItem"
+                            id="budgetDistributionList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="25%, 25%, 20%, 20%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="budgetDistribution.businessUnit"
+                                    dataModel="#{budgetDistributionDataModel}"
+                                    reRender="budgetDistributionList, dataScroller">
+                                #{messages['BudgetDistribution.businessUnit']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="budgetDistribution.gestion.year,budgetDistribution.type"
+                                    dataModel="#{budgetDistributionDataModel}"
+                                    reRender="budgetDistributionList, dataScroller">
+                                #{messages['BudgetDistribution.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="budgetDistribution.type,budgetDistribution.gestion.year"
+                                    dataModel="#{budgetDistributionDataModel}"
+                                    reRender="budgetDistributionList, dataScroller">
+                                #{messages['BudgetDistribution.type']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader
+                                    sortProperty="budgetDistribution.percentDistribution"
+                                    dataModel="#{budgetDistributionDataModel}"
+                                    reRender="budgetDistributionList, dataScroller">
+                                #{messages['BudgetDistribution.percentDistribution']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{budgetDistributionItem.businessUnit.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{budgetDistributionItem.gestion.year}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[budgetDistributionItem.type.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{budgetDistributionItem.percentDistribution}">
+                        <app:realNumberConverter forId="percentDistribution"/>
+                    </h:outputText>
+                    <h:outputText value="#{messages['Unit.percentage']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{budgetDistributionAction.select(budgetDistributionItem)}"
+                                   rendered="#{s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="budgetDistributionList"
+                              dataModel="#{budgetDistributionDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/budgetDistribution.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('BUDGETDISTRIBUTION','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

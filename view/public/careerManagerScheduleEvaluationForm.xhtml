@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ScheduleEvaluationForm.careerManagerForm']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="showPowered" value="true"/>
+    <ui:define name="body">
+        <a4j:region>
+            <h:form>
+                <a4j:poll id="poll" interval="600000" reRender="poll, evaluationDateField"
+                          limitToList="true" immediate="true" ajaxSingle="true"/>
+            </h:form>
+        </a4j:region>
+        <h:form id="careerManagerScheduleEvaluationForm"
+                rendered="#{not empty careerManagerScheduleEvaluationFormAction.pollForm and careerManagerScheduleEvaluationFormAction.enabledToEvaluate}">
+
+            <app:requiredFieldsMessage/>
+
+            <c:set var="evaluationCriteriaList"
+                   value="#{careerManagerScheduleEvaluationFormAction.evaluationCriteriaList}"/>
+
+            <c:set var="academicStructureListSize"
+                   value="#{careerManagerScheduleEvaluationFormAction.academicStructureListSize+1}"/>
+
+            <c:set var="borderTopStyle" value="border-top:1px solid #{a4jSkin.intShadow};"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{careerManagerScheduleEvaluationFormAction.createByGroupPunctuations}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{careerManagerScheduleEvaluationFormAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="pollCopyPanel">
+                <f:facet name="header">
+                    #{messages['ScheduleEvaluationForm.careerManagerForm']}
+                </f:facet>
+
+                <ui:include src="evaluationDetail.xhtml">
+                    <ui:param name="showComment" value="false"/>
+                    <ui:param name="scheduleEvaluationFormAction"
+                              value="#{careerManagerScheduleEvaluationFormAction}"/>
+                </ui:include>
+
+                <br/>
+
+                <rich:dataTable value="#{careerManagerScheduleEvaluationFormAction.pollForm.sectionList}"
+                                var="sectionItem"
+                                width="100%"
+                                columnsWidth="15%, 25%, 15%, 15%, 30%"
+                                columnClasses="width15percent,width25percent,width15percent,width15percent,width30percent"
+                                first="0">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column styleClass="center">
+                                #{messages['ScheduleEvaluationForm.dimension']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['ScheduleEvaluationForm.question']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['PollCopy.career']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                #{messages['PollCopy.teacher']}
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <c:forEach items="#{evaluationCriteriaList}" var="evaluationCriteria">
+                                    <app:dataTable cellspacing="0" cellpadding="0" border="0" width="100%"
+                                                   id="horizontalDataTable#{evaluationCriteria.id}"
+                                                   value="#{evaluationCriteria.evaluationCriteriaValueList}"
+                                                   var="ecValue"
+                                                   layout="horizontal">
+                                        <h:outputText value="#{ecValue.sequence} : #{ecValue.title}"/>
+                                    </app:dataTable>
+                                </c:forEach>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:subTable value="#{sectionItem.questionList}"
+                                   var="questionItem"
+                                   rowKeyVar="questionKeyVar">
+                        <rich:column rowspan="#{sectionItem.questionListSize*academicStructureListSize}"
+                                     rendered="#{questionKeyVar eq 0}"
+                                     style="#{borderTopStyle}">
+                            <h:outputText value="#{sectionItem.fullName}"/>
+                        </rich:column>
+                        <rich:subTable value="#{careerManagerScheduleEvaluationFormAction.academicStructureList}"
+                                       var="academicStructureItem"
+                                       rowKeyVar="academicStructureKeyVar">
+                            <rich:column rowspan="#{academicStructureListSize}"
+                                         rendered="#{academicStructureKeyVar eq 0}"
+                                         style="#{borderTopStyle}">
+                                <h:outputText value="#{questionItem.fullName}"/>
+                            </rich:column>
+                            <rich:column style="#{borderTopStyle}">
+                                <h:outputText value="#{academicStructureItem.career.name}"/>
+                            </rich:column>
+                            <rich:column style="#{borderTopStyle}">
+                                <h:outputText value="#{academicStructureItem.employee.fullName}"/>
+                            </rich:column>
+                            <rich:column style="#{borderTopStyle}">
+                                <s:decorate template="/include/validateField.xhtml"
+                                            styleClass="formRow">
+                                    <ui:param name="errorStyleClass" value="boldErrors"/>
+                                    <h:selectOneRadio
+                                            value="#{careerManagerScheduleEvaluationFormAction.evaluationCriteriaValueResult[academicStructureItem][questionItem]}"
+                                            styleClass="width100percent"
+                                            required="true">
+                                        <s:selectItems
+                                                value="#{questionItem.evaluationCriteria.evaluationCriteriaValueList}"
+                                                var="eCValue" label="#{eCValue.sequence}"/>
+                                        <s:convertEntity/>
+                                    </h:selectOneRadio>
+                                </s:decorate>
+                            </rich:column>
+                        </rich:subTable>
+                    </rich:subTable>
+                </rich:dataTable>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{careerManagerScheduleEvaluationFormAction.createByGroupPunctuations}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{careerManagerScheduleEvaluationFormAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:div rendered="#{empty careerManagerScheduleEvaluationFormAction.pollForm}">
+            <ui:include src="scheduleEvaluationFormNotFound.xhtml"/>
+        </s:div>
+        <s:div rendered="#{not careerManagerScheduleEvaluationFormAction.enabledToEvaluate}">
+            <ui:include src="scheduleEvaluationFormNotEnabled.xhtml"/>
+        </s:div>
+    </ui:define>
+</ui:composition>
+

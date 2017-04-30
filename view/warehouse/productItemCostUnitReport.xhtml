@@ -1,0 +1,211 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['ProductItem.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="productItemReportForm">
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['ProductItem.report']}
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent">
+
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.state']}</ui:define>
+                    <h:selectOneMenu id="state"
+                                     value="#{productItemCostUnitReportAction.productItemState}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{productItemStates}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        #{messages['InventoryManagement.executorUnitCode']}
+                    </ui:define>
+                    <h:selectOneMenu id="executorUnitCode"
+                                     value="#{productItemCostUnitReportAction.executorUnit}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{businessUnitList.resultList}"
+                                       var="executorUnit"
+                                       label="#{executorUnit.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange"
+                                     reRender="warehouseField, warehouseListModalPanelContainer"
+                                     action="#{productItemCostUnitReportAction.cleanMainOptions}"
+                                     ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="productItemCostUnitReportAction.warehouse.warehouseCode"
+                                     value="#{productItemCostUnitReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="3">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="warehouse.executorUnit = #{productItemCostUnitReportAction.executorUnit}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{productItemCostUnitReportAction.warehouse.name}"
+                                     value="#{productItemCostUnitReportAction.warehouse}"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
+                                     clearAction="productItemCostUnitReportAction.cleanWarehouseField()"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.productItem']}</ui:define>
+                    <app:quickSearch id="quickSearchProductItem"
+                                     textValue="productItemCostUnitReportAction.productItem.productItemCode"
+                                     value="#{productItemCostUnitReportAction.productItem}"
+                                     searchField="productItemCode"
+                                     alias="productItem"
+                                     reRender="productItemField"
+                                     tabindex="4"/>
+                    <app:selectPopUp id="productItem"
+                                     textValue="#{productItemCostUnitReportAction.productItem.name}"
+                                     value="#{productItemCostUnitReportAction.productItem}"
+                                     clearAction="productItemCostUnitReportAction.cleanProductItemField()"
+                                     searchModalPanel="productItemListModalPanel"
+                                     dataModel="#{productItemSearchDataModel}"
+                                     reRender="productItemField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+                <s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.report.group']}</ui:define>
+                    <app:quickSearch id="quickSearchGroup"
+                                     textValue="productItemCostUnitReportAction.group.groupCode"
+                                     value="#{productItemCostUnitReportAction.group}"
+                                     searchField="groupCode"
+                                     reRender="groupField , subGroupField"
+                                     tabindex="9"/>
+                    <app:selectPopUp id="group"
+                                     textValue="#{productItemCostUnitReportAction.group.fullName}"
+                                     value="#{productItemCostUnitReportAction.group}"
+                                     dataModel="#{groupSearchDataModel}"
+                                     clearAction="productItemCostUnitReportAction.cleanGroupField()"
+                                     searchModalPanel="groupListModalPanel"
+                                     reRender="subGroupField, groupField"
+                                     hotKeySelect="alt+3">
+                    </app:selectPopUp>
+                </s:decorate>
+                <s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.subGroup']}</ui:define>
+                    <app:quickSearch id="quickSearchSubGroup"
+                                     textValue="productItemCostUnitReportAction.subGroup.subGroupCode"
+                                     value="#{productItemCostUnitReportAction.subGroup}"
+                                     searchField="subGroupCode"
+                                     alias="subGroup"
+                                     reRender="subGroupField , groupField "
+                                     tabindex="10">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="subGroup.group = #{productItemCostUnitReportAction.group}"/>
+                            <app:restriction
+                                    condition="subGroup.state != #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SubGroupState', 'BLO')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="subGroup"
+                                     textValue="#{productItemCostUnitReportAction.subGroup.fullName}"
+                                     value="#{productItemCostUnitReportAction.subGroup}"
+                                     clearAction="productItemCostUnitReportAction.cleanSubGroup()"
+                                     searchModalPanel="subGroupListModalPanel"
+                                     dataModel="#{subGroupSearchDataModel}"
+                                     reRender="subGroupField"
+                                     hotKeySelect="alt+4"/>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:panel>
+
+        <app:reportDefaultOptions reportAction="#{productItemCostUnitReportAction}" showPageFormat="false"
+                                  tabIndex="11"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{productItemCostUnitReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+    <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="warehouseModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{productItemCostUnitReportAction.assignWarehouse(warehouseItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="warehouseField"
+                               oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{productItemCostUnitReportAction.assignProductItem(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="groupListModalPanelContainer" template="/warehouse/groupListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{productItemCostUnitReportAction.assignGroup(groupItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="subGroupField, groupField, subGroupListModalPanel"
+                               oncomplete="Richfaces.hideModalPanel('groupListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+    <s:decorate id="subGroupListModalPanelContainer" template="/warehouse/subGroupListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{productItemCostUnitReportAction.setSubGroup(subGroupItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="subGroupField, groupField"
+                               oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</ui:define>
+</ui:composition>

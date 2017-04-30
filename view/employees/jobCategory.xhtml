@@ -1,0 +1,587 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{jobCategoryAction.managed}">
+            #{messages['JobCategory.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['JobCategory.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="jobCategoryForm">
+
+<div class="buttons">
+    <h:commandButton action="#{jobCategoryAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','CREATE')}"
+                     id="createButtonId" tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <a4j:commandButton action="#{jobCategoryAction.update}" value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','UPDATE')}"
+                       reRender="jobCategoryForm"
+                       tabindex="2"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobCategoryAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true" tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{jobCategoryAction.managed}">
+            #{messages['JobCategory.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['JobCategory.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<app:fieldset id="jobCategoryTitle" title="#{messages['JobCategory.title']}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.name']}</ui:define>
+                <h:inputText id="name" value="#{jobCategory.name}" styleClass="input" required="true"
+                             maxlength="200"
+                             tabindex="5">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.acronym']}</ui:define>
+                <h:inputText id="acronym" value="#{jobCategory.acronym}" styleClass="input" required="true"
+                             maxlength="200"
+                             tabindex="6">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="sectorField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.sector']}</ui:define>
+                <h:selectOneMenu id="sector" value="#{jobCategory.sector}" styleClass="input"
+                                 required="true"
+                                 tabindex="7">
+                    <s:selectItems value="#{sectorList.resultList}" var="sector" label="#{sector.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="payrollGenerationTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Sector.payrollGenerationType']}</ui:define>
+                <h:selectOneMenu id="payrollGenerationType" value="#{jobCategory.payrollGenerationType}"
+                                 styleClass="input" tabindex="8"
+                                 required="true">
+                    <s:selectItems value="#{payrollGenerationTypeEnum}" var="payrollGenerationType"
+                                   label="#{messages[payrollGenerationType.resourceKey]}"
+                                   hideNoSelectionLabel="false" noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.active']}</ui:define>
+                <h:selectBooleanCheckbox id="retentionFlag" value="#{jobCategory.active}"
+                                         tabindex="20"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.position']}</ui:define>
+                <h:inputText id="position"
+                             value="#{jobCategory.position}"
+                             tabindex="21"
+                             styleClass="input">
+                    <f:validateLongRange maximum="2147483640"/>
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.description']}</ui:define>
+                <h:inputTextarea id="description" value="#{jobCategory.description}"
+                                 styleClass="input textarea"
+                                 tabindex="22">
+                    <f:validateLength maximum="200"/>
+                </h:inputTextarea>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</app:fieldset>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+<s:div>
+    <app:fieldset id="salaryPayrollAccounts" title="#{messages['JobCategory.salaryPayrollAccounts']}">
+        <s:decorate id="nationalCurrencyDebitAccountCodeField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyDebitAccountCode']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyDebitAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyDebitAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyDebitAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('G','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyDebitAccount()"
+                             searchModalPanel="nationalCurrencyDebitAccountModalPanel"
+                             reRender="nationalCurrencyDebitAccountCodeField"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+        <s:decorate id="foreignCurrencyDebitAccountCodeField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.foreignCurrencyDebitAccountCode']}</ui:define>
+            <app:selectPopUp id="foreignCurrencyDebitAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.foreignCurrencyDebitAccount.fullName}"
+                             value="#{jobCategory.foreignCurrencyDebitAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('G','D')"
+                             clearAction="jobCategoryAction.clearForeignCurrencyDebitAccount()"
+                             searchModalPanel="foreignCurrencyDebitAccountModalPanel"
+                             reRender="foreignCurrencyDebitAccountCodeField"
+                             hotKeySelect="alt+2"/>
+        </s:decorate>
+        <s:decorate id="nationalCurrencyCreditAccountCodeField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyCreditAccountCode']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyCreditAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyCreditAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyCreditAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyCreditAccount()"
+                             searchModalPanel="nationalCurrencyCreditAccountModalPanel"
+                             reRender="nationalCurrencyCreditAccountCodeField"
+                             hotKeySelect="alt+3"/>
+        </s:decorate>
+        <s:decorate id="foreignCurrencyCreditAccountCodeField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.foreignCurrencyCreditAccountCode']}</ui:define>
+            <app:selectPopUp id="foreignCurrencyCreditAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.foreignCurrencyCreditAccount.fullName}"
+                             value="#{jobCategory.foreignCurrencyCreditAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','D')"
+                             clearAction="jobCategoryAction.clearForeignCurrencyCreditAccount()"
+                             searchModalPanel="foreignCurrencyCreditAccountModalPanel"
+                             reRender="foreignCurrencyCreditAccountCodeField"
+                             hotKeySelect="alt+4"/>
+        </s:decorate>
+    </app:fieldset>
+    <app:fieldset id="christmasPayrollAccounts" title="#{messages['JobCategory.christmasPayrollAccounts']}">
+        <s:decorate id="nationalCurrencyChristmasExpendAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyChristmasExpendAccount']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyChristmasExpendAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyChristmasExpendAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyChristmasExpendAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('G','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyChristmasExpendAccount()"
+                             searchModalPanel="nationalCurrencyChristmasExpendAccountModalPanel"
+                             reRender="nationalCurrencyChristmasExpendAccountField"
+                             hotKeySelect="alt+5"/>
+        </s:decorate>
+        <s:decorate id="nationalCurrencyChristmasProvisionAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyChristmasProvisionAccount']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyChristmasProvisionAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyChristmasProvisionAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyChristmasProvisionAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyChristmasProvisionAccount()"
+                             searchModalPanel="nationalCurrencyChristmasProvisionAccountModalPanel"
+                             reRender="nationalCurrencyChristmasProvisionAccountField"
+                             hotKeySelect="alt+6"/>
+        </s:decorate>
+        <s:decorate id="foreignCurrencyChristmasProvisionAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.foreignCurrencyChristmasProvisionAccount']}</ui:define>
+            <app:selectPopUp id="foreignCurrencyChristmasProvisionAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.foreignCurrencyChristmasProvisionAccount.fullName}"
+                             value="#{jobCategory.foreignCurrencyChristmasProvisionAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','D')"
+                             clearAction="jobCategoryAction.clearForeignCurrencyChristmasProvisionAccount()"
+                             searchModalPanel="foreignCurrencyChristmasProvisionAccountModalPanel"
+                             reRender="foreignCurrencyChristmasProvisionAccountField"
+                             hotKeySelect="alt+7"/>
+        </s:decorate>
+    </app:fieldset>
+</s:div>
+<s:div>
+    <app:fieldset id="compensationAccounts" title="#{messages['JobCategory.compensationAccounts']}">
+        <s:decorate id="nationalCurrencyCompensationExpendAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyCompensationExpendAccount']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyCompensationExpendAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyCompensationExpendAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyCompensationExpendAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('G','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyCompensationExpendAccount()"
+                             searchModalPanel="nationalCurrencyCompensationExpendAccountModalPanel"
+                             reRender="nationalCurrencyCompensationExpendAccountField"
+                             hotKeySelect="alt+6"/>
+        </s:decorate>
+        <s:decorate id="nationalCurrencyCompensationPrevisionAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.nationalCurrencyCompensationPrevisionAccount']}</ui:define>
+            <app:selectPopUp id="nationalCurrencyCompensationPrevisionAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.nationalCurrencyCompensationPrevisionAccount.fullName}"
+                             value="#{jobCategory.nationalCurrencyCompensationPrevisionAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','P')"
+                             clearAction="jobCategoryAction.clearNationalCurrencyCompensationPrevisionAccount()"
+                             searchModalPanel="nationalCurrencyCompensationPrevisionAccountModalPanel"
+                             reRender="nationalCurrencyCompensationPrevisionAccountField"
+                             hotKeySelect="alt+6"/>
+        </s:decorate>
+        <s:decorate id="foreignCurrencyCompensationPrevisionAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.foreignCurrencyCompensationPrevisionAccount']}</ui:define>
+            <app:selectPopUp id="foreignCurrencyCompensationPrevisionAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.foreignCurrencyCompensationPrevisionAccount.fullName}"
+                             value="#{jobCategory.foreignCurrencyCompensationPrevisionAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClassAndCurrency('P','D')"
+                             clearAction="jobCategoryAction.clearForeignCurrencyCompensationPrevisionAccount()"
+                             searchModalPanel="foreignCurrencyCompensationPrevisionAccountModalPanel"
+                             reRender="foreignCurrencyCompensationPrevisionAccountField"
+                             hotKeySelect="alt+7"/>
+        </s:decorate>
+    </app:fieldset>
+    <app:fieldset id="patronalAccounts" title="#{messages['JobCategory.patronalAccounts']}">
+        <s:decorate id="pensionFundPatronalAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.pensionFundPatronalAccount']}</ui:define>
+            <app:selectPopUp id="pensionFundPatronalAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.pensionFundPatronalAccount.fullName}"
+                             value="#{jobCategory.pensionFundPatronalAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             clearAction="jobCategoryAction.clearPensionFundPatronalAccount()"
+                             searchModalPanel="pensionFundPatronalAccountModalPanel"
+                             reRender="pensionFundPatronalAccountField"
+                             hotKeySelect="alt+7"/>
+        </s:decorate>
+        <s:decorate id="socialSecurityPatronalAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['JobCategory.socialSecurityPatronalAccount']}</ui:define>
+            <app:selectPopUp id="socialSecurityPatronalAccount"
+                             styleClass="input"
+                             required="true"
+                             textValue="#{jobCategory.socialSecurityPatronalAccount.fullName}"
+                             value="#{jobCategory.socialSecurityPatronalAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             clearAction="jobCategoryAction.clearSocialSecurityPatronalAccount()"
+                             searchModalPanel="socialSecurityPatronalAccountModalPanel"
+                             reRender="socialSecurityPatronalAccountField"
+                             hotKeySelect="alt+8"/>
+        </s:decorate>
+    </app:fieldset>
+    <app:fieldset id="toleranceFieldset" title="#{messages['JobCategory.defaultToleranceLimit']}">
+        <s:decorate id="toleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Tolerance.tolerance']}</ui:define>
+            <h:selectOneMenu id="tolerance" value="#{jobCategory.tolerance}"
+                             styleClass="input"
+                             rendered="#{!jobCategoryAction.managed}"
+                             required="true"
+                             tabindex="23">
+                <s:selectItems value="#{toleranceList.resultList}" var="tolerance"
+                               label="#{functionAction.hourMinuteToString(tolerance.beforeInit)}-#{functionAction.hourMinuteToString(tolerance.beforeEnd)} | #{functionAction.hourMinuteToString(tolerance.afterInit)}-#{functionAction.hourMinuteToString(tolerance.afterEnd)}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText
+                    rendered="#{jobCategoryAction.managed}"
+                    value="#{functionAction.hourMinuteToString(jobCategory.tolerance.beforeInit)}-#{functionAction.hourMinuteToString(jobCategory.tolerance.beforeEnd)} | #{functionAction.hourMinuteToString(jobCategory.tolerance.afterInit)}-#{functionAction.hourMinuteToString(jobCategory.tolerance.afterEnd)}"/>
+        </s:decorate>
+        <s:decorate id="limitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Limit.limit']}</ui:define>
+            <h:selectOneMenu id="limit" value="#{jobCategory.limit}"
+                             styleClass="input"
+                             rendered="#{!jobCategoryAction.managed}"
+                             required="true"
+                             tabindex="24">
+                <s:selectItems value="#{limitList.resultList}" var="limit"
+                               label="#{functionAction.hourMinuteToString(limit.beforeInit)}-#{functionAction.hourMinuteToString(limit.beforeEnd)} | #{functionAction.hourMinuteToString(limit.afterInit)}-#{functionAction.hourMinuteToString(limit.afterEnd)}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText
+                    rendered="#{jobCategoryAction.managed}"
+                    value="#{functionAction.hourMinuteToString(jobCategory.limit.beforeInit)}-#{functionAction.hourMinuteToString(jobCategory.limit.beforeEnd)} | #{functionAction.hourMinuteToString(jobCategory.limit.afterInit)}-#{functionAction.hourMinuteToString(jobCategory.limit.afterEnd)}"/>
+        </s:decorate>
+    </app:fieldset>
+
+</s:div>
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{jobCategoryAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','CREATE')}"
+                     tabindex="25">
+    </h:commandButton>
+
+    <a4j:commandButton action="#{jobCategoryAction.update}" value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','UPDATE')}"
+                       reRender="jobCategoryForm"
+                       tabindex="26"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','DELETE')}"
+                     tabindex="27">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{jobCategoryAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true" tabindex="28">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['JobCategory.delete.confirmation']}">
+                <f:param value="#{jobCategory.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{jobCategoryAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"
+                           rendered="#{jobCategoryAction.managed and s:hasPermission('JOBCATEGORY','DELETE')}"
+                           tabindex="1000"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyDebitAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyDebitAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyDebitAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyDebitAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyDebitAccountCodeField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyDebitAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyCreditAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyCreditAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyCreditAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyCreditAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyCreditAccountCodeField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyCreditAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="foreignCurrencyDebitAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="foreignCurrencyDebitAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="foreignCurrencyDebitAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignForeignCurrencyDebitAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="foreignCurrencyDebitAccountCodeField"
+                           oncomplete="Richfaces.hideModalPanel('foreignCurrencyDebitAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="foreignCurrencyCreditAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="foreignCurrencyCreditAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="foreignCurrencyCreditAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignForeignCurrencyCreditAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="foreignCurrencyCreditAccountCodeField"
+                           oncomplete="Richfaces.hideModalPanel('foreignCurrencyCreditAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyChristmasExpendAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyChristmasExpendAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyChristmasExpendAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyChristmasExpendAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyChristmasExpendAccountField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyChristmasExpendAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyChristmasProvisionAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyChristmasProvisionAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyChristmasProvisionAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyChristmasProvisionAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyChristmasProvisionAccountField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyChristmasProvisionAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="foreignCurrencyChristmasProvisionAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="foreignCurrencyChristmasProvisionAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="foreignCurrencyChristmasProvisionAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignForeignCurrencyChristmasProvisionAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="foreignCurrencyChristmasProvisionAccountField"
+                           oncomplete="Richfaces.hideModalPanel('foreignCurrencyChristmasProvisionAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyCompensationExpendAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyCompensationExpendAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyCompensationExpendAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyCompensationExpendAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyCompensationExpendAccountField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyCompensationExpendAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="nationalCurrencyCompensationPrevisionAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="nationalCurrencyCompensationPrevisionAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="nationalCurrencyCompensationPrevisionAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignNationalCurrencyCompensationPrevisionAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="nationalCurrencyCompensationPrevisionAccountField"
+                           oncomplete="Richfaces.hideModalPanel('nationalCurrencyCompensationPrevisionAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="foreignCurrencyCompensationPrevisionAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="foreignCurrencyCompensationPrevisionAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="foreignCurrencyCompensationPrevisionAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignForeignCurrencyCompensationPrevisionAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="foreignCurrencyCompensationPrevisionAccountField"
+                           oncomplete="Richfaces.hideModalPanel('foreignCurrencyCompensationPrevisionAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="pensionFundPatronalAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="pensionFundPatronalAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="pensionFundPatronalAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignPensionFundPatronalAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="pensionFundPatronalAccountField"
+                           oncomplete="Richfaces.hideModalPanel('pensionFundPatronalAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="socialSecurityPatronalAccountModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="socialSecurityPatronalAccountModalPanelContainer"/>
+    <ui:param name="dialogId" value="socialSecurityPatronalAccountModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{jobCategoryAction.assignSocialSecurityPatronalAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="image-middle"
+                           reRender="socialSecurityPatronalAccountField"
+                           oncomplete="Richfaces.hideModalPanel('socialSecurityPatronalAccountModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

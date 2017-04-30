@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Voucher.list']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="97%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="VoucherSearch">
+<rich:simpleTogglePanel id="voucherSearchPanelId"
+                        label="#{messages['menu.finances.accounting']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div id="leftSidePanel">
+            <s:decorate id="documTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                <h:selectOneMenu id="documType"
+                                 value="#{voucherAction.docType}"
+                                 styleClass="input"
+                                 tabindex="1">
+                    <s:selectItems value="#{voucherDocumentTypeList}"
+                                   var="element"
+                                   label="#{element.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="documentNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define
+                        name="label">#{messages['Voucher.documentNumber']}
+                </ui:define>
+                <h:inputText id="documentNumber"
+                             value="#{voucherAction.documentNumber}"
+                             styleClass="input"
+                             maxlength="150"
+                             tabindex="2"/>
+            </s:decorate>
+            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define
+                        name="label">#{messages['Voucher.gloss']}
+                </ui:define>
+                <h:inputText id="gloss"
+                             value="#{voucherAction.gloss}"
+                             styleClass="input"
+                             maxlength="150"
+                             tabindex="3"/>
+
+                <a4j:commandButton action="#{voucherAction.search}"
+                                   reRender="voucherSearchPanelId, voucherList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="6">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <h:panelGrid columns="4" width="100%"
+                             columnClasses="top,top,top,top">
+                    <h:outputText value="#{messages['Common.dateFrom']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="startDate"
+                                       value="#{voucherDataModel.startDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="4">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                    <h:outputText value="#{messages['Common.dateTo']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="endDate"
+                                       value="#{voucherDataModel.endDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </h:panelGrid>
+            </s:decorate>
+        </s:div>
+
+    </h:panelGrid>
+
+    <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/accounting/voucherCreate.xhtml"
+              styleClass="button"
+              rendered="#{s:hasPermission('VOUCHER','CREATE')}"
+              propagation="begin"/>
+</div>
+
+<rich:dataTable id="voucherList"
+                value="#{voucherDataModel}"
+                var="voucherItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="7%, 7%, 7%, 7%, 53%, 7%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.date"
+                                       dataModel="#{voucherDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['Voucher.date']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.transactionNumber"
+                                       dataModel="#{voucherDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['Voucher.documentNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.documentType"
+                                       dataModel="#{voucherDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['Voucher.documentType']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.state"
+                                       dataModel="#{voucherDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['Voucher.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="voucher.gloss"
+                                       dataModel="#{voucherDataModel}"
+                                       reRender="voucherList, dataScroller">
+                    #{messages['Voucher.gloss']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{voucherItem.date}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.documentNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.documentType}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.state}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{voucherItem.gloss}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{voucherUpdateAction.select(voucherItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="voucherList" dataModel="#{voucherDataModel}"/>
+
+</h:form>
+</ui:define>
+
+</ui:composition>

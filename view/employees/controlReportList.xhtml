@@ -1,0 +1,237 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['ControlReport.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="controlReportSearch">
+
+<rich:simpleTogglePanel id="searchPanel" label="#{messages['ControlReport.search']}" switchType="client">
+
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ControlReport.ci']}</ui:define>
+        <h:inputText id="idNumber" value="#{controlReportDataModel.criteria.idNumber}"
+                     maxlength="150" tabindex="1" styleClass="input">
+            <app:naturalNumberConverter forId="idNumber"/>
+        </h:inputText>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+        <h:inputText id="lastName" value="#{controlReportDataModel.criteria.lastName}"
+                     maxlength="150" tabindex="2" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+        <h:inputText id="maidenName" value="#{controlReportDataModel.criteria.maidenName}"
+                     maxlength="150" tabindex="3" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+        <h:inputText id="firstName" value="#{controlReportDataModel.criteria.firstName}"
+                     maxlength="150" tabindex="4" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ControlReport.day']}</ui:define>
+        <h:inputText id="day" value="#{controlReportDataModel.criteria.day}"
+                     maxlength="150" tabindex="5" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
+
+    <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ControlReport.date']}</ui:define>
+        <rich:calendar value="#{controlReportDataModel.criteria.date}" styleClass="input"
+                       datePattern="#{messages['patterns.date']}"
+                       tabindex="6">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+        </rich:calendar>
+        <a4j:commandButton action="#{controlReportDataModel.search()}"
+                           reRender="searchPanel,controlReportList, dataScroller"
+                           styleClass="button"
+                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="7">
+            <s:defaultAction/>
+        </a4j:commandButton>
+    </s:decorate>
+
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<rich:dataTable value="#{controlReportDataModel}" var="controlReportItem" id="controlReportList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="20%, 20%, 20%, 20%, 10%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.idNumber"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.ci']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.lastName"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['Person.lastName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.maidenName"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['Person.maidenName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.firstName"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['Person.firstName']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.career"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.career']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.initHour"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.initHour']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.endHour"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.endHour']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.day"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.day']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.date"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.date']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.initMark"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.initMark']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.endMark"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.endMark']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.minutesDiscount"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.minutesDiscount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.discountAmount"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.discountAmount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="controlReport.marks"
+                                       dataModel="#{controlReportDataModel}"
+                                       reRender="controlReportList, dataScroller">
+                    #{messages['ControlReport.marks']}
+                </app:commandSortHeader>
+            </rich:column>
+
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{controlReportItem.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.firstName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.career}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.initHour}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}" type="time"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.endHour}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}" type="time"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.day}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.initMark}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}" type="time"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.endMark}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}" type="time"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.minutesDiscount}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.discountAmount}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{controlReportItem.marks}"/>
+    </rich:column>
+
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="controlReportList" dataModel="#{controlReportDataModel}"/>
+
+</h:form>
+</ui:define>
+</ui:composition>

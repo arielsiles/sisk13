@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Budget.entryBudget.reportPage.title']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="entryBudgetReportForm">
+
+            <rich:simpleTogglePanel label="#{messages['Budget.entryBudget.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.seat']}</ui:define>
+                    <h:selectOneMenu id="businessUnit"
+                                     value="#{entryBudgetReportAction.businessUnit}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{businessUnitList}" var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.costCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="entryBudgetReportAction.costCenter.code"
+                                     value="#{entryBudgetReportAction.costCenter}"
+                                     searchField="code"
+                                     reRender="costCenterField"
+                                     tabindex="2"/>
+                    <app:selectPopUp id="costCenter"
+                                     textValue="#{entryBudgetReportAction.costCenter.fullName}"
+                                     value="#{entryBudgetReportAction.costCenter}"
+                                     clearAction="entryBudgetReportAction.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="burdenField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.burden']}</ui:define>
+                    <h:selectOneMenu id="burden"
+                                     value="#{entryBudgetReportAction.classifier}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <s:selectItems value="#{burdenList}" var="burden"
+                                       label="#{burden.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EntryBudget.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{entryBudgetReportAction.gestion}"
+                                     styleClass="input"
+                                     tabindex="3"
+                                     required="true">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <app:reportDefaultOptions reportAction="#{entryBudgetReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{entryBudgetReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+            <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+            <ui:param name="dialogId" value="costCenterListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{entryBudgetReportAction.assignCostCenter(costCenterItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   immediate="true"
+                                   reRender="costCenterField"
+                                   oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

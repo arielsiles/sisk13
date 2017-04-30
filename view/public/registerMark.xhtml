@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/templateRegisterMark.xhtml">
+    <ui:define name="pageTitle">#{messages['RHMark.search']}</ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="showPowered" value="true"/>
+    <ui:define name="head">
+        <a4j:loadScript src="/scripts/date_hour.js"/>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form id="markRegister">
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    #{messages['RHMark.new']}
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" columnClasses="top-aligned">
+                    <!--<span id="date_server" style="position:absolute;left:690px;top:25px; font-size: 16px;"></span>-->
+                    <!--<h:inputHidden id="marDate" value="#{rHMark.marDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:inputHidden>-->
+
+                    <s:div>
+                        <s:decorate id="dateMarkField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">Fecha: </ui:define>
+                            <span id="date_server"></span>
+                        </s:decorate>
+
+                        <s:decorate id="marPerIdField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
+                                <h:inputText id="marRefCard"
+                                         value="#{rHMark.marPerId}"
+                                         styleClass="input"
+                                         maxlength="200"
+                                         required="true"
+                                         tabindex="1"
+                                        autocomplete="off">
+
+                            </h:inputText>
+                        </s:decorate>
+
+                       <!-- <s:decorate id="marDate" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{rHMark.marDate}</ui:define>
+                        </s:decorate>-->
+
+                        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RegisterMarck.description']}</ui:define>
+                            <h:inputTextarea id="description"
+                                             value="#{rHMark.description}"
+                                             style="margin: 0px; width: 250px; height: 100px;"
+                                             styleClass="input textarea"
+                                             tabindex="2"
+                                    />
+                        </s:decorate>
+                        <s:decorate id="createField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <h:commandButton action="#{rHMarkAction.create}" value="#{messages['Common.register']}"
+                                             styleClass="button" tabindex="3" style="font-size: 20px;">
+
+                                <s:defaultAction/>
+                            </h:commandButton>
+                        </s:decorate>
+                        <s:decorate id="timeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <span id="time_server" style="font-size: 17px;"></span>
+                        </s:decorate>
+                    </s:div>
+
+                            <h:inputHidden id="marDate" value="#{rHMark.marDate}">
+                                    </h:inputHidden>
+                            <h:inputHidden id="marTime" value="#{rHMark.marTime}" >
+                            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                               type="time"/>
+                            </h:inputHidden>
+
+
+
+                </h:panelGrid>
+            </rich:panel>
+
+
+        </h:form>
+        <a4j:outputPanel ajaxRendered="true">
+            <s:decorate id="rhMarkHelpModalPanelContainer" template="/employees/rHMarkHelpModalPanel.xhtml"/>
+        </a4j:outputPanel>
+        <rich:jQuery selector="#marRefCard" query="focus()" timing="onload"/>
+    </ui:define>
+    <!--</body>-->
+</ui:composition>

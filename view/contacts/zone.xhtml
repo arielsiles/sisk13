@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{zoneAction.managed}">
+                #{messages['Zone.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Zone.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="zoneForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{zoneAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!zoneAction.managed and s:hasPermission('ZONE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{zoneAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{zoneAction.managed and s:hasPermission('ZONE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{zoneAction.managed and s:hasPermission('ZONE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{zoneAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{zoneAction.managed}">
+                            #{messages['Zone.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Zone.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.country']}</ui:define>
+                    <h:selectOneMenu id="country"
+                                     value="#{zoneAction.country}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{countryList.resultList}" var="country" label="#{country.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange" reRender="department, city" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.department']}</ui:define>
+                    <h:selectOneMenu id="department"
+                                     value="#{zoneAction.department}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{departmentList.resultList}"
+                                       var="department"
+                                       label="#{department.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="city" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.city']}</ui:define>
+                    <h:selectOneMenu id="city"
+                                     value="#{zone.city}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{cityList.resultList}" var="city" label="#{city.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.name']}</ui:define>
+                    <h:inputText id="name" value="#{zone.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="4"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{zoneAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!zoneAction.managed and s:hasPermission('ZONE','CREATE')}"
+                                 tabindex="5"/>
+
+                <h:commandButton action="#{zoneAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{zoneAction.managed and s:hasPermission('ZONE','UPDATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{zoneAction.managed and s:hasPermission('ZONE','DELETE')}"
+                                 tabindex="7">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{zoneAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="8"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{zoneAction.managed and s:hasPermission('ZONE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Zone.delete.confirmation']}">
+                        <f:param value="#{zone.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{zoneAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{zoneAction.managed and s:hasPermission('ZONE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#country" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,550 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="leftSidePanel">
+    <s:decorate template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{warehousePurchaseOrderAction.managed}">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.orderNumber']}"/>
+        </ui:define>
+        <h:outputText value="#{warehousePurchaseOrder.orderNumber}"/>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{warehousePurchaseOrderAction.managed}">
+        <ui:define name="label">#{messages['WarehousePurchaseOrder.state']}</ui:define>
+        <h:outputText value="#{messages[warehousePurchaseOrder.state.resourceKey]}"/>
+    </s:decorate>
+
+    <s:decorate id="documentTypeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseOrder.purchaseDocumentType']}</ui:define>
+        <c:choose>
+            <c:when test="#{isPurchaseOrderPending or empty warehousePurchaseOrder.documentType}">
+                <h:selectOneMenu id="purchaseDocumentType"
+                                 value="#{warehousePurchaseOrder.documentType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="1">
+                    <s:selectItems value="#{purchaseCollectionDocumentTypeEnum}"
+                                   var="element"
+                                   label="#{messages[element.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+
+                    <a4j:support event="onchange"
+                                 action="#{warehousePurchaseOrderAction.verifyCondicionWill}"
+                                 reRender="rightSidePanel"
+                                 imnediate = "true"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{messages[warehousePurchaseOrder.documentType.resourceKey]}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{warehousePurchaseOrderAction.managed}">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.invoiceNumber']}"/>
+        </ui:define>
+        <h:inputText id="invoiceNumber"
+                     value="#{warehousePurchaseOrder.invoiceNumber}"
+                     styleClass="input"
+                     maxlength="150"
+                     tabindex="1"/>
+        <c:if test="#{warehousePurchaseOrderAction.managed and empty warehousePurchaseOrder.invoiceNumber}">
+            <br/>
+        </c:if>
+        <h:outputText rendered="#{warehousePurchaseOrderAction.managed and empty warehousePurchaseOrder.invoiceNumber}"
+                      styleClass="messageWarm" value="#{messages['PurchaseOrder.defaultInvoiceNumber']}"/>
+    </s:decorate>
+
+    <s:div id="jobContractDiv">
+        <s:decorate id="petitionerJobContractField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.petitioner']}</ui:define>
+            <app:quickSearch id="quickSearchPetitionerJobContract"
+                             textValue="warehousePurchaseOrder.petitionerJobContract.contract.employee.idNumber"
+                             value="#{warehousePurchaseOrder.petitionerJobContract}"
+                             namedQuery="jobContractByEmployeeIdNumberQuickSearch"
+                             postSearchAction="warehousePurchaseOrderAction.loadPetitionerJobContractValues()"
+                             reRender="jobContractDiv, warehouseField, receptionPlacePanel"
+                             tabindex="2"/>
+            <app:selectPopUp id="petitionerJobContract"
+                             required="true"
+                             textValue="#{warehousePurchaseOrder.petitionerJobContract.contract.employee.fullName}"
+                             value="#{warehousePurchaseOrder.petitionerJobContract}"
+                             dataModel="#{jobContractDataModel}"
+                             clearAction="warehousePurchaseOrderAction.clearPetitionerJobContract()"
+                             searchModalPanel="jobContractListModalPanel"
+                             reRender="jobContractDiv, warehouseField, receptionPlacePanel"
+                             readOnly="#{not warehousePurchaseOrderAction.purchaseOrderPending}"
+                             renderedSelectLink="#{warehousePurchaseOrderAction.purchaseOrderPending}"
+                             renderedClearLink="#{warehousePurchaseOrderAction.purchaseOrderPending}"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+        <s:decorate id="contractPetitionerChargeField" template="/include/inputField.xhtml"
+                    rendered="#{warehousePurchaseOrderAction.enableContractInfo}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.petitionerCharge']}</ui:define>
+            <h:outputText value="#{warehousePurchaseOrder.petitionerJobContract.job.charge.name}"
+                          styleClass="input">
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="contractPetitionerOrganizationalUnitField" template="/include/inputField.xhtml"
+                    rendered="#{warehousePurchaseOrderAction.enableContractInfo}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.petitionerArea']}</ui:define>
+            <h:outputText value="#{warehousePurchaseOrder.petitionerJobContract.job.organizationalUnit.fullName}"
+                          styleClass="input">
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="validateId" value="executorUnit"/>
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehousePurchaseOrder.executorUnit']}"/>
+            </ui:define>
+            <c:choose>
+                <c:when test="#{isPurchaseOrderPending}">
+                    <app:quickSearch id="quickSearchExecutorUnit"
+                                     textValue="warehousePurchaseOrder.executorUnit.executorUnitCode"
+                                     value="#{warehousePurchaseOrder.executorUnit}"
+                                     postSearchAction="warehousePurchaseOrderAction.changeExecutorUnit()"
+                                     searchField="executorUnitCode"
+                                     filters="businessUnitFilter"
+                                     reRender="executorUnitField, warehouseField, receptionPlacePanel"
+                                     tabindex="2"/>
+                    <h:selectOneMenu id="executorUnit"
+                                     value="#{warehousePurchaseOrder.executorUnit}"
+                                     styleClass="input"
+                                     required="true">
+                        <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                                       var="businessUnit"
+                                       label="#{businessUnit.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange"
+                                     reRender="executorUnitField, warehouseField, receptionPlacePanel"
+                                     action="#{warehousePurchaseOrderAction.changeExecutorUnit()}"
+                                     ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </c:when>
+                <c:otherwise>
+                    <ui:param name="required" value="true"/>
+                    <h:outputText value="#{warehousePurchaseOrder.executorUnit.fullName}"/>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehousePurchaseOrder.costCenter']}"/>
+            </ui:define>
+            <app:quickSearch id="quickSearchCostCenterField"
+                             textValue="warehousePurchaseOrder.costCenter.code"
+                             value="#{warehousePurchaseOrder.costCenter}"
+                             searchField="code"
+                             reRender="costCenterField"
+                             rendered="#{isPurchaseOrderPending}"
+                             tabindex="3"/>
+            <app:selectPopUp id="costCenter"
+                             required="true"
+                             textValue="#{warehousePurchaseOrder.costCenter.fullName}"
+                             value="#{warehousePurchaseOrder.costCenter}"
+                             clearAction="warehousePurchaseOrderAction.clearCostCenter()"
+                             searchModalPanel="costCenterListModalPanel"
+                             dataModel="#{costCenterDataModel}"
+                             reRender="costCenterField"
+                             readOnly="#{not isPurchaseOrderPending}"
+                             renderedSelectLink="#{isPurchaseOrderPending}"
+                             renderedClearLink="#{isPurchaseOrderPending}"
+                             hotKeySelect="alt+2"/>
+        </s:decorate>
+    </s:div>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.responsible']}"/>
+        </ui:define>
+        <ui:param name="required" value="true"/>
+        <h:outputText value="#{warehousePurchaseOrderAction.responsibleFullName}"/>
+    </s:decorate>
+
+    <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.gloss']}"/>
+        </ui:define>
+        <h:inputTextarea id="observation"
+                         value="#{warehousePurchaseOrder.gloss}"
+                         styleClass="input textarea"
+                         required="true"
+                         readonly="#{not isPurchaseOrderPending}"
+                         tabindex="4">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+</s:div>
+
+
+<s:div id="rightSidePanel">
+<s:decorate template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{warehousePurchaseOrderAction.managed}">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.date']}"/>
+    </ui:define>
+    <h:outputText value="#{warehousePurchaseOrder.date}">
+        <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                           timeZone="#{sessionUser.timeZone}"
+                           type="both"/>
+    </h:outputText>
+</s:decorate>
+
+<s:decorate template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{warehousePurchaseOrderAction.managed}">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.subTotalAmount']}"/>
+    </ui:define>
+    <h:outputText value="#{warehousePurchaseOrder.subTotalAmount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <h:outputText value=" #{messages['Currency.Bs']}"/>
+</s:decorate>
+<a4j:region renderRegionOnly="true">
+    <s:decorate id="discountAmountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{warehousePurchaseOrderAction.managed}">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.discountAmount']}"/>
+        </ui:define>
+        <c:choose>
+            <c:when test="#{isPurchaseOrderPending}">
+                <h:inputText id="discountPercentEdit"
+                             value="#{warehousePurchaseOrder.discountPercent}"
+                             styleClass="inputMedium right"
+                             required="true"
+                             tabindex="5">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
+                                             minimum="0"
+                                             maximum="100"
+                                             forId="discountPercentEdit"/>
+                    <app:keyUpEvent focus="discountPercentEdit"
+                                    reRender="discountAmountField, totalAmountField"
+                                    action="warehousePurchaseOrderAction.calculateTotalAmountByPercentAmount()"/>
+                </h:inputText>
+                &#160;
+                <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+                &#160;
+                <h:outputFormat value="#{messages['Common.parenthesis']}">
+                    <f:param value="#{warehousePurchaseOrder.discountAmount}"/>
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputFormat>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{warehousePurchaseOrder.discountAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Bs']}"/>
+                &#160;
+                <h:outputFormat value="#{messages['Common.percentage']}">
+                    <f:param value="#{warehousePurchaseOrder.discountPercent}"/>
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputFormat>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate id="totalAmountField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow"
+                rendered="#{warehousePurchaseOrderAction.managed}">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.totalAmount']}"/>
+        </ui:define>
+        <c:choose>
+            <c:when test="#{isPurchaseOrderPending}">
+                <h:inputText id="totalAmount"
+                             value="#{warehousePurchaseOrder.totalAmount}"
+                             styleClass="inputMedium right"
+                             required="true"
+                             tabindex="6">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                             minimum="0"
+                                             maximum="#{warehousePurchaseOrder.subTotalAmount}"
+                                             forId="totalAmount"/>
+                    <app:keyUpEvent focus="totalAmount"
+                                    reRender="discountAmountField, totalAmountField"
+                                    action="warehousePurchaseOrderAction.calculatePercentAmountByTotalAmount()"/>
+                </h:inputText>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{warehousePurchaseOrder.totalAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value=" #{messages['Currency.Bs']}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</a4j:region>
+
+<s:decorate template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{not warehousePurchaseOrderAction.isPurchaseOrderPending()}">
+    <ui:define name="label">
+        <h:outputText value="#{messages['PurchaseOrder.balanceAmount']}"/>
+    </ui:define>
+    <h:outputText value="#{warehousePurchaseOrder.balanceAmount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+    <h:outputText value=" #{messages['Currency.Bs']}"/>
+</s:decorate>
+
+<s:decorate template="/include/inputField.xhtml"
+            styleClass="formRow"
+            rendered="#{not warehousePurchaseOrderAction.isPurchaseOrderPending()}">
+    <ui:define name="label">
+        <h:outputText value="#{messages['PurchaseOrder.paymentStatus']}"/>
+    </ui:define>
+    <h:outputText value="#{messages[warehousePurchaseOrder.paymentStatus.resourceKey]}"/>
+</s:decorate>
+
+<s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
+    </ui:define>
+    <app:quickSearch id="quickSearchProvider"
+                     textValue="warehousePurchaseOrder.provider.providerCode"
+                     value="#{warehousePurchaseOrder.provider}"
+                     searchField="providerCode"
+                     reRender="providerField, purchaseOrderDetailsPanel"
+                     rendered="#{isPurchaseOrderPending and isEmptyWarehousePurchaseOrder}"
+                     tabindex="6"/>
+    <app:selectPopUp id="provider"
+                     required="true"
+                     textValue="#{warehousePurchaseOrder.provider.fullName}"
+                     value="#{warehousePurchaseOrder.provider}"
+                     clearAction="warehousePurchaseOrderAction.clearProvider()"
+                     searchModalPanel="providerListModalPanel"
+                     dataModel="#{providerDataModel}"
+                     reRender="providerField, purchaseOrderDetailsPanel"
+                     readOnly="#{not isPurchaseOrderPending or !isEmptyWarehousePurchaseOrder}"
+                     renderedSelectLink="#{isPurchaseOrderPending}"
+                     renderedClearLink="#{isPurchaseOrderPending}"
+                     newModalPanel="financeProviderModalPanel"
+                     renderedNewLink="true"
+                     newAction="#{financeProviderAction.newInstanceInModalPanel()}"
+                     editModalPanel="financeProviderModalPanel"
+                     renderedEditLink="#{warehousePurchaseOrderAction.purchaseOrderPending and null != warehousePurchaseOrder.provider}"
+                     editAction="#{financeProviderAction.selectInstanceInModalPanel(warehousePurchaseOrder.provider)}"
+                     hotKeySelect="alt+3">
+        <ui:define name="dataModelStaticProperties">
+            <f:setPropertyActionListener
+                    value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
+                    target="#{providerDataModel.moduleProviderType}"/>
+            <f:setPropertyActionListener
+                    value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
+                    target="#{providerDataModel.financesEntityState}"/>
+        </ui:define>
+    </app:selectPopUp>
+
+    <a4j:commandLink id="textLink"
+                     oncomplete="Richfaces.showModalPanel('financeProviderModalPanel');"
+                     rendered="#{null != warehousePurchaseOrder.provider and warehousePurchaseOrderAction.managed and isPurchaseOrderPending}"
+                     reRender="financeProviderModalPanel"
+                     ajaxSingle="true"
+                     action="#{financeProviderAction.selectInstanceInModalPanel(warehousePurchaseOrder.provider)}"
+                     title="#{messages['Common.edit']}"
+                     immediate="true">
+        <h:graphicImage value="/img/edit3.png" styleClass="select-image-middle"/>
+    </a4j:commandLink>
+</s:decorate>
+
+<s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.warehouse']}"/>
+    </ui:define>
+    <app:quickSearch id="quickSearchWarehouse"
+                     textValue="warehousePurchaseOrder.warehouse.warehouseCode"
+                     value="#{warehousePurchaseOrder.warehouse}"
+                     searchField="warehouseCode"
+                     alias="warehouse"
+                     reRender="warehouseField"
+                     filters="businessUnitFilter"
+                     rendered="#{isPurchaseOrderPending}"
+                     disabled="#{!warehousePurchaseOrderAction.executorUnitSelected}"
+                     tabindex="7">
+        <ui:define name="restrictions">
+            <app:restriction
+                    condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState', 'VIG')}"/>
+            <app:restriction condition="warehouse.executorUnit = #{warehousePurchaseOrder.executorUnit}"/>
+        </ui:define>
+    </app:quickSearch>
+    <app:selectPopUp id="warehouse"
+                     required="true"
+                     textValue="#{warehousePurchaseOrder.warehouse.fullName}"
+                     value="#{warehousePurchaseOrder.warehouse}"
+                     clearAction="warehousePurchaseOrderAction.clearWarehouse()"
+                     searchModalPanel="warehouseListModalPanel"
+                     dataModel="#{warehouseSearchDataModel}"
+                     entityManagerName="businessUnitListEntityManager"
+                     reRender="warehouseField"
+                     readOnly="#{not isPurchaseOrderPending}"
+                     renderedSelectLink="#{isPurchaseOrderPending and warehousePurchaseOrderAction.executorUnitSelected}"
+                     renderedClearLink="#{isPurchaseOrderPending and warehousePurchaseOrderAction.executorUnitSelected}"
+                     hotKeySelect="alt+4">
+        <ui:define name="criteriaValues">
+            <app:criteriaValue fieldName="executorUnit" value="#{warehousePurchaseOrder.executorUnit}"/>
+        </ui:define>
+    </app:selectPopUp>
+</s:decorate>
+
+<s:decorate id="receptionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.receptionDate']}"/>
+    </ui:define>
+    <rich:calendar id="receptionDate"
+                   value="#{warehousePurchaseOrder.receptionDate}"
+                   popup="true"
+                   datePattern="#{messages['patterns.date']}"
+                   styleClass="input"
+                   enableManualInput="true"
+                   required="true"
+                   tabindex="8">
+        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                           timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+</s:decorate>
+
+<s:decorate id="consumeMonthField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.consumeMoth']}"/>
+    </ui:define>
+    <c:choose>
+        <c:when test="#{isPurchaseOrderPending or empty warehousePurchaseOrder.consumeMonth}">
+            <h:selectOneMenu id="consumeMonth"
+                             value="#{warehousePurchaseOrder.consumeMonth}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="9">
+                <s:selectItems value="#{month}"
+                               var="month"
+                               label="#{messages[month.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </c:when>
+        <c:otherwise>
+            <ui:param name="required" value="true"/>
+            <h:outputText value="#{messages[warehousePurchaseOrder.consumeMonth.resourceKey]}"/>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+
+<s:div id="receptionPlacePanel">
+    <s:decorate id="receptionPlaceField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.receptionPlace']}"/>
+        </ui:define>
+        <c:choose>
+            <c:when test="#{isPurchaseOrderPending}">
+                <app:quickSearch id="quickSearchReceptionPlace"
+                                 textValue="warehousePurchaseOrder.receptionPlace.code"
+                                 value="#{warehousePurchaseOrder.receptionPlace}"
+                                 searchField="code"
+                                 alias="receptionPlace"
+                                 reRender="receptionPlaceField"
+                                 disabled="#{!warehousePurchaseOrderAction.executorUnitSelected}"
+                                 tabindex="10">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="receptionPlace.businessUnit = #{warehousePurchaseOrder.executorUnit}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <h:selectOneMenu id="receptionPlace"
+                                 value="#{warehousePurchaseOrder.receptionPlace}"
+                                 styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{receptionPlaceList.resultList}"
+                                   var="receptionPlace"
+                                   label="#{receptionPlace.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"
+                                   disabled="#{not warehousePurchaseOrderAction.executorUnitSelected}"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange" reRender="receptionPlaceField" ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <ui:param name="required" value="true"/>
+                <h:outputText value="#{warehousePurchaseOrder.receptionPlace.fullName}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+</s:div>
+
+<s:decorate id="payConditionsField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.payConditions']}"/>
+    </ui:define>
+    <c:choose>
+        <c:when test="#{isPurchaseOrderPending}">
+            <app:quickSearch id="quickSearchPayConditions"
+                             textValue="warehousePurchaseOrder.payConditions.code"
+                             value="#{warehousePurchaseOrder.payConditions}"
+                             searchField="code"
+                             reRender="payConditionsField"
+                             tabindex="11"/>
+            <h:selectOneMenu id="payConditions"
+                             value="#{warehousePurchaseOrder.payConditions}"
+                             styleClass="input"
+                             required="true">
+                <s:selectItems value="#{payConditionsList.resultList}"
+                               var="payConditions"
+                               label="#{payConditions.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange" reRender="payConditionsField" ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </c:when>
+        <c:otherwise>
+            <ui:param name="required" value="true"/>
+            <h:outputText value="#{warehousePurchaseOrder.payConditions.fullName}"/>
+        </c:otherwise>
+    </c:choose>
+</s:decorate>
+
+<s:decorate id="billConditionsField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehousePurchaseOrderAction.showBillConditions}">
+    <ui:define name="label">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.billConditions']}"/>
+    </ui:define>
+    <h:selectBooleanCheckbox value="#{warehousePurchaseOrderAction.billConditions}" disabled="#{!isPurchaseOrderPending}">
+        <a4j:support event="onchange" action="#{warehousePurchaseOrderAction.setWithWill}" ajaxSingle="true"/>
+    </h:selectBooleanCheckbox>
+</s:decorate>
+
+</s:div>
+</h:panelGrid>
+</ui:composition>

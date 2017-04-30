@@ -1,0 +1,80 @@
+<rich:modalPanel height="400" width="400" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="organizationalUnitTreeModalPanel">
+    <f:facet name="header">
+        <h:outputText>#{messages['OrganizationalUnit.list']}</h:outputText>
+    </f:facet>
+
+    #{organizationalUnitTreeAction.setSelectAnyElement(selectAnyElement)}
+
+    <h:form id="organizationalUnitTreeForm">
+
+        <s:decorate id="businessUnitTreeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+            <h:selectOneMenu id="businessUnit" value="#{organizationalUnitTreeAction.businessUnit}" styleClass="input"
+                             required="true" tabindex="1">
+                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                               label="#{businessUnit.organization.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="businessUnitTreeField, treeComponent, selectedOrganizationalUnitField"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="treeComponent" template="/include/inputField.xhtml"
+                    styleClass="formRow panel-border panel-tree">
+            <rich:tree immediate="true" switchType="ajax">
+                <rich:treeNodesAdaptor id="sector" nodes="#{organizationalUnitTreeAction.sectorList}" var="sector">
+                    <rich:treeNode>
+                        <h:outputText value="#{sector.name}"/>
+                    </rich:treeNode>
+                    <rich:recursiveTreeNodesAdaptor id="organizationalUnit"
+                                                    roots="#{organizationalUnitTreeAction.getOrganizationalUnitsRoot(sector)}"
+                                                    var="organizationalUnit"
+                                                    nodes="#{organizationalUnitTreeAction.getOrganizationalUnitsByRoot(organizationalUnit)}">
+                        <rich:treeNode>
+                            <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true"
+                                             style="display:block;width:100%;"
+                                             value="#{organizationalUnit.fullName}"
+                                             action="#{organizationalUnitTreeAction.selectOrganizationalUnit(organizationalUnit)}"
+                                             reRender="selectedOrganizationalUnitField"/>
+                        </rich:treeNode>
+                    </rich:recursiveTreeNodesAdaptor>
+                </rich:treeNodesAdaptor>
+            </rich:tree>
+        </s:decorate>
+
+        <s:decorate id="selectedOrganizationalUnitField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.selectedOrgUnit']}</ui:define>
+            <h:inputText readonly="true" styleClass="input"
+                         value="#{organizationalUnitTreeAction.selectedOrganizationalunitFullName}"/>
+        </s:decorate>
+
+        <div class="buttons">
+
+            <ui:insert name="selectOption"/>
+
+            <rich:componentControl for="organizationalUnitTreeModalPanel" event="onclick" disableDefault="true"
+                                   operation="hide" attachTo="selectButton"/>
+
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" id="cancelBotton"/>
+
+            <rich:componentControl for="organizationalUnitTreeModalPanel" event="onclick" disableDefault="true"
+                                   operation="hide" attachTo="selectButton"/>
+            <rich:componentControl for="organizationalUnitTreeModalPanel" event="onclick" disableDefault="true"
+                                   operation="hide" attachTo="cancelBotton"/>
+
+        </div>
+    </h:form>
+</rich:modalPanel>
+

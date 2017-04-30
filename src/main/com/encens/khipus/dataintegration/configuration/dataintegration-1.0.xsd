@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://encens.com/products/khipus/integrations"
+           xmlns:integrations="http://encens.com/products/khipus/integrations">
+
+    <xs:element name="column">
+        <xs:complexType>
+            <xs:attribute name="db-column-name" type="xs:string" use="required"/>
+            <xs:attribute name="alias" type="xs:string" use="required"/>
+            <xs:attribute name="is-primary-key" type="xs:boolean" use="optional"/>
+            <xs:attribute name="data-type" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="mappedColumn">
+        <xs:complexType>
+            <xs:attribute name="db-column-name" type="xs:string" use="required"/>
+            <xs:attribute name="alias" type="xs:string" use="required"/>
+            <xs:attribute name="source-column-alias" type="xs:string" use="required"/>
+            <xs:attribute name="is-primary-key" type="xs:boolean" use="optional"/>
+            <xs:attribute name="data-type" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:attributeGroup name="attlist.table">
+        <xs:attribute name="db-schema-name" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    Name of the schema in the data base.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="db-table-name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Name of the table in the data base.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="alias" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    A custom name, it should not be contain empty spaces.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+    <xs:element name="targetTable">
+        <xs:annotation>
+            <xs:documentation>
+                The targetTable Tag define the table where store the data than were readed from source table.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="integrations:mappedColumn"/>
+            </xs:choice>
+            <xs:attributeGroup ref="integrations:attlist.table"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="sourceTable">
+        <xs:annotation>
+            <xs:documentation>
+                The sourceTable Tag define the table than contains the data than will be integrated.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="integrations:column"/>
+            </xs:choice>
+            <xs:attributeGroup ref="integrations:attlist.table"/>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:attributeGroup name="attlist.integration">
+        <xs:attribute name="application-id" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Application integration identifier, it should be unique for every integration Tag.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="service-seam-name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Name of the seam component associated to Stateless session bean, this session bean performs
+                    the custom integration logic.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="data-source" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The JNDI name of the datasource where source table are located.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+    <xs:element name="integration">
+        <xs:annotation>
+            <xs:documentation>The integration Tag define a integration element</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" ref="integrations:sourceTable"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="integrations:targetTable"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="integrations:attlist.integration"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:attributeGroup name="attlist.integrations">
+        <xs:attribute name="timer-interval" type="xs:long" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    Data integration timer interval, it is expressed in miliseconds.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="local-data-source" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The JNDI name of the datasource where target table are located.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+    <xs:element name="integrations">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="integrations:integration"/>
+            </xs:choice>
+            <xs:attributeGroup ref="integrations:attlist.integrations"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

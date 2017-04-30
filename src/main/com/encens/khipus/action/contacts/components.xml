@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd"
+            xmlns:web="http://jboss.com/products/seam/web">
+
+
+    <factory name="countryList" value="#{countryQuery}"/>
+    <framework:entity-query name="countryQuery" ejbql="select c from Country c order by c.name"/>
+
+    <factory name="departmentList" value="#{departmentQuery}"/>
+    <framework:entity-query name="departmentQuery" ejbql="select d from Department d">
+        <framework:restrictions>
+            <value>d.country = #{cityAction.country}</value>
+            <value>d.country = #{zoneAction.country}</value>
+            <value>d.country = #{districtAction.country}</value>
+            <value>d.country = #{streetAction.country}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="cityList" value="#{cityQuery}"/>
+    <framework:entity-query name="cityQuery" ejbql="select c from City c">
+        <framework:restrictions>
+            <value>c.department = #{zoneAction.department}</value>
+            <value>c.department = #{districtAction.department}</value>
+            <value>c.department = #{streetAction.department}</value>
+            <!--<value>c.department = #{businessAction.department}</value>
+            <value>c.department = #{businessUnitAction.department}</value> -->
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="zoneList" value="#{zoneQuery}"/>
+    <framework:entity-query name="zoneQuery" ejbql="select z from Zone z">
+        <framework:restrictions>
+            <value>z.city = #{districtAction.city}</value>
+            <value>z.city = #{streetAction.city}</value>
+            <value>z.city = #{businessUnitAction.city}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="districtList" value="#{districtQuery}"/>
+    <framework:entity-query name="districtQuery" ejbql="select d from District d">
+        <framework:restrictions>
+            <value>d.zone = #{streetAction.zone}</value>
+            <value>d.zone = #{businessUnitAction.zone}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="templateList" value="#{templateQuery}"/>
+    <framework:entity-query name="templateQuery" ejbql="select t from Template t"/>
+
+    <web:multipart-filter create-temp-files="true"
+                          max-request-size="10000000"
+                          url-pattern="/*"/>
+    <factory name="businessUnitExtensionList" value="#{businessUnitExtensionQuery}"/>
+    <framework:entity-query name="businessUnitExtensionQuery"
+                            ejbql="select c from Extension c">
+        <framework:restrictions>
+            <value>c.documentType=#{businessUnit.organization.documentType}</value>
+        </framework:restrictions>
+        <framework:order>
+            c.extension
+        </framework:order>
+    </framework:entity-query>
+
+    <factory name="extensionList" value="#{extensionQuery}"/>
+    <framework:entity-query name="extensionQuery"
+                            ejbql="select c from Extension c">
+        <framework:restrictions>
+            <value>c.documentType=#{bank.documentType}</value>
+            <value>c.documentType=#{employee.documentType}</value>
+            <value>c.documentType=#{partner.documentType}</value>
+            <value>c.documentType=#{jobContractAction.employee.documentType}</value>
+        </framework:restrictions>
+        <framework:order>
+            c.extension
+        </framework:order>
+    </framework:entity-query>
+
+    <!--Enumerations-->
+
+    <factory name="genderEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.contacts.Gender')}"/>
+
+</components>

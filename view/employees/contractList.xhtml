@@ -1,0 +1,253 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['Contract.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="contractSearch">
+
+<rich:simpleTogglePanel id="searchOptionsPanel" label="#{messages['Contract.search']}" switchType="client">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+                <h:selectOneMenu id="businessUnit" styleClass="input"
+                                 tabindex="1"
+                                 value="#{contractDataModel.businessUnit}">
+                    <s:selectItems value="#{businessUnitList}" var="business"
+                                   label="#{business.organization.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <a4j:support event="onchange" ajaxSingle="true"
+                                 reRender="businessUnitField"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                <h:selectOneMenu id="gestion"
+                                 value="#{contractDataModel.gestion}"
+                                 styleClass="input"
+                                 tabindex="2">
+                    <s:selectItems value="#{gestionList}" var="gestion" label="#{gestion.year}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+        </s:div>
+        <s:div>
+            <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.employee']}</ui:define>
+                <h:inputText styleClass="input" readonly="true"
+                             value="#{contractDataModel.employee.fullName}"
+                             tabindex="3"/>
+                <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
+                                 tabindex="4"
+                                 title="#{messages['Contract.selectEmployee']}"
+                                 reRender="employeeField"
+                                 onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
+                                 tabindex="5"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{contractDataModel.clearEmployee()}"
+                                 reRender="employeeField">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+
+            <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Job.jobCategory']}</ui:define>
+                <h:selectOneMenu id="jobCategory" styleClass="input"
+                                 tabindex="6"
+                                 value="#{contractDataModel.jobCategory}">
+                    <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                   label="#{jobCategory.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.initDate']}</ui:define>
+                <rich:calendar id="initDate" value="#{contractDataModel.criteria.initDate}"
+                               styleClass="input" datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="7">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+                <rich:calendar id="endDate" value="#{contractDataModel.criteria.endDate}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="8">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{contractDataModel.search()}"
+                                       reRender="contractList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="7">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{contractDataModel.clear()}"
+                                       reRender="searchOptionsPanel, contractList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       id="clearButtonId"
+                                       tabindex="8">
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+
+    </h:panelGrid>
+</rich:simpleTogglePanel>
+
+<rich:spacer height="20px"/>
+<rich:dataTable value="#{contractDataModel}" var="contractItem"
+                id="contractList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="10%,10%, 31%, 10%, 10%, 12%, 12%, 5%">
+    <f:facet name="header">
+        <rich:columnGroup>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.idNumber"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="contractList, dataScroller">
+                    #{messages['Person.idNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="employee.markCode"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="contractList, dataScroller">
+                    #{messages['Employee.markCode']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader
+                        sortProperty="employee.lastName,employee.maidenName,employee.firstName"
+                        dataModel="#{contractDataModel}"
+                        reRender="contractList, dataScroller">
+                    #{messages['Contract.employee']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.occupationalBasicAmount"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="contractList, dataScroller">
+                    #{messages['Contract.occupationalBasicAmount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.cycle.gestion"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="jobContractList, dataScroller">
+                    #{messages['JobContract.gestion']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.initDate"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="contractList, dataScroller">
+                    #{messages['Contract.initDate']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="contract.endDate"
+                                       dataModel="#{contractDataModel}"
+                                       reRender="contractList, dataScroller">
+                    #{messages['Contract.endDate']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{contractItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{contractItem.employee.markCode}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{contractItem.employee.fullName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{contractItem.occupationalBasicAmount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{contractItem.cycle.gestion.year}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{contractItem.initDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{contractItem.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{contractAction.select(contractItem)}"
+                       rendered="#{s:hasPermission('CONTRACT','VIEW')}">
+            <s:conversationPropagation value="begin"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="contractList" dataModel="#{contractDataModel}"/>
+
+
+</h:form>
+
+<s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{contractDataModel.setEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

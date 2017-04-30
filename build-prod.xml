@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<!--Build used for development-->
+<project name="KHIPUS-PROD" default="dist" basedir=".">
+    <!-- Give user a chance to override without editing this file or typing -D -->
+
+    <property name="profile" value="prod"/>
+    <import file="build-common.xml"/>
+
+
+    <!--<target name="dist" depends="clean,jar,war,ear"-->
+    <target name="dist" depends="clear-profile-artifacts,war-applet"
+            description="Package the archives">
+
+        <antcall target="replacejava"/>
+        <antcall target="stage"/>
+        <antcall target="replaceview"/>
+
+        <jar jarfile="${dist.dir}/${project.name}.jar" basedir="${jar.dir}"/>
+        <jar jarfile="${dist.dir}/${project.name}.war" basedir="${war.dir}"/>
+        <jar jarfile="${dist.dir}/${project.name}.ear">
+            <fileset dir="${ear.dir}">
+                <exclude name="${project.name}_jar/**"/>
+                <exclude name="${project.name}_war/**"/>
+            </fileset>
+            <fileset dir="${dist.dir}">
+                <include name="${project.name}.jar"/>
+                <include name="${project.name}.war"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="replacejava" description="replace in java clases (before compiling)">
+
+        <replaceregexp
+                description="Replaces the finances schema for production only (it changes the src before compiling)">
+            <regexp pattern="(public.*static.*final.*String.*KHIPUS_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+            <substitution expression="\1${mainSchema}\2"/>
+            <fileset dir="${src.main.dir}">
+                <include name="**/com/encens/khipus/util/Constants.java"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp
+                description="Replaces the finances schema for production only (it changes the src before compiling)">
+            <regexp pattern="(public.*static.*final.*String.*FINANCES_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+            <substitution expression="\1${financesSchema}\2"/>
+            <fileset dir="${src.main.dir}">
+                <include name="**/com/encens/khipus/util/Constants.java"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp
+                description="Replaces the cashbox schema for production only (it changes the src before compiling)">
+            <regexp pattern="(public.*static.*final.*String.*CASHBOX_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+            <substitution expression="\1${cashBoxSchema}\2"/>
+            <fileset dir="${src.main.dir}">
+                <include name="**/com/encens/khipus/util/Constants.java"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp
+                description="Replaces the cashbox schema for production only (it changes the src before compiling)">
+            <regexp pattern="(public.*static.*final.*String.*ACADEMIC_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+            <substitution expression="\1${academicSchema}\2"/>
+            <fileset dir="${src.main.dir}">
+                <include name="**/com/encens/khipus/util/Constants.java"/>
+            </fileset>
+        </replaceregexp>
+    </target>
+
+    <target name="replaceview" description="replaces texts related to war files (after compiling)">
+        <replaceregexp match="@@APPNAME_VERSION@@" replace="${app.name} (Version: ${app.version} Build: #${app.build})">
+            <fileset dir="${war.dir}">
+                <include name="**/footer.xhtml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp>
+            <regexp pattern="(.*&lt;core:init.*debug=&quot;).*(&quot;.*jndi-pattern.*/>)"/>
+            <substitution expression="\1false\2"/>
+            <fileset dir="${war.dir}">
+                <include name="**/components.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp byline="false" flags="m">
+            <regexp pattern="(.*&lt;param-name>.*javax.faces.STATE_SAVING_METHOD.*&#10;.*&lt;param-value>).*(&lt;/param-value>)"/>
+            <substitution expression="\1server\2"/>
+            <fileset dir="${war.dir}">
+                <include name="**/web.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp byline="false" flags="m">
+            <regexp pattern="(.*&lt;param-name>.*facelets.DEVELOPMENT.*&#10;.*&lt;param-value>).*(&lt;/param-value>)"/>
+            <substitution expression="\1false\2"/>
+            <fileset dir="${war.dir}">
+                <include name="**/web.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp byline="false" flags="m">
+            <regexp pattern="(.*&lt;param-name>.*facelets.REFRESH_PERIOD.*&#10;.*&lt;param-value>).*(&lt;/param-value>)"/>
+            <substitution expression="\1-1\2"/>
+            <fileset dir="${war.dir}">
+                <include name="**/web.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp byline="false" flags="m">
+            <regexp pattern="db-schema-name=&quot;SISDEV&quot;"/>
+            <substitution expression="db-schema-name=&quot;SIS&quot;"/>
+            <fileset dir="${war.dir}">
+                <include name="**/dataintegration.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <replaceregexp byline="false" flags="m">
+            <regexp pattern="db-schema-name=&quot;KHIPUSDEV&quot;"/>
+            <substitution expression="db-schema-name=&quot;KHIPUS&quot;"/>
+            <fileset dir="${war.dir}">
+                <include name="**/dataintegration.xml"/>
+            </fileset>
+        </replaceregexp>
+
+        <!--
+        Enable this if cache must be invalidated for resources url. e.g. scripts/common.js?@build@
+        <replaceregexp match="@build@" replace="${app.build}" flags="g">
+            <fileset dir="${war.dir}">
+                <include name="**/*.*"/>
+                <exclude name="**/*.jar"/>
+                <exclude name="**/*.gif"/>
+                <exclude name="**/*.jpg"/>
+                <exclude name="**/*.png"/>
+            </fileset>
+        </replaceregexp>-->
+    </target>
+
+</project>

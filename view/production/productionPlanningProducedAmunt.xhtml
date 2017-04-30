@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+      #{messages['ProductionPlanning.edit']}
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+<style type="text/css">
+    .top-aligned {
+        vertical-align: top;
+    }
+</style>
+<h:form id="productionPlanningForm">
+
+<rich:panel id="productionPlanningPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{productionPlanningAction.managed}">
+            <h:outputFormat value="{0, date, dd-MM-yyyy}">
+                <f:param value="#{productionPlanning.date}"/>
+            </h:outputFormat>
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductionPlanning.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+
+<h:panelGroup id="productionPlannigProducedAmount">
+<a4j:region>
+    <h:panelGrid columns="3" columnClasses="top-aligned,top-aligned,top-aligned" width="100%"
+                 rendered="#{productionPlanningAction.formulaState eq 'EDIT' and productionOrderForPlanning.estateOrder != 'PENDING'}">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionOrder.order']}</ui:define>
+            <h:outputText value="#{productionOrderForPlanning.productComposition.processedProduct.name}"
+                    >
+            </h:outputText>
+        </s:decorate>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionOrder.productComposition.name']}</ui:define>
+            <h:outputText value="#{productCompositionForPlanning.name}"
+                    >
+            </h:outputText>
+        </s:decorate>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionOrder.expectedAmount']}</ui:define>
+            <h:outputText value="#{productionOrderForPlanning.expendAmount}">
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="estateOrdField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionOrder.estateOrder']}</ui:define>
+            <h:outputText
+                    style="font-weight: bold; color: #{productionOrderItem.estateOrder == 'PENDING' ? 'red' :(productionOrderItem.estateOrder == 'EXECUTED' ? 'blue' : (productionOrderItem.estateOrder == 'TABULATED' ? 'fuchsia' : (productionOrderItem.estateOrder == 'INSTOCK' ? 'fuchsia' : 'green')))}"
+                    value="#{productionOrderItem.estateOrder == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (productionOrderItem.estateOrder == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (productionOrderItem.estateOrder == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : (productionOrderItem.estateOrder == 'INSTOCK' ? messages['productionOrderForPlanning.estateOrder.ab.instock'] : messages['productionOrderForPlanning.estateOrder.finalized'])))}"/>
+        </s:decorate>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionOrder.expectedAmount']}</ui:define>
+            <h:inputText value="#{productionOrderForPlanning.producedAmount}"
+                         required="false" readonly="false" maxlength="500" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:div>
+            <a4j:commandButton action="#{productionPlanningAction.updateProducedAmount}"
+                               value="#{messages['ProductionPlanning.saveCantProducer']}"
+                               reRender="productionList,formulaSet,ruleBotton2,ruleBotton1,baseProductionList"
+                               rendered="#{productionOrderForPlanning.estateOrder == 'EXECUTED'}"/>
+            <rich:spacer width="10"/>
+            <a4j:commandButton action="#{productionPlanningAction.cancelFormulation}" ajaxSingle="true"
+                               value="#{messages['ProductionPlanning.innerButtonCancel']}"
+                               reRender="productionList,formulaSet,ruleBotton2,ruleBotton1,baseProductionList"/>
+        </s:div>
+    </h:panelGrid>
+
+</a4j:region>
+</h:panelGroup>
+</rich:panel>
+
+</h:form>
+
+</ui:define>
+</ui:composition>

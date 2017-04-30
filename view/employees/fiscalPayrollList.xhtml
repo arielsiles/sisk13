@@ -1,0 +1,455 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    #{messages['FiscalPayroll.title']}
+</ui:define>
+
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="fiscalPayrollGenerated">
+
+<rich:simpleTogglePanel id="fiscalPayrollSearchPanel" label="#{messages['FiscalPayroll.search']}" switchType="client">
+    <h:panelGrid columns="2" columnClasses="width50percent, width50percent" width="95%" cellpadding="0" cellspacing="0">
+        <s:div>
+            <s:decorate id="personalIdentifierField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FiscalPayroll.personalIdentifier']}</ui:define>
+                <h:inputText id="personalIdentifier" value="#{fiscalPayrollDataModel.personalIdentifier}"
+                             maxlength="100"
+                             tabindex="1"
+                             styleClass="input">
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FiscalPayroll.name']}</ui:define>
+                <h:inputText id="name" value="#{fiscalPayrollDataModel.name}" maxlength="100"
+                             tabindex="2"
+                             styleClass="input"/>
+                <a4j:commandButton action="#{fiscalPayrollDataModel.search}"
+                                   reRender="fiscalPayrollSearchPanel, fiscalPayrollDataTable, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="10">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#personalIdentifier" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+<br/>
+
+<div class="buttons">
+    <h:commandButton action="#{fiscalPayrollDataModel.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<s:div style="overflow: auto;">
+<rich:dataTable id="fiscalPayrollDataTable"
+                value="#{fiscalPayrollDataModel}"
+                var="fiscalPayrollItem"
+                rows="500000"
+                width="100%">
+<f:facet name="header">
+<rich:columnGroup>
+<!--field groups view-->
+<rich:column colspan="13">
+    <rich:spacer/>
+</rich:column>
+<rich:column colspan="2">
+    <h:outputText value="#{messages['FiscalPayroll.payment']}"/>
+</rich:column>
+<rich:column colspan="3">
+    <rich:spacer/>
+</rich:column>
+<rich:column colspan="2">
+    <h:outputText value="#{messages['FiscalPayroll.extraTime']}"/>
+</rich:column>
+<rich:column colspan="3">
+    <h:outputText value="#{messages['FiscalPayroll.bonus']}"/>
+</rich:column>
+<rich:column colspan="1">
+    <rich:spacer/>
+</rich:column>
+<rich:column colspan="8">
+    <h:outputText value="#{messages['FiscalPayroll.discounts']}"/>
+</rich:column>
+<rich:column colspan="2">
+    <rich:spacer/>
+</rich:column>
+
+<!--fields-->
+<rich:column breakBefore="true">
+    <app:commandSortHeader sortProperty="fiscalPayroll.number"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.number']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.personalIdentifier"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.personalIdentifier']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.pensionFundRegistrationCode']}"/>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.name"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.name']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.jobContract.contract.pensionFundOrganization.name"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.pensionFund']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.costCenter']}"/>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.nationality"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.nationality']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.birthday"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.birthday']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.gender"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.gender']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.occupation"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.occupation']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.newnessType"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.newness']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.entranceDate"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.entranceDate']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.workedDays"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.workedDaysInternalPayroll']}"/>
+    </app:commandSortHeader>
+</rich:column>
+
+
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.paidDays"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.workedDays']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.hourDayPayment"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.hourDayPayment']}"/>
+    </app:commandSortHeader>
+</rich:column>
+
+
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.basicAmount"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.basicAmount']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.seniorityYears']}"/>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.seniorityBonus"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.seniorityBonus']}"/>
+    </app:commandSortHeader>
+</rich:column>
+
+
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.extraHour']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.extraHourCost']}"/>
+</rich:column>
+
+
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.productionBonus']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.sundayBonus']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.otherBonus']}"/>
+</rich:column>
+
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.totalGrained"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.totalGrained']}"/>
+    </app:commandSortHeader>
+</rich:column>
+
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.absenceMinutesDiscount']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.tardinessMinutesDiscount']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.loanDiscount']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.advanceDiscount']}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.winDiscount']}"/>
+</rich:column>
+<rich:column>
+    <h:outputFormat value="#{messages['FiscalPayroll.retentionAFP']}">
+        <f:param value="#{payrollGenerationCycleAction.instance.afpRate.rate}"/>
+    </h:outputFormat>
+</rich:column>
+<rich:column>
+    <h:outputFormat value="#{messages['FiscalPayroll.retentionClearance']}">
+        <f:param value="#{payrollGenerationCycleAction.instance.ivaRate.rate}"/>
+    </h:outputFormat>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages['FiscalPayroll.otherDiscount']}"/>
+</rich:column>
+
+
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.totalDiscount"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.totalDiscount']}"/>
+    </app:commandSortHeader>
+</rich:column>
+<rich:column>
+    <app:commandSortHeader sortProperty="fiscalPayroll.liquidPayment"
+                           dataModel="#{fiscalPayrollDataModel}"
+                           reRender="fiscalPayrollDataTable, dataScroller">
+        <h:outputText value="#{messages['FiscalPayroll.liquidPayment']}"/>
+    </app:commandSortHeader>
+</rich:column>
+</rich:columnGroup>
+</f:facet>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.number}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.personalIdentifier}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.jobContract.contract.pensionFundRegistrationCode}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.name}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.jobContract.contract.pensionFundOrganization.name}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.jobContract.job.organizationalUnit.costCenter.code}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.nationality}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.birthday}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                           timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages[fiscalPayrollItem.gender.acronymResourceKey]}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.occupation}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{messages[fiscalPayrollItem.newnessType.resourceKey]}"/>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{fiscalPayrollItem.entranceDate}">
+        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                           timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.workedDays}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.paidDays}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.hourDayPayment}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.basicAmount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.seniorityYears}"/>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.seniorityBonus}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.extraHour}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.extraHourCost}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.productionBonus}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.sundayBonus}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.otherBonus}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.totalGrained}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.absenceMinutesDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.tardinessMinutesDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.loanDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.advanceDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.winDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.retentionAFP}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.retentionClearance}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.otherDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.totalDiscount}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column styleClass="right">
+    <h:outputText value="#{fiscalPayrollItem.liquidPayment}">
+        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="fiscalPayrollDataTable" dataModel="#{fiscalPayrollDataModel}"/>
+</s:div>
+
+<div class="buttons">
+    <h:commandButton action="#{fiscalPayrollDataModel.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="20"
+                     immediate="true"/>
+</div>
+
+</h:form>
+</ui:define>
+</ui:composition>

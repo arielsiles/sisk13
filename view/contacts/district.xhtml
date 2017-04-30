@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{districtAction.managed}">
+                #{messages['District.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['District.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="districtForm">
+            <div class="buttons">
+                <h:commandButton action="#{districtAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!districtAction.managed and s:hasPermission('DISTRICT','CREATE')}"
+                                 id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{districtAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{districtAction.managed and s:hasPermission('DISTRICT','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{districtAction.managed and s:hasPermission('DISTRICT','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{districtAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{districtAction.managed}">
+                            #{messages['District.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['District.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['District.country']}</ui:define>
+                    <h:selectOneMenu id="country" value="#{districtAction.country}" styleClass="input" tabindex="1">
+                        <s:selectItems value="#{countryList.resultList}" var="country" label="#{country.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange" reRender="department, city, zone" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['District.department']}</ui:define>
+                    <h:selectOneMenu id="department" value="#{districtAction.department}" styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{departmentList.resultList}"
+                                       var="department"
+                                       label="#{department.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="city" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['District.city']}</ui:define>
+                    <h:selectOneMenu id="city" value="#{districtAction.city}" styleClass="input" tabindex="3">
+                        <s:selectItems value="#{cityList.resultList}" var="city" label="#{city.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange" reRender="zone" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="zoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['District.zone']}</ui:define>
+                    <h:selectOneMenu id="zone" value="#{district.zone}" styleClass="input" required="true"
+                                     tabindex="4">
+                        <s:selectItems value="#{zoneList.resultList}" var="zone" label="#{zone.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['District.name']}</ui:define>
+                    <h:inputText id="name" value="#{district.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="5"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{districtAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!districtAction.managed and s:hasPermission('DISTRICT','CREATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton action="#{districtAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{districtAction.managed and s:hasPermission('DISTRICT','UPDATE')}"
+                                 tabindex="7"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{districtAction.managed and s:hasPermission('DISTRICT','DELETE')}"
+                                 tabindex="8">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{districtAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="9"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{districtAction.managed and s:hasPermission('DISTRICT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['District.delete.confirmation']}">
+                        <f:param value="#{district.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{districtAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{districtAction.managed and s:hasPermission('DISTRICT','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#country" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

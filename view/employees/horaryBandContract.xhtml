@@ -1,0 +1,272 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{horaryBandContractAction.managed}">
+            #{messages['HoraryBandContract.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['HoraryBandContract.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="horaryBandContractForm">
+
+<div class="buttons">
+    <h:commandButton action="#{horaryBandContractAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{horaryBandContractAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','UPDATE')}"
+                     tabindex="2"/>
+
+    <h:commandButton action="#{horaryBandContractAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="3">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{horaryBandContractAction.managed}">
+                #{messages['HoraryBandContract.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['HoraryBandContract.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <h:panelGroup>
+
+            <app:fieldset id="jobContractFieldset" title="#{messages['HoraryBandContract.jobContract']}">
+                <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['HoraryBandContract.employee']}</ui:define>
+                    <h:inputText required="true" styleClass="input" readonly="true"
+                                 value="#{horaryBandContractAction.changeEmployeeFullName}"
+                                 tabindex="4"/>
+                    <a4j:commandLink id="selectJobContract" ajaxSingle="true" immediate="true"
+                                     title="#{messages['HoraryBandContract.selectJobContract']}"
+                                     onclick="Richfaces.showModalPanel('jobContractListModalPanel');"
+                                     tabindex="5">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{horaryBandContractAction.clearJobContract}"
+                                     reRender="jobContractFieldset, limitField, toleranceField"
+                                     tabindex="6">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+                <s:decorate id="organizationalUnitField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['HoraryBandContract.organizationalUnit']}</ui:define>
+                    <h:inputText id="organizationalUnitFullName" styleClass="input" readonly="true"
+                                 value="#{horaryBandContractAction.organizationalUnitFullName}"
+                                 tabindex="7"/>
+                </s:decorate>
+
+                <s:decorate id="jobField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['HoraryBandContract.job']}</ui:define>
+                    <h:inputText styleClass="input" readonly="true"
+                                 value="#{horaryBandContractAction.jobFullName}"
+                                 tabindex="8"/>
+                </s:decorate>
+            </app:fieldset>
+
+            <app:fieldset id="toleranceFieldset" title="#{messages['HoraryBandContract.tolerance']}">
+
+                <s:decorate id="toleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Tolerance.tolerance']}</ui:define>
+                    <h:selectOneMenu id="tolerance" value="#{horaryBandContract.tolerance}"
+                                     styleClass="input"
+                                     required="true" tabindex="9">
+                        <s:selectItems value="#{toleranceList.resultList}" var="tolerance"
+                                       label="#{functionAction.hourMinuteToString(tolerance.beforeInit)}-#{functionAction.hourMinuteToString(tolerance.beforeEnd)} | #{functionAction.hourMinuteToString(tolerance.afterInit)}-#{functionAction.hourMinuteToString(tolerance.afterEnd)}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="limitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Limit.limit']}</ui:define>
+                    <h:selectOneMenu id="limit" value="#{horaryBandContract.limit}"
+                                     styleClass="input"
+                                     required="true" tabindex="10">
+                        <s:selectItems value="#{limitList.resultList}" var="limit"
+                                       label="#{functionAction.hourMinuteToString(limit.beforeInit)}-#{functionAction.hourMinuteToString(limit.beforeEnd)} | #{functionAction.hourMinuteToString(limit.afterInit)}-#{functionAction.hourMinuteToString(limit.afterEnd)}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </app:fieldset>
+            <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.active']}</ui:define>
+                <h:selectBooleanCheckbox
+                        id="active"
+                        value="#{horaryBandContract.active}"
+
+                        tabindex="11">
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </h:panelGroup>
+
+        <app:fieldset id="horaryFieldset" title="#{messages['HoraryBandContract.horary']}">
+            <s:decorate id="initHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.initHour']}</ui:define>
+
+                <h:inputText id="initHour" value="#{horaryBandContractAction.horaryBand.initHour}" styleClass="input"
+                             required="true"
+                             maxlength="150" tabindex="11">
+                    <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                       timeZone="#{sessionUser.timeZone}" type="time"/>
+                </h:inputText>
+
+            </s:decorate>
+
+            <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.endHour']}</ui:define>
+                <h:inputText id="endHour" value="#{horaryBandContractAction.horaryBand.endHour}" styleClass="input"
+                             required="true"
+                             maxlength="150" tabindex="12">
+                    <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                       timeZone="#{sessionUser.timeZone}" type="time"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="initDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.initDay']}</ui:define>
+                <h:selectOneMenu id="initDay" value="#{horaryBandContractAction.horaryBand.initDay}" styleClass="input"
+                                 required="true"
+                                 tabindex="13">
+                    <s:selectItems value="#{availableDay}" var="ad"
+                                   itemValue="#{messages[ad.resourceKey]}"
+                                   label="#{messages[ad.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="endDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.endDay']}</ui:define>
+                <h:selectOneMenu id="endDay" value="#{horaryBandContractAction.horaryBand.endDay}" styleClass="input"
+                                 required="true" tabindex="14">
+                    <s:selectItems value="#{availableDay}" var="ad"
+                                   itemValue="#{messages[ad.resourceKey]}"
+                                   label="#{messages[ad.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="durationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBand.duration']}</ui:define>
+                <h:inputText id="duration" value="#{horaryBandContractAction.horaryBand.duration}" styleClass="input"
+                             required="true"
+                             maxlength="150" tabindex="15">
+                    <!--<app:naturalNumberConverter/>-->
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="timerTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.timerType']}</ui:define>
+                <h:selectOneMenu id="timeType" value="#{horaryBandContract.timeType}" styleClass="input"
+                                 required="true" tabindex="16">
+                    <s:selectItems value="#{horaryBandTimeTypeEnum}" var="tte"
+                                   itemValue="#{messages[tte.resourceKey]}"
+                                   label="#{messages[tte.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.initDate']}</ui:define>
+                <rich:calendar id="initDate" value="#{horaryBandContract.initDate}" popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               required="true"
+                               enableManualInput="true"
+                               tabindex="17">
+                    <a4j:support event="onchanged" reRender="initDateField,endDateField"/>
+                    <a4j:support event="oninputchange" reRender="initDateField,endDateField"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.endDate']}</ui:define>
+                <rich:calendar id="endDate" value="#{horaryBandContract.endDate}" popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input" required="true"
+                               enableManualInput="true"
+                               tabindex="18">
+                    <app:dateRangeValidator forId="initDate"
+                                            forLabel="#{messages['HoraryBandContract.initDate']}"
+                                            type="greater"/>
+                    <a4j:support event="onchanged" reRender="initDateField,endDateField"/>
+                    <a4j:support event="oninputchange" reRender="initDateField,endDateField"/>
+                </rich:calendar>
+            </s:decorate>
+        </app:fieldset>
+    </h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{horaryBandContractAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','CREATE')}"
+                     tabindex="19">
+    </h:commandButton>
+
+    <h:commandButton action="#{horaryBandContractAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','UPDATE')}"
+                     tabindex="20"/>
+
+    <h:commandButton action="#{horaryBandContractAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="21">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate id="jobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{horaryBandContractAction.assignJobContract(jobContractItem)}"
+                           image="/img/active.gif" style="border:0" ajaxSingle="true"
+                           reRender="jobContractFieldset, limitField, toleranceField"
+                           tabindex="1000"/>
+        <rich:componentControl for="jobContractListModalPanel" attachTo="assignButton"
+                               operation="hide" event="onclick"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#selectJobContract" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

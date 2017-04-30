@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperTemplate PUBLIC "-//JasperReports//DTD Template//EN" "http://jasperreports.sourceforge.net/dtds/jaspertemplate.dtd">
+
+<jasperTemplate>
+	<style name="titleStyle" isDefault="true" fontName="Verdana" fontSize="20" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
+	<style name="tinyTitleStyle" isDefault="true" fontName="Verdana" fontSize="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
+	<style name="detailStyle" isDefault="true" fontName="Verdana" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana" isPdfEmbedded="true">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="headerStyle" isDefault="true" backcolor="#C0C0C0" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="headerStyleBlank" isDefault="true" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+	<style name="totalStyle" isDefault="true" backcolor="#E0DFDF" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
+</jasperTemplate>

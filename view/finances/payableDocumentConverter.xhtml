@@ -1,0 +1,545 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['PayableDocumentConverter.title']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="payableDocumentConverterForm">
+
+<div class="buttons">
+    <h:commandButton value="#{messages['PayableDocumentConverter.convert']}"
+                     styleClass="button"
+                     action="#{payableDocumentConverterAction.convertToPayableDocument}"
+                     onclick="Richfaces.showModalPanel('progressModalPanel');"/>
+    <h:commandButton action="#{payableDocumentConverterAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['PayableDocumentConverter.title']}
+</f:facet>
+
+<s:div id="payablesDocumentInfo">
+    <app:fieldset id="payablesDocumentFieldset"
+                  title="#{messages['PayableDocumentConverter.payableDocumentInfo']}">
+        <h:panelGrid id="payablesDocumentData" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocument.provider']}</ui:define>
+                    <app:quickSearch id="quickSearchProvider"
+                                     textValue="payableDocumentConverter.provider.providerCode"
+                                     value="#{payableDocumentConverter.provider}"
+                                     postSearchAction="payableDocumentConverterAction.updateProviderInfo()"
+                                     searchField="providerCode"
+                                     alias="provider"
+                                     reRender="payablesDocumentInfo"
+                                     tabindex="1"/>
+                    <app:selectPopUp id="provider"
+                                     textValue="#{payableDocumentConverter.provider.fullName}"
+                                     value="#{payableDocumentConverter.provider}"
+                                     clearAction="payableDocumentConverterAction.clearProvider()"
+                                     searchModalPanel="providerListModalPanel"
+                                     dataModel="#{providerDataModel}"
+                                     reRender="payablesDocumentInfo"
+                                     hotKeySelect="alt+1"
+                                     tabindex="2"/>
+                </s:decorate>
+                <s:decorate id="payableAccountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocument.payableAccount']}</ui:define>
+                    <app:quickSearch id="quickSearchPayableAccount"
+                                     textValue="payableDocumentConverter.payableAccount.accountCode"
+                                     value="#{payableDocumentConverter.payableAccount}"
+                                     searchField="accountCode"
+                                     alias="cashAccount"
+                                     reRender="payableAccountField"
+                                     tabindex="3"/>
+                    <app:selectPopUp id="payableAccount"
+                                     textValue="#{payableDocumentConverter.payableAccount.fullName}"
+                                     value="#{payableDocumentConverter.payableAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="payableDocumentConverterAction.clearPayableAccount()"
+                                     searchModalPanel="payableCashAccountListModalPanel"
+                                     reRender="payableAccountField"
+                                     hotKeySelect="alt+2"
+                                     tabindex="4"/>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocument.documentType']}</ui:define>
+                    <app:quickSearch id="quickSearchDocumentType"
+                                     textValue="payableDocumentConverter.documentType.documentType"
+                                     value="#{payableDocumentConverter.documentType}"
+                                     searchField="documentType"
+                                     alias="payableDocumentType"
+                                     reRender="documentTypeField"
+                                     tabindex="5">
+                        <ui:define name="restrictions">
+                            <app:restriction
+                                    condition="payableDocumentType.movementType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinanceMovementType','C')}"/>
+                            <app:restriction
+                                    condition="payableDocumentType.documentClass=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentClass','OTR')}"/>
+                            <app:restriction
+                                    condition="payableDocumentType.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentTypeState','VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <h:selectOneMenu id="documentType"
+                                     value="#{payableDocumentConverter.documentType}"
+                                     styleClass="input"
+                                     tabindex="6">
+                        <s:selectItems value="#{creditOtherPayableDocumentTypeList}" var="payableDocumentType"
+                                       label="#{payableDocumentType.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support ajaxSingle="true"
+                                     event="onchange"
+                                     reRender="documentTypeField"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+
+<s:div id="generalFilters">
+    <app:fieldset id="generalFiltersFieldset"
+                  title="#{messages['PayableDocumentConverter.generalFilters']}">
+        <h:panelGrid id="generalFiltersInfo" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="converterTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.converterType']}</ui:define>
+                    <h:selectOneMenu id="converterType"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.converterType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{payableDocumentSourceTypeEnumList}"
+                                       var="item"
+                                       label="#{messages[item.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support ajaxSingle="true"
+                                     event="onchange"
+                                     reRender="generalFilters, customFiltersPanel"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.businessUnit']}</ui:define>
+                    <h:selectOneMenu id="businessUnit"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.businessUnit}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="7">
+                        <s:selectItems value="#{sedeList}"
+                                       var="sede"
+                                       label="#{sede.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.costCenter']}</ui:define>
+                    <app:selectPopUp id="costCenter"
+                                     styleClass="input"
+                                     textValue="#{accountingMovementDataModelForPayableDocumentConverter.costCenter.fullName}"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.costCenter}"
+                                     clearAction="accountingMovementDataModelForPayableDocumentConverter.clearCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="costCenterField"
+                                     hotKeySelect="alt+3"
+                                     tabindex="8"/>
+                </s:decorate>
+                <s:decorate id="cashAccountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.cashAccount']}</ui:define>
+                    <app:selectPopUp id="cashAccount"
+                                     styleClass="input"
+                                     textValue="#{accountingMovementDataModelForPayableDocumentConverter.cashAccount.fullName}"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.cashAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="accountingMovementDataModelForPayableDocumentConverter.clearCashAccount()"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     reRender="cashAccountField"
+                                     hotKeySelect="alt+4"
+                                     tabindex="8"/>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingMovement.gloss']}</ui:define>
+                    <h:inputText id="gloss"
+                                 value="#{accountingMovementDataModelForPayableDocumentConverter.gloss}"
+                                 styleClass="input"
+                                 tabindex="9"/>
+                </s:decorate>
+                <s:decorate id="recordDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingMovement.recordDate']}</ui:define>
+                    <h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" columnClasses="top,top,top,top">
+                        <h:outputLabel value="#{messages['Common.from']}" styleClass="spacer"/>
+                        <s:decorate template="/include/validateField.xhtml">
+                            <rich:calendar
+                                    value="#{accountingMovementDataModelForPayableDocumentConverter.movementStartDate}"
+                                    datePattern="#{messages['patterns.date']}"
+                                    enableManualInput="true"
+                                    inputClass="inputSmall"
+                                    tabindex="10"/>
+                        </s:decorate>
+                        <h:outputLabel value="#{messages['Common.to']}" styleClass="spacer"/>
+                        <s:decorate id="retentionFlagField" template="/include/validateField.xhtml">
+                            <rich:calendar
+                                    value="#{accountingMovementDataModelForPayableDocumentConverter.movementEndDate}"
+                                    datePattern="#{messages['patterns.date']}"
+                                    enableManualInput="true"
+                                    inputClass="inputSmall"
+                                    tabindex="10"/>
+                        </s:decorate>
+                    </h:panelGrid>
+                </s:decorate>
+                <s:decorate id="createDateField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountingMovement.createDate']}</ui:define>
+                    <h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" columnClasses="top,top,top,top">
+                        <h:outputLabel value="#{messages['Common.from']}" styleClass="spacer"/>
+                        <s:decorate template="/include/validateField.xhtml">
+                            <rich:calendar
+                                    value="#{accountingMovementDataModelForPayableDocumentConverter.createStartDate}"
+                                    datePattern="#{messages['patterns.date']}"
+                                    enableManualInput="true"
+                                    inputClass="inputSmall"
+                                    tabindex="11"/>
+                        </s:decorate>
+                        <h:outputLabel value="#{messages['Common.to']}" styleClass="spacer"/>
+                        <s:decorate id="retentionFlagField" template="/include/validateField.xhtml">
+                            <rich:calendar
+                                    value="#{accountingMovementDataModelForPayableDocumentConverter.createEndDate}"
+                                    datePattern="#{messages['patterns.date']}"
+                                    enableManualInput="true"
+                                    inputClass="inputSmall"
+                                    tabindex="11"/>
+                        </s:decorate>
+                    </h:panelGrid>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+<s:div id="customFiltersPanel">
+    <app:fieldset id="hhrrFilters"
+                  title="#{messages['PayableDocumentConverter.hhrrFilters']}"
+                  rendered="#{accountingMovementDataModelForPayableDocumentConverter.isHHRRConverterType}">
+        <h:panelGrid id="hhrrFiltersInfo" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.jobCategory']}</ui:define>
+                    <h:selectOneMenu id="jobCategory"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.jobCategory}"
+                                     styleClass="input"
+                                     tabindex="13">
+                        <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                       label="#{jobCategory.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.generatedDate']}</ui:define>
+                    <rich:calendar id="initDate"
+                                   value="#{accountingMovementDataModelForPayableDocumentConverter.generatedDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="14">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate id="gestionPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.gestionPayrollType']}</ui:define>
+                    <h:selectOneMenu id="gestionPayrollType"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.gestionPayrollType}"
+                                     styleClass="input"
+                                     tabindex="15">
+                        <s:selectItems value="#{gestionPayrollTypeEnum}" var="gestionPayrollType"
+                                       label="#{messages[gestionPayrollType.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.gestion}"
+                                     styleClass="input"
+                                     tabindex="16">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.month']}</ui:define>
+                    <h:selectOneMenu id="month"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.month}"
+                                     styleClass="input"
+                                     tabindex="17">
+                        <s:selectItems value="#{monthEnum}" var="month"
+                                       label="#{messages[month.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+    <app:fieldset id="purchaseOrderFilters"
+                  title="#{messages['PayableDocumentConverter.purchaseOrderFilters']}"
+                  rendered="#{accountingMovementDataModelForPayableDocumentConverter.isPurchaseOrderConverterType}">
+        <h:panelGrid id="purchaseOrderFiltersInfo" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['PayableDocumentConverter.purchaseOrderType']}"/>
+                    </ui:define>
+                    <h:selectOneMenu id="orderType"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.purchaseOrderType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="18">
+                        <s:selectItems value="#{purchaseOrderTypeEnum}"
+                                       var="purchaseOrderType"
+                                       label="#{messages[purchaseOrderType.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="purchaseOrderNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PayableDocumentConverter.purchaseOrderNumber']}</ui:define>
+                    <h:inputText id="purchaseOrderNumber"
+                                 value="#{accountingMovementDataModelForPayableDocumentConverter.purchaseOrderNumber}"
+                                 styleClass="input"
+                                 tabindex="18"/>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['PayableDocumentConverter.consumeMoth']}"/>
+                    </ui:define>
+                    <h:selectOneMenu id="consumeMonth"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.consumeMonth}"
+                                     styleClass="input"
+                                     tabindex="19">
+                        <s:selectItems value="#{month}"
+                                       var="month"
+                                       label="#{messages[month.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+</s:div>
+
+<div class="buttons">
+    <a4j:commandButton id="searchButton"
+                       value="#{messages['Common.search']}"
+                       styleClass="button"
+                       action="#{accountingMovementDataModelForPayableDocumentConverter.search}"
+                       tabindex="20"
+                       reRender="generalFilters, customFiltersPanel, accountingMovementListContainer"/>
+</div>
+
+<s:div id="accountingMovementListContainer">
+
+
+    <rich:dataTable value="#{accountingMovementDataModelForPayableDocumentConverter}" var="accountingMovementItem"
+                    rows="10000000"
+                    id="accountingMovementList" width="100%" columnsWidth="5%,5%,15%,9%,9%,30%,9%,9%,9%"
+                    rendered="#{accountingMovementDataModelForPayableDocumentConverter.active}">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    #{messages['PayableDocumentConverter.selectPayableDocument']}
+                </rich:column>
+                <rich:column>
+                    #{messages['PayableDocumentConverter.selectPayments']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.voucherNumber']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.recordDate']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.createDate']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.gloss']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.sourceModule']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.userNumber']}
+                </rich:column>
+                <rich:column>
+                    #{messages['AccountingMovement.amount']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column>
+            <h:selectBooleanCheckbox id="selectedForPayableAccount"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.selectedForPayableAccount[accountingMovementItem]}"
+                                     rendered="#{accountingMovementItem.transferenceVoucher}">
+                <a4j:support event="onchange" ajaxSingle="true"
+                             reRender="selectedForPayableAccount"/>
+            </h:selectBooleanCheckbox>
+        </rich:column>
+        <rich:column>
+            <h:selectBooleanCheckbox id="selectedForPayments"
+                                     value="#{accountingMovementDataModelForPayableDocumentConverter.selectedForPayments[accountingMovementItem]}">
+                <a4j:support event="onchange" ajaxSingle="true"
+                             reRender="selectedForPayments"/>
+            </h:selectBooleanCheckbox>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.fullName}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.recordDate}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.createDate}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.gloss}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.sourceModule}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{accountingMovementItem.userNumber}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{accountingMovementItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="accountingMovementDataScroller"
+                      for="accountingMovementList"
+                      dataModel="#{accountingMovementDataModelForPayableDocumentConverter}"
+                      rendered="#{accountingMovementDataModelForPayableDocumentConverter.active}"/>
+</s:div>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton value="#{messages['PayableDocumentConverter.convert']}"
+                     styleClass="button"
+                     action="#{payableDocumentConverterAction.convertToPayableDocument}"
+                     onclick="Richfaces.showModalPanel('progressModalPanel');"/>
+    <h:commandButton action="#{payableDocumentConverterAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+</h:form>
+
+
+<s:decorate id="progressDialog" template="/include/progressDialog.xhtml"
+            rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+    <ui:param name="dialogId" value="progressModalPanel"/>
+    <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+    <ui:define name="progressTitle">#{messages['PayableDocumentConverter.processTitle']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['PayableDocumentConverter.processMessage']}"/>
+        </p>
+    </ui:define>
+</s:decorate>
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{accountingMovementDataModelForPayableDocumentConverter.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{payableDocumentConverterAction.assignProvider(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="payablesDocumentInfo"
+                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="payableCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="payableCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="payableCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{payableDocumentConverterAction.assignPayableAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="payableAccountField"
+                           oncomplete="Richfaces.hideModalPanel('payableCashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{accountingMovementDataModelForPayableDocumentConverter.assignCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashAccountField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

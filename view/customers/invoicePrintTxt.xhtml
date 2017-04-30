@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+
+    <f:view>
+        <h:outputText value="ICNorte S.A."/> <br/>
+        <h:outputText value="Av. Melchor Perez de olguin "/> <br/>
+        <h:outputText value="Cbba - Bolivia"/> <br/>
+
+
+        <h:outputText value="FACTURA" style="font-size: 12; align:right"/> <br/>
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+        <h:outputText> #{messages['Entity.idNumber']}: 1111111111111</h:outputText> <br/>
+        <h:outputText value="#{messages['Invoice.number']}: #{invoicePrintAction.invoice.number}"/> <br/>
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+
+        <h:outputText value="#{messages['Invoice.date']}: "/>
+        <h:outputText value="#{invoicePrintAction.invoice.creationDate}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText> <br/>
+
+
+        <c:choose>
+            <c:when test="#{empty invoicePrintAction.invoice.organizationName}">
+                <h:outputText
+                        value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.lastName} #{invoicePrintAction.invoice.maidenName} #{invoicePrintAction.invoice.firstName}"/>
+                <br/>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.organizationName}"/>
+                <br/>
+            </c:otherwise>
+        </c:choose>
+
+
+        <h:outputText
+                value="#{messages['Entity.idNumber']}: #{invoicePrintAction.invoice.customer.entity.idNumber}"/> <br/>
+
+
+        <h:outputText>---------------------------------------------</h:outputText> <br/>
+
+        <!-- prueba para hacer un data table sin columnas -->
+        <h:dataTable value="#{invoicePrintAction.invoice.details}" var="detail">
+            <h:column>
+                <f:facet name="header"><h:outputText>
+                    $#{messages['InvoiceDetail.quantity']}$#{messages['InvoiceDetail.product.name']}$#{messages['InvoiceDetail.price']}$#{messages['InvoiceDetail.totalAmount']}$</h:outputText></f:facet>
+                <h:outputText style="text-align:right;">|#{detail.quantity}|</h:outputText>
+                <h:outputText>#{detail.product.name}|</h:outputText>
+                <h:outputText value="#{detail.price}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText value="#{detail.totalAmount}|">|
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </h:column>
+        </h:dataTable>
+        <br/>
+
+        <h:outputText>---------------------------------------------</h:outputText>
+        <h:dataTable value="#{invoicePrintAction.invoice.details}" var="detail" cellpadding="4">
+            <f:facet name="footer">
+                <h:column>
+                    <h:outputText> #{messages['Invoice.totalSum']} Bs.: ------------------->
+                        <h:outputText value="#{invoicePrintAction.invoice.totalAmount}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </h:outputText>
+                </h:column>
+            </f:facet>
+        </h:dataTable>
+    </f:view>
+
+
+</ui:composition>
+

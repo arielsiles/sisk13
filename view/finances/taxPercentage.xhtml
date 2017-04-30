@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{taxPercentageAction.managed}">
+                #{messages['TaxPercentage.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['TaxPercentage.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="taxPercentageForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{taxPercentageAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!taxPercentageAction.managed}" id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{taxPercentageAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{taxPercentageAction.managed}"
+                                 id="updateButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{taxPercentageAction.managed}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{taxPercentageAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{taxPercentageAction.managed}">
+                            #{messages['TaxPercentage.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['TaxPercentage.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="taxPercentageTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['TaxPercentage.taxPercentageType']}</ui:define>
+                    <h:selectOneMenu id="taxPercentageType" value="#{taxPercentage.taxPercentageType}"
+                                     styleClass="input"
+                                     required="true" tabindex="1">
+                        <s:selectItems value="#{taxPercentageTypeList.resultList}" var="taxPercentageType"
+                                       label="#{taxPercentageType.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="percentageField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['TaxPercentage.percentage']}</ui:define>
+                    <h:inputText id="percentage" value="#{taxPercentage.percentage}" required="true"
+                                 maxlength="40" tabindex="2" styleClass="input">
+                        <app:realNumberConverter minimum="0.0" maximum="100.0" forId="percentage"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['TaxPercentage.description']}</ui:define>
+                    <h:inputTextarea id="descriptionBU" value="#{taxPercentage.description}" styleClass="input textarea"
+                                     tabindex="3"/>
+                </s:decorate>
+            </rich:panel>
+
+
+            <div class="buttons">
+                <h:commandButton action="#{taxPercentageAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!taxPercentageAction.managed}"
+                                 tabindex="4"/>
+                <h:commandButton action="#{taxPercentageAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{taxPercentageAction.managed}"
+                                 tabindex="5"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{taxPercentageAction.managed}"
+                                 tabindex="6">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{taxPercentageAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="7"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{taxPercentageAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['TaxPercentage.delete.confirmation']}">
+                        <f:param value="#{taxPercentage.taxPercentageType.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{taxPercentageAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

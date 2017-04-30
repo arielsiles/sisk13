@@ -1,0 +1,186 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <h:outputText
+                value="#{dismissalRuleAction.managed?messages['DismissalRule.edit']:messages['DismissalRule.new']}"/>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="dismissalRuleForm">
+
+            <ui:include src="dismissalRuleFormButtons.xhtml">
+                <ui:param name="formLocation" value="Top"/>
+                <ui:param name="default" value="${true}"/>
+            </ui:include>
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{dismissalRuleAction.managed?messages['DismissalRule.edit']:messages['DismissalRule.new']}"/>
+                </f:facet>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dismissalRuleAction.managed}">
+                    <ui:define name="label">#{messages['DismissalRule.code']}</ui:define>
+                    <h:outputText id="code" value="#{dismissalRule.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{dismissalRule.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="250"
+                                 tabindex="1"/>
+                </s:decorate>
+                <s:decorate id="dismissalRuleTypeField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.dismissalRuleType']}</ui:define>
+                    <h:selectOneMenu id="dismissalRuleType"
+                                     value="#{dismissalRule.dismissalRuleType}"
+                                     styleClass="inputMedium"
+                                     required="true"
+                                     tabindex="2">
+                        <s:selectItems value="#{dismissalRuleTypeEnum}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange"
+                                     reRender="dismissalRuleTypeField, ocurrenceField "
+                                     ajaxSingle="true"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="amountTypeField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.amountType']}</ui:define>
+                    <h:selectOneMenu id="amountType"
+                                     value="#{dismissalRule.amountType}"
+                                     styleClass="inputMedium"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{amountTypeEnum}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                        <a4j:support event="onchange"
+                                     action="#{dismissalRuleAction.amountTypeChanged()}"
+                                     reRender="amountTypeField, currencyDiv, amountDiv "
+                                     ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:div id="currencyDiv">
+                    <s:decorate id="currencyField" template="/include/inputField.xhtml"
+                                rendered="#{dismissalRuleAction.fixed}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['DismissalRule.currency']}</ui:define>
+                        <h:selectOneMenu id="currency"
+                                         value="#{dismissalRule.currency}"
+                                         styleClass="inputMedium"
+                                         required="true"
+                                         tabindex="4">
+                            <s:selectItems value="#{basicFinancesCurrencies}"
+                                           var="element"
+                                           label="#{messages[element.resourceKey]} (#{messages[element.symbolResourceKey]})"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                            <a4j:support event="onchange"
+                                         reRender="currencyField, amountField "
+                                         ajaxSingle="true"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </s:div>
+                <s:div id="amountDiv">
+                    <s:decorate id="amountField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['DismissalRule.amount']}</ui:define>
+                        <h:inputText id="amount"
+                                     value="#{dismissalRule.amount}"
+                                     required="true"
+                                     styleClass="inputMedium right"
+                                     tabindex="5">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" minimum="0.01"
+                                                     forId="amount"/>
+                        </h:inputText>
+                        <h:outputFormat rendered="#{dismissalRuleAction.fixed and not empty dismissalRule.currency}"
+                                        value="#{messages['Common.parenthesis']}">
+                            <f:param value="#{messages[dismissalRule.currency.symbolResourceKey]}"/>
+                        </h:outputFormat>
+                        <h:outputFormat rendered="#{dismissalRuleAction.percentage}"
+                                        value="#{messages['Common.parenthesis']}">
+                            <f:param value="#{messages['Common.percentageSymbol']}"/>
+                        </h:outputFormat>
+                    </s:decorate>
+                </s:div>
+                <s:decorate id="ocurrenceField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.ocurrence']}</ui:define>
+                    <h:inputText id="ocurrence"
+                                 value="#{dismissalRule.ocurrence}"
+                                 required="true"
+                                 styleClass="inputMedium right"
+                                 tabindex="6">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}" minimum="0"
+                                                    forId="ocurrence"/>
+                    </h:inputText>
+                    <h:outputFormat rendered="#{not empty dismissalRule.dismissalRuleType}"
+                                    value="#{messages['Common.parenthesis']}">
+                        <f:param value="#{messages[dismissalRule.dismissalRuleType.unitResourceKey]}"/>
+                    </h:outputFormat>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{dismissalRule.description}"
+                                     styleClass="input textarea"
+                                     tabindex="7">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
+                </s:decorate>
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalRule.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active"
+                                             value="#{dismissalRule.active}"
+                                             tabindex="8"/>
+                </s:decorate>
+            </rich:panel>
+
+            <ui:include src="dismissalRuleFormButtons.xhtml">
+                <ui:param name="formLocation" value="Button"/>
+            </ui:include>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dismissalRuleAction.managed and s:hasPermission('DISMISSALRULE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DismissalRule.delete.confirmation']}">
+                        <f:param value="#{dismissalRule.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dismissalRuleAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

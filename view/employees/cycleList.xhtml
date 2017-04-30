@@ -1,0 +1,182 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Cycle.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="cycleSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Cycle.search']}" switchType="client">
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Cycle.name']}</ui:define>
+                    <h:inputText id="name" value="#{cycleDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="cycleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Cycle.cycleType']}</ui:define>
+                    <h:selectOneMenu id="cycleType" styleClass="input"
+                                     tabindex="2"
+                                     value="#{cycleDataModel.criteria.cycleType}">
+                        <s:selectItems value="#{cycleTypeList}" var="cycleType"
+                                       label="#{cycleType.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <a4j:support event="onchange" ajaxSingle="true"
+                                     reRender="cycleTypeField"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Cycle.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion" styleClass="input"
+                                     tabindex="2"
+                                     value="#{cycleDataModel.criteria.gestion}">
+                        <s:selectItems value="#{gestionList}" var="gestion"
+                                       label="#{gestion.year}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <a4j:support event="onchange" ajaxSingle="true"
+                                     reRender="gestionField"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <a4j:commandButton action="#{cycleDataModel.search}" reRender="cycleList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/cycle.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('CYCLE','CREATE')}"
+                          propagation="none"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable value="#{cycleDataModel}" var="cycleItem" id="cycleList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%, 10%, 15%, 15%, 18%, 18%,7%, 7%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.cycleType.sector"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['CycleType.sector']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.gestion"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.gestion']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.cycleType"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.cycleType']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.name"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.startDate"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.startDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.endDate"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.endDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="cycle.active"
+                                                   dataModel="#{cycleDataModel}"
+                                                   reRender="cycleList, dataScroller">
+                                #{messages['Cycle.active']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.cycleType.sector.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.gestion.year}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.cycleType.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.startDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{cycleItem.endDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:graphicImage value="/img/active.gif" styleClass="select-image-middle"
+                                    rendered="#{cycleItem.active}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('CYCLE','VIEW')}"
+                                   action="#{cycleAction.select(cycleItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="cycleList" dataModel="#{cycleDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/cycle.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('CYCLE','CREATE')}"
+                          propagation="none"
+                          tabindex="6"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

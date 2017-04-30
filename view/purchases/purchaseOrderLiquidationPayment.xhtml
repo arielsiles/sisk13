@@ -1,0 +1,287 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:c="http://java.sun.com/jstl/core"
+              xmlns:rich="http://richfaces.org/rich"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              template="/layout/template.xhtml"
+              id="fixedAssetPaymentFieldset"
+              title="#{messages['PurchaseOrderPayment.paymentDetail']}">
+<a4j:region>
+<s:div id="globalDiv">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div>
+    <s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.paymentType']}</ui:define>
+        <h:selectOneMenu id="paymentType"
+                         value="#{liquidationPaymentAction.liquidationPayment.paymentType}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="1000">
+            <s:selectItems value="#{purchaseOrderPaymentTypeEnum}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         action="#{liquidationPaymentAction.paymentTypeChanged()}"
+                         reRender="beneficiaryPanel, cashBoxCashAccountDiv, checkDestinationDiv, bankDiv, calculatedAmountDiv, exchangeRatePanel, rotatoryFundDiv, rotatoryFundListModalPanelDiv,purchaseOrdersWithCheckList"
+                         ajaxSingle="true"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:div id="beneficiaryPanel">
+        <s:fragment rendered="#{liquidationPaymentAction.enableBeneficiaryFields}">
+            <s:decorate id="beneficiaryNameField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrderPayment.beneficiaryName']}</ui:define>
+                <h:inputText id="beneficiaryName"
+                             value="#{liquidationPaymentAction.liquidationPayment.beneficiaryName}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="200"
+                             tabindex="1001"/>
+            </s:decorate>
+
+            <s:decorate id="beneficiaryTypeField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseOrderPayment.beneficiaryType']}</ui:define>
+                <h:selectOneRadio value="#{liquidationPaymentAction.liquidationPayment.beneficiaryType}"
+                                  layout="lineDirection">
+                    <s:selectItems value="#{beneficiaryTypes}"
+                                   var="element"
+                                   label="#{messages[element.resourceKey]}"/>
+                    <s:convertEnum/>
+                </h:selectOneRadio>
+            </s:decorate>
+        </s:fragment>
+    </s:div>
+    <s:div id="checkDestinationDiv">
+        <s:decorate id="checkDestinationField" template="/include/inputField.xhtml"
+                    rendered="#{liquidationPaymentAction.checkPayment}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['RotatoryFund.checkDestination']}</ui:define>
+            <ui:param name="validateId" value="executorUnit"/>
+            <app:quickSearch id="quickSearchCheckDestination"
+                             textValue="liquidationPaymentAction.liquidationPayment.checkDestination.executorUnitCode"
+                             value="#{liquidationPaymentAction.liquidationPayment.checkDestination}"
+                             searchField="executorUnitCode"
+                             reRender="checkDestinationField"
+                             tabindex="15"/>
+            <h:selectOneMenu id="executorUnit"
+                             value="#{liquidationPaymentAction.liquidationPayment.checkDestination}"
+                             styleClass="inputMedium"
+                             required="true">
+                <s:selectItems value="#{businessUnitList}"
+                               var="businessUnit"
+                               label="#{businessUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             reRender="checkDestinationField"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+    <s:div id="bankDiv">
+        <s:decorate id="bankAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.enableBankAccount}">
+            <ui:define name="label">#{messages['PurchaseOrderPayment.bankAccount']}</ui:define>
+            <h:selectOneMenu id="bankAccount"
+                             value="#{liquidationPaymentAction.liquidationPayment.bankAccount}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="1002">
+                <s:selectItems value="#{financesBankAccountList}"
+                               var="element"
+                               label="#{element.description} #{messages[element.currency.symbolResourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             reRender="sourceCurrencyDiv, exchangeRatePanel, payCurrencyField, payAmountField,purchaseOrderWithCheckPanel"
+                             action="#{liquidationPaymentAction.accountChanged}"
+                             ajaxSingle="true"
+                             oncomplete="document.getElementById('#{rich:clientId(payAmountId)}').focus();"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+    <s:div id="cashBoxCashAccountDiv">
+        <s:decorate id="cashBoxCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.cashBoxPayment}">
+            <ui:define name="label">#{messages['RotatoryFundPayment.cashBoxCashAccount']}</ui:define>
+            <app:selectPopUp id="cashBoxCashAccount"
+                             required="true"
+                             textValue="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount.fullName}"
+                             value="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="liquidationPaymentAction.clearCashBoxCashAccount()"
+                             searchModalPanel="cashBoxCashAccountListModalPanel"
+                             reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                             hotKeySelect="alt+3"
+                             tabindex="1003">
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="rotatoryFundDiv">
+        <s:decorate id="rotatoryFundField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.rotatoryFundPayment}">
+            <ui:define name="label">#{messages['PurchaseOrderPayment.rotatoryFund']}</ui:define>
+            <app:selectPopUp id="rotatoryFund"
+                             required="true"
+                             textValue="#{liquidationPaymentAction.liquidationPayment.rotatoryFund.fullName}"
+                             value="#{liquidationPaymentAction.liquidationPayment.rotatoryFund}"
+                             dataModel="#{rotatoryFundDataModel}"
+                             clearAction="liquidationPaymentAction.clearRotatoryFund()"
+                             searchModalPanel="rotatoryFundListModalPanel"
+                             reRender="rotatoryFundField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                             hotKeySelect="alt+3"
+                             tabindex="1003">
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="exchangeRatePanel">
+        <s:decorate id="exchangeRateField"
+                    template="/include/inputField.xhtml"
+                    rendered="#{liquidationPaymentAction.enableExchangeRateField}"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseOrderPayment.exchangeRate']}</ui:define>
+            <h:inputText id="exchangeRate"
+                         value="#{liquidationPaymentAction.liquidationPayment.exchangeRate}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="1004">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="exchangeRate"/>
+            </h:inputText>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="calculatedAmountDiv">
+        <s:decorate id="sourceAmountField"
+                    template="/include/viewField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{not empty liquidationPaymentAction.liquidationPayment.sourceAmount}">
+            <ui:define name="label">
+                <c:choose>
+                    <c:when test="#{liquidationPaymentAction.checkPayment}">
+                        #{messages['PurchaseOrderPayment.sourceCheckAmount']}
+                    </c:when>
+                    <c:when test="#{liquidationPaymentAction.bankPayment}">
+                        #{messages['PurchaseOrderPayment.sourceBankAmount']}
+                    </c:when>
+                    <c:when test="#{liquidationPaymentAction.cashBoxPayment}">
+                        #{messages['PurchaseOrderPayment.sourceCashBoxAmount']}
+                    </c:when>
+                    <c:when test="#{liquidationPaymentAction.rotatoryFundPayment}">
+                        #{messages['PurchaseOrderPayment.sourceRotatoryFundAmount']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['PurchaseOrderPayment.amount']}
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+
+            <ui:param name="required" value="false"/>
+            <h:outputText value="#{liquidationPaymentAction.liquidationPayment.sourceAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputText
+                    value="#{messages[liquidationPaymentAction.liquidationPayment.sourceCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+    </s:div>
+</s:div>
+<s:div>
+    <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.description']}</ui:define>
+        <h:inputTextarea id="description"
+                         value="#{liquidationPaymentAction.liquidationPayment.description}"
+                         styleClass="input textarea"
+                         required="true"
+                         tabindex="1005">
+            <f:validateLength maximum="1000"/>
+        </h:inputTextarea>
+    </s:decorate>
+    <s:decorate id="computePaymentButton"
+                template="/include/viewField.xhtml"
+                styleClass="formRow">
+        <ui:param name="required" value="falmse"/>
+        <a4j:commandButton id="calculatePayentValues"
+                           action="#{liquidationPaymentAction.computePayment(mainAction.currentBalanceAmount)}"
+                           value="#{messages['PurchaseOrderPayment.computePayment']}"
+                           styleClass="button"
+                           ajaxSingle="false"
+                           immediate="false"
+                           reRender="globalDiv"
+                           tabindex="1006"/>
+    </s:decorate>
+</s:div>
+<s:div id="purchaseOrdersWithCheckList">
+
+    <ui:include src="/warehouse/warehousePurchaseOrderWithCheckListCreate.xhtml"/>
+    <!--<rich:dataTable value="#{warehousePurchaseOrderDataModel}"
+                    var="purchaseOrderItem"
+                    id="purchaseOrderWithCheckList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    rendered="#{liquidationPaymentAction.checkPayment}"
+                    width="100%"
+                    >
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.orderNumber']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.invoiceNumber']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.date']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.responsible']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.provider']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.warehouse']}
+                </rich:column>
+                <rich:column>
+                        #{messages['WarehousePurchaseOrder.state']}
+                </rich:column>
+                <rich:column styleClass="center">
+                    #{messages['Common.action']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+
+    </rich:dataTable>-->
+</s:div>
+</h:panelGrid>
+</s:div>
+</a4j:region>
+</app:fieldset>

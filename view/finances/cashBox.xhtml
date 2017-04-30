@@ -1,0 +1,166 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{cashBoxAction.managed}">
+                #{messages['CashBox.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CashBox.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="cashBoxForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{cashBoxAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!cashBoxAction.managed}" id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}"
+                                 id="updateButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxAction.selectUserCashBox}" value="#{messages['CashBox.assignUser']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{cashBoxAction.managed}">
+                            #{messages['CashBox.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CashBox.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBox.description']}</ui:define>
+                    <h:inputText id="name" value="#{cashBox.description}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1"/>
+                </s:decorate>
+                <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBox.type']}</ui:define>
+                    <h:selectOneMenu id="type" value="#{cashBox.type}" styleClass="input" tabindex="2"
+                                     required="true">
+                        <s:selectItems value="#{cashBoxTypeList.resultList}" var="type" label="#{type.name}"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBox.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{cashBox.state}" styleClass="input" tabindex="3"
+                                     required="true">
+                        <s:selectItems value="#{cashBoxState}" var="state" label="#{messages[state.resourceKey]}"/>
+                        <a4j:support event="onchange" reRender="stateDateField, closingDateField, openingDateField"
+                                     ajaxSingle="true"
+                                     action="#{cashBoxAction.changeState(cashBox.state)}"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="authorizationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBox.requiredAuthorization']}</ui:define>
+                    <h:selectOneRadio id="authorization" value="#{cashBox.requiredAuthorization}" layout="pageDirection"
+                                      required="true"
+                                      tabindex="4">
+                        <f:selectItem itemValue="true" itemLabel="#{messages['CashBox.requiredAuthorization.yes']}"/>
+                        <f:selectItem itemValue="false" itemLabel="#{messages['CashBox.requiredAuthorization.no']}"/>
+                    </h:selectOneRadio>
+                </s:decorate>
+                <s:decorate template="/include/viewField.xhtml" rendered="#{cashBoxAction.managed}"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['CashBox.createdOn']}</ui:define>
+                    <h:outputText value="#{cashBox.creationDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="stateDateField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{cashBoxAction.managed}">
+                    <ui:define name="label">#{messages['CashBox.stateDate']}</ui:define>
+                    <h:outputText value="#{cashBox.stateDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="openingDateField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{cashBoxAction.managed}">
+                    <ui:define name="label">#{messages['UserCashBox.openingDate']}</ui:define>
+                    <h:outputText value="#{cashBoxAction.openingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="closingDateField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{cashBoxAction.managed}">
+                    <ui:define name="label">#{messages['UserCashBox.closingDate']}</ui:define>
+                    <h:outputText value="#{cashBoxAction.closingDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{cashBoxAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!cashBoxAction.managed}"
+                                 tabindex="5"/>
+                <h:commandButton action="#{cashBoxAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}"
+                                 tabindex="6"/>
+                <h:commandButton action="#{cashBoxAction.selectUserCashBox}" value="#{messages['CashBox.assignUser']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}"
+                                 tabindex="7"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{cashBoxAction.managed}"
+                                 tabindex="8">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{cashBoxAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="9"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{cashBoxAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CashBox.delete.confirmation']}">
+                        <f:param value="#{cashBox.description}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{cashBoxAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,149 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Credit.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+    <h:form id="creditSearch">
+    <rich:simpleTogglePanel label="#{messages['Credit.search']}" switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+                    <h:inputText id="firstName" value="#{creditDataModel.firstName}"
+                                 maxlength="80" tabindex="2" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+                    <h:inputText id="lastName" value="#{creditDataModel.lastName}"
+                                 maxlength="80" tabindex="2" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
+                    <h:inputText id="code" value="#{creditDataModel.criteria.code}"
+                                 maxlength="80" tabindex="3" styleClass="inputMedium">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{creditDataModel.search}" reRender="creditList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+        <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/credit.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CREDIT','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 20%, 15%, 15%, 15%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>#{messages['Credit.creditCode']}</rich:column>
+
+                        <rich:column>#{messages['Credit.partnerName']}</rich:column>
+
+                        <rich:column>#{messages['Credit.amount']}</rich:column>
+
+                        <rich:column>#{messages['Credit.grantDate']}</rich:column>
+
+                        <!--<rich:column>#{messages['Credit.createdOn']}</rich:column>-->
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="credit.creationDate"
+                                                   dataModel="#{creditDataModel}"
+                                                   reRender="creditList, dataScroller">
+                                #{messages['Credit.createdOn']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.code}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.partner.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{creditItem.amount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.grantDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.creationDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{creditAction.select(creditItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                    &#160;
+                    <h:commandLink action="#{creditReportAction.generateReport(creditItem)}"
+                                   immediate="true">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['Credit.generatePaymentPlan']}"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="creditList" dataModel="#{creditDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/credit.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CREDIT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

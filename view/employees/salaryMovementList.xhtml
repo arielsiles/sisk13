@@ -1,0 +1,288 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['SalaryMovement.list']}</ui:define>
+
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="salaryMovementSearch">
+<rich:simpleTogglePanel id="searchPanelId"
+                        label="#{messages['SalaryMovement.search']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="gestionPayrollField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['SalaryMovement.gestionPayroll']}</ui:define>
+                <app:selectPopUp id="gestionPayrollSelectPopup"
+                                 textValue="#{salaryMovementDataModel.criteria.gestionPayroll.gestionName}"
+                                 value="#{salaryMovementDataModel.criteria.gestionPayroll}"
+                                 dataModel="#{gestionPayRollSearchDataModel}"
+                                 clearAction="salaryMovementDataModel.cleanGestionPayroll()"
+                                 searchModalPanel="gestionPayRollSearchModalPanel"
+                                 reRender="gestionPayrollField"
+                                 hotKeySelect="alt+1"/>
+            </s:decorate>
+            <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SalaryMovement.employee']}</ui:define>
+                <app:quickSearch id="quickSearchEmployee"
+                                 textValue="salaryMovementDataModel.criteria.employee.idNumber"
+                                 value="#{salaryMovementDataModel.criteria.employee}"
+                                 searchField="idNumber"
+                                 reRender="employeeField"
+                                 tabindex="1"/>
+                <app:selectPopUp id="employee"
+                                 textValue="#{salaryMovementDataModel.criteria.employee.fullName}"
+                                 value="#{salaryMovementDataModel.criteria.employee}"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 clearAction="salaryMovementDataModel.criteria.setEmployee(null)"
+                                 searchModalPanel="generalEmployeeListModalPanel"
+                                 reRender="employeeField"
+                                 hotKeySelect="alt+2"/>
+            </s:decorate>
+            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SalaryMovement.amount']}</ui:define>
+                <h:inputText id="amount"
+                             value="#{salaryMovementDataModel.criteria.amount}"
+                             maxlength="80"
+                             tabindex="2"
+                             styleClass="input">
+                    <a4j:support event="onblur" reRender="amountField"/>
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SalaryMovement.date']}</ui:define>
+                <rich:calendar id="initDate"
+                               value="#{salaryMovementDataModel.criteria.date}"
+                               styleClass="input"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               tabindex="3">
+                    <a4j:support event="oninputchange" reRender="dateField"/>
+                </rich:calendar>
+            </s:decorate>
+            <s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['SalaryMovement.salaryMovementType']}</ui:define>
+                <h:selectOneMenu id="salaryMovementType"
+                                 value="#{salaryMovementDataModel.criteria.salaryMovementType}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    <s:selectItems value="#{salaryMovementTypeList}"
+                                   var="salaryMovementType"
+                                   label="#{salaryMovementType.fullName}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <a4j:commandButton action="#{salaryMovementDataModel.search}"
+                                   reRender="searchPanelId, salaryMovementList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="5">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/salaryMovement.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+</div>
+
+
+<rich:dataTable id="salaryMovementList"
+                value="#{salaryMovementDataModel}"
+                var="salaryMovementItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%, 13%, 13%, 13%,11%, 10%,  10%,10%, 10%, 10%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.employee.idNumber"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['Person.idNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.employee.lastName"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['Employee.lastName']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.employee.maidenName"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['Employee.maidenName']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.employee.firstName"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['Employee.firstName']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.salaryMovementType.name"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['SalaryMovement.salaryMovementType']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.amount"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['SalaryMovement.amount']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.currency.simbol"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['Currency.currency']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="salaryMovement.date"
+                                       dataModel="#{salaryMovementDataModel}"
+                                       reRender="salaryMovementList, dataScroller">
+                    #{messages['SalaryMovement.date']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.employee.idNumber}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.employee.lastName}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.employee.maidenName}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.employee.firstName}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.salaryMovementType.name}"/>
+    </rich:column>
+
+    <rich:column styleClass="right">
+        <h:outputText value="#{salaryMovementItem.amount}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.currency.symbol}"/>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{salaryMovementItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       action="#{salaryMovementAction.select(salaryMovementItem)}"
+                       immediate="true"
+                       rendered="#{s:hasPermission('SALARYMOVEMENT','VIEW')}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="salaryMovementList" dataModel="#{salaryMovementDataModel}"/>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/salaryMovement.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('SALARYMOVEMENT','CREATE')}"/>
+</div>
+</h:form>
+
+<s:decorate id="gestionPayRollListModalPanelContainer"
+            template="/employees/gestionPayRollSearchModalPanel.xhtml">
+    <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{salaryMovementDataModel.assignGestionPayroll(gestionPayrollItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="gestionPayrollField"
+                           oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{salaryMovementDataModel.criteria.setEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+
+</ui:composition>

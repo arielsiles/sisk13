@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ManagersSummaryPayrollNational.report']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="MNSPReportSearch">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['ManagersSummaryPayrollNational.report']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GestionPayroll.jobCategory']}</ui:define>
+                            <h:selectOneMenu id="jobCategory"
+                                             value="#{managersPayrollSummaryReportAction.jobCategory}"
+                                             styleClass="input" required="true"
+                                             tabindex="1">
+                                <s:selectItems value="#{administrativeJobCategoryList}" var="jobCategory"
+                                               label="#{jobCategory.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             action="#{managersPayrollSummaryReportAction.cleanGestionList}"
+                                             reRender="jobCategoryField, gestionPayrollListField" ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                            <h:selectOneMenu id="gestion"
+                                             value="#{managersPayrollSummaryReportAction.gestion}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="2">
+                                <s:selectItems value="#{gestionList}" var="gestion"
+                                               label="#{gestion.year}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange"
+                                             action="#{managersPayrollSummaryReportAction.cleanGestionList}"
+                                             reRender="gestionField, gestionPayrollListField" ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Month.month']}</ui:define>
+                            <h:selectOneMenu id="month"
+                                             value="#{managersPayrollSummaryReportAction.month}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="3">
+                                <s:selectItems value="#{monthEnum}" var="month"
+                                               label="#{messages[month.resourceKey]}"
+                                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                                <a4j:support event="onchange"
+                                             action="#{managersPayrollSummaryReportAction.cleanGestionList}"
+                                             reRender="monthField, gestionPayrollListField" ajaxSingle="true"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="commentField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ManagersSummaryPayrollNational.comments']}</ui:define>
+                            <h:inputTextarea id="comments" value="#{managersPayrollSummaryReportAction.comments}"
+                                             tabindex="4"
+                                             styleClass="input">
+                            </h:inputTextarea>
+                        </s:decorate>
+                    </s:div>
+                    <s:decorate id="gestionPayrollListField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['ManagersSummaryPayrollNational.gestionPayrollList']}</ui:define>
+                        <h:selectManyCheckbox id="gestionPayrollList"
+                                              value="#{managersPayrollSummaryReportAction.gestionPayrollList}"
+                                              styleClass="panel-border panel-select-multiple"
+                                              layout="pageDirection"
+                                              required="true"
+                                              tabindex="5"
+                                              disabled="#{empty managersPayrollSummaryReportAction.jobCategory
+                                              or empty managersPayrollSummaryReportAction.gestion
+                                              or empty managersPayrollSummaryReportAction.month}">
+                            <s:selectItems value="#{gestionPayrollToManagersSummaryList}" var="gestionPayroll"
+                                           label="#{gestionPayroll.gestionName}"/>
+                            <a4j:support event="onchange"
+                                         reRender="gestionPayrollListField" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectManyCheckbox>
+                    </s:decorate>
+
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{managersPayrollSummaryReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{managersPayrollSummaryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

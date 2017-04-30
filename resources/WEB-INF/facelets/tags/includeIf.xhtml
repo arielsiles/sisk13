@@ -1,0 +1,17 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.com/products/seam/taglib"
+       xmlns:c="http://java.sun.com/jstl/core"
+       xmlns:a4j="http://richfaces.org/a4j"
+       rendered="#{empty permission or permission}">
+    <c:choose>
+        <c:when test="#{empty test or test}">
+            <ui:include src="#{src}"/>
+        </c:when>
+        <c:when test="#{showMessage}">
+            <ui:include src="/include/loadingPanel.xhtml"/>
+        </c:when>
+    </c:choose>
+</s:div>
+

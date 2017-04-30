@@ -1,0 +1,360 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['FixedAssetMaintenanceRequestReport.report.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="90%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetMaintenanceRequestReportForm">
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['FixedAssetMaintenanceRequestReport.report.title']}
+</f:facet>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+
+<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.code']}</ui:define>
+    <h:inputText id="number"
+                 value="#{fixedAssetMaintenanceRequestReportAction.maintenanceRequestCode}"
+                 styleClass="input"
+                 maxlength="150"
+                 tabindex="1"/>
+</s:decorate>
+<s:decorate id="historyDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.historyDate']}</ui:define>
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.from']}</h:outputText>
+    &#160;
+    <rich:calendar id="initHistoryDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.historyStartDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="2">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.to']}</h:outputText>
+    &#160;
+    <rich:calendar id="endHistoryDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.historyEndDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="3">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initHistoryDate"
+                                forLabel="#{messages['FixedAssetMaintenanceRequest.historyDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+
+<!--2nd Line-->
+
+<s:decorate id="requestDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.requestDate']}</ui:define>
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.from']}</h:outputText>
+    &#160;
+    <rich:calendar id="initRequestDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.requestStartDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="2">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.to']}</h:outputText>
+    &#160;
+    <rich:calendar id="endRequestDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.requestEndDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="3">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initRequestDate"
+                                forLabel="#{messages['FixedAssetMaintenanceRequest.requestDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+
+<s:decorate id="estimatedReceiptDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenance.estimatedReceiptDate']}</ui:define>
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.from']}</h:outputText>
+    &#160;
+    <rich:calendar id="initEstimatedReceiptDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.estimatedReceiptStartDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="2">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.to']}</h:outputText>
+    &#160;
+    <rich:calendar id="endEstimatedReceiptDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.estimatedReceiptEndDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="3">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initEstimatedReceiptDate"
+                                forLabel="#{messages['FixedAssetMaintenance.estimatedReceiptDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+
+<!--3rd line-->
+
+<s:decorate id="petitionerEmployeeField"
+            template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.petitioner']}</ui:define>
+    <h:inputText id="petitionerEmployee"
+                 styleClass="input"
+                 readonly="true"
+                 value="#{fixedAssetMaintenanceRequestReportAction.petitioner.fullName}"
+                 tabindex="22"/>
+    <a4j:commandLink id="selectPetitionerEmployee"
+                     ajaxSingle="true"
+                     immediate="true"
+                     title="#{messages['Common.choose']}"
+                     onclick="Richfaces.showModalPanel('generalPetitionerEmployeeListModalPanel');">
+        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+    </a4j:commandLink>
+    <a4j:commandLink id="clearPetitionerEmployee"
+                     ajaxSingle="true"
+                     immediate="true"
+                     title="#{messages['Common.clear']}"
+                     action="#{fixedAssetMaintenanceRequestReportAction.clearPetitioner}"
+                     reRender="petitionerEmployeeField"
+                     tabindex="23">
+        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+    </a4j:commandLink>
+</s:decorate>
+<s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.historyStateDescription']}</ui:define>
+    <h:inputText id="description"
+                 value="#{fixedAssetMaintenanceRequestReportAction.historyStateDescription}"
+                 styleClass="input"
+                 tabindex="5">
+    </h:inputText>
+</s:decorate>
+
+<!--4th line-->
+
+<s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.costCenter']}</ui:define>
+    <app:quickSearch id="quickSearchCostCenterField"
+                     textValue="fixedAssetMaintenanceRequestReportAction.costCenter.code"
+                     value="#{warehouseVoucherReportAction.costCenter}"
+                     searchField="code"
+                     reRender="costCenterField"
+                     tabindex="13"/>
+    <app:selectPopUp id="costCenter"
+                     textValue="#{fixedAssetMaintenanceRequestReportAction.costCenter.fullName}"
+                     value="#{fixedAssetMaintenanceRequestReportAction.costCenter}"
+                     clearAction="fixedAssetMaintenanceRequestReportAction.clearCostCenter()"
+                     searchModalPanel="costCenterListModalPanel"
+                     dataModel="#{costCenterDataModel}"
+                     reRender="costCenterField"
+                     hotKeySelect="alt+2"
+                     tabindex="14"/>
+</s:decorate>
+<s:decorate id="receiptDateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.receiptDate']}</ui:define>
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.from']}</h:outputText>
+    &#160;
+    <rich:calendar id="initReceiptDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.receiptStartDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="2">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+    </rich:calendar>
+    &#160;
+    <h:outputText>#{messages['FixedAssetMaintenanceRequest.date.to']}</h:outputText>
+    &#160;
+    <rich:calendar id="endReceiptDate"
+                   value="#{fixedAssetMaintenanceRequestReportAction.receiptEndDate}"
+                   datePattern="#{messages['patterns.date']}"
+                   enableManualInput="true"
+                   styleClass="input1"
+                   tabindex="3">
+        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                           type="date"/>
+        <app:dateRangeValidator forId="initReceiptDate"
+                                forLabel="#{messages['FixedAssetMaintenanceRequest.receiptDate']}"
+                                type="greater"/>
+    </rich:calendar>
+</s:decorate>
+<!--5th line-->
+<s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.executorUnit']}</ui:define>
+    <h:selectOneMenu id="executorUnit"
+                     value="#{fixedAssetMaintenanceRequestReportAction.executorUnit}"
+                     styleClass="input"
+                     tabindex="12">
+        <s:selectItems value="#{businessUnitList.resultList}"
+                       var="executorUnit"
+                       label="#{executorUnit.fullName}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+
+<s:decorate id="receiptStateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.fixedAssetState']}</ui:define>
+    <h:selectOneMenu id="receiptState"
+                     value="#{fixedAssetMaintenanceRequestReportAction.maintenanceReceiptState}"
+                     styleClass="input"
+                     tabindex="3">
+        <s:selectItems value="#{fixedAssetMaintenanceReceiptStateList.resultList}"
+                       var="state"
+                       label="#{state.name}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+
+<!--6th line-->
+<s:decorate id="maintenanceRequestStateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.state']}</ui:define>
+    <h:selectOneMenu id="type"
+                     value="#{fixedAssetMaintenanceRequestReportAction.requestState}"
+                     styleClass="input"
+                     tabindex="12">
+        <s:selectItems value="#{fixedAssetMaintenanceRequestState}"
+                       var="state"
+                       label="#{messages[state.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+</s:decorate>
+
+<s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.amount']}</ui:define>
+    <h:outputText value="#{messages['Common.from']}"/>
+    &#160;
+    <h:inputText id="startAmount"
+                 value="#{fixedAssetMaintenanceRequestReportAction.startAmount}"
+                 styleClass="inputNumberSmall"
+                 tabindex="6">
+        <app:realNumberConverter forId="startAmount" pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:inputText>
+    &#160;
+    <h:outputText value="#{messages['Common.to']}"/>
+    &#160;
+    <h:inputText id="endAmount"
+                 value="#{fixedAssetMaintenanceRequestReportAction.endAmount}"
+                 styleClass="inputNumberSmall"
+                 tabindex="7">
+        <app:realNumberConverter forId="endAmount" pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:inputText>
+</s:decorate>
+
+<!--7th Line-->
+<s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.type']}</ui:define>
+    <h:selectOneMenu id="type"
+                     value="#{fixedAssetMaintenanceRequestReportAction.requestType}"
+                     styleClass="input"
+                     tabindex="3">
+        <s:selectItems value="#{fixedAssetMaintenanceRequestType}"
+                       var="type"
+                       label="#{messages[type.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.currency']}</ui:define>
+    <h:selectOneMenu id="currency" value="#{fixedAssetMaintenanceRequestReportAction.currency}" styleClass="input"
+                     tabindex="9">
+        <s:selectItems value="#{currencyList}" var="currency"
+                       label="#{currency.name} - #{currency.symbol}"
+                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+        <s:convertEntity/>
+    </h:selectOneMenu>
+</s:decorate>
+
+<!--8th line-->
+<s:decorate id="maintenanceReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['FixedAssetMaintenanceRequest.maintenanceReason']}</ui:define>
+    <h:inputText id="maintenanceReason"
+                 value="#{fixedAssetMaintenanceRequestReportAction.maintenanceReason}"
+                 styleClass="input"
+                 tabindex="5">
+    </h:inputText>
+</s:decorate>
+</h:panelGrid>
+</rich:panel>
+<app:reportDefaultOptions reportAction="#{fixedAssetMaintenanceRequestReportAction}"
+                          showPageFormat="false"
+                          showReportTitle="false" tabIndex="14"/>
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetMaintenanceRequestReportAction.generateReport}"
+                     styleClass="button" tabindex="15"
+                     value="#{messages['Common.generate']}" id="searchButtonId">
+        <s:defaultAction/>
+    </h:commandButton>
+</div>
+<!--<rich:jQuery selector="#selectEmployee" query="focus()" timing="onload"/>-->
+
+</h:form>
+
+<s:decorate id="generalPetitionerListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalPetitionerEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetMaintenanceRequestReportAction.assignPetitioner(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="petitionerEmployeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalPetitionerEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetMaintenanceRequestReportAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+</ui:define>
+</ui:composition>
+
+

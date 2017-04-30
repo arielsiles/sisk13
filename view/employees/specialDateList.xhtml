@@ -1,0 +1,265 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['SpecialDate.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="specialDateSearch">
+
+<rich:simpleTogglePanel id="searchPanel" label="#{messages['SpecialDate.search']}" switchType="client">
+
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDate.title']}</ui:define>
+            <h:inputText id="name" value="#{specialDateDataModel.criteria.title}"
+                         maxlength="150" tabindex="1" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Employee.idNumber']}</ui:define>
+            <h:inputText id="idNumber" value="#{specialDateDataModel.idNumber}"
+                         maxlength="80" tabindex="7" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="specialDateTargetField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDate.target']}</ui:define>
+            <h:selectOneMenu id="specialDateTarget"
+                             value="#{specialDateDataModel.criteria.specialDateTarget}"
+                             styleClass="input"
+                             tabindex="2">
+                <s:selectItems value="#{specialDateTargetEnum}" var="specialDateTarget"
+                               label="#{messages[specialDateTarget.resourceKey]}"
+                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Employee.lastName']}</ui:define>
+            <h:inputText id="firstName" value="#{specialDateDataModel.lastName}"
+                         maxlength="80" tabindex="7" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="initPeriodField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDate.initPeriod']}</ui:define>
+            <rich:calendar id="initPeriod"
+                           enableManualInput="true"
+                           value="#{specialDateDataModel.criteria.initPeriod}"
+                           datePattern="#{messages['patterns.date']}"
+                           tabindex="3">
+                <a4j:support event="oninputchange" reRender="initPeriodField,endPeriodField"/>
+                <a4j:support event="onchanged" reRender="initPeriodField,endPeriodField"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Employee.maidenName']}</ui:define>
+            <h:inputText id="lastName" value="#{specialDateDataModel.maidenName}"
+                         maxlength="80" tabindex="9" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="endPeriodField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDate.endPeriod']}</ui:define>
+            <rich:calendar id="endPeriod"
+                           enableManualInput="true"
+                           value="#{specialDateDataModel.criteria.endPeriod}"
+                           datePattern="#{messages['patterns.date']}"
+                           tabindex="4">
+                <a4j:support event="oninputchange" reRender="initPeriodField,endPeriodField"/>
+                <a4j:support event="onchanged" reRender="initPeriodField,endPeriodField"/>
+                <app:dateRangeValidator forId="initPeriod"
+                                        forLabel="#{messages['SpecialDate.initPeriod']}"
+                                        type="greater"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Employee.firstName']}</ui:define>
+            <h:inputText id="firstName" value="#{specialDateDataModel.firstName}"
+                         maxlength="80" tabindex="10" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['JobContract.organizationalUnit']}</ui:define>
+            <h:inputText id="organizationalUnitName" value="#{specialDateDataModel.organizationalUnitName}"
+                         maxlength="80" tabindex="5" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
+            <h:selectOneMenu id="businessUnit" value="#{specialDateDataModel.businessUnit}" styleClass="input"
+                             tabindex="11">
+                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                               label="#{businessUnit.organization.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="specialDateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDateType']}</ui:define>
+            <h:selectOneMenu id="specialDateType" value="#{specialDateDataModel.criteria.credit}"
+                             styleClass="input" tabindex="6">
+                <s:selectItems value="#{specialDateType}" var="sdt" label="#{messages[sdt.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <a4j:commandButton action="#{specialDateDataModel.search}"
+                               reRender="specialDateList, dataScroller, searchPanel"
+                               styleClass="button"
+                               value="#{messages['Common.search']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </a4j:commandButton>
+            <a4j:commandButton action="#{specialDateDataModel.clear}"
+                               reRender="specialDateList, dataScroller, searchPanel"
+                               styleClass="button"
+                               immediate="false"
+                               value="#{messages['Common.clear']}" tabindex="13"/>
+        </s:decorate>
+    </h:panelGrid>
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/specialDate.xhtml"
+              styleClass="button"
+              rendered="#{s:hasPermission('SPECIALDATE','CREATE')}"
+              propagation="begin"/>
+</div>
+<rich:dataTable value="#{specialDateDataModel}" var="specialDateItem" id="specialDateList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="20%, 10%, 35%, 8%, 8%, 8%, 8%, 5%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.title"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.title']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.specialDateTarget"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.target']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                #{messages['SpecialDate.assignedTo']}
+            </rich:column>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.initPeriod"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.init']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.endPeriod"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.end']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.startTime"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.startTime']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.endTime"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.endTime']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                <app:commandSortHeader>
+                    #{messages['SpecialDate.rol']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.title}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[specialDateItem.specialDateTarget.resourceKey]}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateAction.getOwnerFullName(specialDateItem)}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.initPeriod}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.endPeriod}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.startTime}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.endTime}">
+            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{specialDateItem.rolType}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       rendered="#{s:hasPermission('SPECIALDATE','VIEW')}"
+                       action="#{specialDateAction.select(specialDateItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="specialDateList" dataModel="#{specialDateDataModel}"/>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/specialDate.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('SPECIALDATE','CREATE')}"/>
+</div>
+
+</h:form>
+</ui:define>
+</ui:composition>

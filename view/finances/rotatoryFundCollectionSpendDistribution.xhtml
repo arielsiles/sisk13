@@ -1,0 +1,265 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{rotatoryFundCollectionSpendDistributionAction.managed}">
+            #{messages['RotatoryFundCollectionSpendDistribution.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['RotatoryFundCollectionSpendDistribution.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="spendDistributionForm">
+    <div class="buttons">
+        <h:commandButton id="createButtonId"
+                         action="#{rotatoryFundCollectionSpendDistributionAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!rotatoryFundCollectionSpendDistributionAction.managed and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','CREATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!rotatoryFundCollectionSpendDistributionAction.managed and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','CREATE')}"
+                         tabindex="2"/>
+        <h:commandButton id="updateButtonId"
+                         action="#{rotatoryFundCollectionSpendDistributionAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{rotatoryFundCollectionSpendDistributionAction.managed and
+                                 rotatoryFundCollectionAction.rotatoryFundCollectionPending and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','UPDATE')}"
+                         tabindex="3">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{rotatoryFundCollectionSpendDistributionAction.managed and rotatoryFundCollectionAction.rotatoryFundCollectionPending and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="4"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{rotatoryFundCollectionSpendDistributionAction.managed}">
+                    #{messages['SpendDistribution.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['SpendDistribution.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+        <s:decorate id="amountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['SpendDistribution.amount']}</ui:define>
+            <h:inputText id="amount"
+                         value="#{rotatoryFundCollectionSpendDistribution.amount}"
+                         styleClass="inputMedium"
+                         rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending}"
+                         required="true"
+                         tabindex="5">
+                <app:realNumberConverter minimum="0.000001"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="amount"/>
+            </h:inputText>
+            <h:outputText value="#{rotatoryFundCollectionSpendDistribution.amount}"
+                          rendered="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"/>
+            <h:outputText value=" #{messages[rotatoryFundCollection.sourceCurrency.symbolResourceKey]}"/>
+        </s:decorate>
+        <s:decorate id="businessUnitField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['SpendDistribution.businessUnit']}</ui:define>
+            <h:selectOneMenu id="businessUnit"
+                             value="#{rotatoryFundCollectionSpendDistribution.businessUnit}"
+                             styleClass="inputMedium"
+                             required="true"
+                             rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending}"
+                             tabindex="6">
+                <s:selectItems value="#{businessUnitList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{rotatoryFundCollectionSpendDistribution.businessUnit.fullName}"
+                          rendered="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"/>
+        </s:decorate>
+
+
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpendDistribution.costCenter']}</ui:define>
+            <app:selectPopUp id="costCenter"
+                             required="true"
+                             textValue="#{rotatoryFundCollectionSpendDistribution.costCenter.fullName}"
+                             value="#{rotatoryFundCollectionSpendDistribution.costCenter}"
+                             clearAction="rotatoryFundCollectionSpendDistributionAction.clearCostCenter()"
+                             searchModalPanel="costCenterListModalPanel"
+                             dataModel="#{costCenterDataModel}"
+                             reRender="costCenterField"
+                             hotKeySelect="alt+1"
+                             rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending and !rotatoryFundCollectionSpendDistributionAction.enableCostCenterList}"
+                             readOnly="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"
+                             tabindex="7"/>
+            <h:selectOneMenu id="costCenterC"
+                             value="#{rotatoryFundCollectionSpendDistribution.costCenter}"
+                             styleClass="inputMedium"
+                             required="true"
+                             rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending and rotatoryFundCollectionSpendDistributionAction.enableCostCenterList}"
+                             tabindex="6">
+                <s:selectItems value="#{rotatoryFundCollectionSpendDistributionAction.costCenterList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{rotatoryFundCollectionSpendDistribution.costCenter.fullName}"
+                          rendered="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"/>
+        </s:decorate>
+        <s:decorate id="cashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpendDistribution.cashAccount']}</ui:define>
+            <app:selectPopUp id="cashAccount"
+                             required="true"
+                             textValue="#{rotatoryFundCollectionSpendDistribution.cashAccount.fullName}"
+                             value="#{rotatoryFundCollectionSpendDistribution.cashAccount}"
+                             clearAction="rotatoryFundCollectionSpendDistributionAction.clearCashAccount()"
+                             searchModalPanel="cashAccountListModalPanel"
+                             dataModel="#{rotatoryFundCashAccountDataModel}"
+                             reRender="cashAccountField"
+                             hotKeySelect="alt+2"
+                             rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending and !rotatoryFundCollectionSpendDistributionAction.enableCashAccountList}"
+                             readOnly="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"
+                             tabindex="8"/>
+            <h:selectOneMenu id="cashAccountC"
+                             value="#{rotatoryFundCollectionSpendDistribution.cashAccount}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{rotatoryFundCollectionAction.rotatoryFundCollectionPending and rotatoryFundCollectionSpendDistributionAction.enableCashAccountList}"
+                             tabindex="6">
+                <s:selectItems value="#{rotatoryFundCollectionSpendDistributionAction.cashAccountList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+            <h:outputText value="#{rotatoryFundCollectionSpendDistribution.cashAccount.fullName}"
+                          rendered="#{!rotatoryFundCollectionAction.rotatoryFundCollectionPending}"/>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!rotatoryFundCollectionSpendDistributionAction.managed and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','CREATE')}"
+                         tabindex="9"/>
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!rotatoryFundCollectionSpendDistributionAction.managed and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','CREATE')}"
+                         tabindex="10"/>
+
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{rotatoryFundCollectionSpendDistributionAction.managed and
+                                 rotatoryFundCollectionAction.rotatoryFundCollectionPending and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','UPDATE')}"
+                         tabindex="11"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{rotatoryFundCollectionSpendDistributionAction.managed and rotatoryFundCollectionAction.rotatoryFundCollectionPending
+                                 and s:hasPermission('ROTATORYFUNDCOLLECTIONSPENDDISTRIBUTION','DELETE')}"
+                         tabindex="12">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="13"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{rotatoryFundCollectionSpendDistributionAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['SpendDistribution.delete.confirmation']}">
+                <f:param value="#{rotatoryFundCollectionSpendDistribution.percentage}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rotatoryFundCollectionSpendDistributionAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{rotatoryFundCollectionSpendDistributionAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:param name="dataModel" value="#{rotatoryFundCashAccountDataModel}"/>
+    <ui:param name="accountClass" value="G"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{rotatoryFundCollectionSpendDistributionAction.assignCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashAccountField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#percentage" query="focus()" timing="onload"/>
+</ui:define>
+
+</ui:composition>

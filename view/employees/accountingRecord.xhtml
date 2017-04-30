@@ -1,0 +1,1117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['AccountingRecord.title']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="accountingRecordForm">
+
+<div class="buttons">
+    <h:commandButton action="#{accountingRecordAction.create}"
+                     styleClass="button"
+                     value="#{messages['AccountingRecord.beginMigration']}"
+                     tabindex="1"
+                     rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}"
+                     onclick="Richfaces.showModalPanel('progressModalPanel');">
+        <s:defaultAction/>
+    </h:commandButton>
+</div>
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['AccountingRecord.title']}
+</f:facet>
+<app:fieldset id="payablesDocumentFieldset"
+              title="#{messages['AccountingRecord.payableDocumentInfo']}">
+    <h:panelGrid id="payablesDocumentData" columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PayableDocument.provider']}</ui:define>
+                <app:quickSearch id="quickSearchProvider"
+                                 textValue="accountingRecord.provider.providerCode"
+                                 value="#{accountingRecord.provider}"
+                                 postSearchAction="accountingRecordAction.updateProviderInfo()"
+                                 searchField="providerCode"
+                                 alias="provider"
+                                 reRender="providerField"
+                                 tabindex="1"/>
+                <app:selectPopUp id="provider"
+                                 required="true"
+                                 textValue="#{accountingRecord.provider.fullName}"
+                                 value="#{accountingRecord.provider}"
+                                 clearAction="accountingRecordAction.clearProvider()"
+                                 searchModalPanel="providerListModalPanel"
+                                 dataModel="#{providerDataModel}"
+                                 reRender="providerField"
+                                 hotKeySelect="alt+1"
+                                 tabindex="2"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PayableDocument.documentType']}</ui:define>
+                <app:quickSearch id="quickSearchDocumentType"
+                                 textValue="accountingRecord.documentType.documentType"
+                                 value="#{accountingRecord.documentType}"
+                                 searchField="documentType"
+                                 alias="payableDocumentType"
+                                 reRender="documentTypeField"
+                                 tabindex="3">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="payableDocumentType.movementType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinanceMovementType','C')}"/>
+                        <app:restriction
+                                condition="payableDocumentType.documentClass=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentClass','OTR')}"/>
+                        <app:restriction
+                                condition="payableDocumentType.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.PayableDocumentTypeState','VIG')}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <h:selectOneMenu id="documentType"
+                                 required="true"
+                                 value="#{accountingRecord.documentType}"
+                                 styleClass="input"
+                                 tabindex="4">
+                    <s:selectItems value="#{creditOtherPayableDocumentTypeList}" var="payableDocumentType"
+                                   label="#{payableDocumentType.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support ajaxSingle="true"
+                                 event="onchange"
+                                 reRender="documentTypeField"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</app:fieldset>
+
+<app:fieldset id="bankAccountPaymentTypeField" title="#{messages['AccountingRecord.totalAmounts']}">
+    <h:panelGrid columns="4" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width25percent,width25percent,width25percent,width25percent">
+        <s:decorate id="nationalAmountForCheckField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">
+                #{messages['AccountingRecord.checkPaymentType']} - #{messages['AccountingRecord.nationalCurrencySymbol']}
+            </ui:define>
+            <h:inputText id="nationalAmountForCheck" value="#{accountingRecord.nationalAmountForCheck}"
+                         styleClass="input" readonly="true" maxlength="25">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="nationalAmountForCheck"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="foreignAmountForCheckField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">
+                #{messages['AccountingRecord.checkPaymentType']} - #{messages['AccountingRecord.foreignCurrencySymbol']}
+            </ui:define>
+            <h:inputText id="foreignAmountForCheck" value="#{accountingRecord.foreignAmountForCheck}"
+                         styleClass="input" readonly="true" maxlength="25">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="foreignAmountForCheck"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="nationalAmountForBankField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">
+                #{messages['AccountingRecord.bankAccountPaymentType']} -  #{messages['AccountingRecord.nationalCurrencySymbol']}
+            </ui:define>
+            <ui:param name="oneLine" value="true"/>
+            <h:inputText id="nationalAmountForBank" value="#{accountingRecord.nationalAmountForBank}"
+                         styleClass="input" readonly="true" maxlength="25">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="nationalAmountForBank"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="foreignAmountForBankField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">
+                #{messages['AccountingRecord.bankAccountPaymentType']} - #{messages['AccountingRecord.foreignCurrencySymbol']}
+            </ui:define>
+            <ui:param name="oneLine" value="true"/>
+            <h:inputText id="foreignAmountForBank" value="#{accountingRecord.foreignAmountForBank}"
+                         styleClass="input" readonly="true" maxlength="25">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="foreignAmountForBank"/>
+            </h:inputText>
+        </s:decorate>
+    </h:panelGrid>
+</app:fieldset>
+<app:fieldset id="bankAccountListField" title="#{messages['AccountingRecord.bankAccounts']}">
+
+<c:set var="financesBankAccountResultList" value="#{financesBankAccountList.resultList}"/>
+
+<rich:dataTable value="#{financesBankAccountResultList}" var="financesBankAccountItem"
+                align="center"
+                id="financesBankAccountList" width="100%"
+                columnClasses="width15percent,width10percent active-row,width10percent,width10percent active-row,width10percent,width10percent active-row,width10percent,width10percent active-row,width10percent,width5percent">
+<f:facet name="header">
+    <rich:columnGroup>
+        <rich:column rowspan="2">
+            <rich:spacer/>
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['AccountingRecord.checkPaymentType']} - #{messages['AccountingRecord.nationalCurrencySymbol']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['AccountingRecord.checkPaymentType']} - #{messages['AccountingRecord.foreignCurrencySymbol']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['AccountingRecord.bankAccountPaymentType']} -  #{messages['AccountingRecord.nationalCurrencySymbol']}
+        </rich:column>
+        <rich:column colspan="2">
+            #{messages['AccountingRecord.bankAccountPaymentType']} - #{messages['AccountingRecord.foreignCurrencySymbol']}
+        </rich:column>
+        <rich:column rowspan="2">
+            #{messages['AccountingRecord.exchangeRate']}
+        </rich:column>
+        <rich:column breakBefore="true">
+            #{messages['AccountingRecord.amount']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.equivalent']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.amount']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.equivalent']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.amount']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.equivalent']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.amount']}
+        </rich:column>
+        <rich:column>
+            #{messages['AccountingRecord.equivalent']}
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+
+<rich:column>
+    <h:outputLabel styleClass="textLabel"
+                   value="#{messages[financesBankAccountItem.currency.symbolResourceKey]} - #{financesBankAccountItem.fullName}"/>
+    #{accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].setCurrencyBankAccount(financesBankAccountItem.currency)}
+    #{accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].setCurrencyBankAccount(financesBankAccountItem.currency)}
+    #{accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].setCurrencyBankAccount(financesBankAccountItem.currency)}
+    #{accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].setCurrencyBankAccount(financesBankAccountItem.currency)}
+</rich:column>
+<!-- for checkPaymentTypeNationalAmount-->
+<rich:column>
+    <s:decorate id="checkPaymentTypeNationalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <h:outputLabel id="checkPaymentTypeNationalAmount"
+                       value="#{accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount}"
+                       styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="checkPaymentTypeNationalAmount"/>
+        </h:outputLabel>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency}"
+                       value="#{messages[accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency.symbolResourceKey]}">
+        </h:outputLabel>
+        &#160;
+        <a4j:commandLink ajaxSingle="true"
+                         immediate="true"
+                         reRender="fixAmountModalPanel"
+                         rendered="#{not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency}"
+                         action="#{accountingRecordAction.initFixAmount(financesBankAccountItem.companyNumber,financesBankAccountItem.accountNumber,accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber])}"
+                         oncomplete="Richfaces.showModalPanel('fixAmountModalPanel');"
+                         title="#{messages['AccountingRecord.fixAmount']}"
+                         rel="#{messages['AccountingRecord.fixAmount']}">
+            <h:graphicImage value="/img/config.png" styleClass="select-image right bottom"/>
+        </a4j:commandLink>
+    </s:decorate>
+</rich:column>
+<rich:column>
+    <s:decorate id="checkPaymentTypeNationalEquiAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <h:outputLabel id="checkPaymentTypeNationalEquiAmount"
+                       value="#{accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentAmount}"
+                       styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="checkPaymentTypeNationalEquiAmount"/>
+        </h:outputLabel>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentAmount and not empty accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentCurrency}"
+                       value="#{messages[accountingRecordAction.nationalAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentCurrency.symbolResourceKey]}">
+        </h:outputLabel>
+    </s:decorate>
+</rich:column>
+<!-- for checkPaymentTypeForeignAmount-->
+<rich:column>
+    <s:decorate id="checkPaymentTypeForeignAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <h:outputLabel id="checkPaymentTypeForeignAmount"
+                       value="#{accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount}"
+                       styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="checkPaymentTypeForeignAmount"/>
+        </h:outputLabel>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency}"
+                       value="#{messages[accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency.symbolResourceKey]}">
+        </h:outputLabel>
+        &#160;
+        <a4j:commandLink ajaxSingle="true"
+                         immediate="true"
+                         reRender="fixAmountModalPanel"
+                         rendered="#{not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].currency}"
+                         action="#{accountingRecordAction.initFixAmount(financesBankAccountItem.companyNumber,financesBankAccountItem.accountNumber,accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber])}"
+                         oncomplete="Richfaces.showModalPanel('fixAmountModalPanel');"
+                         title="#{messages['AccountingRecord.fixAmount']}"
+                         rel="#{messages['AccountingRecord.fixAmount']}">
+            <h:graphicImage value="/img/config.png" styleClass="select-image right bottom"/>
+        </a4j:commandLink>
+    </s:decorate>
+</rich:column>
+<rich:column>
+    <s:decorate id="checkPaymentTypeForeignEquiAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <h:outputText id="checkPaymentTypeForeignEquiAmount"
+                      value="#{accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentAmount}"
+                      styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="checkPaymentTypeForeignEquiAmount"/>
+        </h:outputText>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentAmount and not empty accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentCurrency}"
+                       value="#{messages[accountingRecordAction.foreignAmountForCheckDataMap[financesBankAccountItem.accountNumber].equivalentCurrency.symbolResourceKey]}">
+        </h:outputLabel>
+    </s:decorate>
+</rich:column>
+<!-- for bankAccountPaymentTypeNationalAmount-->
+<rich:column>
+    <s:decorate id="bankAccountPaymentTypeNationalAmountField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <h:outputLabel id="bankAccountPaymentTypeNationalAmount"
+                       value="#{accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].amount}"
+                       styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="bankAccountPaymentTypeNationalAmount"/>
+        </h:outputLabel>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].currency}"
+                       value="#{messages[accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].currency.symbolResourceKey]}">
+        </h:outputLabel>
+        &#160;
+        <a4j:commandLink ajaxSingle="true"
+                         immediate="true"
+                         reRender="fixAmountModalPanel"
+                         rendered="#{not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].currency}"
+                         action="#{accountingRecordAction.initFixAmount(financesBankAccountItem.companyNumber,financesBankAccountItem.accountNumber,accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber])}"
+                         oncomplete="Richfaces.showModalPanel('fixAmountModalPanel');"
+                         title="#{messages['AccountingRecord.fixAmount']}"
+                         rel="#{messages['AccountingRecord.fixAmount']}">
+            <h:graphicImage value="/img/config.png" styleClass="select-image right bottom"/>
+        </a4j:commandLink>
+    </s:decorate>
+</rich:column>
+<rich:column>
+    <s:decorate id="bankAccountPaymentTypeNationalEquiAmountField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <h:outputText id="bankAccountPaymentTypeNationalEquiAmount"
+                      value="#{accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentAmount}"
+                      styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="bankAccountPaymentTypeNationalEquiAmount"/>
+        </h:outputText>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentAmount and not empty accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentCurrency}"
+                       value="#{messages[accountingRecordAction.nationalAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentCurrency.symbolResourceKey]}">
+        </h:outputLabel>
+    </s:decorate>
+</rich:column>
+<!-- for bankAccountPaymentTypeForeignAmount-->
+<rich:column>
+    <s:decorate id="bankAccountPaymentTypeForeignAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <h:outputLabel id="bankAccountPaymentTypeForeignAmount"
+                       value="#{accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].amount}"
+                       styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="bankAccountPaymentTypeForeignAmount"/>
+        </h:outputLabel>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].currency}"
+                       value="#{messages[accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].currency.symbolResourceKey]}">
+        </h:outputLabel>
+        &#160;
+        <a4j:commandLink ajaxSingle="true"
+                         immediate="true"
+                         reRender="fixAmountModalPanel"
+                         rendered="#{not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].amount and not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].currency}"
+                         action="#{accountingRecordAction.initFixAmount(financesBankAccountItem.companyNumber,financesBankAccountItem.accountNumber,accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber])}"
+                         oncomplete="Richfaces.showModalPanel('fixAmountModalPanel');"
+                         title="#{messages['AccountingRecord.fixAmount']}"
+                         rel="#{messages['AccountingRecord.fixAmount']}">
+            <h:graphicImage value="/img/config.png" styleClass="select-image right bottom"/>
+        </a4j:commandLink>
+    </s:decorate>
+</rich:column>
+<rich:column>
+    <s:decorate id="bankAccountPaymentTypeForeignEquiAmountField" template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <h:outputText id="bankAccountPaymentTypeForeignEquiAmount"
+                      value="#{accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentAmount}"
+                      styleClass="textLabel">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="bankAccountPaymentTypeForeignEquiAmount"/>
+        </h:outputText>
+        &#160;
+        <h:outputLabel styleClass="textLabel"
+                       rendered="#{not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentAmount and not empty accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentCurrency}"
+                       value="#{messages[accountingRecordAction.foreignAmountForBankDataMap[financesBankAccountItem.accountNumber].equivalentCurrency.symbolResourceKey]}">
+        </h:outputLabel>
+    </s:decorate>
+</rich:column>
+<!-- for exchangeRateAmount-->
+<rich:column>
+    <s:decorate id="exchangeRateAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:param name="vertical" value="true"/>
+        <h:inputText id="exchangeRateAmount"
+                     value="#{accountingRecordAction.exchangeRateAmountMap[financesBankAccountItem.accountNumber]}"
+                     styleClass="inputNumberTiny" required="true" maxlength="25">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     forId="exchangeRateAmount"/>
+            <a4j:support event="onblur" ajaxSingle="true"
+                         reRender="checkPaymentTypeNationalAmountField,checkPaymentTypeNationalEquiAmountField,checkPaymentTypeForeignAmountField,checkPaymentTypeForeignEquiAmountField,bankAccountPaymentTypeNationalAmountField,bankAccountPaymentTypeNationalEquiAmountField,bankAccountPaymentTypeForeignAmountField,bankAccountPaymentTypeForeignEquiAmountField,exchangeRateAmountField,checkPaymentTypeNationalTotalAmounts,checkPaymentTypeForeignTotalAmounts,bankAccountPaymentTypeNationalTotalAmounts,bankAccountPaymentTypeForeignTotalAmounts"/>
+        </h:inputText>
+    </s:decorate>
+</rich:column>
+<f:facet name="footer">
+    <rich:columnGroup>
+        <rich:column styleClass="right">#{messages['AccountingRecord.total']}</rich:column>
+        <rich:column colspan="2">
+            <s:div id="checkPaymentTypeNationalTotalAmounts">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.nationalAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.nationalAmountForCheckNationalTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.foreignAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.nationalAmountForCheckForeignTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.D']}"/>
+                </s:decorate>
+            </s:div>
+        </rich:column>
+        <rich:column colspan="2">
+            <s:div id="checkPaymentTypeForeignTotalAmounts">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.nationalAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.foreignAmountForCheckNationalTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.foreignAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.foreignAmountForCheckForeignTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.D']}"/>
+                </s:decorate>
+            </s:div>
+        </rich:column>
+        <rich:column colspan="2">
+            <s:div id="bankAccountPaymentTypeNationalTotalAmounts">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.nationalAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.nationalAmountForBankNationalTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.foreignAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.nationalAmountForBankForeignTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.D']}"/>
+                </s:decorate>
+            </s:div>
+        </rich:column>
+        <rich:column colspan="2">
+            <s:div id="bankAccountPaymentTypeForeignTotalAmounts">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.nationalAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.foreignAmountForBankNationalTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label"> #{messages['AccountingRecord.foreignAmount']} </ui:define>
+                    <h:outputText value="#{accountingRecordAction.foreignAmountForBankForeignTotalAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    &#160;
+                    <h:outputText value="#{messages['FinancesCurrencyType.symbol.D']}"/>
+                </s:decorate>
+            </s:div>
+        </rich:column>
+        <rich:column>
+
+        </rich:column>
+    </rich:columnGroup>
+</f:facet>
+</rich:dataTable>
+</app:fieldset>
+
+<app:fieldset id="payrollGenerationDataField" title="#{messages['AccountingRecord.payrollGenerationData']}">
+
+<h:panelGrid id="panelInfo" columns="4" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width25percent,width25percent,width25percent,width25percent">
+    <s:div>
+        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.businessUnit']}</ui:define>
+            <h:selectOneMenu id="businessUnit" value="#{accountingRecord.businessUnit}"
+                             styleClass="input" required="true"
+                             tabindex="1">
+                <s:selectItems value="#{sedeList.resultList}" var="sede"
+                               label="#{sede.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.costCenter']}</ui:define>
+            <h:inputText styleClass="inputMedium" readonly="true"
+                         value="#{accountingRecordAction.costCenterFullName}" tabindex="22"/>
+            <a4j:commandLink id="selectOrganizationUnit" ajaxSingle="true" immediate="true" tabindex="23"
+                             title="#{messages['Common.search']}"
+                             onclick="Richfaces.showModalPanel('costCenterListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="24"
+                             title="#{messages['Common.clear']}"
+                             action="#{accountingRecordAction.clearCostCenter}"
+                             reRender="costCenterField">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+    </s:div>
+    <s:div>
+        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.jobCategory']}</ui:define>
+            <h:selectOneMenu id="jobCategory" value="#{accountingRecord.jobCategory}"
+                             styleClass="input" required="true"
+                             tabindex="2">
+                <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                               label="#{jobCategory.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.idNumber']}</ui:define>
+            <h:inputText id="idNumber"
+                         value="#{accountingRecord.idNumber}"
+                         styleClass="input"
+                         tabindex="4" maxlength="100">
+            </h:inputText>
+        </s:decorate>
+    </s:div>
+    <s:div>
+        <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.gestion']}</ui:define>
+            <h:selectOneMenu id="gestion"
+                             value="#{accountingRecord.gestion}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="3">
+                <s:selectItems value="#{gestionList}" var="gestion"
+                               label="#{gestion.year}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:div>
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent, width50percent">
+                <s:decorate id="lesserAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label">#{messages['AccountingRecord.lesserAmount']}</ui:define>
+                    <h:inputText id="lesserAmount"
+                                 value="#{accountingRecord.lesserAmount}"
+                                 styleClass="inputSmall"
+                                 tabindex="4" maxlength="25">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="lesserAmount"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="higherAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:param name="vertical" value="true"/>
+                    <ui:define name="label">#{messages['AccountingRecord.higherAmount']}</ui:define>
+                    <h:inputText id="higherAmount"
+                                 value="#{accountingRecord.higherAmount}"
+                                 styleClass="inputSmall"
+                                 tabindex="5" maxlength="25">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="higherAmount"/>
+                    </h:inputText>
+                </s:decorate>
+            </h:panelGrid>
+        </s:div>
+    </s:div>
+    <s:div id="thirdColumn">
+        <s:decorate id="gestionPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.gestionPayrollType']}</ui:define>
+            <h:selectOneMenu id="gestionPayrollType"
+                             value="#{accountingRecord.gestionPayrollType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="6">
+                <s:selectItems value="#{gestionPayrollTypeEnum}" var="gestionPayrollType"
+                               label="#{messages[gestionPayrollType.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support ajaxSingle="true"
+                             action="#{accountingRecordAction.updateMothByGestionPayrollType}"
+                             event="onchange"
+                             reRender="thirdColumn"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="vertical" value="true"/>
+            <ui:param name="required" value="true"/>
+            <ui:define name="label">#{messages['AccountingRecord.month']}</ui:define>
+            <h:selectOneMenu id="month"
+                             value="#{accountingRecord.month}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{accountingRecord.gestionPayrollSalaryType}"
+                             tabindex="7">
+                <s:selectItems value="#{monthEnum}" var="month"
+                               label="#{messages[month.resourceKey]}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+            <h:outputText value="#{messages[accountingRecord.month.resourceKey]}"
+                          rendered="#{accountingRecord.gestionPayrollChristmasBonusType}"/>
+        </s:decorate>
+        <s:decorate id="buttonsField" template="/include/inputField.xhtml" styleClass="formRow">
+            <h:commandButton id="searchButton" value="#{messages['Common.search']}" styleClass="button"
+                             action="#{accountingRecordAction.searchPayrollGenerationList}"
+                             onclick="Richfaces.showModalPanel('searchProgressModalPanel')"/>
+            &#160;
+            <h:commandButton id="calculateAmountsButton" value="#{messages['AccountingRecord.calculateAmounts']}"
+                             styleClass="button"
+                             action="#{accountingRecordAction.calculateSelectedPayrollGenerationList}"
+                             onclick="Richfaces.showModalPanel('calculateProgressModalPanel')"/>
+        </s:decorate>
+    </s:div>
+</h:panelGrid>
+
+<br/>
+
+<s:div id="payrollGenerationList">
+<c:set var="financesBankAccountResultList" value="#{financesBankAccountList.resultList}"/>
+<rich:dataTable value="#{fiscalProfessorPayrollGenerationDataModel}" var="fiscalProfessorPayrollItem"
+                rows="100000"
+                id="fiscalProfessorPayrollList" width="100%" columnsWidth="15%,15%,10%,15%,15%,15%,10%"
+                rendered="#{accountingRecordAction.professorGenerationBySalary}">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                #{messages['AccountingRecord.paymentBankAccount']}
+                <h:selectOneMenu id="mainBankAccount"
+                                 value="#{accountingRecordAction.mainBankAccount}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support action="#{accountingRecordAction.selectAllBankAccounts}"
+                                 event="onchange"
+                                 reRender="fiscalProfessorPayrollList"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.paymentType']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.ci']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.lastName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.maidenName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.firstName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.liquid']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <s:div id="financesBankAccountFieldContainer">
+            <s:decorate id="financesBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="vertical" value="true"/>
+                <ui:param name="required" value="true"/>
+                <h:selectOneMenu id="financesBankAccount"
+                                 value="#{accountingRecordAction.selectedBankAccountMap[fiscalProfessorPayrollItem.id]}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[fiscalProfessorPayrollItem.employee.paymentType.resourceKey]}"/>
+        <h:graphicImage value="/img/warnIcon.gif" styleClass="select-image-middle"
+                        rendered="#{employeeAction.isBankAccountPaymentType(fiscalProfessorPayrollItem.employee) and not employeeAction.hasBankAccount(managersPayrollItem.employee)}"
+                        title="#{messages['Employee.warn.hasBankAccount']}"
+                        alt="#{messages['Employee.warn.hasBankAccount']}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fiscalProfessorPayrollItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fiscalProfessorPayrollItem.employee.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fiscalProfessorPayrollItem.employee.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fiscalProfessorPayrollItem.employee.firstName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{fiscalProfessorPayrollItem.liquid}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        &#160;
+        <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+    </rich:column>
+</rich:dataTable>
+<rich:dataTable value="#{managersPayrollGenerationDataModel}" var="managersPayrollItem"
+                rows="100000"
+                id="managersPayrollList" width="100%" columnsWidth="15%,15%,10%,15%,15%,15%,10%"
+                rendered="#{not accountingRecordAction.professorGenerationBySalary and accountingRecordAction.generationBySalaryType}">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                #{messages['AccountingRecord.paymentBankAccount']}
+                <h:selectOneMenu id="mainBankAccount"
+                                 value="#{accountingRecordAction.mainBankAccount}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support action="#{accountingRecordAction.selectAllBankAccounts}"
+                                 event="onchange"
+                                 reRender="managersPayrollList"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.paymentType']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.ci']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.lastName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.maidenName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.firstName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.liquid']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <s:div id="financesBankAccountFieldContainer">
+            <s:decorate id="financesBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="vertical" value="true"/>
+                <ui:param name="required" value="true"/>
+                <h:selectOneMenu id="financesBankAccount"
+                                 value="#{accountingRecordAction.selectedBankAccountMap[managersPayrollItem.id]}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[managersPayrollItem.employee.paymentType.resourceKey]}"/>
+        <h:graphicImage value="/img/warnIcon.gif" styleClass="select-image-middle"
+                        rendered="#{employeeAction.isBankAccountPaymentType(managersPayrollItem.employee) and not employeeAction.hasBankAccount(managersPayrollItem.employee)}"
+                        title="#{messages['Employee.warn.hasBankAccount']}"
+                        alt="#{messages['Employee.warn.hasBankAccount']}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{managersPayrollItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{managersPayrollItem.employee.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{managersPayrollItem.employee.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{managersPayrollItem.employee.firstName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{managersPayrollItem.liquid}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        &#160;
+        <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="managersPayrollDataScroller" for="managersPayrollList"
+                  dataModel="#{managersPayrollGenerationDataModel}"
+                  rendered="#{accountingRecordAction.generationBySalaryType}"/>
+
+<rich:dataTable value="#{professorsPayrollGenerationDataModel}" var="professorsPayrollItem"
+                rows="100000"
+                id="professorsPayrollList" width="100%" columnsWidth="15%,15%,10%,15%,15%,15%,10%"
+                rendered="#{not accountingRecordAction.professorGenerationBySalary and accountingRecordAction.generationByTimeType}">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                #{messages['AccountingRecord.paymentBankAccount']}
+                <h:selectOneMenu id="mainBankAccount"
+                                 value="#{accountingRecordAction.mainBankAccount}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support action="#{accountingRecordAction.selectAllBankAccounts}"
+                                 event="onchange"
+                                 reRender="professorsPayrollList"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.paymentType']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.ci']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.lastName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.maidenName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.firstName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.liquid']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <s:div id="financesBankAccountFieldContainer">
+            <s:decorate id="financesBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="vertical" value="true"/>
+                <ui:param name="required" value="true"/>
+                <h:selectOneMenu id="financesBankAccount"
+                                 value="#{accountingRecordAction.selectedBankAccountMap[professorsPayrollItem.id]}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[professorsPayrollItem.employee.paymentType.resourceKey]}"/>
+        <h:graphicImage value="/img/warnIcon.gif" styleClass="select-image-middle"
+                        rendered="#{employeeAction.isBankAccountPaymentType(professorsPayrollItem.employee) and not employeeAction.hasBankAccount(professorsPayrollItem.employee)}"
+                        title="#{messages['Employee.warn.hasBankAccount']}"
+                        alt="#{messages['Employee.warn.hasBankAccount']}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{professorsPayrollItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{professorsPayrollItem.employee.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{professorsPayrollItem.employee.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{professorsPayrollItem.employee.firstName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText id="liquid" value="#{professorsPayrollItem.liquid}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        &#160;
+        <h:outputText value="#{messages['FinancesCurrencyType.symbol.D']}"/>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="generalPayrollDataScroller" for="professorsPayrollList"
+                  dataModel="#{professorsPayrollGenerationDataModel}"
+                  rendered="#{accountingRecordAction.generationByTimeType}"/>
+
+<rich:dataTable value="#{christmasPayrollGenerationDataModel}" var="christmasPayrollItem"
+                rows="100000"
+                id="christmasPayrollList" width="100%" columnsWidth="15%,15%,10%,15%,15%,15%,10%"
+                rendered="#{accountingRecordAction.gestionPayrollChristmasBonusType}">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                #{messages['AccountingRecord.paymentBankAccount']}
+                <h:selectOneMenu id="mainBankAccount"
+                                 value="#{accountingRecordAction.mainBankAccount}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <a4j:support action="#{accountingRecordAction.selectAllBankAccounts}"
+                                 event="onchange"
+                                 reRender="christmasPayrollList"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.paymentType']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.ci']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.lastName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.maidenName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.firstName']}
+            </rich:column>
+            <rich:column>
+                #{messages['AccountingRecord.liquid']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <s:div id="financesBankAccountFieldContainer">
+            <s:decorate id="financesBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="vertical" value="true"/>
+                <ui:param name="required" value="true"/>
+                <h:selectOneMenu id="financesBankAccount"
+                                 value="#{accountingRecordAction.selectedBankAccountMap[christmasPayrollItem.id]}"
+                                 styleClass="inputMedium"
+                                 tabindex="1">
+                    <s:selectItems value="#{financesBankAccountResultList}" var="financesBankAccount"
+                                   label="#{messages[financesBankAccount.currency.symbolResourceKey]} - #{financesBankAccount.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[christmasPayrollItem.employee.paymentType.resourceKey]}"/>
+        <h:graphicImage value="/img/warnIcon.gif" styleClass="select-image-middle"
+                        rendered="#{employeeAction.isBankAccountPaymentType(christmasPayrollItem.employee) and not employeeAction.hasBankAccount(christmasPayrollItem.employee)}"
+                        title="#{messages['Employee.warn.hasBankAccount']}"
+                        alt="#{messages['Employee.warn.hasBankAccount']}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.idNumber}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.lastName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.maidenName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{christmasPayrollItem.employee.firstName}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{christmasPayrollItem.liquid}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        &#160;
+        <h:outputText value="#{messages['FinancesCurrencyType.symbol.P']}"/>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="christmasPayrollDataScroller" for="christmasPayrollList"
+                  dataModel="#{christmasPayrollGenerationDataModel}"
+                  rendered="#{accountingRecordAction.gestionPayrollChristmasBonusType}"/>
+</s:div>
+</app:fieldset>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{accountingRecordAction.create}"
+                     styleClass="button"
+                     value="#{messages['AccountingRecord.beginMigration']}"
+                     tabindex="4"
+                     rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}"
+                     onclick="Richfaces.showModalPanel('progressModalPanel');">
+        <s:defaultAction/>
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate id="fixAmountModalPanelContainer" template="/employees/fixAmountModalPanel.xhtml"
+            rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+    <ui:define name="dialogTitle">#{messages['AccountingRecord.fixAmount']}</ui:define>
+    <ui:define name="assignAction">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{accountingRecordAction.assignSomeValueOperation(accountingRecordAction.someValue)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('fixAmountModalPanel');"/>
+    </ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['AccountingRecord.processMessage']}"/>
+        </p>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="progressDialog" template="/include/progressDialog.xhtml"
+            rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+    <ui:param name="dialogId" value="progressModalPanel"/>
+    <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+    <ui:define name="progressTitle">#{messages['AccountingRecord.processTitle']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['AccountingRecord.processMessage']}"/>
+        </p>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="calculateProgressDialog" template="/include/progressDialog.xhtml"
+            rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+    <ui:param name="dialogId" value="calculateProgressModalPanel"/>
+    <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+    <ui:define name="progressTitle">#{messages['AccountingRecord.calculateProcessTitle']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['AccountingRecord.calculateProcessMessage']}"/>
+        </p>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="searchProgressDialog" template="/include/progressDialog.xhtml"
+            rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">
+    <ui:param name="dialogId" value="searchProgressModalPanel"/>
+    <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+    <ui:define name="progressTitle">#{messages['AccountingRecord.searchProcessTitle']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['AccountingRecord.searchProcessMessage']}"/>
+        </p>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{accountingRecordAction.assignProvider(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="payablesDocumentData"
+                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{accountingRecordAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+
+</ui:define>
+</ui:composition>         

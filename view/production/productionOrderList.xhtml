@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductionOrder.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <style type="text/css">
+        .special tr[id]{
+            display:none;
+        }
+    </style>
+
+    <ui:define name="body">
+        <h:form id="productionOrderSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductionOrder.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.code']}</ui:define>
+                    <h:inputText id="code" value="#{productionOrderDataModel.criteria.code}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.date']}</ui:define>
+                    <rich:calendar id="date" value="#{productionOrderDataModel.criteria.productionPlanning.date}">
+                    </rich:calendar>
+                    <a4j:commandButton action="#{productionOrderDataModel.search}"
+                                       reRender="productionOrderList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <rich:spacer height="20" />
+
+
+            <rich:dataTable value="#{productionOrderDataModel}" var="productionOrderItem" id="productionOrderList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productionOrder.code" dataModel="#{productionOrderDataModel}"
+                                                   reRender="productionOrderList, dataScroller">
+                                #{messages['ProductionOrder.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productionOrder.productionPlanning.date" dataModel="#{productionOrderDataModel}"
+                                                   reRender="productionOrderList, dataScroller">
+                                #{messages['ProductionOrder.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductionOrder.producedAmount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productionOrderItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productionOrderItem.productionPlanning.date}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productionOrderItem.producedAmount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{productionOrderAction.select(productionOrderItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productionOrderList" dataModel="#{productionOrderDataModel}"/>
+
+
+            <rich:jQuery selector="#productionOrderList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#productionOrderList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

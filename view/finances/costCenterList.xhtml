@@ -1,0 +1,141 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CostCenter.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="costCenterSearch">
+            <rich:simpleTogglePanel label="#{messages['CostCenter.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <ui:insert name="searchOptions"/>
+                    <s:div>
+                        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CostCenter.code']}</ui:define>
+                            <h:inputText id="code" value="#{costCenterDataModel.criteria.code}"
+                                         maxlength="20"
+                                         styleClass="input"
+                                         tabindex="1"/>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Common.showAll']}</ui:define>
+                            <h:selectBooleanCheckbox id="showAll" value="#{costCenterDataModel.showAll}" tabindex="2"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CostCenter.description']}</ui:define>
+                            <h:inputText id="description"
+                                         value="#{costCenterDataModel.criteria.description}"
+                                         maxlength="200"
+                                         styleClass="input"
+                                         tabindex="3"/>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton action="#{costCenterDataModel.search}"
+                                               reRender="costCenterList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="4">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/finances/costCenter.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('COSTCENTER','CREATE')}"
+                          propagation="none"/>
+            </div>
+            <rich:dataTable value="#{costCenterDataModel}"
+                            var="costCenterItem"
+                            id="costCenterList"
+                            rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="25%, 15%, 40%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="costCenter.groupCode,costCenter.code"
+                                                   dataModel="#{costCenterDataModel}"
+                                                   reRender="costCenterList, dataScroller">
+                                #{messages['CostCenter.group']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="costCenter.code"
+                                                   dataModel="#{costCenterDataModel}"
+                                                   reRender="costCenterList, dataScroller">
+                                #{messages['CostCenter.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="costCenter.description"
+                                                   dataModel="#{costCenterDataModel}"
+                                                   reRender="costCenterList, dataScroller">
+                                #{messages['CostCenter.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="costCenter.exclusiveConsumption"
+                                                   dataModel="#{costCenterDataModel}"
+                                                   reRender="costCenterList, dataScroller">
+                                #{messages['CostCenter.exclusiveConsumption']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText rendered="#{not empty costCenterItem.costCenterGroup}"
+                                  value="#{costCenterItem.costCenterGroup.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{costCenterItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{costCenterItem.description}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[costCenterItem.exclusiveConsumption?'Common.yes':'Common.not']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('COSTCENTER','VIEW')}"
+                                   action="#{costCenterAction.select(costCenterItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="costCenterList" dataModel="#{costCenterDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/finances/costCenter.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('COSTCENTER','CREATE')}"
+                          propagation="none"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

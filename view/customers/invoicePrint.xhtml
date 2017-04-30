@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:document xmlns:ui="http://java.sun.com/jsf/facelets"
+            xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:s="http://jboss.com/products/seam/taglib"
+            xmlns:c="http://java.sun.com/jstl/core"
+            xmlns:h="http://java.sun.com/jsf/html"
+            xmlns:p="http://jboss.com/products/seam/pdf" pageSize="212 524" margins="15 15 30 30">
+
+    <p:font size="8">
+        <p:paragraph alignment="center"><p:text value="ICNorte S.A."/></p:paragraph>
+        <p:paragraph alignment="center"><p:text value="Av. Melchor Perez de olguin"/></p:paragraph>
+        <p:paragraph alignment="center"><p:text value="Cbba - Bolivia"/></p:paragraph>
+    </p:font>
+
+
+    <p:font size="8">
+        <p:paragraph alignment="center" spacingBefore="2">FACTURA</p:paragraph>
+    </p:font>
+    <p:paragraph alignment="center" spacingBefore="0">---------------------------------------------</p:paragraph>
+
+    <p:font size="8">
+        <p:paragraph alignment="left">#{messages['Entity.idNumber']}: 1111111111111</p:paragraph>
+        <p:paragraph alignment="left">#{messages['Invoice.number']}: #{invoicePrintAction.invoice.number}</p:paragraph>
+    </p:font>
+    <p:paragraph alignment="center" spacingBefore="0">---------------------------------------------</p:paragraph>
+    <p:font size="8">
+        <p:paragraph alignment="left">
+            <p:text value="#{messages['Invoice.date']}: "/>
+            <p:text value="#{invoicePrintAction.invoice.creationDate}">
+                <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+            </p:text>
+        </p:paragraph>
+        <p:paragraph alignment="left">
+            <c:choose>
+                <c:when test="#{empty invoicePrintAction.invoice.organizationName}">
+                    <p:text value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.lastName} #{invoicePrintAction.invoice.maidenName} #{invoicePrintAction.invoice.firstName}"/>
+                </c:when>
+                <c:otherwise>
+                    <p:text value="#{messages['Invoice.customer']}: #{invoicePrintAction.invoice.organizationName}"/>
+                </c:otherwise>
+            </c:choose>
+        </p:paragraph>
+        <p:paragraph alignment="left"><p:text
+                value="#{messages['Entity.idNumber']}: #{invoicePrintAction.invoice.customer.entity.idNumber}"/>
+        </p:paragraph>
+    </p:font>
+    <p:paragraph alignment="center" spacingBefore="0">---------------------------------------------</p:paragraph>
+    <p:font size="7">
+        <p:table columns="4" widths="1 2 1 1" widthPercentage="100" horizontalAlignment="left" spacingBefore="5"
+                 headerRows="1">
+            <f:facet name="defaultCell">
+                <p:cell borderWidth="0" horizontalAlignment="left"/>
+            </f:facet>
+
+            <p:cell horizontalAlignment="right">
+                <p:paragraph>#{messages['InvoiceDetail.quantity']}</p:paragraph>
+            </p:cell>
+            <p:cell horizontalAlignment="center">
+                <p:paragraph>#{messages['InvoiceDetail.product.name']}</p:paragraph>
+            </p:cell>
+            <p:cell horizontalAlignment="center">
+                <p:paragraph>#{messages['InvoiceDetail.price']}</p:paragraph>
+            </p:cell>
+            <p:cell horizontalAlignment="center">
+                <p:paragraph>#{messages['InvoiceDetail.totalAmount']}</p:paragraph>
+            </p:cell>
+            <ui:repeat value="#{invoicePrintAction.invoice.details}" var="detail">
+                <p:cell horizontalAlignment="right">
+                    <p:paragraph>#{detail.quantity}</p:paragraph>
+                </p:cell>
+                <p:cell>
+                    <p:paragraph>#{detail.product.name}</p:paragraph>
+                </p:cell>
+                <p:cell horizontalAlignment="right">
+                    <p:paragraph>
+                        <p:text value="#{detail.price}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </p:text>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell horizontalAlignment="right">
+                    <p:paragraph>
+                        <p:text value="#{detail.totalAmount}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </p:text>
+                    </p:paragraph>
+                </p:cell>
+            </ui:repeat>
+
+            <p:cell colspan="3" borderWidth="0" horizontalAlignment="right">
+                <p:font size="8"><p:paragraph>#{messages['Invoice.totalSum']} Bs.:</p:paragraph></p:font>
+            </p:cell>
+            <p:cell borderWidth="0" horizontalAlignment="right">
+                <p:font size="7"><p:paragraph>
+                    <p:text value="#{invoicePrintAction.invoice.totalAmount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </p:text>
+                </p:paragraph></p:font>
+            </p:cell>
+        </p:table>
+    </p:font>
+    <p:paragraph alignment="center" spacingBefore="0">---------------------------------------------</p:paragraph>
+
+</p:document>
+

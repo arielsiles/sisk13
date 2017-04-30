@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/customers/*" login-required="true"/>
+
+    <page view-id="/customers/documentTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{documentTypeAction.select(documentTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/documentType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/documentType.xhtml" no-conversation-view-id="/customers/documentTypeList.xhtml">
+        <navigation from-action="#{extensionAction.addExtension}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/extension.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{extensionAction.select(extensionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/extension.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/customers/documentType.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/documentTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/extension.xhtml"
+          no-conversation-view-id="/customers/documentTypeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/documentType.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/customers/documentType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/customerCategoryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{customerCategoryAction.select(customerCategoryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/customerCategory.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/customerCategory.xhtml" no-conversation-view-id="/customers/customerCategoryList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/customerCategoryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/partnerClubCategoryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{partnerClubCategoryAction.select(partnerClubCategoryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/partnerClubCategory.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/partnerClubCategory.xhtml"
+          no-conversation-view-id="/customers/partnerClubCategoryList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/partnerClubCategoryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="*">
+        <navigation from-action="#{invoiceCustomerAction.validateResponsibleUser}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/invoiceCustomer.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoiceCustomerAction.openCashBox}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/invoiceCustomer.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/invoiceCustomer.xhtml" no-conversation-view-id="/customers/invoiceCustomer.xhtml">
+        <begin-conversation join="true" flush-mode="MANUAL"/>
+        <navigation from-action="#{invoiceCustomerAction.select}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/invoice.xhtml">
+                    <param name="id" value="#{invoice.id}"/>
+                </redirect>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoiceCustomerAction.cancel}">
+            <end-conversation before-redirect="true"/>
+            <redirect view-id="/customers/invoiceCustomer.xhtml"/>
+        </navigation>
+        <param name="id" value="#{invoiceCustomerAction.idPreviousInvoice}"/>
+
+        <navigation from-action="#{invoiceCustomerAction.validateResponsibleUser}">
+            <rule if-outcome="Success">
+                <redirect view-id="/login.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoiceCustomerAction.closeCashBox}">
+            <rule if-outcome="Success">
+                <redirect view-id="/login.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/invoice.xhtml" no-conversation-view-id="/customers/invoiceCustomer.xhtml">
+        <begin-conversation join="true" flush-mode="MANUAL"/>
+        <navigation from-action="#{invoiceAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/invoiceCustomer.xhtml">
+                    <param name="id" value="#{invoice.id}"/>
+                </redirect>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoiceAction.cancel}">
+            <end-conversation before-redirect="true"/>
+            <redirect view-id="/customers/invoiceCustomer.xhtml">
+                <param name="id" value="-1"/>
+            </redirect>
+        </navigation>
+        <param name="id" value="#{invoicePrintAction.invoiceId}"/>
+    </page>
+
+
+    <page view-id="/customers/creditList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{creditAction.select(creditItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/account.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/accountList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/credit.xhtml" no-conversation-view-id="/customers/creditList.xhtml">
+        <!--<navigation from-action="#{creditAction.cancel}">
+            <rule>
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+        </navigation>-->
+        <navigation from-action="#{creditAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+        <!-- For Credit, Add Credit Payment -->
+        <navigation from-action="#{creditAction.addCreditPayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/addCreditPayment.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{creditAction.addPayoutCredit}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/addPayoutCredit.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{creditAction.selectCreditTransaction(creditTransactionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/addCreditPayment.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/addCreditPayment.xhtml"
+          no-conversation-view-id="/customers/creditList.xhtml">
+        <navigation from-action="#{creditTransactionAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/addPayoutCredit.xhtml" no-conversation-view-id="/customers/creditList.xhtml">
+        <!--<navigation from-action="#{creditTransactionAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>-->
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/partner.xhtml" no-conversation-view-id="/customers/partnerList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/partnerList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/partnerList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{partnerAction.select(partnerItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/partner.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/discountPolicyList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{discountPolicyAction.select(discountPolicyItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/discountPolicy.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/discountPolicy.xhtml" no-conversation-view-id="/customers/discountPolicyList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/discountPolicyList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/customerDiscountRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{customerDiscountRuleAction.select(customerDiscountRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/customerDiscountRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/customerDiscountRule.xhtml"
+          no-conversation-view-id="/customers/customerDiscountRuleList.xhtml">
+        <navigation from-action="#{customerDiscountRuleAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true"/>
+                <redirect view-id="/customers/customerDiscountRule.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/customerDiscountRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/customers/invoicePrintHeader.xhtml">
+        <param name="id" value="#{invoicePrintAction.invoiceId}"/>
+    </page>
+
+    <page view-id="/customers/invoicePrintBody.xhtml">
+        <param name="detailId" value="#{invoicePrintAction.invoiceDetailId}"/>
+    </page>
+
+    <page view-id="/customers/invoicePrintFooter.xhtml">
+        <param name="id" value="#{invoicePrintAction.invoiceId}"/>
+    </page>
+
+    <page view-id="/customers/invoicePrintTxt.xhtml">
+        <param name="id" value="#{invoicePrintAction.invoiceId}"/>
+    </page>
+
+</pages>

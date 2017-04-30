@@ -1,0 +1,224 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{administrativeNotificationAction.managed}">
+            #{messages['AdministrativeNotification.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['AdministrativeNotification.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyWidth" value="90%"/>
+
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+    <h:form id="userForm">
+
+        <div class="buttons">
+            <h:commandButton id="createButtonId"
+                             action="#{administrativeNotificationAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','CREATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton id="updateButtonId"
+                             action="#{administrativeNotificationAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','UPDATE')}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','DELETE')}">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{administrativeNotificationAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true">
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{administrativeNotificationAction.managed}">
+                        #{messages['AdministrativeNotification.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['AdministrativeNotification.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+
+            <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.title']}</ui:define>
+                <h:inputText id="title"
+                             value="#{administrativeNotification.title}"
+                             styleClass="input"
+                             required="true"
+                             maxlength="40"
+                             tabindex="1"/>
+            </s:decorate>
+
+            <s:decorate id="administrativeEventTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.administrativeEventType']}
+                </ui:define>
+                <h:selectOneMenu id="administrativeEventType"
+                                 value="#{administrativeNotification.administrativeEventType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="2">
+                    <s:selectItems value="#{administrativeEventType}" var="type"
+                                   label="#{messages[type.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="publishDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.publishDate']}</ui:define>
+                <rich:calendar id="publishDate"
+                               value="#{administrativeNotification.publishDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.dateTime']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               required="true"
+                               tabindex="3">
+                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="dateTime"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="expirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.expirationDate']}</ui:define>
+                <rich:calendar id="expirationDate"
+                               value="#{administrativeNotification.expirationDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.dateTime']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               required="true"
+                               tabindex="4">
+                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="dateTime"/>
+                    <app:dateRangeValidator forId="publishDate"
+                                            forLabel="#{messages['AdministrativeNotification.publishDate']}"
+                                            type="greater"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="roleListField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.roleList']}</ui:define>
+                <h:selectManyListbox id="roleList" value="#{administrativeNotification.roleList}"
+                                     styleClass="input textarea"
+                                     tabindex="5">
+                    <s:selectItems value="#{roleList.resultList}" var="role" label="#{role.name}"
+                                   noSelectionLabel="#{messages['AdministrativeNotification.showToAll']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectManyListbox>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['AdministrativeNotification.description']}</ui:define>
+                <rich:editor id="description" width="550" height="300" theme="advanced" tabindex="6"
+                             required="true"
+                             value="#{administrativeNotification.description}">
+                    <f:param name="theme_advanced_buttons1"
+                             value="bold,italic,underline,cut,copy,paste,separator,forecolor,backcolor,separator,fontselect,fontsizeselect"/>
+                    <f:param name="theme_advanced_buttons2"
+                             value="justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,outdent,indent,separator,undo,redo,separator,hr,removeformat,separator,sub,sup,separator,charmap"/>
+                    <f:param name="theme_advanced_buttons3" value=""/>
+                    <f:param name="theme_advanced_more_colors" value="false"/>
+                    <f:param name="theme_advanced_toolbar_location" value="top"/>
+                    <f:param name="theme_advanced_toolbar_align" value="left"/>
+                </rich:editor>
+            </s:decorate>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{administrativeNotificationAction.create}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','CREATE')}"
+                             tabindex="7">
+            </h:commandButton>
+
+            <h:commandButton action="#{administrativeNotificationAction.update}"
+                             value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','UPDATE')}"
+                             tabindex="8">
+            </h:commandButton>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','DELETE')}"
+                             tabindex="9">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{administrativeNotificationAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"
+                             tabindex="10">
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{administrativeNotificationAction.managed and s:hasPermission('ADMINISTRATIVENOTIFICATION','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['AdministrativeNotification.delete.confirmation']}">
+                    <f:param value="#{administrativeNotification.title}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{administrativeNotificationAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               tabindex="16"
+                               rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','DELETE')}"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:fragment>
+        <rich:jQuery selector="#title" query="focus()" timing="onload"/>
+    </s:fragment>
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,222 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{taxRuleAction.managed}">
+            #{messages['TaxRule.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['TaxRule.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="taxRuleForm">
+
+        <div class="buttons">
+            <h:commandButton action="#{taxRuleAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{!taxRuleAction.managed}" id="createButtonId">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton id="updateButtonId" action="#{taxRuleAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{taxRuleAction.managed}">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button" rendered="#{taxRuleAction.managed}">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+            <h:commandButton action="#{taxRuleAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"/>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{taxRuleAction.managed}">
+                        #{messages['TaxRule.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['TaxRule.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+
+            <s:decorate id="taxPercentageField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.taxPercentage']}</ui:define>
+                <h:selectOneMenu id="taxPercentage" value="#{taxRule.taxPercentage}" styleClass="input"
+                                 required="true" tabindex="1">
+                    <s:selectItems value="#{taxPercentageList.resultList}" var="taxPercentage"
+                                   label="#{taxPercentage.percentage} #{taxPercentage.taxPercentageType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="dosageTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.dosageType']}</ui:define>
+                <h:selectOneMenu id="dosageType" value="#{taxRule.dosageType}" styleClass="input"
+                                 required="true" tabindex="2">
+                    <s:selectItems value="#{dosageTypeList.resultList}" var="dosageType"
+                                   label="#{dosageType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="orderNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.orderNumber']}</ui:define>
+                <h:inputText id="orderNumber" value="#{taxRule.orderNumber}" styleClass="input" required="true"
+                             maxlength="50" tabindex="3"/>
+            </s:decorate>
+
+            <s:decorate id="serialNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.serialNumber']}</ui:define>
+                <h:inputText id="serialNumber" value="#{taxRule.serialNumber}" styleClass="input" required="true"
+                             maxlength="50" tabindex="4"/>
+            </s:decorate>
+
+            <s:decorate id="startInvoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.startInvoiceNumber']}</ui:define>
+                <h:inputText id="startInvoiceNumber" value="#{taxRule.startInvoiceNumber}" styleClass="input"
+                             required="true" maxlength="100" tabindex="5">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="endInvoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.endInvoiceNumber']}</ui:define>
+                <h:inputText id="endInvoiceNumber" value="#{taxRule.endInvoiceNumber}" styleClass="input"
+                             required="true" maxlength="100" tabindex="6">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="currentInvoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.currentInvoiceNumber']}</ui:define>
+                <h:inputText id="currentInvoiceNumber" value="#{taxRule.currentInvoiceNumber}" styleClass="input"
+                             required="true" maxlength="100" tabindex="7">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="assignedAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.assignedAmount']}</ui:define>
+                <h:inputText id="assignedAmount" value="#{taxRule.assignedAmount}" styleClass="input"
+                             required="true" maxlength="100" tabindex="8">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="minimalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.minimalAmount']}</ui:define>
+                <h:inputText id="minimalAmount" value="#{taxRule.minimalAmount}" styleClass="input"
+                             required="true" maxlength="100" tabindex="9">
+                    <app:naturalNumberConverter/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="requestDosageField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.requestDosage']}</ui:define>
+                <h:inputText id="requestDosage" value="#{taxRule.requestDosage}" styleClass="input"
+                             required="true" maxlength="150" tabindex="10"/>
+            </s:decorate>
+
+            <s:decorate id="dateRequestField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.dateRequest']}</ui:define>
+                <rich:calendar value="#{taxRule.dateRequest}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               required="true"
+                               enableManualInput="true"
+                               tabindex="11">
+                    <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="dateDosageField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.dateDosage']}</ui:define>
+                <rich:calendar value="#{taxRule.dateDosage}"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               required="true"
+                               enableManualInput="true"
+                               tabindex="12">
+                    <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="userField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.user']}</ui:define>
+                <h:selectOneMenu id="user" value="#{taxRule.user}" styleClass="input"
+                                 required="true" tabindex="13">
+                    <s:selectItems value="#{userList.resultList}" var="user"
+                                   label="#{user.employee.firstName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['TaxRule.notes']}</ui:define>
+                <h:inputTextarea id="descriptionBU" value="#{taxRule.notes}" styleClass="input textarea"
+                                 tabindex="14"/>
+            </s:decorate>
+        </rich:panel>
+
+
+        <div class="buttons">
+            <h:commandButton action="#{taxRuleAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{!taxRuleAction.managed}"
+                             tabindex="15"/>
+            <h:commandButton action="#{taxRuleAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{taxRuleAction.managed}"
+                             tabindex="16"/>
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button" rendered="#{taxRuleAction.managed}"
+                             tabindex="17">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+            <h:commandButton action="#{taxRuleAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="18"/>
+        </div>
+
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml" rendered="#{taxRuleAction.managed}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['TaxRule.delete.confirmation']}">
+                    <f:param value="#{taxRule.orderNumber}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{taxRuleAction.delete}"
+                               value="#{messages['Common.delete']}" immediate="true"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

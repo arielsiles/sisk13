@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <h:panelGrid columns="1"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0">
+        <s:div id="gestionTaxDetailsPanel">
+            <div class="buttons">
+                <a4j:commandButton id="addGestionTaxCommandButton"
+                                   value="#{messages['GestionTax.button.addGetionTax']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('gestionTaxModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   reRender="gestionTaxModalPanel">
+                </a4j:commandButton>
+            </div>
+
+            <rich:dataTable value="#{rawMaterialProducer.producerTaxes}"
+                            var="instance"
+                            id="instancesList"
+                            rows="7"
+                            width="100%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column styleClass="center">
+                            #{messages['GestionTax.numberForm']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['GestionTax.startDate']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['GestionTax.endDate']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:inputText id="formNumber"
+                                 value="#{instance.formNumber}"
+                                 styleClass="input"
+                                 required="true">
+                    </h:inputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{instance.gestionTax.startDate}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{instance.gestionTax.endDate}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <s:div id="removeLinkId">
+                        <a4j:commandLink ajaxSingle="true"
+                                         immediate="true"
+                                         title="#{messages['Common.remove']}"
+                                         action="#{rawMaterialProducerAction.removeGestionTax(instance)}"
+                                         reRender="gestionTaxDetailsPanel">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </s:div>
+                </rich:column>
+            </rich:dataTable>
+        </s:div>
+    </h:panelGrid>
+</ui:composition>

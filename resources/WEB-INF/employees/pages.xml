@@ -1,0 +1,1455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/employees/*" login-required="true"/>
+
+    <page view-id="/employees/afpRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{afpRateAction.select(afpRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/afpRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/afpRate.xhtml" no-conversation-view-id="/employees/afpRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/afpRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/cnsRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cnsRateAction.select(cnsRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/cnsRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/cnsRate.xhtml" no-conversation-view-id="/employees/cnsRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/cnsRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/ivaRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{ivaRateAction.select(ivaRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/ivaRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/ivaRate.xhtml" no-conversation-view-id="/employees/ivaRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/ivaRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/smnRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{smnRateAction.select(smnRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/smnRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/smnRate.xhtml" no-conversation-view-id="/employees/smnRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/smnRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/bonusList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{bonusAction.select(bonusItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/bonus.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/bonus.xhtml" no-conversation-view-id="/employees/bonusList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/bonusList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/bonus.xhtml">
+        <navigation from-action="#{seniorityBonusDetailAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/seniorityBonusDetail.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{seniorityBonusDetailAction.select(seniorityBonusDetailItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/seniorityBonusDetail.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/bonusList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/seniorityBonusDetail.xhtml" no-conversation-view-id="/employees/bonus.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/bonus.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/employeeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{employeeAction.select(employeeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/employee.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/employee.xhtml" no-conversation-view-id="/employees/employeeList.xhtml">
+        <navigation from-action="#{employeeAcademicFormationAction.assignAcademicFormation}">
+            <rule>
+                <redirect view-id="/employees/employeeAcademicFormation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{employeeAcademicFormationAction.select(academicFormationItem)}">
+            <rule>
+                <redirect view-id="/employees/employeeAcademicFormation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/employeeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/employeeAcademicFormation.xhtml" no-conversation-view-id="/employees/employeeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/employee.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/employees/postulantList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{postulantAction.select(postulantItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/postulant.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/postulant.xhtml" no-conversation-view-id="/employees/postulantList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/postulantList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/exchangeRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{exchangeRateAction.select(exchangeRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/exchangeRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/exchangeRate.xhtml" no-conversation-view-id="/employees/exchangeRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/exchangeRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+    <page view-id="/employees/kindOfSalaryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{kindOfSalaryAction.select(kindOfSalaryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/kindOfSalary.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/kindOfSalary.xhtml" no-conversation-view-id="/employees/kindOfSalaryList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/kindOfSalaryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/organizationalUnitList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{organizationalUnitAction.select(organizationalUnitItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/organizationalUnit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/organizationalUnit.xhtml"
+          no-conversation-view-id="/employees/organizationalUnitList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/organizationalUnitList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/organizationalLevelList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{organizationalLevelAction.select(organizationalLevelItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/organizationalLevel.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/organizationalLevel.xhtml"
+          no-conversation-view-id="/employees/organizationalLevelList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/organizationalLevelList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/gestionPayrollSchedule.xhtml"
+          no-conversation-view-id="/employees/gestionPayrollScheduleList.xhtml">
+        <navigation from-action="#{gestionPayrollScheduleAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/gestionPayrollSchedule.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/gestionPayrollScheduleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/gestionPayrollScheduleList.xhtml">
+        <navigation from-action="#{gestionPayrollScheduleAction.select(gestionPayrollScheduleItem)}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/gestionPayrollSchedule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/gestionPayrollList.xhtml">
+        <navigation from-action="#{gestionPayrollAction.select(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/gestionPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.generatePayroll(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generatePayroll.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.viewPayroll(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/generatePayroll.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/payrollGenCycleGeneratePayroll.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/gestionPayroll.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/specialDateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{specialDateAction.select(specialDateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/specialDate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/specialDate.xhtml" no-conversation-view-id="/employees/specialDateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/specialDateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/rHMarkList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rHMarkAction.select(rHMarkItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/rHMark.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/rHMark.xhtml" no-conversation-view-id="/employees/rHMarkList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/rHMarkList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/horaryBandContractList.xhtml">
+        <!--<end-conversation/>-->
+        <navigation from-action="#{horaryBandContractAction.select(horaryBandContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/horaryBandContract.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{horaryBandContractAction.selectUnsubscribe(horaryBandContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/horaryBandContractChanges.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{horaryBandContractAction.selectBandChange(horaryBandContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/horaryBandContractChanges.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/horaryBandContract.xhtml"
+          no-conversation-view-id="/employees/horaryBandContractList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/horaryBandContractList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/horaryBandContractChanges.xhtml"
+          no-conversation-view-id="/employees/horaryBandContractList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/horaryBandContractList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/toleranceList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{toleranceAction.select(toleranceItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/tolerance.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/tolerance.xhtml" no-conversation-view-id="/employees/toleranceList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/toleranceList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/bankAccountList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{bankAccountAction.select(bankAccountItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/bankAccount.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/bankAccount.xhtml" no-conversation-view-id="/employees/bankAccountList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/bankAccountList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/sectorList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{sectorAction.select(sectorItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/sector.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/sector.xhtml" no-conversation-view-id="/employees/sectorList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/sectorList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/contractModeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{contractModeAction.select(contractModeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/contractMode.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/contractMode.xhtml" no-conversation-view-id="/employees/contractModeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/contractModeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/bankEntityList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{bankEntityAction.select(bankEntityItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/bankEntity.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/bankEntity.xhtml" no-conversation-view-id="/employees/bankEntityList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/bankEntityList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/subjectList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{subjectAction.select(subjectItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/subject.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/subject.xhtml" no-conversation-view-id="/employees/subjectList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/subjectList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/subjectGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{subjectGroupAction.select(subjectGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/subjectGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/subjectGroup.xhtml" no-conversation-view-id="/employees/subjectGroupList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/subjectGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/jobCategoryList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{jobCategoryAction.select(jobCategoryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobCategory.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/jobCategory.xhtml" no-conversation-view-id="/employees/jobCategoryList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/jobCategoryList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/controlReportList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{controlReportAction.select(controlReportItem)}">
+            <rule if-outcome="Success">
+                <!--<redirect view-id="/employees/area.xhtml"/>-->
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/generatedPayrollList.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation from-action="#{generatedPayrollAction.viewProfessorsGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generalPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewManagersGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/managersPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewFiscalProfessorGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/fiscalProfessorPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.select(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generatedPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewChristmasGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/christmasPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{controlReportAction.viewControlReport(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generalControlReportList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/employees/gestionPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation from-action="#{generatedPayrollAction.viewProfessorsGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generalPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewManagersGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/managersPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewFiscalProfessorGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/fiscalProfessorPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.select(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generatedPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{generatedPayrollAction.viewChristmasGeneratedPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/christmasPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{controlReportAction.viewControlReport(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generalControlReportList.xhtml"/>
+            </rule>
+        </navigation>
+        <!--category tributary payroll-->
+        <navigation
+                from-action="#{generatedPayrollAction.viewCategoryTributaryPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/categoryTributaryPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <!--category fiscal payroll-->
+        <navigation
+                from-action="#{generatedPayrollAction.viewCategoryFiscalPayroll(generatedPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/categoryFiscalPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/generalControlReportList.xhtml"
+          no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel" if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel" if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/generatedPayroll.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/limitList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{limitAction.select(limitItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/limit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/limit.xhtml" no-conversation-view-id="/employees/limitList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/limitList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/currencyList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{currencyAction.select(currencyItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/currency.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/currency.xhtml" no-conversation-view-id="/employees/currencyList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/currencyList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/generalPayrollList.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel" if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel" if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/managersPayrollList.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel" if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel" if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+    <page view-id="/employees/fiscalProfessorPayrollList.xhtml"
+          no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel" if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel" if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/christmasPayrollList.xhtml" no-conversation-view-id="/employees/gestionPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel" if="#{empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/generatedPayrollList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel" if="#{not empty generatedPayrollAction.payrollGenerationCycleAction}">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/categoryTributaryPayrollList.xhtml"
+          no-conversation-view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/categoryFiscalPayrollList.xhtml"
+          no-conversation-view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/pollFormList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{pollFormAction.select(pollFormItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/pollForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/pollForm.xhtml" no-conversation-view-id="/employees/pollFormList.xhtml">
+        <navigation from-action="#{sectionAction.assignSection}">
+            <rule>
+                <redirect view-id="/employees/section.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{sectionAction.select(sectionItem)}">
+            <rule>
+                <redirect view-id="/employees/section.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{questionAction.assignQuestion}">
+            <rule>
+                <redirect view-id="/employees/question.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{questionAction.select(questionItem)}">
+            <rule>
+                <redirect view-id="/employees/question.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{pollCopyAction.assignPollCopy}">
+            <rule>
+                <redirect view-id="/employees/pollCopy.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{pollCopyAction.selectFromPollForm(pollCopyItem)}">
+            <rule>
+                <redirect view-id="/employees/pollCopy.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/pollFormList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/section.xhtml" no-conversation-view-id="/employees/pollFormList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/pollForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/question.xhtml" no-conversation-view-id="/employees/pollFormList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/pollForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/pollCopyList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{pollCopyAction.selectFromPollCopyList(pollCopyItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/pollCopy.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/pollCopy.xhtml" no-conversation-view-id="/employees/pollFormList.xhtml">
+        <navigation>
+            <rule if-outcome="fromPollForm">
+                <redirect view-id="/employees/pollForm.xhtml"/>
+            </rule>
+            <rule if-outcome="fromPollCopyList">
+                <redirect view-id="/employees/pollCopyList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- JobContract -->
+    <page view-id="/employees/jobContractList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{jobContractAction.select(jobContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobContract.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation
+                from-action="#{generateEmployeeContractAction.generateForwad(jobContractItem.contract.employee,jobContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generateEmployeeContract.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/jobContract.xhtml" no-conversation-view-id="/employees/jobContractList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/jobContractList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/generateEmployeeContract.xhtml"
+          no-conversation-view-id="/employees/jobContractList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/jobContractList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Contract-->
+    <page view-id="/employees/contractList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{contractAction.select(contractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/contract.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/contract.xhtml" no-conversation-view-id="/employees/contractList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/contractList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{jobContractAction.select(jobContractItem)}">
+            <begin-conversation flush-mode="MANUAL" join="false"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobContract.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{jobContractAction.selectJobContract(jobContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobContract.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation
+                from-action="#{generateEmployeeContractAction.generateForwad(jobContractItem.contract.employee,jobContractItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/generateEmployeeContract.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Salary Movement-->
+    <page view-id="/employees/salaryMovementList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salaryMovementAction.select(salaryMovementItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/salaryMovement.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/salaryMovement.xhtml"
+          no-conversation-view-id="/employees/salaryMovementList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/salaryMovementList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Salary Movement Type-->
+    <page view-id="/employees/salaryMovementTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salaryMovementTypeAction.select(salaryMovementTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/salaryMovementType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/salaryMovementType.xhtml"
+          no-conversation-view-id="/employees/salaryMovementTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/salaryMovementTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!--Gestion-->
+    <page view-id="/employees/gestionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{gestionAction.select(gestionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/gestion.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/gestion.xhtml"
+          no-conversation-view-id="/employees/gestionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/gestionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!--Cycle-->
+    <page view-id="/employees/cycleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cycleAction.select(cycleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/cycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/cycle.xhtml"
+          no-conversation-view-id="/employees/cycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/cycleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--EvaluationCriteria-->
+    <page view-id="/employees/evaluationCriteriaList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{evaluationCriteriaAction.select(evaluationCriteriaItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/evaluationCriteria.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/evaluationCriteria.xhtml"
+          no-conversation-view-id="/employees/evaluationCriteriaList.xhtml">
+        <navigation from-action="#{evaluationCriteriaValueAction.assignCriteriaValue}">
+            <rule>
+                <redirect view-id="/employees/evaluationCriteriaValue.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{evaluationCriteriaValueAction.select(evaluationCriteriaValueItem)}">
+            <rule>
+                <redirect view-id="/employees/evaluationCriteriaValue.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/evaluationCriteriaList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/evaluationCriteriaValue.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/evaluationCriteria.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/accountingRecord.xhtml" no-conversation-view-id="/home.xhtml">
+        <navigation from-action="#{accountingRecordAction.create}">
+            <rule>
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/finalEvaluationFormList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{finalEvaluationFormAction.select(finalEvaluationFormItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/finalEvaluationForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/finalEvaluationForm.xhtml"
+          no-conversation-view-id="/employees/finalEvaluationFormList.xhtml">
+        <navigation from-action="#{finalEvaluationPunctuationRangeAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/finalEvaluationPunctuationRange.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{finalEvaluationPunctuationRangeAction.select(finalEvaluationPunctuationRangeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/finalEvaluationPunctuationRange.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/finalEvaluationFormList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/finalEvaluationPunctuationRange.xhtml"
+          no-conversation-view-id="/employees/finalEvaluationFormList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/finalEvaluationForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/scheduleEvaluationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{scheduleEvaluationAction.select(scheduleEvaluationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/scheduleEvaluation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/scheduleEvaluation.xhtml"
+          no-conversation-view-id="/empoyees/scheduleEvlauationList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/scheduleEvaluationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/dischargeDocumentList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{dischargeDocumentAction.select(element)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/dischargeDocument.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/dischargeDocument.xhtml"
+          no-conversation-view-id="/employees/dischargeDocumentList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/dischargeDocumentList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/payrollGenerationCycleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{payrollGenerationCycleAction.select(element)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/payrollGenerationCycle.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation from-action="#{payrollGenerationCycleAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/employees/payrollGenerationCycleList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{payrollGenerationCycleAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/employees/payrollGenerationCycleList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.select(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenCycleGestionPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.generatePayroll(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenCycleGeneratePayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.viewPayroll(gestionPayrollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenCycleGeneratedPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{tributaryPayrollGeneratedAction.select(tributaryPayrollElement)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/tributaryPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{fiscalPayrollGeneratedAction.select(fiscalPayrollElement)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/fiscalPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{payrollGenerationCycleAction.generateTributaryPayroll}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{payrollGenerationCycleAction.generateFiscalPayroll}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{payrollGenerationInvestmentRegistrationCreateAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenerationInvestmentRegistrationCreate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{gestionPayrollAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/payrollGenCycleGestionPayroll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoicesFormAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/invoicesForm.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{invoicesFormAction.select(invoicesFormItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/invoicesForm.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{extraHoursWorkedAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/extraHoursWorked.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{extraHoursWorkedAction.select(extraHoursWorkedItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/extraHoursWorked.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{grantedBonusCreateAction.addGrantedBonus}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/grantedBonusCreate.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{grantedBonusAction.select(grantedBonusItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/grantedBonus.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+        <!--tributary payroll-->
+        <navigation
+                from-action="#{payrollGenerationCycleAction.viewTributaryPayroll(payrollGenerationCycleAction.instance)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/tributaryPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+        <!--fiscal payroll-->
+        <navigation
+                from-action="#{payrollGenerationCycleAction.viewFiscalPayroll(payrollGenerationCycleAction.instance)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/fiscalPayrollList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/tributaryPayrollList.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/fiscalPayrollList.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/payrollGenerationInvestmentRegistrationCreate.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/payrollGenCycleGestionPayroll.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/tributaryPayroll.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/fiscalPayroll.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/invoicesForm.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/extraHoursWorked.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/grantedBonusCreate.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycle.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/grantedBonus.xhtml"
+          no-conversation-view-id="/employees/payrollGenerationCycle.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/payrollGenerationCycle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Vacation rule-->
+    <page view-id="/employees/vacationRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{vacationRuleAction.select(vacationRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/vacationRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/vacationRule.xhtml" no-conversation-view-id="/employees/vacationRuleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/vacationRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Vacation plan-->
+    <page view-id="/employees/vacationPlanningList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{vacationPlanningAction.select(vacationPlanningItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/vacationPlanning.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/vacationPlanning.xhtml" no-conversation-view-id="/employees/vacationPlanningList.xhtml">
+        <navigation from-action="#{vacationAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/vacation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{vacationAction.select(vacationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/vacation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{vacationPlanningAction.synchronizeVacationDays}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/vacationPlanning.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/vacationPlanningList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Vacation-->
+    <page view-id="/employees/vacation.xhtml" no-conversation-view-id="/employees/vacationPlanningList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/vacationPlanning.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Discount rule-->
+    <page view-id="/employees/discountRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{discountRuleAction.select(discountRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/discountRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/discountRule.xhtml" no-conversation-view-id="/employees/discountRuleList.xhtml">
+        <navigation from-action="#{discountRuleRangeAction.newInstance}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/discountRuleRange.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{discountRuleRangeAction.select(discountRuleRangeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/discountRuleRange.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/discountRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--Discount rule range-->
+    <page view-id="/employees/discountRuleRange.xhtml" no-conversation-view-id="/employees/discountRuleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/discountRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!--DismissalCause-->
+    <page view-id="/employees/dismissalCauseList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{dismissalCauseAction.select(dismissalCauseItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/dismissalCause.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/dismissalCause.xhtml" no-conversation-view-id="/employees/dismissalCauseList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/dismissalCauseList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!--DismissalRule-->
+    <page view-id="/employees/dismissalRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{dismissalRuleAction.select(dismissalRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/dismissalRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/dismissalRule.xhtml" no-conversation-view-id="/employees/dismissalRuleList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/dismissalRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!--Dismissal-->
+    <page view-id="/employees/dismissalList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{dismissalAction.select(dismissalItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/dismissal.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/dismissal.xhtml" no-conversation-view-id="/employees/dismissalList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/dismissalList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!--SocialWelfareEntity-->
+    <page view-id="/employees/socialWelfareEntityList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{socialWelfareEntityAction.select(socialWelfareEntityItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/socialWelfareEntity.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/socialWelfareEntity.xhtml"
+          no-conversation-view-id="/employees/socialWelfareEntityList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/socialWelfareEntityList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+</pages>

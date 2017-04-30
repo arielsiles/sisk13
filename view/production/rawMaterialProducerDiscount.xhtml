@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{rawMaterialProducerDiscountAction.managed}">
+            #{messages['ProductiveZone.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductiveZone.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+
+<style type="text/css">
+    .special tr[id]{
+        display:none;
+    }
+</style>
+
+<h:form id="rawMaterialProducerDiscountForm">
+<div class="buttons">
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','CREATE')}"/>
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{rawMaterialProducerDiscountAction.managed}">
+                #{messages['RawMaterialProducerDiscount.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RawMaterialProducerDiscount.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <fieldset class="fieldset-border">
+        <legend class="fieldset-title">#{messages['RawMaterialProducerDiscount.fieldsetGeneralData']}</legend>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.productiveZone']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.rawMaterialProducer.productiveZone.fullName}" readonly="true" styleClass="input" required="false"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.rawMaterialProducer']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.rawMaterialProducer.fullName}" styleClass="input" readonly="true" required="false"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+    </fieldset>
+
+    <rich:spacer height="15" />
+
+    <fieldset class="fieldset-border">
+        <legend class="fieldset-title">#{messages['RawMaterialProducerDiscount.fieldsetDiscounts']}</legend>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.alcohol']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.alcohol}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.concentrated']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.concentrated}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.yogurt']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.yogurt}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.veterinary']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.veterinary}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.credit']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.credit}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.cans']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.cans}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.otherDiscounts']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.otherDiscount}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+    </fieldset>
+
+    <rich:spacer height="10" />
+    <fieldset class="fieldset-border">
+        <legend class="fieldset-title">#{messages['RawMaterialProducerDiscount.fieldsetIncomings']}</legend>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducerDiscount.otherIncomings']}</ui:define>
+            <h:inputText value="#{rawMaterialProducerDiscount.otherIncoming}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+    </fieldset>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{!rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','CREATE')}"/>
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button" rendered="#{rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','UPDATE')}"/>
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button" rendered="#{rawMaterialProducerDiscountAction.managed and s:hasPermission('RAWMATERIALPRODUCERDISCOUNT','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+    <h:commandButton action="#{rawMaterialProducerDiscountAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"/>
+</div>
+</h:form>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

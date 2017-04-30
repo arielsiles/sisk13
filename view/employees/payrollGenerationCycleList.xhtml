@@ -1,0 +1,235 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['PayrollGenerationCycle.list']}</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+<h:form id="payrollGenerationCycleListForm">
+<rich:simpleTogglePanel id="searchPanel"
+                        label="#{messages['PayrollGenerationCycle.list.search']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent, width50percent">
+        <s:div id="leftDiv">
+            <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:param name="validate" value="false"/>
+                <ui:define name="label">#{messages['BusinessUnit.executorUnitCode']}</ui:define>
+                <app:quickSearch id="businessUnitQuickSearch"
+                                 textValue="payrollGenerationCycleDataModel.criteria.businessUnit.executorUnitCode"
+                                 value="#{payrollGenerationCycleDataModel.criteria.businessUnit}"
+                                 searchField="executorUnitCode"
+                                 reRender="executorUnitField"/>
+                <h:selectOneMenu id="executorUnit"
+                                 value="#{payrollGenerationCycleDataModel.criteria.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="1">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange"
+                                 reRender="executorUnitField"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PayrollGenerationCycle.gestion']}</ui:define>
+                <h:selectOneMenu id="gestion"
+                                 value="#{payrollGenerationCycleDataModel.criteria.gestion}"
+                                 styleClass="input"
+                                 tabindex="2">
+                    <s:selectItems value="#{gestionList}" var="gestion"
+                                   label="#{gestion.year}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+        <s:div id="rigthDiv">
+            <s:decorate id="monthId"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PayrollGenerationCycle.month']}"/>
+                </ui:define>
+                <h:selectOneMenu id="monthSelectOneMenu"
+                                 value="#{payrollGenerationCycleDataModel.criteria.month}"
+                                 styleClass="input"
+                                 tabindex="3">
+                    <s:selectItems value="#{monthEnumeration}"
+                                   var="monthENUM"
+                                   label="#{messages[monthENUM.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{payrollGenerationCycleDataModel.search()}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{payrollGenerationCycleDataModel.clear()}"
+                                       reRender="searchPanel, payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       tabindex="5"/>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Common.new']}"
+              view="/employees/payrollGenerationCycle.xhtml"
+              styleClass="button"
+              propagation="begin"
+              rendered="#{s:hasPermission('PAYROLLGENERATIONCYCLE','CREATE')}"/>
+</div>
+<rich:dataTable id="payrollGenerationCycleDataTable"
+                value="#{payrollGenerationCycleDataModel}"
+                var="element"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="15%, 7%, 8%, 20%, 10%, 10%,10%, 10%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.businessUnit"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.businessUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.gestion"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.gestion']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.month"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.month']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.name"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.name']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.generationInitDate"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.generationInitDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.generationEndDate"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.generationEndDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.startDate"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.startDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="payrollGenerationCycle.endDate"
+                                       dataModel="#{payrollGenerationCycleDataModel}"
+                                       reRender="payrollGenerationCycleDataTable, payrollGenerationCycleDataScroller">
+                    #{messages['PayrollGenerationCycle.endDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{element.businessUnit.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.gestion.year}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[element.month.resourceKey]}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.name}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.generationInitDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.generationEndDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.startDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{element.endDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{payrollGenerationCycleAction.select(element)}"
+                       rendered="#{s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="payrollGenerationCycleDataScroller"
+                  for="payrollGenerationCycleDataTable"
+                  dataModel="#{payrollGenerationCycleDataModel}"/>
+</h:form>
+</ui:define>
+</ui:composition>

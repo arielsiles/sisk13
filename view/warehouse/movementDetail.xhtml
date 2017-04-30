@@ -1,0 +1,328 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{movementDetailAction.managed}">
+            #{messages['MovementDetail.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['MovementDetail.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<c:set var="relatedWithPurchaseOrder"
+       value="#{warehouseVoucherUpdateAction.warehouseVoucher.relatedWithPurchaseOrder}"/>
+
+<c:set var="warehouseVoucherApproved"
+       value="#{movementDetailAction.approved}"/>
+<c:set var="warehouseVoucherPending"
+       value="#{movementDetailAction.pending}"/>
+
+<c:set var="readOnly"
+       value="#{warehouseVoucherApproved or relatedWithPurchaseOrder}"/>
+
+<c:set var="selectProductItemButtonId"
+       value="select_link_productItem"/>
+
+<c:set var="quantityId"
+       value="quantity"/>
+
+<h:form id="movementDetailForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{movementDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{movementDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{movementDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{movementDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{movementDetailAction.managed}">
+                #{messages['MovementDetail.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['MovementDetail.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+        <h:outputText value="#{movementDetailAction.warehouseVoucher.documentType.name}" styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{!movementDetailAction.transference}">
+        <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+        <h:outputText value="#{movementDetailAction.warehouseVoucher.warehouse.name}" styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="sourceWarehouseField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{movementDetailAction.transference}">
+        <ui:define name="label">#{messages['WarehouseVoucher.sourceWarehouse']}</ui:define>
+        <h:outputText value="#{movementDetailAction.warehouseVoucher.warehouse.name}" styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="targetWarehouseField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{movementDetailAction.transference}">
+        <ui:define name="label">#{messages['WarehouseVoucher.targetWarehouse']}</ui:define>
+        <h:outputText value="#{movementDetailAction.warehouseVoucher.targetWarehouse.name}" styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['MovementDetail.productItem']}</ui:define>
+        <c:if test="#{not empty warehouseVoucherUpdateAction.warehouseVoucher.warehouse and (warehouseVoucherUpdateAction.warehouseVoucher.reception or warehouseVoucherUpdateAction.warehouseVoucher.input)}">
+            <app:quickSearch id="productItemQuickSearch"
+                             textValue="movementDetail.productItem.productItemCode"
+                             value="#{movementDetail.productItem}"
+                             searchField="productItemCode"
+                             alias="productItem"
+                             postSearchAction="movementDetailAction.updateProductItemFields()"
+                             reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"
+                             rendered="#{!readOnly}"
+                             tabindex="1">
+                <ui:define name="restrictions">
+                    <app:restriction
+                            condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                </ui:define>
+            </app:quickSearch>
+            <app:selectPopUp id="productItem"
+                             required="true"
+                             textValue="#{movementDetail.productItem.name}"
+                             value="#{movementDetail.productItem}"
+                             clearAction="movementDetailAction.clearProductItem()"
+                             searchModalPanel="productItemListModalPanel"
+                             dataModel="#{productItemSearchDataModel}"
+                             readOnly="#{readOnly}"
+                             renderedSelectLink="#{not readOnly}"
+                             renderedClearLink="#{not readOnly}"
+                             reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"/>
+        </c:if>
+        <c:if test="#{not empty warehouseVoucherUpdateAction.warehouseVoucher.warehouse and not (warehouseVoucherUpdateAction.warehouseVoucher.reception or warehouseVoucherUpdateAction.warehouseVoucher.input)}">
+            <app:quickSearch id="productItemQuickSearch"
+                             textValue="movementDetail.productItem.productItemCode"
+                             value="#{movementDetail.productItem}"
+                             namedQuery="productItemByWarehouseQuickSearchList"
+                             postSearchAction="movementDetailAction.updateProductItemFields()"
+                             reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"
+                             rendered="#{!readOnly}"
+                             tabindex="1"/>
+            <app:selectPopUp id="productItem"
+                             required="true"
+                             textValue="#{movementDetail.productItem.name}"
+                             value="#{movementDetail.productItem}"
+                             clearAction="movementDetailAction.clearProductItem()"
+                             searchModalPanel="productItemByWarehouseListModalPanel"
+                             dataModel="#{productItemByWarehouseDataModel}"
+                             readOnly="#{readOnly}"
+                             renderedSelectLink="#{not readOnly}"
+                             renderedClearLink="#{not readOnly}"
+                             reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"/>
+        </c:if>
+    </s:decorate>
+
+    <s:div id="movementDetailInformationPanel">
+        <s:decorate id="unitCostField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{movementDetailAction.shownUnitCostField}">
+            <ui:define name="label">#{messages['MovementDetail.unitCost']}</ui:define>
+            <h:outputText value="#{movementDetail.productItem.unitCost}" styleClass="input">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="productItemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['MovementDetail.productItemAccount']}</ui:define>
+            <h:outputText value="#{movementDetail.productItemAccount}" styleClass="input"/>
+        </s:decorate>
+        <s:decorate id="measureUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['MovementDetail.measureUnit']}</ui:define>
+            <h:outputText value="#{movementDetail.measureUnit.name}" styleClass="input"/>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="quantityPanel">
+        <s:decorate id="quantityField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['MovementDetail.quantity']}</ui:define>
+            <h:inputText id="quantity"
+                         value="#{movementDetail.quantity}"
+                         styleClass="input right"
+                         required="true"
+                         maxlength="20"
+                         tabindex="4">
+                <app:realNumberConverter minimum="0.01"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="quantity"/>
+            </h:inputText>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="amountFieldPanel">
+        <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{movementDetailAction.showAmountField}">
+            <ui:define name="label">#{messages['MovementDetail.amount']}</ui:define>
+            <h:inputText id="amount"
+                         value="#{movementDetail.amount}"
+                         styleClass="input right"
+                         readonly="#{not movementDetailAction.enabledAmountField}"
+                         required="#{movementDetailAction.enabledAmountField}"
+                         maxlength="20"
+                         tabindex="5">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimal6FNumber']}"
+                                         forId="amount"/>
+            </h:inputText>
+            <a4j:commandLink id="calculateTotalAmountButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             title="#{messages['Common.calculate']}"
+                             reRender="amountField"
+                             rendered="#{not movementDetailAction.enabledAmountField and warehouseVoucherPending}"
+                             action="#{movementDetailAction.calculateTotalAmount}"
+                             tabindex="6">
+                <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
+                <a4j:support event="onclick" reRender="quantityPanel"/>
+            </a4j:commandLink>
+        </s:decorate>
+    </s:div>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{movementDetailAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="7"/>
+
+    <h:commandButton action="#{movementDetailAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="7"/>
+
+    <h:commandButton action="#{movementDetailAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="8"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{movementDetailAction.managed and !warehouseVoucherApproved and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="9">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{movementDetailAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="10"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{movementDetailAction.managed and !warehouseVoucherApproved and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['MovementDetail.delete.confirmation']}">
+                <f:param value="#{movementDetail.productItem.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{movementDetailAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:div id="productItemListModalPanelGroupContainer">
+    <c:if test="#{not readOnly and not empty warehouseVoucherUpdateAction.warehouseVoucher.warehouse and (warehouseVoucherUpdateAction.warehouseVoucher.reception or warehouseVoucherUpdateAction.warehouseVoucher.input)}">
+        <s:decorate id="productItemListModalPanelContainer"
+                    template="/warehouse/productItemListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{movementDetailAction.assignProductItem(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"
+                                   oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');document.getElementById('#{rich:clientId(quantityId)}').focus();"/>
+            </ui:define>
+        </s:decorate>
+    </c:if>
+    <c:if test="#{not readOnly and not empty warehouseVoucherUpdateAction.warehouseVoucher.warehouse and not (warehouseVoucherUpdateAction.warehouseVoucher.reception or warehouseVoucherUpdateAction.warehouseVoucher.input)}">
+        <s:decorate id="productItemByWarehouseListModalPanelContainer"
+                    template="/warehouse/productItemByWarehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemByWarehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemByWarehouseListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{movementDetailAction.assignProductItem(inventoryItem.productItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField, amountFieldPanel, movementDetailInformationPanel"
+                                   oncomplete="Richfaces.hideModalPanel('productItemByWarehouseListModalPanel');document.getElementById('#{rich:clientId(quantityId)}').focus();"/>
+            </ui:define>
+        </s:decorate>
+    </c:if>
+</s:div>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#productItemQuickSearch" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,442 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{vacationPlanningAction.managed}">
+            #{messages['VacationPlanning.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['VacationPlanning.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="vacationPlanningForm">
+
+<div class="buttons">
+    <h:commandButton action="#{vacationPlanningAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{vacationPlanningAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
+
+    <h:commandButton action="#{vacationPlanningAction.synchronizeVacationDays}"
+                     value="#{messages['VacationPlanning.synchronizeGestionVacation']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton action="#{vacationAction.newInstance}"
+                     value="#{messages['VacationPlanning.addVacation']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton action="#{vacationPlanningAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{vacationPlanningAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{vacationPlanningAction.managed}">
+                #{messages['VacationPlanning.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['VacationPlanning.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="codeField" template="/include/viewField.xhtml" styleClass="formRow"
+                        rendered="#{vacationPlanningAction.managed}">
+                <ui:define name="label">#{messages['VacationPlanning.code']}</ui:define>
+                <h:outputText value="#{vacationPlanning.code}"/>
+            </s:decorate>
+            <s:decorate id="jobContractField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.employee']}</ui:define>
+                <app:quickSearch id="quickSearchJobContract"
+                                 textValue="vacationPlanning.jobContract.contract.employee.idNumber"
+                                 value="#{vacationPlanning.jobContract}"
+                                 namedQuery="#{jobContractByEmployeeIdNumberQuickSearch}"
+                                 postSearchAction="vacationPlanningAction.loadJobContractValues()"
+                                 reRender="formPanel"
+                                 rendered="#{not vacationPlanningAction.managed}"
+                                 tabindex="1"/>
+                <app:selectPopUp id="jobContract"
+                                 required="true"
+                                 textValue="#{vacationPlanning.jobContract.contract.employee.fullName}"
+                                 value="#{vacationPlanning.jobContract}"
+                                 dataModel="#{jobContractDataModel}"
+                                 clearAction="vacationPlanningAction.clearJobContract()"
+                                 searchModalPanel="jobContractListModalPanel"
+                                 reRender="formPanel"
+                                 readOnly="#{vacationPlanningAction.managed}"
+                                 hotKeySelect="alt+1"
+                                 tabindex="2"/>
+            </s:decorate>
+
+            <s:decorate id="sedeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{vacationPlanningAction.hasAssignedJobContract()}">
+                <ui:define name="label">#{messages['VacationPlanning.sede']}</ui:define>
+                <h:outputText value="#{vacationPlanning.jobContract.job.organizationalUnit.businessUnit.fullName}"/>
+            </s:decorate>
+            <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{vacationPlanningAction.hasAssignedJobContract()}">
+                <ui:define name="label">#{messages['VacationPlanning.organizationalUnit']}</ui:define>
+                <h:outputText value="#{vacationPlanning.jobContract.job.organizationalUnit.name}"/>
+            </s:decorate>
+            <s:decorate id="chargeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{vacationPlanningAction.hasAssignedJobContract()}">
+                <ui:define name="label">#{messages['VacationPlanning.charge']}</ui:define>
+                <h:outputText value="#{vacationPlanning.jobContract.job.charge.name}"/>
+            </s:decorate>
+
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.initDate']}</ui:define>
+                <rich:calendar id="initDate"
+                               value="#{vacationPlanning.initDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               required="true"
+                               enableManualInput="true"
+                               rendered="#{not vacationPlanningAction.managed}"
+                               tabindex="3">
+                    <app:dateRangeValidator forValue="#{functionAction.toDay}"
+                                            forLabel="#{messages['Common.toDay']}"
+                                            type="less"/>
+                </rich:calendar>
+                <h:outputText value="#{vacationPlanning.initDate}"
+                              rendered="#{vacationPlanningAction.managed}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="seniorityYearsField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.seniorityYears']}</ui:define>
+                <h:outputText value="#{vacationPlanning.seniorityYears}" styleClass="inputNumber">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="vacationDaysField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.vacationDays']}</ui:define>
+                <h:outputText value="#{vacationPlanning.vacationDays}"
+                              styleClass="inputNumber">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="daysOffField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.daysOff']}</ui:define>
+                <h:outputText value="#{vacationPlanning.daysOff}"
+                              styleClass="inputNumber">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="daysUsedField" template="/include/viewField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['VacationPlanning.daysUsed']}</ui:define>
+                <h:outputText value="#{vacationPlanning.daysUsed}"
+                              styleClass="inputNumber">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <c:if test="#{vacationPlanningAction.managed}">
+        <app:fieldset id="gestionList" title="#{messages['VacationPlanning.gestionVacations']}">
+            <s:div id="vacationGestionListDiv" rendered="#{vacationPlanningAction.managed}">
+                <rich:dataTable value="#{vacationGestionDataModel}"
+                                var="vacationGestionItem"
+                                id="vacationGestionList"
+                                rows="#{sessionUser.rowsPerPage}"
+                                width="100%" columnsWidth="40%, 20%, 20%, 20%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.gestion"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.gestion']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.vacationDays"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.vacationDays']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.daysUsed"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.daysUsed']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.daysOff"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.daysOff']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{vacationGestionItem.gestion}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.vacationDays}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.daysUsed}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.daysOff}"/>
+                    </rich:column>
+                </rich:dataTable>
+                <app:dataScroller id="gestionDataScroller"
+                                  for="vacationGestionList"
+                                  dataModel="#{vacationGestionDataModel}"/>
+            </s:div>
+        </app:fieldset>
+    </c:if>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{vacationPlanningAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{vacationPlanningAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
+
+    <h:commandButton action="#{vacationPlanningAction.synchronizeVacationDays}"
+                     value="#{messages['VacationPlanning.synchronizeGestionVacation']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton action="#{vacationAction.newInstance}"
+                     value="#{messages['VacationPlanning.addVacation']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton action="#{vacationPlanningAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{vacationPlanningAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+<br/>
+
+<c:if test="#{vacationPlanningAction.managed}">
+    <!--<s:div id="vacationListDiv" rendered="#{vacationPlanningAction.managed}">-->
+        <rich:dataTable value="#{vacationDataModel}"
+                        var="vacationItem"
+                        id="vacationList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="30%,10%, 10%, 10%, 10%,10%, 10%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.description"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.description']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacationGestion.gestion"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.gestion']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.initDate"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.initDate']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.endDate"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.endDate']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.totalDays"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.totalDays']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.daysOff"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.daysOff']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.useForPayrollGeneration"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.useForPayrollGeneration']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="vacation.state"
+                                               dataModel="#{vacationDataModel}"
+                                               reRender="vacationList, dataScroller">
+                            <h:outputText value="#{messages['Vacation.state']}"/>
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{messages['Common.action']}"/>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{vacationItem.description}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{vacationItem.vacationGestion.gestion}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{vacationItem.initDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{vacationItem.endDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{vacationItem.totalDays}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{vacationItem.daysOff}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:graphicImage title="#{messages['Vacation.useForPayrollGeneration']}"
+                                value="/img/active.gif"
+                                styleClass="select-image-middle"
+                                rendered="#{vacationItem.useForPayrollGeneration}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{messages[vacationItem.state.resourceKey]}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{vacationAction.select(vacationItem)}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller"
+                          for="vacationList"
+                          dataModel="#{vacationDataModel}"/>
+    <!--</s:div>-->
+</c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['VacationPlanning.delete.confirmation']}">
+                <f:param value="#{vacationPlanning.fullName}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{vacationPlanningAction.delete}"
+                           rendered="#{s:hasPermission('VACATIONPLANNING','DELETE')}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="jobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:param name="dialogId" value="jobContractListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{vacationPlanningAction.assignJobContract(jobContractItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="formPanel"
+                           oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

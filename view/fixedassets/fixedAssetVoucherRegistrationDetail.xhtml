@@ -1,0 +1,167 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core">
+    <app:fieldset id="fixedAssetVoucherMovementApprovalFieldset"
+                  title="#{messages['FixedAssetVoucher.FixedAssetVoucherDetail']}"
+                  rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW') and
+                      fixedAssetVoucherAction.registrationMovement}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:div rendered="#{fixedAssetVoucherAction.managed}">
+                    <s:decorate id="voucherCodeField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.voucherCode']}</ui:define>
+                        <h:outputText value="#{fixedAssetVoucher.voucherCode}" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="stateField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.state']}</ui:define>
+                        <h:outputText value=" #{messages[fixedAssetVoucher.state.resourceKey]}"/>
+                    </s:decorate>
+                </s:div>
+
+                <s:div id="fixedAssetPurchaseOrderDiv">
+                    <s:decorate id="fixedAssetPurchaseOrderField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.fixedAssetPurchaseOrder']}</ui:define>
+                        <app:quickSearch id="purchaseOrderSearch"
+                                         rendered="#{!fixedAssetVoucherAction.managed}"
+                                         textValue="fixedAssetVoucher.purchaseOrder.orderNumber"
+                                         value="#{fixedAssetVoucher.purchaseOrder}"
+                                         postSearchAction="fixedAssetVoucherAction.assignPurchaseOrder()"
+                                         searchField="orderNumber"
+                                         alias="purchaseOrder"
+                                         reRender="fixedAssetPurchaseOrderField,jobContractDiv,purchaseOrdersFixedAssetsDiv, causeDiv"
+                                         tabindex="15">
+                            <ui:define name="restrictions">
+                                <app:restriction
+                                        condition="purchaseOrder.state in (#{enumerationUtil.getEnumValuesByName('com.encens.khipus.model.purchases.PurchaseOrderState', 'LIQ', 'FIN')})"/>
+                                <app:restriction
+                                        condition="purchaseOrder.orderType = #{enumerationUtil.getEnumValue('com.encens.khipus.model.purchases.PurchaseOrderType', 'FIXEDASSET')}"/>
+                                <app:restriction
+                                        condition="purchaseOrder not in ( select purchaseOrder from FixedAssetVoucher voucher left join voucher.purchaseOrder purchaseOrder where voucher.purchaseOrder is not null and voucher.state=#{enumerationUtil.getEnumValue('com.encens.khipus.model.fixedassets.FixedAssetVoucherState', 'APR')})"/>
+                            </ui:define>
+                        </app:quickSearch>
+                        <app:selectPopUp id="fixedAssetPurchaseOrder"
+                                         required="true"
+                                         textValue="#{fixedAssetVoucher.purchaseOrder.orderNumber}"
+                                         value="#{fixedAssetVoucher.purchaseOrder}"
+                                         dataModel="#{fixedAssetPurchaseOrderToApproveFixedAssetRegistrationDataModel}"
+                                         clearAction="fixedAssetVoucherAction.clearPurchaseOrder()"
+                                         searchModalPanel="fixedAssetPurchaseOrderListModalPanel"
+                                         reRender="fixedAssetPurchaseOrderDiv,jobContractDiv, purchaseOrdersFixedAssetsDiv, causeDiv"
+                                         readOnly="#{fixedAssetVoucherAction.managed}"
+                                         hotKeySelect="alt+1"
+                                         tabindex="16"/>
+                    </s:decorate>
+                </s:div>
+                <s:div id="jobContractDiv">
+                    <s:decorate id="contractEmployeeField" template="/include/inputField.xhtml"
+                                rendered="#{fixedAssetVoucherAction.enableContractInfo}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.custodianJobContract']}</ui:define>
+                        <h:outputText id="employee"
+                                      styleClass="input"
+                                      value="#{fixedAssetVoucher.custodianJobContract.contract.employee.fullName}"/>
+                    </s:decorate>
+                    <s:decorate id="contractExecutorUnitField" template="/include/inputField.xhtml"
+                                rendered="#{fixedAssetVoucherAction.enableContractInfo}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.executorUnit']}</ui:define>
+                        <h:outputText id="executorUnit"
+                                      value="#{fixedAssetVoucher.businessUnit.fullName}"
+                                      styleClass="input">
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="chargeField" template="/include/inputField.xhtml"
+                                rendered="#{fixedAssetVoucherAction.enableContractInfo}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.charge']}</ui:define>
+                        <h:outputText id="charge"
+                                      value="#{fixedAssetVoucher.custodianJobContract.job.charge.name}"
+                                      styleClass="input">
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml"
+                                rendered="#{fixedAssetVoucherAction.enableContractInfo}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.organizationalUnit']}</ui:define>
+                        <h:outputText id="organizationalUnit"
+                                      value="#{fixedAssetVoucher.custodianJobContract.job.organizationalUnit.fullName}"
+                                      styleClass="input">
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="costCenterField" template="/include/inputField.xhtml"
+                                rendered="#{fixedAssetVoucherAction.enableContractInfo}"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetVoucher.costCenter']}</ui:define>
+                        <h:outputText value="#{fixedAssetVoucher.costCenter.fullName}"
+                                      styleClass="input">
+                        </h:outputText>
+                    </s:decorate>
+                </s:div>
+            </s:div>
+            <s:div id="causeDiv">
+                <s:decorate id="fixedAssetLocationField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{fixedAssetVoucher.purchaseOrder.purchaseOrderCause.fixedassetPurchase}">
+                    <ui:define name="label">#{messages['FixedAsset.location']}</ui:define>
+                    <h:selectOneMenu id="fixedAssetLocation"
+                                     value="#{fixedAssetVoucher.fixedAssetLocation}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="14"
+                                     rendered="#{not fixedAssetVoucherAction.managed or empty fixedAssetVoucher.fixedAssetLocation}">
+                        <s:selectItems value="#{fixedAssetLocationList}"
+                                       var="fixedAssetLocation"
+                                       label="#{fixedAssetLocation.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{fixedAssetVoucher.fixedAssetLocation.name}"
+                                  rendered="#{fixedAssetVoucherAction.managed and not empty fixedAssetVoucher.fixedAssetLocation}"/>
+                </s:decorate>
+                <s:decorate id="causeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FixedAssetVoucher.gloss']}</ui:define>
+                    <h:inputTextarea id="cause"
+                                     required="true"
+                                     disabled="#{fixedAssetVoucherAction.fixedAssetVoucherApproved or fixedAssetVoucherAction.fixedAssetVoucherAnnulled}"
+                                     value="#{fixedAssetVoucher.cause}"
+                                     styleClass="input textarea"
+                                     tabindex="17">
+                        <f:validateLength maximum="250"/>
+                    </h:inputTextarea>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+
+    <!--fixed assets datatable corresponding to the purchase order -->
+    <s:div id="purchaseOrdersFixedAssetsDiv">
+        <c:if test="#{fixedAssetVoucherAction.showFixedAssetByPurchaseOrderFieldSet}">
+            <app:fieldset id="purchaseOrdersFixedAssetsFieldset"
+                          title="#{messages['FixedAsset.list']}">
+                <ui:include src="fixedAssetByPurchaseOrderList.xhtml"/>
+            </app:fieldset>
+        </c:if>
+        <c:if test="#{fixedAssetVoucherAction.showFixedAssetPartByPurchaseOrderFieldSet}">
+            <app:fieldset id="FixedAssetPartFieldset"
+                          title="#{messages['FixedAssetPart.list']}">
+                <ui:include src="purchaseOrderFixedAssetPartList.xhtml">
+                    <ui:param name="showActionColumn" value="#{false}"/>
+                    <ui:param name="purchaseOrder" value="#{fixedAssetVoucher.purchaseOrder}"/>
+                </ui:include>
+            </app:fieldset>
+        </c:if>
+    </s:div>
+
+</ui:composition>

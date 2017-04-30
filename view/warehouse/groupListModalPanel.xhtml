@@ -1,0 +1,102 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="groupListModalPanel"
+                 onshow="jQuery('#groupListModalPanelContainer\\:groupListForm\\:groupCodeField\\:groupCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['ProductItem.groupList']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="groupListForm">
+        <rich:simpleTogglePanel label="#{messages['ProductItem.groupSearch']}" switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="groupCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Group.groupCode']}</ui:define>
+                    <h:inputText id="groupCode"
+                                 value="#{groupSearchDataModel.criteria.id.groupCode}"
+                                 maxlength="100"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Group.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{groupSearchDataModel.criteria.name}"
+                                 maxlength="100"
+                                 tabindex="2"
+                                 styleClass="input"/>
+                    <a4j:commandButton action="#{groupSearchDataModel.search}"
+                                       reRender="groupList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{groupSearchDataModel}"
+                        var="groupItem"
+                        id="groupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="50%, 25%, 25%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="groupItem.groupCode"
+                                               dataModel="#{groupSearchDataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['Group.groupCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="groupItem.name"
+                                               dataModel="#{groupSearchDataModel}"
+                                               reRender="groupList, dataScroller">
+                            #{messages['Group.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{groupItem.groupCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{groupItem.name}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="groupListModalPanel"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller" for="groupList" dataModel="#{groupSearchDataModel}"/>
+
+        <rich:componentControl for="groupListModalPanel"
+                               attachTo="closeLink, assignButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['menu.home']}
+</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="home"/>
+
+<ui:define name="body">
+<rich:tabPanel switchType="ajax"
+               rendered="#{s:hasPermission('INCOMEPANEL','VIEW') or
+                    s:hasPermission('EXPENSEPANEL','VIEW') or
+                    s:hasPermission('DEBTSPANEL','VIEW') or
+                    s:hasPermission('LATENESSPANEL','VIEW') or
+                    s:hasPermission('MISSINGPANEL','VIEW') or
+                    s:hasPermission('HUMANRESOURCESPANEL','VIEW') or
+                    s:hasPermission('BANKBALANCEPANEL','VIEW') or
+                    s:hasPermission('WAREHOUSEMONTHLYCLOSEWIDGET','VIEW') or
+                    s:hasPermission('FIXEDASSETWIDGET','VIEW') or
+                    s:hasPermission('FIXEDASSETMAINTENANCEWIDGET','VIEW') or
+                    s:hasPermission('PENDINGFIXEDASSETMAINTENANCEREQUESTWIDGET','VIEW') or
+                    s:hasPermission('DISCHARGEBEFORELIFETIMEWIDGET','VIEW') or
+                    s:hasPermission('FOUNDSTOPAYWIDGET','VIEW') or
+                    s:hasPermission('PENDINGINVOICESWIDGET','VIEW') or
+                    s:hasPermission('OFFICIALPAYROLLGENERATIONWIDGET','VIEW') or
+                    s:hasPermission('ENTRYBUDGETEXECUTIONWIDGET','VIEW') or
+                    s:hasPermission('EXPENSEBUDGETEXECUTIONWIDGET','VIEW') or
+                    s:hasPermission('PENDINGRECEIPTACCOUNTSTOPAYWIDGET','VIEW') or
+                    s:hasPermission('DEBTWIDGET','VIEW') or
+                    s:hasPermission('DESERTIONWIDGET','VIEW') or
+                    s:hasPermission('DOCUMENTATIONREGISTRATIONWIDGET','VIEW') or
+                    s:hasPermission('EXPIREDRECEIVABLESWIDGET','VIEW') or
+                    s:hasPermission('MAXPRODUCTITEMCONTROLWIDGET','VIEW') or
+                    s:hasPermission('MINPRODUCTITEMCONTROLWIDGET','VIEW') or
+                    s:hasPermission('CHECKDELIVERYWIDGET','VIEW')}"
+               selectedTab="#{dashboardPanelAction.selectedTab}">
+<rich:tab id="dashboardGeneralTab"
+          switchType="ajax"
+          action="#{dashboardPanelAction.setSelectedTab('dashboardGeneralTab')}"
+          label="#{messages['Dashboard.tab.general']}"
+          rendered="#{s:hasPermission('INCOMEPANEL','VIEW') or
+                    s:hasPermission('EXPENSEPANEL','VIEW') or
+                    s:hasPermission('DEBTSPANEL','VIEW') or
+                    s:hasPermission('LATENESSPANEL','VIEW') or
+                    s:hasPermission('MISSINGPANEL','VIEW') or
+                    s:hasPermission('HUMANRESOURCESPANEL','VIEW') or
+                    s:hasPermission('BANKBALANCEPANEL','VIEW')}">
+    <h:panelGrid id="generalDashboardPanel"
+                 columns="2"
+                 width="100%"
+                 border="0"
+                 cellpadding="0"
+                 cellspacing="6"
+                 columnClasses="width50percent,width50percent">
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/incomeView.xhtml"
+                       permission="#{s:hasPermission('INCOMEPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/expense.xhtml"
+                       permission="#{s:hasPermission('EXPENSEPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/debtView.xhtml"
+                       permission="#{s:hasPermission('DEBTSPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/latenessView.xhtml"
+                       permission="#{s:hasPermission('LATENESSPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/missingView.xhtml"
+                       permission="#{s:hasPermission('MISSINGPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/humanResources.xhtml"
+                       permission="#{s:hasPermission('HUMANRESOURCESPANEL','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                       src="/dashboard/bankBalanceView.xhtml"
+                       permission="#{s:hasPermission('BANKBALANCEPANEL','VIEW')}"
+                       showMessage="true"/>
+    </h:panelGrid>
+    <a4j:region>
+        <h:form>
+            <a4j:poll interval="0"
+                      enabled="#{not dashboardPanelAction.showComponent['generalDashboardPanel']}"
+                      action="#{dashboardPanelAction.enableShowComponent('generalDashboardPanel')}"
+                      reRender="generalDashboardPanel"/>
+        </h:form>
+    </a4j:region>
+</rich:tab>
+<rich:tab id="dashboardAgileTab"
+          action="#{dashboardPanelAction.setSelectedTab('dashboardAgileTab')}"
+          switchType="ajax"
+          label="#{messages['Dashboard.tab.agile']}"
+          rendered="#{s:hasPermission('WAREHOUSEMONTHLYCLOSEWIDGET','VIEW') or
+                    s:hasPermission('FIXEDASSETWIDGET','VIEW') or
+                    s:hasPermission('DISCHARGEBEFORELIFETIMEWIDGET','VIEW') or
+                    s:hasPermission('OFFICIALPAYROLLGENERATIONWIDGET','VIEW') or
+                    s:hasPermission('EXPIREDRECEIVABLESWIDGET','VIEW') or
+                    s:hasPermission('MAXPRODUCTITEMCONTROLWIDGET','VIEW') or
+                    s:hasPermission('MINPRODUCTITEMCONTROLWIDGET','VIEW') or
+                    s:hasPermission('CHECKDELIVERYWIDGET','VIEW')
+                    }">
+    <h:panelGrid id="dashboardAgilePanel"
+                 columns="1"
+                 width="100%"
+                 border="0"
+                 cellpadding="0"
+                 cellspacing="6">
+        <app:includeIf test="#{dashboardPanelAction.showComponent['dashboardAgilePanel']}"
+                       src="/dashboard/agileWidgetList.xhtml"
+                       showMessage="true"/>
+    </h:panelGrid>
+
+    <a4j:region>
+        <h:form>
+            <a4j:poll interval="0"
+                      enabled="#{not dashboardPanelAction.showComponent['dashboardAgilePanel']}"
+                      action="#{dashboardPanelAction.enableShowComponent('dashboardAgilePanel')}"
+                      reRender="dashboardAgilePanel"/>
+        </h:form>
+    </a4j:region>
+
+</rich:tab>
+<rich:tab id="dashboardFinancesTab"
+          action="#{dashboardPanelAction.setSelectedTab('dashboardFinancesTab')}"
+          switchType="ajax"
+          label="#{messages['Dashboard.tab.finances']}"
+          rendered="#{s:hasPermission('WAREHOUSEMONTHLYCLOSEWIDGET','VIEW') or
+                    s:hasPermission('FIXEDASSETWIDGET','VIEW') or
+                    s:hasPermission('FIXEDASSETMAINTENANCEWIDGET','VIEW') or
+                    s:hasPermission('PENDINGFIXEDASSETMAINTENANCEREQUESTWIDGET','VIEW') or
+                    s:hasPermission('DISCHARGEBEFORELIFETIMEWIDGET','VIEW') or
+                    s:hasPermission('FOUNDSTOPAYWIDGET','VIEW') or
+                    s:hasPermission('PENDINGINVOICESWIDGET','VIEW') or
+                    s:hasPermission('OFFICIALPAYROLLGENERATIONWIDGET','VIEW') or
+                    s:hasPermission('ENTRYBUDGETEXECUTIONWIDGET','VIEW') or
+                    s:hasPermission('EXPENSEBUDGETEXECUTIONWIDGET','VIEW') or
+                    s:hasPermission('PENDINGRECEIPTACCOUNTSTOPAYWIDGET','VIEW') or
+                    s:hasPermission('DEBTWIDGET','VIEW')}">
+    <h:panelGrid id="financesDashboardPanel"
+                 columns="2"
+                 width="100%"
+                 border="0"
+                 cellpadding="0"
+                 cellspacing="6"
+                 columnClasses="width50percent,width50percent">
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/warehouseMonthlyCloseWidget.xhtml"
+                       permission="#{s:hasPermission('WAREHOUSEMONTHLYCLOSEWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/fixedAssetWidget.xhtml"
+                       permission="#{s:hasPermission('FIXEDASSETWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/fixedAssetMaintenanceWidget.xhtml"
+                       permission="#{s:hasPermission('FIXEDASSETMAINTENANCEWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/pendingFixedAssetMaintenanceRequestWidget.xhtml"
+                       permission="#{s:hasPermission('PENDINGFIXEDASSETMAINTENANCEREQUESTWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/dischargeBeforeLifetimeWidget.xhtml"
+                       permission="#{s:hasPermission('DISCHARGEBEFORELIFETIMEWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/foundsToPayWidget.xhtml"
+                       permission="#{s:hasPermission('FOUNDSTOPAYWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/pendingInvoicesWidget.xhtml"
+                       permission="#{s:hasPermission('PENDINGINVOICESWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/officialPayrollGenerationWidget.xhtml"
+                       permission="#{s:hasPermission('OFFICIALPAYROLLGENERATIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/entryBudgetExecutionWidget.xhtml"
+                       permission="#{s:hasPermission('ENTRYBUDGETEXECUTIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/expenseBudgetExecutionWidget.xhtml"
+                       permission="#{s:hasPermission('EXPENSEBUDGETEXECUTIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/exceedExpenseBudgetExecutionWidget.xhtml"
+                       permission="#{s:hasPermission('EXCEEDEXPENSEBUDGETEXECUTIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/pendingReceiptAccountsToPayWidget.xhtml"
+                       permission="#{s:hasPermission('PENDINGRECEIPTACCOUNTSTOPAYWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                       src="/dashboard/debtWidget.xhtml"
+                       permission="#{s:hasPermission('DEBTWIDGET','VIEW')}"
+                       showMessage="true"/>
+    </h:panelGrid>
+    <a4j:region>
+        <h:form>
+            <a4j:poll interval="0"
+                      enabled="#{not dashboardPanelAction.showComponent['financesDashboardPanel']}"
+                      action="#{dashboardPanelAction.enableShowComponent('financesDashboardPanel')}"
+                      reRender="financesDashboardPanel"/>
+        </h:form>
+    </a4j:region>
+</rich:tab>
+<rich:tab id="dashboardAcademicTab"
+          action="#{dashboardPanelAction.setSelectedTab('dashboardAcademicTab')}"
+          switchType="ajax"
+          label="#{messages['Dashboard.tab.acedemic']}"
+          rendered="#{s:hasPermission('DESERTIONWIDGET','VIEW') or
+                    s:hasPermission('DOCUMENTATIONREGISTRATIONWIDGET','VIEW')}">
+    <h:panelGrid id="academicDashboardPanel"
+                 columns="2"
+                 width="100%"
+                 border="0"
+                 cellpadding="0"
+                 cellspacing="6"
+                 columnClasses="width50percent,width50percent">
+        <app:includeIf test="#{dashboardPanelAction.showComponent['academicDashboardPanel']}"
+                       src="/dashboard/desertionWidget.xhtml"
+                       permission="#{s:hasPermission('DESERTIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+        <app:includeIf test="#{dashboardPanelAction.showComponent['academicDashboardPanel']}"
+                       src="/dashboard/documentationRegistrationWidget.xhtml"
+                       permission="#{s:hasPermission('DOCUMENTATIONREGISTRATIONWIDGET','VIEW')}"
+                       showMessage="true"/>
+    </h:panelGrid>
+    <a4j:region>
+        <h:form>
+            <a4j:poll interval="0"
+                      enabled="#{not dashboardPanelAction.showComponent['academicDashboardPanel']}"
+                      action="#{dashboardPanelAction.enableShowComponent('academicDashboardPanel')}"
+                      reRender="academicDashboardPanel"/>
+        </h:form>
+    </a4j:region>
+</rich:tab>
+</rich:tabPanel>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,48 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:c="http://java.sun.com/jstl/core"
+              xmlns:rich="http://richfaces.org/rich"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              id="fixedAssetAdditionalInfoFieldset"
+              title="#{messages['FixedAsset.additionalInfo']}"
+              rendered="#{!fixedAssetAction.pendant}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{not empty fixedAsset.barCode}">
+            <ui:define name="label">#{messages['FixedAsset.barCodeImage']}</ui:define>
+            <rich:paint2D id="painter"
+                          width="200"
+                          height="100"
+                          data="#{fixedAssetAction.barcodeData}"
+                          format="png"
+                          paint="#{fixedAssetAction.barcodeRenderer.paint}"/>
+        </s:decorate>
+        <s:div styleClass="left">
+            <s:decorate id="photoField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.photo']}</ui:define>
+                <s:fileUpload id="photo"
+                              styleClass="input"
+                              data="#{fixedAsset.photo.value}"
+                              fileName="#{fixedAsset.photo.name}"
+                              fileSize="#{fixedAsset.photo.size}"
+                              contentType="#{fixedAsset.photo.contentType}"/>
+            </s:decorate>
+            <h:panelGroup id="photoValueField">
+                <br/>
+                <s:graphicImage value="#{fixedAsset.photo.value}"
+                                alt="#{fixedAsset.photo.name}"
+                                title="#{fixedAsset.photo.name}"
+                                rendered="#{!fixedAsset.photo.isEmpty()}"/>
+            </h:panelGroup>
+        </s:div>
+
+
+    </h:panelGrid>
+</app:fieldset>
+

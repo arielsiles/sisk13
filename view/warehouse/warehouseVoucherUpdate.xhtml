@@ -1,0 +1,998 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['WarehouseVoucher.edit']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="90%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="relatedWithPurchaseOrder"
+       value="#{warehouseVoucherUpdateAction.warehouseVoucher.relatedWithPurchaseOrder}"/>
+
+<c:set var="warehouseVoucherApproved" value="#{warehouseVoucherUpdateAction.approved}"/>
+
+<c:set var="isTransferenceType" value="#{warehouseVoucherUpdateAction.warehouseVoucher.transfer}"/>
+
+<c:set var="isReceptionType" value="#{warehouseVoucherUpdateAction.warehouseVoucher.reception}"/>
+
+<c:set var="isInputType" value="#{warehouseVoucherUpdateAction.warehouseVoucher.input}"/>
+
+<c:set var="isRelatedWithPurchaseOrderType"
+       value="#{warehouseVoucherUpdateAction.warehouseVoucher.relatedWithPurchaseOrder}"/>
+
+<c:set var="isDevolutionType" value="#{warehouseVoucherUpdateAction.warehouseVoucher.devolution}"/>
+
+<c:set var="isExecutorUnitTransferenceType" value="#{warehouseVoucherUpdateAction.executorUnitTransference}"/>
+
+<c:set var="isEmptyWarehouseVoucher" value="#{warehouseVoucherUpdateAction.emptyWarehouseVoucher}"/>
+
+<h:form id="warehouseVoucherForm">
+<div class="buttons">
+    <h:commandButton
+            action="#{voucherDocumentReportAction.generateReport(warehouseVoucherUpdateAction.warehouseVoucher)}"
+            value="#{messages['WarehouseVoucher.button.generateDocument']}"
+            immediate="true"
+            styleClass="button"
+            rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"/>
+
+    <h:commandButton
+            action="#{partialWarehouseVoucherAction.addPartialWarehouseVoucher}"
+            value="#{messages['WarehouseVoucher.button.addPartialWarehouseVoucher']}"
+            styleClass="button"
+            immediate="true"
+            rendered="#{warehouseVoucherUpdateAction.showAddPartialWarehouseVoucherButton and s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"/>
+
+    <h:commandButton action="#{warehouseVoucherUpdateAction.approve}"
+                     value="#{messages['WarehouseVoucher.button.approveWarehouseVoucher']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and s:hasPermission('WAREHOUSEVOUCHERAPPROVAL','VIEW')}"/>
+
+    <h:commandButton action="#{movementDetailAction.addMovementDetail}"
+                     value="#{messages['WarehouseVoucher.addMovementDetail']}"
+                     immediate="true"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     styleClass="button"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{warehouseVoucherUpdateAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','DELETE')}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseVoucherUpdateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['WarehouseVoucher.edit']}
+</f:facet>
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div>
+    <c:if test="#{relatedWithPurchaseOrder}">
+        <s:decorate id="orderNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.purchaseOrder.orderNumber']}</ui:define>
+            <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.purchaseOrder.orderNumber}"/>
+        </s:decorate>
+        <s:decorate id="invoiceNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.purchaseOrder.invoiceNumber']}</ui:define>
+            <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.purchaseOrder.invoiceNumber}"/>
+        </s:decorate>
+    </c:if>
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+        <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.documentType.name}"/>
+    </s:decorate>
+</s:div>
+<s:div>
+    <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.number']}</ui:define>
+        <h:outputText value="#{messages[warehouseVoucherUpdateAction.warehouseVoucher.number]}"/>
+    </s:decorate>
+    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.state']}</ui:define>
+        <h:outputText value="#{messages[warehouseVoucherUpdateAction.warehouseVoucher.state.resourceKey]}"/>
+    </s:decorate>
+</s:div>
+<c:choose>
+<c:when test="#{isExecutorUnitTransferenceType}">
+<s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:param name="validateId" value="executorUnitCode"/>
+    <ui:define name="label">
+        #{messages['WarehouseVoucher.sourceExecutorUnitCode']}
+    </ui:define>
+    <app:quickSearch id="quickSearchExecutorUnit"
+                     textValue="warehouseVoucherUpdateAction.warehouseVoucher.executorUnit.executorUnitCode"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                     postSearchAction="warehouseVoucherUpdateAction.clearWarehouses()"
+                     searchField="executorUnitCode"
+                     filters="businessUnitFilter"
+                     reRender="executorUnitCodeField, warehousePanel, responsibleField"
+                     rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                     tabindex="1"/>
+    <h:selectOneMenu id="executorUnitCode"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                     styleClass="input"
+                     required="true"
+                     disabled="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}">
+        <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                       var="executorUnit"
+                       label="#{executorUnit.fullName}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support event="onchange"
+                     reRender="executorUnitCodeField, warehousePanel, responsibleField"
+                     action="#{warehouseVoucherUpdateAction.clearWarehouses}"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="targetExecutorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.targetExecutorUnitCode']}</ui:define>
+    <app:quickSearch id="quickSearchTargetExecutorUnit"
+                     textValue="warehouseVoucherUpdateAction.warehouseVoucher.targetExecutorUnit.executorUnitCode"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetExecutorUnit}"
+                     postSearchAction="warehouseVoucherUpdateAction.clearTargetWarehouse()"
+                     searchField="executorUnitCode"
+                     reRender="targetExecutorUnitCodeField, targetWarehousePanel, targetResponsibleField"
+                     rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                     tabindex="2"/>
+    <h:selectOneMenu id="targetExecutorUnitCode"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetExecutorUnit}"
+                     styleClass="input"
+                     required="true"
+                     disabled="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}">
+        <s:selectItems value="#{businessUnitList.resultList}"
+                       var="executorUnit"
+                       label="#{executorUnit.fullName}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEntity/>
+        <a4j:support event="onchange"
+                     reRender="targetExecutorUnitCodeField, targetWarehousePanel, targetResponsibleField"
+                     action="#{warehouseVoucherUpdateAction.clearTargetWarehouse}"
+                     ajaxSingle="true"/>
+    </h:selectOneMenu>
+</s:decorate>
+<s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.sourceCostCenterCode']}</ui:define>
+    <app:quickSearch id="quickSearchCostCenterField"
+                     textValue="warehouseVoucherUpdateAction.warehouseVoucher.costCenter.code"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                     searchField="code"
+                     reRender="costCenterCodeField"
+                     rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                     tabindex="3"/>
+    <app:selectPopUp id="costCenter"
+                     required="true"
+                     textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter.fullName}"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                     clearAction="warehouseVoucherUpdateAction.clearCostCenter()"
+                     searchModalPanel="costCenterListModalPanel"
+                     dataModel="#{costCenterDataModel}"
+                     reRender="costCenterCodeField"
+                     readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                     hotKeySelect="alt+1"/>
+</s:decorate>
+<s:decorate id="targetCostCenterCodeField"
+            template="/include/inputField.xhtml"
+            styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.targetCostCenterCode']}</ui:define>
+    <app:quickSearch id="quickSearchTargetCostCenterField"
+                     textValue="warehouseVoucherUpdateAction.warehouseVoucher.targetCostCenter.code"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetCostCenter}"
+                     searchField="code"
+                     reRender="targetCostCenterCodeField"
+                     rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                     tabindex="4"/>
+    <app:selectPopUp id="targetCostCenterCode"
+                     required="true"
+                     textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.targetCostCenter.fullName}"
+                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetCostCenter}"
+                     clearAction="warehouseVoucherUpdateAction.clearTargetCostCenter()"
+                     searchModalPanel="targetCostCenterListModalPanel"
+                     dataModel="#{costCenterDataModel}"
+                     reRender="targetCostCenterCodeField"
+                     readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                     hotKeySelect="alt+2"/>
+</s:decorate>
+<s:div id="warehousePanel">
+    <s:decorate id="warehouseField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.sourceWarehouse']}</ui:define>
+        <app:quickSearch id="quickSearchWarehouseField"
+                         textValue="warehouseVoucherUpdateAction.warehouseVoucher.warehouse.warehouseCode"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                         searchField="warehouseCode"
+                         postSearchAction="warehouseVoucherUpdateAction.assignResponsible()"
+                         alias="warehouse"
+                         reRender="warehouseField, responsibleField"
+                         rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                         tabindex="5">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                <app:restriction
+                        condition="warehouse.executorUnit = #{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="warehouseSelectPopup"
+                         required="true"
+                         textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse.fullName}"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                         clearAction="warehouseVoucherUpdateAction.clearWarehouse()"
+                         searchModalPanel="warehouseModalPanel"
+                         dataModel="#{warehouseSearchDataModel}"
+                         reRender="warehouseField, responsibleField"
+                         readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                         renderedSelectLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                         renderedClearLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                         hotKeySelect="alt+3">
+            <ui:define name="criteriaValues">
+                <app:criteriaValue fieldName="executorUnit"
+                                   value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+            </ui:define>
+        </app:selectPopUp>
+    </s:decorate>
+</s:div>
+<s:div id="targetWarehousePanel">
+    <s:decorate id="targetWarehouseField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.targetWarehouse']}</ui:define>
+        <app:quickSearch id="quickSearchTargetWarehouseField"
+                         textValue="warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse.warehouseCode"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse}"
+                         searchField="warehouseCode"
+                         postSearchAction="warehouseVoucherUpdateAction.assignTargetResponsible()"
+                         alias="warehouse"
+                         reRender="targetWarehouseField, targetResponsibleField"
+                         rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.targetExecutorUnitFieldSelected}"
+                         tabindex="6">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                <app:restriction
+                        condition="warehouse.executorUnit = #{warehouseVoucherUpdateAction.warehouseVoucher.targetExecutorUnit}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="targetWarehouse"
+                         required="true"
+                         textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse.fullName}"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse}"
+                         clearAction="warehouseVoucherUpdateAction.clearTargetWarehouse()"
+                         searchModalPanel="targetWarehouseModalPanel"
+                         dataModel="#{warehouseSearchDataModel}"
+                         reRender="targetWarehouseField, targetResponsibleField"
+                         readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                         renderedSelectLink="#{warehouseVoucherUpdateAction.targetExecutorUnitFieldSelected}"
+                         renderedClearLink="#{warehouseVoucherUpdateAction.targetExecutorUnitFieldSelected}"
+                         hotKeySelect="alt+4">
+            <ui:define name="criteriaValues">
+                <app:criteriaValue fieldName="executorUnit"
+                                   value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetExecutorUnit}"/>
+            </ui:define>
+        </app:selectPopUp>
+    </s:decorate>
+</s:div>
+<s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.sourceResponsible']}</ui:define>
+    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible.fullName}"/>
+</s:decorate>
+<s:decorate id="targetResponsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.targetResponsible']}</ui:define>
+    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetResponsible.fullName}"/>
+</s:decorate>
+<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
+    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.date}">
+        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                           timeZone="#{sessionUser.timeZone}"/>
+    </h:outputText>
+</s:decorate>
+<s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
+    <h:inputTextarea id="description"
+                     value="#{warehouseVoucherUpdateAction.inventoryMovement.description}"
+                     required="true"
+                     styleClass="input textarea"
+                     tabindex="7"/>
+</s:decorate>
+</c:when>
+<c:when test="#{isTransferenceType}">
+    <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:param name="validateId" value="executorUnitCode"/>
+        <ui:define name="label">#{messages['WarehouseVoucher.executorUnitCode']}</ui:define>
+        <app:quickSearch id="quickSearchExecutorUnit"
+                         textValue="warehouseVoucherUpdateAction.warehouseVoucher.executorUnit.executorUnitCode"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                         postSearchAction="warehouseVoucherUpdateAction.clearWarehouses()"
+                         searchField="executorUnitCode"
+                         filters="businessUnitFilter"
+                         reRender="executorUnitCodeField, warehousePanel, responsibleField, targetWarehousePanel, targetResponsibleField"
+                         rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                         tabindex="8"/>
+        <h:selectOneMenu id="executorUnitCode"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                         styleClass="input"
+                         required="true"
+                         disabled="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}">
+            <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                           var="executorUnit"
+                           label="#{executorUnit.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange"
+                         reRender="executorUnitCodeField, warehousePanel, responsibleField, targetWarehousePanel, targetResponsibleField"
+                         action="#{warehouseVoucherUpdateAction.clearWarehouses}"
+                         ajaxSingle="true"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:div id="targetWarehousePanel">
+        <s:decorate id="targetWarehouseField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.targetWarehouse']}</ui:define>
+            <app:quickSearch id="quickSearchTargetWarehouseField"
+                             textValue="warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse.warehouseCode"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse}"
+                             searchField="warehouseCode"
+                             postSearchAction="warehouseVoucherUpdateAction.assignTargetResponsible()"
+                             alias="warehouse"
+                             reRender="targetWarehouseField, targetResponsibleField"
+                             rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             tabindex="9">
+                <ui:define name="restrictions">
+                    <app:restriction
+                            condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                    <app:restriction
+                            condition="warehouse.executorUnit = #{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                </ui:define>
+            </app:quickSearch>
+            <app:selectPopUp id="targetWarehouse"
+                             required="true"
+                             textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse.fullName}"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetWarehouse}"
+                             clearAction="warehouseVoucherUpdateAction.clearTargetWarehouse()"
+                             searchModalPanel="targetWarehouseModalPanel"
+                             dataModel="#{warehouseSearchDataModel}"
+                             reRender="targetWarehouseField, targetResponsibleField"
+                             readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                             renderedSelectLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             renderedClearLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             hotKeySelect="alt+5">
+                <ui:define name="criteriaValues">
+                    <app:criteriaValue fieldName="executorUnit"
+                                       value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                </ui:define>
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.costCenter']}</ui:define>
+        <app:quickSearch id="quickSearchCostCenterField"
+                         textValue="warehouseVoucherUpdateAction.warehouseVoucher.costCenter.code"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                         searchField="code"
+                         reRender="costCenterCodeField"
+                         rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                         tabindex="10"/>
+        <app:selectPopUp id="costCenter"
+                         required="true"
+                         textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter.fullName}"
+                         value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                         clearAction="warehouseVoucherUpdateAction.clearCostCenter()"
+                         searchModalPanel="costCenterListModalPanel"
+                         dataModel="#{costCenterDataModel}"
+                         reRender="costCenterCodeField"
+                         readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                         hotKeySelect="alt+6"/>
+    </s:decorate>
+    <s:decorate id="targetResponsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.targetResponsible']}</ui:define>
+        <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.targetResponsible.fullName}"/>
+    </s:decorate>
+    <s:div id="warehousePanel">
+        <s:decorate id="warehouseField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.sourceWarehouse']}</ui:define>
+            <app:quickSearch id="quickSearchWarehouseField"
+                             textValue="warehouseVoucherUpdateAction.warehouseVoucher.warehouse.warehouseCode"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                             searchField="warehouseCode"
+                             postSearchAction="warehouseVoucherUpdateAction.assignResponsible()"
+                             alias="warehouse"
+                             reRender="warehouseField, responsibleField"
+                             rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             tabindex="11">
+                <ui:define name="restrictions">
+                    <app:restriction
+                            condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                    <app:restriction
+                            condition="warehouse.executorUnit = #{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                </ui:define>
+            </app:quickSearch>
+            <app:selectPopUp id="warehouseSelectPopup"
+                             required="true"
+                             textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse.fullName}"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                             clearAction="warehouseVoucherUpdateAction.clearWarehouse()"
+                             searchModalPanel="warehouseModalPanel"
+                             dataModel="#{warehouseSearchDataModel}"
+                             reRender="warehouseField, responsibleField"
+                             readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                             renderedSelectLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             renderedClearLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                             hotKeySelect="alt+7">
+                <ui:define name="criteriaValues">
+                    <app:criteriaValue fieldName="executorUnit"
+                                       value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                </ui:define>
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
+        <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.date}">
+            <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                               timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </s:decorate>
+    <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.sourceResponsible']}</ui:define>
+        <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible.fullName}"/>
+    </s:decorate>
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
+        <h:inputTextarea id="description"
+                         value="#{warehouseVoucherUpdateAction.inventoryMovement.description}"
+                         required="true"
+                         styleClass="input textarea"
+                         tabindex="12"/>
+    </s:decorate>
+</c:when>
+<c:otherwise>
+    <s:div id="leftSidePanel">
+        <c:if test="#{warehouseVoucherUpdateAction.output or warehouseVoucherUpdateAction.consumption}">
+            <s:div id="jobContractDiv">
+                <s:decorate id="petitionerJobContractField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.petitioner']}</ui:define>
+                    <app:selectPopUp id="petitionerJobContract"
+                                     required="true"
+                                     textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.petitionerJobContract.contract.employee.fullName}"
+                                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.petitionerJobContract}"
+                                     dataModel="#{jobContractDataModel}"
+                                     clearAction="warehouseVoucherUpdateAction.clearPetitionerJobContract()"
+                                     searchModalPanel="jobContractListModalPanel"
+                                     readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                                     reRender="#{warehouseVoucherGeneralAction.elementsToReRenderForPetitionerJobContractChange}"
+                                     hotKeySelect="alt+8"/>
+                </s:decorate>
+                <s:decorate id="contractPetitionerChargeField" template="/include/inputField.xhtml"
+                            rendered="#{warehouseVoucherUpdateAction.enableContractInfo}"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.petitionerCharge']}</ui:define>
+                    <h:outputText
+                            value="#{warehouseVoucherUpdateAction.warehouseVoucher.petitionerJobContract.job.charge.name}"
+                            styleClass="input">
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="contractPetitionerOrganizationalUnitField" template="/include/inputField.xhtml"
+                            rendered="#{warehouseVoucherUpdateAction.enableContractInfo}"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.petitionerArea']}</ui:define>
+                    <h:outputText
+                            value="#{warehouseVoucherUpdateAction.warehouseVoucher.petitionerJobContract.job.organizationalUnit.fullName}"
+                            styleClass="input">
+                    </h:outputText>
+                </s:decorate>
+            </s:div>
+        </c:if>
+        <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="validateId" value="executorUnitCode"/>
+            <ui:define name="label">#{messages['WarehouseVoucher.executorUnitCode']}</ui:define>
+            <app:quickSearch id="quickSearchExecutorUnit"
+                             textValue="warehouseVoucherUpdateAction.warehouseVoucher.executorUnit.executorUnitCode"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                             postSearchAction="warehouseVoucherUpdateAction.clearWarehouses()"
+                             searchField="executorUnitCode"
+                             filters="businessUnitFilter"
+                             reRender="executorUnitCodeField, warehousePanel, responsibleField"
+                             rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                             tabindex="13"/>
+            <h:selectOneMenu id="executorUnitCode"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"
+                             styleClass="input"
+                             required="true"
+                             disabled="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher or relatedWithPurchaseOrder}">
+                <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                               var="executorUnit"
+                               label="#{executorUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="executorUnitCodeField, warehousePanel, responsibleField"
+                             action="#{warehouseVoucherUpdateAction.clearWarehouses}"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.costCenter']}</ui:define>
+            <app:quickSearch id="quickSearchCostCenterField"
+                             textValue="warehouseVoucherUpdateAction.warehouseVoucher.costCenter.code"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                             searchField="code"
+                             reRender="costCenterCodeField"
+                             rendered="#{!warehouseVoucherApproved and isEmptyWarehouseVoucher}"
+                             tabindex="14"/>
+            <app:selectPopUp id="costCenter"
+                             required="true"
+                             textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter.fullName}"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.costCenter}"
+                             clearAction="warehouseVoucherUpdateAction.clearCostCenter()"
+                             searchModalPanel="costCenterListModalPanel"
+                             dataModel="#{costCenterDataModel}"
+                             reRender="costCenterCodeField"
+                             readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                             hotKeySelect="alt+9"/>
+        </s:decorate>
+        <s:decorate id="contraAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{not empty warehouseVoucherUpdateAction.warehouseVoucher.contraAccount and (
+                warehouseVoucherUpdateAction.warehouseVoucher.documentType.isInputType() or
+                warehouseVoucherUpdateAction.warehouseVoucher.documentType.isOutputType())}">
+            <ui:define name="label">#{messages['WarehouseVoucher.contraAccount']}</ui:define>
+            <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.contraAccount.fullName}"/>
+        </s:decorate>
+        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
+            <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.date}">
+                <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                   timeZone="#{sessionUser.timeZone}"/>
+            </h:outputText>
+        </s:decorate>
+    </s:div>
+    <s:div id="rightSidePanel">
+        <s:div id="warehousePanel">
+            <s:decorate id="warehouseField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+                <app:quickSearch id="quickSearchWarehouseField"
+                                 textValue="warehouseVoucherUpdateAction.warehouseVoucher.warehouse.warehouseCode"
+                                 value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                                 searchField="warehouseCode"
+                                 postSearchAction="warehouseVoucherUpdateAction.assignResponsible()"
+                                 alias="warehouse"
+                                 reRender="warehouseField, responsibleField"
+                                 rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                                 tabindex="15">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+                        <app:restriction
+                                condition="warehouse.executorUnit = #{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <app:selectPopUp id="warehouseSelectPopup"
+                                 required="true"
+                                 textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse.fullName}"
+                                 value="#{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}"
+                                 clearAction="warehouseVoucherUpdateAction.clearWarehouse()"
+                                 searchModalPanel="warehouseModalPanel"
+                                 dataModel="#{warehouseSearchDataModel}"
+                                 reRender="warehouseField, responsibleField"
+                                 readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                                 renderedSelectLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                                 renderedClearLink="#{warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                                 hotKeySelect="alt+10">
+                    <ui:define name="criteriaValues">
+                        <app:criteriaValue fieldName="executorUnit"
+                                           value="#{warehouseVoucherUpdateAction.warehouseVoucher.executorUnit}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </s:decorate>
+        </s:div>
+        <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseVoucher.responsible']}</ui:define>
+            <c:choose>
+                <c:when test="#{warehouseVoucherUpdateAction.enabledResponsibleField}">
+                    <app:quickSearch id="quickSearchResponsible"
+                                     textValue="warehouseVoucherUpdateAction.warehouseVoucher.responsible.idNumber"
+                                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible}"
+                                     searchField="idNumber"
+                                     reRender="responsibleField"
+                                     rendered="#{(!warehouseVoucherApproved and isEmptyWarehouseVoucher) and warehouseVoucherUpdateAction.executorUnitFieldSelected}"
+                                     tabindex="16"/>
+                    <app:selectPopUp id="responsibleSelectPopup"
+                                     required="true"
+                                     textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible.fullName}"
+                                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible}"
+                                     clearAction="warehouseVoucherUpdateAction.cleanResponsible()"
+                                     searchModalPanel="generalEmployeeListModalPanel"
+                                     dataModel="#{generalEmployeeDataModel}"
+                                     readOnly="#{warehouseVoucherApproved or !isEmptyWarehouseVoucher}"
+                                     reRender="responsibleField"
+                                     hotKeySelect="alt+11"/>
+                </c:when>
+                <c:otherwise>
+                    <h:outputText value="#{warehouseVoucherUpdateAction.warehouseVoucher.responsible.fullName}"/>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
+            <h:inputTextarea id="description"
+                             value="#{warehouseVoucherUpdateAction.inventoryMovement.description}"
+                             required="true"
+                             styleClass="input textarea"
+                             tabindex="17"/>
+        </s:decorate>
+    </s:div>
+</c:otherwise>
+</c:choose>
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+
+    <h:commandButton
+            action="#{voucherDocumentReportAction.generateReport(warehouseVoucherUpdateAction.warehouseVoucher)}"
+            value="#{messages['WarehouseVoucher.button.generateDocument']}"
+            immediate="true"
+            styleClass="button"
+            rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"/>
+
+    <h:commandButton
+            action="#{partialWarehouseVoucherAction.addPartialWarehouseVoucher}"
+            value="#{messages['WarehouseVoucher.button.addPartialWarehouseVoucher']}"
+            styleClass="button"
+            immediate="true"
+            rendered="#{warehouseVoucherUpdateAction.showAddPartialWarehouseVoucherButton and s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"/>
+
+    <h:commandButton action="#{warehouseVoucherUpdateAction.approve}"
+                     value="#{messages['WarehouseVoucher.button.approveWarehouseVoucher']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and s:hasPermission('WAREHOUSEVOUCHERAPPROVAL','VIEW')}"
+                     tabindex="18"/>
+
+    <h:commandButton action="#{movementDetailAction.addMovementDetail}"
+                     value="#{messages['WarehouseVoucher.addMovementDetail']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="19"/>
+
+    <h:commandButton action="#{warehouseVoucherUpdateAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','UPDATE')}"
+                     tabindex="20"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.pending and !relatedWithPurchaseOrder and s:hasPermission('WAREHOUSEVOUCHER','DELETE')}"
+                     tabindex="21">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseVoucherUpdateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="22"/>
+</div>
+
+<rich:spacer height="15px"/>
+<s:div id="tabPanelDiv">
+    <rich:tabPanel id="tabPanel" switchType="ajax">
+        <rich:tab name="movementDetailTab"
+                  label="#{messages['WarehouseVoucher.movementDetailTab']}" ajaxSingle="true">
+            <c:set var="movementDetailListcolumnsWidth"
+                   value="#{warehouseVoucherUpdateAction.warehouseVoucher.partial?'30%, 15%, 15%, 10%, 20%, 10%':'30%, 20%, 20%, 20%, 10%'}"/>
+            <rich:dataTable value="#{movementDetailDataModel}"
+                            var="movementDetailItem"
+                            id="movementDetailList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="#{movementDetailListcolumnsWidth}">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['MovementDetail.productItem']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['MovementDetail.quantity']}
+                        </rich:column>
+                        <rich:column rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.partial}">
+                            #{messages['MovementDetail.residue']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['MovementDetail.measureUnit']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['MovementDetail.amount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{movementDetailItem.productItem.fullName}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{movementDetailItem.quantity}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right"
+                             rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.partial}">
+                    <h:outputText value="#{movementDetailItem.quantity}" rendered="#{empty movementDetailItem.residue}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                    <h:outputText value="#{movementDetailItem.residue}"
+                                  rendered="#{not empty movementDetailItem.residue}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{movementDetailItem.measureUnit.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{movementDetailItem.amount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{movementDetailAction.select(movementDetailItem)}"/>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="movementDetailList" dataModel="#{movementDetailDataModel}"/>
+
+        </rich:tab>
+
+        <rich:tab name="partialMovementDetailTab"
+                  rendered="#{not empty warehouseVoucherUpdateAction.warehouseVoucher.warehouseVoucherReceptionType}"
+                  label="#{messages['WarehouseVoucher.partialMovementDetailTab']}" ajaxSingle="true">
+            <rich:dataTable value="#{partialMovementDetailDataModel}"
+                            var="movementDetailItem"
+                            id="partialMovementDetailList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 20%, 20%, 20%, 20%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="warehouseVoucher.number, productItem.name"
+                                                   dataModel="#{partialMovementDetailDataModel}"
+                                                   reRender="partialMovementDetailList, partialDataScroller">
+                                <h:outputText value="#{messages['WarehouseVoucher.number']}"/>
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.name, warehouseVoucher.number"
+                                                   dataModel="#{partialMovementDetailDataModel}"
+                                                   reRender="partialMovementDetailList, partialDataScroller">
+                                <h:outputText value="#{messages['MovementDetail.productItem']}"/>
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="movementDetail.quantity"
+                                                   dataModel="#{partialMovementDetailDataModel}"
+                                                   reRender="partialMovementDetailList, partialDataScroller">
+                                <h:outputText value="#{messages['MovementDetail.quantity']}"/>
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="movementDetail.measureUnit"
+                                                   dataModel="#{partialMovementDetailDataModel}"
+                                                   reRender="partialMovementDetailList, partialDataScroller">
+                                <h:outputText value="#{messages['MovementDetail.measureUnit']}"/>
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="movementDetail.amount"
+                                                   dataModel="#{partialMovementDetailDataModel}"
+                                                   reRender="partialMovementDetailList, partialDataScroller">
+                                <h:outputText value="#{messages['MovementDetail.amount']}"/>
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{movementDetailItem.inventoryMovement.warehouseVoucher.number}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{movementDetailItem.productItem.fullName}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{movementDetailItem.quantity}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{movementDetailItem.measureUnit.name}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{movementDetailItem.amount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{movementDetailAction.select(movementDetailItem)}"/>
+                    &#160;
+                    <h:commandLink action="#{voucherDocumentReportAction.generateReport(movementDetailItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['WarehouseVoucher.button.generateDocument']}"/>
+                    </h:commandLink>
+
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="partialDataScroller" for="partialMovementDetailList"
+                              dataModel="#{partialMovementDetailDataModel}"/>
+        </rich:tab>
+
+    </rich:tabPanel>
+</s:div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{!warehouseVoucherUpdateAction.approved and s:hasPermission('WAREHOUSEVOUCHER','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['WarehouseVoucher.delete.confirmation']}"/>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{warehouseVoucherUpdateAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('WAREHOUSEVOUCHER','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherUpdateAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterCodeField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="targetCostCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="targetCostCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="targetCostCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherUpdateAction.assignTargetCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="targetCostCenterCodeField"
+                           oncomplete="Richfaces.hideModalPanel('targetCostCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+    <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+    <ui:param name="dialogId" value="warehouseModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherUpdateAction.assignWarehouse(warehouseItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="warehouseField, responsibleField"
+                           oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="targetWarehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+    <ui:param name="containerId" value="targetWarehouseListModalPanelContainer"/>
+    <ui:param name="dialogId" value="targetWarehouseModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherUpdateAction.assignTargetWarehouse(warehouseItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="targetWarehouseField, targetResponsibleField"
+                           oncomplete="Richfaces.hideModalPanel('targetWarehouseModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherUpdateAction.assignResponsible(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="responsible"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="jobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:param name="dialogId" value="jobContractListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehouseVoucherCreateAction.assignPetitionerJobContract(jobContractItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="#{warehouseVoucherGeneralAction.elementsToReRenderForPetitionerJobContractChange}"
+                           oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#quickSearchExecutorUnit" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

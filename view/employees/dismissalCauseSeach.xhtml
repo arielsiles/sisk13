@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <rich:simpleTogglePanel id="searchOptionsPanel" label="#{messages['DismissalCause.search']}" switchType="client">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.code']}</ui:define>
+                    <h:inputText id="code" value="#{dismissalCauseDataModel.criteria.code}"
+                                 tabindex="1" styleClass="input">
+                        <f:convertNumber pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.name']}</ui:define>
+                    <h:inputText id="name" value="#{dismissalCauseDataModel.criteria.name}"
+                                 tabindex="2" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.description']}</ui:define>
+                    <h:inputText id="description" value="#{dismissalCauseDataModel.criteria.description}"
+                                 tabindex="3" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.active']}</ui:define>
+                    <h:selectOneMenu id="active"
+                                     value="#{dismissalCauseDataModel.criteria.active}"
+                                     styleClass="input"
+                                     tabindex="4">
+                        <s:selectItems value="#{booleanEnum}" var="active"
+                                       label="#{messages[active.resourceKey]}"
+                                       itemValue="#{active.value}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="payableField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.payable']}</ui:define>
+                    <h:selectOneMenu id="payable"
+                                     value="#{dismissalCauseDataModel.criteria.payable}"
+                                     styleClass="input"
+                                     tabindex="5">
+                        <s:selectItems value="#{booleanEnum}" var="payable"
+                                       label="#{messages[payable.resourceKey]}"
+                                       itemValue="#{payable.value}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <s:div styleClass="right input">
+                        <a4j:commandButton action="#{dismissalCauseDataModel.search()}"
+                                           reRender="dismissalCauseList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="6">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{dismissalCauseDataModel.clear()}"
+                                           reRender="searchOptionsPanel, dismissalCauseList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.clear']}"
+                                           id="clearButtonId"
+                                           tabindex="7">
+                        </a4j:commandButton>
+                    </s:div>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+</ui:composition>

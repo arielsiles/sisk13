@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <s:div rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','VIEW')
+                        and( s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','VIEW')
+                        or s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','CREATE')
+                        or s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','UPDATE')
+                        or s:hasPermission('GESTIONPAYROLLSCHEDULEGESTIONITEM','DELETE'))}">
+        <app:fieldset id="actionsField#{businessUnit.executorUnitCode}"
+                      title="#{messages['Common.action']}">
+
+            <s:div id="jobCategoryDiv#{businessUnit.executorUnitCode}" styleClass="right">
+                <s:decorate id="jobCategoryField#{businessUnit.executorUnitCode}"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['JobContract.jobCategory']}</ui:define>
+                    <app:quickSearch id="quickSearchProvider"
+                                     textValue="gestionPayrollScheduleAction.jobCategory.acronym"
+                                     value="#{gestionPayrollScheduleAction.jobCategory}"
+                                     searchField="acronym"
+                                     reRender="jobCategoryDiv#{businessUnit.executorUnitCode}"
+                                     tabindex="7"/>
+                    <h:selectOneMenu id="jobCategory#{businessUnit.executorUnitCode}"
+                                     styleClass="input"
+                                     value="#{gestionPayrollScheduleAction.jobCategory}"
+                                     required="true"
+                                     tabindex="8">
+                        <s:selectItems value="#{jobCategoryList}"
+                                       var="jobCategory"
+                                       label="#{jobCategory.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <a4j:support event="onchange"
+                                     reRender="jobCategoryDiv#{businessUnit.executorUnitCode}"
+                                     ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <a4j:commandButton id="edit#{businessUnit.executorUnitCode}"
+                                       action="#{gestionPayrollScheduleAction.loadGestionPayrollToEditList()}"
+                                       value="#{messages['Common.edit']}"
+                                       styleClass="button right"
+                                       reRender="jobCategoryField#{businessUnit.executorUnitCode}, gestionPayrollScheduleEditListModalPanelContainer"
+                                       oncomplete="if(#{not empty gestionPayrollScheduleAction.jobCategory}) Richfaces.showModalPanel('gestionPayrollScheduleEditListModalPanel');"
+                                       tabindex="9">
+                    </a4j:commandButton>
+
+                </s:decorate>
+            </s:div>
+        </app:fieldset>
+    </s:div>
+</ui:composition>

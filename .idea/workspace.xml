@@ -1,0 +1,3046 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_TEST_SOURCES" value="false" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="k1_1.8.2.4">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/BalanceSheetReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/ProductionCostReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/ProfitAndLossN3ReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/ProfitAndLossReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/SummaryClientStateReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountDataModel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionDataModel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerDataModel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/reports/CreditReportAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/accounting/SaleType.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/admin/ProductSaleType.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Account.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountState.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransaction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransactionType.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Partner.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/ProductionCost.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/balanceSheetReport.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/generateCostOfSales.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/productionCostReport.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/profitAndLossN3Report.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/profitAndLossReport.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/balanceSheetReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/lossReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/productionCostReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/profitAndLossReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/profitReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/reports/summaryProviderKardexReport.jrxml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/accounting/summaryClientStateReport.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/customers/account.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/customers/accountList.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/customers/addCreditPayment.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/customers/makePaymentModalPanel.xhtml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/view/customers/partnerList.xhtml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/test.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/academics/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/admin/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/budget/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/cashbox/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/contacts/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/customers/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/employees/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/finances/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/fixedassets/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/production/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/products/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/purchases/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/treasury/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/action/warehouse/components.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/dashboard/configuration/dashboard-1.0.xsd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/com/encens/khipus/dataintegration/configuration/dataintegration-1.0.xsd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/khipus/hibernate.cfg.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/view/accounting/reports/majorAccountingReport - copia (2).jrxml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/view/accounting/reports/majorAccountingReport - copia.jrxml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/ant.xml" afterPath="$PROJECT_DIR$/.idea/ant.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build-common.xml" afterPath="$PROJECT_DIR$/build-common.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/WEB-INF/customers/pages.xml" afterPath="$PROJECT_DIR$/resources/WEB-INF/customers/pages.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/khipus-prod-ds.xml" afterPath="$PROJECT_DIR$/resources/khipus-prod-ds.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/messages_app.properties" afterPath="$PROJECT_DIR$/resources/messages_app.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/khipus.iml" afterPath="$PROJECT_DIR$/src/khipus.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherCreateAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherCreateAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherUpdateAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/VoucherUpdateAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/components.xml" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/components.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/CheckSumsBalancesReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/CheckSumsBalancesReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/KardexProviderReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/KardexProviderReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/MajorAccountingReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/MajorAccountingReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/StateBalancesReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/StateBalancesReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/VoucherReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/VoucherReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/admin/components.xml" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/admin/components.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/contacts/components.xml" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/contacts/components.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/components.xml" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/components.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/fixedassets/FixedAssetAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/fixedassets/FixedAssetAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/CollectionFormAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/CollectionFormAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/ProductionPlanningAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/ProductionPlanningAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/RawMaterialPayRollAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/RawMaterialPayRollAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMaterialPayRollReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMaterialPayRollReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMaterialPaySummaryReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMaterialPaySummaryReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMilkReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/RawMilkReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/VoletaDePagoReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/VoletaDePagoReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehousePurchaseOrderAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehousePurchaseOrderAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehouseVoucherUpdateAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehouseVoucherUpdateAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/reports/ProductItemCostUnitReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/reports/ProductItemCostUnitReportAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/ArticleOrder.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/ArticleOrder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CustomerOrder.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CustomerOrder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/VentaDirecta.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/VentaDirecta.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/CashAccount.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/CashAccount.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/CompanyConfiguration.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/CompanyConfiguration.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/Voucher.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/Voucher.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/VoucherDetail.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/VoucherDetail.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/BaseProduct.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/BaseProduct.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/ProductionOrder.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/ProductionOrder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/RawMaterialPayRecord.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/RawMaterialPayRecord.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/RawMaterialPayRoll.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/production/RawMaterialPayRoll.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/warehouse/InventoryDetail.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/warehouse/InventoryDetail.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/warehouse/ProductItem.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/warehouse/ProductItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/FinancesPkGeneratorService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/FinancesPkGeneratorService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/FinancesPkGeneratorServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/FinancesPkGeneratorServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/VoucherService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/VoucherService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/VoucherServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/finances/VoucherServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/fixedassets/FixedAssetServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/fixedassets/FixedAssetServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/BoletaPagoProductor.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/BoletaPagoProductor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/ProductionPlanningServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/ProductionPlanningServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/RawMaterialPayRollService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/RawMaterialPayRollService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/RawMaterialPayRollServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/RawMaterialPayRollServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/ApprovalWarehouseVoucherServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/ApprovalWarehouseVoucherServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/ProductItemServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/ProductItemServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseAccountEntryService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseAccountEntryService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseAccountEntryServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseAccountEntryServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseServiceBean.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/util/Constants.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/util/Constants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/util/MoneyUtil.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/util/MoneyUtil.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/web/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/src/web/WEB-INF/web.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/accounting/kardexProviderReport.xhtml" afterPath="$PROJECT_DIR$/view/accounting/kardexProviderReport.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/accounting/reports/checkSumsBalancesReport.jrxml" afterPath="$PROJECT_DIR$/view/accounting/reports/checkSumsBalancesReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/accounting/reports/stateBalancesReport.jrxml" afterPath="$PROJECT_DIR$/view/accounting/reports/stateBalancesReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/accounting/reports/voucherReport.jrxml" afterPath="$PROJECT_DIR$/view/accounting/reports/voucherReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/accounting/simplePurchaseDocument.xhtml" afterPath="$PROJECT_DIR$/view/accounting/simplePurchaseDocument.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/customers/credit.xhtml" afterPath="$PROJECT_DIR$/view/customers/credit.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/customers/creditList.xhtml" afterPath="$PROJECT_DIR$/view/customers/creditList.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/employees/reports/CareerManagerEvaluationReport.jrxml" afterPath="$PROJECT_DIR$/view/employees/reports/CareerManagerEvaluationReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/employees/reports/criteriaValueEvaluationSubReport.jrxml" afterPath="$PROJECT_DIR$/view/employees/reports/criteriaValueEvaluationSubReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/fixedassets/fixedAssetList.xhtml" afterPath="$PROJECT_DIR$/view/fixedassets/fixedAssetList.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/layout/menu.xhtml" afterPath="$PROJECT_DIR$/view/layout/menu.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/productionPlanning.xhtml" afterPath="$PROJECT_DIR$/view/production/productionPlanning.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/rawMaterialPayRollList.xhtml" afterPath="$PROJECT_DIR$/view/production/rawMaterialPayRollList.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/productionOrderSummaryReport.jrxml" afterPath="$PROJECT_DIR$/view/production/reports/productionOrderSummaryReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/rawMaterialPayRollReport.jrxml" afterPath="$PROJECT_DIR$/view/production/reports/rawMaterialPayRollReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/rawMaterialPaySummaryReport.jrxml" afterPath="$PROJECT_DIR$/view/production/reports/rawMaterialPaySummaryReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/rawMilkReport.jrxml" afterPath="$PROJECT_DIR$/view/production/reports/rawMilkReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/voletaDePago.jrxml" afterPath="$PROJECT_DIR$/view/production/reports/voletaDePago.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/reports/voletasDePagoReport.xhtml" afterPath="$PROJECT_DIR$/view/production/reports/voletasDePagoReport.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/production/singleProductDetail.xhtml" afterPath="$PROJECT_DIR$/view/production/singleProductDetail.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/warehouse/inventory.xhtml" afterPath="$PROJECT_DIR$/view/warehouse/inventory.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/warehouse/providerList.xhtml" afterPath="$PROJECT_DIR$/view/warehouse/providerList.xhtml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/warehouse/reports/kardexSumaryReport.jrxml" afterPath="$PROJECT_DIR$/view/warehouse/reports/kardexSumaryReport.jrxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/warehouse/reports/productItemCostUnitReport.jrxml" afterPath="$PROJECT_DIR$/view/warehouse/reports/productItemCostUnitReport.jrxml" />
+    </list>
+    <list id="c1390d32-d74c-4ab2-894a-a0eab5dbc76a" name="discard" comment="" />
+    <ignored path="khipus.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path="$PROJECT_DIR$/.idea/" />
+    <ignored path="$PROJECT_DIR$/build/" />
+    <ignored path="$PROJECT_DIR$/dist/" />
+    <ignored path="$PROJECT_DIR$/lib/" />
+    <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path=".idea/dataSources.local.xml" />
+    <ignored path="$PROJECT_DIR$/bootstrap/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Commander">
+    <leftPanel />
+    <rightPanel />
+    <splitter proportion="0.5" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DatabaseView">
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_TABLE_DETAILS" value="true" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="khipus" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="PartnerAction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="326">
+              <caret line="69" column="5" lean-forward="false" selection-start-line="63" selection-start-column="4" selection-end-line="69" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="warehousePurchaseOrderDetail.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderDetail.xhtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="349">
+              <caret line="176" column="61" lean-forward="true" selection-start-line="176" selection-start-column="61" selection-end-line="176" selection-end-column="61" />
+              <folding>
+                <element signature="n#s:div#0;n#rich:panel#0;n#h:form#0;n#ui:define#1;n#ui:composition#0;n#!!top" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WarehousePurchaseOrderDetailAction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehousePurchaseOrderDetailAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="632">
+              <caret line="463" column="5" lean-forward="true" selection-start-line="463" selection-start-column="5" selection-end-line="463" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PurchaseOrderDetail.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/purchases/PurchaseOrderDetail.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="632">
+              <caret line="246" column="27" lean-forward="false" selection-start-line="246" selection-start-column="19" selection-end-line="246" selection-end-column="27" />
+              <folding>
+                <element signature="e#5913#5914#0" expanded="true" />
+                <element signature="e#5953#5954#0" expanded="true" />
+                <element signature="e#6120#6121#0" expanded="true" />
+                <element signature="e#6151#6152#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PartnerService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditAction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1156">
+              <caret line="84" column="38" lean-forward="false" selection-start-line="84" selection-start-column="15" selection-end-line="84" selection-end-column="38" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#1328#1329#0" expanded="false" />
+                <element signature="e#1364#1365#0" expanded="false" />
+                <element signature="e#4044#4045#0" expanded="false" />
+                <element signature="e#4078#4079#0" expanded="false" />
+                <element signature="e#4130#4131#0" expanded="false" />
+                <element signature="e#4176#4177#0" expanded="false" />
+                <element signature="e#4219#4220#0" expanded="false" />
+                <element signature="e#4254#4255#0" expanded="false" />
+                <element signature="e#4314#4315#0" expanded="false" />
+                <element signature="e#4362#4363#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GenericServiceBean.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/framework/service/GenericServiceBean.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="544">
+              <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#3880#3881#0" expanded="false" />
+                <element signature="e#3905#3906#0" expanded="false" />
+                <element signature="e#3960#3961#0" expanded="false" />
+                <element signature="e#4001#4002#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="addPayoutCredit.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/customers/addPayoutCredit.xhtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1071">
+              <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="messages_app.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/messages_app.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="318">
+              <caret line="4513" column="46" lean-forward="true" selection-start-line="4513" selection-start-column="0" selection-end-line="4513" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditServiceBean.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="612">
+              <caret line="47" column="5" lean-forward="false" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PartnerServiceBean.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerServiceBean.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="30" column="16" lean-forward="false" selection-start-line="30" selection-start-column="16" selection-end-line="30" selection-end-column="16" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="19" column="53" lean-forward="false" selection-start-line="19" selection-start-column="53" selection-end-line="19" selection-end-column="53" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditTransactionAction.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="442">
+              <caret line="66" column="57" lean-forward="false" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditTransactionServiceBean.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionServiceBean.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="731">
+              <caret line="57" column="39" lean-forward="false" selection-start-line="57" selection-start-column="39" selection-end-line="57" selection-end-column="39" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditTransactionService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="16" column="9" lean-forward="false" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreditTransaction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="290">
+              <caret line="52" column="23" lean-forward="false" selection-start-line="52" selection-start-column="23" selection-end-line="52" selection-end-column="23" />
+              <folding>
+                <element signature="e#3611#3612#0" expanded="true" />
+                <element signature="e#3640#3641#0" expanded="true" />
+                <element signature="e#4470#4471#0" expanded="true" />
+                <element signature="e#4500#4501#0" expanded="true" />
+                <element signature="e#4627#4628#0" expanded="true" />
+                <element signature="e#4658#4659#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="purchaseDocument.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/purchases/purchaseDocument.xhtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="408">
+              <caret line="24" column="99" lean-forward="false" selection-start-line="24" selection-start-column="99" selection-end-line="24" selection-end-column="99" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="credit.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/customers/credit.xhtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="217" column="28" lean-forward="false" selection-start-line="217" selection-start-column="28" selection-end-line="219" selection-end-column="43" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="addCreditPayment.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/customers/addCreditPayment.xhtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="25" column="67" lean-forward="false" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>dsc</find>
+      <find>by</find>
+      <find>sortProperty</find>
+      <find>sortDesc</find>
+      <find>sortAsc</find>
+      <find>creditAction.addCreditPayment</find>
+      <find>addCreditPayment.x</find>
+      <find>deleteConfirmation</find>
+      <find>creditTransactionListId</find>
+      <find>payoutConfirmation</find>
+      <find>operation=&quot;hide&quot;</find>
+      <find>hide</find>
+      <find>focus</find>
+      <find>selectPetitioner</find>
+      <find>generalEmployeeListModalPanel</find>
+      <find>firstInputToFocusId</find>
+      <find>client</find>
+      <find>glo</find>
+      <find>warehousePurchaseDocumentAction.addPurchaseDocument</find>
+      <find>amount</find>
+      <find>creditTransactionAction</find>
+      <find>amountField</find>
+      <find>Nuevo detalle de orden de compra</find>
+      <find>WarehousePurchaseOrderDetail.new</find>
+      <find>Precio unitario del proveedor</find>
+      <find>WarehousePurchaseOrderDetail.providerUnitPrice</find>
+      <find>calculateTotalAmount()</find>
+      <find>updateProperties</find>
+      <find>unitCost</find>
+      <find>totalAmountField</find>
+    </findStrings>
+    <dirStrings>
+      <dir>D:\Intellij\sisk1\src\main\com\encens\khipus\model</dir>
+      <dir>D:\Intellij\sisk1\src\main\com\encens\khipus\action\employees</dir>
+      <dir>D:\Intellij\sisk1\src\main\com\encens\khipus\action</dir>
+    </dirStrings>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="true" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Ariel" />
+        <option value="ariel.siles@gmail.com" />
+        <option value="Ariel &lt;ariel.siles@gmail.com&gt;" />
+        <option value="ariel.siles@gmail.com1." />
+        <option value="ariel.siles@gmail.compersiste" />
+        <option value="AS" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransactionType.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountDataModel.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransaction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/components.xml" />
+        <option value="$PROJECT_DIR$/view/production/rawMaterialPayRollList.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountAction.java" />
+        <option value="$PROJECT_DIR$/view/customers/account.xhtml" />
+        <option value="$PROJECT_DIR$/view/customers/accountList.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/fixedassets/FixedAssetAction.java" />
+        <option value="$PROJECT_DIR$/view/fixedassets/fixedAssetList.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/production/RawMaterialPayRollServiceBean.java" />
+        <option value="$PROJECT_DIR$/view/production/reports/voletasDePagoReport.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/VoletaDePagoReportAction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/SummaryClientStateReportAction.java" />
+        <option value="$PROJECT_DIR$/build-common.xml" />
+        <option value="$PROJECT_DIR$/query/k1-v1.8.5.4.sql" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/ProductItemAction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/PartnerState.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/util/Constants.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerServiceBean.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerService.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/contacts/CityAction.java" />
+        <option value="$PROJECT_DIR$/view/contacts/city.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/contacts/components.xml" />
+        <option value="$PROJECT_DIR$/view/layout/menu.xhtml" />
+        <option value="$PROJECT_DIR$/view/customers/partner.xhtml" />
+        <option value="$PROJECT_DIR$/view/customers/partnerList.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerAction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Partner.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorService.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorServiceBean.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditState.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Account.java" />
+        <option value="$PROJECT_DIR$/view/customers/creditList.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransactionType.java" />
+        <option value="$PROJECT_DIR$/resources/WEB-INF/customers/pages.xml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/util/BigDecimalUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionService.java" />
+        <option value="$PROJECT_DIR$/view/customers/credit.xhtml" />
+        <option value="$PROJECT_DIR$/resources/messages_app.properties" />
+        <option value="$PROJECT_DIR$/view/customers/addPayoutCredit.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionServiceBean.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" />
+        <option value="$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderDetail.xhtml" />
+        <option value="$PROJECT_DIR$/view/customers/addCreditPayment.xhtml" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState />
+  </component>
+  <component name="PhpServers">
+    <servers />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Android</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="view" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="view" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="customers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="customers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="action" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="query" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="options.lastSelected" value="preferences.externalResources" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/build.xml" />
+    <property name="recentsLimit" value="5" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="268" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="297" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="298" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="972" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="290" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="289" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="291" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="965" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="OverrideImplement.overriding.sorted" value="false" />
+    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://D:/intellij/sisk1/view/production/productionPlanning.xhtml&#10;messa&#9;FILE&#9;file://D:/intellij/sisk1/resources/messages_app.properties&#10;warehousePurchaseOrder&#9;FILE&#9;file://D:/intellij/sisk1/view/warehouse/warehousePurchaseOrder.xhtml&#10;voucherUpdateAction&#9;FILE&#9;file://D:/intellij/sisk1/src/main/com/encens/khipus/action/accounting/VoucherUpdateAction.java&#10;accountingPurchaseDocument&#9;FILE&#9;file://D:/intellij/sisk1/view/accounting/accountingPurchaseDocument.xhtml&#10;voucherUpdate&#9;FILE&#9;file://D:/intellij/sisk1/view/accounting/voucherUpdate.xhtml&#10;simplePurchaseDocument&#9;FILE&#9;file://D:/intellij/sisk1/view/accounting/simplePurchaseDocument.xhtml&#10;VouDeta&#9;PSI&#9;JAVA://com.encens.khipus.model.finances.VoucherDetail" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
+    <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="khipus" />
+    <property name="js.eslint.eslintPackage" value="" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.encens.khipus.service.customers" />
+      <recent name="com.encens.khipus.service.warehouse" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Intellij\sisk1\view\customers" />
+      <recent name="D:\Intellij\sisk1\query" />
+      <recent name="D:\Intellij\sisk1\view\accounting" />
+      <recent name="D:\Intellij\sisk1\view\accounting\reports" />
+      <recent name="D:\intellij\sisk1\view\accounting\reports" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.encens.khipus.model.customers" />
+      <recent name="com.encens.khipus.service.customers" />
+      <recent name="com.encens.khipus.action.customers" />
+      <recent name="com.encens.khipus.action.customers.reports" />
+      <recent name="com.encens.khipus.model.admin" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\intellij\khipus\view\customers" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JBoss Server.JBoss5">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <method />
+    </configuration>
+    <configuration default="true" type="AntRunConfiguration" factoryName="Ant Target">
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="ArquillianTestNG" factoryName="">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Cold Fusion runner description" factoryName="Cold Fusion" custom_browser="" web_path="">
+      <method />
+    </configuration>
+    <configuration default="true" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="myFilePath" />
+      <option name="GLUE" />
+      <option name="myNameFilter" />
+      <option name="myGeneratedName" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="FlashRunConfigurationType" factoryName="Flash App">
+      <option name="BCName" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="false" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="" />
+      <option name="overriddenMainClass" value="" />
+      <option name="overriddenOutputFileName" value="" />
+      <option name="overrideMainClass" value="false" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://" />
+      <option name="usbDebugPort" value="7936" />
+      <method />
+    </configuration>
+    <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" appDescriptorForEmulator="Android" class_name="" emulatorAdlOptions="" method_name="" package_name="" scope="Class">
+      <option name="BCName" value="" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="moduleName" value="" />
+      <option name="trusted" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="GrailsRunConfigurationType" factoryName="Grails">
+      <setting name="vmparams" value="" />
+      <setting name="cmdLine" value="run-app" />
+      <setting name="passParentEnv" value="true" />
+      <setting name="launchBrowser" value="false" />
+      <setting name="launchBrowserUrl" value="" />
+      <setting name="depsClasspath" value="false" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JBossConfiguration" factoryName="Local" APPLICATION_SERVER_NAME="JBoss 5.1.0.GA" ALTERNATIVE_JRE_ENABLED="false" ALTERNATIVE_JRE_PATH="">
+      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/khipus" />
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment />
+      <server-settings>
+        <option name="SERVER" value="default" />
+        <option name="BINDING_SET_NAME" value="ports-default" />
+        <option name="DOMAIN" value="false" />
+        <option name="SERVER_GROUP" value="" />
+        <option name="USERNAME" value="" />
+        <option name="PASSWORD" value="" />
+      </server-settings>
+      <predefined_log_file id="JBoss" enabled="true" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <RunnerSettings RunnerId="Cover" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="49261" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method>
+        <option name="Make" enabled="false" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build-common.xml" target="explode" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="JarApplication" factoryName="JAR Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Java Scratch" factoryName="Java Scratch">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="SCRATCH_FILE_ID" value="0" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerProtractor" factoryName="Protractor">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="khipus" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <pass-parent-envs>true</pass-parent-envs>
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Run Launcher">
+      <method />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Test Launcher (JUnit)">
+      <method />
+    </configuration>
+    <configuration default="false" name="JBoss5" type="JBossConfiguration" factoryName="Local" APPLICATION_SERVER_NAME="JBoss 5.1.0.GA" ALTERNATIVE_JRE_ENABLED="false" ALTERNATIVE_JRE_PATH="1.6">
+      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8081/khipus" />
+      <option name="BROWSER_ID" value="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512" />
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment />
+      <server-settings>
+        <option name="SERVER" value="default" />
+        <option name="BINDING_SET_NAME" value="ports-default" />
+        <option name="DOMAIN" value="false" />
+        <option name="SERVER_GROUP" />
+        <option name="USERNAME" value="" />
+        <option name="PASSWORD" value="" />
+      </server-settings>
+      <predefined_log_file id="JBoss" enabled="true" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <RunnerSettings RunnerId="Cover" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="49261" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method>
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build-prod.xml" target="explode" />
+      </method>
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="JBoss Server.JBoss5" />
+    </list>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="" />
+      <changelist id="c1390d32-d74c-4ab2-894a-a0eab5dbc76a" name="discard" comment="" />
+      <created>1419795782224</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1419795782224</updated>
+      <workItem from="1419795783489" duration="515000" />
+      <workItem from="1419796396091" duration="610000" />
+      <workItem from="1419812051887" duration="3057000" />
+      <workItem from="1419815148534" duration="3291000" />
+      <workItem from="1419889608374" duration="5798000" />
+      <workItem from="1419904474532" duration="17798000" />
+      <workItem from="1419943160334" duration="2125000" />
+      <workItem from="1419949170131" duration="4424000" />
+      <workItem from="1419967374735" duration="727000" />
+      <workItem from="1419976059923" duration="3815000" />
+      <workItem from="1419997814547" duration="3743000" />
+      <workItem from="1420461266943" duration="60000" />
+      <workItem from="1421019006649" duration="547000" />
+      <workItem from="1421026195852" duration="14766000" />
+      <workItem from="1421064445280" duration="9038000" />
+      <workItem from="1421085435181" duration="881000" />
+      <workItem from="1421101727442" duration="280000" />
+      <workItem from="1421149747994" duration="1629000" />
+      <workItem from="1421152691404" duration="5817000" />
+      <workItem from="1421172733732" duration="827000" />
+      <workItem from="1421354487852" duration="893000" />
+      <workItem from="1421358737064" duration="1855000" />
+      <workItem from="1421380836162" duration="6053000" />
+      <workItem from="1421416614601" duration="17314000" />
+      <workItem from="1421839694276" duration="624000" />
+      <workItem from="1421856342094" duration="922000" />
+      <workItem from="1422366880489" duration="1335000" />
+      <workItem from="1422458866747" duration="4215000" />
+      <workItem from="1422538703571" duration="10449000" />
+      <workItem from="1422585374443" duration="527000" />
+      <workItem from="1422619252294" duration="2912000" />
+      <workItem from="1422671056645" duration="5899000" />
+      <workItem from="1422853107016" duration="430000" />
+      <workItem from="1423148643196" duration="5427000" />
+      <workItem from="1423169956827" duration="8321000" />
+      <workItem from="1423767367645" duration="11222000" />
+      <workItem from="1424061525141" duration="1276000" />
+      <workItem from="1424098317496" duration="1863000" />
+      <workItem from="1424223452846" duration="716000" />
+      <workItem from="1424296896673" duration="815000" />
+      <workItem from="1424347727091" duration="1975000" />
+      <workItem from="1424816633613" duration="1457000" />
+      <workItem from="1425528879480" duration="1070000" />
+      <workItem from="1425564486170" duration="980000" />
+      <workItem from="1425584381828" duration="641000" />
+      <workItem from="1425698845741" duration="8509000" />
+      <workItem from="1425857816339" duration="5438000" />
+      <workItem from="1426372407537" duration="5352000" />
+      <workItem from="1426534211586" duration="1243000" />
+      <workItem from="1426651650640" duration="2484000" />
+      <workItem from="1426710501200" duration="5476000" />
+      <workItem from="1426723740858" duration="772000" />
+      <workItem from="1426737457840" duration="3945000" />
+      <workItem from="1426801261108" duration="3036000" />
+      <workItem from="1426807022412" duration="8987000" />
+      <workItem from="1426854006363" duration="5563000" />
+      <workItem from="1426916130792" duration="2979000" />
+      <workItem from="1426934431129" duration="747000" />
+      <workItem from="1426944051034" duration="2101000" />
+      <workItem from="1426970314977" duration="1223000" />
+      <workItem from="1427054566135" duration="4022000" />
+      <workItem from="1427222201606" duration="2040000" />
+      <workItem from="1427304593381" duration="2607000" />
+      <workItem from="1427337204976" duration="3804000" />
+      <workItem from="1427424216485" duration="31000" />
+      <workItem from="1427424292827" duration="10073000" />
+      <workItem from="1427463270029" duration="1739000" />
+      <workItem from="1427549456691" duration="2143000" />
+      <workItem from="1427552858624" duration="7616000" />
+      <workItem from="1427565903360" duration="37806000" />
+      <workItem from="1427637403000" duration="5679000" />
+      <workItem from="1427664722720" duration="35440000" />
+      <workItem from="1427743571916" duration="1127000" />
+      <workItem from="1427829021904" duration="4170000" />
+      <workItem from="1427837086810" duration="1345000" />
+      <workItem from="1427838945946" duration="1887000" />
+      <workItem from="1428117878125" duration="12099000" />
+      <workItem from="1428196138980" duration="12399000" />
+      <workItem from="1428250654805" duration="21553000" />
+      <workItem from="1428293534829" duration="667000" />
+      <workItem from="1428332596484" duration="3292000" />
+      <workItem from="1428362395714" duration="4749000" />
+      <workItem from="1428766824795" duration="30869000" />
+      <workItem from="1428849961561" duration="259000" />
+      <workItem from="1428850308820" duration="2142000" />
+      <workItem from="1428888440384" duration="726000" />
+      <workItem from="1428889198922" duration="4582000" />
+      <workItem from="1428939010389" duration="1042000" />
+      <workItem from="1428974870219" duration="16029000" />
+      <workItem from="1429020619428" duration="2285000" />
+      <workItem from="1429068659506" duration="7041000" />
+      <workItem from="1429107607754" duration="10048000" />
+      <workItem from="1429147444181" duration="5863000" />
+      <workItem from="1429230207351" duration="14750000" />
+      <workItem from="1429281841499" duration="8114000" />
+      <workItem from="1429371253242" duration="5221000" />
+      <workItem from="1429536039594" duration="1009000" />
+      <workItem from="1429713843618" duration="1993000" />
+      <workItem from="1429796112108" duration="3415000" />
+      <workItem from="1429851760775" duration="518000" />
+      <workItem from="1429921728366" duration="2647000" />
+      <workItem from="1430767454598" duration="4868000" />
+      <workItem from="1430786353656" duration="2244000" />
+      <workItem from="1430875338887" duration="19871000" />
+      <workItem from="1430913908082" duration="8579000" />
+      <workItem from="1430951209697" duration="849000" />
+      <workItem from="1430964797620" duration="8455000" />
+      <workItem from="1431006941964" duration="1679000" />
+      <workItem from="1431053779938" duration="914000" />
+      <workItem from="1431054986323" duration="34000" />
+      <workItem from="1431092254217" duration="1122000" />
+      <workItem from="1431113231411" duration="818000" />
+      <workItem from="1431133367684" duration="2877000" />
+      <workItem from="1431234367897" duration="311000" />
+      <workItem from="1431275556709" duration="696000" />
+      <workItem from="1431308264563" duration="986000" />
+      <workItem from="1431354769875" duration="3131000" />
+      <workItem from="1431393781769" duration="3581000" />
+      <workItem from="1431653282213" duration="1809000" />
+      <workItem from="1431707372891" duration="927000" />
+      <workItem from="1431743967725" duration="2716000" />
+      <workItem from="1431956358839" duration="2139000" />
+      <workItem from="1432049530533" duration="5841000" />
+      <workItem from="1432149181690" duration="2611000" />
+      <workItem from="1432303332023" duration="3596000" />
+      <workItem from="1432326833437" duration="4264000" />
+      <workItem from="1432432985237" duration="383000" />
+      <workItem from="1432433588885" duration="4940000" />
+      <workItem from="1432440314287" duration="532000" />
+      <workItem from="1432442926048" duration="327000" />
+      <workItem from="1432443514638" duration="158000" />
+      <workItem from="1432494020663" duration="5039000" />
+      <workItem from="1432521487732" duration="6053000" />
+      <workItem from="1432592324687" duration="923000" />
+      <workItem from="1432606039799" duration="4546000" />
+      <workItem from="1432759142380" duration="7088000" />
+      <workItem from="1432866815548" duration="3376000" />
+      <workItem from="1432870402027" duration="1876000" />
+      <workItem from="1432905637942" duration="9585000" />
+      <workItem from="1432926231686" duration="23582000" />
+      <workItem from="1433423590629" duration="4570000" />
+      <workItem from="1434069897037" duration="14569000" />
+      <workItem from="1434085165253" duration="3521000" />
+      <workItem from="1434144997863" duration="64000" />
+      <workItem from="1434145130138" duration="1367000" />
+      <workItem from="1434156728667" duration="1406000" />
+      <workItem from="1434158225770" duration="19690000" />
+      <workItem from="1434383930236" duration="1709000" />
+      <workItem from="1434400817623" duration="8679000" />
+      <workItem from="1434465977820" duration="2330000" />
+      <workItem from="1434486494932" duration="5977000" />
+      <workItem from="1434516081720" duration="988000" />
+      <workItem from="1434548860406" duration="16215000" />
+      <workItem from="1434643759930" duration="1085000" />
+      <workItem from="1434657481335" duration="6329000" />
+      <workItem from="1434684494021" duration="3421000" />
+      <workItem from="1434750108094" duration="1166000" />
+      <workItem from="1434769884591" duration="10600000" />
+      <workItem from="1434817905345" duration="8504000" />
+      <workItem from="1434982938764" duration="1205000" />
+      <workItem from="1435023448738" duration="24000" />
+      <workItem from="1435023516298" duration="111000" />
+      <workItem from="1435023643387" duration="3733000" />
+      <workItem from="1435083075471" duration="2705000" />
+      <workItem from="1435115922626" duration="8907000" />
+      <workItem from="1435203307581" duration="3166000" />
+      <workItem from="1435282642672" duration="7763000" />
+      <workItem from="1435630902889" duration="7906000" />
+      <workItem from="1435718587603" duration="5622000" />
+      <workItem from="1435756047747" duration="7615000" />
+      <workItem from="1435845628814" duration="20178000" />
+      <workItem from="1436386141389" duration="17554000" />
+      <workItem from="1436449964727" duration="22799000" />
+      <workItem from="1436803329103" duration="16644000" />
+      <workItem from="1436892460813" duration="1450000" />
+      <workItem from="1436925892657" duration="2905000" />
+      <workItem from="1436968657430" duration="5336000" />
+      <workItem from="1437576834040" duration="7048000" />
+      <workItem from="1437686071271" duration="1705000" />
+      <workItem from="1438116593484" duration="1953000" />
+      <workItem from="1438267890652" duration="1273000" />
+      <workItem from="1438282668315" duration="5285000" />
+      <workItem from="1438349536486" duration="54596000" />
+      <workItem from="1440027820375" duration="10608000" />
+      <workItem from="1440074996191" duration="13482000" />
+      <workItem from="1440287391197" duration="7084000" />
+      <workItem from="1441146947595" duration="26267000" />
+      <workItem from="1441226679778" duration="9342000" />
+      <workItem from="1441244884522" duration="3340000" />
+      <workItem from="1441289847893" duration="32005000" />
+      <workItem from="1441371116383" duration="6630000" />
+      <workItem from="1441899233958" duration="1564000" />
+      <workItem from="1442241886655" duration="33270000" />
+      <workItem from="1442499529150" duration="15297000" />
+      <workItem from="1442583169863" duration="12892000" />
+      <workItem from="1442948689957" duration="1963000" />
+      <workItem from="1442952846123" duration="3592000" />
+      <workItem from="1442980663609" duration="1609000" />
+      <workItem from="1443012441251" duration="30429000" />
+      <workItem from="1443099388540" duration="4721000" />
+      <workItem from="1443104787830" duration="62808000" />
+      <workItem from="1443738963743" duration="1565000" />
+      <workItem from="1443825382628" duration="2695000" />
+      <workItem from="1444056172170" duration="5463000" />
+      <workItem from="1444215337129" duration="16000" />
+      <workItem from="1444222940418" duration="17072000" />
+      <workItem from="1444356304408" duration="9088000" />
+      <workItem from="1444397645608" duration="608000" />
+      <workItem from="1444428627512" duration="4728000" />
+      <workItem from="1444481578451" duration="23512000" />
+      <workItem from="1444567168594" duration="4750000" />
+      <workItem from="1444650743218" duration="946000" />
+      <workItem from="1444652421142" duration="40000" />
+      <workItem from="1444664622013" duration="6104000" />
+      <workItem from="1444676324031" duration="13266000" />
+      <workItem from="1444738360782" duration="7002000" />
+      <workItem from="1444751531666" duration="1296000" />
+      <workItem from="1445020776534" duration="940000" />
+      <workItem from="1445258990281" duration="5240000" />
+      <workItem from="1445350637874" duration="5193000" />
+      <workItem from="1445379086618" duration="50381000" />
+      <workItem from="1445513156169" duration="17419000" />
+      <workItem from="1445611757870" duration="19604000" />
+      <workItem from="1445643697807" duration="11431000" />
+      <workItem from="1445720886646" duration="6993000" />
+      <workItem from="1445790357141" duration="1787000" />
+      <workItem from="1445824211610" duration="36069000" />
+      <workItem from="1445954044571" duration="9214000" />
+      <workItem from="1445984431383" duration="11371000" />
+      <workItem from="1446037056913" duration="7251000" />
+      <workItem from="1446212311336" duration="15304000" />
+      <workItem from="1446308531281" duration="592000" />
+      <workItem from="1446392508227" duration="29972000" />
+      <workItem from="1446561699130" duration="24014000" />
+      <workItem from="1446635685770" duration="8352000" />
+      <workItem from="1446811365569" duration="2528000" />
+      <workItem from="1446902556689" duration="4533000" />
+      <workItem from="1447072325785" duration="22642000" />
+      <workItem from="1447158219189" duration="24285000" />
+      <workItem from="1447245587041" duration="27930000" />
+      <workItem from="1447362175706" duration="73000" />
+      <workItem from="1447365948864" duration="64155000" />
+      <workItem from="1447882232100" duration="1888000" />
+      <workItem from="1447993201226" duration="1619000" />
+      <workItem from="1448023629193" duration="14531000" />
+      <workItem from="1448105306818" duration="4184000" />
+      <workItem from="1448233575171" duration="9431000" />
+      <workItem from="1448337196108" duration="8341000" />
+      <workItem from="1448496442234" duration="17471000" />
+      <workItem from="1448716434962" duration="592000" />
+      <workItem from="1448842504149" duration="31059000" />
+      <workItem from="1449193432804" duration="4136000" />
+      <workItem from="1449485976018" duration="1265000" />
+      <workItem from="1449584918750" duration="13892000" />
+      <workItem from="1449690583862" duration="23515000" />
+      <workItem from="1449837710209" duration="10012000" />
+      <workItem from="1450059572034" duration="9477000" />
+      <workItem from="1450202579149" duration="18488000" />
+      <workItem from="1450291126508" duration="7896000" />
+      <workItem from="1450385873367" duration="1801000" />
+      <workItem from="1450478258747" duration="2042000" />
+      <workItem from="1450530452631" duration="10827000" />
+      <workItem from="1450673243162" duration="1215000" />
+      <workItem from="1450884539378" duration="44000" />
+      <workItem from="1450884665387" duration="2673000" />
+      <workItem from="1451002430238" duration="12663000" />
+      <workItem from="1451278935039" duration="996000" />
+      <workItem from="1451405300781" duration="14937000" />
+      <workItem from="1451861703098" duration="947000" />
+      <workItem from="1452118850376" duration="4300000" />
+      <workItem from="1452173645361" duration="2151000" />
+      <workItem from="1452197623776" duration="1394000" />
+      <workItem from="1452205918889" duration="677000" />
+      <workItem from="1452482552194" duration="1569000" />
+      <workItem from="1452536689750" duration="8731000" />
+      <workItem from="1452712327383" duration="32878000" />
+      <workItem from="1453090354579" duration="10192000" />
+      <workItem from="1453642824605" duration="41376000" />
+      <workItem from="1454095211475" duration="137000" />
+      <workItem from="1454095563451" duration="58759000" />
+      <workItem from="1454537385662" duration="7703000" />
+      <workItem from="1454589386051" duration="333000" />
+      <workItem from="1454589735201" duration="11339000" />
+      <workItem from="1454611648091" duration="2565000" />
+      <workItem from="1454673282483" duration="7432000" />
+      <workItem from="1454762518536" duration="4457000" />
+      <workItem from="1455235114099" duration="3377000" />
+      <workItem from="1455563885901" duration="12850000" />
+      <workItem from="1455773773343" duration="9283000" />
+      <workItem from="1455822906191" duration="257000" />
+      <workItem from="1455890614871" duration="2334000" />
+      <workItem from="1456286185250" duration="876000" />
+      <workItem from="1456343039411" duration="45991000" />
+      <workItem from="1457719489181" duration="2730000" />
+      <workItem from="1459274557083" duration="3389000" />
+      <workItem from="1459286145664" duration="19295000" />
+      <workItem from="1460505563037" duration="9998000" />
+      <workItem from="1460591970007" duration="1528000" />
+      <workItem from="1461303496017" duration="28196000" />
+      <workItem from="1461718115104" duration="685000" />
+      <workItem from="1461792311422" duration="9989000" />
+      <workItem from="1462544956860" duration="15580000" />
+      <workItem from="1462721395639" duration="494000" />
+      <workItem from="1462722023638" duration="4433000" />
+      <workItem from="1462756821588" duration="268000" />
+      <workItem from="1462758015276" duration="1321000" />
+      <workItem from="1462824907791" duration="853000" />
+      <workItem from="1462907736494" duration="8916000" />
+      <workItem from="1463517592616" duration="5179000" />
+      <workItem from="1464915889219" duration="8955000" />
+      <workItem from="1464996446568" duration="12426000" />
+      <workItem from="1465017215653" duration="16000" />
+      <workItem from="1465048485837" duration="25140000" />
+      <workItem from="1465511666663" duration="36626000" />
+      <workItem from="1466386487508" duration="34738000" />
+      <workItem from="1466727927933" duration="25784000" />
+      <workItem from="1466964804657" duration="42071000" />
+      <workItem from="1467314861531" duration="24692000" />
+      <workItem from="1467852012221" duration="8386000" />
+      <workItem from="1467901063911" duration="593000" />
+      <workItem from="1467937924243" duration="3157000" />
+      <workItem from="1467986940831" duration="1215000" />
+      <workItem from="1468369892061" duration="3219000" />
+      <workItem from="1468471301953" duration="3695000" />
+      <workItem from="1468529805053" duration="1782000" />
+      <workItem from="1468550484888" duration="939000" />
+      <workItem from="1468626426654" duration="592000" />
+      <workItem from="1468640848240" duration="1556000" />
+      <workItem from="1468852737409" duration="1916000" />
+      <workItem from="1468872783410" duration="1000000" />
+      <workItem from="1468874190385" duration="9592000" />
+      <workItem from="1468893073090" duration="11119000" />
+      <workItem from="1468978614280" duration="8941000" />
+      <workItem from="1469028093561" duration="37602000" />
+      <workItem from="1469239687640" duration="6302000" />
+      <workItem from="1469291140588" duration="598000" />
+      <workItem from="1469483218510" duration="108000" />
+      <workItem from="1469483352254" duration="474000" />
+      <workItem from="1469483852841" duration="988000" />
+      <workItem from="1469485270227" duration="558000" />
+      <workItem from="1469485856322" duration="2970000" />
+      <workItem from="1469537665403" duration="1618000" />
+      <workItem from="1469541818558" duration="1092000" />
+      <workItem from="1469558788391" duration="3785000" />
+      <workItem from="1469571654157" duration="20144000" />
+      <workItem from="1469666146306" duration="128000" />
+      <workItem from="1469732008807" duration="5761000" />
+      <workItem from="1469833971223" duration="3682000" />
+      <workItem from="1470160553281" duration="683000" />
+      <workItem from="1470166462274" duration="726000" />
+      <workItem from="1470257154987" duration="3450000" />
+      <workItem from="1470320030019" duration="7511000" />
+      <workItem from="1470423257461" duration="1877000" />
+      <workItem from="1470786216513" duration="3390000" />
+      <workItem from="1470844387498" duration="1539000" />
+      <workItem from="1470974018337" duration="164000" />
+      <workItem from="1471276549511" duration="14724000" />
+      <workItem from="1471365163511" duration="17915000" />
+      <workItem from="1464712181849" duration="638000" />
+      <workItem from="1471476350113" duration="1276000" />
+      <workItem from="1471527049987" duration="16428000" />
+      <workItem from="1471962169858" duration="617000" />
+      <workItem from="1472073042015" duration="16930000" />
+      <workItem from="1472156100245" duration="17242000" />
+      <workItem from="1472821786525" duration="15034000" />
+      <workItem from="1473421062298" duration="1216000" />
+      <workItem from="1473766241978" duration="2198000" />
+      <workItem from="1474370684959" duration="6415000" />
+      <workItem from="1475004497887" duration="18021000" />
+      <workItem from="1475159308593" duration="3530000" />
+      <workItem from="1475446244317" duration="5989000" />
+      <workItem from="1475781836758" duration="6000" />
+      <workItem from="1475781853773" duration="17516000" />
+      <workItem from="1476247066310" duration="418000" />
+      <workItem from="1476405443305" duration="2297000" />
+      <workItem from="1476667403727" duration="4020000" />
+      <workItem from="1476754837198" duration="709000" />
+      <workItem from="1476797241907" duration="8347000" />
+      <workItem from="1477607865069" duration="1191000" />
+      <workItem from="1477920701009" duration="2666000" />
+      <workItem from="1478265951356" duration="14988000" />
+      <workItem from="1478826308496" duration="2492000" />
+      <workItem from="1479241615916" duration="13203000" />
+      <workItem from="1479425489469" duration="16729000" />
+      <workItem from="1479736482563" duration="28944000" />
+      <workItem from="1480422221384" duration="13884000" />
+      <workItem from="1480520545251" duration="3257000" />
+      <workItem from="1480628667109" duration="5177000" />
+      <workItem from="1481148576753" duration="1258000" />
+      <workItem from="1481248891759" duration="1057000" />
+      <workItem from="1481305843440" duration="387000" />
+      <workItem from="1481306248463" duration="2479000" />
+      <workItem from="1481581572680" duration="16009000" />
+      <workItem from="1481679865634" duration="13763000" />
+      <workItem from="1481722242932" duration="47830000" />
+      <workItem from="1481911877825" duration="13733000" />
+      <workItem from="2239313286355" duration="45000" />
+      <workItem from="2239313499802" duration="33000" />
+      <workItem from="1481931173590" duration="249000" />
+      <workItem from="1481931459714" duration="93000" />
+      <workItem from="1481931577363" duration="2433000" />
+      <workItem from="1481936980289" duration="12000" />
+      <workItem from="1481937029066" duration="79000" />
+      <workItem from="1481937160435" duration="19183000" />
+      <workItem from="1481984120367" duration="12928000" />
+      <workItem from="1482016580701" duration="2626000" />
+      <workItem from="1482067323893" duration="13349000" />
+      <workItem from="1482178147695" duration="21325000" />
+      <workItem from="1482247061398" duration="25154000" />
+      <workItem from="1482332571785" duration="19618000" />
+      <workItem from="1482965932090" duration="848000" />
+      <workItem from="1483068927265" duration="667000" />
+      <workItem from="1483118526292" duration="3398000" />
+      <workItem from="1483420382434" duration="640000" />
+      <workItem from="1483471942413" duration="6289000" />
+      <workItem from="1483539549504" duration="14950000" />
+      <workItem from="1483624770832" duration="6784000" />
+      <workItem from="1483741419744" duration="1070000" />
+      <workItem from="1484370432397" duration="3761000" />
+      <workItem from="1484537817499" duration="1485000" />
+      <workItem from="1484602140691" duration="3975000" />
+      <workItem from="1484666451099" duration="3428000" />
+      <workItem from="1484962791456" duration="377000" />
+      <workItem from="1486206267523" duration="1898000" />
+      <workItem from="1487136066193" duration="3755000" />
+      <workItem from="1490062575130" duration="2170000" />
+      <workItem from="1490295559524" duration="4021000" />
+      <workItem from="1490627314922" duration="1725000" />
+      <workItem from="1490973813492" duration="638000" />
+      <workItem from="1491404823272" duration="2367000" />
+      <workItem from="1491962596721" duration="2496000" />
+      <workItem from="1492047845163" duration="681000" />
+      <workItem from="1492080368528" duration="808000" />
+      <workItem from="1492135699684" duration="3000" />
+      <workItem from="1492562302501" duration="6656000" />
+      <workItem from="1492599304115" duration="8736000" />
+      <workItem from="1492714004409" duration="28759000" />
+      <workItem from="1492896965934" duration="27000" />
+      <workItem from="1492902194095" duration="9491000" />
+      <workItem from="1492983890471" duration="4736000" />
+      <workItem from="1492995493860" duration="3318000" />
+      <workItem from="1493036469300" duration="603000" />
+      <workItem from="1493215000566" duration="65000" />
+      <workItem from="1493215503358" duration="5690000" />
+      <workItem from="1493348731116" duration="1669000" />
+      <workItem from="1493386541264" duration="32105000" />
+      <workItem from="1493471880501" duration="17746000" />
+      <workItem from="1493557693305" duration="7680000" />
+    </task>
+    <task id="LOCAL-00013" summary="delete permission">
+      <created>1424297037731</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1424297037731</updated>
+    </task>
+    <task id="LOCAL-00014" summary="1.5.9.8 planilla acopio 3.50 bs">
+      <created>1424349404482</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1424349404482</updated>
+    </task>
+    <task id="LOCAL-00015" summary="persistence">
+      <created>1425565385167</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1425565385167</updated>
+    </task>
+    <task id="LOCAL-00016" summary="iml">
+      <created>1425565460697</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1425565460697</updated>
+    </task>
+    <task id="LOCAL-00017" summary="1.5.9.9">
+      <created>1425708479784</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1425708479784</updated>
+    </task>
+    <task id="LOCAL-00018" summary="1.6.0 Register Mark, Total Milk">
+      <created>1426653743125</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1426653743125</updated>
+    </task>
+    <task id="LOCAL-00019" summary="1.6.1 jobContract">
+      <created>1426935027237</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1426935027237</updated>
+    </task>
+    <task id="LOCAL-00020" summary="1.6.1 jobContract">
+      <created>1426945453253</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1426945453253</updated>
+    </task>
+    <task id="LOCAL-00021" summary="OrderInput, change amountStock true">
+      <created>1427464302332</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1427464302332</updated>
+    </task>
+    <task id="LOCAL-00022" summary="1.6.2 OrderInput, change amountStock true">
+      <created>1427464441807</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1427464441807</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Changes to MySql">
+      <created>1427641733594</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1427641733594</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Changes to MySql Resumen acopio">
+      <created>1427689409630</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1427689409630</updated>
+    </task>
+    <task id="LOCAL-00025" summary="v2.0 Changes to MySql">
+      <created>1427723006380</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1427723006381</updated>
+    </task>
+    <task id="LOCAL-00026" summary="v2.0 Changes to MySql">
+      <created>1427732393325</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1427732393325</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Changes to MySql, IndirectCosts">
+      <created>1428293734154</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1428293734154</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Changes buttons production planning">
+      <created>1428767798695</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1428767798695</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Changes Testing Reception Vales">
+      <created>1428892699006</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1428892699006</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Approve VALE and accounting">
+      <created>1429113491737</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1429113491737</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Contabilizar Ordenes de Produccion">
+      <created>1429156698594</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1429156698594</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Updates INV_">
+      <created>1429805113351</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1429805113351</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Planilla Reserva Productores">
+      <created>1430794463115</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1430794463115</updated>
+    </task>
+    <task id="LOCAL-00034" summary="1.7 Release MySql">
+      <created>1430975930942</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1430975930942</updated>
+    </task>
+    <task id="LOCAL-00035" summary="1.7 Release MySql">
+      <created>1430976137562</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1430976137562</updated>
+    </task>
+    <task id="LOCAL-00036" summary="1.7.0 Release MySql">
+      <created>1430976654035</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1430976654035</updated>
+    </task>
+    <task id="LOCAL-00037" summary="v1.7.1 Correct Yogurt Base">
+      <created>1431144621764</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1431144621764</updated>
+    </task>
+    <task id="LOCAL-00038" summary="v1.7.1 Database 10-05-2015 12:45">
+      <created>1431276354508</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1431276354508</updated>
+    </task>
+    <task id="LOCAL-00039" summary="v1.7.2 Correción Modificar insumos Ilfrut (Yogurt Base)">
+      <created>1431405409376</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1431405409376</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Accounting 1.0">
+      <created>1433424980579</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1433424980579</updated>
+    </task>
+    <task id="LOCAL-00041" summary="1.7.3 correccion planilla acopio cantidades">
+      <created>1433434481007</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1433434481007</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Changes Accounting">
+      <created>1434420403670</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1434420403670</updated>
+    </task>
+    <task id="LOCAL-00043" summary="v1.7.4 Release Boleta de Pago Productores">
+      <created>1434470926139</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1434470926139</updated>
+    </task>
+    <task id="LOCAL-00044" summary="v1.7.5 Release Boleta de Pago Productores Final">
+      <created>1434602676491</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1434602676491</updated>
+    </task>
+    <task id="LOCAL-00045" summary="v1.7.6 Release Boleta de Pago correcciones">
+      <created>1434662561589</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1434662561589</updated>
+    </task>
+    <task id="LOCAL-00046" summary="v1.7.7 View Accounting Entries">
+      <created>1434689479948</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1434689479948</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Cambios Proveedores OC">
+      <created>1435083272006</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1435083272006</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Cambios Proveedores OC">
+      <created>1435083768208</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1435083768208</updated>
+    </task>
+    <task id="LOCAL-00049" summary="v1.7.8 Cambios Proveedores OC">
+      <created>1435089944119</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1435089944119</updated>
+    </task>
+    <task id="LOCAL-00050" summary="v1.7.9 Correcciones Ordenes Compra, Asientos">
+      <created>1435859623425</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1435859623426</updated>
+    </task>
+    <task id="LOCAL-00051" summary="v1.7.9.1 Correccion Reporte Productos Producidos">
+      <created>1435892733608</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1435892733608</updated>
+    </task>
+    <task id="LOCAL-00052" summary="v1.7.9.2 Correcciones SF_TMP (Voucher, VoucherDetail)">
+      <created>1436415445118</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1436415445118</updated>
+    </task>
+    <task id="LOCAL-00053" summary="v1.7.9.2 Correcciones SF_TMP (Voucher, VoucherDetail)">
+      <created>1436416012085</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1436416012085</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Contabilidad, Asientos Independientes">
+      <created>1436820924726</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1436820924726</updated>
+    </task>
+    <task id="LOCAL-00055" summary="v1.7.9.3 Correcciones, Entrega de Pedidos">
+      <created>1436847707664</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1436847707664</updated>
+    </task>
+    <task id="LOCAL-00056" summary="v1.7.9.4 Correcciones entregas de articulos">
+      <created>1436977617335</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1436977617335</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Correcciones Asientos Secuencia sftmpenc sftmpdet">
+      <created>1439922478930</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1439922478930</updated>
+    </task>
+    <task id="LOCAL-00058" summary="v1.7.9.5 Correcciones Asientos Secuencia sftmpenc sftmpdet">
+      <created>1439935024600</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1439935024600</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Initial Commit">
+      <created>1460593518522</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1460593518522</updated>
+    </task>
+    <task id="LOCAL-00060" summary="CRUD Voucher">
+      <created>1461472877052</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1461472877052</updated>
+    </task>
+    <task id="LOCAL-00061" summary="k1_1.8.2.4">
+      <created>1461587857404</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1461587857404</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="3445903000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37662336" sideWeight="0.5021322" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31135136" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.49134198" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16151386" sideWeight="0.46839547" order="8" side_tool="false" content_ui="tabs" x="891" y="347" width="137" height="345" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17004265" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14285715" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1609808" sideWeight="0.5316045" order="7" side_tool="false" content_ui="tabs" x="1341" y="168" width="350" height="644" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3416216" sideWeight="0.4978678" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32864866" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22294372" sideWeight="0.49946696" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37662336" sideWeight="0.4978678" order="10" side_tool="false" content_ui="tabs" x="21" y="375" width="1878" height="289" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33982685" sideWeight="0.48987207" order="5" side_tool="false" content_ui="tabs" x="22" y="337" width="1876" height="366" />
+      <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3225108" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1673774" sideWeight="0.50159746" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16897655" sideWeight="0.48757765" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15495208" sideWeight="0.50054055" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Seam" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24040511" sideWeight="0.5122807" order="12" side_tool="true" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1748401" sideWeight="0.51124746" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39675677" sideWeight="0.50319827" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41233766" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="1.7 Release MySql" />
+    <MESSAGE value="1.7.0 Release MySql" />
+    <MESSAGE value="v1.7.1 Correct Yogurt Base" />
+    <MESSAGE value="v1.7.1 Database 10-05-2015 12:45" />
+    <MESSAGE value="v1.7.2 Correción Modificar insumos Ilfrut (Yogurt Base)" />
+    <MESSAGE value="Accounting 1.0" />
+    <MESSAGE value="1.7.3 correccion planilla acopio cantidades" />
+    <MESSAGE value="Changes Accounting" />
+    <MESSAGE value="v1.7.4 Release Boleta de Pago Productores" />
+    <MESSAGE value="v1.7.5 Release Boleta de Pago Productores Final" />
+    <MESSAGE value="v1.7.6 Release Boleta de Pago correcciones" />
+    <MESSAGE value="v1.7.7 View Accounting Entries" />
+    <MESSAGE value="Cambios Proveedores OC" />
+    <MESSAGE value="v1.7.8 Cambios Proveedores OC" />
+    <MESSAGE value="v1.7.9 Correcciones Ordenes Compra, Asientos" />
+    <MESSAGE value="v1.7.9.1 Correccion Reporte Productos Producidos" />
+    <MESSAGE value="v1.7.9.2 Correcciones SF_TMP (Voucher, VoucherDetail)" />
+    <MESSAGE value="Contabilidad, Asientos Independientes" />
+    <MESSAGE value="v1.7.9.3 Correcciones, Entrega de Pedidos" />
+    <MESSAGE value="v1.7.9.4 Correcciones entregas de articulos" />
+    <MESSAGE value="Correcciones Asientos Secuencia sftmpenc sftmpdet" />
+    <MESSAGE value="v1.7.9.5 Correcciones Asientos Secuencia sftmpenc sftmpdet" />
+    <MESSAGE value="Initial Commit" />
+    <MESSAGE value="CRUD Voucher" />
+    <MESSAGE value="k1_1.8.2.4" />
+    <option name="LAST_COMMIT_MESSAGE" value="k1_1.8.2.4" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/PartialWarehouseVoucherAction.java</url>
+          <line>97</line>
+          <properties />
+          <option name="timeStamp" value="721" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseServiceBean.java</url>
+          <line>119</line>
+          <properties />
+          <option name="timeStamp" value="722" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehouseAccountEntryServiceBean.java</url>
+          <line>534</line>
+          <properties />
+          <option name="timeStamp" value="735" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/com/encens/khipus/util/VoucherBuilder.java</url>
+          <line>69</line>
+          <properties class="com.encens.khipus.util.VoucherBuilder" method="newCheckPaymentTypeVoucher" />
+          <option name="timeStamp" value="727" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <default-breakpoints>
+        <breakpoint type="java-exception">
+          <dependency master-id="0" />
+          <properties>
+            <option name="NOTIFY_CAUGHT" value="false" />
+          </properties>
+        </breakpoint>
+        <breakpoint type="javascript-exception">
+          <dependency id="0" />
+          <properties />
+        </breakpoint>
+      </default-breakpoints>
+      <option name="time" value="744" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <PATH>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="khipus" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="khipus" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+    </PATH>
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="true" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <targetFilters>
+        <filter targetName="init" isVisible="true" />
+        <filter targetName="init-rebel" isVisible="false" />
+        <filter targetName="compile" isVisible="true" />
+        <filter targetName="copyclasses" isVisible="true" />
+        <filter targetName="jar" isVisible="true" />
+        <filter targetName="war" isVisible="true" />
+        <filter targetName="war-applet" isVisible="true" />
+        <filter targetName="ear" isVisible="true" />
+        <filter targetName="clear-profile-artifacts" isVisible="true" />
+        <filter targetName="stage" isVisible="false" />
+        <filter targetName="archive" isVisible="true" />
+        <filter targetName="datasource" isVisible="false" />
+        <filter targetName="explode" isVisible="true" />
+        <filter targetName="unexplode" isVisible="true" />
+        <filter targetName="reexplode" isVisible="true" />
+        <filter targetName="check-deployed" isVisible="true" />
+        <filter targetName="restart-exploded" isVisible="true" />
+        <filter targetName="restart-deployed" isVisible="true" />
+        <filter targetName="restart" isVisible="true" />
+        <filter targetName="deploy" isVisible="true" />
+        <filter targetName="undeploy" isVisible="true" />
+        <filter targetName="redeploy" isVisible="true" />
+        <filter targetName="clean" isVisible="true" />
+        <filter targetName="compiletest" isVisible="true" />
+        <filter targetName="copytestclasses" isVisible="true" />
+        <filter targetName="buildtest" isVisible="true" />
+        <filter targetName="test" isVisible="true" />
+        <filter targetName="javadoc" isVisible="false" />
+        <filter targetName="validateConfiguration" isVisible="false" />
+        <filter targetName="validate" isVisible="true" />
+        <filter targetName="purge" isVisible="true" />
+      </targetFilters>
+      <expanded value="true" />
+    </buildFile>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/view/finances/cashAccountListModalPanel.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="683">
+          <caret line="97" column="46" lean-forward="false" selection-start-line="97" selection-start-column="42" selection-end-line="97" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/admin/authenticationModalPanel.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="109" lean-forward="false" selection-start-line="9" selection-start-column="109" selection-end-line="9" selection-end-column="109" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/admin/userListModalPanel.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="131" column="77" lean-forward="false" selection-start-line="131" selection-start-column="77" selection-end-line="131" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/employees/pollCopy.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="584">
+          <caret line="325" column="49" lean-forward="true" selection-start-line="325" selection-start-column="49" selection-end-line="325" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/WEB-INF/facelets/tags/keyUpEvent.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="17" lean-forward="false" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/employees/employeeList.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="81" lean-forward="false" selection-start-line="14" selection-start-column="75" selection-end-line="14" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/include/modalDialog.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="24" lean-forward="false" selection-start-line="19" selection-start-column="24" selection-end-line="19" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/employees/generalEmployeeListModalPanel.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="128" column="67" lean-forward="true" selection-start-line="128" selection-start-column="67" selection-end-line="128" selection-end-column="67" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderList.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="479">
+          <caret line="344" column="100" lean-forward="true" selection-start-line="339" selection-start-column="8" selection-end-line="344" selection-end-column="100" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/employees/Employee.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="102" column="4" lean-forward="true" selection-start-line="102" selection-start-column="4" selection-end-line="104" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/WEB-INF/customers/pages.xml">
+      <provider editor-type-id="com.intellij.seam.fileEditor.PagesGraphFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="552">
+          <caret line="243" column="24" lean-forward="true" selection-start-line="243" selection-start-column="24" selection-end-line="243" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="53" column="23" lean-forward="false" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
+          <folding>
+            <element signature="e#3914#3915#0" expanded="false" />
+            <element signature="e#3943#3944#0" expanded="false" />
+            <element signature="e#5563#5564#0" expanded="false" />
+            <element signature="e#5591#5592#0" expanded="false" />
+            <element signature="e#6052#6053#0" expanded="false" />
+            <element signature="e#6084#6085#0" expanded="false" />
+            <element signature="e#6135#6136#0" expanded="false" />
+            <element signature="e#6177#6178#0" expanded="false" />
+            <marker date="1493433480795" expanded="true" signature="1581:1597" ph="@{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/customers/creditList.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="123" column="62" lean-forward="true" selection-start-line="123" selection-start-column="62" selection-end-line="123" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/framework/service/GenericService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/warehouse/warehousePurchaseOrder.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1105">
+          <caret line="65" column="82" lean-forward="false" selection-start-line="65" selection-start-column="31" selection-end-line="65" selection-end-column="82" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/WEB-INF/warehouse/pages.xml">
+      <provider editor-type-id="com.intellij.seam.fileEditor.PagesGraphFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7667">
+          <caret line="451" column="71" lean-forward="false" selection-start-line="451" selection-start-column="46" selection-end-line="451" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/warehouse/warehousePurchaseDocument.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="62" lean-forward="false" selection-start-line="25" selection-start-column="62" selection-end-line="25" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehousePurchaseDocumentAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="57" column="4" lean-forward="false" selection-start-line="57" selection-start-column="4" selection-end-line="57" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="15" column="9" lean-forward="false" selection-start-line="15" selection-start-column="9" selection-end-line="15" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceGeneratorServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="39" column="70" lean-forward="false" selection-start-line="39" selection-start-column="70" selection-end-line="39" selection-end-column="70" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2687#2688#0" expanded="false" />
+            <element signature="e#2733#2734#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="15" column="9" lean-forward="false" selection-start-line="15" selection-start-column="9" selection-end-line="15" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/common/SequenceServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="26" column="35" lean-forward="false" selection-start-line="26" selection-start-column="35" selection-end-line="26" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/PartnerServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="30" column="16" lean-forward="false" selection-start-line="30" selection-start-column="16" selection-end-line="30" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/framework/service/GenericServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#3880#3881#0" expanded="false" />
+            <element signature="e#3905#3906#0" expanded="false" />
+            <element signature="e#3960#3961#0" expanded="false" />
+            <element signature="e#4001#4002#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="47" column="5" lean-forward="false" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="19" column="53" lean-forward="false" selection-start-line="19" selection-start-column="53" selection-end-line="19" selection-end-column="53" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/purchases/purchaseDocument.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="24" column="99" lean-forward="false" selection-start-line="24" selection-start-column="99" selection-end-line="24" selection-end-column="99" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/richfaces-ui.jar!/META-INF/richfaces.tld">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="6" lean-forward="true" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/richfaces-ui.jar!/META-INF/richfaces.component-dependencies.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="491">
+          <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/richfaces-ui.jar!/META-INF/richfaces.taglib.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="16" column="9" lean-forward="false" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditTransactionServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="57" column="39" lean-forward="false" selection-start-line="57" selection-start-column="39" selection-end-line="57" selection-end-column="39" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1156">
+          <caret line="84" column="38" lean-forward="false" selection-start-line="84" selection-start-column="15" selection-end-line="84" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#1328#1329#0" expanded="false" />
+            <element signature="e#1364#1365#0" expanded="false" />
+            <element signature="e#4044#4045#0" expanded="false" />
+            <element signature="e#4078#4079#0" expanded="false" />
+            <element signature="e#4130#4131#0" expanded="false" />
+            <element signature="e#4176#4177#0" expanded="false" />
+            <element signature="e#4219#4220#0" expanded="false" />
+            <element signature="e#4254#4255#0" expanded="false" />
+            <element signature="e#4314#4315#0" expanded="false" />
+            <element signature="e#4362#4363#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/framework/action/GenericAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="144" column="18" lean-forward="false" selection-start-line="144" selection-start-column="18" selection-end-line="144" selection-end-column="18" />
+          <folding>
+            <element signature="e#4249#4250#0" expanded="false" />
+            <element signature="e#4286#4287#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/util/BigDecimalUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="32" column="78" lean-forward="true" selection-start-line="32" selection-start-column="78" selection-end-line="32" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/jboss-seam.jar!/org/jboss/seam/intercept/SeamInvocationContext.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="58" column="71" lean-forward="true" selection-start-line="58" selection-start-column="71" selection-end-line="58" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/customers/addPayoutCredit.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1071">
+          <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="52" column="23" lean-forward="false" selection-start-line="52" selection-start-column="23" selection-end-line="52" selection-end-column="23" />
+          <folding>
+            <element signature="e#3611#3612#0" expanded="true" />
+            <element signature="e#3640#3641#0" expanded="true" />
+            <element signature="e#4470#4471#0" expanded="true" />
+            <element signature="e#4500#4501#0" expanded="true" />
+            <element signature="e#4627#4628#0" expanded="true" />
+            <element signature="e#4658#4659#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/messages_app.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="4513" column="46" lean-forward="true" selection-start-line="4513" selection-start-column="0" selection-end-line="4513" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="ResourceBundle">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/purchases/PurchaseOrderDetail.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="632">
+          <caret line="246" column="27" lean-forward="false" selection-start-line="246" selection-start-column="19" selection-end-line="246" selection-end-column="27" />
+          <folding>
+            <element signature="e#5913#5914#0" expanded="true" />
+            <element signature="e#5953#5954#0" expanded="true" />
+            <element signature="e#6120#6121#0" expanded="true" />
+            <element signature="e#6151#6152#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/customers/credit.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="217" column="28" lean-forward="false" selection-start-line="217" selection-start-column="28" selection-end-line="219" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderDetailServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="55" column="16" lean-forward="false" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderDetailService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="590">
+          <caret line="56" column="9" lean-forward="false" selection-start-line="56" selection-start-column="9" selection-end-line="56" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="69" column="5" lean-forward="false" selection-start-line="63" selection-start-column="4" selection-end-line="69" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/jboss-seam.jar!/org/jboss/seam/annotations/AutoCreate.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="16" column="18" lean-forward="false" selection-start-line="16" selection-start-column="18" selection-end-line="16" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files (x86)/Java/jdk1.6.0_17/src.zip!/java/lang/Override.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="22" column="18" lean-forward="false" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderDetail.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="176" column="61" lean-forward="true" selection-start-line="176" selection-start-column="61" selection-end-line="176" selection-end-column="61" />
+          <folding>
+            <element signature="n#s:div#0;n#rich:panel#0;n#h:form#0;n#ui:define#1;n#ui:composition#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/WarehousePurchaseOrderDetailAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="632">
+          <caret line="463" column="5" lean-forward="true" selection-start-line="463" selection-start-column="5" selection-end-line="463" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/customers/addCreditPayment.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="25" column="67" lean-forward="false" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="66" column="57" lean-forward="false" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>khipus:Web exploded</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Web (khipus)|Web</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>lib</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.6</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>khipus</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>lib</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

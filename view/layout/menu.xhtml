@@ -1,0 +1,2331 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:rich="http://richfaces.org/rich"
+     xmlns:s="http://jboss.com/products/seam/taglib">
+<h:form id="mainMenuForm" style="margin:0;padding:0">
+<div id="menu">
+<rich:toolBar id="mainToolBar" styleClass="mail-toolbar" contentClass="mail-toolbar-content">
+<rich:tabPanel id="mainTabPanel"
+               selectedTab="#{selectedTab}"
+               switchType="client"
+               contentClass="rich-tab-inactive tab-panel-container"
+               activeTabClass="rich-toolbar active-tab"
+               tabClass="default-tab">
+<rich:tab id="home" label="#{messages['menu.home']}">
+    <h:panelGrid columns="1" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-end-separator">
+        <s:link view="/home.xhtml"
+                value="#{messages['dashboard']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+    </h:panelGrid>
+</rich:tab>
+<rich:tab id="customers"
+          label="#{messages['menu.customers']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+            s:hasPermission('CASHBOX','VIEW') or
+            s:hasPermission('CASHBOXTRANSACTION','VIEW') or
+            s:hasPermission('ORDER','VIEW') or
+            s:hasPermission('BANKENTITY','VIEW') or
+            s:hasPermission('CREDIT','VIEW') or
+            s:hasPermission('DISCOUNTPOLICY','VIEW') or
+            s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW') or
+            s:hasPermission('CUSTOMERCATEGORY','VIEW') or
+            s:hasPermission('PRINTINVOICE','VIEW') or
+            s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
+    <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-separator,tab-separator,tab-end-separator">
+
+        <rich:dropDownMenu value="#{messages['menu.customers.order']}"
+                           rendered="#{
+        s:hasPermission('ORDER','VIEW')}">
+
+            <rich:menuGroup value="#{messages['menu.customers.order.report']}" rendered="#{s:hasPermission('ORDERREPORT','VIEW') }">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('ORDERREPORTRECEIPT','VIEW')}">
+                    <s:link view="/customers/reports/orderReportReceipt.xhtml"
+                            value="#{messages['menu.customers.order.report.receipt']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:menuGroup>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('PRINTINVOICE','VIEW')}">
+                <s:link view="/customers/printInvoiceList.xhtml"
+                        value="#{messages['menu.customers.order.printInvoice']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+        </rich:dropDownMenu>
+
+        <rich:dropDownMenu value="#{messages['menu.customers.sales']}"
+                           rendered="#{
+        s:hasPermission('CASHBOX','VIEW') or
+        s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CASHBOX','VIEW')}">
+                <s:link
+                        propagation="none"
+                        action="#{invoiceCustomerAction.openCashBox}"
+                        value="#{messages['menu.customers.sales.cashbox']}"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
+                <s:link view="/finances/cashBoxTransactionList.xhtml"
+                        propagation="none"
+                        value="#{messages['menu.customers.sales.cashBoxTransaction']}"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+
+        <s:link view="/customers/cashSale.xhtml"
+                value="#{messages['menu.customers.sales.cashSales']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <s:link view="/customers/partnerList.xhtml"
+                value="#{messages['menu.customers.partner']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <s:link view="/customers/creditList.xhtml"
+                value="#{messages['menu.customers.credit']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <s:link view="/customers/accountList.xhtml"
+                value="#{messages['menu.customers.account']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <rich:dropDownMenu value="#{messages['menu.customers.configuration']}" rendered="#{
+                s:hasPermission('BANKENTITY','VIEW') or
+                s:hasPermission('CREDIT','VIEW') or
+                s:hasPermission('DISCOUNTPOLICY','VIEW') or
+                s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW') or
+                s:hasPermission('CUSTOMERCATEGORY','VIEW') or
+                s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BANKENTITY','VIEW')}">
+                <s:link view="/contacts/bankList.xhtml"
+                        value="#{messages['menu.customers.configuration.bank']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                <s:link view="/customers/partnerList.xhtml"
+                        value="#{messages['menu.customers.configuration.partner']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                <s:link view="/customers/creditList.xhtml"
+                        value="#{messages['menu.customers.configuration.credit']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DISCOUNTPOLICY','VIEW')}">
+                <s:link view="/customers/discountPolicyList.xhtml"
+                        value="#{messages['menu.customers.configuration.discountPolicy']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW')}">
+                <s:link view="/customers/customerDiscountRuleList.xhtml"
+                        value="#{messages['menu.customers.configuration.customerDiscountRule']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CUSTOMERCATEGORY','VIEW')}">
+                <s:link view="/customers/customerCategoryList.xhtml"
+                        value="#{messages['menu.customers.configuration.customerCategory']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
+                <s:link view="/customers/partnerClubCategoryList.xhtml"
+                        value="#{messages['menu.customers.configuration.partnerClubCategory']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+    </h:panelGrid>
+</rich:tab>
+<rich:tab id="finances"
+          label="#{messages['menu.finances']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+            s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW') or
+            s:hasPermission('WAREHOUSEVOUCHER','VIEW') or
+            s:hasPermission('PRODUCTDELIVERY','VIEW') or
+            s:hasPermission('INVENTORY','VIEW') or
+            s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW') or
+            s:hasPermission('KARDEXREPORT','VIEW') or
+            s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
+            s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
+            s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
+            s:hasPermission('ARTICLESREPORT','VIEW') or
+            s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW') or
+            s:hasPermission('SUBGROUPREPORT','VIEW') or
+            s:hasPermission('GROUP','VIEW') or
+            s:hasPermission('WAREHOUSE','VIEW') or
+            s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW') or
+            s:hasPermission('PRODUCTITEM','VIEW') or
+            s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW') or
+            s:hasPermission('FIXEDASSETPURCHASEORDER','VIEW') or
+            s:hasPermission('FIXEDASSET','VIEW') or
+            s:hasPermission('FIXEDASSETCHANGEMONTHSGUARANTY','VIEW') or
+            s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','VIEW') or
+            s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') or
+            s:hasPermission('FIXEDASSETSREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETVOUCHERREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETGROUPSREPORT','VIEW') or
+            s:hasPermission('DEPRECIATEDFIXEDASSETSREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETFILEREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETBYCUSTODIANREPORT','VIEW') or
+            s:hasPermission('DEPRECIATIONSUMMARYREPORT','VIEW') or
+            s:hasPermission('ACCUMULATEDDEPRECIATIONSUMMARYREPORT','VIEW') or
+            s:hasPermission('ACCUMDEPRECIATIONSUMMBYFIXEDASSETREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETMAINTENANCEREQUESTREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW') or
+            s:hasPermission('FIXEDASSETGROUP','VIEW') or
+            s:hasPermission('PURCHASEORDERCAUSE','VIEW') or
+            s:hasPermission('FIXEDASSETSUBGROUP','VIEW') or
+            s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW') or
+            s:hasPermission('ENTRYBUDGETS','VIEW') or
+            s:hasPermission('EXPENSEBUDGET','VIEW') or
+            s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+            s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW') or
+            s:hasPermission('CLASSIFIERS','VIEW') or
+            s:hasPermission('BUDGETPROGRAM','VIEW') or
+            s:hasPermission('BUDGETDISTRIBUTION','VIEW') or
+            s:hasPermission('BANKINGMOVEMENTSYNC','VIEW') or
+            s:hasPermission('OTHERRECEIVABLES','VIEW') or
+            s:hasPermission('ROTATORYFUND','VIEW') or
+            s:hasPermission('ROTATORYFUND','CREATE') or
+            s:hasPermission('REPORTROTATORYFUND','VIEW') or
+            s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW') or
+            s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW') or
+            s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW') or
+            s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW') or
+            s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW') or
+            s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW') or
+            s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW') or
+            s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW') or
+            s:hasPermission('MEASUREUNIT','VIEW') or
+            s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
+            s:hasPermission('CASHACCOUNTGROUP','VIEW') or
+            s:hasPermission('COSTCENTER','VIEW') or
+            s:hasPermission('COSTCENTERGROUP','VIEW')}">
+<h:panelGrid columns="8" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+
+<rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/voucherList.xhtml"
+                value="#{messages['menu.finances.accounting.accountingEntries']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <!--<rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/voucherList2.xhtml"
+                value="#{messages['menu.finances.accounting.accountingEntriesClient']}"
+                propagation="none" />
+    </rich:menuItem>-->
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/majorAccountingReport.xhtml"
+                value="#{messages['menu.finances.accounting.majorAccounting']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/reportCheckSumsBalances.xhtml"
+                value="#{messages['menu.finances.accounting.checkSumsAndBalances']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/stateBalancesReport.xhtml"
+                value="#{messages['menu.finances.accounting.stateBalances']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/kardexProviderReport.xhtml"
+                value="#{messages['menu.finances.accounting.analyticalAuxiliary']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/summaryClientStateReport.xhtml"
+                value="#{messages['menu.finances.accounting.summaryClientState']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/productionCostReport.xhtml"
+                value="#{messages['menu.finances.accounting.productionCost']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/balanceSheetReport.xhtml"
+                value="#{messages['menu.finances.accounting.balanceSheet']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/profitAndLossReport.xhtml"
+                value="#{messages['menu.finances.accounting.profitAndLoss']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/profitAndLossN3Report.xhtml"
+                value="#{messages['menu.finances.accounting.profitAndLossN3']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/generateCostOfSales.xhtml"
+                value="#{messages['menu.finances.accounting.generateCostOfSales']}"
+                propagation="none" />
+    </rich:menuItem>
+
+</rich:dropDownMenu>
+
+
+<rich:dropDownMenu value="#{messages['menu.finances.inventory']}" rendered="#{
+        s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW') or
+        s:hasPermission('WAREHOUSEVOUCHER','VIEW') or
+        s:hasPermission('PRODUCTDELIVERY','VIEW') or
+        s:hasPermission('INVENTORY','VIEW') or
+        s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW') or
+        s:hasPermission('KARDEXREPORT','VIEW') or
+        s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
+        s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
+        s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
+        s:hasPermission('ARTICLESREPORT','VIEW') or
+        s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW') or
+        s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
+        s:hasPermission('SUBGROUPREPORT','VIEW') or
+        s:hasPermission('KARDEXSUMMARYREPORT','VIEW') or
+        s:hasPermission('GROUP','VIEW') or
+        s:hasPermission('WAREHOUSE','VIEW') or
+        s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW') or
+        s:hasPermission('PRODUCTITEM','VIEW') or
+        s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW') or
+        s:hasPermission('PREPAREDELIVERY','VIEW') or
+        s:hasPermission('APPROVEDALLACCOUNTENTRIES','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/warehouse/warehousePurchaseOrderList.xhtml"
+                value="#{messages['menu.warehouse.warehousePurchaseOrder']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}">
+        <s:link view="/warehouse/warehouseVoucherList.xhtml"
+                value="#{messages['menu.warehouse.warehouseVoucher']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">
+        <s:link view="/warehouse/productDeliveryList.xhtml"
+                value="#{messages['menu.warehouse.productDelivery']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PREPAREDELIVERY','VIEW')}">
+        <s:link view="/warehouse/productDeliveryPrepare.xhtml"
+                value="#{messages['menu.warehouse.prepareDelivery']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('APPROVEDALLACCOUNTENTRIES','VIEW')}">
+        <s:link view="/warehouse/accountEntriesList.xhtml"
+                value="#{messages['menu.warehouse.accountEntries']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('INVENTORY','VIEW')}">
+        <s:link view="/warehouse/inventoryList.xhtml"
+                value="#{messages['menu.warehouse.inventory']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['menu.warehouse.report']}" rendered="#{
+        s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW') or
+        s:hasPermission('KARDEXREPORT','VIEW') or
+        s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
+        s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
+        s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
+        s:hasPermission('ARTICLESREPORT','VIEW') or
+        s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW') or
+        s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
+        s:hasPermission('KARDEXSUMMARYREPORT','VIEW') or
+        s:hasPermission('ESTIMATIONSTOCKREPORT','VIEW') or
+        s:hasPermission('SUBGROUPREPORT','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}">
+            <s:link view="/warehouse/productItemCostUnitReport.xhtml"
+                    value="#{messages['menu.warehouse.report.unitCost']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('KARDEXREPORT','VIEW')}">
+            <s:link view="/warehouse/kardexReport.xhtml"
+                    value="#{messages['Reports.kardex.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}">
+            <s:link view="/warehouse/kardexSumaryReport.xhtml"
+                    value="#{messages['Reports.kardex.summary.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW')}">
+            <s:link view="/warehouse/generalValuedEvolutionReport.xhtml"
+                    value="#{messages['GeneralValuedEvolutionReport.report.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW')}">
+            <s:link view="/warehouse/warehouseEvolutionReport.xhtml"
+                    value="#{messages['Reports.warehouseEvolution.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('ESTIMATIONSTOCKREPORT','VIEW')}">
+            <s:link view="/warehouse/estimationStockReport.xhtml"
+                    value="#{messages['Reports.warehouseEstimationStock.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW')}">
+            <s:link view="/warehouse/valuedWarehouseResidueReport.xhtml"
+                    value="#{messages['ValuedWarehouseResidueReport.report.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW')}">
+            <s:link view="/warehouse/productItemProviderReport.xhtml"
+                    value="#{messages['Reports.productItemProvider.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW')}">
+            <s:link view="/warehouse/productItemByProviderHistoryReport.xhtml"
+                    value="#{messages['Reports.productItemByProviderHistory.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PENDINGSOLDPRODUCTDELIVERYREPORT','VIEW')}">
+            <s:link view="/warehouse/pendingSoldProductDeliveryReport.xhtml"
+                    value="#{messages['Reports.pendingSoldProductDelivery.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW')}">
+            <s:link view="/warehouse/warehouseVoucherReport.xhtml"
+                    value="#{messages['Reports.warehouseVoucherReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuSeparator/>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('ARTICLESREPORT','VIEW')}">
+            <s:link view="/warehouse/articlesReport.xhtml"
+                    value="#{messages['Reports.warehouse.articleReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('SUBGROUPREPORT','VIEW')}">
+            <s:link view="/warehouse/subGroupReport.xhtml"
+                    value="#{messages['Reports.subGroup.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+    <rich:menuGroup value="#{messages['menu.warehouse.configuration']}" rendered="#{
+        s:hasPermission('GROUP','VIEW') or
+        s:hasPermission('WAREHOUSE','VIEW') or
+        s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW') or
+        s:hasPermission('PRODUCTITEM','VIEW') or
+        s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('GROUP','VIEW')}">
+            <s:link view="/warehouse/groupList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.group']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSE','VIEW')}">
+            <s:link view="/warehouse/warehouseList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.warehouse']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW')}">
+            <s:link view="/warehouse/documentTypeList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.documentType']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}">
+            <s:link view="/warehouse/productItemList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.productItem']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}">
+            <s:link view="/warehouse/providerList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.provider']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.finances.fixedAssets']}" rendered="#{
+    s:hasPermission('FIXEDASSETPURCHASEORDER','VIEW') or
+    s:hasPermission('FIXEDASSET','VIEW') or
+    s:hasPermission('FIXEDASSETCHANGEMONTHSGUARANTY','VIEW') or
+    s:hasPermission('FIXEDASSETSREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETVOUCHERREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETBARCODEREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETGROUPSREPORT','VIEW') or
+    s:hasPermission('DEPRECIATEDFIXEDASSETSREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETFILEREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETBYCUSTODIANREPORT','VIEW') or
+    s:hasPermission('DEPRECIATIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('ACCUMULATEDDEPRECIATIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('ACCUMDEPRECIATIONSUMMBYFIXEDASSETREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('FIXEDASSETGROUP','VIEW') or
+    s:hasPermission('PURCHASEORDERCAUSE','VIEW') or
+    s:hasPermission('FIXEDASSETSUBGROUP','VIEW') or
+    s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW') or
+    s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','VIEW') or
+    s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') or
+    s:hasPermission('FIXEDASSETVOUCHER','VIEW') or
+    s:hasPermission('FIXEDASSETLOCATION','VIEW')}">
+<rich:menuItem submitMode="none"
+               rendered="#{s:hasPermission('FIXEDASSETPURCHASEORDER','VIEW')}"
+               styleClass="main-menu-item">
+    <s:link view="/fixedassets/fixedAssetPurchaseOrderList.xhtml"
+            value="#{messages['menu.finances.fixedassets.fixedAssetPurchaseOrder']}"
+            propagation="none"/>
+</rich:menuItem>
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('FIXEDASSET','VIEW')}">
+    <s:link view="/fixedassets/fixedAssetList.xhtml"
+            value="#{messages['menu.finances.fixedassets.fixedAsset']}"
+            propagation="none"/>
+</rich:menuItem>
+
+<rich:menuItem submitMode="none"
+               rendered="#{s:hasPermission('FIXEDASSETVOUCHER','VIEW')}"
+               styleClass="main-menu-item">
+    <s:link view="/fixedassets/fixedAssetVoucherList.xhtml"
+            value="#{messages['menu.finances.fixedassets.fixedAssetVoucher']}"
+            propagation="none"/>
+</rich:menuItem>
+
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','VIEW') or s:hasPermission('FIXEDASSETMAINTENANCE','VIEW')}">
+    <s:link view="/fixedassets/fixedAssetMaintenanceList.xhtml"
+            value="#{messages['menu.finances.fixedassets.fixedAssetMaintenance']}"
+            propagation="none"/>
+</rich:menuItem>
+
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('FIXEDASSETCHANGEMONTHSGUARANTY','VIEW')}">
+    <s:link view="/fixedassets/changeFixedAssetGuaranty.xhtml"
+            value="#{messages['menu.finances.fixedassets.changeFixedAssetGuaranty']}"
+            propagation="begin"/>
+</rich:menuItem>
+
+<rich:menuGroup value="#{messages['menu.finances.fixedassets.reports']}" rendered="#{
+        s:hasPermission('FIXEDASSETSREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETVOUCHERREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETBARCODEREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETGROUPSREPORT','VIEW') or
+        s:hasPermission('DEPRECIATEDFIXEDASSETSREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETFILEREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETBYCUSTODIANREPORT','VIEW') or
+        s:hasPermission('DEPRECIATIONSUMMARYREPORT','VIEW') or
+        s:hasPermission('ACCUMULATEDDEPRECIATIONSUMMARYREPORT','VIEW') or
+        s:hasPermission('ACCUMDEPRECIATIONSUMMBYFIXEDASSETREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETMAINTENANCEREQUESTREPORT','VIEW') or
+        s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETSREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetsReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetsReport']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETBARCODEREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetBarCodeReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetBarCodeReport']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETGROUPSREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetGroupsReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetGroupsReport']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DEPRECIATEDFIXEDASSETSREPORT','VIEW')}">
+        <s:link view="/fixedassets/depreciatedFixedAssetsReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.depreciatedFixedAsset']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETFILEREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetFileReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetFile']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETVOUCHERREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetVoucherReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetVoucherReport']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETBYCUSTODIANREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetByCustodianReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetByCustodian']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DEPRECIATIONSUMMARYREPORT','VIEW')}">
+        <s:link view="/fixedassets/depreciationSummaryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.depreciationSummary']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ACCUMULATEDDEPRECIATIONSUMMARYREPORT','VIEW')}">
+        <s:link view="/fixedassets/accumulatedDepreciationSummaryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.accumulatedDepreciationSummary']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ACCUMDEPRECIATIONSUMMBYFIXEDASSETREPORT','VIEW')}">
+        <s:link view="/fixedassets/accumulatedDepreciationSummaryByFixedAssetReport.xhtml"
+                value="#{messages['Reports.accumulatedDepreciationByFixetAsset.menu.title']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW')}">
+        <s:link view="/fixedassets/evolutionByGroupSummaryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetEvolutionByGroupSummary']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW')}">
+        <s:link view="/fixedassets/evolutionBySubGroupSummaryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetEvolutionBySubGroupSummary']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW')}">
+        <s:link view="/fixedassets/evolutionByFixedAssetSummaryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetEvolutionSummary']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETINVENTORYREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetInventoryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetInventory']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEINVENTORYREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetTransferenceInventoryReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetTransferenceInventory']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETMAINTENANCEREQUESTREPORT','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetMaintenanceReport.xhtml"
+                value="#{messages['menu.finances.fixedassets.fixedAssetMaintenanceRequest']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:menuGroup>
+<rich:menuGroup value="#{messages['menu.finances.fixedassets.configuration']}" rendered="#{
+        s:hasPermission('FIXEDASSETGROUP','VIEW') or
+        s:hasPermission('PURCHASEORDERCAUSE','VIEW') or
+        s:hasPermission('FIXEDASSETSUBGROUP','VIEW') or
+        s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETGROUP','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetGroupList.xhtml"
+                value="#{messages['menu.finances.fixedassets.configuration.fixedAssetGroup']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETSUBGROUP','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetSubGroupList.xhtml"
+                value="#{messages['menu.finances.fixedassets.configuration.fixedAssetSubGroup']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetMovementTypeList.xhtml"
+                value="#{messages['menu.finances.fixedassets.configuration.fixedAssetMovementType']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PURCHASEORDERCAUSE','VIEW')}">
+        <s:link view="/fixedassets/purchaseOrderCauseList.xhtml"
+                value="#{messages['menu.finances.fixedassets.configuration.purchaseOrderCause']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FIXEDASSETLOCATION','VIEW')}">
+        <s:link view="/fixedassets/fixedAssetLocationList.xhtml"
+                value="#{messages['menu.finances.fixedassets.configuration.fixedAssetLocation']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:menuGroup>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.finances.budget']}" rendered="#{
+    s:hasPermission('ENTRYBUDGETS','VIEW') or
+    s:hasPermission('EXPENSEBUDGET','VIEW') or
+    s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+    s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+    s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+    s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+    s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW') or
+    s:hasPermission('CLASSIFIERS','VIEW') or
+    s:hasPermission('BUDGETPROGRAM','VIEW') or
+    s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ENTRYBUDGETS','VIEW')}">
+        <s:link view="/budget/entryBudgetList.xhtml"
+                value="#{messages['menu.finances.budget.entryBudget']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('EXPENSEBUDGET','VIEW')}">
+        <s:link view="/budget/expenseBudgetList.xhtml"
+                value="#{messages['menu.finances.budget.expenseBudget']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['Budget.menu.reports']}" rendered="#{
+        s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+        s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+        s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+        s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+        s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('EXPENSEBUDGETREPORT','VIEW')}">
+            <s:link view="/budget/expenseBudgetReport.xhtml"
+                    value="#{messages['menu.finances.budget.expenseBudgetReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('ENTRYBUDGETREPORT','VIEW')}">
+            <s:link view="/budget/entryBudgetReport.xhtml"
+                    value="#{messages['menu.finances.budget.entryBudgetReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW')}">
+            <s:link view="/budget/expenseBudgetExecutionReport.xhtml"
+                    value="#{messages['menu.finances.budget.expenseBudgetExecutionReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW')}">
+            <s:link view="/budget/expenseBudgetConsolidatedExecutionReport.xhtml"
+                    value="#{messages['menu.finances.budget.expenseBudgetConsolidatedExecutionReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW')}">
+            <s:link view="/budget/expenseBudgetGlobalExecutionReport.xhtml"
+                    value="#{messages['menu.finances.budget.expenseBudgetGlobalExecutionReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+    <rich:menuGroup value="#{messages['menu.finances.budget.configuration']}" rendered="#{
+        s:hasPermission('CLASSIFIERS','VIEW') or
+        s:hasPermission('BUDGETPROGRAM','VIEW') or
+        s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('CLASSIFIERS','VIEW')}">
+            <s:link view="/budget/burdenList.xhtml"
+                    value="#{messages['menu.finances.configuration.burden']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('CLASSIFIERS','VIEW')}">
+            <s:link view="/budget/accountingItemList.xhtml"
+                    value="#{messages['menu.finances.configuration.accountingItem']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('BUDGETPROGRAM','VIEW')}">
+            <s:link view="/budget/budgetProgramList.xhtml"
+                    value="#{messages['menu.finances.budget.budgetProgram']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+            <s:link view="/budget/budgetDistributionList.xhtml"
+                    value="#{messages['menu.finances.budget.budgetDistribution']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+</rich:dropDownMenu>
+
+
+<rich:dropDownMenu value="#{messages['menu.finances.treasury']}"
+                   rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','VIEW')}">
+        <s:link view="/treasury/bankingMovementSyncInfo.xhtml"
+                value="#{messages['menu.treasury.bankingMovementSync']}"
+                propagation="begin"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.finances.receivables']}"
+                   rendered="#{s:hasPermission('ROTATORYFUND','VIEW')
+                or s:hasPermission('ROTATORYFUND','CREATE')
+                or s:hasPermission('OTHERRECEIVABLES','VIEW')
+                or s:hasPermission('REPORTROTATORYFUND','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')
+                or s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')
+                or s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')
+                or s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ROTATORYFUND','VIEW') or s:hasPermission('OTHERRECEIVABLES','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/finances/rotatoryFundList.xhtml"
+                value="#{messages['menu.finances.rotatoryFund']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ROTATORYFUND','CREATE')}"
+                   styleClass="main-menu-item">
+        <s:link view="/finances/rotatoryFund.xhtml"
+                value="#{messages['menu.finances.newRotatoryFund']}"
+                action="#{rotatoryFundAction.newRotatoryFund}"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['menu.finances.receivables.report']}" rendered="#{
+        s:hasPermission('REPORTROTATORYFUND','VIEW')
+        or s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')
+        or s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')
+        or s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')
+        or s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')
+        or s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')
+        or s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')
+        or s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUND','VIEW')}">
+            <s:link view="/finances/rotatoryFundReport.xhtml"
+                    value="#{messages['Reports.rotatoryFund.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')}">
+            <s:link view="/finances/rotatoryFundBalancesReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundBalances.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')}">
+            <s:link view="/finances/rotatoryFundBalancesDetailReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundBalancesDetail.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')}">
+            <s:link view="/finances/rotatoryFundPaymentReceivableReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundPaymentReceivable.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')}">
+            <s:link view="/finances/retrieveByDebtorReport.xhtml"
+                    value="#{messages['Reports.retrieveByDebtor.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')}">
+            <s:link view="/finances/rotatoryFundCollectionDetailReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundCollectionDetail.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')}">
+            <s:link view="/finances/rotatoryFundInvoiceCollectionReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundInvoiceCollection.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')}">
+            <s:link view="/finances/rotatoryFundByAccountReport.xhtml"
+                    value="#{messages['Reports.rotatoryFundByAccount.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+    <rich:menuGroup value="#{messages['menu.finances.receivables.configuration']}"
+                    rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+            <s:link view="/finances/rotatoryFundDocumentTypeList.xhtml"
+                    value="#{messages['menu.finances.receivables.configuration.documentType']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.finances.report']}" rendered="#{
+        s:hasPermission('REPORTPURCHASEORDER','VIEW')
+        }">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('REPORTPURCHASEORDER','VIEW')}">
+        <s:link view="/purchases/purchaseOrderReport.xhtml"
+                value="#{messages['Reports.purchaseOrder.menu.title']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.finances.configuration']}"
+                   rendered="#{s:hasPermission('MEASUREUNIT','VIEW') or
+                    s:hasPermission('CASHACCOUNTGROUP','VIEW') or
+                    s:hasPermission('COSTCENTER','VIEW') or
+                    s:hasPermission('COSTCENTERGROUP','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('MEASUREUNIT','VIEW')}">
+        <s:link view="/finances/measureUnitList.xhtml"
+                value="#{messages['menu.finances.configuration.measureUnit']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CASHACCOUNTGROUP','VIEW')}">
+        <s:link view="/finances/cashAccountGroupList.xhtml"
+                value="#{messages['menu.finances.configuration.cashAccountGroup']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('COSTCENTER','VIEW')}">
+        <s:link view="/finances/costCenterList.xhtml"
+                value="#{messages['menu.rrhh.configuration.costCenter']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('COSTCENTERGROUP','VIEW')}">
+        <s:link view="/finances/costCenterGroupList.xhtml"
+                value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/finances/cashBoxList.xhtml"
+                value="#{messages['menu.finances.configuration.cashBox']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+</rich:dropDownMenu>
+</h:panelGrid>
+</rich:tab>
+<rich:tab id="products"
+          label="#{messages['menu.products']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+    s:hasPermission('PRODUCT','VIEW') or
+    s:hasPermission('PRODUCTTYPE','VIEW') or
+    s:hasPermission('PRODUCTSTATE','VIEW') or
+    s:hasPermission('PRODUCTDISCOUNTRULE','VIEW') }">
+<h:panelGrid columns="6" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator">
+
+<s:link view="/products/productList.xhtml"
+        value="#{messages['menu.products.products']}"
+        rendered="#{s:hasPermission('PRODUCT','VIEW')}"
+        styleClass="tab-cell"
+        propagation="none"/>
+
+<s:link view="/warehouse/productInventoryList.xhtml"
+        value="#{messages['menu.products.stock']}"
+        rendered="#{s:hasPermission('PRODUCTSTOCK','VIEW')}"
+        styleClass="tab-cell"
+        propagation="none"/>
+
+<rich:dropDownMenu value="#{messages['menu.products.configuration']}"
+                   rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item">
+        <s:link view="/products/productTypeList.xhtml"
+                value="#{messages['menu.products.configuration.productType']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/products/productStateList.xhtml"
+                value="#{messages['menu.products.configuration.productState']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/products/productDiscountRuleList.xhtml"
+                value="#{messages['menu.products.configuration.productDiscountRule']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/productiveZoneList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.productiveZone']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/gestionTaxList.xhtml"
+                value="#{messages['GestionTax.CreateGestionTax']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/discountProducerList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.reservProducerMilk']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/rawMaterialProducerList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.rawMaterialProducer']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/processedProductList.xhtml"
+                value="#{messages['menu.production.configuration.processedProduct']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/measureUnitProductionList.xhtml"
+                value="#{messages['menu.production.configuration.measureUnitProduction']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/productionInputList.xhtml"
+                value="#{messages['menu.production.configuration.productionInput']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/productionMaterialList.xhtml"
+                value="#{messages['menu.production.configuration.productionMaterial']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/indirectCostConfigList.xhtml"
+                value="#{messages['menu.production.configuration.indirectCostconfiguration']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+
+            >
+        <s:link view="/production/indirectCostsList.xhtml"
+                value="#{messages['menu.production.configuration.indirectCosts']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+
+<rich:dropDownMenu value="#{messages['menu.production.rawMaterialCollection']}"
+                   rendered="#{s:hasPermission('RAWMATERIALCOLLECTION','VIEW')}">
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/production/rawMaterialRejectionNoteList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.rawMaterialRejectionNote']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/production/rawMaterialCollectionSessionList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.rawMaterialCollectionSession']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/production/collectionFormList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.collectionForm']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+
+<rich:dropDownMenu value="#{messages['menu.production.supplierPayments']}"
+                   rendered="#{s:hasPermission('PAYMENTPRODUCERS','VIEW')}">
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/production/salaryMovementProducerList.xhtml"
+                value="#{messages['menu.production.supplierPayments.rawMaterialProducerDiscount']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+            >
+        <s:link view="/production/salaryMovementGABList.xhtml"
+                value="#{messages['menu.production.salaryMovementGAB']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   >
+        <s:link view="/production/rawMaterialPayRollList.xhtml"
+                value="#{messages['menu.production.supplierPayments.rawMaterialPayRoll']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+
+    <rich:menuGroup value="#{messages['menu.production.supplierPayments.reports']}"
+                    >
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       >
+
+            <s:link view="/production/reports/rawMaterialPaySummaryReport.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.summary']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       >
+
+            <s:link view="/production/reports/rawMaterialPayRollReport.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.payRoll']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                >
+
+            <s:link view="/production/reports/voletasDePagoReport.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.voletasPago']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+        <!--Todo: el reporte de acopio solo-->
+        <!--<rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       >
+
+            <s:link view="/production/reports/rawMaterialCollectedByGABReport.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.collectedReportByGAB']}"
+                    propagation="begin"/>
+        </rich:menuItem>-->
+
+    </rich:menuGroup>
+
+</rich:dropDownMenu>
+
+<!--<rich:dropDownMenu value="#{messages['menu.production.planification']}"
+                   rendered="#{
+        s:hasPermission('PRODUCTCOMPOSITION','VIEW') or
+        s:hasPermission('PRODUCTDISTRIBUTION','VIEW') or
+        s:hasPermission('REPORTMILKRAW','VIEW') or
+        s:hasPermission('REPORTPRODUCTPRODUCED','VIEW') or
+        s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW') or
+        s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','VIEW')}">-->
+<rich:dropDownMenu value="#{messages['menu.production.planification']}"
+                   rendered="#{
+        s:hasPermission('PRODUCTIONPLANNING','VIEW')}">
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCTCOMPOSITION','VIEW')}">
+        <s:link view="/production/productCompositionList.xhtml"
+                value="#{messages['menu.production.planification.productFormulation']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','VIEW')}">
+        <s:link view="/production/productionPlanningList.xhtml"
+                value="#{messages['menu.production.planification.distribution']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','VIEW')}">
+        <s:link view="/production/productionTransferLogList.xhtml"
+                value="#{messages['menu.production.planification.productionTransferLog']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['menu.production.planification.Reportes']}"
+                    rendered="#{
+            s:hasPermission('REPORTMILKRAW','VIEW') or
+            s:hasPermission('REPORTPRODUCTPRODUCED','VIEW') or
+            s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW')}">
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTMILKRAW','VIEW')}">
+
+            <s:link view="/production/reports/rawMilkReport.xhtml"
+                    value="#{messages['menu.production.planification.ReportMilkRaw']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
+        <!--<rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTPRODUCTPRODUCED','VIEW')}">
+            <s:link view="/production/reports/productsProducedReport.xhtml"
+                    value="#{messages['menu.production.planification.produced']}"
+                    propagation="begin"/>
+        </rich:menuItem>-->
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTPRODUCTPRODUCED','VIEW')}">
+            <s:link view="/production/totalProductionReport.xhtml"
+                    value="#{messages['menu.production.planification.totalProduction']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW')}">
+
+            <s:link view="/production/reports/productionBalanceReport.xhtml"
+                    value="#{messages['menu.production.planification.reportProductionBalance']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
+    </rich:menuGroup>
+</rich:dropDownMenu>
+
+
+</h:panelGrid>
+</rich:tab>
+<rich:tab id="rrhh"
+          label="#{messages['menu.rrhh']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+    s:hasPermission('HUMANRESOURCESAPPLICANT','VIEW') or
+    s:hasPermission('HUMANRESOURCESPOLL','VIEW') or
+    s:hasPermission('POLLCOPY','VIEW') or
+    s:hasPermission('FINALEVALUATIONFORM','VIEW') or
+    s:hasPermission('POLLBYPERSONREPORT','VIEW') or
+    s:hasPermission('POLLBYCAREERREPORT','VIEW') or
+    s:hasPermission('TEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALTEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERMANAGEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERBOSSEVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALEVALUATIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('POSTULANTREPORT','VIEW') or
+    s:hasPermission('PERSONBYAREAREPORT','VIEW') or
+    s:hasPermission('SCHEDULEEVALUATION','VIEW') or
+    s:hasPermission('GESTIONPAYROLLSCHEDULE','VIEW') or
+    s:hasPermission('GESTIONPAYROLL','VIEW') or
+    s:hasPermission('ACCOUNTINGRECORD','VIEW') or
+    s:hasPermission('SUMMARYPAYROLLBYPAYMENTMETHODREPORT','VIEW') or
+    s:hasPermission('MANAGERSNATIONALSUMMARYPAYROLLREPORT','VIEW') or
+    s:hasPermission('CHRISTMASNATIONALSUMMARYREPORT','VIEW') or
+    s:hasPermission('ACADEMICPAYROLLSUMMARYREPORT','VIEW') or
+    s:hasPermission('LABORALPROFESSORPAYROLLSUMMARYREPORT','VIEW') or
+    s:hasPermission('SPECIALDATEREPORT','VIEW') or
+    s:hasPermission('JOBCONTRACTREPORT','VIEW') or
+    s:hasPermission('SALARYMOVEMENTREPORT','VIEW') or
+    s:hasPermission('TEACHERCONTRACT','VIEW') or
+    s:hasPermission('ACCIDENTALASSOCIATION','VIEW') or
+    s:hasPermission('AFPRATE','VIEW') or
+    s:hasPermission('CNSRATE','VIEW') or
+    s:hasPermission('IVARATE','VIEW') or
+    s:hasPermission('SMNRATE','VIEW') or
+    s:hasPermission('EMPLOYEE','VIEW') or
+    s:hasPermission('GESTION','VIEW') or
+    s:hasPermission('CYCLE','VIEW') or
+    s:hasPermission('SALARYMOVEMENT','VIEW') or
+    s:hasPermission('SALARYMOVEMENTTYPE','VIEW') or
+    s:hasPermission('EVALUATIONCRITERIA','VIEW') or
+    s:hasPermission('SPECIALDATE','VIEW') or
+    s:hasPermission('JOBCONTRACT','VIEW') or
+    s:hasPermission('CONTRACT','VIEW') or
+    s:hasPermission('HORARYBANDCONTRACT','VIEW') or
+    s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
+    s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
+    s:hasPermission('KINDOFSALARY','VIEW') or
+    s:hasPermission('RHMARK','VIEW') or
+    s:hasPermission('TOLERANCE','VIEW') or
+    s:hasPermission('LIMIT','VIEW') or
+    s:hasPermission('SECTOR','VIEW') or
+    s:hasPermission('JOBCATEGORY','VIEW') or
+    s:hasPermission('BANKENTITY','VIEW') or
+    s:hasPermission('BANKACCOUNT','VIEW') or
+    s:hasPermission('CURRENCY','VIEW') or
+    s:hasPermission('DISMISSALCAUSE','VIEW') or
+    s:hasPermission('DISMISSALRULE','VIEW') or
+    s:hasPermission('DISMISSAL','VIEW')
+    }">
+<h:panelGrid columns="4" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="tab-separator,tab-separator,tab-separator,tab-end-separator">
+<rich:dropDownMenu value="#{messages['menu.rrhh.humanDevelopment']}" rendered="#{
+    s:hasPermission('HUMANRESOURCESAPPLICANT','VIEW') or
+    s:hasPermission('HUMANRESOURCESPOLL','VIEW') or
+    s:hasPermission('POLLCOPY','VIEW') or
+    s:hasPermission('FINALEVALUATIONFORM','VIEW') or
+    s:hasPermission('POLLBYPERSONREPORT','VIEW') or
+    s:hasPermission('POLLBYCAREERREPORT','VIEW') or
+    s:hasPermission('TEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALTEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERMANAGEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERBOSSEVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALEVALUATIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('POSTULANTREPORT','VIEW') or
+    s:hasPermission('PERSONBYAREAREPORT','VIEW') or
+    s:hasPermission('SCHEDULEEVALUATION','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('HUMANRESOURCESAPPLICANT','VIEW')}">
+        <s:link view="/employees/postulantList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.applicant']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('HUMANRESOURCESPOLL','VIEW')}">
+        <s:link view="/employees/pollFormList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.pollForm']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('POLLCOPY','VIEW')}">
+        <s:link view="/employees/pollCopyList.xhtml"
+                value="#{messages['PollCopy.list']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FINALEVALUATIONFORM','VIEW')}">
+        <s:link view="/employees/finalEvaluationFormList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.finalEvaluationForm']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SCHEDULEEVALUATION','VIEW')}">
+        <s:link view="/employees/scheduleEvaluationList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.scheduleEvaluation']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['menu.rrhh.humanDevelopment.reports.title']}" rendered="#{
+    s:hasPermission('POLLBYPERSONREPORT','VIEW') or
+    s:hasPermission('POLLBYCAREERREPORT','VIEW') or
+    s:hasPermission('TEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALTEACHEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERMANAGEREVALUATIONREPORT','VIEW') or
+    s:hasPermission('CAREERBOSSEVALUATIONREPORT','VIEW') or
+    s:hasPermission('FINALEVALUATIONSUMMARYREPORT','VIEW') or
+    s:hasPermission('POSTULANTREPORT','VIEW') or
+    s:hasPermission('PERSONBYAREAREPORT','VIEW')}">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('POLLBYPERSONREPORT','VIEW')}">
+            <s:link view="/employees/pollByPersonReport.xhtml"
+                    value="#{messages['PollCopy.pollByPersonReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('POLLBYCAREERREPORT','VIEW')}">
+            <s:link view="/employees/pollByCareerReport.xhtml"
+                    value="#{messages['PollCopy.pollByCareerReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('TEACHEREVALUATIONREPORT','VIEW')}">
+            <s:link view="/employees/teacherEvaluationReport.xhtml"
+                    value="#{messages['PollCopy.teacherEvaluationResultReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('FINALTEACHEREVALUATIONREPORT','VIEW')}">
+            <s:link view="/employees/finalTeacherEvaluationReport.xhtml"
+                    value="#{messages['Reports.finalTeacherEvaluation.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('CAREERMANAGEREVALUATIONREPORT','VIEW')}">
+            <s:link view="/employees/careerManagerEvaluationReport.xhtml"
+                    value="#{messages['PollCopy.careerManagerEvaluationReport.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('CAREERBOSSEVALUATIONREPORT','VIEW')}">
+            <s:link view="/employees/careerBossEvaluationReport.xhtml"
+                    value="#{messages['menu.rrhh.reports.careerBossEvaluationReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('FINALEVALUATIONSUMMARYREPORT','VIEW')}">
+            <s:link view="/employees/finalEvaluationSummaryReport.xhtml"
+                    value="#{messages['Reports.finalEvalSummary.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('POSTULANTREPORT','VIEW')}">
+            <s:link view="/employees/postulantReport.xhtml"
+                    value="#{messages['Postulant.report.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PERSONBYAREAREPORT','VIEW')}">
+            <s:link view="/employees/personByAreaReport.xhtml"
+                    value="#{messages['PersonByAreaReport.menu']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.rrhh.payrollGeneration']}" rendered="#{
+    s:hasPermission('GESTIONPAYROLLSCHEDULE','VIEW') or
+    s:hasPermission('GESTIONPAYROLL','VIEW') or
+    s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW') or
+    s:hasPermission('ACCOUNTINGRECORD','VIEW') or
+    s:hasPermission('VACATIONPLANNING','VIEW') or
+    s:hasPermission('SUMMARYPAYROLLBYPAYMENTMETHODREPORT','VIEW') or
+    s:hasPermission('MANAGERSNATIONALSUMMARYPAYROLLREPORT','VIEW') or
+    s:hasPermission('CHRISTMASNATIONALSUMMARYREPORT','VIEW') or
+    s:hasPermission('ACADEMICPAYROLLSUMMARYREPORT','VIEW') or
+    s:hasPermission('LABORALPROFESSORPAYROLLSUMMARYREPORT','VIEW') or
+    s:hasPermission('SPECIALDATEREPORT','VIEW') or
+    s:hasPermission('JOBCONTRACTREPORT','VIEW') or
+    s:hasPermission('SALARYMOVEMENTREPORT','VIEW') or
+    s:hasPermission('AFPRATE','VIEW') or
+    s:hasPermission('CNSRATE','VIEW') or
+    s:hasPermission('IVARATE','VIEW') or
+    s:hasPermission('SMNRATE','VIEW') or
+    s:hasPermission('BONUS','VIEW')   or
+    s:hasPermission('DISCHARGEDOCUMENT','VIEW') or
+    s:hasPermission('VACATIONRULE','VIEW') or
+    s:hasPermission('DISCOUNTRULE','VIEW')
+    }">
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('GESTIONPAYROLL','VIEW')}">
+    <s:link view="/employees/gestionPayrollList.xhtml"
+            action="#{gestionPayrollDataModel.setLastGestionPayroll}"
+            value="#{messages['menu.rrhh.payrollGeneration.gestion']}"
+            propagation="none"/>
+</rich:menuItem>
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}">
+    <s:link view="/employees/payrollGenerationCycleList.xhtml"
+            value="#{messages['menu.rrhh.payrollGeneration.payrollGenerationCycle']}"
+            propagation="none"/>
+</rich:menuItem>
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('GESTIONPAYROLLSCHEDULE', 'VIEW')}">
+    <s:link view="/employees/gestionPayrollScheduleList.xhtml"
+            value="#{messages['menu.rrhh.payrollGeneration.gestionPayrollSchedule']}"
+            propagation="none"/>
+</rich:menuItem>
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('ACCOUNTINGRECORD','VIEW')}">
+    <s:link view="/employees/accountingRecord.xhtml"
+            value="#{messages['menu.rrhh.payrollGeneration.accountingRecord']}"
+            propagation="begin"/>
+</rich:menuItem>
+<rich:menuItem submitMode="none"
+               styleClass="main-menu-item"
+               rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}">
+    <s:link view="/employees/vacationPlanningList.xhtml"
+            value="#{messages['menu.employees.vacationPlanning']}"
+            propagation="none"/>
+</rich:menuItem>
+<rich:menuGroup value="#{messages['menu.rrhh.payrollGeneration.reports.title']}" rendered="#{
+        s:hasPermission('SUMMARYPAYROLLBYPAYMENTMETHODREPORT','VIEW') or
+        s:hasPermission('MANAGERSNATIONALSUMMARYPAYROLLREPORT','VIEW') or
+        s:hasPermission('CHRISTMASNATIONALSUMMARYREPORT','VIEW') or
+        s:hasPermission('ACADEMICPAYROLLSUMMARYREPORT','VIEW') or
+        s:hasPermission('LABORALPROFESSORPAYROLLSUMMARYREPORT','VIEW') or
+        s:hasPermission('SPECIALDATEREPORT','VIEW') or
+        s:hasPermission('JOBCONTRACTREPORT','VIEW') or
+        s:hasPermission('SALARYMOVEMENTREPORT','VIEW') or
+        s:hasPermission('AFPRATE','VIEW') or
+        s:hasPermission('CNSRATE','VIEW') or
+        s:hasPermission('IVARATE','VIEW') or
+        s:hasPermission('SMNRATE','VIEW') or
+        s:hasPermission('BONUS','VIEW')   or
+        s:hasPermission('DISCHARGEDOCUMENT','VIEW') or
+        s:hasPermission('VACATIONRULE','VIEW') or
+        s:hasPermission('FORMRECORDREPORT','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SUMMARYPAYROLLBYPAYMENTMETHODREPORT','VIEW')}">
+        <s:link view="/employees/reports/payrollSummaryReport.xhtml"
+                value="#{messages['SummaryPayrollByPaymentMethod.report']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('MANAGERSNATIONALSUMMARYPAYROLLREPORT','VIEW')}">
+        <s:link view="/employees/managersPayrollSummaryReport.xhtml"
+                value="#{messages['ManagersSummaryPayrollNational.report']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ACADEMICPAYROLLSUMMARYREPORT','VIEW')}">
+        <s:link view="/employees/academicPayrollSummaryReport.xhtml"
+                value="#{messages['AcademicPayrollSummary.report']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('LABORALPROFESSORPAYROLLSUMMARYREPORT','VIEW')}">
+        <s:link view="/employees/laboralProfessorPayrollSummaryReport.xhtml"
+                value="#{messages['LaboralProfessorPayrollSummary.report']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CHRISTMASNATIONALSUMMARYREPORT','VIEW')}">
+        <s:link view="/employees/christmasNationalSummaryReport.xhtml"
+                value="#{messages['ChristmasNationalSummary.report']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SPECIALDATEREPORT','VIEW')}">
+        <s:link view="/employees/specialDateReport.xhtml"
+                value="#{messages['Reports.specialDate.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('JOBCONTRACTREPORT','VIEW')}">
+        <s:link view="/employees/jobContractReport.xhtml"
+                value="#{messages['Reports.jobContract.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SALARYMOVEMENTREPORT','VIEW')}">
+        <s:link view="/employees/salaryMovementReport.xhtml"
+                value="#{messages['Reports.salaryMovement.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DISCHARGEDOCUMENTSREPORT','VIEW')}">
+        <s:link view="/employees/dischargeDocumentsReport.xhtml"
+                value="#{messages['Reports.dischargeDocuments.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('FORMRECORDREPORT','VIEW')}">
+        <s:link view="/employees/formRecordReport.xhtml"
+                value="#{messages['taxPayrollGeneration.reports.101FormRecordReport']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:menuGroup>
+<rich:menuGroup value="#{messages['menu.rrhh.payrollGeneration.configuration.title']}"
+                rendered="#{s:hasPermission('AFPRATE','VIEW') or
+                                s:hasPermission('CNSRATE','VIEW') or
+                                s:hasPermission('IVARATE','VIEW') or
+                                s:hasPermission('SMNRATE','VIEW') or
+                                s:hasPermission('BONUS','VIEW')   or
+                                s:hasPermission('DISCHARGEDOCUMENT','VIEW')  or
+                                s:hasPermission('VACATIONRULE','VIEW') or
+                                s:hasPermission('DISCOUNTRULE','VIEW')
+                                }">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('AFPRATE','VIEW')}">
+        <s:link view="/employees/afpRateList.xhtml"
+                value="#{messages['menu.employees.configuration.afpRate']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CNSRATE','VIEW')}">
+        <s:link view="/employees/cnsRateList.xhtml"
+                value="#{messages['menu.employees.configuration.cnsRate']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('IVARATE','VIEW')}">
+        <s:link view="/employees/ivaRateList.xhtml"
+                value="#{messages['menu.employees.configuration.ivaRate']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SMNRATE','VIEW')}">
+        <s:link view="/employees/smnRateList.xhtml"
+                value="#{messages['menu.employees.configuration.smnRate']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('BONUS','VIEW')}">
+        <s:link view="/employees/bonusList.xhtml"
+                value="#{messages['menu.employees.configuration.bonus']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DISCHARGEDOCUMENT','VIEW')}">
+        <s:link view="/employees/dischargeDocumentList.xhtml"
+                value="#{messages['menu.rrhh.payrollGeneration.dischargeDocument']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('VACATIONRULE','VIEW')}">
+        <s:link view="/employees/vacationRuleList.xhtml"
+                value="#{messages['menu.employees.configuration.vacationRules']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DISCOUNTRULE','VIEW')}">
+        <s:link view="/employees/discountRuleList.xhtml"
+                value="#{messages['menu.employees.configuration.discountRule']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:menuGroup>
+<rich:menuGroup value="#{messages['menu.rrhh.personalManagement']}" rendered="#{
+    s:hasPermission('DISMISSAL','VIEW')
+    }">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('DISMISSAL','VIEW')}">
+        <s:link view="/employees/dismissalList.xhtml"
+                value="#{messages['menu.rrhh.personalManagement.dismissal']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuGroup value="#{messages['menu.rrhh.configuration']}" rendered="#{
+        s:hasPermission('DISMISSALCAUSE','VIEW') or
+        s:hasPermission('DISMISSALRULE','VIEW')
+        }">
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('DISMISSALCAUSE','VIEW')}">
+            <s:link view="/employees/dismissalCauseList.xhtml"
+                    value="#{messages['menu.employees.configuration.dismissalCause']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('DISMISSALRULE','VIEW')}">
+            <s:link view="/employees/dismissalRuleList.xhtml"
+                    value="#{messages['menu.employees.configuration.dismissalRule']}"
+                    propagation="none"/>
+        </rich:menuItem>
+    </rich:menuGroup>
+</rich:menuGroup>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.rrhh.documentGeneration']}" rendered="#{
+    s:hasPermission('TEACHERCONTRACT','VIEW') or
+    s:hasPermission('ACCIDENTALASSOCIATION','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('TEACHERCONTRACT','VIEW')}">
+        <s:link view="/employees/generateTeacherContract.xhtml"
+                value="#{messages['GenerateTeacherContract.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ACCIDENTALASSOCIATION','VIEW')}">
+        <s:link view="/employees/generateAccidentalAssociation.xhtml"
+                value="#{messages['GenerateAccidentalAssociation.menu.title']}"
+                propagation="begin"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+<rich:dropDownMenu value="#{messages['menu.rrhh.configuration']}" rendered="#{
+    s:hasPermission('EMPLOYEE','VIEW') or
+    s:hasPermission('GESTION','VIEW') or
+    s:hasPermission('CYCLE','VIEW') or
+    s:hasPermission('SALARYMOVEMENT','VIEW') or
+    s:hasPermission('SALARYMOVEMENTTYPE','VIEW') or
+    s:hasPermission('EVALUATIONCRITERIA','VIEW') or
+    s:hasPermission('SPECIALDATE','VIEW') or
+    s:hasPermission('JOBCONTRACT','VIEW') or
+    s:hasPermission('CONTRACT','VIEW') or
+    s:hasPermission('HORARYBANDCONTRACT','VIEW') or
+    s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
+    s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
+    s:hasPermission('KINDOFSALARY','VIEW') or
+    s:hasPermission('RHMARK','VIEW') or
+    s:hasPermission('TOLERANCE','VIEW') or
+    s:hasPermission('LIMIT','VIEW') or
+    s:hasPermission('SECTOR','VIEW') or
+    s:hasPermission('JOBCATEGORY','VIEW') or
+    s:hasPermission('BANKENTITY','VIEW') or
+    s:hasPermission('BANKACCOUNT','VIEW') or
+    s:hasPermission('CURRENCY','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('EMPLOYEE','VIEW')}">
+        <s:link view="/employees/employeeList.xhtml"
+                value="#{messages['menu.employees.configuration.employee']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SOCIALWELFAREENTITY','VIEW')}">
+        <s:link view="/employees/socialWelfareEntityList.xhtml"
+                value="#{messages['menu.employees.configuration.socialWelfareEntity']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('GESTION','VIEW')}">
+        <s:link view="/employees/gestionList.xhtml"
+                value="#{messages['menu.rrhh.configuration.gestion']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CYCLE','VIEW')}">
+        <s:link view="/employees/cycleList.xhtml"
+                value="#{messages['menu.rrhh.configuration.cycle']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SALARYMOVEMENT','VIEW')}">
+        <s:link view="/employees/salaryMovementList.xhtml"
+                value="#{messages['menu.employees.configuration.salaryMovement']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SALARYMOVEMENTTYPE','VIEW')}">
+        <s:link view="/employees/salaryMovementTypeList.xhtml"
+                value="#{messages['menu.employees.configuration.salaryMovementType']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('EVALUATIONCRITERIA','VIEW')}">
+        <s:link view="/employees/evaluationCriteriaList.xhtml"
+                value="#{messages['menu.employees.evaluationCriteria']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SPECIALDATE','VIEW')}">
+        <s:link view="/employees/specialDateList.xhtml"
+                value="#{messages['menu.employees.configuration.specialDate']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CONTRACT','VIEW')}">
+        <s:link view="/employees/contractList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.contract']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}">
+        <s:link view="/employees/jobContractList.xhtml"
+                value="#{messages['menu.rrhh.humanDevelopment.jobContract']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}">
+        <s:link view="/employees/horaryBandContractList.xhtml"
+                value="#{messages['menu.employees.configuration.horaryBandContract']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ORGANIZATIONALUNIT','VIEW')}">
+        <s:link view="/employees/organizationalUnitList.xhtml"
+                value="#{messages['menu.employees.configuration.organizationalUnit']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('ORGANIZATIONALLEVEL','VIEW')}">
+        <s:link view="/employees/organizationalLevelList.xhtml"
+                value="#{messages['menu.employees.configurationLevel.organizationalLevel']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('KINDOFSALARY','VIEW')}">
+        <s:link view="/employees/kindOfSalaryList.xhtml"
+                value="#{messages['menu.employees.configuration.kindOfSalary']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('RHMARK','VIEW')}">
+        <s:link view="/employees/rHMarkList.xhtml"
+                value="#{messages['menu.employees.configuration.rHMark']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('TOLERANCE','VIEW')}">
+        <s:link view="/employees/toleranceList.xhtml"
+                value="#{messages['menu.employees.configuration.tolerance']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('LIMIT','VIEW')}">
+        <s:link view="/employees/limitList.xhtml"
+                value="#{messages['menu.employees.configuration.limit']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('SECTOR','VIEW')}">
+        <s:link id="menuSectorListId" view="/employees/sectorList.xhtml"
+                value="#{messages['menu.employees.configuration.sector']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('JOBCATEGORY','VIEW')}">
+        <s:link view="/employees/jobCategoryList.xhtml"
+                value="#{messages['menu.employees.configuration.jobCategory']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('BANKENTITY','VIEW')}">
+        <s:link view="/employees/bankEntityList.xhtml"
+                value="#{messages['menu.rrhh.configuration.bankEntity']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('BANKACCOUNT','VIEW')}">
+        <s:link view="/employees/bankAccountList.xhtml"
+                value="#{messages['menu.employees.configuration.bankAccount']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CURRENCY','VIEW')}">
+        <s:link view="/employees/currencyList.xhtml"
+                value="#{messages['menu.rrhh.configuration.currency']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('CONTRACTMODE','VIEW')}">
+        <s:link view="/employees/contractModeList.xhtml"
+                value="#{messages['menu.employees.configuration.contractMode']}"
+                propagation="none"/>
+    </rich:menuItem>
+</rich:dropDownMenu>
+</h:panelGrid>
+</rich:tab>
+<rich:tab id="admin"
+          label="#{messages['menu.admin']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+    s:hasPermission('ROLE','VIEW') or
+    s:hasPermission('USER','VIEW') or
+    s:hasPermission('SESSIONUSERLOG','VIEW') or
+    s:hasPermission('ADMINISTRATIVENOTIFICATION','VIEW') or
+    s:hasPermission('BUSINESSUNIT','VIEW') or
+    s:hasPermission('BUSINESSUNITTYPE','VIEW') or
+    s:hasPermission('COMPANYSETTING','VIEW')}">
+    <h:panelGrid columns="6" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+        <s:link view="/admin/roleList.xhtml"
+                value="#{messages['Role.list']}"
+                rendered="#{s:hasPermission('ROLE','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+        <s:link view="/admin/userList.xhtml"
+                value="#{messages['User.list']}"
+                rendered="#{s:hasPermission('USER','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+        <s:link view="/admin/sessionUserLogList.xhtml"
+                value="#{messages['SessionUserLog.list']}"
+                rendered="#{s:hasPermission('SESSIONUSERLOG','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+        <s:link view="/admin/administrativeNotificationList.xhtml"
+                value="#{messages['AdministrativeNotification.list']}"
+                rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+        <rich:dropDownMenu value="#{messages['menu.admin.reports']}"
+                           rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">
+                <s:link view="/admin/userRoleReport.xhtml"
+                        value="#{messages['menu.admin.reports.userRole']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+        <rich:dropDownMenu value="#{messages['menu.admin.configuration']}"
+                           rendered="#{s:hasPermission('BUSINESSUNITTYPE','VIEW') or
+                    s:hasPermission('BUSINESSUNIT','VIEW') or
+                    s:hasPermission('COMPANYSETTING','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BUSINESSUNITTYPE','VIEW')}">
+                <s:link view="/admin/businessUnitTypeList.xhtml"
+                        value="#{messages['menu.admin.configuration.businessUnitType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BUSINESSUNIT','VIEW')}">
+                <s:link view="/admin/businessUnitList.xhtml"
+                        value="#{messages['menu.admin.institution.businessUnit']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}">
+                <s:link action="#{companySettingAction.loadCompanySettings()}"
+                        view="/admin/companySetting.xhtml"
+                        value="#{messages['Functionality.admin.companySetting']}">
+                </s:link>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+    </h:panelGrid>
+</rich:tab>
+<rich:tab id="global"
+          label="#{messages['menu.global']}"
+          disabled="#{disableMenu}"
+          rendered="#{
+    s:hasPermission('COUNTRY','VIEW') or
+    s:hasPermission('DEPARTMENT','VIEW') or
+    s:hasPermission('CITY','VIEW') or
+    s:hasPermission('ZONE','VIEW') or
+    s:hasPermission('DISTRICT','VIEW') or
+    s:hasPermission('STREET','VIEW') or
+    s:hasPermission('TEMPLATE','VIEW') or
+    s:hasPermission('DOCUMENTTYPE','VIEW') or
+    s:hasPermission('TITLE','VIEW') or
+    s:hasPermission('SALUTATION','VIEW') or
+    s:hasPermission('MARITALSTATUS','VIEW') or
+    s:hasPermission('ORGANIZATION','VIEW')}">
+    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-separator,tab-separator,tab-end-separator">
+        <rich:dropDownMenu value="#{messages['menu.global.geographic']}" rendered="#{
+        s:hasPermission('COUNTRY','VIEW') or
+        s:hasPermission('DEPARTMENT','VIEW') or
+        s:hasPermission('CITY','VIEW') or
+        s:hasPermission('ZONE','VIEW') or
+        s:hasPermission('DISTRICT','VIEW') or
+        s:hasPermission('STREET','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COUNTRY','VIEW')}">
+                <s:link view="/contacts/countryList.xhtml"
+                        value="#{messages['menu.global.geographic.country']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DEPARTMENT','VIEW')}">
+                <s:link view="/contacts/departmentList.xhtml"
+                        value="#{messages['menu.global.geographic.department']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CITY','VIEW')}">
+                <s:link view="/contacts/cityList.xhtml"
+                        value="#{messages['menu.global.geographic.city']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('ZONE','VIEW')}">
+                <s:link view="/contacts/zoneList.xhtml"
+                        value="#{messages['menu.global.geographic.zone']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DISTRICT','VIEW')}">
+                <s:link view="/contacts/districtList.xhtml"
+                        value="#{messages['menu.global.geographic.district']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('STREET','VIEW')}">
+                <s:link view="/contacts/streetList.xhtml"
+                        value="#{messages['menu.global.geographic.street']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+        <rich:dropDownMenu value="#{messages['menu.global.document']}" rendered="#{s:hasPermission('TEMPLATE','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('TEMPLATE','VIEW')}">
+                <s:link view="/contacts/templateList.xhtml"
+                        value="#{messages['menu.global.document.template']}"
+                        propagation="none"
+                        />
+            </rich:menuItem>
+        </rich:dropDownMenu>
+        <rich:dropDownMenu value="#{messages['menu.global.contact']}" rendered="#{
+        s:hasPermission('DOCUMENTTYPE','VIEW') or
+        s:hasPermission('TITLE','VIEW') or
+        s:hasPermission('SALUTATION','VIEW') or
+        s:hasPermission('MARITALSTATUS','VIEW') or
+        s:hasPermission('ORGANIZATION','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DOCUMENTTYPE','VIEW')}">
+                <s:link view="/customers/documentTypeList.xhtml"
+                        value="#{messages['menu.customers.configuration.documentType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('TITLE','VIEW')}">
+                <s:link view="/contacts/titleList.xhtml"
+                        value="#{messages['menu.customers.configuration.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('SALUTATION','VIEW')}">
+                <s:link view="/contacts/salutationList.xhtml"
+                        value="#{messages['menu.customers.configuration.salutation']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('MARITALSTATUS','VIEW')}">
+                <s:link view="/contacts/maritalStatusList.xhtml"
+                        value="#{messages['menu.customers.configuration.maritalStatus']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('ORGANIZATION','VIEW')}">
+                <s:link view="/contacts/organizationList.xhtml"
+                        value="#{messages['menu.contacts.configuration.organization']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+    </h:panelGrid>
+</rich:tab>
+<rich:tab id="reports"
+          label="#{messages['menu.reports']}"
+          rendered="#{
+    s:hasPermission('REPORTDEBTBYSTUDENT','VIEW') or
+    s:hasPermission('REPORTINCOMEBYCASHBOX','VIEW') or
+    s:hasPermission('REPORTENTRYBUDGET','VIEW') or
+    s:hasPermission('REPORTCREDDEBCOMP','VIEW') or
+    s:hasPermission('REPORTACADEMICPLANNINGSUMMARY','VIEW') or
+    s:hasPermission('REPORTCASHAVAILABLE','VIEW') or
+    s:hasPermission('REPORTMARKSTATE','VIEW') or
+    s:hasPermission('PURCHASEBOOKREPORT','VIEW') or
+    s:hasPermission('SALESBOOKREPORT','VIEW')}">
+    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-separator,tab-end-separator">
+        <rich:dropDownMenu value="#{messages['Reports.finances']}" rendered="#{
+        s:hasPermission('REPORTDEBTBYSTUDENT','VIEW') or
+        s:hasPermission('REPORTINCOMEBYCASHBOX','VIEW') or
+        s:hasPermission('REPORTENTRYBUDGET','VIEW') or
+        s:hasPermission('REPORTCREDDEBCOMP','VIEW') or
+        s:hasPermission('REPORTCASHAVAILABLE','VIEW') or
+        s:hasPermission('REPORTMARKSTATE','VIEW') or
+        s:hasPermission('PURCHASEBOOKREPORT','VIEW') or
+        s:hasPermission('SALESBOOKREPORT','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTDEBTBYSTUDENT','VIEW')}">
+                <s:link view="/cashbox/debtByStudentReport.xhtml"
+                        value="#{messages['Reports.finances.debtByStudents']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTDEBTEXTENDED','VIEW')}">
+                <s:link view="/cashbox/debtExtendedReport.xhtml"
+                        value="#{messages['Reports.debtExtended.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTINCOMEBYCASHBOX','VIEW')}">
+                <s:link view="/cashbox/incomeByCashboxReport.xhtml"
+                        value="#{messages['Reports.incomeByCashbox.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTENTRYBUDGET','VIEW')}">
+                <s:link view="/cashbox/entryBudgetReport.xhtml"
+                        value="#{messages['Reports.entryBudget.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTINCOMEBYINVOICE','VIEW')}">
+                <s:link view="/cashbox/incomeByInvoiceReport.xhtml"
+                        value="#{messages['Reports.incomeByInvoice.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTEXPENSEBUDGETEXTENDED','VIEW')}">
+                <s:link view="/cashbox/expenseBudgetExtendedReport.xhtml"
+                        value="#{messages['Reports.expenseBudgetExtended.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTHUMANRESOURCEEXPENSEEXT','VIEW')}">
+                <s:link view="/cashbox/humanResourcesExpenseExtendedReport.xhtml"
+                        value="#{messages['Reports.humanResourcesExpenseExtended.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTCREDDEBCOMP','VIEW')}">
+                <s:link view="/cashbox/creditDebitComparativeReport.xhtml"
+                        value="#{messages['Reports.finances.creditDebitComparative']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTCASHAVAILABLE','VIEW')}">
+                <s:link view="/finances/cashAvailableReport.xhtml"
+                        value="#{messages['Reports.cashAvailable.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTMARKSTATE','VIEW')}">
+                <s:link view="/employees/markStateReport.xhtml"
+                        value="#{messages['Reports.rrhh.markState']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}">
+                <s:link view="/finances/purchaseBookReport.xhtml"
+                        value="#{messages['Reports.purchaseBookReport.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('SALESBOOKREPORT','VIEW')}">
+                <s:link view="/finances/salesBookReport.xhtml"
+                        value="#{messages['Reports.salesBookReport.menu.title']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+        <rich:dropDownMenu value="#{messages['Reports.academics']}"
+                           rendered="#{s:hasPermission('REPORTACADEMICPLANNINGSUMMARY','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('REPORTACADEMICPLANNINGSUMMARY','VIEW')}">
+                <s:link view="/employees/academicPlanningSummaryReport.xhtml"
+                        value="#{messages['Reports.academics.planningSummary']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+    </h:panelGrid>
+</rich:tab>
+</rich:tabPanel>
+</rich:toolBar>
+<!--<rich:componentControl for="validateAuthorizationForCashBox" event="onclick" disableDefault="true" operation="show"
+                       attachTo="menuCashBoxId"/>-->
+</div>
+</h:form>
+
+<!--<s:decorate id="validateAuthorization" template="/customers/validateAuthorizationForCashBox.xhtml"/>-->
+
+<div id="shadow"/>
+
+<rich:jQuery selector=".main-menu-item"
+             query="click(function() {location.href = jQuery(this).find('a').attr('href')})"/>
+<rich:jQuery selector=".rich-menu-list-border" query="parent().css('position', 'relative')"/>
+<rich:jQuery selector=".rich-tabpanel-content-position" query="attr('cellpadding', 5)"/>
+<rich:jQuery selector="#mainMenuForm:mainToolBar" query="find('td[style]').css('width', '')"/>
+</div>

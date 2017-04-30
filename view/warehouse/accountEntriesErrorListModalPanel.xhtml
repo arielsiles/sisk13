@@ -1,0 +1,42 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="accountEntriesErrorListModalPanel">
+    <f:facet name="header">
+        <h:outputText>#{messages['AccountEntries.listError']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+        <rich:dataTable value="#{listErrors}"
+                        var="errorItem"
+                        id="errorList"
+                        width="100%"
+                        >
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <!--<rich:column>
+                            #{messages['AccountEntries.number']}
+                    </rich:column>-->
+                    <rich:column>
+                            #{messages['AccountEntries.error.description']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{errorItem}"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <!--<app:dataScroller id="dataScroller"
+                          for="errorList"
+                          dataModel="#{voucherEntriesApproveAction.listErrors}"/>-->
+    <rich:componentControl for="accountEntriesErrorListModalPanel"
+                           attachTo="closeLink, addButton"
+                           operation="hide"
+                           event="onclick"/>
+</rich:modalPanel>

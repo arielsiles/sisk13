@@ -1,0 +1,145 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <!--
+    Documentation:
+    This tag render a pop-up select components, these components are:
+    - input text: That contain the name for selected element.
+    - select link: That show a modal panel with selectable elements.
+    - clear link: That clear the selected element.
+
+    Attributes:
+    id: This is the input-text id and they are used to generate the identifiers for other components. It is required.
+    required: Enable or disable the required validation for selected element, it is a optional.
+    textValue: This is the value that will be show in the input-text. It is required.
+    styleClass: This is the style class for the input-text. the default value is 'input'.
+    modalPanel: This is the modal panel name, it contains the selectable elements and comes up when select link is clicked.
+    clearAction: This is the method that will be call when clear link is clicked, it is required.
+    dataModel: This is the datamodel object that contain the criteria object, it is a required attribute
+    value: This is the selected value. it is required.
+    renderedSelectLink: Condition to render select link, it is a optional attribute.
+    renderedClearLink:  Condition to render clear link, it is a optional attribute.
+    reRender: The id of parent container component, this component will be re rendered when clear link is clicked, it is a optional attribute.
+    readOnly: Just display text of an existing value disabling the possibility to select another one to change its value.
+    rendered: Define if the current component will show on user interface.
+    -->
+    <c:if test="#{not empty rendered ? rendered : true}">
+
+        <c:if test="#{empty readOnly}">
+            <c:set var="readOnly" value="false"/>
+        </c:if>
+
+        <c:choose>
+            <c:when test="#{readOnly}">
+                <h:outputText id="outputText_#{id}" value="#{textValue}"/>
+            </c:when>
+            <c:otherwise>
+                <c:if test="#{empty selectLinkId}">
+                    <c:set var="selectLinkId" value="select_link_#{id}"/>
+                </c:if>
+
+                <c:if test="#{empty required}">
+                    <c:set var="required" value="false"/>
+                </c:if>
+
+                <c:if test="#{empty renderedSelectLink}">
+                    <c:set var="renderedSelectLink" value="true"/>
+                </c:if>
+
+                <c:if test="#{empty renderedNewLink}">
+                    <c:set var="renderedNewLink" value="false"/>
+                </c:if>
+
+                <c:if test="#{empty renderedEditLink}">
+                    <c:set var="renderedEditLink" value="false"/>
+                </c:if>
+
+
+                <c:set var="newLinkId" value="new_link_#{id}"/>
+
+                <c:set var="editLinkId" value="edit_link_#{id}"/>
+
+                <c:set var="clearLinkId" value="clear_link_#{id}"/>
+
+                <h:inputText id="#{id}"
+                             value="#{textValue}"
+                             title="#{textValue}"
+                             required="#{required}"
+                             styleClass="#{not empty styleClass ? styleClass : 'inputMedium'}"
+                             readonly="true"/>
+
+                <a4j:commandLink id="#{selectLinkId}"
+                                 action="#{elEvaluator.evaluateMethodBinding(selectAction)}"
+                                 actionListener="#{selectPopUpAction.select}"
+                                 oncomplete="Richfaces.showModalPanel('#{searchModalPanel}');"
+                                 reRender="#{searchModalPanel}"
+                                 rendered="#{renderedSelectLink}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{hotKeySelect} #{messages['Common.choose']}">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    <f:attribute name="entityManagerName" value="#{entityManagerName}"/>
+                    <f:attribute name="dataModelObject" value="#{dataModel}"/>
+                    <ui:insert name="criteriaValues"/>
+                    <ui:insert name="dataModelStaticProperties"/>
+                </a4j:commandLink>
+
+                <a4j:commandLink id="#{newLinkId}"
+                                 action="#{elEvaluator.evaluateMethodBinding(newAction)}"
+                                 oncomplete="Richfaces.showModalPanel('#{newModalPanel}');"
+                                 reRender="#{newModalPanel}"
+                                 rendered="#{renderedNewLink and not empty newModalPanel}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{hotKeyNew} #{messages['Common.new']}">
+                    <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+
+                <a4j:commandLink id="#{editLinkId}"
+                                 action="#{elEvaluator.evaluateMethodBinding(editAction)}"
+                                 oncomplete="Richfaces.showModalPanel('#{editModalPanel}');"
+                                 reRender="#{editModalPanel}"
+                                 rendered="#{renderedEditLink and not empty editModalPanel}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{hotKeyEdit} #{messages['Common.edit']}">
+                    <h:graphicImage value="/img/edit3.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+
+                <a4j:commandLink id="#{clearLinkId}"
+                                 action="#{elEvaluator.evaluateMethodBinding(clearAction)}"
+                                 reRender="#{not empty reRender ? reRender : id}"
+                                 rendered="#{(not empty renderedClearLink ? renderedClearLink : true)}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{messages['Common.clear']}">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+
+                <h:inputHidden id="hidden_#{id}"
+                               value="#{value}"
+                               required="#{required}">
+                    <ui:insert name="validators"/>
+                    <s:convertEntity/>
+                </h:inputHidden>
+                <h:message for="hidden_#{id}" styleClass="errors" style="display:block;"/>
+                <c:if test="#{not empty hotKeySelect and renderedSelectLink}">
+                    <rich:hotKey key="#{hotKeySelect}"
+                                 handler="if((selectLink=document.getElementById('#{rich:clientId(selectLinkId)}'))!=null){selectLink.onclick();}"/>
+                </c:if>
+                <c:if test="#{not empty hotKeyNew and not empty newModalPanel and renderedNewLink}">
+                    <rich:hotKey key="#{hotKeyNew}"
+                                 handler="if((newLink=document.getElementById('#{rich:clientId(newLinkId)}'))!=null){newLink.onclick();}"/>
+                </c:if>
+                <c:if test="#{not empty hotKeyEdit and not empty editModalPanel and renderedEditLink}">
+                    <rich:hotKey key="#{hotKeyEdit}"
+                                 handler="if((editLink=document.getElementById('#{rich:clientId(editLinkId)}'))!=null){editLink.onclick();}"/>
+                </c:if>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
+</ui:composition>

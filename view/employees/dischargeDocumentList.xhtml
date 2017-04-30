@@ -1,0 +1,194 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DischargeDocument.list.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="95%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="dischargeDocumentListForm">
+            <rich:simpleTogglePanel label="#{messages['DischargeDocument.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent, width50percent">
+                    <s:div id="leftPanel">
+                        <s:decorate id="nameId" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DischargeDocument.name']}</ui:define>
+                            <h:inputText id="nameInputText"
+                                         value="#{dischargeDocumentDataModel.criteria.name}"
+                                         styleClass="input"
+                                         tabindex="1"/>
+                        </s:decorate>
+                        <s:decorate id="employeeId"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['DischargeDocument.employee']}</ui:define>
+                            <app:selectPopUp id="employeeSelectPopup"
+                                             textValue="#{dischargeDocumentDataModel.employee.fullName}"
+                                             value="#{dischargeDocumentDataModel.employee}"
+                                             dataModel="#{generalEmployeeDataModel}"
+                                             clearAction="dischargeDocumentDataModel.cleanEmployee()"
+                                             searchModalPanel="generalEmployeeListModalPanel"
+                                             reRender="employeeId"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div id="rightPanel">
+                        <s:decorate id="gestionPayrollId"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['DischargeDocument.gestionPayroll']}</ui:define>
+                            <app:selectPopUp id="gestionPayrollSelectPopup"
+                                             textValue="#{dischargeDocumentDataModel.gestionPayroll.gestionName}"
+                                             value="#{dischargeDocumentDataModel.gestionPayroll}"
+                                             dataModel="#{gestionPayRollSearchDataModel}"
+                                             clearAction="dischargeDocumentDataModel.cleanGestionPayroll()"
+                                             searchModalPanel="gestionPayRollSearchModalPanel"
+                                             reRender="gestionPayrollId"/>
+                        </s:decorate>
+                        <s:decorate id="numberId" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DischargeDocument.number']}</ui:define>
+                            <h:inputText id="numberInputText"
+                                         value="#{dischargeDocumentDataModel.criteria.number}"
+                                         styleClass="input"
+                                         tabindex="2"/>
+                        </s:decorate>
+                        <s:div styleClass="right input">
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{dischargeDocumentDataModel.search}"
+                                               reRender="dischargeDocumentDataTable, dischargeDocumentDataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               tabindex="3"/>
+                            <a4j:commandButton action="#{dischargeDocumentDataModel.clear}"
+                                               reRender="nameId, numberId, gestionPayrollId, employeeId, dischargeDocumentDataTable, dischargeDocumentDataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.clear']}"
+                                               tabindex="4"/>
+                        </s:div>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#nameInputText" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/dischargeDocument.xhtml"
+                          rendered="#{s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"
+                          styleClass="button"
+                          propagation="begin"/>
+            </div>
+            <rich:dataTable value="#{dischargeDocumentDataModel}"
+                            var="element"
+                            id="dischargeDocumentDataTable"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 25%, 25%, 10%, 10%,  10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.transactionNumber']}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.jobContract']}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.name']}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.date']}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.state']}"/>
+                        </rich:column>
+
+                        <rich:column>
+                            <h:outputText value="#{messages['DischargeDocument.amount']}"/>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <h:outputText value="#{messages['Common.action']}"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{element.transactionNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{element.jobContract.contract.employee.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{element.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{element.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[element.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{element.amount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DISCHARGEDOCUMENT','VIEW')}"
+                                   action="#{dischargeDocumentAction.select(element)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dischargeDocumentDataScroller"
+                              for="dischargeDocumentDataTable"
+                              dataModel="#{dischargeDocumentDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/dischargeDocument.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('DISCHARGEDOCUMENT','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{dischargeDocumentDataModel.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeId"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+        <s:decorate id="gestionPayRollListModalPanelContainer"
+                    template="/employees/gestionPayRollSearchModalPanel.xhtml">
+            <ui:param name="dialogId" value="gestionPayRollSearchModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{dischargeDocumentDataModel.assignGestionPayroll(gestionPayrollItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="gestionPayrollId"
+                                   oncomplete="Richfaces.hideModalPanel('gestionPayRollSearchModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

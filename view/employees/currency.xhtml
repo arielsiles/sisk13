@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{currencyAction.managed}">
+                #{messages['Currency.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Currency.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="currencyForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{currencyAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!currencyAction.managed and s:hasPermission('CURRENCY','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{currencyAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{currencyAction.managed and s:hasPermission('CURRENCY','UPDATE')}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{currencyAction.managed and s:hasPermission('CURRENCY','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{currencyAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{currencyAction.managed}">
+                            #{messages['Currency.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Currency.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Currency.name']}</ui:define>
+                    <h:inputText id="name" value="#{currency.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="symbolField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Currency.symbol']}</ui:define>
+                    <h:inputText id="symbol" value="#{currency.symbol}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="6">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="afterInitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Currency.currencyCode']}</ui:define>
+                    <h:inputText id="afterInit" value="#{currency.currencyCode}" styleClass="input" required="true"
+                                 maxlength="20" tabindex="7">
+                    </h:inputText>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{currencyAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!currencyAction.managed and s:hasPermission('CURRENCY','CREATE')}"
+                                 tabindex="8">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{currencyAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{currencyAction.managed and s:hasPermission('CURRENCY','UPDATE')}"
+                                 tabindex="9"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{currencyAction.managed and s:hasPermission('CURRENCY','DELETE')}"
+                                 tabindex="10">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{currencyAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="11">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{currencyAction.managed and s:hasPermission('CURRENCY','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Currency.delete.confirmation']}">
+                        <f:param value="#{currency.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{currencyAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   rendered="#{s:hasPermission('CURRENCY','DELETE')}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,137 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{subjectGroupAction.managed}">
+                #{messages['SubjectGroup.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['SubjectGroup.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="subjectGroupForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{subjectGroupAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!subjectGroupAction.managed}" id="createButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{subjectGroupAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{subjectGroupAction.managed}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{subjectGroupAction.managed}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{subjectGroupAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{subjectGroupAction.managed}">
+                            #{messages['SubjectGroup.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['SubjectGroup.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SubjectGroup.name']}</ui:define>
+                    <h:inputText id="name" value="#{subjectGroup.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="nameField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="subjectField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Subject.subject']}</ui:define>
+                    <h:selectOneMenu id="subject" value="#{subjectGroup.subject}"
+                                     styleClass="input"
+                                     required="true" tabindex="4">
+                        <s:selectItems value="#{subjectList.resultList}" var="subject"
+                                       label="#{subject.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrganizationalUnit.unit']}</ui:define>
+                    <h:selectOneMenu id="organizationalUnit" value="#{subjectGroup.organizationalUnit}"
+                                     styleClass="input"
+                                     required="true" tabindex="4">
+                        <s:selectItems value="#{organizationalUnitList.resultList}" var="organizationalUnit"
+                                       label="#{organizationalUnit.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{subjectGroupAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!subjectGroupAction.managed}">
+                </h:commandButton>
+
+                <h:commandButton action="#{subjectGroupAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{subjectGroupAction.managed}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{subjectGroupAction.managed}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{subjectGroupAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{subjectGroupAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['SubjectGroup.delete.confirmation']}">
+                        <f:param value="#{subjectGroup.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{subjectGroupAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

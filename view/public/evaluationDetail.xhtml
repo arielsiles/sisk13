@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <app:fieldset id="evaluationDetail"
+                  title="#{messages['ScheduleEvaluationForm.evaluationDetail']}">
+
+        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollForm.code']}</ui:define>
+            <h:outputText id="code"
+                          value="#{scheduleEvaluationFormAction.pollForm.code}"/>
+        </s:decorate>
+
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollForm.description']}</ui:define>
+            <h:outputText id="description"
+                          value="#{scheduleEvaluationFormAction.pollForm.description}"/>
+        </s:decorate>
+
+        <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollForm.title']}</ui:define>
+            <h:outputText id="title"
+                          value="#{scheduleEvaluationFormAction.pollForm.title}"/>
+        </s:decorate>
+
+        <s:decorate id="subTitleField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollForm.subTitle']}</ui:define>
+            <h:outputText id="subTitle"
+                          value="#{scheduleEvaluationFormAction.pollForm.subTitle}"/>
+        </s:decorate>
+
+        <s:decorate id="evaluationDateField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollCopy.evaluationDate']}</ui:define>
+            <h:outputText id="evaluationDate" value="#{currentDate}">
+                <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="studentField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollCopy.evaluator']}</ui:define>
+            <h:outputText id="student"
+                          value="#{scheduleEvaluationFormAction.evaluator.fullName}"/>
+        </s:decorate>
+
+        <s:decorate id="commentField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{empty showComment or showComment}">
+            <ui:param name="errorStyleClass" value="boldErrors"/>
+            <ui:define name="label">#{messages['PollCopy.comment']}</ui:define>
+            <h:inputTextarea id="comment"
+                             value="#{scheduleEvaluationFormAction.comment.value}"
+                             styleClass="input textarea"/>
+        </s:decorate>
+    </app:fieldset>
+</ui:composition>

@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['RawMaterialRejectionNote.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="rawMaterialRejectionNoteSearch">
+            <rich:simpleTogglePanel label="#{messages['RawMaterialRejectionNote.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
+                            <h:inputText id="group" value="#{productiveZoneForSearch.number}"
+                                         maxlength="100" tabindex="1" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
+                            <h:inputText id="group" value="#{productiveZoneForSearch.group}"
+                                         maxlength="100" tabindex="2" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                            <h:inputText id="name" value="#{productiveZoneForSearch.name}"
+                                         maxlength="100" tabindex="3" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialRejectionNote.state']}</ui:define>
+                            <h:selectOneMenu id="state"
+                                             value="#{rawMaterialRejectionNoteDataModel.state}"
+                                             styleClass="inputMedium"
+                                             tabindex="4">
+                                <s:selectItems value="#{productionCollentionStateEnum}"
+                                               var="element"
+                                               label="#{messages[element.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                            <h:inputText id="firstName" value="#{rawMaterialProducerForSearch.firstName}"
+                                         maxlength="100" tabindex="5" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                            <h:inputText id="lastName" value="#{rawMaterialProducerForSearch.lastName}"
+                                         maxlength="100" tabindex="6" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                            <h:inputText id="maidenName" value="#{rawMaterialProducerForSearch.maidenName}"
+                                         maxlength="100" tabindex="7" styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton action="#{rawMaterialRejectionNoteDataModel.search}" reRender="rawMaterialRejectionNoteList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                               tabindex="8">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#group" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" action="#{rawMaterialRejectionNoteAction.startNew}"  styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('RAWMATERIALREJECTIONNOTE','CREATE')}"
+                />
+            </div>
+            <rich:dataTable value="#{rawMaterialRejectionNoteDataModel}" var="rawMaterialRejectionNoteItem" id="rawMaterialRejectionNoteList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%,15%,15%,15%,15%,15%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialRejectionNote.rawMaterialProducer.lastName" dataModel="#{rawMaterialRejectionNoteDataModel}"
+                                                   reRender="rawMaterialRejectionNoteList, dataScroller">
+                                #{messages['Person.lastName']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialRejectionNote.rawMaterialProducer.maidenName" dataModel="#{rawMaterialRejectionNoteDataModel}"
+                                                   reRender="rawMaterialRejectionNoteList, dataScroller">
+                                #{messages['Person.maidenName']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialRejectionNote.rawMaterialProducer.firstName" dataModel="#{rawMaterialRejectionNoteDataModel}"
+                                                   reRender="rawMaterialRejectionNoteList, dataScroller">
+                                #{messages['Person.firstName']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialRejectionNote.metaProduct.name" dataModel="#{rawMaterialRejectionNoteDataModel}"
+                                                   reRender="rawMaterialRejectionNoteList, dataScroller">
+                                #{messages['RawMaterialRejectionNote.rawMaterial']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['RawMaterialRejectionNote.productiveZone']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['RawMaterialRejectionNote.date']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['RawMaterialRejectionNote.amount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['RawMaterialRejectionNote.state']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.rawMaterialProducer.lastName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.rawMaterialProducer.maidenName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.rawMaterialProducer.firstName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.metaProduct.fullNameRawMaterial}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.rawMaterialProducer.productiveZone.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.date}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialRejectionNoteItem.rejectedAmount}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{rawMaterialRejectionNoteItem.state == 'PENDING'
+                            ? messages['RawMaterialCollectionSession.state.pending']
+                            : messages['RawMaterialCollectionSession.state.approved']}"
+                            />
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{rawMaterialRejectionNoteAction.select(rawMaterialRejectionNoteItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="rawMaterialRejectionNoteList" dataModel="#{rawMaterialRejectionNoteDataModel}"/>
+
+            <rich:jQuery selector="#rawMaterialRejectionNoteList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#rawMaterialRejectionNoteList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" action="#{rawMaterialRejectionNoteAction.startNew}" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('RAWMATERIALREJECTIONNOTE','CREATE')}"
+                 />
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

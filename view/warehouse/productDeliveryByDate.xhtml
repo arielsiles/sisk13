@@ -1,0 +1,277 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productDeliveryAction.managed}">
+                #{messages['ProductDelivery.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductDelivery.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="productDeliveryForm">
+            <div class="buttons">
+                <h:commandButton id="productDeliveryButtonId"
+                                 action="#{productDeliveryAction.productDeliveryOrderByDate}"
+                                 value="#{messages['ProductDelivery.button.deliverOrderByDate']}"
+                                 styleClass="button"
+                                 rendered="#{!productDeliveryAction.managed and s:hasPermission('PRODUCTDELIVERY','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="createButtonId"
+                                 action="#{productDeliveryAction.entregarTodos}"
+                                 value="#{messages['ProductDelivery.button.deliver']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('PRODUCTDELIVERY','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{productDeliveryAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel>
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productDeliveryAction.managed}">
+                            #{messages['ProductDelivery.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductDelivery.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <!--<s:decorate id="invoideNumberField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow"
+                        >
+                    <h:outputLabel rendered="#{!productDeliveryAction.showDeliveryOrder}" >#{messages['ProductDelivery.documentNumber']}</h:outputLabel>
+
+                    <h:inputText id="invoiceNumber"
+                                 value="#{productDeliveryAction.orderNumber}"
+                                 maxlength="20"
+                                 styleClass="inputMedium"
+                                 tabindex="1"
+                                 required="true"
+                                 autocomplete="off"
+                                 rendered="#{!productDeliveryAction.showDeliveryOrder}">
+                    </h:inputText>
+                    <h:outputText styleClass="input"
+                                  value="#{productDelivery.invoiceNumber}"
+                                  rendered="#{!productDeliveryAction.showDeliveryOrder}"/>
+                </s:decorate>-->
+
+
+                <s:decorate id="employeeField"
+                            template="/include/inputField.xhtml" styleClass="formRow" >
+                    <h:outputLabel rendered="#{productDeliveryAction.showDeliveryOrder}" >#{messages['Order.report.date']}</h:outputLabel>
+                    <rich:calendar id="dateDelivery"
+                                   value="#{productDeliveryAction.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   rendered="#{productDeliveryAction.showDeliveryOrder}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+
+                    <h:outputLabel >Territorio:</h:outputLabel>
+                    <h:selectOneMenu id="territorio"
+                                     value="#{productDeliveryAction.territorioTrabajo}"
+                                     styleClass="input">
+                        <s:selectItems value="#{territorioList}"
+                                       var="territorio"
+                                       label="#{territorio.nombre}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="actionButton"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <a4j:commandButton id="searchButtonId"
+                                       action="#{productDeliveryAction.buscarPorTerritorioFecha}"
+                                       reRender="buttonDelivery,createButtonId,invoiceNumber, soldProductPanel, messageSearchOrder,soldProductPanel,listProductsSolds"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       tabindex="2">
+
+                    </a4j:commandButton>
+                    <a4j:commandLink id="clearInvoiceNumber"
+                                     ajaxSingle="true"
+                                     immediate="true"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{productDeliveryAction.cleanInvoiceNumber}"
+                                     reRender="buttonDelivery,createButtonId,invoiceNumber, soldProductPanel, messageSearchOrder,listProductsSolds,employeeField"
+                                     tabindex="3">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+
+            </rich:panel>
+            <s:decorate id="messageSearchOrder" style="color: red;">
+                <h:outputText value="#{productDeliveryAction.messageSearchOrder}"/>
+            </s:decorate>
+            <s:fragment id="productDeliveryPanel" rendered="#{productDeliveryAction.managed}">
+                <s:decorate id="warehouseVoucherField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDelivery.warehouseVoucher']}</ui:define>
+                    <h:outputText value="#{productDelivery.warehouseVoucher.number}"/>
+                </s:decorate>
+            </s:fragment>
+            <s:div id="soldProductPanel" >
+                <s:fragment id="listProductsSolds" rendered="#{productDeliveryAction.showDeliveryOrder}">
+                    <rich:dataTable value="#{productDeliveryAction.orderClients}" var="client">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column rendered="#{productDeliveryAction.orderClients.size() > 0}">
+                                    #{messages['ProductoDelivery.message.client']}
+                                </rich:column>
+                                <rich:column rendered="#{productDeliveryAction.orderClients.size() > 0}">
+                                    #{messages['ProductoDelivery.delivery']}
+                                </rich:column>
+                                <c:forEach var="productSold" items="#{productDeliveryAction.orderItems}" varStatus="row">
+                                    <rich:column>
+                                        #{productSold.nameItem}
+                                    </rich:column>
+                                </c:forEach>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column styleClass="#{client.type.equals('TERRITORIO')?'labelInfo':''}">
+                            <h:outputText value="#{client.name}"/>
+                        </rich:column>
+                        <rich:column rendered="#{!client.type.equals('TERRITORIO')}">
+                            <!--<h:outputText value="#{client.state.equals('PREPARAR')?'NO':'SI'}"/>-->
+                            <h:outputText value="#{client.stockFlag ? 'Si':'No'}"/>
+                        </rich:column>
+                        <rich:column rendered="#{client.type.equals('TERRITORIO')}">
+                            <h:outputText value="-"/>
+                        </rich:column>
+                        <c:forEach var="orderItem" items="#{productDeliveryAction.orderItems}" varStatus="row">
+                            <rich:column styleClass="#{client.type.equals('TERRITORIO')?'labelInfo':''}">
+                                #{productDeliveryAction.getCantidad(client,orderItem)}
+                            </rich:column>
+                        </c:forEach>
+                        <f:facet name="footer">
+                            <rich:columnGroup>
+                                <rich:column rendered="#{productDeliveryAction.territorioTrabajo == null and productDeliveryAction.orderClients.size() > 0}">
+                                    <h:outputText value="#{messages['ProductoDelivery.message.total']}"/>
+                                </rich:column>
+                                <rich:column rendered="#{productDeliveryAction.territorioTrabajo == null and productDeliveryAction.orderClients.size() > 0}">
+                                    <h:outputText value="-"/>
+                                </rich:column>
+                                <c:forEach var="productSold" items="#{productDeliveryAction.orderItems}" varStatus="row">
+                                    <rich:column rendered="#{productDeliveryAction.territorioTrabajo == null}">
+                                        #{productDeliveryAction.getCantidadTotal(productSold)}
+                                    </rich:column>
+                                </c:forEach>
+
+                            </rich:columnGroup>
+                        </f:facet>
+                    </rich:dataTable>
+                </s:fragment>
+                <!--<s:fragment id="soldProductInformationPanel" rendered="#{productDeliveryAction.existsSoldProducts and !productDeliveryAction.showDeliveryOrder}">
+                    <s:decorate id="namesField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SoldProduct.names']}</ui:define>
+                        <h:outputText value="#{productDeliveryAction.soldProduct.names}"/>
+                    </s:decorate>
+                    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SoldProduct.firstName']}</ui:define>
+                        <h:outputText value="#{productDeliveryAction.soldProduct.firstName}"/>
+                    </s:decorate>
+                    <s:decorate id="secondNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SoldProduct.secondName']}</ui:define>
+                        <h:outputText value="#{productDeliveryAction.soldProduct.secondName}"/>
+                    </s:decorate>
+                    <s:decorate id="personalIdentificationField" template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['SoldProduct.personalIdentification']}</ui:define>
+                        <h:outputText value="#{productDeliveryAction.soldProduct.personalIdentification}"/>
+                    </s:decorate>
+                    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SoldProduct.state']}</ui:define>
+                        <h:outputText value="#{messages[productDeliveryAction.soldProduct.state.resourceKey]}"/>
+                    </s:decorate>
+                    <s:decorate id="soldProductField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductDelivery.soldProduct']}</ui:define>
+                        <ui:param name="vertical" value="true"/>
+                        <rich:dataTable value="#{productDeliveryAction.soldProducts}"
+                                        var="soldProduct"
+                                        columnsWidth="70%, 30%"
+                                        width="98%">
+                            <rich:column>
+                                <f:facet name="header">
+                                    #{messages['SoldProduct.productItem']}
+                                </f:facet>
+                                <h:outputText value="#{soldProduct.productItem.fullName}"/>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <f:facet name="header">
+                                    #{messages['SoldProduct.quantity']}
+                                </f:facet>
+                                <h:outputText value="#{soldProduct.quantity}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                        </rich:dataTable>
+                    </s:decorate>
+                </s:fragment>-->
+
+
+            </s:div>
+            <div class="buttons">
+                <h:commandButton action="#{productDeliveryAction.entregarTodos}"
+                                 value="#{messages['ProductDelivery.button.deliver']}"
+                                 styleClass="button"
+                                 rendered="#{!productDeliveryAction.managed and s:hasPermission('PRODUCTDELIVERY','CREATE') }"
+                                 tabindex="4"
+                                 id="buttonDelivery"/>
+                <h:commandButton action="#{productDeliveryAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="6"/>
+            </div>
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{productDeliveryAction.setDistributor(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <!--Set selector Id to enable focus-->
+        <rich:jQuery selector="#invoiceNumber" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

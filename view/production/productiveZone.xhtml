@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productiveZoneAction.managed}">
+                #{messages['ProductiveZone.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductiveZone.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productiveZoneForm">
+            <div class="buttons">
+                <h:commandButton action="#{productiveZoneAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','CREATE')}"
+                                 id="createButtonId">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{productiveZoneAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{productiveZoneAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productiveZoneAction.managed}">
+                            #{messages['ProductiveZone.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductiveZone.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                    <h:inputText id="name" value="#{productiveZone.name}" styleClass="input" required="true"
+                                 maxlength="200" tabindex="3">
+                        <a4j:support event="onblur" reRender="nameField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
+                    <h:inputText id="number" value="#{productiveZone.number}" styleClass="input" required="true"
+                                 maxlength="100" tabindex="3">
+                        <a4j:support event="onblur" reRender="numberField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <!--<s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
+                    <h:inputText id="group" value="#{productiveZone.group}" styleClass="input" required="true"
+                                 maxlength="100" tabindex="3">
+                        <a4j:support event="onblur" reRender="groupField"/>
+                    </h:inputText>
+                </s:decorate>-->
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{productiveZoneAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','CREATE')}"/>
+                <h:commandButton action="#{productiveZoneAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productiveZoneAction.managed and s:hasPermission('PRODUCTIVEZONE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{productiveZoneAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{productiveZoneAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductiveZone.delete.confirmation']}">
+                        <f:param value="#{productiveZone.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{productiveZoneAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

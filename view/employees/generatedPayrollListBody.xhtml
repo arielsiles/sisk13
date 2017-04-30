@@ -1,0 +1,339 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<h:form id="gestionPayrollForm">
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="1">
+    </h:commandButton>
+
+</div>
+<rich:panel id="gestionPayrollPane">
+    <f:facet name="header">
+        #{messages['GestionPayroll.gestionPayrollTitle']}
+    </f:facet>
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="gestionName" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GestionPayroll.gestionName']}</ui:define>
+                <h:outputText id="gestionName" value="#{gestionPayroll.gestionName}"/>
+
+            </s:decorate>
+            <s:decorate id="yearField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Gestion.year']}</ui:define>
+                <h:outputText id="year" value="#{gestionPayroll.gestion.year}">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{gestionPayroll.salaryType}">
+                <ui:define name="label">#{messages['GestionPayroll.month']}</ui:define>
+                <h:outputText id="month" value="#{messages[gestionPayroll.month.resourceKey]}"/>
+            </s:decorate>
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{gestionPayroll.salaryType}">
+                <ui:define name="label">#{messages['GestionPayroll.initDate']}</ui:define>
+                <h:outputText id="initDate" value="#{gestionPayroll.initDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{gestionPayroll.salaryType}">
+                <ui:define name="label">#{messages['GestionPayroll.endDate']}</ui:define>
+                <h:outputText id="endDate" value="#{gestionPayroll.endDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Sede.sede']}</ui:define>
+                <h:outputText id="businessUnit" value="#{gestionPayroll.businessUnit.organization.name}"
+                              styleClass="output"/>
+            </s:decorate>
+            <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GestionPayroll.jobCategory']}</ui:define>
+                <h:outputText id="jobCategory" value="#{gestionPayroll.jobCategory.name}"
+                              styleClass="output"/>
+            </s:decorate>
+
+            <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+                <h:outputText id="rate" value="#{gestionPayroll.exchangeRate.rate}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</rich:panel>
+
+<rich:simpleTogglePanel label="#{messages['GeneratedPayroll.search']}" switchType="client">
+
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GeneratedPayroll.name']}</ui:define>
+        <h:inputText id="name" value="#{generatedPayrollDataModel.criteria.name}"
+                     maxlength="150" styleClass="input"
+                     tabindex="2">
+        </h:inputText>
+
+    </s:decorate>
+
+    <s:decorate id="generatedPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['GeneratedPayroll.generatedPayrollType']}</ui:define>
+        <h:selectOneMenu id="generatedPayrollType" value="#{generatedPayrollDataModel.generatedPayrollType}"
+                         styleClass="input"
+                         tabindex="3">
+            <s:selectItems value="#{generatedPayrollTypeEnum}" var="generatedPayrollType"
+                           label="#{messages[generatedPayrollType.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+        <a4j:commandButton action="#{generatedPayrollDataModel.search()}"
+                           reRender="generatedPayrollList, dataScroller"
+                           styleClass="button"
+                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+            <s:defaultAction/>
+        </a4j:commandButton>
+    </s:decorate>
+
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="5">
+    </h:commandButton>
+</div>
+
+<rich:dataTable value="#{generatedPayrollDataModel}" var="generatedPayrollItem" id="generatedPayrollList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="35%,25%,25%,15%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="generatedPayroll.name"
+                                       dataModel="#{generatedPayrollDataModel}"
+                                       reRender="generatedPayrollList, dataScroller">
+                    #{messages['GeneratedPayroll.name']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="generatedPayroll.generatedPayrollType.name"
+                                       dataModel="#{generatedPayrollDataModel}"
+                                       reRender="generatedPayrollList, dataScroller">
+                    #{messages['GeneratedPayroll.generatedPayrollType']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="generatedPayroll.generationDate"
+                                       dataModel="#{generatedPayrollDataModel}"
+                                       reRender="generatedPayrollList, dataScroller">
+                    #{messages['GeneratedPayroll.generationDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column>
+        <h:outputText value="#{generatedPayrollItem.name}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[generatedPayrollItem.generatedPayrollType.resourceKey]}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{generatedPayrollItem.generationDate}">
+            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"
+                               type="both"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:panelGrid styleClass="tiny-menu-cell" columnClasses="tiny-menu-option-list" columns="3">
+            <h:commandLink value="#{messages['Common.edit']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('GENERATEDPAYROLL','VIEW')}"
+                           action="#{generatedPayrollAction.select(generatedPayrollItem)}"/>
+            <rich:dropDownMenu value="#{messages['GeneratedPayroll.action.view']}"
+                               style="color: #{a4jSkin.generalLinkColor};"
+                               styleClass="tiny-menu-cell-border"
+                               event="onclick">
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.salaryPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewProfessorsGeneratedPayroll(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationByTime(generatedPayrollItem) and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.salaryPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewManagersGeneratedPayroll(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationBySalary(generatedPayrollItem) and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.salaryPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewFiscalProfessorGeneratedPayroll(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isProfessorGenerationBySalary(generatedPayrollItem) and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.christmasPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewChristmasGeneratedPayroll(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.controlreport']}"
+                               immediate="true"
+                               action="#{controlReportAction.viewControlReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <!-- category tributary payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.categoryTributaryPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewCategoryTributaryPayroll(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <!-- category fiscal payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/payroll.jpg"
+                               value="#{messages['GeneratedPayroll.categoryFiscalPayroll']}"
+                               immediate="true"
+                               action="#{generatedPayrollAction.viewCategoryFiscalPayroll(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+            </rich:dropDownMenu>
+
+            <rich:dropDownMenu value="#{messages['GeneratedPayroll.action.generate']}"
+                               style="color: #{a4jSkin.generalLinkColor};"
+                               styleClass="tiny-menu-cell-border"
+                               event="onclick">
+                <!--general payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportToExcel']}"
+                               action="#{generalPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationByTime(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.payrollTorrhhByCostCenter']}"
+                               action="#{generalPayrollByCostCenterReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationByTime(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <!--managers payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.payrollTorrhh']}"
+                               action="#{managersPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationBySalary(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.payrollTorrhhByCostCenter']}"
+                               action="#{managersPayrollByCostCenterReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationBySalary(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['ManagersPayroll.payrollByArea']}"
+                               action="#{managersPayrollByAreaReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationBySalary(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.payrollToPresidency']}"
+                               action="#{managersPayrollExtendedReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isGenerationBySalary(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <!--laboral professor payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportLaboralProfessor']}"
+                               action="#{laboralProfessorPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isProfessorGenerationBySalary(generatedPayrollItem)
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <!--christmas bonus payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.christmasBonusPayroll']}"
+                               action="#{christmasBonusPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.christmasBonusPayrollByArea']}"
+                               action="#{christmasBonusPayrollByAreaReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.christmasBonusPayrollByCostCenter']}"
+                               action="#{christmasBonusPayrollByCostCenterReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <rich:menuItem styleClass="left"
+                               icon="/img/moneyicon.png"
+                               value="#{messages['Reports.payrollBankReport']}"
+                               action="#{payrollBankReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportControlreport']}"
+                               action="#{controlReportReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{s:hasPermission('GENERATEDPAYROLL','VIEW')
+                               and !generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <!-- category tributary payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportCategoryTributaryPayroll']}"
+                               immediate="true"
+                               action="#{categoryTributaryPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+                <!-- category fiscal payroll-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/excelIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportCategoryFiscalPayroll']}"
+                               immediate="true"
+                               action="#{categoryFiscalPayrollReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <!-- category payment slip-->
+                <rich:menuItem styleClass="left"
+                               icon="/img/pdfIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportCategoryPaymentSlip']}"
+                               immediate="true"
+                               action="#{categoryPaymentSlipReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem) and generatedPayrollAction.isOfficialGeneratedPayrollType(generatedPayrollItem)}"/>
+
+            </rich:dropDownMenu>
+        </h:panelGrid>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="generatedPayrollList" dataModel="#{generatedPayrollDataModel}"/>
+
+<div class="buttons">
+    <h:commandButton action="#{generatedPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="6">
+    </h:commandButton>
+</div>
+</h:form>
+</ui:composition>

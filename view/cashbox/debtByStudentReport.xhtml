@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['DebtByStudentReport.pageTitle']}</ui:define>
+
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="reports"/>
+    <ui:define name="body">
+        <h:form id="careerManagerEvaluationReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['DebtByStudentReport.title']}
+                </f:facet>
+
+                <h:panelGrid id="searchOptionsPanel"
+                             columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftSidePanel">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DebtByStudentExtended.year']}</ui:define>
+                            <h:inputText id="year"
+                                         value="#{debtByStudentFiltersAction.year}"
+                                         styleClass="input"
+                                         required="true"
+                                         maxlength="100"
+                                         tabindex="1">
+                                <app:naturalNumberConverter/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DebtByStudentExtended.period']}</ui:define>
+                            <h:selectOneMenu id="periodId"
+                                             value="#{debtByStudentFiltersAction.period}"
+                                             styleClass="input"
+                                             tabindex="2">
+                                <s:selectItems value="#{periodIdList.resultList}"
+                                               var="periodCod"
+                                               label="#{periodCod}"
+                                               noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DebtByStudentExtended.executorUnit']}</ui:define>
+                            <h:selectOneMenu id="executorUnitCode"
+                                             value="#{debtByStudentFiltersAction.executorUnit}"
+                                             styleClass="input"
+                                             tabindex="2">
+                                <s:selectItems value="#{executorUnitList.resultList}"
+                                               var="executorUnit"
+                                               label="#{executorUnit.description}"
+                                               noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                               hideNoSelectionLabel="false"/>
+                                <a4j:support event="onchange" reRender="facultyOption, carrerOption" ajaxSingle="true"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+                        <s:div id="facultyOption">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['DebtByStudentExtended.faculty']}</ui:define>
+                                <h:selectOneMenu id="facultyId"
+                                                 value="#{debtByStudentFiltersAction.faculty}"
+                                                 disabled="#{not debtByStudentFiltersAction.executorUnitSelected}"
+                                                 styleClass="input"
+                                                 tabindex="3">
+                                    <s:selectItems value="#{academicFacultyList.resultList}"
+                                                   var="faculty"
+                                                   label="#{faculty.description}"
+                                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                    <a4j:support event="onchange" reRender="carrerOption" ajaxSingle="true"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </s:div>
+                        <s:div id="carrerOption">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['DebtByStudentExtended.career']}</ui:define>
+                                <h:selectOneMenu id="careerId"
+                                                 value="#{debtByStudentFiltersAction.carrer}"
+                                                 styleClass="input"
+                                                 disabled="#{not debtByStudentFiltersAction.executorUnitSelected}"
+                                                 tabindex="4">
+                                    <s:selectItems value="#{academicCareerList.resultList}"
+                                                   var="career"
+                                                   label="#{career.name}"
+                                                   noSelectionLabel="#{messages['Dashboard.label.all']}"
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </s:div>
+
+                        <s:decorate id="cashAccountListField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['DebtByStudentExtended.debtDetail']}</ui:define>
+                            <h:selectManyCheckbox id="debtDetailIdList"
+                                                  value="#{debtByStudentFiltersAction.cashboxAccountList}"
+                                                  styleClass="panel-border panel-select-multiple"
+                                                  layout="pageDirection"
+                                                  tabindex="5">
+                                <s:selectItems value="#{cashboxAccountList.resultList}"
+                                               var="account"
+                                               label="#{account.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyCheckbox>
+                        </s:decorate>
+
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{debtByStudentReportAction}" showPageFormat="false"
+                                      showReportTitle="false" tabIndex="10"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{debtByStudentReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId" tabindex="1000">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

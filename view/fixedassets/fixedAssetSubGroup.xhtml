@@ -1,0 +1,412 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{fixedAssetSubGroupAction.managed}">
+            #{messages['FixedAssetSubGroup.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FixedAssetSubGroup.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="fixedAssetSubGroupForm">
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetSubGroupAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{fixedAssetSubGroupAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','CREATE')}"
+                     tabindex="2">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetSubGroupAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','UPDATE')}"
+                     tabindex="3"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','DELETE')}"
+                     tabindex="4">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetSubGroupAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="5">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{fixedAssetSubGroupAction.managed}">
+            #{messages['FixedAssetSubGroup.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['FixedAssetSubGroup.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+             columnClasses="width50percent,width50percent">
+    <s:div id="leftSide">
+
+        <s:decorate id="fixedAssetSubGroupCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetSubGroupCode']}</ui:define>
+            <h:outputText value="#{fixedAssetSubGroup.id.fixedAssetSubGroupCode}"/>
+        </s:decorate>
+
+        <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetGroup']}</ui:define>
+            <app:quickSearch id="quickSearchFixedAssetGroup"
+                             textValue="fixedAssetSubGroup.fixedAssetGroup.groupCode"
+                             value="#{fixedAssetSubGroup.fixedAssetGroup}"
+                             searchField="groupCode"
+                             reRender="fixedAssetSubGroupCodeField, fixedAssetGroupField"
+                             postSearchAction="fixedAssetSubGroupAction.updateCurrentFixedAssetCode()"
+                             rendered="#{!fixedAssetSubGroupAction.managed}"
+                             tabindex="1"/>
+            <app:selectPopUp id="fixedAssetGroup"
+                             required="true"
+                             textValue="#{fixedAssetSubGroup.fixedAssetGroup.fullName}"
+                             value="#{fixedAssetSubGroup.fixedAssetGroup}"
+                             dataModel="#{fixedAssetSubGroupDataModel}"
+                             clearAction="fixedAssetSubGroupAction.clearFixedAssetGroup()"
+                             searchModalPanel="fixedAssetGroupListModalPanel"
+                             reRender="fixedAssetSubGroupCodeField, fixedAssetGroupField"
+                             readOnly="#{fixedAssetSubGroupAction.managed}"
+                             hotKeySelect="alt+1"
+                             tabindex="1"/>
+        </s:decorate>
+
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.description']}</ui:define>
+            <h:inputText id="description"
+                         value="#{fixedAssetSubGroup.description}"
+                         maxlength="100"
+                         styleClass="input"
+                         required="true"
+                         tabindex="8">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="depreciationRateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.depreciationRate']}</ui:define>
+            <h:inputText id="depreciationRate" value="#{fixedAssetSubGroup.depreciationRate}"
+                         styleClass="input right" required="true"
+                         rendered="#{!fixedAssetSubGroupAction.managed}"
+                         tabindex="9">
+                <app:realNumberConverter minimum="0.0" maximum="100.0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="depreciationRate"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetSubGroup.depreciationRate}"
+                          rendered="#{fixedAssetSubGroupAction.managed}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Unit.percentage']}"/>
+        </s:decorate>
+        <s:decorate id="durationField" template="/include/inputField.xhtml" styleClass="formRow right">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.duration']}</ui:define>
+            <h:inputText id="duration" value="#{fixedAssetSubGroup.duration}"
+                         styleClass="input right" required="true"
+                         rendered="#{!fixedAssetSubGroupAction.managed}"
+                         tabindex="10">
+                <app:naturalNumberConverter minimun='0' pattern="#{messages['patterns.integerNumber']}"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetSubGroup.duration}"
+                          rendered="#{fixedAssetSubGroupAction.managed}">
+                <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Unit.month']}"/>
+        </s:decorate>
+        <s:decorate id="rubbishField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.rubbish']}</ui:define>
+            <h:inputText id="rubbish"
+                         value="#{fixedAssetSubGroup.rubbish}"
+                         rendered="#{!fixedAssetSubGroupAction.managed}"
+                         styleClass="input right"
+                         required="true"
+                         tabindex="11">
+                <app:realNumberConverter minimum="1"
+                                         pattern="#{messages['patterns.decimalNumber']}" forId="rubbish"/>
+            </h:inputText>
+            <h:outputText value="#{fixedAssetSubGroup.rubbish}"
+                          rendered="#{fixedAssetSubGroupAction.managed}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            <h:outputText value=" #{messages['Currency.Ufv']}"/>
+        </s:decorate>
+        <s:decorate id="detailField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.detail']}</ui:define>
+            <h:inputTextarea id="detail"
+                             value="#{fixedAssetSubGroup.detail}"
+                             styleClass="input textarea"
+                             tabindex="12">
+                <f:validateLength maximum="250"/>
+            </h:inputTextarea>
+        </s:decorate>
+        <s:decorate id="requirePartsId" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.requireParts']}</ui:define>
+            <h:selectBooleanCheckbox id="requirePartsSelectCheckbox"
+                                     value="#{fixedAssetSubGroup.requireParts}"
+                                     tabindex="13"/>
+        </s:decorate>
+    </s:div>
+    <s:div id="rigthDiv">
+        <s:decorate id="originalValueAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.originalValueAccount']}</ui:define>
+            <app:selectPopUp id="originalValueCashAccount"
+                             required="true"
+                             textValue="#{fixedAssetSubGroup.originalValueCashAccount.fullName}"
+                             value="#{fixedAssetSubGroup.originalValueCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClass('A')"
+                             clearAction="fixedAssetSubGroupAction.clearOriginalValueCashAccount()"
+                             searchModalPanel="originalValueCashAccountListModalPanel"
+                             reRender="originalValueAccountField"
+                             readOnly="#{fixedAssetSubGroupAction.managed}"
+                             hotKeySelect="alt+2"
+                             tabindex="13"/>
+        </s:decorate>
+
+        <s:decorate id="improvementAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.improvementAccount']}</ui:define>
+            <app:selectPopUp id="improvementCashAccount"
+                             textValue="#{fixedAssetSubGroup.improvementCashAccount.fullName}"
+                             value="#{fixedAssetSubGroup.improvementCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClass('A')"
+                             clearAction="fixedAssetSubGroupAction.clearImprovementCashAccount()"
+                             searchModalPanel="improvementCashAccountListModalPanel"
+                             reRender="improvementAccountField"
+                             readOnly="#{fixedAssetSubGroupAction.managed and not empty fixedAssetSubGroup.improvementCashAccount}"
+                             hotKeySelect="alt+3"
+                             tabindex="13"/>
+        </s:decorate>
+
+        <s:decorate id="accumulatedDepreciationAccountField" template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.accumulatedDepreciationAccount']}</ui:define>
+            <app:selectPopUp id="accumulatedDepreciationCashAccount"
+                             required="true"
+                             textValue="#{fixedAssetSubGroup.accumulatedDepreciationCashAccount.fullName}"
+                             value="#{fixedAssetSubGroup.accumulatedDepreciationCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClass('A')"
+                             clearAction="fixedAssetSubGroupAction.clearAccumulatedDepreciationCashAccount()"
+                             searchModalPanel="accumulatedDepreciationCashAccountListModalPanel"
+                             reRender="accumulatedDepreciationAccountField"
+                             readOnly="#{fixedAssetSubGroupAction.managed}"
+                             hotKeySelect="alt+4"
+                             tabindex="13"/>
+        </s:decorate>
+
+        <s:decorate id="warehouseAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.warehouseAccount']}</ui:define>
+            <app:selectPopUp id="warehouseCashAccount"
+                             required="true"
+                             textValue="#{fixedAssetSubGroup.warehouseCashAccount.fullName}"
+                             value="#{fixedAssetSubGroup.warehouseCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClass('A')"
+                             clearAction="fixedAssetSubGroupAction.clearWarehouseCashAccount()"
+                             searchModalPanel="warehouseCashAccountListModalPanel"
+                             reRender="warehouseAccountField"
+                             readOnly="#{fixedAssetSubGroupAction.managed}"
+                             hotKeySelect="alt+5"
+                             tabindex="13"/>
+        </s:decorate>
+
+        <s:decorate id="expenseAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAssetSubGroup.expenseAccount']}</ui:define>
+            <app:selectPopUp id="expenseCashAccount"
+                             required="true"
+                             textValue="#{fixedAssetSubGroup.expenseCashAccount.fullName}"
+                             value="#{fixedAssetSubGroup.expenseCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             selectAction="cashAccountDataModel.searchByAccountClass('G')"
+                             clearAction="fixedAssetSubGroupAction.clearExpenseCashAccount()"
+                             searchModalPanel="expenseCashAccountListModalPanel"
+                             reRender="expenseAccountField"
+                             readOnly="#{fixedAssetSubGroupAction.managed}"
+                             hotKeySelect="alt+6"
+                             tabindex="13"/>
+        </s:decorate>
+    </s:div>
+</h:panelGrid>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{fixedAssetSubGroupAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','CREATE')}"
+                     tabindex="28">
+        <s:defaultAction/>
+    </h:commandButton>
+    <h:commandButton action="#{fixedAssetSubGroupAction.createAndNew}" value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','CREATE')}"
+                     tabindex="29">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetSubGroupAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','UPDATE')}"
+                     tabindex="30"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','DELETE')}"
+                     tabindex="31">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{fixedAssetSubGroupAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="32">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{fixedAssetSubGroupAction.managed and s:hasPermission('FIXEDASSETSUBGROUP','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['FixedAssetSubGroup.delete.confirmation']}">
+                <f:param value="#{fixedAssetSubGroup.id.fixedAssetSubGroupCode}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{fixedAssetSubGroupAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('FIXEDASSETSUBGROUP','DELETE')}"
+                           immediate="true"
+                           styleClass="button"
+                           tabindex="33"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="originalValueCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasFixedAssetsPermission" value="true"/>
+    <ui:param name="containerId" value="originalValueCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="originalValueCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignOriginalValueCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="originalValueAccountField"
+                           oncomplete="Richfaces.hideModalPanel('originalValueCashAccountListModalPanel');"
+                           tabindex="34"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="improvementCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasFixedAssetsPermission" value="true"/>
+    <ui:param name="containerId" value="improvementCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="improvementCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignImprovementCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="improvementAccountField"
+                           oncomplete="Richfaces.hideModalPanel('improvementCashAccountListModalPanel');"
+                           tabindex="35"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="accumulatedDepreciationCashAccountListModalPanelContainer"
+            template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasFixedAssetsPermission" value="true"/>
+    <ui:param name="containerId" value="accumulatedDepreciationCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="accumulatedDepreciationCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignAccumulatedDepreciationCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="accumulatedDepreciationAccountField"
+                           oncomplete="Richfaces.hideModalPanel('accumulatedDepreciationCashAccountListModalPanel');"
+                           tabindex="36"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="warehouseCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasFixedAssetsPermission" value="true"/>
+    <ui:param name="containerId" value="warehouseCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="warehouseCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignWarehouseCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="warehouseAccountField"
+                           oncomplete="Richfaces.hideModalPanel('warehouseCashAccountListModalPanel');"
+                           tabindex="37"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="expenseCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasFixedAssetsPermission" value="true"/>
+    <ui:param name="containerId" value="expenseCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="expenseCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignExpenseCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="expenseAccountField"
+                           oncomplete="Richfaces.hideModalPanel('expenseCashAccountListModalPanel');"
+                           tabindex="38"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="fixedAssetGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetGroupListModalPanel.xhtml"
+            rendered="#{not fixedAssetSubGroupAction.managed}">
+    <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetSubGroupAction.assignFixedAssetGroup(fixedAssetGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetSubGroupCodeField, fixedAssetGroupField"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<rich:jQuery selector="#fixedAssetSubGroupCode" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

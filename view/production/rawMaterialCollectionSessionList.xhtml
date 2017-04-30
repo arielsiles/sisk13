@@ -1,0 +1,216 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['RawMaterialCollectionSession.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="rawMaterialCollectionSessionSearch">
+            <rich:simpleTogglePanel label="#{messages['RawMaterialCollectionSession.search']}" switchType="client">
+                <h:panelGrid columns="3" width="100%" columnClasses="top-aligned">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.startDate']}</ui:define>
+                            <rich:calendar value="#{rawMaterialCollectionSessionDataModel.privateCriteria.startDate}"
+                                           tabindex="1" styleClass="input">
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.endDate']}</ui:define>
+                            <rich:calendar value="#{rawMaterialCollectionSessionDataModel.privateCriteria.endDate}"
+                                           tabindex="2" styleClass="input">
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.state']}</ui:define>
+                            <h:selectOneMenu id="state"
+                                             value="#{rawMaterialCollectionSessionDataModel.privateCriteria.state}"
+                                             styleClass="inputMedium"
+                                             tabindex="3">
+                                <s:selectItems value="#{productionCollentionStateEnum}"
+                                               var="element"
+                                               label="#{messages[element.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.productiveZoneName']}</ui:define>
+                            <h:inputText value="#{rawMaterialCollectionSessionDataModel.criteria.productiveZone.name}"
+                                         maxlength="50" tabindex="4" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.productiveZoneGroup']}</ui:define>
+                            <h:inputText value="#{rawMaterialCollectionSessionDataModel.criteria.productiveZone.group}"
+                                         maxlength="50" tabindex="5" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.productiveZoneNumber']}</ui:define>
+                            <h:inputText value="#{rawMaterialCollectionSessionDataModel.criteria.productiveZone.number}"
+                                         maxlength="50" tabindex="6" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.rawMaterialProducerFirstName']}</ui:define>
+                            <h:inputText
+                                    value="#{rawMaterialCollectionSessionDataModel.privateCriteria.rawMaterialProducer.firstName}"
+                                    maxlength="50" tabindex="7" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.rawMaterialProducerLastName']}</ui:define>
+                            <h:inputText
+                                    value="#{rawMaterialCollectionSessionDataModel.privateCriteria.rawMaterialProducer.lastName}"
+                                    maxlength="50" tabindex="8" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['RawMaterialCollectionSession.rawMaterialProducerMaidenName']}</ui:define>
+                            <h:inputText
+                                    value="#{rawMaterialCollectionSessionDataModel.privateCriteria.rawMaterialProducer.maidenName}"
+                                    maxlength="50" tabindex="9" styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton action="#{rawMaterialCollectionSessionDataModel.search}"
+                                               reRender="rawMaterialCollectionSessionList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="10">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" action="#{rawMaterialCollectionSessionAction.startCreate}"
+                          styleClass="button"
+                          />
+            </div>
+
+            <rich:dataTable value="#{rawMaterialCollectionSessionDataModel}" var="rawMaterialCollectionSessionItem"
+                            id="rawMaterialCollectionSessionList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.date"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList, dataScroller">
+                                #{messages['RawMaterialCollectionSession.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.metaProduct.name"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList, dataScroller">
+                                #{messages['RawMaterialCollectionSession.rawMaterial']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.productiveZone.name"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList,dataScroller">
+                                #{messages['RawMaterialCollectionSession.productiveZoneName']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.productiveZone.number"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList,dataScroller">
+                                #{messages['RawMaterialCollectionSession.productiveZoneNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.productiveZone.group"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList,dataScroller">
+                                #{messages['RawMaterialCollectionSession.productiveZoneGroup']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialCollectionSession.state"
+                                                   dataModel="#{rawMaterialCollectionSessionDataModel}"
+                                                   reRender="rawMaterialCollectionSessionList,dataScroller">
+                                #{messages['RawMaterialCollectionSession.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{rawMaterialCollectionSessionItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialCollectionSessionItem.metaProduct.fullNameRawMaterial}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialCollectionSessionItem.productiveZone.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialCollectionSessionItem.productiveZone.number}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{rawMaterialCollectionSessionItem.productiveZone.group}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{rawMaterialCollectionSessionItem.state == 'PENDING'
+                            ? messages['RawMaterialCollectionSession.state.pending']
+                            : messages['RawMaterialCollectionSession.state.approved']}"
+                    />
+
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{rawMaterialCollectionSessionAction.select(rawMaterialCollectionSessionItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="rawMaterialCollectionSessionList"
+                              dataModel="#{rawMaterialCollectionSessionDataModel}"/>
+
+            <rich:jQuery selector="#rawMaterialCollectionSessionList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#rawMaterialCollectionSessionList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" action="#{rawMaterialCollectionSessionAction.startCreate}"
+                          styleClass="button"
+                          />
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

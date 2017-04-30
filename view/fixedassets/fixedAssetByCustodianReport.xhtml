@@ -1,0 +1,262 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['FixedAssetByCustodianReport.report.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="80%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetByCustodianReportForm">
+
+    <rich:panel>
+        <f:facet name="header">
+            #{messages['FixedAssetByCustodianReport.report.title']}
+        </f:facet>
+        <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.custodian']}</ui:define>
+            <h:inputText styleClass="input" readonly="true"
+                         value="#{fixedAssetByCustodianReportAction.employee.fullName}" tabindex="1"/>
+            <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="2"
+                             title="#{messages['FixedAsset.selectEmployee']}"
+                             reRender="employeeField"
+                             onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true" tabindex="3"
+                             title="#{messages['Common.clear']}"
+                             action="#{fixedAssetByCustodianReportAction.clearEmployee}"
+                             reRender="employeeField">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+        <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.executorUnit']}</ui:define>
+            <app:quickSearch id="businessUnitQuickSearch"
+                             textValue="fixedAssetByCustodianReportAction.businessUnit.executorUnitCode"
+                             value="#{fixedAssetByCustodianReportAction.businessUnit}"
+                             searchField="executorUnitCode"
+                             reRender="executorUnitField"
+                             tabindex="4">
+            </app:quickSearch>
+            <h:selectOneMenu id="executorUnit"
+                             value="#{fixedAssetByCustodianReportAction.businessUnit}"
+                             styleClass="inputMedium"
+                             tabindex="4">
+                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                               label="#{businessUnit.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="executorUnitField"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.costCenter']}</ui:define>
+            <app:quickSearch id="quickSearchCostCenterField"
+                             textValue="fixedAssetByCustodianReportAction.costCenter.code"
+                             value="#{fixedAssetByCustodianReportAction.costCenter}"
+                             searchField="code"
+                             reRender="costCenterField"
+                             tabindex="5"/>
+            <app:selectPopUp id="costCenter"
+                             textValue="#{fixedAssetByCustodianReportAction.costCenter.fullName}"
+                             value="#{fixedAssetByCustodianReportAction.costCenter}"
+                             clearAction="fixedAssetByCustodianReportAction.clearCostCenter()"
+                             searchModalPanel="costCenterListModalPanel"
+                             dataModel="#{costCenterDataModel}"
+                             reRender="costCenterField"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+
+
+        <s:div id="fixedAssetGroupDiv">
+            <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Fixedassets.report.fixedAssetGroup']}</ui:define>
+                <app:quickSearch id="quickSearchFixedAssetGroup"
+                                 textValue="fixedAssetByCustodianReportAction.fixedAssetGroup.groupCode"
+                                 value="#{fixedAssetByCustodianReportAction.fixedAssetGroup}"
+                                 searchField="groupCode"
+                                 reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv"
+                                 tabindex="7"/>
+                <app:selectPopUp id="fixedAssetGroup"
+                                 textValue="#{fixedAssetByCustodianReportAction.fixedAssetGroup.fullName}"
+                                 value="#{fixedAssetByCustodianReportAction.fixedAssetGroup}"
+                                 dataModel="#{fixedAssetGroupDataModel}"
+                                 clearAction="fixedAssetByCustodianReportAction.clearFixedAssetGroup()"
+                                 searchModalPanel="fixedAssetGroupListModalPanel"
+                                 reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel"
+                                 hotKeySelect="alt+2"/>
+            </s:decorate>
+        </s:div>
+        <s:div id="fixedAssetSubGroupDiv">
+            <s:decorate id="fixedAssetSubGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.fixedAssetSubGroup']}</ui:define>
+                <app:quickSearch id="quickSearchFixedAssetSubGroup"
+                                 textValue="fixedAssetByCustodianReportAction.fixedAssetSubGroup.fixedAssetSubGroupCode"
+                                 value="#{fixedAssetByCustodianReportAction.fixedAssetSubGroup}"
+                                 searchField="fixedAssetSubGroupCode"
+                                 alias="fixedAssetSubGroup"
+                                 reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                 tabindex="8">
+                    <ui:define name="restrictions">
+                        <app:restriction
+                                condition="fixedAssetSubGroup.fixedAssetGroup = #{fixedAssetByCustodianReportAction.fixedAssetGroup}"/>
+                    </ui:define>
+                </app:quickSearch>
+                <app:selectPopUp id="fixedAssetSubGroup"
+                                 textValue="#{fixedAssetByCustodianReportAction.fixedAssetSubGroup.fullName}"
+                                 value="#{fixedAssetByCustodianReportAction.fixedAssetSubGroup}"
+                                 dataModel="#{fixedAssetSubGroupDataModel}"
+                                 clearAction="fixedAssetByCustodianReportAction.clearFixedAssetSubGroup()"
+                                 searchModalPanel="fixedAssetSubGroupListModalPanel"
+                                 reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                                 hotKeySelect="alt+3">
+                </app:selectPopUp>
+
+            </s:decorate>
+        </s:div>
+
+        <s:decorate id="fixedAssetLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['FixedAsset.location']}"/>
+            </ui:define>
+            <h:selectOneMenu id="fixedAssetLocation"
+                             value="#{fixedAssetByCustodianReportAction.fixedAssetLocation}"
+                             styleClass="input"
+                             tabindex="9">
+                <s:selectItems value="#{fixedAssetLocationList}"
+                               var="fixedAssetLocation"
+                               label="#{fixedAssetLocation.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="fixedAssetCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Fixedassets.report.fixedAssetCode']}</ui:define>
+            <h:inputText id="fixedAssetCode"
+                         value="#{fixedAssetByCustodianReportAction.fixedAssetCode}"
+                         styleClass="inputNumber"
+                         tabindex="10">
+                <f:convertNumber/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Fixedassets.report.barCode']}</ui:define>
+            <app:inputBarcode id="barCode"
+                              value="#{fixedAssetByCustodianReportAction.barCode}"
+                              maxlength="250"
+                              styleClass="input"
+                              tabindex="11"/>
+        </s:decorate>
+        <s:decorate id="initRevisionDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define
+                    name="label">#{messages['FixedAssetByCustodianReport.report.registrationDate']}
+            </ui:define>
+            <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+            <rich:calendar id="initRegistrationDate"
+                           value="#{fixedAssetByCustodianReportAction.initRegistrationDate}"
+                           datePattern="#{messages['patterns.date']}"
+                           enableManualInput="true"
+                           styleClass="input1"
+                           tabindex="12">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+            <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+            <rich:calendar id="endRegistrationDate"
+                           value="#{fixedAssetByCustodianReportAction.endRegistrationDate}"
+                           datePattern="#{messages['patterns.date']}"
+                           enableManualInput="true"
+                           styleClass="input1"
+                           tabindex="13">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+                <app:dateRangeValidator forId="initRegistrationDate"
+                                        forLabel="#{messages['Fixedassets.report.registrationDate']}"
+                                        type="greater"/>
+            </rich:calendar>
+        </s:decorate>
+    </rich:panel>
+    <app:reportDefaultOptions reportAction="#{fixedAssetByCustodianReportAction}"
+                              showPageFormat="false"
+                              showReportTitle="false" tabIndex="14"/>
+
+    <div class="buttons">
+        <h:commandButton action="#{fixedAssetByCustodianReportAction.generateReport}"
+                         styleClass="button" tabindex="15"
+                         value="#{messages['Common.generate']}" id="searchButtonId">
+            <s:defaultAction/>
+        </h:commandButton>
+    </div>
+    <rich:jQuery selector="#selectEmployee" query="focus()" timing="onload"/>
+
+</h:form>
+<s:decorate id="generalEmployeeListModalPanelContainer"
+            template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetByCustodianReportAction.setEmployee(employeeItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           ajaxSingle="true"
+                           reRender="employeeField"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetByCustodianReportAction.setCostCenter(costCenterItem)}"
+                           image="/img/active.gif" styleClass="select-image" immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="fixedAssetGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetByCustodianReportAction.setFixedAssetGroup(fixedAssetGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetGroupDiv, fixedAssetSubGroupDiv, fixedAssetSubGroupListModalPanel "
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="fixedAssetSubGroupListModalPanelContainer"
+            template="/fixedassets/fixedAssetSubGroupListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSubGroupListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetByCustodianReportAction.setFixedAssetSubGroup(fixedAssetSubGroupItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="fixedAssetSubGroupDiv, fixedAssetGroupDiv"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>
+
+

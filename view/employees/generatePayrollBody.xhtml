@@ -1,0 +1,137 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <h:form id="gestionPayrollForm">
+        <div class="buttons">
+            <h:commandButton action="#{gestionPayrollAction.generatePayroll()}" value="Generar Planilla"
+                             styleClass="button"
+                             onclick="Richfaces.showModalPanel('progressModalPanel');"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton action="#{gestionPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="2">
+            </h:commandButton>
+
+        </div>
+        <rich:panel id="gestionPayrollPane">
+            <f:facet name="header">
+                #{messages['GestionPayroll.gestionPayrollTitle']}
+            </f:facet>
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="gestionName" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['GestionPayroll.gestionName']}</ui:define>
+                        <h:outputText id="gestionName" value="#{gestionPayroll.gestionName}"/>
+
+                    </s:decorate>
+                    <s:decorate id="yearField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Gestion.year']}</ui:define>
+                        <h:outputText id="year" value="#{gestionPayroll.gestion.year}">
+                            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{gestionPayroll.salaryType}">
+                        <ui:define name="label">#{messages['GestionPayroll.month']}</ui:define>
+                        <h:outputText id="month" value="#{messages[gestionPayroll.month.resourceKey]}"/>
+                    </s:decorate>
+                    <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{gestionPayroll.salaryType}">
+                        <ui:define name="label">#{messages['GestionPayroll.initDate']}</ui:define>
+                        <h:outputText id="initDate" value="#{gestionPayroll.initDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{gestionPayroll.salaryType}">
+                        <ui:define name="label">#{messages['GestionPayroll.endDate']}</ui:define>
+                        <h:outputText id="endDate" value="#{gestionPayroll.endDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Sede.sede']}</ui:define>
+                        <h:outputText id="businessUnit" value="#{gestionPayroll.businessUnit.organization.name}"
+                                      styleClass="output"/>
+                    </s:decorate>
+                    <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['GestionPayroll.jobCategory']}</ui:define>
+                        <h:outputText id="jobCategory" value="#{gestionPayroll.jobCategory.name}"
+                                      styleClass="output"/>
+                    </s:decorate>
+
+                    <s:decorate id="gestionRateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+                        <h:outputText id="gestionrate" value="#{gestionPayroll.exchangeRate.rate}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+                        </h:outputText>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:panel>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                #{messages['GeneratePayroll.generatePayroll']}
+            </f:facet>
+            <s:decorate id="generatedPayrollNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GeneratedPayroll.name']}</ui:define>
+                <h:inputText id="nameField" value="#{gestionPayrollAction.generatedPayroll.name}"
+                             styleClass="input" required="true"
+                             maxlength="150"
+                             tabindex="3">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ExchangeRate.rate']}</ui:define>
+                <h:inputText id="rate"
+                             value="#{gestionPayrollAction.generatedPayroll.exchangeRate.rate}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="4">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rate"/>
+                </h:inputText>
+            </s:decorate>
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{gestionPayrollAction.generatePayroll}" value="Generar Planilla"
+                             styleClass="button"
+                             onclick="Richfaces.showModalPanel('progressModalPanel');"
+                             tabindex="5">
+                <s:defaultAction/>
+            </h:commandButton>
+            <h:commandButton action="#{gestionPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="6">
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+        <ui:param name="dialogId" value="progressModalPanel"/>
+        <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+        <ui:define name="progressTitle">#{messages['GeneralPayroll.generatingPayrollTitle']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['GeneralPayroll.generatingPayrollMessage']}"/>
+            </p>
+        </ui:define>
+    </s:decorate>
+
+    <rich:jQuery selector="#nameField" query="focus()" timing="onload"/>
+
+</ui:composition>

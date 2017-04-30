@@ -1,0 +1,655 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{warehousePurchaseOrderAction.managed}">
+            #{messages['WarehousePurchaseOrder.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['WarehousePurchaseOrder.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="isEmptyWarehousePurchaseOrder" value="#{warehousePurchaseOrderAction.warehousePurchaseOrderEmpty}"/>
+<c:set var="isPurchaseOrderPending" value="#{warehousePurchaseOrderAction.purchaseOrderPending}"/>
+<c:set var="isPurchaseOrderApproved" value="#{warehousePurchaseOrderAction.purchaseOrderApproved}"/>
+<c:set var="isPurchaseOrderFinalized" value="#{warehousePurchaseOrderAction.purchaseOrderFinalized}"/>
+<c:set var="isPurchaseOrderLiquidated" value="#{warehousePurchaseOrderAction.purchaseOrderLiquidated}"/>
+<c:set var="isPurchaseOrderNullified" value="#{warehousePurchaseOrderAction.purchaseOrderNullified}"/>
+<c:set var="selectPetitionerJobContractButtonId" value="select_link_petitionerJobContract"/>
+
+<h:form id="warehousePurchaseOrderForm">
+<div class="buttons">
+    <h:commandButton id="generateReportButtonId"
+                     action="#{warehousePurchaseOrderPrintAction.generateReport(warehousePurchaseOrder)}"
+                     value="#{messages['Warehouse.purchaseOrder.report.generateReport']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}"
+                     immediate="true"/>
+
+    <h:commandButton action="#{discountCommentAction.addWarehousePurchaseOrderDiscountComment}"
+                     value="#{messages['DiscountComment.newDiscountComment']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and !warehousePurchaseOrderAction.instance.annulled
+                      and s:hasPermission('DISCOUNTCOMMENT','CREATE')}"
+                     immediate="true"/>
+
+    <h:commandButton id="newAdvancePaymentId"
+                     action="#{warehouseAdvancePaymentAction.addAdvancePayment}"
+                     value="#{messages['WarehousePurchaseOrder.addAdvancePayment']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('ADVANCEPAYMENT','CREATE')}"
+                     immediate="true"/>
+
+    <h:commandButton id="newWarehousePurchaseOrderDetailId"
+                     action="#{warehousePurchaseOrderDetailAction.addWarehousePurchaseOrderDetail}"
+                     value="#{messages['PurchaseOrder.newPurchaseOrderDetail']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}"
+                     immediate="true"/>
+
+    <h:commandButton action="#{warehousePurchaseDocumentAction.addPurchaseDocument}"
+                     value="#{messages['PurchaseDocument.button.add']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and !isPurchaseOrderNullified and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
+                     immediate="true"/>
+
+    <h:commandButton id="createButtonId"
+                     action="#{warehousePurchaseOrderAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDER','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.finalizeWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.finalize']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderApproved and s:hasPermission('WAREHOUSEPURCHASEORDERFINALIZE','VIEW')}"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.liquidateWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.liquidate']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('WAREHOUSEPURCHASEORDERLIQUIDATE','VIEW')}"/>
+
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.approveWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.approve']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERAPPROVE','VIEW')}"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.nullifyWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.nullify']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{warehousePurchaseOrderAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDER','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.specialUpdate}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{(warehousePurchaseOrderAction.purchaseOrderFinalized or warehousePurchaseOrderAction.purchaseOrderLiquidated) and s:hasPermission('SPECIALUPDATEPURCHASEORDER','VIEW')}"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{warehousePurchaseOrderAction.managed}">
+                #{messages['WarehousePurchaseOrder.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['WarehousePurchaseOrder.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <c:choose>
+        <c:when test="#{warehousePurchaseOrderAction.managed}">
+            <ui:include src="warehousePurchaseOrderForm.xhtml"/>
+        </c:when>
+        <c:otherwise>
+            <app:fieldset id="purchaseOrderFields" title="#{messages['WarehousePurchaseOrder.title']}">
+                <ui:include src="warehousePurchaseOrderForm.xhtml"/>
+            </app:fieldset>
+            <app:fieldset id="purchaseOrderDetails" title="#{messages['WarehousePurchaseOrderDetail.title']}">
+                <ui:include src="warehousePurchaseOrderDetailListCreateForm.xhtml"/>
+            </app:fieldset>
+        </c:otherwise>
+    </c:choose>
+
+    <c:if test="#{warehousePurchaseOrderAction.purchaseOrderFinalized and warehousePurchaseOrderAction.hasBalanceAmount()}">
+        <ui:include src="/purchases/purchaseOrderLiquidationPayment.xhtml">
+            <ui:param name="mainAction" value="#{warehousePurchaseOrderAction}"/>
+            <ui:param name="purchaseOrder" value="#{warehousePurchaseOrderAction.purchaseOrder}"/>
+        </ui:include>
+    </c:if>
+
+</rich:panel>
+
+<div class="buttons">
+
+    <h:commandButton action="#{warehousePurchaseOrderPrintAction.generateReport(warehousePurchaseOrder)}"
+                     value="#{messages['Warehouse.purchaseOrder.report.generateReport']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}"
+                     immediate="true"
+                     tabindex="30"/>
+
+    <h:commandButton action="#{discountCommentAction.addWarehousePurchaseOrderDiscountComment}"
+                     value="#{messages['DiscountComment.newDiscountComment']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and !warehousePurchaseOrderAction.instance.annulled
+                      and s:hasPermission('DISCOUNTCOMMENT','CREATE')}"
+                     tabindex="31"
+                     immediate="true"/>
+
+    <h:commandButton action="#{warehouseAdvancePaymentAction.addAdvancePayment}"
+                     value="#{messages['WarehousePurchaseOrder.addAdvancePayment']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('ADVANCEPAYMENT','CREATE')}"
+                     tabindex="33"
+                     immediate="true"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderDetailAction.addWarehousePurchaseOrderDetail}"
+                     value="#{messages['PurchaseOrder.newPurchaseOrderDetail']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERDETAIL','CREATE')}"
+                     tabindex="34"
+                     immediate="true"/>
+
+    <h:commandButton action="#{warehousePurchaseDocumentAction.addPurchaseDocument}"
+                     value="#{messages['PurchaseDocument.button.add']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and !isPurchaseOrderNullified and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
+                     tabindex="34"
+                     immediate="true"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehousePurchaseOrderAction.managed and s:hasPermission('WAREHOUSEPURCHASEORDER','CREATE')}"
+                     tabindex="31"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.finalizeWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.finalize']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderApproved and s:hasPermission('WAREHOUSEPURCHASEORDERFINALIZE','VIEW')}"
+                     tabindex="32"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.liquidateWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.liquidate']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('WAREHOUSEPURCHASEORDERLIQUIDATE','VIEW')}"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.approveWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.approve']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERAPPROVE','VIEW')}"
+                     tabindex="35"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.nullifyWarehousePurchaseOrder}"
+                     value="#{messages['PurchaseOrder.nullify']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"
+                     tabindex="36"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDER','UPDATE')}"
+                     tabindex="37"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.specialUpdate}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{(warehousePurchaseOrderAction.purchaseOrderFinalized or warehousePurchaseOrderAction.purchaseOrderLiquidated) and s:hasPermission('SPECIALUPDATEPURCHASEORDER','VIEW')}"/>
+
+    <h:commandButton action="#{warehousePurchaseOrderAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="38"/>
+</div>
+
+<c:if test="#{warehousePurchaseOrderAction.managed}">
+<rich:tabPanel switchType="ajax" selectedTab="#{warehousePurchaseOrderAction.activeTabName}">
+<rich:tab name="warehousePurchaseOrderTab"
+          label="#{messages['WarehousePurchaseOrderDetail.tab']}"
+          action="#{warehousePurchaseOrderAction.enablePurchaseOrderDetailTab}"
+          ajaxSingle="true" immediate="true">
+    <rich:dataTable value="#{warehousePurchaseOrderDetailDataModel}"
+                    var="warehousePurchaseOrderDetailItem"
+                    id="warehousePurchaseOrderDetailList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%" columnsWidth="10%, 35%, 15%, 15%, 15%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <h:outputText value="#{messages['WarehousePurchaseOrderDetail.detailNumber']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['WarehousePurchaseOrderDetail.productItem']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['WarehousePurchaseOrderDetail.requestedQuantity']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['WarehousePurchaseOrderDetail.unitCost']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['WarehousePurchaseOrderDetail.totalAmount']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{warehousePurchaseOrderDetailItem.detailNumber}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{warehousePurchaseOrderDetailItem.productItem.fullName}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{warehousePurchaseOrderDetailItem.requestedQuantity}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            &#160;
+            <h:outputFormat value="#{messages['Common.parenthesis']}">
+                <f:param value="#{warehousePurchaseOrderDetailItem.purchaseMeasureUnit.name}"/>
+            </h:outputFormat>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{warehousePurchaseOrderDetailItem.unitCost}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{warehousePurchaseOrderDetailItem.totalAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{warehousePurchaseOrderDetailAction.select(warehousePurchaseOrderDetailItem)}"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller"
+                      for="warehousePurchaseOrderDetailList"
+                      dataModel="#{warehousePurchaseOrderDetailDataModel}"/>
+</rich:tab>
+<rich:tab name="purchaseOrderPaymentTab"
+          action="#{warehousePurchaseOrderAction.enablePurchaseOrderPaymentTab}"
+          rendered="#{(warehousePurchaseOrderAction.purchaseOrderFinalized or warehousePurchaseOrderAction.purchaseOrderLiquidated) and s:hasPermission('ADVANCEPAYMENT','VIEW')}"
+          label="#{messages['PurchaseOrderPayment.tab']}" ajaxSingle="true" immediate="true">
+    <rich:dataTable value="#{warehousePurchaseOrderPaymentDataModel}"
+                    var="purchaseOrderPaymentItem"
+                    id="purchaseOrderPaymentList"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="15%, 15%, 15%, 20%,15%, 10%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.paymentType']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.creationDate']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.payAmount']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.bankAccount']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.purchaseOrderPaymentKind']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseOrderPayment.state']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{messages[purchaseOrderPaymentItem.paymentType.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{purchaseOrderPaymentItem.creationDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{purchaseOrderPaymentItem.payAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+            (
+            <h:outputText value="#{messages[purchaseOrderPaymentItem.payCurrency.symbolResourceKey]}"/>
+            )
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{purchaseOrderPaymentItem.bankAccount.description}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[purchaseOrderPaymentItem.purchaseOrderPaymentKind.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[purchaseOrderPaymentItem.state.resourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="center">
+            <!--<c:set var="isEnabledToRemake"
+                   value="#{warehouseAdvancePaymentAction.checkIsEnabledToRemake(purchaseOrderPaymentItem) and s:hasPermission('REMAKEPURCHASEORDERPAYMENT','VIEW')}"/>-->
+            <c:set var="isEnabledToRemake"
+                   value="#{s:hasPermission('REMAKEPURCHASEORDERPAYMENT','VIEW')}"/>
+
+            <h:commandLink immediate="true"
+                           action="#{warehouseAdvancePaymentAction.selectToRemake(purchaseOrderPaymentItem)}"
+                           rendered="#{isEnabledToRemake}">
+                <h:graphicImage value="/img/tournicoti.gif"
+                                styleClass="select-image-middle"
+                                alt="#{messages['PurchaseOrderPayment.remake']}"
+                                title="#{messages['PurchaseOrderPayment.remake']}"/>
+            </h:commandLink>
+
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           action="#{warehouseAdvancePaymentAction.select(purchaseOrderPaymentItem)}"
+                           rendered="#{not isEnabledToRemake}"/>
+
+            <h:commandLink action="#{warehousePurchaseOrderAction.generateVoucherReport(purchaseOrderPaymentItem)}"
+                           immediate="true">
+                <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                title="#{messages['WarehouseVoucher.button.generateDocument']}"/>
+            </h:commandLink>
+
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="purchaseOrderPaymentDataScroller"
+                      for="purchaseOrderPaymentList"
+                      dataModel="#{warehousePurchaseOrderPaymentDataModel}"/>
+</rich:tab>
+
+<rich:tab name="purchaseDocumentTab"
+          label="#{messages['PurchaseDocument.tab.title']}"
+          ajaxSingle="true"
+          rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}">
+    <rich:dataTable id="purchaseDocumentListId"
+                    value="#{warehousePurchaseDocumentDataModel}"
+                    var="purchaseDocumentItem"
+                    rows="#{sessionUser.rowsPerPage}"
+                    width="100%"
+                    columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.transactionNumber']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.documentType']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.invoiceNumber']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.name']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.date']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.state']}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{messages['PurchaseDocument.amount']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['Common.action']}"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{purchaseDocumentItem.transactionNumber}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[purchaseDocumentItem.type.resourceKey]}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{purchaseDocumentItem.number}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{purchaseDocumentItem.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{purchaseDocumentItem.date}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{messages[purchaseDocumentItem.state.resourceKey]}"/>
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{purchaseDocumentItem.amount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="center">
+            <h:commandLink value="#{messages['Common.select']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}"
+                           action="#{warehousePurchaseDocumentAction.select(purchaseDocumentItem)}"/>
+        </rich:column>
+    </rich:dataTable>
+    <app:dataScroller id="purchaseDocumentListDataScrollerId"
+                      for="purchaseDocumentListId"
+                      dataModel="#{warehousePurchaseDocumentDataModel}"/>
+</rich:tab>
+<rich:tab name="discountCommentTab"
+          rendered="#{s:hasPermission('DISCOUNTCOMMENT','VIEW')}"
+          label="#{messages['DiscountComment.tab']}" ajaxSingle="true">
+    <ui:include src="/finances/discountCommentListFragment.xhtml">
+        <ui:param name="dataModel" value="#{discountCommentDataModel}"/>
+        <ui:param name="searchByWarehousePurchaseOrder" value="true"/>
+    </ui:include>
+</rich:tab>
+</rich:tabPanel>
+</c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{warehousePurchaseOrderAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['WarehousePurchaseOrder.delete.confirmation']}">
+                <f:param value="#{warehousePurchaseOrder.orderNumber}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{warehousePurchaseOrderAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+    <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+    <ui:param name="dialogId" value="warehouseListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderAction.assignWarehouse(warehouseItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="warehouseField"
+                           oncomplete="Richfaces.hideModalPanel('warehouseListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="costCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="costCenterField"
+                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="financeProviderModalPanelContainer"
+            template="/finances/financeProviderModalPanel.xhtml">
+    <ui:param name="containerId" value="financeProviderModalPanelContainer"/>
+    <ui:param name="dialogId" value="financeProviderModalPanel"/>
+    <ui:param name="reRender" value="providerField, purchaseOrderDetailsPanel"/>
+    <ui:param name="postCreateAction"
+              value="warehousePurchaseOrderAction.assignProvider(financeProviderAction.instance)"/>
+    <ui:param name="postUpdateAction"
+              value="warehousePurchaseOrderAction.assignProvider(financeProviderAction.instance)"/>
+</s:decorate>
+
+<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderAction.assignProvider(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="providerField, purchaseOrderDetailsPanel"
+                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="jobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:param name="dialogId" value="jobContractListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderAction.assignPetitionerJobContract(jobContractItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="petitionerJobContractField, jobContractDiv, warehouseField, receptionPlacePanel"
+                           oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="productItemsByProviderListModalPanelContainer"
+            template="/warehouse/productItemsByProviderListModalPanel.xhtml">
+    <ui:param name="containerId" value="productItemsByProviderListModalPanelContainer"/>
+    <ui:param name="dialogId" value="productItemsByProviderListModalPanel"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{warehousePurchaseOrderDetailListCreateAction.addProductItems(provideSearchDataModel.selectedProductItems)}"
+                           value="#{messages['Common.add']}"
+                           reRender="purchaseOrderDetailsPanel"
+                           styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('productItemsByProviderListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="purchaseOrderWithCheckListModalPanelContainer"
+            template="/warehouse/warehousePurchaseOrderListModalPanel.xhtml">
+    <ui:param name="containerId" value="purchaseOrderWithCheckListModalPanelContainer"/>
+    <ui:param name="dialogId" value="purchaseOrderWithCheckListModalPanel"/>
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
+                           immediate="true"
+                           ajaxSingle="true"
+                           action="#{warehousePurchaseOrderAction.addPurchaseOrder(purchaseOrderWithCheckSearchDataModel.selectedPurchaseOrders)}"
+                           value="#{messages['Common.add']}"
+                           reRender="globalDiv,observation,paymentDescriptionField"
+                           styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('purchaseOrderWithCheckListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="accountType" value="A"/>
+    <ui:param name="accountClass" value="A"/>
+    <ui:param name="hasPayableAccountsPermission" value="true"/>
+    <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{liquidationPaymentAction.assignCashBoxCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel, payAmountField, payCurrencyField"
+                           oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:div id="rotatoryFundListModalPanelDiv">
+    <s:decorate id="rotatoryFundListModalPanelContainer"
+                template="/finances/rotatoryFundListModalPanel.xhtml"
+                rendered="#{warehousePurchaseOrderAction.purchaseOrderFinalized and warehousePurchaseOrderAction.hasBalanceAmount() and liquidationPaymentAction.rotatoryFundPayment}">
+        <ui:param name="containerId" value="rotatoryFundListModalPanelContainer"/>
+        <ui:param name="dialogId" value="rotatoryFundListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{liquidationPaymentAction.assignRotatoryFund(rotatoryFundItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="rotatoryFundDiv"
+                               oncomplete="Richfaces.hideModalPanel('rotatoryFundListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
+
+<c:if test="#{not functionAction.hasSeverityErrorMessages and not warehousePurchaseOrderAction.managed}">
+    <script type="text/javascript">
+        document.getElementById('#{rich:clientId(selectPetitionerJobContractButtonId)}').onclick();
+    </script>
+</c:if>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#invoiceNumber"
+             query="focus()"
+             timing="onload"
+             rendered="#{warehousePurchaseOrderAction.managed}"/>
+</ui:define>
+</ui:composition>

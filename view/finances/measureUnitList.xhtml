@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['MeasureUnit.list']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="measureUnitSearch">
+            <rich:simpleTogglePanel label="#{messages['MeasureUnit.search']}" switchType="client">
+                <s:decorate id="measureUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MeasureUnit.measureUnitCode']}</ui:define>
+                    <h:inputText id="measureUnitCode" value="#{measureUnitDataModel.criteria.measureUnitCode}"
+                                 maxlength="6" tabindex="1" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MeasureUnit.name']}</ui:define>
+                    <h:inputText id="name" value="#{measureUnitDataModel.criteria.name}"
+                                 maxlength="150" tabindex="2" styleClass="input"/>
+                    <a4j:commandButton action="#{measureUnitDataModel.search}"
+                                       reRender="measureUnitList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#measureUnitCode" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/measureUnit.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('MEASUREUNIT','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{measureUnitDataModel}" var="measureUnitItem" id="measureUnitList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="25%, 35%, 30%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="measureUnit.measureUnitCode"
+                                                   dataModel="#{measureUnitDataModel}"
+                                                   reRender="measureUnitList, dataScroller">
+                                #{messages['MeasureUnit.measureUnitCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="measureUnit.name"
+                                                   dataModel="#{measureUnitDataModel}"
+                                                   reRender="measureUnitList, dataScroller">
+                                #{messages['MeasureUnit.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="measureUnit.description"
+                                                   dataModel="#{measureUnitDataModel}"
+                                                   reRender="measureUnitList, dataScroller">
+                                #{messages['MeasureUnit.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{measureUnitItem.measureUnitCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{measureUnitItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputLabel value="#{measureUnitItem.description}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{measureUnitAction.select(measureUnitItem)}"
+                                   rendered="#{s:hasPermission('MEASUREUNIT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="measureUnitList" dataModel="#{measureUnitDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/measureUnit.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('MEASUREUNIT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

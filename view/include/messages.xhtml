@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.com/products/seam/taglib">
+    <div>
+        <rich:messages globalOnly="true" styleClass="message" errorClass="messageError" infoClass="messageInfo"
+                       warnClass="messageWarm">
+            <f:facet name="errorMarker">
+                <h:graphicImage value="/img/errorIcon.gif"/>
+            </f:facet>
+            <f:facet name="infoMarker">
+                <h:graphicImage value="/img/infoIcon.gif"/>
+            </f:facet>
+            <f:facet name="warnMarker">
+                <h:graphicImage value="/img/warnIcon.gif"/>
+            </f:facet>
+        </rich:messages>
+        <br/>
+    </div>
+</ui:composition>
+
+
+
+

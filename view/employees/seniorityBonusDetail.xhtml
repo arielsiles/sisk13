@@ -1,0 +1,173 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{seniorityBonusDetailAction.managed}">
+                #{messages['SeniorityBonusDetail.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['SeniorityBonusDetail.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="seniorityBonusDetailForm">
+            <div class="buttons">
+                <h:commandButton action="#{seniorityBonusDetailAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!seniorityBonusDetailAction.managed and s:hasPermission('BONUS','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{seniorityBonusDetailAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{seniorityBonusDetailAction.managed and s:hasPermission('BONUS','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{seniorityBonusDetailAction.managed and s:hasPermission('BONUS','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{seniorityBonusDetailAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{bonusAction.managed}">
+                            #{messages['Bonus.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Bonus.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width100percent">
+                    <s:div>
+                        <s:decorate id="startYearField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['SeniorityBonusDetail.startYear']}</ui:define>
+                            <h:inputText id="startYear"
+                                         value="#{seniorityBonusDetail.startYear}"
+                                         required="true"
+                                         maxlength="255"
+                                         styleClass="input"
+                                         tabindex="5">
+                                <app:naturalNumberConverter forId="startYear"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="endYearField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['SeniorityBonusDetail.endYear']}</ui:define>
+                            <h:inputText id="endYear"
+                                         value="#{seniorityBonusDetail.endYear}"
+                                         maxlength="255"
+                                         styleClass="input"
+                                         tabindex="6">
+                                <app:naturalNumberConverter forId="endYear"/>
+                                <app:numberRangeValidator forId="startYear"
+                                                          forLabel="#{messages['SeniorityBonusDetail.startYear']}"
+                                                          type="greaterEqual"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="percentField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['SeniorityBonusDetail.percent']}</ui:define>
+                            <h:inputText id="percent"
+                                         value="#{seniorityBonusDetail.percent}"
+                                         required="true"
+                                         maxlength="3"
+                                         styleClass="input"
+                                         tabindex="7">
+                                <app:realNumberConverter forId="percent" minimum="0" maximum="100"/>
+                                <app:keyUpEvent focus="percent"
+                                                reRender="amountField, amountField"
+                                                rendered="#{true}"
+                                                action="seniorityBonusDetailAction.calculateAmount()"/>
+                            </h:inputText>
+                            <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+                        </s:decorate>
+                        <s:decorate id="amountField"
+                                    template="/include/inputField.xhtml"
+                                    styleClass="formRow">
+                            <ui:define name="label">#{messages['SeniorityBonusDetail.amount']}</ui:define>
+                            <h:inputText id="amount"
+                                         value="#{seniorityBonusDetail.amount}"
+                                         required="true"
+                                         maxlength="255"
+                                         styleClass="input"
+                                         tabindex="8">
+                                <app:realNumberConverter forId="amount"/>
+                            </h:inputText>
+                            <h:outputText value=" #{messages['Currency.Bs']}"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{seniorityBonusDetailAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!seniorityBonusDetailAction.managed and s:hasPermission('BONUS','CREATE')}"
+                                 tabindex="9"/>
+                <h:commandButton action="#{seniorityBonusDetailAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{seniorityBonusDetailAction.managed and s:hasPermission('BONUS','UPDATE')}"
+                                 tabindex="10"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{seniorityBonusDetailAction.managed and s:hasPermission('BONUS','DELETE')}"
+                                 tabindex="11">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{seniorityBonusDetailAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 tabindex="12"
+                                 immediate="true"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#startYear" query="focus()" timing="onload"/>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{seniorityBonusDetailAction.managed and s:hasPermission('BONUS','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['SeniorityBonusDetail.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{seniorityBonusDetailAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('BONUS','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

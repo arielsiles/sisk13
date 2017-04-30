@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{templateAction.managed}">
+                #{messages['Template.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Template.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+
+        <h:form id="templateForm" enctype="multipart/form-data">
+
+            <div class="buttons">
+                <h:commandButton action="#{templateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!templateAction.managed and s:hasPermission('TEMPLATE','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{templateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{templateAction.managed and s:hasPermission('TEMPLATE','UPDATE')}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{templateAction.managed and s:hasPermission('TEMPLATE','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{templateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{templateAction.managed}">
+                            #{messages['Template.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Template.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent">
+                    <s:div>
+
+                        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Template.name']}</ui:define>
+                            <h:inputText id="name" value="#{template.name}" required="true"
+                                         maxlength="100" tabindex="5" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Template']}</ui:define>
+                            <s:fileUpload id="file"
+                                          required="true"
+                                          styleClass="input"
+                                          data="#{template.file.value}"
+                                          fileName="#{template.file.name}"
+                                          fileSize="#{template.file.size}"
+                                          contentType="#{template.file.contentType}"
+                                          tabindex="6"/>
+                        </s:decorate>
+
+
+                        <s:decorate id="templateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Template.type']}</ui:define>
+                            <h:selectOneMenu id="templateType"
+                                             value="#{template.templateType}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="7">
+                                <s:selectItems value="#{templateType}" var="templateType"
+                                               label="#{messages[templateType.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="fileFormatField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Template.format']}</ui:define>
+                            <h:selectOneMenu id="fileFormat"
+                                             value="#{template.fileFormat}"
+                                             styleClass="input"
+                                             required="true"
+                                             tabindex="8">
+                                <s:selectItems value="#{fileFormat}" var="fileFormat"
+                                               label="#{messages[fileFormat.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{templateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!templateAction.managed and s:hasPermission('TEMPLATE','CREATE')}"
+                                 tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{templateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{templateAction.managed and s:hasPermission('TEMPLATE','UPDATE')}"
+                                 tabindex="11"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{templateAction.managed and s:hasPermission('TEMPLATE','DELETE')}"
+                                 tabindex="12">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{templateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="13">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{templateAction.managed and s:hasPermission('TEMPLATE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Template.delete.confirmation']}">
+                        <f:param value="#{template.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{templateAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('TEMPLATE','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

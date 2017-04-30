@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/templateRegisterMark.xhtml">
+<ui:define name="pageTitle">
+    #{messages['EmployeeTimeCard']}
+</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="showPowered" value="false"/>
+<ui:define name="body">
+
+
+<h:form id="employeeTimeCardForm">
+    <rich:panel id="formPanel">
+
+        <f:facet name="header">
+            #{messages['EmployeeTimeCard.new']}
+        </f:facet>
+
+        <!-- <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['EmployeeTimeCard.dateTimeCard']}</ui:define>
+            <h:outputText value="#{employeeTimeCardAction.dateConcurrent}">
+                <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+            </h:outputText>
+
+        </s:decorate>-->
+
+        <app:fieldset id="emmployeedDatasFields" title="#{messages['EmployeeTimeCard.employeedDates']}">
+            <h:panelGrid columns="1"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                    >
+
+                <s:decorate id="numberIdentifiedField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EmployeeTimeCard.numberIdentified']}</ui:define>
+                    <h:inputText id="numberIdentified" value="#{employeeTimeCardAction.ci}"
+                                 maxlength="100" tabindex="5" styleClass="input" required="true" autocomplete="off">
+                        <a4j:support event="onblur" ajaxSingle="true"
+                                     actionListener="#{employeeTimeCardAction.searchEmployeed}"
+                                     reRender="nameEmployee,detailArea,employeeTimeCards,erroCI"/>
+                    </h:inputText>
+
+                </s:decorate>
+
+
+                <s:decorate id="nameEmployee"
+                            style="font-size: 13px; color: blue;text-align:center; padding-top: 5px;"
+                            styleClass="formRow">
+                    <h:outputText value="#{employeeTimeCardAction.nameEmployeed}">
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="erroCI"
+                            style="font-size: 13px; color: red;text-align:center; padding-top: 5px;"
+                            styleClass="formRow">
+                    <h:outputText value="#{employeeTimeCardAction.ci_invalid}">
+                    </h:outputText>
+                </s:decorate>
+
+            </h:panelGrid>
+        </app:fieldset>
+
+
+        <app:fieldset id="detailArea" title="#{messages['EmployeeTimeCard.areaDates']}">
+
+
+            <s:decorate id="searchTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EmployeeTimeCard.Area']}</ui:define>
+                <h:selectOneRadio id="groupSelect"
+                                  value="#{employeeTimeCardAction.selectGroup}"
+                                  layout="pageDirection"
+                                  tabindex="9">
+                    <s:selectItems value="#{employeeTimeCardAction.groupList}"
+                                   var="group"
+                                   label="#{group.name}"/>
+                    <a4j:support event="onchange" reRender="detailArea"
+                                 action="#{employeeTimeCardAction.setSubGroupTask}"
+                                 ajaxSingle="true"/>
+                    <s:convertEntity/>
+                </h:selectOneRadio>
+
+            </s:decorate>
+
+            <s:decorate id="productionTaskTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EmployeeTimeCard.taskType']}</ui:define>
+                <h:selectOneMenu id="productionTaskType"
+                                 value="#{employeeTimeCardAction.productionTaskType}"
+                                 styleClass="input" required="true">
+                    <s:selectItems value="#{productionTaskTypeList}"
+                                   var="productionTaskType"
+                                   label="#{productionTaskType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="subGroupsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['EmployeeTimeCard.subGroups']}</ui:define>
+                <h:selectOneMenu id="subGroups" value="#{employeeTimeCardAction.subGroup}"
+                                 styleClass="input" required="true"
+                                 tabindex="8">
+                    <s:selectItems value="#{subGroupQueryProduction}" var="subGroup"
+                                   label="#{subGroup.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+        </app:fieldset>
+        <h:panelGrid columns="1">
+
+            <!--<s:decorate  template="/include/inputField.xhtml">
+
+                <h:commandButton action="#{employeeTimeCardAction.finalizeRegister}"
+                                 value="#{messages['EmployeeTimeCard.finalize']}"
+                                 styleClass="button"
+                                 style="font-size: 20px; color: red;text-align: left;"
+                        >
+
+                </h:commandButton>
+
+            </s:decorate>-->
+
+            <s:decorate template="/include/inputField.xhtml">
+
+                <h:commandButton action="#{employeeTimeCardAction.register}"
+                                 value="#{messages['EmployeeTimeCard.register']}"
+                                 styleClass="button"
+                                 style="font-size: 20px;text-align: right;">
+                </h:commandButton>
+
+            </s:decorate>
+        </h:panelGrid>
+
+    </rich:panel>
+
+    <!--region horas registradas-->
+    <app:fieldset id="employeeTimeCards" title="#{messages['EmployeeTimeCard.ListTask']}">
+        <rich:dataTable value="#{employeeTimeCardAction.timeCards}"
+                        var="employeeTimeCard"
+                        id="employeeTimeCardList" styleClass="formRow" width="100%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['EmployeeTimeCard.EmployeeName']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EmployeeTimeCard.TypeTask']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EmployeeTimeCard.StartHour']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EmployeeTimeCard.EndHour']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['EmployeeTimeCard.date']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column
+                    styleClass="#{(employeeTimeCard.endTime == null )?'labelNew':(employeeTimeCard.endDay != null?'labelAlarm':'')}">
+                <h:outputText value="#{employeeTimeCard.employee.fullName}"/>
+            </rich:column>
+
+            <rich:column
+                    styleClass="#{(employeeTimeCard.endTime == null )?'labelNew':(employeeTimeCard.endDay != null?'labelAlarm':'')}">
+                <h:outputText value="#{employeeTimeCard.productionTaskType.name}"/>
+            </rich:column>
+
+            <rich:column
+                    styleClass="#{(employeeTimeCard.endTime == null )?'labelNew':(employeeTimeCard.endDay != null?'labelAlarm':'')}">
+                <h:outputText value="#{employeeTimeCard.startTime}">
+                    <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                       type="time"/>
+                </h:outputText>
+            </rich:column>
+
+            <rich:column
+                    styleClass="#{(employeeTimeCard.endTime == null )?'labelNew':(employeeTimeCard.endDay != null?'labelAlarm':'')}">
+                <h:outputText value="#{employeeTimeCard.endTime}">
+                    <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
+                                       type="time"/>
+                </h:outputText>
+            </rich:column>
+
+            <rich:column
+                    styleClass="#{(employeeTimeCard.endTime == null )?'labelNew':(employeeTimeCard.endDay != null?'labelAlarm':'')}">
+                <h:outputText value="#{employeeTimeCard.date}"/>
+            </rich:column>
+
+        </rich:dataTable>
+    </app:fieldset>
+
+</h:form>
+
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{employeeTimeCardAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['EmployeeTimeCard.delete.confirmation']}">
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{employeeTimeCardAction.finalizeRegister}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>
+

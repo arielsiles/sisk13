@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <h:outputText
+                value="#{dismissalCauseAction.managed?messages['DismissalCause.edit']:messages['DismissalCause.new']}"/>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="dismissalCauseForm">
+
+            <ui:include src="dismissalCauseFormButtons.xhtml">
+                <ui:param name="formLocation" value="Top"/>
+                <ui:param name="default" value="${true}"/>
+            </ui:include>
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{dismissalCauseAction.managed?messages['DismissalCause.edit']:messages['DismissalCause.new']}"/>
+                </f:facet>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dismissalCauseAction.managed}">
+                    <ui:define name="label">#{messages['DismissalCause.code']}</ui:define>
+                    <h:outputText id="code" value="#{dismissalCause.code}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{dismissalCause.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="250"
+                                 tabindex="1"/>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{dismissalCause.description}"
+                                     styleClass="input textarea"
+                                     tabindex="14">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
+                </s:decorate>
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active"
+                                             value="#{dismissalCause.active}"
+                                             tabindex="3"/>
+                </s:decorate>
+                <s:decorate id="payableField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DismissalCause.payable']}</ui:define>
+                    <h:selectBooleanCheckbox id="payable"
+                                             value="#{dismissalCause.payable}"
+                                             tabindex="4"/>
+                </s:decorate>
+            </rich:panel>
+
+            <ui:include src="dismissalCauseFormButtons.xhtml">
+                <ui:param name="formLocation" value="Button"/>
+            </ui:include>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dismissalCauseAction.managed and s:hasPermission('DISMISSALCAUSE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DismissalCause.delete.confirmation']}">
+                        <f:param value="#{dismissalCause.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dismissalCauseAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

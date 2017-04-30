@@ -1,0 +1,442 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+
+<ui:define name="pageTitle">
+    #{messages['Invoice.new']}
+</ui:define>
+<ui:define name="head">
+    <a4j:loadScript src="/scripts/jquery.field.js"/>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="disableMenu" value="true"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+
+
+<script type="text/javascript">
+    //<![CDATA[
+    function expandCollapsePanel() {
+        var panel = jQuery("#invoiceForm\\:searchPanel");
+        var product;
+        SimpleTogglePanelManager.toggleOnClient('onclick', panel.attr("id"));
+        if (SimpleTogglePanelManager.panels.get(panel.attr("id")).status == "true") {
+            product = jQuery("#invoiceForm\\:searchField\\:code");
+        }
+        else {
+            product = jQuery("#invoiceForm\\:productAddField\\:productCode");
+        }
+
+        product.focus();
+    }
+
+    jQuery.extend(jQuery.expr[':'], {
+        focus:"a==document.activeElement"
+    });
+
+    jQuery(document).ready(function () {
+        document.forms['invoiceForm'].onkeypress = function (event) {
+            var keycode;
+            if (window.event) {
+                keycode = window.event.keyCode;
+            }
+            else if (event) {
+                keycode = event.which;
+            }
+            else {
+                return true;
+            }
+            if (keycode == 13) {
+                var currentField = jQuery("INPUT:focus()");
+                var currentFieldId = currentField.attr("id");
+                if ("invoiceForm:productAddField:addButtonId" == currentFieldId) {
+                    currentField.click();
+                    jQuery("#invoiceForm\\:productAddField\\:productCode").focus();
+                } else if ("invoiceForm:createButton" == currentFieldId) {
+                    currentField.click();
+                }
+                else {
+                    currentField.moveNext();
+                }
+
+                return false;
+            } else {
+                return true;
+            }
+        }
+    });
+    //]]>
+
+</script>
+
+<h:form id="invoiceForm">
+
+<style type="text/css">
+    .leftCell {
+        vertical-align: top;
+        text-align: right;
+        width: 20%;
+    }
+
+    .rightCell {
+        vertical-align: top;
+        width: 80%;
+    }
+
+    .inputField {
+        width: 80px;
+    }
+
+    .footer {
+        text-align: right;
+        font-weight: bold;
+        color: black;
+    }
+
+    .image {
+        width: 70px;
+        height: 50px;
+        border: 0;
+    }
+
+        /*  .rich-extdt-cell {
+            text-align: right;
+        }*/
+
+</style>
+
+
+<h:panelGrid columns="2" columnClasses="leftCell, rightCell" width="100%">
+<h:panelGroup>
+    <h:panelGrid columns="1" width="100%">
+        <a4j:commandButton id="cash" image="/img/moneyButton.gif" styleClass="image" action="#{invoiceAction.cash}"
+                           reRender="customerInfoPanel, invoiceDetailTable, invoiceDetailTotalizator" focus="cashAmount"
+                           immediate="true" tabindex="5">
+            <rich:toolTip for="cash" value="#{messages['Invoice.paymentTypes.cash']}" followMouse="false"
+                          direction="top-right" mode="client" horizontalOffset="0" verticalOffset="0"
+                          layout="inline" zorder="2000"/>
+        </a4j:commandButton>
+        <a4j:commandButton id="creditCard" image="/img/creditCardButton.gif" styleClass="image"
+                           action="#{invoiceAction.creditCard}" tabindex="6"
+                           reRender="customerInfoPanel, invoiceDetailTable, invoiceDetailTotalizator"
+                           immediate="true" focus="creditCardNumber">
+            <rich:toolTip for="creditCard" value="#{messages['Invoice.paymentTypes.creditCard']}" followMouse="false"
+                          direction="top-right" mode="client" horizontalOffset="0" verticalOffset="0"
+                          layout="inline" zorder="2000"/>
+        </a4j:commandButton>
+        <a4j:commandButton id="account" image="/img/accountPayButton.gif" styleClass="image"
+                           action="#{invoiceAction.account}" tabindex="7"
+                           reRender="customerInfoPanel, invoiceDetailTable, invoiceDetailTotalizator"
+                           immediate="true" focus="createButton">
+            <rich:toolTip for="account" value="#{messages['Invoice.paymentTypes.account']}" followMouse="false"
+                          direction="top-right" mode="client" horizontalOffset="0" verticalOffset="0"
+                          layout="inline" zorder="2000"/>
+        </a4j:commandButton>
+        <h:commandButton id="exit" image="/img/exitButton.gif" styleClass="image" action="#{identity.logout}"
+                         immediate="true" tabindex="8">
+            <rich:toolTip for="exit" value="#{messages['Common.exit']}" followMouse="false"
+                          direction="top-right" mode="client" horizontalOffset="0" verticalOffset="0"
+                          layout="inline" zorder="2000"/>
+        </h:commandButton>
+    </h:panelGrid>
+</h:panelGroup>
+<h:panelGroup>
+<rich:panel>
+<f:facet name="header">
+    #{messages['Invoice.new']}
+</f:facet>
+
+<h:panelGrid columns="1" border="0" width="95%">
+
+<rich:hotKey key="f10" handler="expandCollapsePanel();return false;"/>
+
+<rich:simpleTogglePanel id="searchPanel" switchType="client" opened="false" width="850px">
+    <f:facet name="header">
+        #{messages['Product.search']}
+    </f:facet>
+    <s:decorate id="searchField" template="/include/inputField.xhtml" styleClass="formRow">
+
+        <ui:define name="label">#{messages['Product.code']}</ui:define>
+        <h:inputText id="code" styleClass="input" maxlength="100" value="#{invoiceAction.code}" tabindex="11"/>
+        <a4j:commandButton id="searchButton" action="#{invoiceAction.searchProduct}" reRender="searchField"
+                           styleClass="button" value="#{messages['Common.search']}" tabindex="12"/>
+
+        <h:panelGrid columns="1">
+            <h:outputText id="productName" value="#{messages['Product.name']}: #{invoiceAction.productName}"
+                          rendered="#{invoiceAction.productFound}"/>
+            <h:outputText id="productPrice" value="#{messages['Product.sellPrice']}: #{invoiceAction.productPrice}"
+                          rendered="#{invoiceAction.productFound}">
+                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </h:panelGrid>
+    </s:decorate>
+</rich:simpleTogglePanel>
+
+
+<rich:simpleTogglePanel id="customerInfoPanel" switchType="client" width="850px">
+    <f:facet name="header">
+        #{messages['Invoice.customer']}
+    </f:facet>
+
+    <s:decorate id="idNumberField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Entity.idNumber']}</ui:define>
+        #{customer.idNumber}
+    </s:decorate>
+
+    <s:fragment rendered="#{invoiceAction.person}">
+        <s:decorate id="firstNameField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+            #{customer.firstName}
+        </s:decorate>
+
+        <s:decorate id="lastNameField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+            #{customer.lastName}
+        </s:decorate>
+
+        <s:decorate id="maidenNameField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+            #{customer.maidenName}
+        </s:decorate>
+    </s:fragment>
+
+    <s:fragment rendered="#{!invoiceAction.person}">
+        <s:decorate id="organizationNameField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Organization.name']}</ui:define>
+            #{customer.name}
+        </s:decorate>
+    </s:fragment>
+
+    <s:fragment rendered="#{invoiceAction.typeCreditCard}">
+        <s:decorate id="creditCardNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="oneLine" value="true"/>
+            <ui:define name="label">#{messages['Invoice.creditCardNumber']}</ui:define>
+            <h:inputText id="creditCardNumber" styleClass="input" maxlength="150"
+                         tabindex="#{invoiceAction.typeCreditCard ? '4' : '17'}" required="true">
+            </h:inputText>
+        </s:decorate>
+    </s:fragment>
+
+    <s:fragment rendered="#{invoiceAction.fewInvoiceNumber}">
+        <s:decorate id="fewinvoiceNumberField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label"></ui:define>
+            <h:outputText> #{messages['Invoice.fewInvoiceNumber']} </h:outputText>
+            <ui:include src="/include/message.xhtml"/>
+        </s:decorate>
+    </s:fragment>
+</rich:simpleTogglePanel>
+
+
+<rich:extendedDataTable value="#{details}" var="invoiceDetail" id="invoiceDetailTable" width="850px"
+                        height="250px" styleClass="right" footerClass="removeBorderClass">
+
+    <f:facet name="header">
+        #{messages['InvoiceDetail.title']}
+    </f:facet>
+
+    <rich:column width="150px" sortable="false">
+        <f:facet name="header">
+            #{messages['InvoiceDetail.product.code']}
+        </f:facet>
+        <h:outputText value="#{invoiceDetail.product.code}"/>
+    </rich:column>
+    <rich:column width="200px" sortable="false">
+        <f:facet name="header">
+            #{messages['InvoiceDetail.product.name']}
+        </f:facet>
+        <h:outputText value="#{invoiceDetail.product.name}"/>
+    </rich:column>
+    <rich:column width="130px" sortable="false">
+        <f:facet name="header">
+            #{messages['InvoiceDetail.quantity']}
+        </f:facet>
+        <h:outputText value="#{invoiceDetail.quantity}"/>
+    </rich:column>
+    <rich:column width="130px" sortable="false">
+        <f:facet name="header">
+            #{messages['InvoiceDetail.price']}
+        </f:facet>
+        <h:outputText value="#{invoiceDetail.price}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column sortable="false">
+        <f:facet name="header">
+            #{messages['InvoiceDetail.totalAmount']}
+        </f:facet>
+        <h:outputText value="#{invoiceDetail.totalAmount}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+
+    <rich:column width="110px" sortable="false">
+        <f:facet name="header">
+            #{messages['Common.action']}
+        </f:facet>
+        <a4j:commandLink id="selectDetail" value=" #{messages['Common.delete']}" action="#{invoiceAction.selectDetail}"
+                         oncomplete="Richfaces.showModalPanel('deletePanel');" focus="username"/>
+    </rich:column>
+</rich:extendedDataTable>
+
+<rich:panel id="invoiceDetailTotalizator" styleClass="right">
+    <s:div>
+        <h:outputText value="#{messages['Common.total']}: "/>
+        <h:outputText value="#{invoice.totalAmount}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:div>
+
+    <s:div rendered="#{invoiceAction.discountAssigned}">
+        <h:outputText value="#{messages['Invoice.discount']}: "/>
+        <h:outputText
+                value="#{invoiceAction.customerDiscountAmount} - #{invoiceAction.customerDiscountPercentage}%">
+        </h:outputText>
+    </s:div>
+
+    <s:div rendered="#{invoiceAction.discountAssigned}">
+        <h:outputText value="#{messages['Invoice.actualTotalAmount']}: "/>
+        <h:outputText value="#{invoiceAction.actualTotalAmount}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:div>
+
+    <s:div id="cashAmountField" rendered="#{invoiceAction.typeCash}">
+        <h:outputText value="#{messages['Invoice.cash']}:  "/>
+        <h:inputText id="cashAmount" styleClass="inputField" maxlength="10" value="#{invoiceAction.cashAmount}"
+                     tabindex="#{invoiceAction.typeCash ? '4' : '17'}" style="text-align:right;"
+                     valueChangeListener="#{invoiceAction.cashAmountChange}"
+                     validator="#{invoiceAction.validateCashAmount}"
+                     validatorMessage="#{messages['Invoice.error.wrongCashAmount']}">
+            <a4j:support event="onblur" ajaxSingle="true" reRender="change, cashAmountField"/>
+        </h:inputText>
+        <s:div>
+            <h:message for="cashAmount" styleClass="errors"/>
+        </s:div>
+    </s:div>
+
+    <s:div rendered="#{invoiceAction.typeCash}">
+        <h:outputText value="#{messages['Invoice.change']}: "/>
+        <h:outputText id="change" value="#{invoiceAction.change}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:div>
+    <s:div rendered="#{invoiceAction.typeAccount}">
+        <h:outputText value="#{messages['Invoice.creditAmmount']}:  "/>
+        <h:outputText id="creditAmmount" value="#{invoiceAction.creditAmount}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:div>
+    <s:div rendered="#{invoiceAction.typeAccount}">
+        <h:outputText value="#{messages['Invoice.balance']}: "/>
+        <h:outputText id="creditBalance" value="#{invoiceAction.creditBalance}">
+            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:div>
+</rich:panel>
+
+
+<rich:modalPanel id="deletePanel" width="350" height="130" resizeable="false">
+    <f:facet name="header">
+        #{messages['Common.delete.confirmation']}
+    </f:facet>
+
+    <s:decorate id="usernameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Login.username']}</ui:define>
+        <h:inputText id="username" styleClass="input" tabindex="13"/>
+    </s:decorate>
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Login.password']}</ui:define>
+        <h:inputSecret id="password" styleClass="input" tabindex="14"/>
+    </s:decorate>
+
+    <div class="buttons">
+        <a4j:commandButton action="#{invoiceAction.deleteProduct}" value="#{messages['Common.delete']}"
+                           styleClass="button" reRender="invoiceDetailTable, invoiceDetailTotalizator, refreshApplet"
+                           tabindex="15">
+            <rich:componentControl for="deletePanel" event="oncomplete" disableDefault="true" operation="hide"/>
+        </a4j:commandButton>
+
+        <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" tabindex="16">
+            <rich:componentControl for="deletePanel" event="onclick" disableDefault="true" operation="hide"/>
+        </h:commandButton>
+    </div>
+</rich:modalPanel>
+
+</h:panelGrid>
+
+
+<s:decorate id="productAddField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['InvoiceDetail.addProduct']}</ui:define>
+    <h:inputText id="productCode" value="#{invoiceAction.productCode}"
+                 maxlength="80" tabindex="1" styleClass="input">
+        <rich:toolTip for="productCode" value="#{messages['InvoiceDetail.tooltip.product.code']}"
+                      followMouse="false" direction="top-right" mode="client" horizontalOffset="0"
+                      verticalOffset="0" layout="inline" zorder="2000">
+        </rich:toolTip>
+    </h:inputText>
+    <h:inputText id="quantity" value="#{invoiceAction.productQuantity}" required="true"
+                 maxlength="80" tabindex="2" styleClass="smallInput">
+        <rich:toolTip for="quantity" value="#{messages['InvoiceDetail.tooltip.quantity']}" followMouse="false"
+                      direction="top-right" mode="client" horizontalOffset="0" verticalOffset="0"
+                      layout="inline" zorder="2000">
+        </rich:toolTip>
+    </h:inputText>
+    <a4j:commandButton action="#{invoiceAction.addProduct}"
+                       reRender="invoiceDetailTable, invoiceDetailTotalizator, productAddField, refreshApplet"
+                       styleClass="button" value="#{messages['Common.add']}"
+                       id="addButtonId" tabindex="3" focus="productCode">
+    </a4j:commandButton>
+</s:decorate>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton id="createButton" action="#{invoiceAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button" tabindex="9"/>
+    <h:commandButton action="#{invoiceAction.cancel}" styleClass="button"
+                     value="#{messages['Common.cancel']}" immediate="true" tabindex="10"/>
+</div>
+</h:panelGroup>
+
+</h:panelGrid>
+
+</h:form>
+<rich:jQuery selector="#productCode" query="focus()" timing="onload"/>
+
+
+<s:div id="refreshApplet">
+    <c:if test="#{invoiceAction.invoiceDetailId != null}">
+        <s:fragment>
+            <APPLET CODE="com.encens.khipus.applet.printer.PrintApplet.class"
+                    CODEBASE="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/applet/"
+                    archive="printer.jar, htmlparser.jar" WIDTH="0" HEIGHT="0">
+                <PARAM name="url"
+                       value="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/customers/invoicePrintBody;jsessionid=#{facesContext.externalContext.request.session.id}?detailId=#{invoiceAction.invoiceDetailId}"/>
+            </APPLET>
+        </s:fragment>
+    </c:if>
+
+    <c:if test="#{invoiceAction.invoiceDetailId == null and invoiceAction.printHeader}">
+        <s:fragment>
+            <APPLET CODE="com.encens.khipus.applet.printer.PrintApplet.class"
+                    CODEBASE="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/applet/"
+                    archive="printer.jar, htmlparser.jar" WIDTH="0" HEIGHT="0">
+                <PARAM name="url"
+                       value="http://#{facesContext.externalContext.request.serverName}:#{facesContext.externalContext.request.serverPort}/khipus/customers/invoicePrintHeader;jsessionid=#{facesContext.externalContext.request.session.id}?id=#{param.id}"/>
+            </APPLET>
+        </s:fragment>
+    </c:if>
+</s:div>
+
+
+</ui:define>
+</ui:composition>

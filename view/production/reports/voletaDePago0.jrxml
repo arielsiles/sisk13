@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voletaDePago" pageWidth="612" pageHeight="395" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<parameter name="fecha" class="java.util.Date"/>
+	<parameter name="hora" class="java.util.Date"/>
+	<parameter name="periodo" class="java.lang.String"/>
+	<parameter name="ci" class="java.lang.String"/>
+	<parameter name="nombreProductor" class="java.lang.String"/>
+	<parameter name="nombreGab" class="java.lang.String"/>
+	<parameter name="precioLeche" class="java.lang.Double"/>
+	<parameter name="totalBrutoBs" class="java.lang.Double"/>
+	<parameter name="totalLitrosLeche" class="java.lang.Double"/>
+	<parameter name="debLeche" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debRetencion" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debReserva" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debAlcohol" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debConcentrados" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debCredito" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debVeterinario" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debYogurt" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debTachos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debAjustes" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debOtrosDescuentos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="debOtrosIngresos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credLeche" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credRetencion" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credReserva" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credAlcohol" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credConcentrados" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credCredito" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credVeterinario" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credYogurt" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credTachos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credAjustes" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credOtrosDescuentos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="credOtrosIngresos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="liquidoPagable" class="java.lang.Double" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Double(0.0)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalLeche" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{credLeche}-$P{debLeche}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalRetencion" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalLeche}+$P{credCredito}-$P{debRetencion}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalReserva" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalRetencion}+$P{credReserva}-$P{debReserva}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalAlcohol" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalReserva}+$P{credAlcohol}-$P{debAlcohol}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalConcentrados" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalAlcohol}+$P{credConcentrados}-$P{debConcentrados}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalCredito" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalConcentrados}+$P{credCredito}+$P{debCredito}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalVeterinario" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalCredito}+$P{credVeterinario}-$P{debVeterinario}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalYogurt" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalVeterinario}+$P{credYogurt}-$P{debYogurt}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalTachos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalYogurt}+$P{credTachos}-$P{debTachos}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalAjustes" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalTachos}+$P{credAjustes}-$P{debAjustes}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalOtrosDescuentos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalAjustes}+$P{credOtrosDescuentos}-$P{debOtrosDescuentos}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalOtrosIngresos" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[$P{totalOtrosDescuentos}+$P{credOtrosIngresos}-$P{debOtrosIngresos}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="liquidoPagableLiteral" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="0" y="0" width="247" height="12"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["INDUSTRIAS LACTEAS DEL VALLE ALTO"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="0" y="12" width="247" height="12"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["COCHABAMBA"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="0" y="24" width="572" height="12"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["BOLETA DE PAGO POR ENTREGA DE LECHE"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="0" y="36" width="572" height="13"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="K:mm" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="325" y="12" width="247" height="12"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{hora}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yy" isBlankWhenNull="true">
+				<reportElement key="date_text" style="titleStyle" positionType="Float" x="325" y="0" width="247" height="12"/>
+				<box padding="1">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{fecha}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="49" width="28" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["C.I.:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="28" y="49" width="57" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{ci}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="84" y="49" width="44" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Nombre: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="128" y="49" width="224" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nombreProductor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="352" y="49" width="29" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["GAB:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="381" y="49" width="191" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nombreGab}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="63" width="51" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Precio Base:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="51" y="63" width="34" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{precioLeche}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="84" y="63" width="57" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total litros:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="141" y="63" width="211" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalLitrosLeche}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="352" y="63" width="84" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total Bruto Bs.:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="436" y="63" width="136" height="16"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalBrutoBs}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="273" splitType="Stretch">
+			<textField>
+				<reportElement x="211" y="0" width="141" height="14"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["DETALLE DE MOVIMIENTO"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="29" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["LECHE CRUDA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="173" y="14" width="127" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Debitos"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="42" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["RETENCION"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="16" y="28" width="540" height="1"/>
+			</line>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="29" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debLeche}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="14" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Creditos"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="428" y="14" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Saldo"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="29" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credLeche}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="29" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalLeche}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="42" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debRetencion}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="42" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalRetencion}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="42" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credRetencion}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="55" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debReserva}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="55" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["RESERVA"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="55" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credReserva}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="68" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debAlcohol}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="68" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["ALCOHOL"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="68" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credAlcohol}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="94" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debCredito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="81" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debConcentrados}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="120" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["YOGURT"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="120" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debYogurt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="81" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credConcentrados}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="107" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debVeterinario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="94" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["CREDITO"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="120" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credYogurt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="94" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credCredito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="107" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credVeterinario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="107" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["VETERINARIO"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="81" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["CONCENTRADOS"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="145" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debAjustes}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="132" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debTachos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="171" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["OTROS INGRESOS"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="171" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debOtrosIngresos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="132" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credTachos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="172" y="158" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{debOtrosDescuentos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="145" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["AJUSTES"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="171" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credOtrosIngresos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="145" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credAjustes}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="300" y="158" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{credOtrosDescuentos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="158" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["OTROS DESCUENTOS"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="132" width="151" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["TACHOS"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="16" y="184" width="540" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="300" y="185" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["LIQUIDO PAGABLE BS.:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="185" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{liquidoPagable}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="195" y="253" width="125" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Recibi conforme"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="161" y="253" width="191" height="1"/>
+			</line>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="55" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalReserva}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="171" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalOtrosIngresos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="120" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalYogurt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="94" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalCredito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="158" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalOtrosDescuentos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="132" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalTachos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="145" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalAjustes}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="68" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalAlcohol}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="81" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalConcentrados}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="107" width="128" height="13"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalVeterinario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="16" y="198" width="540" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{liquidoPagableLiteral}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

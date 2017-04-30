@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['FixedAssetEvolutionByGroupSummary.report.title']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="evolutionByGroupSummaryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['FixedAssetEvolutionByGroupSummary.report.title']}
+                </f:facet>
+                <s:div id="fixedAssetGroupDiv">
+                    <s:decorate id="fixedAssetGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Fixedassets.report.fixedAssetGroup']}</ui:define>
+                        <app:quickSearch id="quickSearchFixedAssetGroup"
+                                         textValue="evolutionByGroupSummaryReportAction.fixedAssetGroup.groupCode"
+                                         value="#{evolutionByGroupSummaryReportAction.fixedAssetGroup}"
+                                         searchField="groupCode"
+                                         reRender="fixedAssetGroupDiv"
+                                         tabindex="1"/>
+                        <app:selectPopUp id="fixedAssetGroup"
+                                         textValue="#{evolutionByGroupSummaryReportAction.fixedAssetGroup.fullName}"
+                                         value="#{evolutionByGroupSummaryReportAction.fixedAssetGroup}"
+                                         dataModel="#{fixedAssetGroupDataModel}"
+                                         clearAction="evolutionByGroupSummaryReportAction.clearFixedAssetGroup()"
+                                         searchModalPanel="fixedAssetGroupListModalPanel"
+                                         reRender="fixedAssetGroupDiv"
+                                         hotKeySelect="alt+1"/>
+                    </s:decorate>
+                </s:div>
+                <s:decorate id="initDateRangeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define
+                            name="label">#{messages['FixedAssetEvolutionSummary.report.movementDate']}
+                    </ui:define>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
+                    <rich:calendar id="initDateRange"
+                                   value="#{evolutionByGroupSummaryReportAction.initDateRange}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                    <h:outputText>#{messages['Fixedassets.report.registrationDate.to']}</h:outputText>
+                    <rich:calendar id="endDateRange"
+                                   value="#{evolutionByGroupSummaryReportAction.endDateRange}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   styleClass="input1"
+                                   tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="initDateRange"
+                                                forLabel="#{messages['Fixedassets.report.registrationDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+            </rich:panel>
+            <app:reportDefaultOptions reportAction="#{evolutionByGroupSummaryReportAction}"
+                                      showPageFormat="false"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{evolutionByGroupSummaryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="searchButtonId">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+            <rich:jQuery selector="quickSearchFixedAssetGroup" query="focus()" timing="onload"/>
+
+        </h:form>
+        <s:decorate id="fixedAssetGroupListModalPanelContainer"
+                    template="/fixedassets/fixedAssetGroupListModalPanel.xhtml">
+            <ui:param name="dialogId" value="fixedAssetGroupListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{evolutionByGroupSummaryReportAction.setFixedAssetGroup(fixedAssetGroupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="fixedAssetGroupDiv "
+                                   oncomplete="Richfaces.hideModalPanel('fixedAssetGroupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>
+
+

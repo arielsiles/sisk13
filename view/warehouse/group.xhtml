@@ -1,0 +1,249 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{groupAction.managed}">
+            #{messages['Group.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Group.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="groupForm">
+    <div class="buttons">
+        <h:commandButton id="createButtonId"
+                         action="#{groupAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!groupAction.managed and s:hasPermission('GROUP','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+        <h:commandButton action="#{groupAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!groupAction.managed and s:hasPermission('GROUP','CREATE')}">
+        </h:commandButton>
+        <h:commandButton action="#{subGroupAction.addSubGroup}"
+                         value="#{messages['Group.addSubgroup']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('SUBGROUP','CREATE')}"/>
+
+        <h:commandButton id="updateButtonId"
+                         action="#{groupAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('GROUP','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('GROUP','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{groupAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{groupAction.managed}">
+                    #{messages['Group.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Group.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="groupCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Group.groupCode']}</ui:define>
+            <h:outputText value="#{warehouseGroup.id.groupCode}"/>
+        </s:decorate>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Group.name']}</ui:define>
+            <h:inputText id="name"
+                         value="#{warehouseGroup.name}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="100"
+                         tabindex="1"/>
+        </s:decorate>
+
+        <s:decorate id="inventoryAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Group.inventoryAccount']}</ui:define>
+            <h:inputText id="inventoryAccount"
+                         required="true"
+                         styleClass="input"
+                         readonly="true"
+                         value="#{warehouseGroup.inventoryAccount}"
+                         maxlength="100"
+                         tabindex="3"/>
+            <a4j:commandLink id="selectInventoryAccount"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="4"
+                             title="#{messages['Group.inventoryAccount.select']}"
+                             onclick="Richfaces.showModalPanel('cashAccountListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="5"
+                             title="#{messages['Common.clear']}"
+                             action="#{groupAction.clearInventoryAccount}"
+                             reRender="inventoryAccount">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{groupAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!groupAction.managed and s:hasPermission('GROUP','CREATE')}"
+                         tabindex="6"/>
+
+        <h:commandButton action="#{groupAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!groupAction.managed and s:hasPermission('GROUP','CREATE')}"
+                         tabindex="7">
+        </h:commandButton>
+        <h:commandButton action="#{subGroupAction.addSubGroup}"
+                         value="#{messages['Group.addSubgroup']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('SUBGROUP','CREATE')}"
+                         tabindex="8"/>
+
+        <h:commandButton action="#{groupAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('GROUP','UPDATE')}"
+                         tabindex="9"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{groupAction.managed and s:hasPermission('GROUP','DELETE')}"
+                         tabindex="10">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{groupAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="11"/>
+    </div>
+
+    <c:if test="#{groupAction.managed and  s:hasPermission('SUBGROUP','VIEW')}">
+        <rich:spacer height="15px"/>
+        <rich:dataTable value="#{subGroupDataModel}"
+                        var="subGroupItem"
+                        id="subGroupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="50%, 15%, 20%, 15%">
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['SubGroup.name']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['SubGroup.subGroupCode']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['SubGroup.state']}
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{subGroupItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{subGroupItem.id.subGroupCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{messages[subGroupItem.state.resourceKey]}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{subGroupAction.select(subGroupItem)}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="subGroupList" dataModel="#{subGroupDataModel}"/>
+    </c:if>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{groupAction.managed and s:hasPermission('GROUP','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Group.delete.confirmation']}">
+                <f:param value="#{warehouseGroup.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{groupAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('GROUP','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{groupAction.assignInventoryAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="inventoryAccount"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>

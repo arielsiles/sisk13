@@ -1,0 +1,283 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="${vacationAction.managed}">
+            #{messages['Vacation.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Vacation.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<c:set var="readOnly" value="${not vacationAction.isPending}"/>
+<c:set var="isAnnulled" value="#{vacationAction.isAnnulled}"/>
+
+<h:form id="vacationForm">
+    <div class="buttons">
+        <h:commandButton id="createButton"
+                         action="#{vacationAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!vacationAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{vacationAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!vacationAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
+
+        <h:commandButton action="#{vacationAction.approve}"
+                         value="#{messages['Vacation.approve']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONAPPROVE','VIEW')}"/>
+
+        <h:commandButton action="#{vacationAction.annul}"
+                         value="#{messages['Vacation.annul']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not isAnnulled and s:hasPermission('VACATIONANNUL','VIEW')}"/>
+
+        <h:commandButton id="saveButton"
+                         action="#{vacationAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONPLANNING','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONPLANNING','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{vacationAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="${vacationAction.managed}">
+                    #{messages['Vacation.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Vacation.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+
+                <s:decorate id="vacationGestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.gestion']}</ui:define>
+                    <h:selectOneMenu id="vacationGestion"
+                                     value="#{vacation.vacationGestion}"
+                                     styleClass="input"
+                                     required="true"
+                                     rendered="#{not readOnly}"
+                                     tabindex="1">
+                        <s:selectItems value="#{vacationAction.vacationGestionList}" var="vacationGestion"
+                                       label="#{vacationGestion.gestion}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{vacation.vacationGestion.gestion}" rendered="#{readOnly}"/>
+                </s:decorate>
+
+                <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.initDate']}</ui:define>
+                    <rich:calendar id="initDate"
+                                   value="#{vacation.initDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   required="true"
+                                   enableManualInput="true"
+                                   rendered="#{not readOnly}"
+                                   tabindex="2">
+                        <app:dateRangeValidator forId="endDate"
+                                                forLabel="#{messages['Vacation.endDate']}"
+                                                type="less"/>
+                        <a4j:support event="onchanged" reRender="initDateField, endDateField, totalDaysField"
+                                     ajaxSingle="true"
+                                     action="#{vacationAction.calculateValues()}"/>
+                        <a4j:support event="oninputchange" reRender="initDateField, endDateField, totalDaysField"
+                                     ajaxSingle="true"
+                                     action="#{vacationAction.calculateValues()}"/>
+                    </rich:calendar>
+                    <h:outputText value="#{vacation.initDate}"
+                                  rendered="#{readOnly}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{vacation.endDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   required="true"
+                                   enableManualInput="true"
+                                   rendered="#{not readOnly}"
+                                   tabindex="3">
+                        <a4j:support event="onchanged" reRender="initDateField, endDateField, totalDaysField"
+                                     ajaxSingle="true"
+                                     action="#{vacationAction.calculateValues()}"/>
+                        <a4j:support event="oninputchange" reRender="initDateField, endDateField, totalDaysField"
+                                     ajaxSingle="true"
+                                     action="#{vacationAction.calculateValues()}"/>
+                    </rich:calendar>
+                    <h:outputText value="#{vacation.endDate}"
+                                  rendered="#{readOnly}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" type="date"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="totalDaysField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.totalDays']}</ui:define>
+                    <h:inputText id="totalDays"
+                                 value="#{vacation.totalDays}"
+                                 styleClass="inputNumber"
+                                 rendered="#{not readOnly}"
+                                 required="true"
+                                 tabindex="4">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                    forId="totalDays"/>
+                    </h:inputText>
+                    <h:outputText value="#{vacation.totalDays}" styleClass="inputNumber"
+                                  rendered="#{readOnly}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="vacationStateField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{vacationAction.managed}">
+                    <ui:define name="label">#{messages['Vacation.state']}</ui:define>
+                    <h:outputText value="#{messages[vacation.state.resourceKey]}"/>
+                </s:decorate>
+
+                <s:decorate id="daysOffField" template="/include/viewField.xhtml" styleClass="formRow"
+                        rendered="#{vacationAction.isApproved}">
+                    <ui:define name="label">#{messages['Vacation.daysOff']}</ui:define>
+                    <h:outputText value="#{vacation.daysOff}"/>
+                </s:decorate>
+
+                <s:decorate id="useForPayrollGenerationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.useForPayrollGeneration']}</ui:define>
+                    <h:selectBooleanCheckbox id="useForPayrollGeneration"
+                                             value="#{vacation.useForPayrollGeneration}"
+                                             rendered="#{not readOnly}"
+                                             tabindex="5"/>
+                    <h:outputText value="#{messages['Common.yes']}"
+                                  rendered="#{readOnly and vacation.useForPayrollGeneration}"/>
+                    <h:outputText value="#{messages['Common.not']}"
+                                  rendered="#{readOnly and not vacation.useForPayrollGeneration}"/>
+                </s:decorate>
+            </s:div>
+            <s:div>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['Vacation.description']}"/>
+                    </ui:define>
+                    <h:inputTextarea id="description"
+                                     value="#{vacation.description}"
+                                     styleClass="input textarea"
+                                     required="true"
+                                     readonly="#{readOnly}"
+                                     tabindex="6">
+                        <f:validateLength maximum="200"/>
+                    </h:inputTextarea>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{vacationAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!vacationAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{vacationAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!vacationAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
+
+        <h:commandButton action="#{vacationAction.approve}"
+                         value="#{messages['Vacation.approve']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONAPPROVE','VIEW')}"/>
+
+        <h:commandButton action="#{vacationAction.annul}"
+                         value="#{messages['Vacation.annul']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not isAnnulled and s:hasPermission('VACATIONANNUL','VIEW')}"/>
+
+        <h:commandButton action="#{vacationAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONPLANNING','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{vacationAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+        </h:commandButton>
+    </div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{vacationAction.managed and not readOnly and s:hasPermission('VACATIONPLANNING','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Vacation.delete.confirmation']}">
+                <f:param value="#{vacation.description}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{vacationAction.delete}"
+                           rendered="#{s:hasPermission('VACATIONPLANNING','DELETE')}"
+                           value="#{messages['Common.delete']}" immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#initDate" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

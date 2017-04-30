@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <a4j:region renderRegionOnly="true">
+        <rich:dataTable width="100%"
+                        value="#{incomeByCashboxComponentAction.resultList}"
+                        var="element"
+                        footerClass="rich-table-footer">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column rowspan="2">
+                        #{messages['IncomeByCashbox.monthName']}
+                    </rich:column>
+                    <rich:column colspan="2">
+                        #{messages['IncomeByCashbox.conceptTotal']}
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        #{messages['IncomeByCashbox.mainUsdTotalAmount']}
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        #{messages['IncomeByCashbox.exchangeRate']}
+                    </rich:column>
+                    <rich:column breakBefore="true">
+                        #{messages['Dashboard.symbol.bs']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Dashboard.symbol.usd']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column styleClass="left" footerClass="rich-table-footercell">
+                <h:outputText value="#{element.monthName}"/>
+                <f:facet name="footer">
+                    #{messages['Dashboard.rowTitle.total']}
+                </f:facet>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.bsAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <f:facet name="footer">
+                    <h:outputText value="#{incomeByCashboxComponentAction.totals['totalBsAmount']}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </f:facet>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.usdAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <f:facet name="footer">
+                    <h:outputText value="#{incomeByCashboxComponentAction.totals['totalUsdAmount']}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </f:facet>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right rich-table-footercell">
+                <h:outputText value="#{element.totalAmount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <f:facet name="footer">
+                    <h:outputText value="#{incomeByCashboxComponentAction.totals['mainTotalAmount']}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </f:facet>
+            </rich:column>
+            <rich:column styleClass="right" footerClass="right">
+                <h:outputText value="#{element.exchangeRate}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+        </rich:dataTable>
+    </a4j:region>
+</ui:composition>

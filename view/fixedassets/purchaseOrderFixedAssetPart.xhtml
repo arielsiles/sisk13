@@ -1,0 +1,285 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{purchaseOrderFixedAssetPartAction.managed}">
+            #{messages['PurchaseOrderFixedAssetPart.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PurchaseOrderFixedAssetPart.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="98%"/>
+<ui:param name="bodyAlign" value="center"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<c:set var="isPurchaseOrderPending" value="#{fixedAssetPurchaseOrderAction.purchaseOrderPending}"/>
+
+<h:form id="purchaseOrderFixedAssetPartForm">
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{purchaseOrderFixedAssetPartAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="1"
+                     rendered="#{!purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}">
+    </h:commandButton>
+
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     tabindex="2"
+                     rendered="#{!purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}"/>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{purchaseOrderFixedAssetPartAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     tabindex="3"
+                     rendered="#{purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}">
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     tabindex="4"
+                     rendered="#{purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="5"/>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{purchaseOrderFixedAssetPartAction.managed}">
+                #{messages['PurchaseOrderFixedAssetPart.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['PurchaseOrderFixedAssetPart.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" width="100%"
+                 columnClasses="width50percent, width50percent">
+        <s:div>
+            <s:decorate id="fixedAssetPartFixedAssetField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.fixedAsset']}"/>
+                </ui:define>
+                <app:quickSearch id="fixedAssetPartFixedAssetQuickSearch"
+                                 textValue="purchaseOrderFixedAssetPart.fixedAsset.barCode"
+                                 value="#{purchaseOrderFixedAssetPart.fixedAsset}"
+                                 searchField="barCode"
+                                 reRender="fixedAssetPartFixedAssetField"
+                                 rendered="#{isPurchaseOrderPending}"
+                                 tabindex="6"/>
+                <app:selectPopUp id="fixedAssetPartFixedAsset"
+                                 required="true"
+                                 textValue="#{purchaseOrderFixedAssetPart.fixedAsset.fullName}"
+                                 value="#{purchaseOrderFixedAssetPart.fixedAsset}"
+                                 clearAction="purchaseOrderFixedAssetPart.cleanFixedAsset()"
+                                 searchModalPanel="fixedAssetSelectListForPartsModalPanel"
+                                 dataModel="#{fixedAssetDataModel}"
+                                 readOnly="#{not isPurchaseOrderPending}"
+                                 reRender="fixedAssetPartFixedAssetField"
+                                 tabindex="7"/>
+            </s:decorate>
+            <s:decorate id="fixedAssetPartMeasureUnitField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.measureUnit']}"/>
+                </ui:define>
+                <app:quickSearch id="measureUnitQuickSearch"
+                                 textValue="purchaseOrderFixedAssetPart.measureUnit.measureUnitCode"
+                                 value="#{purchaseOrderFixedAssetPart.measureUnit}"
+                                 searchField="measureUnitCode"
+                                 reRender="fixedAssetPartMeasureUnitField"
+                                 rendered="#{isPurchaseOrderPending}"
+                                 tabindex="7"/>
+                <h:selectOneMenu id="fixedAssetPartMeasureUnit"
+                                 required="true"
+                                 value="#{purchaseOrderFixedAssetPart.measureUnit}"
+                                 styleClass="inputMedium"
+                                 rendered="#{isPurchaseOrderPending}"
+                                 tabindex="8">
+                    <s:selectItems value="#{measureUnitList}"
+                                   var="element"
+                                   label="#{element.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onblur"
+                                 reRender="fixedAssetPartMeasureUnitField"
+                                 ajaxSingle="true"/>
+                    <a4j:support event="onchange"
+                                 reRender="fixedAssetPartMeasureUnitField"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+                <h:outputText value="#{purchaseOrderFixedAssetPart.measureUnit.fullName}"
+                              rendered="#{not isPurchaseOrderPending}"/>
+            </s:decorate>
+            <s:decorate id="fixedAssetPartUnitPriceField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.unitPrice']}"/>
+                </ui:define>
+                <h:inputText id="fixedAssetPartUnitPrice"
+                             value="#{purchaseOrderFixedAssetPart.unitPrice}"
+                             styleClass="inputNumber"
+                             required="true"
+                             rendered="#{isPurchaseOrderPending}"
+                             tabindex="10">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                             forId="fixedAssetPartUnitPrice"/>
+                    <a4j:support event="onblur"
+                                 reRender="fixedAssetPartUnitPriceField"
+                                 ajaxSingle="true"/>
+                </h:inputText>
+                <h:outputText value="#{purchaseOrderFixedAssetPart.unitPrice}"
+                              rendered="#{not isPurchaseOrderPending}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                &#160;
+                <h:outputText value="#{messages['Currency.Bs']}"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="fixedAssetPartDescriptionField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.description']}"/>
+                </ui:define>
+                <h:inputTextarea id="fixedAssetPartDescription"
+                                 value="#{purchaseOrderFixedAssetPart.description}"
+                                 styleClass="textarea-small"
+                                 required="true"
+                                 readonly="#{not isPurchaseOrderPending}"
+                                 tabindex="11">
+                    <f:validateLength maximum="250"/>
+                    <a4j:support event="onblur"
+                                 reRender="fixedAssetPartDescriptionField"
+                                 ajaxSingle="true"/>
+                </h:inputTextarea>
+            </s:decorate>
+            <s:decorate id="fixedAssetPartSerialNumberField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['PurchaseOrderFixedAssetPart.serialNumber']}"/>
+                </ui:define>
+                <h:inputText id="fixedAssetPartSerialNumber"
+                             value="#{purchaseOrderFixedAssetPart.serialNumber}"
+                             maxlength="250"
+                             styleClass="input"
+                             rendered="#{isPurchaseOrderPending}"
+                             tabindex="12">
+                    <f:validateLength maximum="250"/>
+                    <a4j:support event="onblur"
+                                 reRender="fixedAssetPartSerialNumberField"
+                                 ajaxSingle="true"/>
+                </h:inputText>
+                <h:outputText value="#{purchaseOrderFixedAssetPart.serialNumber}"
+                              rendered="#{not isPurchaseOrderPending}"/>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}"
+                     tabindex="13"/>
+
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     tabindex="14"
+                     rendered="#{!purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}"/>
+
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}"
+                     tabindex="15"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{purchaseOrderFixedAssetPartAction.managed and isPurchaseOrderPending}"
+                     tabindex="16">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{purchaseOrderFixedAssetPartAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="17"/>
+</div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{purchaseOrderFixedAssetPartAction.managed}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['PurchaseOrderFixedAssetPart.delete.confirmation']}">
+                <f:param value="#{purchaseOrderFixedAssetPart.description}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{purchaseOrderFixedAssetPartAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="fixedAssetSelectListForPartsModalPanelContainer"
+            template="/fixedassets/fixedAssetSelectListModalPanel.xhtml">
+    <ui:param name="dialogId" value="fixedAssetSelectListForPartsModalPanel"/>
+    <ui:param name="enableStateFilter" value="false"/>
+    <ui:param name="multiSelect" value="false"/>
+    <ui:param name="dataModel" value="#{fixedAssetDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{purchaseOrderFixedAssetPartAction.putFixedAsset(fixedAssetItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="fixedAssetPartFixedAssetField"
+                           oncomplete="Richfaces.hideModalPanel('fixedAssetSelectListForPartsModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#fixedAssetPartFixedAsset" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,281 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{userAction.managed}">
+            #{messages['User.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['User.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="60%"/>
+
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+<h:form id="userForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{userAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!userAction.managed and s:hasPermission('USER','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton id="updateButtonId"
+                     action="#{userAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{userAction.managed and s:hasPermission('USER','UPDATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{userAction.managed and s:hasPermission('USER','DELETE') and currentUser.id !=  user.id}">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{userAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+
+
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{userAction.managed}">
+                #{messages['User.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['User.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.employee']}</ui:define>
+        <app:selectPopUp id="employee"
+                         required="true"
+                         textValue="#{user.employee.fullName}"
+                         value="#{user.employee}"
+                         clearAction="user.setEmployee(null)"
+                         searchModalPanel="generalEmployeeListModalPanel"
+                         dataModel="#{generalEmployeeDataModel}"
+                         reRender="employeeField"
+                         readOnly="#{userAction.managed}"
+                         tabindex="1"/>
+    </s:decorate>
+
+    <s:decorate id="usernameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.username']}</ui:define>
+        <h:inputText id="username"
+                     value="#{user.username}"
+                     styleClass="input"
+                     required="true"
+                     maxlength="40"
+                     tabindex="2"/>
+    </s:decorate>
+
+    <s:decorate id="passwordField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.password']}</ui:define>
+        <h:inputSecret id="password"
+                       value="#{user.password}"
+                       required="true"
+                       maxlength="40"
+                       redisplay="true"
+                       styleClass="input"
+                       tabindex="3"/>
+    </s:decorate>
+
+    <s:decorate id="confirmPasswordField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.confirmPassword']}</ui:define>
+        <h:inputSecret id="confirmPassword"
+                       value="#{user.confirmPassword}"
+                       required="true"
+                       maxlength="40"
+                       redisplay="true"
+                       styleClass="input"
+                       tabindex="4">
+            <app:validateEqual forId="password" forLabel="#{messages['User.password']}"/>
+        </h:inputSecret>
+    </s:decorate>
+
+    <s:decorate id="emailField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.email']}</ui:define>
+        <h:inputText id="email"
+                     value="#{user.email}"
+                     maxlength="50"
+                     styleClass="input"
+                     required="false"
+                     tabindex="5"/>
+    </s:decorate>
+
+    <s:decorate id="financesUserField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.financesUser']}</ui:define>
+        <h:selectBooleanCheckbox id="financesUser"
+                                 value="#{user.financesUser}"
+                                 disabled="#{userAction.disabledFinancesFields}"
+                                 tabindex="6">
+            <a4j:support event="onclick" reRender="financesCodePanel" ajaxSingle="true"/>
+        </h:selectBooleanCheckbox>
+    </s:decorate>
+
+    <s:div id="financesCodePanel">
+        <c:choose>
+            <c:when test="#{userAction.disabledFinancesFields}">
+                <s:decorate id="financesCodeField" template="/include/viewField.xhtml" styleClass="formRow"
+                            rendered="#{userAction.showFinancesCodeField}">
+                    <ui:define name="label">#{messages['User.financesCode']}</ui:define>
+                    <h:outputText value="#{user.financesCode}"/>
+                </s:decorate>
+            </c:when>
+            <c:otherwise>
+                <s:decorate id="financesCodeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{userAction.showFinancesCodeField}">
+                    <ui:define name="label">#{messages['User.financesCode']}</ui:define>
+                    <h:inputText id="financesCode"
+                                 value="#{user.financesCode}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="4"
+                                 tabindex="7"/>
+                </s:decorate>
+            </c:otherwise>
+        </c:choose>
+    </s:div>
+
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.assignRoles']}</ui:define>
+        <rich:pickList id="userRoles" value="#{user.roles}"
+                       showButtonsLabel="false">
+            <s:selectItems value="#{roleList.resultList}" var="role" label="#{role.name}"/>
+            <s:convertEntity/>
+        </rich:pickList>
+        <!--<h:selectManyListbox value="#{user.roles}"
+                             id="userRoles"
+                             styleClass="input textarea"
+                             tabindex="7">
+            <s:selectItems value="#{roleList.resultList}" var="role" label="#{role.name}"/>
+            <s:convertEntity/>
+        </h:selectManyListbox>-->
+    </s:decorate>
+
+    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.assignBusinessUnits']}</ui:define>
+        <rich:pickList value="#{userAction.businessUnits}"
+                       showButtonsLabel="false">
+            <s:selectItems value="#{businessUnitList.resultList}"
+                           var="businessUnit"
+                           label="#{businessUnit.organization.name}"/>
+            <s:convertEntity/>
+        </rich:pickList>
+    </s:decorate>
+
+    <s:decorate template="/include/viewField.xhtml" rendered="#{userAction.managed}" styleClass="formRow">
+        <ui:define name="label">#{messages['User.createdOn']}</ui:define>
+        <h:outputText value="#{user.creationDate}">
+            <s:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
+    </s:decorate>
+
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{userAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!userAction.managed and s:hasPermission('USER','CREATE')}"
+                     tabindex="8"/>
+
+    <h:commandButton action="#{userAction.update}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{userAction.managed and s:hasPermission('USER','UPDATE')}"
+                     tabindex="9"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{userAction.managed and s:hasPermission('USER','DELETE') and currentUser.id !=  user.id}"
+                     tabindex="10">
+        <rich:componentControl for="deleteConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{userAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="11"
+                     immediate="true"/>
+</div>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{userAction.managed and s:hasPermission('USER','DELETE') and currentUser.id !=  user.id }">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['User.delete.confirmation']}">
+                <f:param value="#{user.employee.fullName}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{userAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           tabindex="16"
+                           rendered="#{s:hasPermission('USER','DELETE') and currentUser.id !=  user.id}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" action="#{userAction.assignEmployee(employeeItem)}"
+                           image="/img/active.gif" style="border:0" ajaxSingle="true"
+                           reRender="formPanel"
+                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+
+<s:fragment rendered="#{!userAction.managed}">
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</s:fragment>
+
+<s:fragment rendered="#{userAction.managed}">
+    <rich:jQuery selector="#username" query="focus()" timing="onload"/>
+</s:fragment>
+
+</ui:define>
+</ui:composition>
+

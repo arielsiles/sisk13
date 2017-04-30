@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+    <factory name="finishedGoodsWarehouseList" value="#{finishedGoodsWarehouseQuery}" />
+    <framework:entity-query name="finishedGoodsWarehouseQuery" ejbql="select warehouse from FinishedGoodsWarehouse warehouse " />
+
+    <factory name="subGroupList" value="#{subGroupQuery}"/>
+    <framework:entity-query name="subGroupQuery"
+                            ejbql="select subGroup from SubGroup subGroup">
+        <framework:restrictions>
+            <value>subGroup.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SubGroupState', 'BLO')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="warehouseDocumentTypeList" value="#{warehouseDocumentTypeQuery}"/>
+    <framework:entity-query name="warehouseDocumentTypeQuery"
+                            ejbql="select documentType from WarehouseDocumentType documentType">
+        <framework:restrictions>
+            <value>documentType.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}
+            </value>
+            <value>documentType.warehouseVoucherType !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType','E')}
+            </value>
+            <value>documentType.warehouseVoucherType !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType','S')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="warehouseSpecialDocumentTypeList" value="#{warehouseSpecialDocumentTypeQuery}"/>
+    <framework:entity-query name="warehouseSpecialDocumentTypeQuery"
+                            ejbql="select documentType from WarehouseDocumentType documentType">
+        <framework:restrictions>
+            <value>documentType.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="warehouseList" value="#{warehouseQuery}"/>
+    <framework:entity-query name="warehouseQuery"
+                            ejbql="select warehouse from Warehouse warehouse">
+        <framework:restrictions>
+            <value>warehouse.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','BLO')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="productItemList" value="#{productItemQuery}"/>
+    <framework:entity-query name="productItemQuery"
+                            ejbql="select productItem from ProductItem productItem">
+        <framework:restrictions>
+            <value>productItem.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState','BLO')}
+            </value>
+        </framework:restrictions>
+        <framework:order>productItem.productItemCode ASC</framework:order>
+    </framework:entity-query>
+
+    <factory name="measureUnitList" value="#{measureUnitQuery}"/>
+    <framework:entity-query name="measureUnitQuery"
+                            ejbql="select measureUnit from MeasureUnit measureUnit order by measureUnit.measureUnitCode"/>
+
+    <factory name="financesEntityList" value="#{financesEntityQuery}"/>
+    <framework:entity-query name="financesEntityQuery"
+                            ejbql="select financesEntity from FinancesEntity financesEntity"/>
+
+    <factory name="groupList" value="#{groupQuery}"/>
+    <framework:entity-query name="groupQuery" ejbql="select group from Group group"/>
+
+    <factory name="measureUnitByProductItemList" value="#{measureUnitByProductItemQuery}"/>
+    <framework:entity-query name="measureUnitByProductItemQuery"
+                            ejbql="select measureUnit from MeasureUnit measureUnit">
+        <framework:restrictions>
+            <value>
+                measureUnit.id.companyNumber = #{warehousePurchaseOrderDetailAction.productItemCompanyNumber}
+            </value>
+            <value>
+                measureUnit.id.measureUnitCode in (#{warehousePurchaseOrderDetailAction.productItemMeasureCodes})
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="productItemByWarehouseList" value="#{productItemByWarehouseQuery}"/>
+    <framework:entity-query name="productItemByWarehouseQuery"
+                            ejbql="select inv.productItem from Inventory inv">
+        <framework:restrictions>
+            <value>
+                inv.warehouse = #{inventoryAction.warehouse}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="soldProductList" value="#{soldProductQuery}"/>
+    <framework:entity-query name="soldProductQuery"
+                            ejbql="select distinct soldProduct from SoldProduct soldProduct">
+        <framework:restrictions>
+            <value>
+                soldProduct.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SoldProductState','PENDING')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+
+    <factory name="productItemQuickSearchList" value="#{productItemQuickSearchQuery}"/>
+    <framework:entity-query name="productItemQuickSearchQuery"
+                            ejbql="select productItem from Provide provider inner join provider.productItem productItem">
+        <framework:restrictions>
+            <value>
+                productItem.id.productItemCode = #{quickSearchAction.searchValue}
+            </value>
+            <value>
+                productItem.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}
+            </value>
+            <value>
+                provider.providerCode = #{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+
+    <factory name="productItemByWarehouseQuickSearchList" value="#{productItemByWarehouseQuickSearchQuery}"/>
+    <framework:entity-query name="productItemByWarehouseQuickSearchQuery"
+                            ejbql="select productItem  from ProductItem productItem, in (productItem.inventories) inventory">
+        <framework:restrictions>
+            <value>
+                productItem.id.productItemCode = #{quickSearchAction.searchValue}
+            </value>
+            <value>
+                inventory.warehouse = #{warehouseVoucherCreateAction.warehouseVoucher.warehouse}
+            </value>
+            <value>
+                inventory.warehouse = #{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}
+            </value>
+            <value>
+                productItem.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="subGroupList2" value="#{subGroupQuery2}"/>
+    <framework:entity-query name="subGroupQuery2" ejbql="select s from SubGroup s">
+        <framework:restrictions>
+            <value>s.group = #{productItemCostUnitReportAction.group}</value>
+            <value>s.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SubGroupState', 'BLO')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+
+    <framework:entity-query name="countProductItemByProviderQuery"
+                            ejbql="select count(p) from Provide p">
+        <framework:restrictions>
+            <value>p.companyNumber = #{provider.companyNumber}</value>
+            <value>p.providerCode = #{provider.providerCode}</value>
+            <value>p.productItemCode = #{provideAction.productItem.productItemCode}</value>
+            <value>p.id != #{provide.id}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <!--Enumerations-->
+
+    <factory name="purchaseOrderTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.purchases.PurchaseOrderType')}"/>
+
+    <factory name="warehouseVoucherTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.warehouse.WarehouseVoucherType')}"/>
+
+    <factory name="documentTypeStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.warehouse.DocumentTypeState')}"/>
+
+    <factory name="warehouseDocumentTypeFieldRestrictionEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.warehouse.WarehouseDocumentTypeFieldRestriction')}"/>
+
+</components>

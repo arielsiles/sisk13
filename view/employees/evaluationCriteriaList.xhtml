@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['EvaluationCriteria.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="evaluationCriteriaSearch">
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['EvaluationCriteria.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{evaluationCriteriaDataModel.criteria.name}"
+                                 maxlength="150"
+                                 styleClass="input"
+                                 tabindex="1"/>
+
+                    <a4j:commandButton action="#{evaluationCriteriaDataModel.search}"
+                                       reRender="evaluationCriteriaList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/evaluationCriteria.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('EVALUATIONCRITERIA','CREATE')}"
+                          propagation="none"
+                          tabindex="3"/>
+            </div>
+
+            <rich:dataTable value="#{evaluationCriteriaDataModel}"
+                            var="evaluationCriteriaItem"
+                            id="evaluationCriteriaList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="85%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="evaluationCriteria.name"
+                                                   dataModel="#{evaluationCriteriaDataModel}"
+                                                   reRender="evaluationCriteriaList, dataScroller">
+                                #{messages['EvaluationCriteria.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{evaluationCriteriaItem.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{evaluationCriteriaAction.select(evaluationCriteriaItem)}"
+                                   rendered="#{s:hasPermission('EVALUATIONCRITERIA','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller"
+                              for="evaluationCriteriaList"
+                              dataModel="#{evaluationCriteriaDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/evaluationCriteria.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('EVALUATIONCRITERIA','CREATE')}"
+                          propagation="none"
+                          tabindex="4"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

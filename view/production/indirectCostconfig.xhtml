@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{indirectCostsConfigurationAction.managed}">
+            #{messages['IndirectcostConfig.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['IndirectcostConfig.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="indirectCostConfigForm">
+    <div class="buttons">
+        <h:commandButton id="createButtonIdUp"
+                         action="#{indirectCostsConfigurationAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton id="updateButtonIdUp"
+                         action="#{indirectCostsConfigurationAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{indirectCostsConfigurationAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{indirectCostsConfigurationAction.managed}">
+                    #{messages['IndirectcostConfig.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['IndirectcostConfig.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['IndirectcostConfig.description']}</ui:define>
+            <h:inputText id="description"
+                         value="#{indirectCostsConfig.description}"
+                         styleClass="input"
+                         required="true"
+                         maxlength="100"
+                         tabindex="1"/>
+        </s:decorate>
+
+        <s:decorate id="indirectCostConfigurationAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['IndirectcostConfig.acount']}</ui:define>
+            <h:inputText id="indirectCostConfigurationAccount"
+                         required="true"
+                         styleClass="input"
+                         readonly="true"
+                         value="#{indirectCostsConfig.cashAccount.accountCode}"
+                         maxlength="100"
+                         tabindex="3"/>
+            <a4j:commandLink id="selectindirectCostConfigurationAccount"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="4"
+                             title="#{messages['IndirectcostConfig.indirectCostConfigurationAccount.select']}"
+                             onclick="Richfaces.showModalPanel('cashAccountListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="5"
+                             title="#{messages['Common.clear']}"
+                             action="#{indirectCostsConfigurationAction.clearCashAccount}"
+                             reRender="indirectCostConfigurationAccount">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+        <s:decorate id="predefinedField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['IndirectcostConfig.predefined']}"/>
+            </ui:define>
+            <h:selectBooleanCheckbox value="#{indirectCostsConfig.predefined}">
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton id="createButtonIdDown"
+                         action="#{indirectCostsConfigurationAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton id="updateButtonId"
+                         action="#{indirectCostsConfigurationAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{indirectCostsConfigurationAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{indirectCostsConfigurationAction.managed and s:hasPermission('INDIRECTCOSTCONFIGURATION','DELETE') and !isWarehouseInUse}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Warehouse.delete.confirmation']}">
+                <f:param value="#{indirectCostsConfig.description}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{indirectCostsConfigurationAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('INDIRECTCOSTCONFIGURATION','DELETE')}"
+                           immediate="true"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{indirectCostsConfigurationAction.assignCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="indirectCostConfigurationAccount"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

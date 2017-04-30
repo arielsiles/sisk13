@@ -1,0 +1,134 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:a4j="http://richfaces.org/a4j">
+
+    <!--
+    Documentation:
+    Attributes:
+    id: This is the h:inputText id and they are used to generate the identifier for other components, it is a required attribute.
+    tabindex: This is the tabindex for the input-text, it is a required attribute.
+    reRender: The id's for the other components that will be rerendered when the ajax request finalize.
+    textValue: This is the value that will be show in the input-text. It is required.
+    readOnly: Just display text of an existing value disabling the possibility to select another one to change its value.
+    namedQuery: The named query that will be execute at search time.
+    postSearchAction: The method name that will be execute when ajax request finalize.
+    alias: The entity alias, this value are used to generate the ejbql.
+    searchField: The search field
+    value: This is the selected value. it is required.
+    rendered: define if the component its rendered or not
+    filters: The filter names that will be enabled to create the query
+    naturalNumber: This boolean value is optional and indicates if the field to search is kind of naturalNumber. By default is false. 
+
+    Restrictions part:
+    In this part can be add restrictions, to make this should be use the 'app:restriction' tag and should be define
+    the 'condition' attribute, in this part can be use the alias attribute value to make a reference to the search entity,
+    because of this if restrictions part is definded, the alias attribute is required.
+
+
+    Converter part:
+    In this part can be add the converters, this used to convert the search value to correct search type,
+    ie, when use Numbers as search value
+
+    The namedQuery attribute:
+    If the attibute 'namedQuery' is defined, the named query should be contain the '#{quickSearchAction.searchValue}'
+    as the basic restriction.
+
+    // todo it is has been removed from inputText, becasuse had a problem with some operations
+    onkeydown="if(#{stopSubmit==true}){dontSubmit(event,this)};"
+    -->
+
+    <c:if test="#{empty rendered}">
+        <c:set var="rendered" value="true"/>
+    </c:if>
+    <c:if test="#{empty readOnly}">
+        <c:set var="readOnly" value="false"/>
+    </c:if>
+    <c:if test="#{empty disabled}">
+        <c:set var="#{disabled}" value="false"/>
+    </c:if>
+    <c:if test="#{empty naturalNumber}">
+        <c:set var="#{naturalNumber}" value="false"/>
+    </c:if>
+
+    <c:choose>
+        <c:when test="#{empty stopSubmitRecoverFocus}">
+            <c:set var="#{stopSubmitRecoverFocus}" value="false"/>
+        </c:when>
+        <c:when test="#{not empty stopSubmitRecoverFocus and stopSubmitRecoverFocus==true}">
+            <c:set var="#{stopSubmit}" value="true"/>
+        </c:when>
+    </c:choose>
+
+    <c:if test="#{empty stopSubmit}">
+        <c:set var="#{stopSubmit}" value="false"/>
+    </c:if>
+
+    <c:if test="#{rendered}">
+        <c:set var="inputHiddenId" value="#{id}_a4jSupport_inputHidden_value"/>
+        <c:set var="textValueEl" value="#{textValue}"/>
+        #{quickSearchAction.evaluateTextValue(textValueEl, rich:findComponent(id))}
+
+        <c:choose>
+            <c:when test="#{readOnly}">
+                <h:outputText value="#{quickSearchAction.searchValue}"/>&#160;&#160;&#160;
+            </c:when>
+            <c:otherwise>
+                <h:inputText id="#{id}"
+                             value="#{quickSearchAction.searchValue}"
+                             styleClass="#{empty styleClass?'tinyQuickSearchInput':styleClass}"
+                             immediate="true"
+                             tabindex="#{tabindex}"
+                             readonly="#{disabled}">
+                    <c:if test="#{naturalNumber}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </c:if>
+                    <a4j:support id="#{id}_a4jSupport"
+                                 event="onblur"
+                                 actionListener="#{quickSearchAction.search}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 reRender="#{reRender}">
+                        <f:attribute name="namedQuery" value="#{namedQuery}"/>
+                        <f:attribute name="postSearchAction" value="#{postSearchAction}"/>
+                        <f:attribute name="searchField" value="#{searchField}"/>
+                        <f:attribute name="alias" value="#{alias}"/>
+                        <f:attribute name="filters" value="#{filters}"/>
+                        <ui:insert name="restrictions"/>
+                    </a4j:support>
+                    <a4j:support id="#{id}_a4jSupportRecoverFocus"
+                                 focus="#{id}"
+                                 event="onkeydown"
+                                 ignoreDupResponses="true"
+                                 requestDelay="500"
+                                 onsubmit="dontSubmit(event,event.target)"
+                                 oncomplete=""
+                                 ajaxSingle="true"
+                                 rendered="#{stopSubmitRecoverFocus}"
+                                 immediate="true"/>
+                    <ui:insert name="converters"/>
+                </h:inputText> &#160;
+            </c:otherwise>
+        </c:choose>
+        <h:inputHidden id="#{inputHiddenId}"
+                       value="#{value}">
+            <s:convertEntity/>
+        </h:inputHidden>
+    </c:if>
+    <script type="text/javascript" language="JavaScript">
+        // <![CDATA[
+        function dontSubmit(event, element) {
+            result = true;
+            if (event.keyCode == 13) {
+                element.blur();
+                result = false;
+            }
+            return result;
+        }
+        // ]]>
+    </script>
+</ui:composition>

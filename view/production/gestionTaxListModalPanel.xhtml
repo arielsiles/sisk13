@@ -1,0 +1,97 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:gestionTaxListForm\\\\:gestionTaxCodeField\\\\:gestionTaxCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['GestionTax.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="gestionTaxListForm">
+        <rich:simpleTogglePanel label="#{messages['GestionTax.search']}" switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionTax.startDate']}</ui:define>
+                    <rich:calendar value="#{gestionTaxSearchDataModel.startDate}"
+                                   tabindex="1" styleClass="input">
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['GestionTax.endDate']}</ui:define>
+                    <rich:calendar value="#{gestionTaxSearchDataModel.endDate}"
+                                   tabindex="2" styleClass="input">
+                    </rich:calendar>
+                    <a4j:commandButton action="#{gestionTaxSearchDataModel.search}"
+                                       reRender="gestionTaxList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="3">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+
+        <div class="buttons">
+            <ui:insert name="addButton"/>
+        </div>
+        <rich:dataTable value="#{gestionTaxSearchDataModel}"
+                        var="gestionTaxItem"
+                        id="gestionTaxList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column styleClass="center">
+                        <app:selectCheckboxHeader dataModel="#{gestionTaxSearchDataModel}"
+                                                  reRender="gestionTaxList, dataScroller"/>
+                    </rich:column>
+                    <rich:column>
+                            #{messages['GestionTax.startDate']}
+                    </rich:column>
+                    <rich:column>
+                            #{messages['GestionTax.endDate']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column styleClass="center">
+                <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                         immediate="true"
+                                         value="#{gestionTaxSearchDataModel.selectedList[gestionTaxSearchDataModel.page][gestionTaxItem.id]}">
+                    <a4j:support event="onchange"
+                                 reRender="selectCheckboxItem"/>
+                </h:selectBooleanCheckbox>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{gestionTaxItem.startDate}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{gestionTaxItem.endDate}"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller"
+                          for="gestionTaxList"
+                          dataModel="#{gestionTaxSearchDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, addButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

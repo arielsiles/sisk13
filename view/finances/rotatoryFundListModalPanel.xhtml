@@ -1,0 +1,250 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false"
+                 style="overflow-y: scroll"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:rotatoryFundListForm\\\\:idNumberField\\\\:idNumber').focus();">
+<f:facet name="header">
+    <h:outputText>#{messages['RotatoryFund.list']}</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" styleClass="select-image" id="closeLink"/>
+</f:facet>
+
+<h:form id="rotatoryFundListForm">
+
+#{rotatoryFundDataModel.setReceivableFundTypeAndApprovedState()}
+
+<rich:simpleTogglePanel id="searchOptionsPanel" label="#{messages['RotatoryFund.search']}" switchType="client">
+
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width55percent,width45percent">
+        <s:div>
+            <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.idNumber']}</ui:define>
+                <h:inputText id="idNumber" value="#{rotatoryFundDataModel.idNumber}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1"/>
+            </s:decorate>
+            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText id="firstName" value="#{rotatoryFundDataModel.firstName}"
+                             maxlength="100" styleClass="input"
+                             tabindex="2"/>
+            </s:decorate>
+            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText id="lastName" value="#{rotatoryFundDataModel.lastName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="3"/>
+            </s:decorate>
+            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText id="maidenName" value="#{rotatoryFundDataModel.maidenName}"
+                             maxlength="100"
+                             styleClass="input"
+                             tabindex="4"/>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RotatoryFund.code']}</ui:define>
+                <h:inputText id="code"
+                             value="#{rotatoryFundDataModel.criteria.code}"
+                             styleClass="input"
+                             tabindex="4">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    <a4j:support event="onchange"
+                                 reRender="codeField"
+                                 ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RotatoryFund.businessUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnitCode"
+                                 value="#{rotatoryFundDataModel.criteria.businessUnit}"
+                                 styleClass="input"
+                                 tabindex="7">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RotatoryFund.description']}</ui:define>
+                <h:inputText id="description"
+                             value="#{rotatoryFundDataModel.criteria.description}"
+                             styleClass="input"
+                             tabindex="5">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RotatoryFund.amount']}</ui:define>
+                <h:inputText id="amount"
+                             value="#{rotatoryFundDataModel.criteria.amount}"
+                             styleClass="inputSmall"
+                             tabindex="6">
+                    <app:realNumberConverter forId="amount" pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:inputText>
+                <a4j:commandButton action="#{rotatoryFundDataModel.search()}"
+                                   reRender="searchOptionsPanel, rotatoryFundList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="11">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+                <a4j:commandButton action="#{rotatoryFundDataModel.clear()}"
+                                   reRender="searchOptionsPanel, rotatoryFundList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.clear']}"
+                                   id="clearButtonId"
+                                   tabindex="12">
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+</rich:simpleTogglePanel>
+
+<br/>
+
+<rich:dataTable id="rotatoryFundList"
+                value="#{rotatoryFundDataModel}"
+                var="rotatoryFundItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%,12%,23%,10%,10%,10%,10%,10%,5%">
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.code"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.code']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.businessUnit"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.businessUnit']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.employee"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.employee']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.startDate"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.startDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.expirationDate"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.expirationDate']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.amount"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.amount']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.receivableResidue"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.receivableResidue']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="rotatoryFund.payableResidue"
+                                       dataModel="#{rotatoryFundDataModel}"
+                                       reRender="rotatoryFundList, dataScroller">
+                    #{messages['RotatoryFund.payableResidue']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
+                #{messages['Common.action']}
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column styleClass="right">
+        <h:outputText value="#{rotatoryFundItem.code}">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{rotatoryFundItem.businessUnit.fullName}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{rotatoryFundItem.employee.fullName}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{rotatoryFundItem.startDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{rotatoryFundItem.expirationDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                               timeZone="#{sessionUser.timeZone}"
+                               type="date"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{rotatoryFundItem.amount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{rotatoryFundItem.receivableResidue}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{rotatoryFundItem.payableResidue}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+        <h:outputText value=" #{messages[rotatoryFundItem.payCurrency.symbolResourceKey]}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <ui:insert name="assignButton"/>
+    </rich:column>
+</rich:dataTable>
+
+<app:dataScroller id="dataScroller" for="rotatoryFundList" dataModel="#{rotatoryFundDataModel}"/>
+
+<rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                       operation="hide" event="onclick"/>
+
+</h:form>
+</rich:modalPanel>

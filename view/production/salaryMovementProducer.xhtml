@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{salaryMovementProducerAction.managed}">
+                #{messages['SalaryMovementProducerAction.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['SalaryMovementProducerAction.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementProducerForm">
+            <div class="buttons">
+                <h:commandButton action="#{salaryMovementProducerAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!salaryMovementProducerAction.managed and s:hasPermission('SALARYMOVEMENTPRODUCER','CREATE')}" >
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{salaryMovementProducerAction.update}" value="#{messages['Common.update']}"
+                                 styleClass="button" rendered="#{salaryMovementProducerAction.managed and salaryMovementProducerAction.pending and s:hasPermission('SALARYMOVEMENTPRODUCER','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{salaryMovementProducerAction.managed and salaryMovementProducerAction.pending and s:hasPermission('SALARYMOVEMENTPRODUCER','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{salaryMovementProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{salaryMovementProducerAction.managed}">
+                            #{messages['SalaryMovementProducer.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['SalaryMovementProducer.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="rawMaterialProducerField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.rawMaterialProducer']}</ui:define>
+                    <app:selectPopUp id="rawMaterialProducer"
+                                     required="true"
+                                     textValue="#{salaryMovementProducer.rawMaterialProducer.fullName}"
+                                     value="#{salaryMovementProducer.rawMaterialProducer}"
+                                     dataModel="#{rawMaterialProducerDataModel}"
+                                     clearAction="salaryMovementProducerAction.clearRawMaterialProducer()"
+                                     searchModalPanel="rawMaterialProducerListModalPanel"
+                                     reRender="rawMaterialProducerField"
+                                     readOnly="#{salaryMovementProducerAction.managed}"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="typeMovementProducerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.typeMovementProducer']}</ui:define>
+                    <h:selectOneMenu id="typeMovementProducer"
+                                     value="#{salaryMovementProducer.typeMovementProducer}"
+                                     styleClass="input"
+                                     tabindex="3"
+                                     required="true">
+                        <s:selectItems value="#{typeMovementProducerList}" var="typeMovementProducer"
+                                       label="#{typeMovementProducer.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.date']}</ui:define>
+                    <rich:calendar value="#{salaryMovementProducer.date}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="4"
+                                   required="true">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="valorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.valor']}</ui:define>
+                    <h:inputText id="valor" value="#{salaryMovementProducer.valor}" styleClass="input" required="true"
+                                 maxlength="100" tabindex="5">
+                        <a4j:support event="onblur" reRender="valorField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.description']}</ui:define>
+                    <h:inputTextarea id="description"
+                                     value="#{salaryMovementProducer.description}"
+                                     styleClass="input textarea"
+                                     tabindex="6">
+                        <a4j:support event="onblur" reRender="valorField"/>
+                    </h:inputTextarea>
+                </s:decorate>
+
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{salaryMovementProducerAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!salaryMovementProducerAction.managed and s:hasPermission('SALARYMOVEMENTPRODUCER','CREATE')}" >
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{salaryMovementProducerAction.update}" value="#{messages['Common.update']}"
+                                 styleClass="button" rendered="#{salaryMovementProducerAction.managed and salaryMovementProducerAction.pending and s:hasPermission('SALARYMOVEMENTPRODUCER','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{salaryMovementProducerAction.managed and salaryMovementProducerAction.pending and s:hasPermission('SALARYMOVEMENTPRODUCER','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{salaryMovementProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{salaryMovementProducerAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['SalaryMovementProducer.delete.confirmation']}">
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{salaryMovementProducerAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="rawMaterialProdecerModalPanelContainer"
+                    template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                    rendered="#{not salaryMovementProducerAction.managed}">
+            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{salaryMovementProducerAction.selectRawMaterialProducer(rawMaterialProducerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="rawMaterialProducerField"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

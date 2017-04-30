@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['AdministrativeNotification.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="admin"/>
+    <ui:define name="body">
+        <h:form id="administrativeNotificationSearch">
+            <rich:simpleTogglePanel label="#{messages['AdministrativeNotification.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AdministrativeNotification.title']}</ui:define>
+                    <h:inputText id="title" value="#{administrativeNotificationDataModel.criteria}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton id="searchButtonId" action="#{administrativeNotificationDataModel.search}"
+                                       reRender="administrativeNotificationList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#title" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/administrativeNotification.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <rich:dataTable id="administrativeNotificationList"
+                            value="#{administrativeNotificationList}"
+                            var="administrativeNotificationItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            reRender="dataScroller"
+                            sortPriority="#{administrativeNotificationDataModel.sortPriority}"
+                            sortMode="multi"
+                            width="100%"
+                            columnsWidth="15%, 14%, 14%, 14%, 14%, 14%, 15%">
+                <rich:column sortBy="#{administrativeNotificationItem.title}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.title']}"/>
+                    </f:facet>
+                    <h:outputText value="#{administrativeNotificationItem.title}"/>
+                </rich:column>
+                <rich:column sortBy="#{administrativeNotificationItem.createdBy.employee.fullName}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.createdBy']}"/>
+                    </f:facet>
+                    <h:outputText value="#{administrativeNotificationItem.createdBy.employee.fullName}"/>
+                </rich:column>
+                <rich:column sortBy="#{messages[administrativeNotificationItem.administrativeEventType.resourceKey]}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.administrativeEventType']}"/>
+                    </f:facet>
+                    <h:outputText
+                            value="#{messages[administrativeNotificationItem.administrativeEventType.resourceKey]}"/>
+                </rich:column>
+                <rich:column id="publishDate" sortOrder="DESCENDING"
+                             sortBy="#{administrativeNotificationItem.publishDate}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.publishDate']}"/>
+                    </f:facet>
+                    <h:outputText value="#{administrativeNotificationItem.publishDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column sortBy="#{administrativeNotificationItem.expirationDate}">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.expirationDate']}"/>
+                    </f:facet>
+                    <h:outputText value="#{administrativeNotificationItem.expirationDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column id="active" sortOrder="DESCENDING" sortBy="#{administrativeNotificationItem.active}"
+                             styleClass="center">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['AdministrativeNotification.active']}"/>
+                    </f:facet>
+                    <h:graphicImage value="/img/infoIcon.gif" style="border:0;vertical-align:middle;"
+                                    alt="#{messages['administrativeNotificationItem.active']}"
+                                    rendered="#{administrativeNotificationItem.active}"/>
+                    <h:graphicImage value="/img/errorIcon.gif" style="border:0;vertical-align:middle;"
+                                    alt="#{messages['administrativeNotificationItem.active']}"
+                                    rendered="#{!administrativeNotificationItem.active}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['Common.action']}"/>
+                    </f:facet>
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','VIEW')}"
+                                   action="#{administrativeNotificationAction.select(administrativeNotificationItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <rich:datascroller id="dataScroller" align="right" for="administrativeNotificationList" maxPages="10"
+                               renderIfSinglePage="false"/>
+            <rich:jQuery selector="#administrativeNotificationList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#administrativeNotificationList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/admin/administrativeNotification.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','CREATE')}"
+                          propagation="begin"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <h:panelGrid columns="1"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 rendered="#{liquidationPaymentAction.checkPayment}">
+        <s:div id="purchaseOrderWithCheckPanel">
+            <div class="buttons">
+                <a4j:commandButton id="addProductItemButton"
+                                   action="#{purchaseOrderWithCheckSearchDataModel.reset()}"
+                                   value="#{messages['PurchaseOrder.withCheck']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('purchaseOrderWithCheckListModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   disabled="#{liquidationPaymentAction.hasAccountCorrency}"
+                                   reRender="purchaseOrderWithCheckListModalPanel">
+                    <f:attribute name="entityManagerName" value=""/>
+                    <f:attribute name="dataModelObject" value="#{purchaseOrderWithCheckSearchDataModel}"/>
+                    <app:criteriaValue fieldName="id"
+                                       value="#{warehousePurchaseOrderAction.purchaseOrder.id}"/>
+                    <app:criteriaValue fieldName="state"
+                                       value="#{warehousePurchaseOrderAction.purchaseOrder.state}"/>
+                    <app:criteriaValue fieldName="provider"
+                                       value="#{warehousePurchaseOrderAction.purchaseOrder.provider}"/>
+                </a4j:commandButton>
+            </div>
+
+            <rich:dataTable value="#{liquidationPaymentAction.purchaseOrdersWithCheck}"
+                            var="purchaseOrderItem"
+                            id="purchaseOrderWithCheckList"
+                            width="100%"
+                            columnsWidth="10%, 15%, 10%, 14%, 15%, 18%, 10%, 8%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                                #{messages['WarehousePurchaseOrder.orderNumber']}
+                        </rich:column>
+                        <rich:column>
+                                #{messages['WarehousePurchaseOrder.invoiceNumber']}
+                        </rich:column>
+                        <rich:column>
+                                #{messages['WarehousePurchaseOrder.date']}
+                        </rich:column>
+                        <rich:column>
+                                #{messages['WarehousePurchaseOrder.responsible']}
+                        </rich:column>
+                        <!--<rich:column>
+                                #{messages['WarehousePurchaseOrder.provider']}
+                        </rich:column>-->
+                        <rich:column>
+                                #{messages['WarehousePurchaseOrder.warehouse']}
+                        </rich:column>
+                        <!--<rich:column>
+                                #{messages['WarehousePurchaseOrder.state']}
+                        </rich:column>-->
+                        <rich:column>
+                            #{messages['WarehousePurchaseOrder.totalAmount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.orderNumber}"/>
+                </rich:column>
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.invoiceNumber}"/>
+                </rich:column>
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.responsible.fullName}"/>
+                </rich:column>
+                <!--<rich:column >
+                    <h:outputText value="#{purchaseOrderItem.provider.fullName}"/>
+                </rich:column>-->
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.warehouse.fullName}"/>
+                </rich:column>
+                <!--<rich:column >
+                    <h:outputText value="#{messages[purchaseOrderItem.state.resourceKey]}"/>
+                </rich:column>-->
+                <rich:column >
+                    <h:outputText value="#{purchaseOrderItem.totalAmount}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <s:div id="removeLinkId">
+                        <a4j:commandLink ajaxSingle="true"
+                                         immediate="true"
+                                         title="#{messages['Common.remove']}"
+                                         action="#{liquidationPaymentAction.removePurchaseOrder(mainAction.removePurchaseOrderAndGetCurrentBalanceAmount(purchaseOrderItem))}"
+                                         reRender="globalDiv">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </s:div>
+                </rich:column>
+
+            </rich:dataTable>
+
+            <!--<app:dataScroller id="dataScrollerWithCheckList" for="purchaseOrderWithCheckList" dataModel="#{purchaseOrderWithCheckSearchDataModel}"/>-->
+
+
+        </s:div>
+    </h:panelGrid>
+</ui:composition>

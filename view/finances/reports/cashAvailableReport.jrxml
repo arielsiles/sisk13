@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="1332" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="1302" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30" isSummaryWithPageHeaderAndFooter="true">
+	<import value="com.encens.khipus.action.finances.reports.CashAvailableReportUtil"/>
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<field name="financesBank.id" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="financesBank.name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.companyNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.accountNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.currency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<title>
+		<band height="75">
+			<image scaleImage="RetainShape" onErrorType="Icon">
+				<reportElement key="COMPANY_LOGO_ELEMENT" x="0" y="0" width="72" height="58" isRemoveLineWhenBlank="true"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logoIlva.png")]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="" style="titleStyle" positionType="Float" x="72" y="0" width="838" height="30"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="72" y="30" width="838" height="12"/>
+				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dateRangeParam}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="12" splitType="Stretch">
+			<frame>
+				<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="1302" height="12"/>
+				<box padding="0">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="100" height="12"/>
+					<box padding="1">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="1211" y="0" width="40" height="12"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="1251" y="0" width="10" height="12"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="1261" y="0" width="40" height="12"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="400">
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="1302" height="24"/>
+				<crosstab>
+					<reportElement mode="Transparent" x="200" y="0" width="1080" height="24"/>
+					<rowGroup name="emptyRowGroup" width="0">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents/>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="financesBank.name" height="12" headerPosition="Stretch">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[$F{financesBank.name}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents mode="Opaque">
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid"/>
+								</box>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="headerStyle" stretchType="RelativeToTallestObject" x="0" y="0" width="90" height="12"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<textFieldExpression class="java.lang.String"><![CDATA[$V{financesBank.name}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<columnGroup name="financesBankAccount.accountNumber" height="12">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[$F{financesBankAccount.accountNumber}+ " " + str($F{financesBankAccount.currency}.getSymbolResourceKey())]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents mode="Opaque">
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid"/>
+								</box>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="90" height="12"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<textFieldExpression class="java.lang.String"><![CDATA[$V{financesBankAccount.accountNumber}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="emptyMeasure" class="java.lang.String">
+						<measureExpression><![CDATA[""]]></measureExpression>
+					</measure>
+					<crosstabCell width="90" height="0">
+						<cellContents/>
+					</crosstabCell>
+				</crosstab>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="24" width="1302" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="200" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.cashAtBanks}]]></textFieldExpression>
+				</textField>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="200" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="executorUnitIdParam">
+						<subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="groupIdentifierParam">
+						<subreportParameterExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.BALANCES_GROUP_KEY]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BANKACCOUNTCROSSTABSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="36" width="1302" height="12"/>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" x="0" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{EXECUTORUNITDEPOSITSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="48" width="1302" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="200" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.depositTotal}]]></textFieldExpression>
+				</textField>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="200" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="executorUnitIdParam">
+						<subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="groupIdentifierParam">
+						<subreportParameterExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.TOTALDEPOSIT_GROUP_KEY]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BANKACCOUNTCROSSTABSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="60" width="1302" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="200" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.depositBalancesTotal}]]></textFieldExpression>
+				</textField>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="200" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="executorUnitIdParam">
+						<subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="groupIdentifierParam">
+						<subreportParameterExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.TOTALDEPOSITBALANCES_GROUP_KEY]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BANKACCOUNTCROSSTABSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="84" width="1302" height="12"/>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" x="0" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{EXECUTORUNITCHECKRECEIVABLESUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="96" width="1302" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="200" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.totalCheckReceivable}]]></textFieldExpression>
+				</textField>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="200" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="executorUnitIdParam">
+						<subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="groupIdentifierParam">
+						<subreportParameterExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.TOTALCHECKSRECEIVABLE_GROUP_KEY]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BANKACCOUNTCROSSTABSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="120" width="1302" height="12"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="200" height="12"/>
+					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Top"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.total}]]></textFieldExpression>
+				</textField>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="200" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="executorUnitIdParam">
+						<subreportParameterExpression><![CDATA[null]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="groupIdentifierParam">
+						<subreportParameterExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.TOTALCASHAVAILABLE_GROUP_KEY]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BANKACCOUNTCROSSTABSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="200" y="157" width="460" height="36"/>
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="460" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="headerStyleBlank" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="90" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.BalancesTotal}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="90" y="0" width="90" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.totalBs}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="180" y="0" width="100" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[CashAvailableReportUtil.getCrossTabInfoValue($P{crosstabInfoMapParam},CashAvailableReportUtil.PARTIALTOTAL_BS_BALANCES_KEY)]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="280" y="0" width="20" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.exchangeRate}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="300" y="0" width="35" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[CashAvailableReportUtil.getCrossTabInfoValue($P{crosstabInfoMapParam},CashAvailableReportUtil.EXCHANGE_RATE_KEY)]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="340" y="0" width="100" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[CashAvailableReportUtil.getCrossTabInfoValue($P{crosstabInfoMapParam},CashAvailableReportUtil.PARTIALTOTAL_BSSUS_BALANCES_KEY)]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="12" width="460" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="90" y="0" width="90" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.totalSus}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="340" y="0" width="100" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[CashAvailableReportUtil.getCrossTabInfoValue($P{crosstabInfoMapParam},CashAvailableReportUtil.PARTIALTOTAL_SUS_BALANCES_KEY)]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="24" width="460" height="12"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="90" y="0" width="90" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left" verticalAlignment="Top"/>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.cashAvailable.totalInSus}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="340" y="0" width="100" height="12"/>
+						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="1.0"/>
+							<leftPen lineWidth="1.0"/>
+							<bottomPen lineWidth="1.0"/>
+							<rightPen lineWidth="1.0"/>
+						</box>
+						<textElement textAlignment="Right"/>
+						<textFieldExpression class="java.math.BigDecimal"><![CDATA[CashAvailableReportUtil.getCrossTabInfoValue($P{crosstabInfoMapParam},CashAvailableReportUtil.TOTAL_SUS_BALANCES_KEY)]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="204" width="1302" height="12"/>
+				<subreport isUsingCache="true">
+					<reportElement positionType="Float" x="0" y="0" width="562" height="12"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="crosstabInfoMapParam">
+						<subreportParameterExpression><![CDATA[$P{crosstabInfoMapParam}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="JPA_ENTITY_MANAGER">
+						<subreportParameterExpression><![CDATA[$P{JPA_ENTITY_MANAGER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{EXECUTORUNITCOLLECTIONSUBREPORT}]]></subreportExpression>
+				</subreport>
+			</frame>
+		</band>
+	</summary>
+</jasperReport>

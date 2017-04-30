@@ -1,0 +1,131 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:costCenterListForm\\\\:codeField\\\\:code').focus();">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['CostCenter.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="costCenterListForm">
+        <rich:simpleTogglePanel label="#{messages['CostCenter.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <ui:insert name="searchOptions"/>
+                <s:div>
+                    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CostCenter.code']}</ui:define>
+                        <h:inputText id="code" value="#{costCenterDataModel.criteria.code}"
+                                     maxlength="20"
+                                     styleClass="input"
+                                     tabindex="1"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Common.showAll']}</ui:define>
+                        <h:selectBooleanCheckbox id="showAll" value="#{costCenterDataModel.showAll}" tabindex="2"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CostCenter.description']}</ui:define>
+                        <h:inputText id="description"
+                                     value="#{costCenterDataModel.criteria.description}"
+                                     maxlength="200"
+                                     styleClass="input"
+                                     tabindex="4"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{costCenterDataModel.search}"
+                                           reRender="costCenterList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="4">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+        <br/>
+        <c:set var="vigState"
+               value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.CostCenterState', 'VIG')}"/>
+        <rich:dataTable value="#{costCenterDataModel}"
+                        var="costCenterItem"
+                        id="costCenterList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="25%, 15%, 45%, 10%, 5%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.groupCode,costCenter.code"
+                                               dataModel="#{costCenterDataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.group']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.code"
+                                               dataModel="#{costCenterDataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.description"
+                                               dataModel="#{costCenterDataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="costCenter.exclusiveConsumption"
+                                               dataModel="#{costCenterDataModel}"
+                                               reRender="costCenterList, dataScroller">
+                            #{messages['CostCenter.exclusiveConsumption']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText rendered="#{not empty costCenterItem.costCenterGroup}"
+                              value="#{costCenterItem.costCenterGroup.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{costCenterItem.code}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{costCenterItem.description}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:outputText value="#{messages[costCenterItem.exclusiveConsumption?'Common.yes':'Common.not']}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <s:div rendered="#{costCenterItem.state==vigState and costCenterItem.hasMovement==true}">
+                    <ui:insert name="assignButton"/>
+                    <rich:componentControl for="costCenterListModalPanel" attachTo="assignButton" operation="hide"
+                                           event="onclick"/>
+
+                </s:div>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="costCenterList" dataModel="#{costCenterDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

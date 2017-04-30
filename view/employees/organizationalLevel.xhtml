@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{organizationalLevelAction.managed}">
+                #{messages['OrganizationalLevel.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['OrganizationalLevel.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="organizationalLevelForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{organizationalLevelAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{organizationalLevelAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{organizationalLevelAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{organizationalLevelAction.managed}">
+                            #{messages['OrganizationalLevel.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['OrganizationalLevel.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrganizationalLevel.name']}</ui:define>
+                    <h:inputText id="name" value="#{organizationalLevel.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" reRender="nameField"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrganizationalLevel.acronym']}</ui:define>
+                    <h:inputText id="acronym" value="#{organizationalLevel.acronym}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="2">
+                        <a4j:support event="onblur" reRender="acronymField"/>
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="funcionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrganizationalLevel.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{organizationalLevel.description}"
+                                     styleClass="input textarea" tabindex="3">
+                        <a4j:support event="onblur" reRender="descriptionField"/>
+                    </h:inputTextarea>
+                </s:decorate>
+                <s:decorate id="organizationalLevelRootField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['OrganizationalLevel.organizationalLevelRoot']}</ui:define>
+                    <h:selectOneMenu id="organizationalLevelRoot"
+                                     value="#{organizationalLevel.organizationalLevelRoot}"
+                                     styleClass="input"
+                                     tabindex="4">
+                        <s:selectItems value="#{organizationalLevelList.resultList}" var="organizationalLevel"
+                                       label="#{organizationalLevel.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{organizationalLevelAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','CREATE')}"
+                                 tabindex="5">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{organizationalLevelAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','UPDATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','DELETE')}"
+                                 tabindex="7">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{organizationalLevelAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 tabindex="8">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{organizationalLevelAction.managed and s:hasPermission('ORGANIZATIONALLEVEL','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['OrganizationalLevel.delete.confirmation']}">
+                        <f:param value="#{organizationalLevel.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{organizationalLevelAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   rendered="#{s:hasPermission('ORGANIZATIONALLEVEL','DELETE')}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

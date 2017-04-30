@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['GenerateTeacherContract.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="generateContractForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{generateTeacherContractAction.generateDocument}"
+                                 value="#{messages['GenerateTeacherContract.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('TEACHERCONTRACT','VIEW')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    #{messages['GenerateTeacherContract.title']}
+                </f:facet>
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['User.idNumber']}</ui:define>
+                            <h:inputText id="idNumber" value="#{generateTeacherContractAction.idNumber}"
+                                         maxlength="100" tabindex="3" styleClass="input">
+                                <app:naturalNumberConverter forId="idNumber"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="jubilateFlagField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateTeacherContract.jubilateFlag']}</ui:define>
+                            <h:selectOneMenu id="jubilateFlag"
+                                             value="#{generateTeacherContractAction.jubilateFlag}"
+                                             styleClass="input"
+                                             tabindex="4">
+                                <s:selectItems value="#{booleanEnum}" var="boolean"
+                                               label="#{messages[boolean.resourceKey]}"
+                                               itemValue="#{boolean.value}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="organizationalUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['JobContract.organizationalUnit']}</ui:define>
+                            <h:inputText styleClass="input" readonly="true"
+                                         value="#{generateTeacherContractAction.organizationalUnit.fullName}" tabindex="5"/>
+                            <a4j:commandLink id="selectOrganizationUnit"
+                                             ajaxSingle="true"
+                                             immediate="true"
+                                             tabindex="5"
+                                             title="#{messages['JobContract.selectOrganizationalUnit']}"
+                                             action="#{organizationalUnitTreeAction.clearSelectedOrganizationalUnit()}"
+                                             reRender="organizationalUnitTreeModalPanelContainer"
+                                             oncomplete="Richfaces.showModalPanel('organizationalUnitTreeModalPanel');">
+                                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink id="selectButton" ajaxSingle="true" immediate="true" tabindex="6"
+                                             title="#{messages['Common.clear']}"
+                                             action="#{generateTeacherContractAction.clearOrganizationalUnit()}"
+                                             reRender="organizationalUnitField, businessUnitField">
+                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </s:decorate>
+
+                        <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateTeacherContract.sede']}</ui:define>
+                            <h:selectOneMenu id="businessUnit" value="#{generateTeacherContractAction.businessUnit}"
+                                             rendered="#{not generateTeacherContractAction.hasOrganizationalUnit()}"
+                                             styleClass="input"
+                                             required="true" tabindex="7">
+                                <s:selectItems value="#{businessUnitList.resultList}" var="businessUnit"
+                                               label="#{businessUnit.organization.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                            <h:outputText value="#{generateTeacherContractAction.businessUnit.organization.name}" rendered="#{generateTeacherContractAction.hasOrganizationalUnit()}"/>
+                        </s:decorate>
+                    </s:div>
+                    <s:div>
+                        <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateTeacherContract.jobCategory']}</ui:define>
+                            <h:selectOneMenu id="jobCategory" value="#{generateTeacherContractAction.jobCategory}"
+                                             styleClass="input"
+                                             required="true" tabindex="8">
+                                <s:selectItems value="#{jobCategoryList}" var="jobCategory"
+                                               label="#{jobCategory.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="templateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateTeacherContract.template']}</ui:define>
+                            <h:selectOneMenu id="template" value="#{generateTeacherContractAction.template}"
+                                             styleClass="input"
+                                             required="true" tabindex="9">
+                                <s:selectItems value="#{templateList.resultList}" var="template"
+                                               label="#{template.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateTeacherContract.initContractRangeDate']}</ui:define>
+                            <rich:calendar id="initDate"
+                                           value="#{generateTeacherContractAction.initDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="10">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['GenerateTeacherContract.endContractRangeDate']}</ui:define>
+                            <rich:calendar id="endDate"
+                                           value="#{generateTeacherContractAction.endDate}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           required="true"
+                                           tabindex="11">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                                <app:dateRangeValidator forId="initDate"
+                                                        forLabel="#{messages['GenerateTeacherContract.initContractRangeDate']}"
+                                                        type="greater"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{generateTeacherContractAction.generateDocument}"
+                                 value="#{messages['GenerateTeacherContract.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('TEACHERCONTRACT','VIEW')}"
+                                 tabindex="20">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+
+        <s:decorate id="organizationalUnitTreeModalPanelContainer" template="/employees/organizationalUnitTreeModalPanel.xhtml">
+            <ui:param name="selectAnyElement" value="false"/>
+            <ui:define name="selectOption">
+                <a4j:commandButton id="selectButton" value="#{messages['Common.choose']}"
+                                   action="#{generateTeacherContractAction.assignOrganizationalUnit(organizationalUnitTreeAction.selectedOrganizationalUnit)}"
+                                   ajaxSingle="true" reRender="organizationalUnitField, businessUnitField"/>
+            </ui:define>
+        </s:decorate>
+
+
+    </ui:define>
+</ui:composition>
+

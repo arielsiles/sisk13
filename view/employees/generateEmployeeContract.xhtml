@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        #{messages['GenerateContract.title']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="generateContractForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{generateEmployeeContractAction.generateDocument}"
+                                 value="#{messages['GenerateContract.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{generateEmployeeContractAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="2">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    #{messages['GenerateContract.title']}
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent">
+                    <s:div>
+
+                        <s:decorate id="templateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['GenerateContract.template']}</ui:define>
+                            <h:selectOneMenu id="template" value="#{generateEmployeeContractAction.template}"
+                                             styleClass="input"
+                                             required="true" tabindex="5">
+                                <s:selectItems value="#{templateList.resultList}" var="template"
+                                               label="#{template.name}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{generateEmployeeContractAction.generateDocument}"
+                                 value="#{messages['GenerateContract.generateDocument']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}"
+                                 tabindex="6">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{generateEmployeeContractAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="7">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <rich:jQuery selector="#template" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

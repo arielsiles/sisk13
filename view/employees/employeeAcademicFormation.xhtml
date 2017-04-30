@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{employeeAcademicFormationAction.managed}">
+                #{messages['AcademicFormation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['AcademicFormation.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="65%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="employeeAcademicFormationForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{employeeAcademicFormationAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{employeeAcademicFormationAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','CREATE')}"/>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{employeeAcademicFormationAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{employeeAcademicFormationAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{employeeAcademicFormationAction.managed}">
+                            #{messages['AcademicFormation.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['AcademicFormation.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.name']}</ui:define>
+                    <h:inputText id="name" value="#{employeeAcademicFormation.name}"
+                                 styleClass="input" required="true" maxlength="250" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="universityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.university']}</ui:define>
+                    <h:inputText id="university" value="#{employeeAcademicFormation.university}"
+                                 styleClass="input" required="true" maxlength="250" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="academicFormationTypeField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['AcademicFormation.type']}</ui:define>
+                    <h:selectOneMenu id="academicFormationType"
+                                     value="#{employeeAcademicFormation.academicFormationType}"
+                                     styleClass="input" required="true" tabindex="3">
+                        <s:selectItems value="#{academicFormationTypeEnum}"
+                                       var="aft"
+                                       label="#{messages[aft.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{employeeAcademicFormationAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','CREATE')}"/>
+
+                <h:commandButton action="#{employeeAcademicFormationAction.createAndNew}"
+                                 value="#{messages['Common.saveAndNew']}"
+                                 styleClass="button"
+                                 rendered="#{!employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','CREATE')}"/>
+
+                <h:commandButton action="#{employeeAcademicFormationAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{employeeAcademicFormationAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+        </h:form>
+
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{employeeAcademicFormationAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['AcademicFormation.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Group.delete.confirmation']}">
+                        <f:param value="#{employeeAcademicFormation.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{employeeAcademicFormationAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('EMPLOYEEACADEMICFORMATION','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

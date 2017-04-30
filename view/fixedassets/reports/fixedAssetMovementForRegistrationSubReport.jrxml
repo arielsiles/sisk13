@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReportTemplate" pageWidth="792" pageHeight="612" orientation="Landscape"
+              whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="0" rightMargin="50" topMargin="0"
+              bottomMargin="0">
+    <template>
+        <![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/voucherReportStyles.jrtx")]]></template>
+    <field name="fixedAssetGroup.groupCode" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+    </field>
+    <field name="fixedAssetGroup.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+    </field>
+    <field name="fixedAssetSubGroup.fixedAssetSubGroupCode" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+    </field>
+    <field name="fixedAssetSubGroup.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.barCode" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.detail" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.measurement" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.trademark" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.model" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.duration" class="java.lang.Integer">
+        <fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.ufvOriginalValue" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.currencyType" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+        <fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.sequence" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+    </field>
+    <field name="fixedAssetPart.id" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_16]]></fieldDescription>
+    </field>
+    <field name="fixedAssetPart.number" class="java.lang.Long">
+        <fieldDescription><![CDATA[COLUMN_17]]></fieldDescription>
+    </field>
+    <field name="fixedAssetPart.description" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_18]]></fieldDescription>
+    </field>
+    <field name="measureUnit.name" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_19]]></fieldDescription>
+    </field>
+    <field name="fixedAssetPart.unitPrice" class="java.math.BigDecimal">
+        <fieldDescription><![CDATA[COLUMN_20]]></fieldDescription>
+    </field>
+    <field name="fixedAssetPart.serialNumber" class="java.lang.String">
+        <fieldDescription><![CDATA[COLUMN_21]]></fieldDescription>
+    </field>
+    <field name="fixedAsset.registrationDate" class="java.util.Date">
+        <fieldDescription><![CDATA[COLUMN_22]]></fieldDescription>
+    </field>
+
+    <variable name="unitPriceTotal" calculation="Sum" resetType="Group" resetGroup="fixedAssetIdGroup" class="java.math.BigDecimal">
+        <variableExpression>$F{fixedAssetPart.unitPrice}</variableExpression>
+    </variable>
+
+    <group name="fixedAssetReportGroup">
+        <groupExpression>$F{fixedAsset.id}</groupExpression>
+        <groupHeader>
+            <band height="12">
+                <frame>
+                    <reportElement x="0" y="0" width="740" height="12" positionType="Float"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="0" y="0" width="65" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[com.encens.khipus.reports.ReportFormatter.formatFullName($F{fixedAssetGroup.groupCode},$F{fixedAssetGroup.description})]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="65" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[com.encens.khipus.reports.ReportFormatter.formatFullName($F{fixedAssetSubGroup.fixedAssetSubGroupCode},$F{fixedAssetSubGroup.description})]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="120" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String"><![CDATA[$F{fixedAsset.barCode}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="175" y="0" width="75" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String"><![CDATA[$F{fixedAsset.detail}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="250" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{fixedAsset.measurement}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="305" y="0" width="75" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$F{fixedAsset.description}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="380" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String"><![CDATA[$F{fixedAsset.trademark}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="435" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String"><![CDATA[$F{fixedAsset.model}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="490" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.lang.String"><![CDATA[$F{fixedAsset.sequence}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="dd/MM/yyyy">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="545" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left"/>
+                        <textFieldExpression class="java.util.Date"><![CDATA[$F{fixedAsset.registrationDate}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="600" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.lang.Integer"><![CDATA[$F{fixedAsset.duration}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject"
+                                       mode="Opaque" x="655" y="0" width="55" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Right"/>
+                        <textFieldExpression class="java.math.BigDecimal">
+                            <![CDATA[$F{fixedAsset.ufvOriginalValue}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+    </group>
+
+    <group name="fixedAssetIdGroup">
+        <groupExpression>$F{fixedAsset.id}</groupExpression>
+        <groupHeader>
+            <band height="36">
+                <printWhenExpression>($F{fixedAssetPart.number}!=null)</printWhenExpression>
+                <frame>
+                    <reportElement x="0" y="12" width="740" height="12" positionType="Float"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="20" y="0"
+                                       width="700" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.parts}]]></textFieldExpression>
+                    </textField>
+                </frame>
+                <frame>
+                    <reportElement x="0" y="24" width="740" height="12" positionType="Float"/>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="20" y="0"
+                                       width="100" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.number}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="120" y="0"
+                                       width="100" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.serialNumber}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="220" y="0"
+                                       width="200" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.description}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="420" y="0"
+                                       width="100" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.measureUnit}]]></textFieldExpression>
+                    </textField>
+                    <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                        <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="0"
+                                       width="100" height="12"/>
+                        <box padding="1">
+                            <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                        </box>
+                        <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                        <textFieldExpression class="java.lang.String">
+                            <![CDATA[$R{FixedAssetPart.unitPrice}]]></textFieldExpression>
+                    </textField>
+                </frame>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="24">
+                <printWhenExpression>($F{fixedAssetPart.number}!=null)</printWhenExpression>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="#,##0.00">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="0"
+                                       width="100" height="12"/>
+                    <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{unitPriceTotal}]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+
+    <title>
+        <band height="24">
+            <frame>
+                <reportElement x="0" y="0" width="740" height="12" positionType="Float"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0"
+                                   y="0" width="280" height="12"/>
+                    <box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+                        <pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+                        <topPen lineWidth="0.0"/>
+                        <leftPen lineWidth="0.0"/>
+                        <bottomPen lineWidth="0.0"/>
+                        <rightPen lineWidth="0.0"/>
+                    </box>
+                    <textElement textAlignment="Left" verticalAlignment="Top"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.list}]]></textFieldExpression>
+                </textField>
+            </frame>
+            <frame>
+                <reportElement x="0" y="12" width="740" height="12" positionType="Float"/>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0"
+                                   width="65" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FixedAssetGroup.group}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="65" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FixedAsset.fixedAssetSubGroup}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="120" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.barCode}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="175" y="0"
+                                   width="75" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.detail}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="250" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FixedAsset.measurement}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="305" y="0"
+                                   width="75" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FixedAsset.description}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="380" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.trademark}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="435" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.model}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="490" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.sequence}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="545" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.registrationDate}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="600" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String"><![CDATA[$R{FixedAsset.duration}]]></textFieldExpression>
+                </textField>
+                <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                    <reportElement style="headerStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="655" y="0"
+                                   width="55" height="12"/>
+                    <box padding="1">
+                        <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                    </box>
+                    <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                    <textFieldExpression class="java.lang.String">
+                        <![CDATA[$R{FixedAsset.originalValue}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </title>
+    <pageHeader>
+        <band/>
+    </pageHeader>
+    <columnHeader>
+        <band/>
+    </columnHeader>
+    <detail>
+        <band height="12">
+            <printWhenExpression>($F{fixedAssetPart.number}!=null)</printWhenExpression>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="20" y="0"
+                               width="100" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.Long">
+                    <![CDATA[$F{fixedAssetPart.number}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="120" y="0"
+                               width="100" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAssetPart.serialNumber}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="220" y="0"
+                               width="200" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{fixedAssetPart.description}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="420" y="0"
+                               width="100" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.lang.String">
+                    <![CDATA[$F{measureUnit.name}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="0"
+                               width="100" height="12"/>
+                <box padding="1">
+                    <pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression class="java.math.BigDecimal">
+                    <![CDATA[$F{fixedAssetPart.unitPrice}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band/>
+    </columnFooter>
+    <pageFooter>
+        <band/>
+    </pageFooter>
+    <summary>
+        <band/>
+    </summary>
+</jasperReport>

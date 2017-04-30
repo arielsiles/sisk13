@@ -1,0 +1,238 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{budgetProgramAction.managed}">
+            #{messages['BudgetProgram.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['BudgetProgram.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="accountingItemForm">
+
+    <div class="buttons">
+
+        <h:commandButton action="#{budgetActivityAction.newBudgetActivity}"
+                         value="#{messages['BudgetProgram.newBudgetActivity']}"
+                         immediate="true"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETACTIVITY','CREATE')}"/>
+
+        <h:commandButton id="createButtonId"
+                         action="#{budgetProgramAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{budgetProgramAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','CREATE')}"/>
+
+        <h:commandButton id="updateButtonId"
+                         action="#{budgetProgramAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{budgetProgramAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{budgetProgramAction.managed}">
+                    #{messages['BudgetProgram.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['BudgetProgram.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <s:decorate id="creatorUserField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{budgetProgramAction.managed}">
+            <ui:define name="label">#{messages['Common.createdBy']}</ui:define>
+            <h:outputText value="#{budgetProgram.creatorUser.employee.fullName}" styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="creationDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{budgetProgramAction.managed}">
+            <ui:define name="label">#{messages['Common.creationDate']}</ui:define>
+            <h:outputText value="#{budgetProgram.creationDate}" styleClass="input">
+                <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"
+                                   type="both"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="updaterUserField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{budgetProgramAction.managed and not empty budgetProgram.updaterUser}">
+            <ui:define name="label">#{messages['Common.updatedBy']}</ui:define>
+            <h:outputText value="#{budgetProgram.updaterUser.employee.fullName}" styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="updateDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{budgetProgramAction.managed and not empty budgetProgram.updaterUser}">
+            <ui:define name="label">#{messages['Common.updateDate']}</ui:define>
+            <h:outputText value="#{budgetProgram.updateDate}" styleClass="input">
+                <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"
+                                   type="both"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BudgetProgram.name']}</ui:define>
+            <h:inputText id="name" value="#{budgetProgram.name}" styleClass="input" required="true"
+                         maxlength="150" tabindex="1">
+                <f:validateLength maximum="150"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BudgetProgram.code']}</ui:define>
+            <h:inputText id="code" value="#{budgetProgram.code}" styleClass="input" required="true"
+                         maxlength="30" tabindex="2">
+                <f:validateLength maximum="30"/>
+            </h:inputText>
+        </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+
+        <h:commandButton action="#{budgetActivityAction.newBudgetActivity}"
+                         value="#{messages['BudgetProgram.newBudgetActivity']}"
+                         immediate="true"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETACTIVITY','CREATE')}"/>
+
+        <h:commandButton action="#{budgetProgramAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','CREATE')}"/>
+
+        <h:commandButton action="#{budgetProgramAction.createAndNew}"
+                         value="#{messages['Common.saveAndNew']}"
+                         styleClass="button"
+                         rendered="#{!budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','CREATE')}"/>
+
+        <h:commandButton action="#{budgetProgramAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','UPDATE')}"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','DELETE')}">
+            <rich:componentControl for="deleteConfirmation"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{budgetProgramAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+        </h:commandButton>
+    </div>
+
+    <c:if test="#{budgetProgramAction.managed}">
+        <rich:dataTable value="#{budgetActivityDataModel}" var="budgetActivityItem" id="budgetActivityList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="50%,30%,20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="budgetActivity.name" dataModel="#{budgetActivityDataModel}"
+                                               reRender="budgetActivityList, dataScroller">
+                            #{messages['BudgetActivity.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="budgetActivity.code" dataModel="#{budgetActivityDataModel}"
+                                               reRender="budgetActivityList, dataScroller">
+                            #{messages['BudgetActivity.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{budgetActivityItem.name}"/>
+            </rich:column>
+
+            <rich:column>
+                <h:outputText value="#{budgetActivityItem.code}"/>
+            </rich:column>
+
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{budgetActivityAction.select(budgetActivityItem)}"
+                               rendered="#{s:hasPermission('BUDGETACTIVITY','VIEW')}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="budgetActivityList" dataModel="#{budgetActivityDataModel}"/>
+    </c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['BudgetProgram.delete.confirmation']}">
+                <f:param value="#{budgetProgram.name}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{budgetProgramAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{budgetProgramAction.managed and s:hasPermission('BUDGETPROGRAM','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>
+

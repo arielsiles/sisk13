@@ -1,0 +1,118 @@
+<rich:modalPanel height="450" width="700" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText value="#{listTitle}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="rawMaterialProducerListForm">
+        <rich:simpleTogglePanel label="#{searchPanelTitle}" switchType="client">
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText value="#{rawMaterialProducerDataModel.criteria.lastName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText value="#{rawMaterialProducerDataModel.criteria.maidenName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                <h:inputText value="#{rawMaterialProducerDataModel.criteria.firstName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+                <a4j:commandButton action="#{rawMaterialProducerDataModel.search}"
+                                   reRender="rawMaterialProducerList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="5">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+
+        <rich:spacer height="10" width="10" />
+
+        <rich:dataTable value="#{rawMaterialProducerDataModel}" var="rawMaterialProducerItem" id="rawMaterialProducerList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" >
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialProducer.lastName"
+                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
+                                               reRender="rawMaterialProducerList, dataScroller">
+                            #{messages['Person.lastName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialProducer.maidenName"
+                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
+                                               reRender="rawMaterialProducerList, dataScroller">
+                            #{messages['Person.maidenName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialProducer.firstName"
+                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
+                                               reRender="rawMaterialProducerList, dataScroller">
+                            #{messages['Person.firstName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialProducer.productiveZone.name"
+                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
+                                               reRender="rawMaterialProducerList, dataScroller">
+                            #{messages['Person.GAB']}
+                        </app:commandSortHeader>
+                    </rich:column>
+
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.lastName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.maidenName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.firstName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.productiveZone.fullName}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="rawMaterialProducerList" dataModel="#{rawMaterialProducerDataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+    <rich:jQuery selector="#rawMaterialProducerList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+    <rich:jQuery selector="#rawMaterialProducerList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+    <c:set var="firstInputToFocusId" value="#{name}"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+</rich:modalPanel>
+

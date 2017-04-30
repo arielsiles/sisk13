@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Classifier.accountingItem.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="classifierSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Classifiers.accountingItem.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Classifier.name']}</ui:define>
+                    <h:inputText id="name" value="#{accountingItemDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Classifier.code']}</ui:define>
+                    <h:inputText id="code" value="#{accountingItemDataModel.criteria.code}"
+                                 maxlength="150" tabindex="2" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{accountingItemDataModel.search}"
+                                       reRender="accountingItemList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/accountingItem.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('CLASSIFIERS','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{accountingItemDataModel}" var="accountingItemItem" id="accountingItemList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="50%, 30%, 20% ">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="classifier.name" dataModel="#{accountingItemDataModel}"
+                                                   reRender="accountingItemList, dataScroller">
+                                #{messages['Classifier.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="classifier.code" dataModel="#{accountingItemDataModel}"
+                                                   reRender="accountingItemList, dataScroller">
+                                #{messages['Classifier.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{accountingItemItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{accountingItemItem.code}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{accountingItemAction.select(accountingItemItem)}"
+                                   rendered="#{s:hasPermission('CLASSIFIERS','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="accountingItemList" dataModel="#{accountingItemDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/budget/accountingItem.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('CLASSIFIERS','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

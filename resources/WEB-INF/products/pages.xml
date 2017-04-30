@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/products/*" login-required="true"/>
+
+    <page view-id="/products/productTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productTypeAction.select(productTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/products/productType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productType.xhtml" no-conversation-view-id="/products/productTypeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/products/productTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productStateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productStateAction.select(productStateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/products/productState.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productState.xhtml" no-conversation-view-id="/products/productStateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/products/productStateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productAction.select(productItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/products/product.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/product.xhtml" no-conversation-view-id="/products/productList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/products/productList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productDiscountRuleList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productDiscountRuleAction.select(productDiscountRuleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/products/productDiscountRule.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/products/productDiscountRule.xhtml"
+          no-conversation-view-id="/products/productDiscountRuleList.xhtml">
+        <navigation from-action="#{productDiscountRuleAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true"/>
+                <redirect view-id="/products/productDiscountRule.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/products/productDiscountRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+</pages>

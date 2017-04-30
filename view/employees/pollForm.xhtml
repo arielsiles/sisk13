@@ -1,0 +1,515 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{pollFormAction.managed}">
+            #{messages['PollForm.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['PollForm.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="rrhh"/>
+<ui:define name="body">
+
+<h:form id="pollForm">
+
+<div class="buttons">
+    <!--<h:commandButton action="#{pollByPersonReportAction.generateReport}"-->
+    <!--value="#{messages['Reports.generateReport']}"-->
+    <!--styleClass="button"-->
+    <!--rendered="#{pollFormAction.isSubjectGrouppingType(pollForm.pollFormGrouppingType) and pollFormAction.managed}"-->
+    <!--immediate="true"/>-->
+
+    <h:commandButton action="#{sectionAction.assignSection}"
+                     value="#{messages['PollForm.assignSection']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"/>
+
+    <h:commandButton action="#{questionAction.assignQuestion}"
+                     value="#{messages['PollForm.assignQuestion']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLFORMQUESTION','CREATE')}"/>
+
+    <h:commandButton action="#{pollCopyAction.assignPollCopy}"
+                     value="#{messages['PollCopy.new']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLCOPY','CREATE')}"/>
+
+    <h:commandButton action="#{pollFormAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollFormAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollFormAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{pollFormAction.managed}">
+                #{messages['PollForm.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['PollForm.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <app:fieldset id="detailFielset" title="#{messages['PollForm.detail']}">
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.code']}</ui:define>
+                <h:inputText id="code" value="#{pollForm.code}" styleClass="input" required="true"
+                             maxlength="100" tabindex="1">
+                    <a4j:support event="onblur" reRender="codeField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="cycleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.gestion']}</ui:define>
+                <h:selectOneMenu id="cycle" value="#{pollForm.cycle}" styleClass="input" tabindex="2" required="true">
+                    <s:selectItems value="#{cycleList}" var="cycle" label="#{cycle.name}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="approvalDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.approvalDate']}</ui:define>
+                <rich:calendar value="#{pollForm.approvalDate}" styleClass="input"
+                               datePattern="#{messages['patterns.date']}" required="true"/>
+            </s:decorate>
+
+            <s:decorate id="reviewField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.review']}</ui:define>
+                <h:inputText id="review" value="#{pollForm.review}" styleClass="input"
+                             required="true" maxlength="10" tabindex="1">
+                    <f:validateLongRange minimum="0" maximum="9999999999"/>
+                    <f:validateLength maximum="10"/>
+                    <a4j:support event="onblur" reRender="reviewField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.title']}</ui:define>
+                <h:inputText id="title" value="#{pollForm.title}" styleClass="input" required="true"
+                             maxlength="250" tabindex="3">
+                    <a4j:support event="onblur" reRender="titleField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="subTitleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.subTitle']}</ui:define>
+                <h:inputText id="subTitle" value="#{pollForm.subTitle}" styleClass="input" required="true"
+                             maxlength="250" tabindex="4">
+                    <a4j:support event="onblur" reRender="subTitleField"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="equivalentPercentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.equivalentPercent']}</ui:define>
+                <h:inputText id="equivalentPercent" value="#{pollForm.equivalentPercent}" styleClass="input"
+                             required="true"
+                             maxlength="10" tabindex="5">
+                    <f:validateLongRange minimum="1" maximum="100"/>
+                    <a4j:support event="onblur" reRender="equivalentPercentField"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="samplePercentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.samplePercent']}</ui:define>
+                <h:inputText id="samplePercent" value="#{pollForm.samplePercent}" styleClass="input" required="true"
+                             maxlength="10" tabindex="5">
+                    <f:validateLongRange minimum="1" maximum="100"/>
+                    <a4j:support event="onblur" reRender="samplePercentField"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.description']}</ui:define>
+                <h:inputTextarea id="description" value="#{pollForm.description}"
+                                 styleClass="input textarea"
+                                 tabindex="6" required="true">
+                    <a4j:support event="onblur" reRender="descriptionField"/>
+                </h:inputTextarea>
+            </s:decorate>
+
+        </app:fieldset>
+
+        <app:fieldset id="pollCopyDestrictionsFielset" title="#{messages['PollForm.pollCopyDestrictions']}">
+
+            <s:decorate id="pollFormGrouppingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.pollFormGrouppingType']}</ui:define>
+                <h:selectOneMenu id="pollFormGrouppingType" value="#{pollForm.pollFormGrouppingType}" styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{pollFormGrouppingTypeEnum}"
+                                   var="pollFormGrouppingType"
+                                   label="#{messages[pollFormGrouppingType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="gruppingRestrictionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.gruppingRestriction']}</ui:define>
+                <h:selectOneMenu id="gruppingRestriction" value="#{pollForm.gruppingRestriction}" styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{fieldRestrictionTypeEnum}"
+                                   var="fieldRestrictionType"
+                                   label="#{messages[fieldRestrictionType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+
+            <s:decorate id="cycleRestrictionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.cycleRestriction']}</ui:define>
+                <h:selectOneMenu id="cycleRestriction" value="#{pollForm.cycleRestriction}"
+                                 styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{fieldRestrictionTypeEnum}"
+                                   var="fieldRestrictionType"
+                                   label="#{messages[fieldRestrictionType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="academicPeriodRestrictionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.academicPeriodRestriction']}</ui:define>
+                <h:selectOneMenu id="academicPeriodRestriction" value="#{pollForm.academicPeriodRestriction}"
+                                 styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{fieldRestrictionTypeEnum}"
+                                   var="fieldRestrictionType"
+                                   label="#{messages[fieldRestrictionType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="personRestrictionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['PollForm.personRestriction']}</ui:define>
+                <h:selectOneMenu id="personRestriction" value="#{pollForm.personRestriction}" styleClass="input"
+                                 required="true">
+                    <s:selectItems value="#{fieldRestrictionTypeEnum}"
+                                   var="fieldRestrictionType"
+                                   label="#{messages[fieldRestrictionType.resourceKey]}"
+                                   hideNoSelectionLabel="false"
+                                   noSelectionLabel=""/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </app:fieldset>
+    </h:panelGrid>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{sectionAction.assignSection}"
+                     value="#{messages['PollForm.assignSection']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLFORMSECTION','CREATE')}"/>
+
+    <h:commandButton action="#{questionAction.assignQuestion}"
+                     value="#{messages['PollForm.assignQuestion']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLFORMQUESTION','CREATE')}"/>
+
+    <h:commandButton action="#{pollCopyAction.assignPollCopy}"
+                     value="#{messages['PollCopy.new']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('POLLCOPY','CREATE')}"/>
+
+    <h:commandButton action="#{pollFormAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollFormAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','UPDATE')}"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','DELETE')}">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{pollFormAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+    <!---->
+    <!--
+        <h:commandButton action="#{postulantReportAction.generateReport}"
+        value="#{messages['Reports.generateReport']}"
+        styleClass="button"
+        rendered="#{pollFormAction.isSubjectGrouppingType(pollForm.pollFormGrouppingType) and pollFormAction.managed}"
+        immediate="true"/>
+    -->
+    <!--there evaulation report-->
+    <!--
+        <h:commandButton action="#{teacherEvaluationReportAction.generateReport}"
+        value="reporte evaluacion"
+        styleClass="button"
+        rendered="#{pollFormAction.isSubjectGrouppingType(pollForm.pollFormGrouppingType) and pollFormAction.managed}"
+        immediate="true"/>
+    -->
+
+    <!--there career manager evaluation report-->
+    <!--
+            <h:commandButton action="#{careerManagerEvaluationReportAction.generateReport}"
+            value="reporte evaluacion jefe de carrera"
+            styleClass="button"
+            rendered="#{pollFormAction.isSubjectGrouppingType(pollForm.pollFormGrouppingType) and pollFormAction.managed}"
+            immediate="true"/>
+    -->
+
+    <!---->
+</div>
+
+<c:if test="#{pollFormAction.managed}">
+    <rich:spacer height="5px"/>
+
+    <rich:panel id="sectionPanel" rendered="#{s:hasPermission('POLLFORMSECTION','VIEW')}">
+        <f:facet name="header">
+            #{messages['Section.list']}
+        </f:facet>
+        <rich:dataTable value="#{sectionDataModel}" var="sectionItem" id="sectionList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="30%, 40%,20%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['Section.sequence']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Section.title']}
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{sectionItem.sequence}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{sectionItem.title}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{sectionAction.select(sectionItem)}"
+                               rendered="#{s:hasPermission('POLLFORMSECTION','VIEW')}"/>
+            </rich:column>
+        </rich:dataTable>
+    </rich:panel>
+
+    <rich:spacer height="5px"/>
+
+    <rich:panel id="questionPanel" rendered="#{s:hasPermission('POLLFORMQUESTION','VIEW')}">
+        <f:facet name="header">
+            #{messages['Question.list']}
+        </f:facet>
+        <rich:dataTable value="#{questionDataModel}" var="questionItem" id="questionList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="30%, 10%, 45%,15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['Question.section']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Question.sequence']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['Question.content']}
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{questionItem.section.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{questionItem.sequence}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{questionItem.content}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{questionAction.select(questionItem)}"
+                               rendered="#{s:hasPermission('POLLFORMQUESTION','VIEW')}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="questionDataScroller" for="questionList" dataModel="#{questionDataModel}"/>
+    </rich:panel>
+
+    <rich:spacer height="5px"/>
+
+    <rich:panel id="pollCopyPanel" rendered="#{s:hasPermission('POLLCOPY','VIEW')}">
+        <f:facet name="header">
+            #{messages['PollCopy.list']}
+        </f:facet>
+        <rich:dataTable value="#{pollCopyForPollFormDataModel}" var="pollCopyItem" id="pollCopyList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="10%,10%,10%,10%,10%,10%,10%,10%,10%,10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        #{messages['PollCopy.revisionDate']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.revisionNumber']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.cycle']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.academicPeriod']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.location']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.faculty']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.career']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.asignature']}
+                    </rich:column>
+                    <rich:column>
+                        #{messages['PollCopy.person']}
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{pollCopyItem.revisionDate}">
+                    <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{pollCopyItem.revisionNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.cycle}" value="#{pollCopyItem.cycle.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.academicPeriod}"
+                              value="#{pollCopyItem.academicPeriod.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.faculty}"
+                              value="#{pollCopyItem.faculty.location.name}"/>
+                <!--<h:outputText rendered="#{not empty pollCopyItem.career}"-->
+                <!--value="#{pollCopyItem.career.faculty.location.name}"/>-->
+                <!--<h:outputText rendered="#{not empty pollCopyItem.subject}"-->
+                <!--value="#{pollCopyItem.subject.career.faculty.location.name}"/>-->
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.faculty}"
+                              value="#{pollCopyItem.faculty.name}"/>
+                <!--<h:outputText rendered="#{not empty pollCopyItem.career}"-->
+                <!--value="#{pollCopyItem.career.faculty.name}"/>-->
+                <!--<h:outputText rendered="#{not empty pollCopyItem.subject}"-->
+                <!--value="#{pollCopyItem.subject.career.faculty.name}"/>-->
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.career}"
+                              value="#{pollCopyItem.career.name}"/>
+                <!--<h:outputText rendered="#{not empty pollCopyItem.subject}"-->
+                <!--value="#{pollCopyItem.subject.career.name}"/>-->
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.subject}"
+                              value="#{pollCopyItem.subject.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText rendered="#{not empty pollCopyItem.person}"
+                              value="#{pollCopyItem.person.fullName}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               immediate="true"
+                               action="#{pollCopyAction.selectFromPollForm(pollCopyItem)}"
+                               rendered="#{s:hasPermission('POLLCOPY','VIEW')}"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="pollCopyDataScroller" for="pollCopyList" dataModel="#{pollCopyForPollFormDataModel}"/>
+    </rich:panel>
+</c:if>
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{pollFormAction.managed and s:hasPermission('HUMANRESOURCESPOLL','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['PollForm.delete.confirmation']}">
+                <f:param value="#{pollForm.code}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{pollFormAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           immediate="true"
+                           rendered="#{s:hasPermission('HUMANRESOURCESPOLL','DELETE')}"
+                           styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#code" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>
+

@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.productItemProvider.page.title']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="evolutionReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.productItemProvider.page.title']}
+                </f:facet>
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent">
+                    <s:div>
+                        <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Reports.productItemProvider.page.Provider']}</ui:define>
+                            <app:quickSearch id="quickSearchProvider"
+                                             textValue="productItemProviderReportAction.provider.providerCode"
+                                             value="#{productItemProviderReportAction.provider}"
+                                             searchField="providerCode"
+                                             reRender="providerField"
+                                             tabindex="6"/>
+                            <app:selectPopUp id="provider"
+                                             textValue="#{productItemProviderReportAction.provider.fullName}"
+                                             value="#{productItemProviderReportAction.provider}"
+                                             clearAction="productItemProviderReportAction.cleanProvider()"
+                                             searchModalPanel="providerListModalPanel"
+                                             dataModel="#{providerDataModel}"
+                                             reRender="providerField"
+                                             hotKeySelect="alt+1">
+                                <ui:define name="dataModelStaticProperties">
+                                    <f:setPropertyActionListener
+                                            value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
+                                            target="#{providerDataModel.moduleProviderType}"/>
+                                    <f:setPropertyActionListener
+                                            value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
+                                            target="#{providerDataModel.financesEntityState}"/>
+                                </ui:define>
+                            </app:selectPopUp>
+                        </s:decorate>
+
+                        <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define
+                                    name="label">#{messages['Reports.productItemProvider.page.ProductItem']}</ui:define>
+                            <app:quickSearch id="productItemQuickSearch"
+                                             textValue="productItemProviderReportAction.productItem.productItemCode"
+                                             value="#{productItemProviderReportAction.productItem}"
+                                             searchField="productItemCode"
+                                             alias="productItem"
+                                             reRender="productItemField"
+                                             tabindex="2">
+                                <ui:define name="restrictions">
+                                    <app:restriction
+                                            condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                                </ui:define>
+                            </app:quickSearch>
+                            <app:selectPopUp id="productItem"
+                                             textValue="#{productItemProviderReportAction.productItem.name}"
+                                             value="#{productItemProviderReportAction.productItem}"
+                                             clearAction="productItemProviderReportAction.cleanProductItem()"
+                                             searchModalPanel="productItemListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="productItemField"
+                                             hotKeySelect="alt+2"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{productItemProviderReportAction}" showPageFormat="false"
+                                      tabIndex="5"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{productItemProviderReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="10">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{productItemProviderReportAction.assignProvider(providerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="providerField, purchaseOrderDetailsPanel"
+                                   oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productItemProviderReportAction.assignProductItem(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField"
+                                   oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#provider" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

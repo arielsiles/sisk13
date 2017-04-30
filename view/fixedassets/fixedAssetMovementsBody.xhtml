@@ -1,0 +1,377 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+<h:form id="fixedAssetBodyMovementsForm">
+
+<s:fragment id="movementsFragment">
+    <div class="buttons">
+        <h:commandButton id="dischargeButton"
+                         action="#{fixedAssetAction.discharge}"
+                         rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW')
+                             and fixedAssetAction.showDischargeButton}"
+                         value="#{messages['FixedAsset.dischargeFixedAsset']}"
+                         styleClass="button"
+                         tabindex="37"/>
+        <h:commandButton id="positiveImprovementButton"
+                         action="#{fixedAssetAction.positiveImprovement}"
+                         rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW')
+                             and fixedAssetAction.showPositiveImprovementButton}"
+                         value="#{messages['FixedAssetmovement.positiveImprovement']}"
+                         styleClass="button"
+                         tabindex="38"/>
+        <h:commandButton id="tarnsferenceButton"
+                         action="#{fixedAssetAction.transfer}"
+                         value="#{messages['FixedAsset.Transfer']}"
+                         styleClass="button"
+                         rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW') and
+                             fixedAssetAction.showTransferenceButton}"
+                         tabindex="40"/>
+
+        <h:commandButton action="#{fixedAssetAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="41">
+        </h:commandButton>
+    </div>
+</s:fragment>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['FixedAsset.title']}
+</f:facet>
+
+<!--here are the movement to apply to the FixedAsset in non pendant state-->
+<app:fieldset id="fixedAssetMovementFieldset"
+              rendered="#{ s:hasPermission('FIXEDASSET','CREATE') and
+              fixedAssetAction.managed}"
+              title="#{messages['FixedAsset.FixedAssetMovement']}">
+    <s:decorate id="movementTypeField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{fixedAssetAction.managed and !fixedAssetAction.pendant
+                and s:hasPermission('FIXEDASSET','CREATE')}">
+        <ui:define name="label">#{messages['FixedAssetMovement.movementType']}</ui:define>
+        <h:selectOneMenu id="movementType"
+                         value="#{fixedAssetAction.fixedAssetMovementType}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="42">
+            <s:selectItems value="#{movementTypeList}"
+                           var="movementType"
+                           label="#{movementType.description}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         reRender="fixedAssetMovementFieldset, fixedAssetBodyMovementsForm, dischargeButton"
+                         ajaxSingle="true"/>
+            <a4j:support event="onchanged"
+                         reRender="fixedAssetMovementFieldset, fixedAssetBodyMovementsForm, dischargeButton"
+                         ajaxSingle="true"/>
+
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+</app:fieldset>
+
+<!-- detalle de la baja-->
+<app:fieldset id="fixedAssetDischargeMovementApprovalFieldset"
+              title="#{messages['FixedAsset.FixedAssetMovementDetail']}"
+              rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW') and
+                      fixedAssetAction.dischargeMovementType()}">
+    <s:decorate id="dischargeCauseField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAssetMovement.cause']}</ui:define>
+        <h:inputText id="cause" value="#{fixedAssetAction.fixedAssetMovement.cause}"
+                     maxlength="250"
+                     required="true"
+                     styleClass="input"
+                     tabindex="43">
+        </h:inputText>
+    </s:decorate>
+</app:fieldset>
+
+<!--detalle-->
+<app:fieldset id="fixedAssetMovementApprovalFieldset" title="#{messages['FixedAsset.FixedAssetMovementDetail']}"
+              rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW') and
+                      (!fixedAssetAction.dischargeMovementType() and !fixedAssetAction.transferenceMovementType()) and
+                      fixedAssetAction.improvementMovementType()}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div>
+            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.gloss']}</ui:define>
+                <h:inputTextarea id="gloss" value="#{fixedAssetAction.gloss}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="44">
+                    <f:validateLength maximum="250"/>
+                </h:inputTextarea>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="causeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAssetMovement.cause']}</ui:define>
+                <h:inputText id="cause" value="#{fixedAssetAction.fixedAssetMovement.cause}"
+                             maxlength="250"
+                             required="true"
+                             styleClass="input"
+                             tabindex="45">
+                </h:inputText>
+            </s:decorate>
+            <a4j:region>
+                <s:div id="valuesImprovement">
+                    <s:decorate id="bsAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['FixedAssetMovement.fixedAssetImprovementAmount']}</ui:define>
+                        <h:inputText id="bsFixedAssetImprovementAmount"
+                                     value="#{fixedAssetAction.fixedAssetMovement.bsAmount}"
+                                     maxlength="250"
+                                     required="true"
+                                     styleClass="input right"
+                                     tabindex="46">
+                            <app:realNumberConverter minimum="0"
+                                                     pattern="#{messages['patterns.decimalNumber']}"
+                                                     forId="bsFixedAssetImprovementAmount"/>
+                        </h:inputText>
+                        <h:outputText value=" #{messages['Currency.Bs']}"/>
+                    </s:decorate>
+                    <s:decorate id="ufvAmountField" template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{not empty fixedAssetAction.fixedAssetMovement.ufvAmount}">
+                        <ui:define
+                                name="label">#{messages['FixedAssetMovement.fixedAssetImprovementAmount']}</ui:define>
+                        <h:outputText value="#{fixedAssetAction.fixedAssetMovement.ufvAmount}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value=" #{messages['Currency.Ufv']}"/>
+                    </s:decorate>
+                </s:div>
+                <s:decorate id="computeButton"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <a4j:commandButton id="calculateValues"
+                                       action="#{fixedAssetAction.computeImprovement()}"
+                                       value="#{messages['Common.Compute']}"
+                                       styleClass="button"
+                                       reRender="valuesImprovement"
+                                       tabindex="47">
+                    </a4j:commandButton>
+                </s:decorate>
+            </a4j:region>
+        </s:div>
+    </h:panelGrid>
+</app:fieldset>
+<c:if test="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW') and
+                      (!fixedAssetAction.dischargeMovementType() and !fixedAssetAction.transferenceMovementType()) and
+                      fixedAssetAction.improvementMovementType()}">
+    <ui:include src="fixedAssetPayment.xhtml">
+        <ui:param name="mainAction" value="#{fixedAssetAction}"/>
+    </ui:include>
+</c:if>
+
+
+<!--tarnsferencia-->
+<app:fieldset id="fixedAssetTransferenceMovementApprovalFieldset" title="#{messages['FixedAsset.Detail']}"
+              rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW') and
+                      (!fixedAssetAction.dischargeState() and fixedAssetAction.transferenceMovementType())}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div id="LastDiv">
+            <s:decorate id="lastEmployeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.lastCustodian']}</ui:define>
+                <h:outputText
+                        value="#{fixedAssetAction.getDatabaseFixedAsset().custodianJobContract.contract.employee.fullName}">
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="lastExecutorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.lastExecutorUnit']}</ui:define>
+                <h:outputText value="#{fixedAssetAction.getDatabaseFixedAsset().businessUnit.fullName}">
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="lastCostCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.lastCostCenter']}</ui:define>
+                <h:outputText value="#{fixedAssetAction.getDatabaseFixedAsset().costCenter.fullName}">
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="lastLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.lastLocation']}</ui:define>
+                <h:outputText value="#{fixedAssetAction.getDatabaseFixedAsset().fixedAssetLocation.name}">
+                </h:outputText>
+            </s:decorate>
+        </s:div>
+        <s:div id="newDiv">
+            <s:decorate id="newJobContractField"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newCustodian']}</ui:define>
+                <app:selectPopUp id="jobContract"
+                                 required="true"
+                                 textValue="#{fixedAssetAction.employeeFullName}"
+                                 value="#{fixedAsset.custodianJobContract}"
+                                 dataModel="#{jobContractDataModel}"
+                                 clearAction="fixedAssetAction.clearJobContract()"
+                                 searchModalPanel="jobContractListModalPanel"
+                                 reRender="newJobContractField, newDiv"
+                                 hotKeySelect="alt+1"
+                                 tabindex="48"/>
+            </s:decorate>
+
+            <s:decorate id="newExecutorUnitField" template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newExecutorUnit']}</ui:define>
+                <h:selectOneMenu id="executorUnit"
+                                 value="#{fixedAsset.businessUnit}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="49">
+                    <s:selectItems value="#{businessUnitList.resultList}"
+                                   var="businessUnit"
+                                   label="#{businessUnit.fullName}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:commandLink action="onchange" ajaxSingle="true"
+                                     reRender="newExecutorUnitField">
+                    </a4j:commandLink>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="newCostCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newCostCenter']}</ui:define>
+                <h:inputText styleClass="input" readonly="true"
+                             value="#{fixedAssetAction.costCenterFullName}"
+                             tabindex="50"/>
+                <a4j:commandLink id="selectCostCenter" ajaxSingle="true" immediate="true"
+                                 tabindex="51"
+                                 title="#{messages['FixedAsset.selectCostCenter']}"
+                                 onclick="Richfaces.showModalPanel('newCostCenterListModalPanel');">
+                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true"
+                                 tabindex="52"
+                                 title="#{messages['Common.clear']}"
+                                 action="#{fixedAssetAction.clearCostCenter()}"
+                                 reRender="newCostCenterField">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+            <s:decorate id="newLocationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.newLocation']}</ui:define>
+                <h:selectOneMenu id="newLocation"
+                                 value="#{fixedAsset.fixedAssetLocation}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="53">
+                    <s:selectItems value="#{fixedAssetLocationList}"
+                                   var="fixedAssetLocation"
+                                   label="#{fixedAssetLocation.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+</app:fieldset>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton
+            action="#{fixedAssetAction.discharge}"
+            rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW')
+                         and fixedAssetAction.showDischargeButton}"
+            value="#{messages['FixedAsset.dischargeFixedAsset']}"
+            styleClass="button"
+            tabindex="55"/>
+    <h:commandButton
+            action="#{fixedAssetAction.positiveImprovement}"
+            rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW')
+                         and fixedAssetAction.showPositiveImprovementButton}"
+            value="#{messages['FixedAssetmovement.positiveImprovement']}"
+            styleClass="button"
+            tabindex="56"/>
+    <h:commandButton action="#{fixedAssetAction.transfer}"
+                     value="#{messages['FixedAsset.Transfer']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW') and
+                         fixedAssetAction.showTransferenceButton}"
+                     tabindex="57"/>
+
+    <h:commandButton action="#{fixedAssetAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="58">
+    </h:commandButton>
+</div>
+
+</h:form>
+
+<c:if test="#{fixedAssetAction.managed}">
+    <s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="accountType" value="A"/>
+        <ui:param name="accountClass" value="A"/>
+        <ui:param name="hasPayableAccountsPermission" value="true"/>
+        <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{fixedAssetPaymentAction.assignCashBoxCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel, payAmountField, payCurrencyField"
+                               oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</c:if>
+
+<s:decorate template="/include/modalDialog.xhtml"
+            rendered="#{fixedAssetAction.managed and s:hasPermission('FIXEDASSET','DELETE')}">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['FixedAsset.delete.confirmation']}">
+                <f:param value="#{fixedAsset.barCode}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{fixedAssetAction.delete}"
+                           value="#{messages['Common.delete']}"
+                           rendered="#{s:hasPermission('FIXEDASSET','DELETE')}"
+                           immediate="true"
+                           styleClass="button"
+                           tabindex="59"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="newCostCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+    <ui:param name="containerId" value="newCostCenterListModalPanelContainer"/>
+    <ui:param name="dialogId" value="newCostCenterListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{fixedAssetAction.assignCostCenter(costCenterItem)}"
+                           image="/img/active.gif" styleClass="select-image"
+                           reRender="newCostCenterField"
+                           oncomplete="Richfaces.hideModalPanel('newCostCenterListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="movementsJobContractListModalPanelContainer"
+            template="/employees/jobContractListModalPanel.xhtml">
+    <ui:param name="dialogId" value="movementsEmployeeListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{fixedAssetAction.assignJobContract(jobContractItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="newJobContractField, newDiv"
+                           oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+</ui:composition>

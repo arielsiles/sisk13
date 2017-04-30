@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+    <h:form id="generatedPayrollForm">
+
+        <div class="buttons">
+            <h:commandButton action="#{generatedPayrollAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{!generatedPayrollAction.managed}" id="createButtonId"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{generatedPayrollAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{generatedPayrollAction.managed}"
+                             tabindex="2"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button" rendered="#{generatedPayrollAction.managed}"
+                             tabindex="3">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{generatedPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="4">
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">
+                <c:choose>
+                    <c:when test="#{generatedPayrollAction.managed}">
+                        #{messages['GeneratedPayroll.edit']}
+                    </c:when>
+                    <c:otherwise>
+                        #{messages['GeneratedPayroll.new']}
+                    </c:otherwise>
+                </c:choose>
+            </f:facet>
+
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GeneratedPayroll.name']}</ui:define>
+                <h:inputText id="name" value="#{generatedPayroll.name}" styleClass="input"
+                             required="true"
+                             maxlength="150"
+                             tabindex="5">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="generationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GeneratedPayroll.generationDate']}</ui:define>
+                <h:outputText id="generationDate" value="#{generatedPayroll.generationDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"
+                                       type="both"/>
+                </h:outputText>
+            </s:decorate>
+
+            <s:decorate id="generatedPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['GeneratedPayroll.generatedPayrollType']}</ui:define>
+                <h:selectOneMenu id="generatedPayrollTypeEnum"
+                                 value="#{generatedPayroll.generatedPayrollType}"
+                                 styleClass="input"
+                                 required="true"
+                                 rendered="#{generatedPayroll.testPayrollType}"
+                                 tabindex="6">
+                    <s:selectItems
+                            value="#{enumerationUtil.getEnumValuesByName('com.encens.khipus.model.employees.GeneratedPayrollType', 'TEST', 'OFFICIAL') }"
+                            var="generatedPayrollTypeEnum"
+                            label="#{messages[generatedPayrollTypeEnum.resourceKey]}"
+                            noSelectionLabel=""
+                            hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <h:outputText value="#{messages[generatedPayroll.generatedPayrollType.resourceKey]}"
+                              rendered="#{!generatedPayroll.testPayrollType}"/>
+            </s:decorate>
+
+        </rich:panel>
+
+        <div class="buttons">
+            <h:commandButton action="#{generatedPayrollAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{!generatedPayrollAction.managed}"
+                             tabindex="7">
+            </h:commandButton>
+
+            <h:commandButton action="#{generatedPayrollAction.update}" value="#{messages['Common.save']}"
+                             styleClass="button" rendered="#{generatedPayrollAction.managed}"
+                             tabindex="8"/>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button" rendered="#{generatedPayrollAction.managed}"
+                             tabindex="9">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{generatedPayrollAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="10">
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml" rendered="#{generatedPayrollAction.managed}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['GeneratedPayroll.delete.confirmation']}">
+                    <f:param value="#{generatedPayroll.name}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{generatedPayrollAction.delete}"
+                               value="#{messages['Common.delete']}" immediate="true"
+                               styleClass="button"
+                               tabindex="1000"/>
+        </ui:define>
+    </s:decorate>
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:composition>

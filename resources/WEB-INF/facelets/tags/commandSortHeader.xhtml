@@ -1,0 +1,35 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j">
+    <h:panelGroup>
+        <c:choose>
+            <c:when test="#{dataModel.rowCount > 1}">
+                <s:fragment rendered="#{dataModel.sortProperty != sortProperty}">
+                    <a4j:commandLink reRender="#{reRender}">
+                        <a4j:actionparam value="#{sortProperty}" assignTo="#{dataModel.sortProperty}"/>
+                        <ui:insert/>
+                    </a4j:commandLink>
+                </s:fragment>
+                <s:fragment rendered="#{dataModel.sortProperty == sortProperty}">
+                    <a4j:commandLink reRender="#{reRender}">
+                        <a4j:actionparam value="#{sortProperty}" assignTo="#{dataModel.sortProperty}"/>
+                        <ui:insert/>
+                    </a4j:commandLink>
+                </s:fragment>
+                &#160;
+                <h:graphicImage value="/img/arrowUp.png" height="7" width="10" style="border:0;"
+                                rendered="#{dataModel.sortAsc and dataModel.sortProperty == sortProperty}"/>
+                <h:graphicImage value="/img/arrowDown.png" height="7" width="10" style="border:0"
+                                rendered="#{!dataModel.sortAsc and dataModel.sortProperty == sortProperty}"/>
+            </c:when>
+            <c:otherwise>
+                <ui:insert/>
+            </c:otherwise>
+        </c:choose>
+
+    </h:panelGroup>
+</ui:composition>
+

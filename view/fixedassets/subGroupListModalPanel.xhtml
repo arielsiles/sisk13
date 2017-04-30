@@ -1,0 +1,113 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="false"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:fixedAssetSubGroupListForm#{dialogId}\\\\:descriptionId\\\\:descriptionInputText').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['FixedAssetSubGroup.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="fixedAssetSubGroupListForm#{dialogId}">
+        <rich:simpleTogglePanel id="fixedAssetSubGroupSearchPanel"
+                                label="#{messages['FixedAssetSubGroup.search']}"
+                                switchType="client">
+            <h:panelGrid columns="2"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="descriptionId" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetSubGroup.description']}</ui:define>
+                        <h:inputText id="descriptionInputText"
+                                     value="#{subGroupListDataModel.criteria.description}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="codeId" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FixedAssetSubGroup.fixedAssetSubGroupCode']}</ui:define>
+                        <h:inputText id="descriptionInputText"
+                                     value="#{subGroupListDataModel.criteria.fixedAssetSubGroupCode}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="searchButtonDecorator" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:div styleClass="right input">
+                            <a4j:commandButton id="searchButtonId"
+                                               action="#{subGroupListDataModel.search}"
+                                               reRender="fixedAssetSubGroupSearchPanel, subGroupList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:div>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{subGroupListDataModel}"
+                        var="element"
+                        id="subGroupList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="30%, 60%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="element.id.fixedAssetSubGroupCode"
+                                               dataModel="#{subGroupListDataModel}"
+                                               reRender="subGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.fixedAssetSubGroup.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="element.description"
+                                               dataModel="#{subGroupListDataModel}"
+                                               reRender="subGroupList, dataScroller">
+                            #{messages['FixedAssetSubGroup.description']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{element.id.fixedAssetSubGroupCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{element.description}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}"
+                                       attachTo="assignButton"
+                                       operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller"
+                          for="subGroupList"
+                          dataModel="#{subGroupListDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, addButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>
