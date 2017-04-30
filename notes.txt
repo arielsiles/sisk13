@@ -1,0 +1,5 @@
+- Rename the build.properties.sample to build.properties and configure your jboss path
+- Change on Jboss start script: JAVA_OPTS=%JAVA_OPTS% -Xms256m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=512m (or depending of your environment).
+- timecard
+
+ 
