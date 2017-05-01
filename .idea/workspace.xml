@@ -4,8 +4,7 @@
     <option name="ANALYZE_TEST_SOURCES" value="false" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="k1_1.8.2.4">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+    <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <list id="c1390d32-d74c-4ab2-894a-a0eab5dbc76a" name="discard" comment="" />
@@ -1565,14 +1564,7 @@
       <workItem from="1493471880501" duration="17746000" />
       <workItem from="1493557693305" duration="7680000" />
       <workItem from="1493592347730" duration="2306000" />
-      <workItem from="1493660281333" duration="918000" />
-    </task>
-    <task id="LOCAL-00013" summary="delete permission">
-      <created>1424297037731</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1424297037731</updated>
+      <workItem from="1493660281333" duration="949000" />
     </task>
     <task id="LOCAL-00014" summary="1.5.9.8 planilla acopio 3.50 bs">
       <created>1424349404482</created>
@@ -1910,11 +1902,18 @@
       <option name="project" value="LOCAL" />
       <updated>1461587857404</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="ignore files">
+      <created>1493668180314</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1493668180315</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3449127000" />
+    <option name="totallyTimeSpent" value="3449158000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -2008,7 +2007,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="1.7 Release MySql" />
     <MESSAGE value="1.7.0 Release MySql" />
     <MESSAGE value="v1.7.1 Correct Yogurt Base" />
     <MESSAGE value="v1.7.1 Database 10-05-2015 12:45" />
@@ -2033,7 +2031,8 @@
     <MESSAGE value="Initial Commit" />
     <MESSAGE value="CRUD Voucher" />
     <MESSAGE value="k1_1.8.2.4" />
-    <option name="LAST_COMMIT_MESSAGE" value="k1_1.8.2.4" />
+    <MESSAGE value="ignore files" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore files" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
