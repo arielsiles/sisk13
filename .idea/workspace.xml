@@ -4,7 +4,7 @@
     <option name="ANALYZE_TEST_SOURCES" value="false" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="k1_1.8.2.4">
+    <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="ignore">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <list id="c1390d32-d74c-4ab2-894a-a0eab5dbc76a" name="discard" comment="" />
@@ -133,8 +133,12 @@
                 <element signature="e#5763#5764#0" expanded="false" />
                 <element signature="e#5817#5818#0" expanded="false" />
                 <element signature="e#5865#5866#0" expanded="false" />
+                <element signature="e#5913#5914#0" expanded="false" />
+                <element signature="e#5953#5954#0" expanded="false" />
                 <element signature="e#6023#6024#0" expanded="false" />
                 <element signature="e#6081#6082#0" expanded="false" />
+                <element signature="e#6120#6121#0" expanded="false" />
+                <element signature="e#6151#6152#0" expanded="false" />
                 <element signature="e#6203#6204#0" expanded="false" />
                 <element signature="e#6243#6244#0" expanded="false" />
                 <element signature="e#6285#6286#0" expanded="false" />
@@ -274,11 +278,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreditTransactionAction.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CreditTransactionAction.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="64" column="52" lean-forward="false" selection-start-line="64" selection-start-column="52" selection-end-line="64" selection-end-column="52" />
+            <state relative-caret-position="561">
+              <caret line="82" column="31" lean-forward="true" selection-start-line="82" selection-start-column="31" selection-end-line="82" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="176">
+              <caret line="2942" column="32" lean-forward="false" selection-start-line="2942" selection-start-column="32" selection-end-line="2942" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="7" lean-forward="true" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -319,6 +343,8 @@
                 <element signature="e#3512#3513#0" expanded="false" />
                 <element signature="e#3546#3547#0" expanded="false" />
                 <element signature="e#3574#3575#0" expanded="false" />
+                <element signature="e#3611#3612#0" expanded="false" />
+                <element signature="e#3640#3641#0" expanded="false" />
                 <element signature="e#3688#3689#0" expanded="false" />
                 <element signature="e#3724#3725#0" expanded="false" />
                 <element signature="e#3753#3754#0" expanded="false" />
@@ -337,8 +363,12 @@
                 <element signature="e#4356#4357#0" expanded="false" />
                 <element signature="e#4398#4399#0" expanded="false" />
                 <element signature="e#4432#4433#0" expanded="false" />
+                <element signature="e#4470#4471#0" expanded="false" />
+                <element signature="e#4500#4501#0" expanded="false" />
                 <element signature="e#4550#4551#0" expanded="false" />
                 <element signature="e#4588#4589#0" expanded="false" />
+                <element signature="e#4627#4628#0" expanded="false" />
+                <element signature="e#4658#4659#0" expanded="false" />
                 <element signature="e#4710#4711#0" expanded="false" />
                 <element signature="e#4750#4751#0" expanded="false" />
                 <element signature="e#4782#4783#0" expanded="false" />
@@ -442,6 +472,7 @@
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
       <list>
+        <option value="borboton" />
         <option value="Ariel" />
         <option value="ariel.siles@gmail.com" />
         <option value="Ariel &lt;ariel.siles@gmail.com&gt;" />
@@ -453,7 +484,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
   </component>
@@ -465,7 +496,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransactionType.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountDataModel.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/AccountTransaction.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/components.xml" />
@@ -516,6 +546,7 @@
         <option value="$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderDetail.xhtml" />
         <option value="$PROJECT_DIR$/view/customers/addCreditPayment.xhtml" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -580,9 +611,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -595,8 +623,25 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="khipus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sisk13" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value=".idea" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1692,13 +1737,7 @@
       <workItem from="1493471880501" duration="17746000" />
       <workItem from="1493557693305" duration="7680000" />
       <workItem from="1493592347730" duration="1047000" />
-    </task>
-    <task id="LOCAL-00013" summary="delete permission">
-      <created>1424297037731</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1424297037731</updated>
+      <workItem from="1493601109442" duration="804000" />
     </task>
     <task id="LOCAL-00014" summary="1.5.9.8 planilla acopio 3.50 bs">
       <created>1424349404482</created>
@@ -2036,11 +2075,18 @@
       <option name="project" value="LOCAL" />
       <updated>1461587857404</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="ignore">
+      <created>1493601837210</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1493601837210</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3446950000" />
+    <option name="totallyTimeSpent" value="3447754000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -2052,7 +2098,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -2070,17 +2116,16 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3416216" sideWeight="0.4978678" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32864866" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22294372" sideWeight="0.49946696" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37662336" sideWeight="0.4978678" order="10" side_tool="false" content_ui="tabs" x="21" y="375" width="1878" height="289" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33982685" sideWeight="0.48987207" order="5" side_tool="false" content_ui="tabs" x="22" y="337" width="1876" height="366" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.267316" sideWeight="0.4978678" order="10" side_tool="false" content_ui="tabs" x="21" y="375" width="1878" height="289" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3225108" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1673774" sideWeight="0.50159746" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16897655" sideWeight="0.48757765" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1705757" sideWeight="0.48757765" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15495208" sideWeight="0.50054055" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Seam" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
@@ -2094,6 +2139,7 @@
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39675677" sideWeight="0.50319827" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22294372" sideWeight="0.49946696" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41233766" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -2101,6 +2147,24 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -2116,7 +2180,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="1.7 Release MySql" />
     <MESSAGE value="1.7.0 Release MySql" />
     <MESSAGE value="v1.7.1 Correct Yogurt Base" />
     <MESSAGE value="v1.7.1 Database 10-05-2015 12:45" />
@@ -2141,7 +2204,8 @@
     <MESSAGE value="Initial Commit" />
     <MESSAGE value="CRUD Voucher" />
     <MESSAGE value="k1_1.8.2.4" />
-    <option name="LAST_COMMIT_MESSAGE" value="k1_1.8.2.4" />
+    <MESSAGE value="ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -2244,20 +2308,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/view/finances/cashAccountListModalPanel.xhtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="683">
-          <caret line="97" column="46" lean-forward="false" selection-start-line="97" selection-start-column="42" selection-end-line="97" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/view/admin/authenticationModalPanel.xhtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="109" lean-forward="false" selection-start-line="9" selection-start-column="109" selection-end-line="9" selection-end-column="109" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/view/admin/userListModalPanel.xhtml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="302">
@@ -2338,7 +2388,6 @@
             <element signature="e#6084#6085#0" expanded="false" />
             <element signature="e#6135#6136#0" expanded="false" />
             <element signature="e#6177#6178#0" expanded="false" />
-            <marker date="1493433480795" expanded="true" signature="1581:1597" ph="@{...}" />
           </folding>
         </state>
       </provider>
@@ -2583,6 +2632,8 @@
             <element signature="e#3512#3513#0" expanded="false" />
             <element signature="e#3546#3547#0" expanded="false" />
             <element signature="e#3574#3575#0" expanded="false" />
+            <element signature="e#3611#3612#0" expanded="false" />
+            <element signature="e#3640#3641#0" expanded="false" />
             <element signature="e#3688#3689#0" expanded="false" />
             <element signature="e#3724#3725#0" expanded="false" />
             <element signature="e#3753#3754#0" expanded="false" />
@@ -2601,8 +2652,12 @@
             <element signature="e#4356#4357#0" expanded="false" />
             <element signature="e#4398#4399#0" expanded="false" />
             <element signature="e#4432#4433#0" expanded="false" />
+            <element signature="e#4470#4471#0" expanded="false" />
+            <element signature="e#4500#4501#0" expanded="false" />
             <element signature="e#4550#4551#0" expanded="false" />
             <element signature="e#4588#4589#0" expanded="false" />
+            <element signature="e#4627#4628#0" expanded="false" />
+            <element signature="e#4658#4659#0" expanded="false" />
             <element signature="e#4710#4711#0" expanded="false" />
             <element signature="e#4750#4751#0" expanded="false" />
             <element signature="e#4782#4783#0" expanded="false" />
@@ -2620,14 +2675,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/messages_app.properties">
+      <provider editor-type-id="ResourceBundle">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76721">
           <caret line="4513" column="46" lean-forward="false" selection-start-line="4513" selection-start-column="0" selection-end-line="4513" selection-end-column="46" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="ResourceBundle">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/purchases/PurchaseOrderDetail.java">
@@ -2654,8 +2709,12 @@
             <element signature="e#5763#5764#0" expanded="false" />
             <element signature="e#5817#5818#0" expanded="false" />
             <element signature="e#5865#5866#0" expanded="false" />
+            <element signature="e#5913#5914#0" expanded="false" />
+            <element signature="e#5953#5954#0" expanded="false" />
             <element signature="e#6023#6024#0" expanded="false" />
             <element signature="e#6081#6082#0" expanded="false" />
+            <element signature="e#6120#6121#0" expanded="false" />
+            <element signature="e#6151#6152#0" expanded="false" />
             <element signature="e#6203#6204#0" expanded="false" />
             <element signature="e#6243#6244#0" expanded="false" />
             <element signature="e#6285#6286#0" expanded="false" />
@@ -2790,8 +2849,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="64" column="52" lean-forward="false" selection-start-line="64" selection-start-column="52" selection-end-line="64" selection-end-column="52" />
+        <state relative-caret-position="561">
+          <caret line="82" column="31" lean-forward="true" selection-start-line="82" selection-start-column="31" selection-end-line="82" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="2942" column="32" lean-forward="false" selection-start-line="2942" selection-start-column="32" selection-end-line="2942" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="7" lean-forward="true" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
           <folding />
         </state>
       </provider>
