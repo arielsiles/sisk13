@@ -8,14 +8,12 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditTransaction;
 import com.encens.khipus.model.customers.CreditTransactionType;
-import com.encens.khipus.model.customers.PartnerState;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -134,13 +132,39 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
-        BigDecimal fullPayment = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
+        //BigDecimal fullPayment = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
 
         getInstance().setInterest(interest);
-        getInstance().setCapital(credit.getQuota());
-        getInstance().setAmount(fullPayment);
+
+        BigDecimal currentCapital = calculateCapital();
+        BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
+
+        getInstance().setCapital(currentCapital);
+        getInstance().setAmount(totalPayment);
 
         return interest;
+    }
+
+    public BigDecimal calculateCapital(){
+
+        Credit credit = creditAction.getInstance();
+        Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
+        Date currentPaymentDate = new Date();
+        System.out.println("......1: " + currentPaymentDate);
+        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
+        System.out.println("......2: " + currentPaymentDate);
+        String current = DateUtils.format(currentPaymentDate, "yyyy-MM-dd");
+        System.out.println("......3: " + current);
+        currentPaymentDate = DateUtils.parse(current, "yyyy-MM-dd");
+        System.out.println("......4: " + currentPaymentDate);
+
+        Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
+        BigDecimal months = BigDecimalUtil.toBigDecimal(DateUtils.monthsBetween(lastPaymentDate, currentPaymentDate));
+
+        System.out.println("......Calculate moths: " + lastPaymentDate + " - " + currentPaymentDate + ": " + months);
+        System.out.println("......Capital: " + BigDecimalUtil.multiply(credit.getQuota(), months, 6));
+
+        return BigDecimalUtil.multiply(credit.getQuota(), months, 6);
     }
 
     public void calculateTotalAmount() {
