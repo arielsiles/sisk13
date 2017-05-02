@@ -16,6 +16,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -81,6 +82,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public  void cleanValues(){
         getInstance().setCapital(BigDecimal.ZERO);
         getInstance().setAmount(BigDecimal.ZERO);
+        getInstance().setDate(null);
+        getInstance().setInterest(BigDecimal.ZERO);
     }
 
     @End(beforeRedirect = true)
@@ -124,9 +127,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public BigDecimal calculateInterest(){
 
         Credit credit = creditAction.getInstance();
+        Date currentPaymentDate = getInstance().getDate();
+        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
+        System.out.println(".....calculateInterest() currentPaymentDate: " + currentPaymentDate);
+
         BigDecimal saldoCapital = credit.getAmount();
         Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-        Date currentPaymentDate = new Date();
         Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
         BigDecimal var_interest = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(credit.getAnnualRate()), BigDecimalUtil.toBigDecimal(100), 6);
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
@@ -149,22 +155,50 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         Credit credit = creditAction.getInstance();
         Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-        Date currentPaymentDate = new Date();
-        System.out.println("......1: " + currentPaymentDate);
+        //Date currentPaymentDate = new Date();
+        Date currentPaymentDate = getInstance().getDate();
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
-        System.out.println("......2: " + currentPaymentDate);
-        String current = DateUtils.format(currentPaymentDate, "yyyy-MM-dd");
-        System.out.println("......3: " + current);
-        currentPaymentDate = DateUtils.parse(current, "yyyy-MM-dd");
-        System.out.println("......4: " + currentPaymentDate);
 
-        Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
-        BigDecimal months = BigDecimalUtil.toBigDecimal(DateUtils.monthsBetween(lastPaymentDate, currentPaymentDate));
+        int quotas = calculateQuotas(lastPaymentDate, currentPaymentDate);
 
-        System.out.println("......Calculate moths: " + lastPaymentDate + " - " + currentPaymentDate + ": " + months);
-        System.out.println("......Capital: " + BigDecimalUtil.multiply(credit.getQuota(), months, 6));
+        return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
+    }
 
-        return BigDecimalUtil.multiply(credit.getQuota(), months, 6);
+    public int calculateQuotas(Date lastPaymentDate, Date currentDate){
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(lastPaymentDate);
+
+        Calendar calendarNext = Calendar.getInstance();
+        calendarNext.setTime(lastPaymentDate);
+        calendarNext.add(Calendar.MONTH, 1);
+        Date nextPaymentDate = calendarNext.getTime();
+
+        int quotas = 1;
+
+        System.out.println("--------------------");
+        while (lastPaymentDate.before(currentDate)){
+
+            if (lastPaymentDate.before(nextPaymentDate)){
+                System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+            }else{
+                quotas++;
+                System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+                calendarNext.add(Calendar.MONTH, 1);
+                nextPaymentDate = calendarNext.getTime();
+            }
+
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            lastPaymentDate = calendar.getTime();
+
+        }
+
+        System.out.println("--------------------");
+        System.out.println("Last Payment   : " + lastPaymentDate);
+        System.out.println("Current Payment: " + currentDate);
+
+        return quotas;
     }
 
     public void calculateTotalAmount() {

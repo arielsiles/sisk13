@@ -49,7 +49,8 @@
             <f:facet name="header">#{messages['PurchaseOrderPayment.new']}</f:facet>
             <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
-                <rich:calendar value="#{creditTransaction.date}"
+                <rich:calendar id="paymentDate"
+                               value="#{creditTransaction.date}"
                                popup="true"
                                required="true"
                                datePattern="#{messages['patterns.date']}"
@@ -58,6 +59,15 @@
                                tabindex="1">
                     <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                 </rich:calendar>
+                <a4j:commandLink id="calculateTotalAmountButton"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 title="#{messages['Common.calculate']}"
+                                 action="#{creditTransactionAction.calculateInterest()}"
+                                 tabindex="6">
+                    <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
+                    <a4j:support event="onclick" reRender="capital, interest, amount"/>
+                </a4j:commandLink>
             </s:decorate>
 
             <c:choose>

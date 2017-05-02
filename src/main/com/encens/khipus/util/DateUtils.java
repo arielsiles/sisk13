@@ -153,25 +153,6 @@ public final class DateUtils {
         return getDifference(toDateCalendar(initDate), toDateCalendar(endDate), TimeUnit.DAYS) + (includeEndDate ? 1 : 0);
     }
 
-    public static int monthsBetween(Date fechaInicio, Date fechaFin) {
-        try {
-            //Fecha inicio en objeto Calendar
-            Calendar startCalendar = Calendar.getInstance();
-            startCalendar.setTime(fechaInicio);
-            //Fecha finalización en objeto Calendar
-            Calendar endCalendar = Calendar.getInstance();
-            endCalendar.setTime(fechaFin);
-            //Cálculo de meses para las fechas de inicio y finalización
-            int startMes = (startCalendar.get(Calendar.YEAR) * 12) + startCalendar.get(Calendar.MONTH);
-            int endMes = (endCalendar.get(Calendar.YEAR) * 12) + endCalendar.get(Calendar.MONTH);
-            //Diferencia en meses entre las dos fechas
-            int diffMonth = endMes - startMes;
-            return diffMonth;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     public static long differenceBetween(Date initDate, Date endDate, TimeUnit units) {
         return differenceBetween(initDate, endDate, units, true);
     }
