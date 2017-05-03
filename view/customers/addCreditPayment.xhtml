@@ -82,6 +82,19 @@
                         <h:outputText>#{credit.partner.fullName}</h:outputText>
                     </s:decorate>
 
+                    <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.creditStatus']}</ui:define>
+                        <h:outputText value="#{messages[credit.state.resourceKey]}"/>
+                    </s:decorate>
+
+                    <s:decorate id="capitalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.capitalBalance']}</ui:define>
+                        <h:outputText id="capitalBalance"
+                                      value="#{credit.capitalBalance}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalBalance"/>
+                        </h:outputText>
+                    </s:decorate>
+
                     <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.interest']}</ui:define>
                         <h:outputText id="interest"

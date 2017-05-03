@@ -60,6 +60,24 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         }
 
         if (result == null)
+            result = credit.getFirstPayment();
+
+        return result;
+    }
+
+    @Override
+    public Date findLastPaymentForInterest(Credit credit) {
+        Date result;
+        try {
+            result =  (Date) em.createNamedQuery("CreditTransaction.findLastTransaction")
+                    .setParameter("credit", credit)
+                    .setParameter("transactionType", CreditTransactionType.ING)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+        if (result == null)
             result = credit.getGrantDate();
 
         return result;

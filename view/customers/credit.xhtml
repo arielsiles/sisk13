@@ -178,6 +178,14 @@
                     <h:outputText value="#{messages[credit.state.resourceKey]}"/>
                 </s:decorate>
 
+                <s:decorate id="capitalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.capitalBalance']}</ui:define>
+                    <h:outputText id="capitalBalance"
+                                  value="#{credit.capitalBalance}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalBalance"/>
+                    </h:outputText>
+                </s:decorate>
+
             </rich:panel>
             <c:if test="#{creditAction.managed}">
             <rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">

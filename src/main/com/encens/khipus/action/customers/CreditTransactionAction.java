@@ -6,6 +6,7 @@ import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Credit;
+import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditTransaction;
 import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.service.customers.CreditService;
@@ -57,7 +58,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         capitalBalance = BigDecimalUtil.subtract(capitalBalance, getInstance().getCapital(), 6);
 
         try {
-            creditTransaction.setDate(new Date());
+            //creditTransaction.setDate(new Date());
+            creditTransaction.setDate(creditTransaction.getDate());
             creditTransaction.setDays(0);
             creditTransaction.setCapitalBalance(capitalBalance);
             creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
@@ -127,13 +129,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public BigDecimal calculateInterest(){
 
         Credit credit = creditAction.getInstance();
+        BigDecimal saldoCapital = credit.getCapitalBalance();
+
         Date currentPaymentDate = getInstance().getDate();
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
-        System.out.println(".....calculateInterest() currentPaymentDate: " + currentPaymentDate);
 
-        BigDecimal saldoCapital = credit.getAmount();
-        Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
+        Date lastPaymentDate = creditTransactionService.findLastPaymentForInterest(credit);
+
         Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
+
         BigDecimal var_interest = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(credit.getAnnualRate()), BigDecimalUtil.toBigDecimal(100), 6);
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
@@ -142,7 +146,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         getInstance().setInterest(interest);
 
-        BigDecimal currentCapital = calculateCapital();
+        BigDecimal currentCapital = calculateCapital(credit);
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
 
         getInstance().setCapital(currentCapital);
@@ -151,20 +155,32 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return interest;
     }
 
-    public BigDecimal calculateCapital(){
+    public BigDecimal calculateCapital(Credit credit){
 
-        Credit credit = creditAction.getInstance();
+        int quotas = 0;
+
         Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-        //Date currentPaymentDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(lastPaymentDate);
+        lastPaymentDate = cal.getTime();
+
         Date currentPaymentDate = getInstance().getDate();
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
-        int quotas = calculateQuotas(lastPaymentDate, currentPaymentDate);
+        CreditState state = credit.getState();
+        int amortize = credit.getAmortization();
 
+        if (state.equals(CreditState.VIG)) {
+            quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
+        }else {
+            if (state.equals(CreditState.VEN)) {
+                quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30);
+            }
+        }
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
     }
 
-    public int calculateQuotas(Date lastPaymentDate, Date currentDate){
+    public int calculateQuotasVen(Date lastPaymentDate, Date currentDate, int amortize){
 
 
         Calendar calendar = Calendar.getInstance();
@@ -172,20 +188,20 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         Calendar calendarNext = Calendar.getInstance();
         calendarNext.setTime(lastPaymentDate);
-        calendarNext.add(Calendar.MONTH, 1);
+        calendarNext.add(Calendar.MONTH, amortize);
         Date nextPaymentDate = calendarNext.getTime();
 
         int quotas = 1;
 
         System.out.println("--------------------");
-        while (lastPaymentDate.before(currentDate)){
+        while (lastPaymentDate.before(currentDate) || lastPaymentDate.equals(currentDate)){
 
             if (lastPaymentDate.before(nextPaymentDate)){
-                System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+                System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
             }else{
                 quotas++;
                 System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
-                calendarNext.add(Calendar.MONTH, 1);
+                calendarNext.add(Calendar.MONTH, amortize);
                 nextPaymentDate = calendarNext.getTime();
             }
 

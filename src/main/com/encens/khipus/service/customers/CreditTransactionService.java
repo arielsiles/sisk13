@@ -15,5 +15,6 @@ import java.util.Date;
 public interface CreditTransactionService {
     void create(Credit credit, Invoice invoice) throws EntryDuplicatedException;
     Date findLastPayment(Credit credit);
+    Date findLastPaymentForInterest(Credit credit);
     void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction);
 }

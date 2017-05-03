@@ -25,6 +25,7 @@ public class CreditTransactionDataModel extends QueryDataModel<Long, CreditTrans
     @Create
     public void init() {
         sortProperty = "creditTransaction.date";
+        sortAsc = false;
     }
 
     @Override
