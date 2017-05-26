@@ -3,6 +3,7 @@ package com.encens.khipus.service.customers;
 import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditTransaction;
+import com.encens.khipus.model.customers.CreditTransactionType;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -45,6 +46,25 @@ public class CreditServiceBean implements CreditService {
             totalTransactions = totalTransactions.add(transaction.getAmount());
         }
         return credit.getAmount().subtract(totalTransactions);
+    }
+
+    public BigDecimal getTotalPaidCapital(Credit credit){
+
+        List<CreditTransaction> transactions = em.createNamedQuery("CreditTransaction.findIncomePayments")
+                .setParameter("credit", credit).setParameter("creditTransactionType", CreditTransactionType.ING).getResultList();
+
+        BigDecimal totalPaidCapital = new BigDecimal(0.0);
+        for (CreditTransaction transaction : transactions) {
+            totalPaidCapital = totalPaidCapital.add(transaction.getCapital());
+        }
+        return totalPaidCapital;
+    }
+
+    public List<Credit> getAllCredits(){
+
+        List<Credit> creditList = em.createNamedQuery("Credit.findAllCredits").getResultList();
+
+        return creditList;
     }
 
 }

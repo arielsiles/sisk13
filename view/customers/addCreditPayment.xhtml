@@ -55,7 +55,7 @@
                                required="true"
                                datePattern="#{messages['patterns.date']}"
                                styleClass="input"
-                               enableManualInput="false"
+                               enableManualInput="true"
                                tabindex="1">
                     <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                 </rich:calendar>
@@ -109,9 +109,10 @@
                                      value="#{creditTransaction.capital}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <app:keyUpEvent focus="capital"
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField"/>
+                            <!--<app:keyUpEvent focus="capital"
                                             reRender="amountField, capitalField"
-                                            action="#{creditTransactionAction.calculateTotalAmount()}"/>
+                                            action="#{creditTransactionAction.calculateTotalAmount()}"/>-->
                         </h:inputText>
                     </s:decorate>
 
@@ -124,7 +125,6 @@
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                            <!--<a4j:support event="onblur" reRender="amountField"/>-->
                         </h:inputText>
                     </s:decorate>
                 </c:when>

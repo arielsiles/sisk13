@@ -1,5 +1,6 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.action.customers.reports.CreditReportAction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
@@ -13,11 +14,13 @@ import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
+import com.google.zxing.NotFoundException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -36,6 +39,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private CreditTransactionService creditTransactionService;
     @In(create = true)
     private CreditAction creditAction;
+    @In(create = true)
+    private CreditReportAction creditReportAction;
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
@@ -132,9 +137,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal saldoCapital = credit.getCapitalBalance();
 
         Date currentPaymentDate = getInstance().getDate();
-        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
-
-        Date lastPaymentDate = creditTransactionService.findLastPaymentForInterest(credit);
+        currentPaymentDate      = DateUtils.removeTime(currentPaymentDate);
+        Date lastPaymentDate    = creditTransactionService.findLastPaymentForInterest(credit);
 
         Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
 
@@ -145,16 +149,56 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         //BigDecimal fullPayment = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
 
         getInstance().setInterest(interest);
-
-        BigDecimal currentCapital = calculateCapital(credit);
+        //BigDecimal currentCapital = calculateCapital(credit);
+        BigDecimal currentCapital = calculateSimpleCapital(credit);
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
-
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
 
         return interest;
     }
 
+    public BigDecimal calculateSimpleCapital(Credit credit){
+
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+        Date currentPaymentDate = getInstance().getDate();
+        BigDecimal totalPaidCapital = creditService.getTotalPaidCapital(credit); // Capital Total Pagado
+        BigDecimal totalPayableCapital = BigDecimal.ZERO;   // Capital Total x Pagar
+        BigDecimal totalBalancePayableCapital = BigDecimal.ZERO;   // Capital SALDO Total x Pagar
+
+        Integer nro = 0;
+        BigDecimal quotaPlan = BigDecimal.ZERO;
+
+        //Si la fecha actual es menor a la fecha del primer pago
+        if (currentPaymentDate.compareTo(credit.getFirstPayment()) < 0){
+            nro = 0;
+            quotaPlan = credit.getQuota();
+        }else {
+            for (CreditReportAction.PaymentPlanData paymentPlan : paymentPlanDatas) {
+                Date paymentPlanDate = DateUtils.parse(paymentPlan.getPaymentDate(), "dd/MM/yyyy");
+                if (paymentPlanDate.compareTo(currentPaymentDate) <= 0 ){
+                    nro = paymentPlan.getNro();
+                    //quotaPlan = paymentPlan.getQuota();
+                    quotaPlan = BigDecimalUtil.sum(quotaPlan, paymentPlan.getQuota(), 6);
+                    System.out.println("-----> " + nro + " - " + quotaPlan + " - " + paymentPlanDate + " - " + currentPaymentDate);
+                }
+
+            }
+        }
+
+
+        //totalPayableCapital = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(nro.doubleValue()), quotaPlan, 6);
+        totalPayableCapital = quotaPlan;
+        totalBalancePayableCapital = BigDecimalUtil.subtract(totalPayableCapital, totalPaidCapital, 6);
+
+        System.out.println("..................nro:::: " + nro);
+        System.out.println("..................totalPayableCapital:::: " + totalPayableCapital);
+        System.out.println("..................totalPaidCapital:::: " + totalPaidCapital);
+        System.out.println("..................totalBalancePayableCapital:::: " + totalBalancePayableCapital);
+        return totalBalancePayableCapital;
+    }
+
+    /** ? **/
     public BigDecimal calculateCapital(Credit credit){
 
         int quotas = 0;
@@ -180,6 +224,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
     }
 
+    /** ? **/
     public int calculateQuotasVen(Date lastPaymentDate, Date currentDate, int amortize){
 
 

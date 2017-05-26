@@ -15,6 +15,7 @@ import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Actions for Credit
@@ -28,6 +29,9 @@ public class CreditAction extends GenericAction<Credit> {
 
     @In
     private CreditTransactionService creditTransactionService;
+
+    @In
+    private CreditService creditService;
 
     @In
     private SequenceGeneratorService sequenceGeneratorService;
@@ -85,26 +89,13 @@ public class CreditAction extends GenericAction<Credit> {
         return creditTransactionAction.select(creditTransaction);
     }
 
-    /*public BigDecimal calculateInterest(Credit credit){
+    public void checkCreditStatus(){
 
-        BigDecimal saldoCapital = credit.getAmount();
-        Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-        Date currentPaymentDate = new Date();
-        Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
-        BigDecimal var_interest = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(credit.getAnnualRate()), BigDecimalUtil.toBigDecimal(100), 6);
-        BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
-        BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
-        interest = BigDecimalUtil.multiply(interest, var_time, 6);
-        BigDecimal totalQuota = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
+        for (Credit credit : creditService.getAllCredits()){
 
-        this.setTotalPayment(totalQuota);
-        creditTransactionAction.getInstance().setCapital(credit.getQuota());
-        creditTransactionAction.getInstance().setAmount(totalQuota);
-        creditTransactionAction.getInstance().setGloss(credit.getCode()+" " + credit.getPartner().getFullName());
-        return interest;
+        }
 
-    }*/
-
+    }
 
     public Date getPaymentDate() {
         return paymentDate;
