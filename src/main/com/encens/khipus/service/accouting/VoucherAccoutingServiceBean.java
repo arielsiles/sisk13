@@ -226,11 +226,21 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>();
 
         try {
-            voucherDetailList = em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+            /*voucherDetailList = em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
                     " left join voucherDetail.voucher voucher " +
                     " where voucher.date < :startdate " +
                     " and voucherDetail.account = :cashAccountCode " +
                     " and voucher.providerCode = :providerCode " +
+                    " and voucher.state <> 'ANL'")
+                    .setParameter("startdate", startDate)
+                    .setParameter("cashAccountCode", cashAccountCode)
+                    .setParameter("providerCode", providerCode)
+                    .getResultList();*/
+            voucherDetailList = em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+                    " left join voucherDetail.voucher voucher " +
+                    " where voucher.date < :startdate " +
+                    " and voucherDetail.account = :cashAccountCode " +
+                    " and voucherDetail.providerCode = :providerCode " +
                     " and voucher.state <> 'ANL'")
                     .setParameter("startdate", startDate)
                     .setParameter("cashAccountCode", cashAccountCode)

@@ -5,15 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d918a0a3-72fc-482b-95ab-7c285f38506e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/reports/CreditReportAction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/reports/CreditReportAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/Credit.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/customers/addCreditPayment.xhtml" afterPath="$PROJECT_DIR$/view/customers/addCreditPayment.xhtml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view/customers/creditList.xhtml" afterPath="$PROJECT_DIR$/view/customers/creditList.xhtml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/khipus.ear" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/khipus.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/khipus.war" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/ant.xml" afterPath="$PROJECT_DIR$/.idea/ant.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build-common.xml" afterPath="$PROJECT_DIR$/build-common.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java" afterPath="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java" />
     </list>
     <list id="c1390d32-d74c-4ab2-894a-a0eab5dbc76a" name="discard" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -28,6 +26,7 @@
     <ignored path=".idea/dataSources.local.xml" />
     <ignored path="$PROJECT_DIR$/bootstrap/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <file path="$PROJECT_DIR$/.idea/workspace.xml" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,9 +60,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1309">
               <caret line="94" column="0" lean-forward="false" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -78,24 +75,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreditReportAction.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/reports/CreditReportAction.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1496">
-              <caret line="116" column="31" lean-forward="false" selection-start-line="116" selection-start-column="31" selection-end-line="116" selection-end-column="31" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="CreditService.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="289">
               <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -115,16 +100,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2601">
               <caret line="176" column="15" lean-forward="false" selection-start-line="176" selection-start-column="15" selection-end-line="176" selection-end-column="15" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CreditDataModel.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="44" column="13" lean-forward="false" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -160,7 +135,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreditTransaction.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CreditTransaction.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransaction.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
@@ -170,11 +145,71 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreditTransactionType.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/CreditTransactionType.java">
+      <file leaf-file-name="kardexProviderReport.xhtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/view/accounting/kardexProviderReport.xhtml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="12" lean-forward="false" selection-start-line="8" selection-start-column="12" selection-end-line="8" selection-end-column="12" />
+            <state relative-caret-position="2210">
+              <caret line="130" column="76" lean-forward="false" selection-start-line="130" selection-start-column="76" selection-end-line="130" selection-end-column="76" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KardexProviderReportAction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/KardexProviderReportAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="85" column="46" lean-forward="false" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="6" lean-forward="true" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VoucherAccoutingService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="493">
+              <caret line="40" column="18" lean-forward="false" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VoucherAccoutingServiceBean.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3723">
+              <caret line="243" column="39" lean-forward="false" selection-start-line="243" selection-start-column="39" selection-end-line="243" selection-end-column="39" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build-common.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build-common.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="578">
+              <caret line="34" column="67" lean-forward="false" selection-start-line="34" selection-start-column="67" selection-end-line="34" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VoucherDetail.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/VoucherDetail.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1700">
+              <caret line="108" column="28" lean-forward="false" selection-start-line="108" selection-start-column="28" selection-end-line="108" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -185,36 +220,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="969">
               <caret line="57" column="54" lean-forward="false" selection-start-line="57" selection-start-column="54" selection-end-line="57" selection-end-column="54" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="productItemCostUnitReport.xhtml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/view/warehouse/productItemCostUnitReport.xhtml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2635">
-              <caret line="155" column="79" lean-forward="false" selection-start-line="155" selection-start-column="79" selection-end-line="155" selection-end-column="79" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProductItemCostUnitReportAction.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/reports/ProductItemCostUnitReportAction.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="799">
-              <caret line="62" column="32" lean-forward="false" selection-start-line="62" selection-start-column="23" selection-end-line="62" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Inventory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/warehouse/Inventory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -235,10 +240,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1887">
               <caret line="126" column="28" lean-forward="false" selection-start-line="126" selection-start-column="28" selection-end-line="126" selection-end-column="28" />
-              <folding>
-                <element signature="e#9049#9050#0" expanded="true" />
-                <element signature="e#9084#9085#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -263,16 +265,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="salaryMovement.xhtml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/view/employees/salaryMovement.xhtml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2363">
-              <caret line="139" column="16" lean-forward="false" selection-start-line="139" selection-start-column="16" selection-end-line="139" selection-end-column="70" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -284,8 +276,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>client</find>
-      <find>glo</find>
       <find>warehousePurchaseDocumentAction.addPurchaseDocument</find>
       <find>amount</find>
       <find>creditTransactionAction</find>
@@ -314,6 +304,8 @@
       <find>creditReportAction</find>
       <find>button</find>
       <find>for</find>
+      <find>GENERATE</find>
+      <find>generate</find>
     </findStrings>
     <dirStrings>
       <dir>D:\Intellij\sisk1\src\main\com\encens\khipus\model</dir>
@@ -353,7 +345,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/AccountAction.java" />
         <option value="$PROJECT_DIR$/view/customers/account.xhtml" />
         <option value="$PROJECT_DIR$/view/customers/accountList.xhtml" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/fixedassets/FixedAssetAction.java" />
@@ -362,7 +353,6 @@
         <option value="$PROJECT_DIR$/view/production/reports/voletasDePagoReport.xhtml" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/production/reports/VoletaDePagoReportAction.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/SummaryClientStateReportAction.java" />
-        <option value="$PROJECT_DIR$/build-common.xml" />
         <option value="$PROJECT_DIR$/query/k1-v1.8.5.4.sql" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/warehouse/ProductItemAction.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/model/customers/PartnerState.java" />
@@ -385,7 +375,6 @@
         <option value="$PROJECT_DIR$/resources/WEB-INF/customers/pages.xml" />
         <option value="$PROJECT_DIR$/view/customers/addPayoutCredit.xhtml" />
         <option value="$PROJECT_DIR$/view/warehouse/warehousePurchaseOrderDetail.xhtml" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/util/DateUtils.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditTransactionDataModel.java" />
@@ -404,6 +393,9 @@
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditServiceBean.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/customers/CreditService.java" />
         <option value="$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditAction.java" />
+        <option value="$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java" />
+        <option value="$PROJECT_DIR$/build-common.xml" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -483,38 +475,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="khipus" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sisk13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="khipus" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sisk13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -534,7 +494,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/build-prod.xml" />
     <property name="recentsLimit" value="5" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="268" />
@@ -1626,7 +1586,10 @@
       <workItem from="1495201628589" duration="5519000" />
       <workItem from="1495636699624" duration="21849000" />
       <workItem from="1495719670963" duration="9147000" />
-      <workItem from="1495803840512" duration="197000" />
+      <workItem from="1495803840512" duration="6967000" />
+      <workItem from="1496099026564" duration="1322000" />
+      <workItem from="1496150299158" duration="5102000" />
+      <workItem from="1496320093369" duration="739000" />
     </task>
     <task id="LOCAL-00017" summary="1.5.9.9">
       <created>1425708479784</created>
@@ -1975,7 +1938,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3517227000" />
+    <option name="totallyTimeSpent" value="3531160000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -2001,7 +1964,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16151386" sideWeight="0.46839547" order="8" side_tool="false" content_ui="tabs" x="891" y="347" width="137" height="345" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1716418" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14285715" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1609808" sideWeight="0.5316045" order="7" side_tool="false" content_ui="tabs" x="1341" y="168" width="350" height="644" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1609808" sideWeight="0.5316045" order="7" side_tool="false" content_ui="tabs" x="1341" y="168" width="350" height="644" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3416216" sideWeight="0.4978678" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32792208" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2010,12 +1973,12 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28030303" sideWeight="0.4978678" order="10" side_tool="false" content_ui="tabs" x="21" y="375" width="1878" height="289" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3961039" sideWeight="0.48987207" order="5" side_tool="false" content_ui="tabs" x="22" y="337" width="1876" height="366" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3625541" sideWeight="0.4978678" order="10" side_tool="false" content_ui="tabs" x="21" y="375" width="1878" height="289" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3560606" sideWeight="0.48987207" order="5" side_tool="false" content_ui="tabs" x="22" y="337" width="1876" height="366" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3225108" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3225108" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1673774" sideWeight="0.50159746" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.123667374" sideWeight="0.48757765" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12686567" sideWeight="0.48757765" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15495208" sideWeight="0.50054055" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Seam" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
@@ -2206,105 +2169,47 @@
       </targetFilters>
       <expanded value="true" />
     </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/build-prod.xml">
+      <targetFilters>
+        <filter targetName="dist" isVisible="true" />
+        <filter targetName="replacejava" isVisible="true" />
+        <filter targetName="replaceview" isVisible="true" />
+        <filter targetName="init" isVisible="true" />
+        <filter targetName="init-rebel" isVisible="false" />
+        <filter targetName="compile" isVisible="true" />
+        <filter targetName="copyclasses" isVisible="true" />
+        <filter targetName="jar" isVisible="true" />
+        <filter targetName="war" isVisible="true" />
+        <filter targetName="war-applet" isVisible="true" />
+        <filter targetName="ear" isVisible="true" />
+        <filter targetName="clear-profile-artifacts" isVisible="true" />
+        <filter targetName="stage" isVisible="false" />
+        <filter targetName="archive" isVisible="true" />
+        <filter targetName="datasource" isVisible="false" />
+        <filter targetName="explode" isVisible="true" />
+        <filter targetName="unexplode" isVisible="true" />
+        <filter targetName="reexplode" isVisible="true" />
+        <filter targetName="check-deployed" isVisible="true" />
+        <filter targetName="restart-exploded" isVisible="true" />
+        <filter targetName="restart-deployed" isVisible="true" />
+        <filter targetName="restart" isVisible="true" />
+        <filter targetName="deploy" isVisible="true" />
+        <filter targetName="undeploy" isVisible="true" />
+        <filter targetName="redeploy" isVisible="true" />
+        <filter targetName="clean" isVisible="true" />
+        <filter targetName="compiletest" isVisible="true" />
+        <filter targetName="copytestclasses" isVisible="true" />
+        <filter targetName="buildtest" isVisible="true" />
+        <filter targetName="test" isVisible="true" />
+        <filter targetName="javadoc" isVisible="false" />
+        <filter targetName="validateConfiguration" isVisible="false" />
+        <filter targetName="validate" isVisible="true" />
+        <filter targetName="purge" isVisible="true" />
+      </targetFilters>
+      <expanded value="false" />
+    </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/lib/jboss-seam.jar!/org/jboss/seam/intercept/SeamInvocationContext.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="58" column="71" lean-forward="true" selection-start-line="58" selection-start-column="71" selection-end-line="58" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/view/customers/addPayoutCredit.xhtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1071">
-          <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/purchases/PurchaseOrderDetail.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3128">
-          <caret line="246" column="27" lean-forward="false" selection-start-line="246" selection-start-column="19" selection-end-line="246" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#4953#4954#0" expanded="false" />
-            <element signature="e#4978#4979#0" expanded="false" />
-            <element signature="e#5012#5013#0" expanded="false" />
-            <element signature="e#5040#5041#0" expanded="false" />
-            <element signature="e#5080#5081#0" expanded="false" />
-            <element signature="e#5116#5117#0" expanded="false" />
-            <element signature="e#5174#5175#0" expanded="false" />
-            <element signature="e#5224#5225#0" expanded="false" />
-            <element signature="e#5271#5272#0" expanded="false" />
-            <element signature="e#5307#5308#0" expanded="false" />
-            <element signature="e#5557#5558#0" expanded="false" />
-            <element signature="e#5591#5592#0" expanded="false" />
-            <element signature="e#5645#5646#0" expanded="false" />
-            <element signature="e#5691#5692#0" expanded="false" />
-            <element signature="e#5728#5729#0" expanded="false" />
-            <element signature="e#5763#5764#0" expanded="false" />
-            <element signature="e#5817#5818#0" expanded="false" />
-            <element signature="e#5865#5866#0" expanded="false" />
-            <element signature="e#5913#5914#0" expanded="false" />
-            <element signature="e#5953#5954#0" expanded="false" />
-            <element signature="e#6023#6024#0" expanded="false" />
-            <element signature="e#6081#6082#0" expanded="false" />
-            <element signature="e#6120#6121#0" expanded="false" />
-            <element signature="e#6151#6152#0" expanded="false" />
-            <element signature="e#6203#6204#0" expanded="false" />
-            <element signature="e#6243#6244#0" expanded="false" />
-            <element signature="e#6285#6286#0" expanded="false" />
-            <element signature="e#6319#6320#0" expanded="false" />
-            <element signature="e#6377#6378#0" expanded="false" />
-            <element signature="e#6423#6424#0" expanded="false" />
-            <element signature="e#6466#6467#0" expanded="false" />
-            <element signature="e#6500#6501#0" expanded="false" />
-            <element signature="e#6756#6757#0" expanded="false" />
-            <element signature="e#6794#6795#0" expanded="false" />
-            <element signature="e#6856#6857#0" expanded="false" />
-            <element signature="e#6910#6911#0" expanded="false" />
-            <element signature="e#6942#6943#0" expanded="false" />
-            <element signature="e#6972#6973#0" expanded="false" />
-            <element signature="e#7016#7017#0" expanded="false" />
-            <element signature="e#7054#7055#0" expanded="false" />
-            <element signature="e#7100#7101#0" expanded="false" />
-            <element signature="e#7142#7143#0" expanded="false" />
-            <element signature="e#7212#7213#0" expanded="false" />
-            <element signature="e#7274#7275#0" expanded="false" />
-            <element signature="e#7325#7326#0" expanded="false" />
-            <element signature="e#7367#7368#0" expanded="false" />
-            <element signature="e#7779#7780#0" expanded="false" />
-            <element signature="e#7830#7831#0" expanded="false" />
-            <element signature="e#8054#8055#0" expanded="false" />
-            <element signature="e#8084#8085#0" expanded="false" />
-            <element signature="e#8130#8131#0" expanded="false" />
-            <element signature="e#8168#8169#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderDetailServiceBean.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8">
-          <caret line="55" column="16" lean-forward="false" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/warehouse/WarehousePurchaseOrderDetailService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="590">
-          <caret line="56" column="9" lean-forward="false" selection-start-line="56" selection-start-column="9" selection-end-line="56" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/PartnerAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="69" column="5" lean-forward="false" selection-start-line="63" selection-start-column="4" selection-end-line="69" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/jboss-seam.jar!/org/jboss/seam/annotations/AutoCreate.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -2337,13 +2242,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="2923" column="32" lean-forward="false" selection-start-line="2923" selection-start-column="32" selection-end-line="2923" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="19" lean-forward="false" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -2432,20 +2330,19 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/messages_app.properties">
+      <provider editor-type-id="ResourceBundle">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="29240">
           <caret line="1720" column="20" lean-forward="false" selection-start-line="1720" selection-start-column="0" selection-end-line="1720" selection-end-column="20" />
         </state>
-      </provider>
-      <provider editor-type-id="ResourceBundle">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/customers/CreditDataModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="44" column="13" lean-forward="false" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2453,7 +2350,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-306">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2461,7 +2357,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="8" column="12" lean-forward="false" selection-start-line="8" selection-start-column="12" selection-end-line="8" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2483,7 +2378,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1496">
           <caret line="116" column="31" lean-forward="false" selection-start-line="116" selection-start-column="31" selection-end-line="116" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2505,7 +2399,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2363">
           <caret line="139" column="16" lean-forward="false" selection-start-line="139" selection-start-column="16" selection-end-line="139" selection-end-column="70" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2513,7 +2406,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2635">
           <caret line="155" column="79" lean-forward="false" selection-start-line="155" selection-start-column="79" selection-end-line="155" selection-end-column="79" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2521,7 +2413,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="799">
           <caret line="62" column="32" lean-forward="false" selection-start-line="62" selection-start-column="23" selection-end-line="62" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2529,7 +2420,37 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2835#2836#0" expanded="false" />
+            <element signature="e#2860#2861#0" expanded="false" />
+            <element signature="e#2901#2902#0" expanded="false" />
+            <element signature="e#2929#2930#0" expanded="false" />
+            <element signature="e#2969#2970#0" expanded="false" />
+            <element signature="e#3005#3006#0" expanded="false" />
+            <element signature="e#3063#3064#0" expanded="false" />
+            <element signature="e#3113#3114#0" expanded="false" />
+            <element signature="e#3151#3152#0" expanded="false" />
+            <element signature="e#3185#3186#0" expanded="false" />
+            <element signature="e#3239#3240#0" expanded="false" />
+            <element signature="e#3285#3286#0" expanded="false" />
+            <element signature="e#3330#3331#0" expanded="false" />
+            <element signature="e#3367#3368#0" expanded="false" />
+            <element signature="e#3431#3432#0" expanded="false" />
+            <element signature="e#3483#3484#0" expanded="false" />
+            <element signature="e#3515#3516#0" expanded="false" />
+            <element signature="e#3545#3546#0" expanded="false" />
+            <element signature="e#3589#3590#0" expanded="false" />
+            <element signature="e#3627#3628#0" expanded="false" />
+            <element signature="e#3666#3667#0" expanded="false" />
+            <element signature="e#3698#3699#0" expanded="false" />
+            <element signature="e#3751#3752#0" expanded="false" />
+            <element signature="e#3793#3794#0" expanded="false" />
+            <element signature="e#3836#3837#0" expanded="false" />
+            <element signature="e#3870#3871#0" expanded="false" />
+            <element signature="e#3929#3930#0" expanded="false" />
+            <element signature="e#3975#3976#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2545,10 +2466,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1887">
           <caret line="126" column="28" lean-forward="false" selection-start-line="126" selection-start-column="28" selection-end-line="126" selection-end-column="28" />
-          <folding>
-            <element signature="e#9049#9050#0" expanded="true" />
-            <element signature="e#9084#9085#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2604,9 +2522,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2630,9 +2546,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1309">
           <caret line="94" column="0" lean-forward="false" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2648,6 +2562,62 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="23" column="108" lean-forward="false" selection-start-line="23" selection-start-column="108" selection-end-line="23" selection-end-column="108" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="40" column="18" lean-forward="false" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/model/finances/VoucherDetail.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1700">
+          <caret line="108" column="28" lean-forward="false" selection-start-line="108" selection-start-column="28" selection-end-line="108" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build-common.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="34" column="67" lean-forward="false" selection-start-line="34" selection-start-column="67" selection-end-line="34" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/view/accounting/kardexProviderReport.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2210">
+          <caret line="130" column="76" lean-forward="false" selection-start-line="130" selection-start-column="76" selection-end-line="130" selection-end-column="76" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/service/accouting/VoucherAccoutingServiceBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3723">
+          <caret line="243" column="39" lean-forward="false" selection-start-line="243" selection-start-column="39" selection-end-line="243" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/encens/khipus/action/accounting/reports/KardexProviderReportAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="85" column="46" lean-forward="false" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="6" lean-forward="true" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
           <folding />
         </state>
       </provider>
