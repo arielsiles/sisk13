@@ -3,6 +3,7 @@ package com.encens.khipus.service.customers;
 import com.encens.khipus.model.customers.Client;
 
 import javax.ejb.Local;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,5 +14,6 @@ import java.util.List;
 public interface ClientService {
 
     List<Client> getAllClients();
+    Double getBalanceClient(Date startDate, String cashAccountCode, Long clientId);
 
 }

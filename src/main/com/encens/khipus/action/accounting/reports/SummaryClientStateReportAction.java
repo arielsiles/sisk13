@@ -63,6 +63,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
         String ejbql = "";
 
             ejbql = " SELECT " +
+                    "        client.id, " +
                     "        client.nit, " +
                     "        client.name, " +
                     "        client.ap, " +
@@ -75,7 +76,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
                     "  WHERE voucher.date between '" + start + "' and '" + end + "' " +
                     "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
                     "  AND   voucher.state <> 'ANL' " +
-                    "  group by client.nit, client.name, client.ap, client.am " +
+                    "  group by client.id, client.nit, client.name, client.ap, client.am " +
                     "  order by client.name";
 
         return ejbql;
@@ -93,6 +94,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
             reportParameters.put("startDate", startDate);
             reportParameters.put("endDate", endDate);
             reportParameters.put("cashAccount", cashAccountName);
+            reportParameters.put("cashAccountCode", cashAccount.getAccountCode());
 
             /*setReportFormat(ReportFormat.PDF);*/
             super.generateReport(

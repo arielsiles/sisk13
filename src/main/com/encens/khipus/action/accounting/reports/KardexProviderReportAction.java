@@ -9,6 +9,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -96,6 +97,22 @@ public class KardexProviderReportAction extends GenericReportAction {
                         "  group by voucherDetail.providerCode, entity.acronym " +
                         "  order by entity.acronym";
             }else{
+                /*ejbql = " SELECT " +
+                        " cashAccount.accountCode AS accountCode," +
+                        " cashAccount.description AS description," +
+                        " entity.id AS providerCode, " +
+                        " entity.acronym AS acronym," +
+                        " SUM(voucherDetail.debit) as debit, " +
+                        " SUM(voucherDetail.credit) as credit " +
+                        " FROM Voucher voucher" +
+                        " LEFT JOIN voucher.voucherDetailList voucherDetail" +
+                        " LEFT JOIN voucherDetail.provider.entity entity" +
+                        " LEFT JOIN voucherDetail.cashAccount cashAccount " +
+                        " WHERE voucher.date between '" + start + "' and '" + end + "' " +  <<--------- Modify
+                        " AND   voucher.state <> 'ANL' " +
+                        " AND   voucherDetail.providerCode IS NOT NULL " +
+                        " GROUP BY cashAccount.accountCode, cashAccount.description, entity.id, entity.acronym " +
+                        " ORDER BY cashAccount.accountCode, cashAccount.description, entity.acronym ";*/
                 ejbql = " SELECT " +
                         " cashAccount.accountCode AS accountCode," +
                         " cashAccount.description AS description," +
@@ -107,7 +124,7 @@ public class KardexProviderReportAction extends GenericReportAction {
                         " LEFT JOIN voucher.voucherDetailList voucherDetail" +
                         " LEFT JOIN voucherDetail.provider.entity entity" +
                         " LEFT JOIN voucherDetail.cashAccount cashAccount " +
-                        " WHERE voucher.date between '" + start + "' and '" + end + "' " +
+                        " WHERE voucher.date <= '" + end + "' " +
                         " AND   voucher.state <> 'ANL' " +
                         " AND   voucherDetail.providerCode IS NOT NULL " +
                         " GROUP BY cashAccount.accountCode, cashAccount.description, entity.id, entity.acronym " +
@@ -156,6 +173,7 @@ public class KardexProviderReportAction extends GenericReportAction {
                 reportParameters.put("startDate", startDate);
                 reportParameters.put("endDate", endDate);
                 reportParameters.put("cashAccount", cashAccountName);
+                reportParameters.put("cashAccountCode", cashAccount.getAccountCode());
 
                 /*setReportFormat(ReportFormat.PDF);*/
                 super.generateReport(
