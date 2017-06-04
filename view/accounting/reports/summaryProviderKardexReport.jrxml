@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summaryProviderKardexReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
-	<property name="ireport.zoom" value="1.9487171000000127"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summaryProviderKardexReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.SummaryProviderReportScriptlet">
+	<property name="ireport.zoom" value="1.771561000000013"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="cashAccount" class="java.lang.String"/>
+	<parameter name="cashAccountCode" class="java.lang.String"/>
 	<field name="providerCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -29,7 +30,7 @@
 		<variableExpression><![CDATA[0.00]]></variableExpression>
 	</variable>
 	<variable name="diference" class="java.lang.Double">
-		<variableExpression><![CDATA[$F{debit}.doubleValue()-$F{credit}.doubleValue()]]></variableExpression>
+		<variableExpression><![CDATA[$V{balance}+$F{debit}.doubleValue()-$F{credit}.doubleValue()]]></variableExpression>
 	</variable>
 	<variable name="rowBalance" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$V{diference}]]></variableExpression>
@@ -44,6 +45,7 @@
 	<variable name="diferenceTotal" class="java.lang.Double">
 		<variableExpression><![CDATA[$V{totalDebit}.doubleValue()-$V{totalCredit}.doubleValue()]]></variableExpression>
 	</variable>
+	<variable name="balance" class="java.lang.Double" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[]]></groupExpression>
 		<groupHeader>
@@ -134,6 +136,13 @@
 							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[N.]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="305" y="1" width="65" height="15"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Saldo Ant.]]></text>
 					</staticText>
 				</frame>
 			</band>
@@ -234,7 +243,7 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Inc_Var}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="25" y="0" width="345" height="11"/>
+				<reportElement x="25" y="0" width="281" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
@@ -246,6 +255,13 @@
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{diference}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="306" y="0" width="65" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{balance}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
