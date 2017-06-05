@@ -62,7 +62,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
 
         String ejbql = "";
 
-            ejbql = " SELECT " +
+            /*ejbql = " SELECT " +
                     "        client.id, " +
                     "        client.nit, " +
                     "        client.name, " +
@@ -77,7 +77,23 @@ public class SummaryClientStateReportAction extends GenericReportAction {
                     "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
                     "  AND   voucher.state <> 'ANL' " +
                     "  group by client.id, client.nit, client.name, client.ap, client.am " +
-                    "  order by client.name";
+                    "  order by client.name";*/
+        ejbql = " SELECT " +
+                "        client.id, " +
+                "        client.nit, " +
+                "        client.name, " +
+                "        client.ap, " +
+                "        client.am, " +
+                "        SUM(voucherDetail.debit) as debit, " +
+                "        SUM(voucherDetail.credit) as credit " +
+                "  FROM  Voucher voucher " +
+                "  JOIN voucher.voucherDetailList voucherDetail " +
+                "  JOIN voucherDetail.client client " +
+                "  WHERE voucher.date <= '" + end + "' " +
+                "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
+                "  AND   voucher.state <> 'ANL' " +
+                "  group by client.id, client.nit, client.name, client.ap, client.am " +
+                "  order by client.name";
 
         return ejbql;
     }

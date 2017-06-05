@@ -20,9 +20,10 @@ public class SummaryClientReportScriptlet extends JRDefaultScriptlet {
         Date startDate = (Date) getParameterValue("startDate");
         String cashAccountCode = (String) getParameterValue("cashAccountCode");
 
-        Double balance = clientService.getBalanceClient(startDate, cashAccountCode, clientId);
+        //Double balance = clientService.getBalanceClient(startDate, cashAccountCode, clientId);
+        Double balance = new Double("0.0");
 
-        this.setVariableValue("balance", balance);
+                this.setVariableValue("balance", balance);
     }
 
 }

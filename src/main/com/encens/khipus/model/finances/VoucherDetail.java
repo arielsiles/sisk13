@@ -108,8 +108,8 @@ public class VoucherDetail implements BaseModel {
     @Length(max = 6)
     private String providerCode;
 
-    @Column(name = "idpersonacliente")
-    private Long clientId;
+    /*@Column(name = "idpersonacliente")
+    private Long clientId;*/
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
@@ -320,13 +320,5 @@ public class VoucherDetail implements BaseModel {
 
     public void setProviderCode(String providerCode) {
         this.providerCode = providerCode;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
     }
 }
