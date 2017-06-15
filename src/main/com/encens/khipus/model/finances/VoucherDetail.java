@@ -108,9 +108,6 @@ public class VoucherDetail implements BaseModel {
     @Length(max = 6)
     private String providerCode;
 
-    @Column(name = "idpersonacliente")
-    private Long clientId;
-
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
         this.businessUnitCode = businessUnitCode;
@@ -261,14 +258,6 @@ public class VoucherDetail implements BaseModel {
         this.provider = provider;
     }
 
-    /*public String getProviderCode() {
-        return providerCode;
-    }
-
-    public void setProviderCode(String providerCode) {
-        this.providerCode = providerCode;
-    }*/
-
     public String getAuxiliaryClient(){
         String result = "";
 
@@ -280,7 +269,6 @@ public class VoucherDetail implements BaseModel {
 
     public String getFullCashAccount(){
 
-        //String result = this.cashAccount.getFullName();
         fullCashAccount = this.cashAccount.getFullName();
 
         if (client != null)
@@ -320,13 +308,5 @@ public class VoucherDetail implements BaseModel {
 
     public void setProviderCode(String providerCode) {
         this.providerCode = providerCode;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
     }
 }
