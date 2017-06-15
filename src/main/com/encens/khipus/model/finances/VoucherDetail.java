@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
- * Entity for VoucherDetail
+ * Entity for VoucherDetail...
  *
  * @author
  * @version 1.4
