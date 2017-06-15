@@ -48,7 +48,7 @@ public class ClientServiceBean implements ClientService {
                     " left join voucherDetail.voucher voucher " +
                     " where voucher.date < :startdate " +
                     " and voucherDetail.account = :cashAccountCode " +
-                    " and voucherDetail.clientId = :clientId " +
+                    " and voucherDetail.client.id = :clientId " +
                     " and voucher.state <> 'ANL'")
                     .setParameter("startdate", startDate)
                     .setParameter("cashAccountCode", cashAccountCode)

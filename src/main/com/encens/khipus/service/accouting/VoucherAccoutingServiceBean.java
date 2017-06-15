@@ -254,18 +254,11 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         Double balanceD = new Double("0.00");
         Double balanceC = new Double("0.00");
 
-        System.out.println("-------- GET BALANCE ---------");
         for (VoucherDetail voucherDetail : voucherDetailList){
-            /*System.out.println("Voucher: " + voucherDetail.getVoucher().getDocumentType() + " - " + voucherDetail.getVoucher().getDocumentNumber());
-            System.out.println("VoucherDetail: " + voucherDetail.getCashAccount().getFullName() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
-            System.out.println("--");*/
-
             balanceD = balanceD + voucherDetail.getDebit().doubleValue();
             balanceC = balanceC + voucherDetail.getCredit().doubleValue();
         }
-
         balance = (balanceD - balanceC);
-        /*System.out.println("TOTAL BALANCE: " + balance);*/
 
         return balance;
     }
