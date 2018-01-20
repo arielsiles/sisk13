@@ -1,9 +1,6 @@
 package com.encens.khipus.service.warehouse;
 
-import com.encens.khipus.model.warehouse.MovementDetail;
-import com.encens.khipus.model.warehouse.MovementDetailType;
-import com.encens.khipus.model.warehouse.WarehouseVoucher;
-import com.encens.khipus.model.warehouse.WarehouseVoucherState;
+import com.encens.khipus.model.warehouse.*;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -54,6 +51,9 @@ public interface MovementDetailService {
 
     @SuppressWarnings(value = "unchecked")
     List<MovementDetail> findDetailListByVoucher(WarehouseVoucher warehouseVoucher);
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findDetailListByProductAndDate(ProductItem productItem, Date startDate, Date endDate);
 
     public void updateAmountTotal(String numTransaction,BigDecimal amount );
 }

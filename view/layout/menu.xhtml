@@ -436,6 +436,14 @@
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}"> <!-- cambiar permisos -->
+            <s:link view="/warehouse/kardexartReport.xhtml"
+                    value="#{messages['Reports.kardex.movement.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
                        rendered="#{s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW')}">
             <s:link view="/warehouse/generalValuedEvolutionReport.xhtml"
                     value="#{messages['GeneralValuedEvolutionReport.report.menu.title']}"

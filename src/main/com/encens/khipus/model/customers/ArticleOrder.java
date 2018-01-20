@@ -15,6 +15,20 @@ import java.math.BigDecimal;
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
+@NamedQueries({
+        @NamedQuery(name  = "ArticleOrder.findCashSaleDetailByCodeAndDate",
+                    query = "select articleOrder " +
+                            "from ArticleOrder articleOrder " +
+                            "left join articleOrder.ventaDirecta cashSale " +
+                            "where articleOrder.codArt =:productItemCode " +
+                            "and cashSale.fechaPedido between :startDate and :endDate "),
+        @NamedQuery(name  = "ArticleOrder.findOrderDetailByCodeAndDate",
+                query = "select articleOrder " +
+                        "from ArticleOrder articleOrder " +
+                        "left join articleOrder.customerOrder customerOrder " +
+                        "where articleOrder.codArt =:productItemCode " +
+                        "and customerOrder.fechaEntrega between :startDate and :endDate ")
+        })
 
 @Entity
 @Table(name = "ARTICULOS_PEDIDO",schema = Constants.CASHBOX_SCHEMA)

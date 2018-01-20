@@ -7,6 +7,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.warehouse.Group;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
@@ -54,6 +55,7 @@ public class IndirectCostsConfig implements BaseModel {
     private String description;
 
     @Column(name = "PREDEFINIDO")
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean predefined;
 
     @Column(name = "CUENTA", insertable = true, updatable = false, nullable = true)
