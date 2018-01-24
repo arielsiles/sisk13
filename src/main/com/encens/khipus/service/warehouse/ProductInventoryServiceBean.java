@@ -4,6 +4,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
+import com.encens.khipus.model.warehouse.InitialInventory;
 import com.encens.khipus.model.warehouse.ProductInventory;
 import com.encens.khipus.model.warehouse.ProductInventoryRecord;
 import com.encens.khipus.model.warehouse.ProductInventoryRecordType;
@@ -145,6 +146,16 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
 
         em.persist(productInventoryRecord);
         em.flush();
+
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<InitialInventory> findInitialInventory(String warehouseCode, String year){
+
+        return (List<InitialInventory>)em.createNamedQuery("initialInventory.findInitialInventory")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("year", year)
+                .getResultList();
 
     }
 

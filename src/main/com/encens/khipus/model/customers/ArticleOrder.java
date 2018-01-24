@@ -21,13 +21,29 @@ import java.math.BigDecimal;
                             "from ArticleOrder articleOrder " +
                             "left join articleOrder.ventaDirecta cashSale " +
                             "where articleOrder.codArt =:productItemCode " +
+                            "and cashSale.estado <> 'ANULADO' " +
                             "and cashSale.fechaPedido between :startDate and :endDate "),
         @NamedQuery(name  = "ArticleOrder.findOrderDetailByCodeAndDate",
                 query = "select articleOrder " +
                         "from ArticleOrder articleOrder " +
                         "left join articleOrder.customerOrder customerOrder " +
                         "where articleOrder.codArt =:productItemCode " +
-                        "and customerOrder.fechaEntrega between :startDate and :endDate ")
+                        "and customerOrder.estado <> 'ANULADO' " +
+                        "and customerOrder.fechaEntrega between :startDate and :endDate "),
+        @NamedQuery(name  = "ArticleOrder.findCashSaleDetailListGroupBy",
+                query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
+                        "from ArticleOrder articleOrder " +
+                        "left join articleOrder.ventaDirecta cashSale " +
+                        "where cashSale.estado <> 'ANULADO' " +
+                        "and cashSale.fechaPedido between :startDate and :endDate " +
+                        "group by articleOrder.codArt "),
+        @NamedQuery(name  = "ArticleOrder.findCustomerOrderDetailListGroupBy",
+                query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
+                        "from ArticleOrder articleOrder " +
+                        "left join articleOrder.customerOrder customerOrder " +
+                        "where customerOrder.estado <> 'ANULADO' " +
+                        "and customerOrder.fechaEntrega between :startDate and :endDate " +
+                        "group by articleOrder.codArt ")
         })
 
 @Entity

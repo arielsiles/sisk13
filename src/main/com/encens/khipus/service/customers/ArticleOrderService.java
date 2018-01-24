@@ -25,6 +25,8 @@ import java.util.Map;
 @Local
 public interface ArticleOrderService extends GenericService {
 
-    public List<ArticleOrder> findCashSaleDetailByCodeAndDate(ProductItem productItem, Date startDate, Date endDate);
-    public List<ArticleOrder> findOrderDetailByCodeAndDate(ProductItem productItem, Date startDate, Date endDate);
+    public List<ArticleOrder> findCashSaleDetailByCodeAndDate(String productItemCode, Date startDate, Date endDate);
+    public List<ArticleOrder> findOrderDetailByCodeAndDate(String productItemCode, Date startDate, Date endDate);
+    public List findCashSaleDetailListGroupBy(Date startDate, Date endDate);
+    public List findCustomerOrderDetailListGroupBy(Date startDate, Date endDate);
 }

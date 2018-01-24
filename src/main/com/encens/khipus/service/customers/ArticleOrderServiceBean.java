@@ -57,19 +57,38 @@ public class ArticleOrderServiceBean extends GenericServiceBean implements Artic
     @In(value = "#{entityManager}")
     private EntityManager em;
 
+    @In
+    ArticleOrderService articleOrderService;
+
     @SuppressWarnings(value = "unchecked")
-    public List<ArticleOrder> findCashSaleDetailByCodeAndDate(ProductItem productItem, Date startDate, Date endDate) {
+    public List<ArticleOrder> findCashSaleDetailByCodeAndDate(String productItemCode, Date startDate, Date endDate) {
         return em.createNamedQuery("ArticleOrder.findCashSaleDetailByCodeAndDate")
-                .setParameter("productItemCode", productItem.getProductItemCode())
+                .setParameter("productItemCode", productItemCode)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .getResultList();
     }
 
     @SuppressWarnings(value = "unchecked")
-    public List<ArticleOrder> findOrderDetailByCodeAndDate(ProductItem productItem, Date startDate, Date endDate) {
+    public List<ArticleOrder> findOrderDetailByCodeAndDate(String productItemCode, Date startDate, Date endDate) {
         return em.createNamedQuery("ArticleOrder.findOrderDetailByCodeAndDate")
-                .setParameter("productItemCode", productItem.getProductItemCode())
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<Object> findCashSaleDetailListGroupBy(Date startDate, Date endDate){
+        return em.createNamedQuery("ArticleOrder.findCashSaleDetailListGroupBy")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<Object> findCustomerOrderDetailListGroupBy(Date startDate, Date endDate){
+        return em.createNamedQuery("ArticleOrder.findCustomerOrderDetailListGroupBy")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .getResultList();

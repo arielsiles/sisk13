@@ -3,6 +3,7 @@ package com.encens.khipus.service.warehouse;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
+import com.encens.khipus.model.warehouse.InitialInventory;
 import com.encens.khipus.model.warehouse.ProductInventory;
 import com.encens.khipus.model.warehouse.ProductInventoryRecordType;
 
@@ -27,4 +28,6 @@ public interface ProductInventoryService extends GenericService {
     public void outputProducts(List<CustomerOrder> customerOrders);
 
     public void updateProductInventory(String productItemCode, Double quantity, ProductInventoryRecordType typeRecord, String description);
+
+    public List<InitialInventory> findInitialInventory(String warehouseCode, String year);
 }

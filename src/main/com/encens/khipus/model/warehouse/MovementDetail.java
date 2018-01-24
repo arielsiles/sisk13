@@ -42,7 +42,18 @@ import java.util.List;
                 query = "select movementDetail " +
                         "from MovementDetail movementDetail " +
                         "where movementDetail.productItemCode =:productItemCode " +
-                        "and movementDetail.movementDetailDate between :startDate and :endDate "),
+                        "and movementDetail.movementDetailDate between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state "),
+
+        @NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndType",
+                query = "select movementDetail " +
+                        "from MovementDetail movementDetail " +
+                        "where movementDetail.warehouseCode =:warehouseCode " +
+                        "and movementDetail.movementDetailDate between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state " +
+                        "and movementDetail.movementType =:movementType "),
+
+
         @NamedQuery(name = "MovementDetail.findProductCodeByVoucher",
                 query = "select distinct(productItem.productItemCode) from MovementDetail movementDetail left join movementDetail.productItem productItem  where movementDetail.companyNumber =:companyNumber and movementDetail.transactionNumber =:transactionNumber order by productItem.productItemCode"),
         @NamedQuery(name = "MovementDetail.deleteByTransactionNumber",

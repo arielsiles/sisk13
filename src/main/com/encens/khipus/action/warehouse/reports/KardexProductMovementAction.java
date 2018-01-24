@@ -5,10 +5,13 @@ import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.warehouse.MovementDetail;
+import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
+import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.JRException;
@@ -50,6 +53,8 @@ public class KardexProductMovementAction extends GenericReportAction {
     MovementDetailService movementDetailService;
     @In
     ArticleOrderService articleOrderService;
+    @In
+    ProductItemService productItemService;
 
     @Create
     public void init() {
@@ -67,15 +72,25 @@ public class KardexProductMovementAction extends GenericReportAction {
         System.out.println("generating Kardex Product Movement................................................");
 
         Collection<CollectionData> beanCollection = calculateCollectionData();
+
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
         DecimalFormat df = new DecimalFormat("#,###.00");
+
+        BigDecimal previousAmount = BigDecimal.ZERO;
+
+        if (startDate != null) {
+            //previousAmount = movementDetailService.calculateInitialQuantityToKardex(Constants.defaultCompanyNumber, productItem.getProductItemCode(), startDate);
+            previousAmount = calculateInitialAmountToKardex(productItem.getProductItemCode(), startDate);
+        }
 
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE DE MOVIMIENTOS");
         paramMap.put("productItemName", productItem.getFullName());
+        paramMap.put("unit", productItem.getUsageMeasureCode());
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
+        paramMap.put("previousAmount", previousAmount);
 
         parameters.putAll(paramMap);
 
@@ -91,8 +106,8 @@ public class KardexProductMovementAction extends GenericReportAction {
     public Collection<CollectionData> calculateCollectionData(){
 
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, startDate, endDate);
-        List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem, startDate, endDate);
-        List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem, startDate, endDate);
+        List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
+        List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
         List<CollectionData> datas = new ArrayList<CollectionData>();
 
@@ -141,6 +156,46 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
         return beanCollection;
+    }
+
+    public BigDecimal calculateInitialAmountToKardex(String productItemCode, Date initDate){
+
+        Calendar calendar = Calendar.getInstance();
+        BigDecimal initialQuantity = BigDecimal.ZERO;
+
+        /** 1er dia del año **/
+        Date firstDate = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(initDate));
+        /** Restando un dia a la fecha **/
+        calendar.setTime(initDate);
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        initDate = calendar.getTime();
+
+        System.out.println("...................firstDate: " + firstDate);
+        System.out.println("...................initDate: " + initDate);
+
+        initialQuantity = productItemService.getInitialInventoryYear(productItemCode, DateUtils.getCurrentYear(firstDate).toString());
+        System.out.println("...................getInitialInventoryYear: " + DateUtils.getCurrentYear(firstDate).toString());
+
+        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, firstDate, initDate);
+        List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItemCode, firstDate, initDate);
+        List<ArticleOrder> orderDetailList     = articleOrderService.findOrderDetailByCodeAndDate(productItemCode, firstDate, initDate);
+
+        for (MovementDetail md:movementDetailList){
+            if (md.getMovementType().equals(MovementDetailType.E))
+                initialQuantity = BigDecimalUtil.sum(initialQuantity, md.getQuantity(), 2);
+            if (md.getMovementType().equals(MovementDetailType.S))
+                initialQuantity = BigDecimalUtil.subtract(initialQuantity, md.getQuantity(), 2);
+        }
+
+        for (ArticleOrder ao:cashSaleDetailList){
+            initialQuantity = BigDecimalUtil.subtract(initialQuantity, BigDecimalUtil.toBigDecimal(ao.getTotal()), 2);
+        }
+
+        for (ArticleOrder ao:orderDetailList){
+            initialQuantity = BigDecimalUtil.subtract(initialQuantity, BigDecimalUtil.toBigDecimal(ao.getTotal()), 2);
+        }
+
+        return  initialQuantity;
     }
 
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {

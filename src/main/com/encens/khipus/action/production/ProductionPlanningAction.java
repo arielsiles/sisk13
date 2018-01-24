@@ -2642,7 +2642,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
             productionOrder.setEstateOrder(EXECUTED);
         }
 
-        productInventoryService.inputProducts(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItemCode(), singleProduct.getAmount().doubleValue());
+        //productInventoryService.inputProducts(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItemCode(), singleProduct.getAmount().doubleValue());
         showDetailSingleProduct = false;
         showInit();
         refreshInstance();
@@ -2747,7 +2747,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         Double quantity = productionOrder.getProducedAmount();
         ProductInventory productInventory = productInventoryService.findProductInventoryByCode(productItemCode);
 
-        productInventoryService.inputProducts(productItemCode, quantity);  //DESCOMENTAR
+        //productInventoryService.inputProducts(productItemCode, quantity);  //DESCOMENTAR
 
     }
 

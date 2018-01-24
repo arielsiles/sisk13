@@ -1,5 +1,6 @@
 package com.encens.khipus.service.warehouse;
 
+import com.encens.khipus.model.employees.MovementType;
 import com.encens.khipus.model.warehouse.*;
 
 import javax.ejb.Local;
@@ -56,4 +57,7 @@ public interface MovementDetailService {
     public List<MovementDetail> findDetailListByProductAndDate(ProductItem productItem, Date startDate, Date endDate);
 
     public void updateAmountTotal(String numTransaction,BigDecimal amount );
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findListMovementByWarehouseAndType(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
 }

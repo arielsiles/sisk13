@@ -19,7 +19,7 @@ import java.util.HashMap;
  * @version 2.3
  */
 
-@Name("productInventoryReportAction")
+@Name("productInventoryReport_Action")
 @Scope(ScopeType.PAGE)
 public class ProductInventoryReportAction extends GenericReportAction {
 

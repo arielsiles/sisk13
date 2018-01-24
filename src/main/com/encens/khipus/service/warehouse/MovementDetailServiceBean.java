@@ -2,6 +2,7 @@ package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.employees.MovementType;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.ValidatorUtil;
@@ -397,6 +398,7 @@ public class MovementDetailServiceBean implements MovementDetailService {
                 .setParameter("productItemCode", productItem.getProductItemCode())
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
                 .getResultList();
     }
 
@@ -414,5 +416,16 @@ public class MovementDetailServiceBean implements MovementDetailService {
           .setParameter("numTransaction",numTransaction)
           .setParameter("amount",amount)
           .executeUpdate();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findListMovementByWarehouseAndType(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType){
+        return em.createNamedQuery("MovementDetail.findListMovementByWarehouseAndType")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
+                .setParameter("movementType", movementDetailType)
+                .getResultList();
     }
 }

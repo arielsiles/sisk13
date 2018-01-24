@@ -13,6 +13,7 @@ import com.encens.khipus.model.warehouse.WarehouseVoucher;
 
 import javax.ejb.Local;
 import javax.ejb.TransactionAttribute;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
@@ -55,4 +56,7 @@ public interface ProductItemService extends GenericService {
     public ProductItem findProductItemByCode(String productItemCode);
 
     List<ArticulosPromocion> findArticuloCombo(ArticleOrder articulo);
+
+    @SuppressWarnings(value = "unchecked")
+    public BigDecimal getInitialInventoryYear(String productItemCode, String year);
 }

@@ -8,17 +8,17 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['Reports.production.totalProductionTitle']}</ui:define>
+    <ui:define name="pageTitle">#{messages['Reports.kardex.movement.titleReport']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="70%"/>
 
-    <ui:param name="selectedTab" value="products"/>
+    <ui:param name="selectedTab" value="finances"/>
     <ui:define name="body">
         <h:form id="estimationStockReportForm">
 
             <rich:panel>
                 <f:facet name="header">
-                    #{messages['Reports.production.productsProducedReport']}
+                    #{messages['Reports.kardex.movement.titleReport']}
                 </f:facet>
 
                 <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">

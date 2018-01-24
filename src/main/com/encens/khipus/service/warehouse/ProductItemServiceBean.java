@@ -151,4 +151,23 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         return new ArrayList<ArticulosPromocion>(promocion.getArticulosPromocions());
     }
 
+    @SuppressWarnings(value = "unchecked")
+    public BigDecimal getInitialInventoryYear(String productItemCode, String year){
+        BigDecimal quantity = BigDecimal.ZERO;
+
+        try {
+            quantity = (BigDecimal)em.createNativeQuery("select i.cantidad " +
+                                    "from inv_inicio i " +
+                                    "where i.cod_art =:productItemCode " +
+                                    "and i.gestion =:gestion")
+                    .setParameter("productItemCode", productItemCode)
+                    .setParameter("gestion", year)
+                    .getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
+
+        return  quantity;
+    }
+
 }

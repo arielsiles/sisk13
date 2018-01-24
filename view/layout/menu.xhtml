@@ -411,6 +411,15 @@
         s:hasPermission('KARDEXSUMMARYREPORT','VIEW') or
         s:hasPermission('ESTIMATIONSTOCKREPORT','VIEW') or
         s:hasPermission('SUBGROUPREPORT','VIEW')}">
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}">
+            <s:link view="/warehouse/productInventoryReport.xhtml"
+                    value="#{messages['menu.warehouse.report.inventoryReport']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}">
@@ -418,6 +427,7 @@
                     value="#{messages['menu.warehouse.report.unitCost']}"
                     propagation="none"/>
         </rich:menuItem>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('KARDEXREPORT','VIEW')}">
@@ -437,7 +447,7 @@
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}"> <!-- cambiar permisos -->
-            <s:link view="/warehouse/kardexartReport.xhtml"
+            <s:link view="/warehouse/kardexProductMovementReport.xhtml"
                     value="#{messages['Reports.kardex.movement.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
@@ -456,13 +466,7 @@
                     value="#{messages['Reports.warehouseEvolution.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('ESTIMATIONSTOCKREPORT','VIEW')}">
-            <s:link view="/warehouse/estimationStockReport.xhtml"
-                    value="#{messages['Reports.warehouseEstimationStock.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW')}">

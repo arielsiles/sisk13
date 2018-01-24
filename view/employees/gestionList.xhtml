@@ -61,9 +61,7 @@
                     </rich:columnGroup>
                 </f:facet>
                 <rich:column>
-                    <h:outputText value="#{gestionItem.year}">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:outputText>
+                    <h:outputText value="#{gestionItem.year}" />
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
