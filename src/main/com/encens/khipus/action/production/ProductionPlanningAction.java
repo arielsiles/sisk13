@@ -1900,6 +1900,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         Map<MovementDetail, BigDecimal> movementDetailOverMaximumStockMap = new HashMap<MovementDetail, BigDecimal>();
         List<MovementDetail> movementDetailWithoutWarnings = new ArrayList<MovementDetail>();
         try {
+            warehouseVoucher.setProductionOrder(order);
             warehouseService.saveWarehouseVoucher(warehouseVoucher, inventoryMovement, movementDetails,
                     movementDetailUnderMinimalStockMap,
                     movementDetailOverMaximumStockMap,
@@ -1954,6 +1955,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         Map<MovementDetail, BigDecimal> movementDetailOverMaximumStockMap = new HashMap<MovementDetail, BigDecimal>();
         List<MovementDetail> movementDetailWithoutWarnings = new ArrayList<MovementDetail>();
         try {
+            warehouseVoucher.setBaseProduct(base);
             warehouseService.saveWarehouseVoucher(warehouseVoucher, inventoryMovement, movementDetails,
                     movementDetailUnderMinimalStockMap,
                     movementDetailOverMaximumStockMap,

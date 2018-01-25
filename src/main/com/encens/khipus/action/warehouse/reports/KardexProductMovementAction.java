@@ -4,10 +4,14 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.Credit;
+import com.encens.khipus.model.production.BaseProduct;
+import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.ArticleOrderService;
+import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -50,11 +54,13 @@ public class KardexProductMovementAction extends GenericReportAction {
     private ProductItem productItem;
 
     @In
-    MovementDetailService movementDetailService;
+    private MovementDetailService movementDetailService;
     @In
-    ArticleOrderService articleOrderService;
+    private ArticleOrderService articleOrderService;
     @In
-    ProductItemService productItemService;
+    private ProductItemService productItemService;
+    @In
+    private ProductionOrderService productionOrderService;
 
     @Create
     public void init() {
@@ -105,11 +111,40 @@ public class KardexProductMovementAction extends GenericReportAction {
 
     public Collection<CollectionData> calculateCollectionData(){
 
+        List<CollectionData> datas = new ArrayList<CollectionData>();
+
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, startDate, endDate);
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
         List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
-        List<CollectionData> datas = new ArrayList<CollectionData>();
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdesByDate(productItem.getProductItemCode(), startDate, endDate);
+        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
+
+        for (ProductionOrder po:productionOrderList){
+            CollectionData collectionData = new CollectionData(
+                    po.getProductionPlanning().getDate(),
+                    po.getCode(),
+                    BigDecimalUtil.toBigDecimal(po.getProducedAmount()),
+                    BigDecimal.ZERO,
+                    "E",
+                    "ORDEN DE PRODUCCION NRO. " + po.getCode());
+            datas.add(collectionData);
+        }
+
+        for (BaseProduct baseProduct:baseProductList){
+            for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
+                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItem.getProductItemCode())){
+                    CollectionData collectionData = new CollectionData(
+                            baseProduct.getProductionPlanningBase().getDate(),
+                            baseProduct.getCode(),
+                            BigDecimalUtil.toBigDecimal(singleProduct.getAmount()),
+                            BigDecimal.ZERO,
+                            "E",
+                            "REPROCESO DE PRODUCCION NRO. " + baseProduct.getCode());
+                    datas.add(collectionData);
+                }
+            }
+        }
 
         for (MovementDetail md:movementDetailList){
             CollectionData collectionData = new CollectionData(
@@ -170,15 +205,26 @@ public class KardexProductMovementAction extends GenericReportAction {
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         initDate = calendar.getTime();
 
-        System.out.println("...................firstDate: " + firstDate);
-        System.out.println("...................initDate: " + initDate);
-
         initialQuantity = productItemService.getInitialInventoryYear(productItemCode, DateUtils.getCurrentYear(firstDate).toString());
-        System.out.println("...................getInitialInventoryYear: " + DateUtils.getCurrentYear(firstDate).toString());
 
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, firstDate, initDate);
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItemCode, firstDate, initDate);
         List<ArticleOrder> orderDetailList     = articleOrderService.findOrderDetailByCodeAndDate(productItemCode, firstDate, initDate);
+
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdesByDate(productItem.getProductItemCode(), firstDate, initDate);
+        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
+
+
+        for (ProductionOrder po:productionOrderList){
+            initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 2);
+        }
+        for (BaseProduct baseProduct:baseProductList){
+            for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
+                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItem.getProductItemCode())){
+                    initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2);
+                }
+            }
+        }
 
         for (MovementDetail md:movementDetailList){
             if (md.getMovementType().equals(MovementDetailType.E))

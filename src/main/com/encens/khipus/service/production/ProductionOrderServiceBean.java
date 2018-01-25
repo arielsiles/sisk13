@@ -3,6 +3,8 @@ package com.encens.khipus.service.production;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.service.GenericServiceBean;
+import com.encens.khipus.model.production.BaseProduct;
+import com.encens.khipus.model.production.ProductionOrder;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -12,6 +14,9 @@ import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+
+import java.util.Date;
+import java.util.List;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
@@ -39,4 +44,22 @@ public class ProductionOrderServiceBean extends GenericServiceBean implements Pr
             throw new EntryDuplicatedException(ee);
         }
     }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ProductionOrder> findProductionOrdesByDate(String productItemCode, Date startDate, Date endDate){
+        return em.createNamedQuery("ProductionOrder.findProductionOrdesByDate")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productItemCode", productItemCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate){
+        return em.createNamedQuery("BaseProduct.findBaseProductByDate")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
 }

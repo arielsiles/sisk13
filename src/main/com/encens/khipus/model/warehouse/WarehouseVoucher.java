@@ -8,6 +8,8 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.JobContract;
+import com.encens.khipus.model.production.BaseProduct;
+import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
@@ -183,6 +185,14 @@ public class WarehouseVoucher implements BaseModel {
     @Column(name = "TIPORECEPCION", length = 2)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherReceptionType warehouseVoucherReceptionType;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "IDORDENPRODUCCION", nullable = true, updatable = false, insertable = true)
+    private ProductionOrder productionOrder;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "IDPRODUCTOBASE", nullable = true, updatable = false, insertable = true)
+    private BaseProduct baseProduct;
 
     public WarehouseVoucherPK getId() {
         return id;
@@ -480,5 +490,21 @@ public class WarehouseVoucher implements BaseModel {
 
     public boolean isInState(WarehouseVoucherState warehouseVoucherState) {
         return null != getState() && getState().equals(warehouseVoucherState);
+    }
+
+    public ProductionOrder getProductionOrder() {
+        return productionOrder;
+    }
+
+    public void setProductionOrder(ProductionOrder productionOrder) {
+        this.productionOrder = productionOrder;
+    }
+
+    public BaseProduct getBaseProduct() {
+        return baseProduct;
+    }
+
+    public void setBaseProduct(BaseProduct baseProduct) {
+        this.baseProduct = baseProduct;
     }
 }

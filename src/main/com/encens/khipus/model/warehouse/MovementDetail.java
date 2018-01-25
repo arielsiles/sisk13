@@ -38,12 +38,15 @@ import java.util.List;
                 query = "select movementDetail from MovementDetail movementDetail " +
                         "where movementDetail.companyNumber =:companyNumber " +
                         "and movementDetail.transactionNumber =:transactionNumber "),
+
         @NamedQuery(name = "MovementDetail.findDetailListByProductAndDate",
                 query = "select movementDetail " +
                         "from MovementDetail movementDetail " +
                         "where movementDetail.productItemCode =:productItemCode " +
                         "and movementDetail.movementDetailDate between :startDate and :endDate " +
-                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state "),
+                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.productionOrder is null " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.baseProduct is null "),
 
         @NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndType",
                 query = "select movementDetail " +

@@ -20,6 +20,15 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 
+@NamedQueries({
+
+        @NamedQuery(name = "BaseProduct.findBaseProductByDate",
+                query = "Select baseProduct " +
+                        "from BaseProduct baseProduct " +
+                        "left join baseProduct.productionPlanningBase productionPlanning " +
+                        "where productionPlanning.date between :startDate and :endDate ")
+})
+
 @TableGenerator(name = "BaseProduct_Generator",
         table = "SECUENCIA",
         pkColumnName = "TABLA",

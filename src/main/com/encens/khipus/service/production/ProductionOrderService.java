@@ -3,8 +3,12 @@ package com.encens.khipus.service.production;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.production.BaseProduct;
+import com.encens.khipus.model.production.ProductionOrder;
 
 import javax.ejb.Local;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,5 +21,7 @@ import javax.ejb.Local;
 public interface ProductionOrderService{
 
     public void update(Object entity) throws ConcurrencyException, EntryDuplicatedException;
+    public List<ProductionOrder> findProductionOrdesByDate(String productItemCode, Date startDate, Date endDate);
+    public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate);
 
 }
