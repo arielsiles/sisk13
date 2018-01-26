@@ -112,7 +112,7 @@ public class KardexProductMovementAction extends GenericReportAction {
 
         List<CollectionData> datas = new ArrayList<CollectionData>();
 
-        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, startDate, endDate);
+        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem.getProductItemCode(), startDate, endDate);
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
         List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
@@ -206,11 +206,11 @@ public class KardexProductMovementAction extends GenericReportAction {
 
         initialQuantity = productItemService.getInitialInventoryYear(productItemCode, DateUtils.getCurrentYear(firstDate).toString());
 
-        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem, firstDate, initDate);
+        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItemCode, firstDate, initDate);
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItemCode, firstDate, initDate);
         List<ArticleOrder> orderDetailList     = articleOrderService.findOrderDetailByCodeAndDate(productItemCode, firstDate, initDate);
 
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), firstDate, initDate);
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItemCode, firstDate, initDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
 
 
@@ -219,7 +219,7 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
         for (BaseProduct baseProduct:baseProductList){
             for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItem.getProductItemCode())){
+                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItemCode)){
                     initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2);
                 }
             }

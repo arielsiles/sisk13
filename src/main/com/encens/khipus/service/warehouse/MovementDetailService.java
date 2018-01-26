@@ -54,7 +54,7 @@ public interface MovementDetailService {
     List<MovementDetail> findDetailListByVoucher(WarehouseVoucher warehouseVoucher);
 
     @SuppressWarnings(value = "unchecked")
-    public List<MovementDetail> findDetailListByProductAndDate(ProductItem productItem, Date startDate, Date endDate);
+    public List<MovementDetail> findDetailListByProductAndDate(String productItemCode, Date startDate, Date endDate);
 
     public void updateAmountTotal(String numTransaction,BigDecimal amount );
 

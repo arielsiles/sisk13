@@ -393,9 +393,9 @@ public class MovementDetailServiceBean implements MovementDetailService {
     }
 
     @SuppressWarnings(value = "unchecked")
-    public List<MovementDetail> findDetailListByProductAndDate(ProductItem productItem, Date startDate, Date endDate){
+    public List<MovementDetail> findDetailListByProductAndDate(String productItemCode, Date startDate, Date endDate){
         return em.createNamedQuery("MovementDetail.findDetailListByProductAndDate")
-                .setParameter("productItemCode", productItem.getProductItemCode())
+                .setParameter("productItemCode", productItemCode)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("state", WarehouseVoucherState.APR)

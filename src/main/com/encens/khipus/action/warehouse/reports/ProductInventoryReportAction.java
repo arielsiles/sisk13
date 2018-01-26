@@ -61,6 +61,9 @@ public class ProductInventoryReportAction extends GenericReportAction {
     @In
     private ProductionOrderService productionOrderService;
 
+    @In(create = true)
+    KardexProductMovementAction kardexProductMovementAction;
+
     @Create
     public void init() {
         restrictions = new String[]{};
@@ -119,6 +122,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     initialInventory.getProductItemName(),
                     initialInventory.getProductItem().getUsageMeasureCode(),
                     initialInventory.getQuantity(),
+                    //kardexProductMovementAction.calculateInitialAmountToKardex(initialInventory.getProductItemCode(), startDate),
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO);
@@ -140,10 +144,18 @@ public class ProductInventoryReportAction extends GenericReportAction {
             }
 
             /** Sum Entry an Output **/
+            BigDecimal quantity  = BigDecimal.ZERO;
+            BigDecimal totalCost = BigDecimal.ZERO;
             for (MovementDetail detail:movementDetailList){
                 if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
-                    if (detail.getMovementType().equals(MovementDetailType.E))
+                    if (detail.getMovementType().equals(MovementDetailType.E)) {
                         data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
+
+                        quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6);
+                        totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getPurchasePrice()), 6);
+                        if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
+
+                    }
                     if (detail.getMovementType().equals(MovementDetailType.S))
                         data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 2));
                 }
@@ -167,12 +179,50 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 }
             }
 
+            /** Unit cost **/
+            quantity  = BigDecimal.ZERO;
+            totalCost = BigDecimal.ZERO;
+            for (ProductionOrder productionOrder:productionOrderList){
+                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
+                    quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6);
+                    totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(productionOrder.getTotalCostProduction()), 6);
+
+                    if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
+
+                }
+            }
+            /** Fijando C.U. **/
+            /*if (quantity.doubleValue()>0)
+                data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
+            else
+                data.setUnitCost(BigDecimal.ZERO);*/
+            /** ************************************************** */
+
+            /** C.U. - Sum Entry an Output **/
+            /*quantity  = BigDecimal.ZERO;
+            totalCost = BigDecimal.ZERO;
+            for (MovementDetail detail:movementDetailList){
+                if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
+                    if (detail.getMovementType().equals(MovementDetailType.E)){
+                        if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())){
+                            quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6);
+                            totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getPurchasePrice()), 6);
+                        }
+                    }
+
+                }
+            }*/
+
+
+
             beanCollection.add(data);
         }
 
         for (CollectionData data:beanCollection){
             data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 2));
             data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 2));
+
+            data.setValuedBalance(BigDecimalUtil.multiply(data.getBalance(), data.getUnitCost(), 2));
         }
 
         return beanCollection;
@@ -246,6 +296,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
         private BigDecimal entryAmount;
         private BigDecimal outputAmount;
         private BigDecimal balance;
+        private BigDecimal unitCost;
+        private BigDecimal valuedBalance;
 
         public CollectionData(String code, String productName, String unit, BigDecimal initialAmount,  BigDecimal entryAmount, BigDecimal outputAmount, BigDecimal balance){
 
@@ -256,6 +308,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
             this.setEntryAmount(entryAmount);
             this.setOutputAmount(outputAmount);
             this.setBalance(balance);
+            this.unitCost = BigDecimal.ZERO;
+            this.valuedBalance = BigDecimal.ZERO;
         }
 
 
@@ -313,6 +367,22 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         public void setUnit(String unit) {
             this.unit = unit;
+        }
+
+        public BigDecimal getUnitCost() {
+            return unitCost;
+        }
+
+        public void setUnitCost(BigDecimal unitCost) {
+            this.unitCost = unitCost;
+        }
+
+        public BigDecimal getValuedBalance() {
+            return valuedBalance;
+        }
+
+        public void setValuedBalance(BigDecimal valuedBalance) {
+            this.valuedBalance = valuedBalance;
         }
     }
 
