@@ -75,7 +75,6 @@ public class KardexProductMovementAction extends GenericReportAction {
     public void generateReport() {
 
         log.debug("generating Kardex Product Movement................................................");
-        System.out.println("generating Kardex Product Movement................................................");
 
         Collection<CollectionData> beanCollection = calculateCollectionData();
 
@@ -117,7 +116,7 @@ public class KardexProductMovementAction extends GenericReportAction {
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
         List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdesByDate(productItem.getProductItemCode(), startDate, endDate);
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), startDate, endDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
         for (ProductionOrder po:productionOrderList){
@@ -211,7 +210,7 @@ public class KardexProductMovementAction extends GenericReportAction {
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItemCode, firstDate, initDate);
         List<ArticleOrder> orderDetailList     = articleOrderService.findOrderDetailByCodeAndDate(productItemCode, firstDate, initDate);
 
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdesByDate(productItem.getProductItemCode(), firstDate, initDate);
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), firstDate, initDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
 
 

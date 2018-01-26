@@ -425,7 +425,17 @@ public class MovementDetailServiceBean implements MovementDetailService {
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("state", WarehouseVoucherState.APR)
-                .setParameter("movementType", movementDetailType)
+                /*.setParameter("movementType", movementDetailType)*/
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findListMovementByWarehouseAndTypeNull(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType){
+        return em.createNamedQuery("MovementDetail.findListMovementByWarehouseAndTypeNull")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
                 .getResultList();
     }
 }

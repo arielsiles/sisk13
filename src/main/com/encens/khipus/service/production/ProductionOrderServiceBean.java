@@ -46,11 +46,19 @@ public class ProductionOrderServiceBean extends GenericServiceBean implements Pr
     }
 
     @SuppressWarnings(value = "unchecked")
-    public List<ProductionOrder> findProductionOrdesByDate(String productItemCode, Date startDate, Date endDate){
-        return em.createNamedQuery("ProductionOrder.findProductionOrdesByDate")
+    public List<ProductionOrder> findProductionOrdersByProductItem(String productItemCode, Date startDate, Date endDate){
+        return em.createNamedQuery("ProductionOrder.findProductionOrdersByProductItem")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("productItemCode", productItemCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ProductionOrder> findProductionOrders(Date startDate, Date endDate){
+        return em.createNamedQuery("ProductionOrder.findProductionOrders")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
     }
 

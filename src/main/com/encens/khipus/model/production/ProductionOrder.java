@@ -19,13 +19,21 @@ import java.util.List;
                         "where productionOrder.code like :seed"),
         @NamedQuery(name = "ProductionOrder.findById", query = "Select p from ProductionOrder p where p.id=:id"),
 
-        @NamedQuery(name = "ProductionOrder.findProductionOrdesByDate",
+        @NamedQuery(name = "ProductionOrder.findProductionOrdersByProductItem",
                    query = "Select productionOrder " +
                            "from ProductionOrder productionOrder " +
                            "left join productionOrder.productionPlanning productionPlanning " +
                            "left join productionOrder.productComposition.processedProduct.productItem productItem " +
                            "where productionPlanning.date between :startDate and :endDate " +
-                           "and productItem.productItemCode =:productItemCode ")
+                           "and productItem.productItemCode =:productItemCode "),
+
+        @NamedQuery(name = "ProductionOrder.findProductionOrders",
+                   query = "Select productionOrder " +
+                           "from ProductionOrder productionOrder " +
+                           "left join productionOrder.productionPlanning productionPlanning " +
+                           "where productionPlanning.date between :startDate and :endDate ")
+
+
 })
 
 @TableGenerator(name = "ProductionOrder_Generator",

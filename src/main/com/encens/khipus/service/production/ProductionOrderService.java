@@ -21,7 +21,8 @@ import java.util.List;
 public interface ProductionOrderService{
 
     public void update(Object entity) throws ConcurrencyException, EntryDuplicatedException;
-    public List<ProductionOrder> findProductionOrdesByDate(String productItemCode, Date startDate, Date endDate);
+    public List<ProductionOrder> findProductionOrdersByProductItem(String productItemCode, Date startDate, Date endDate);
+    public List<ProductionOrder> findProductionOrders(Date startDate, Date endDate);
     public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate);
 
 }

@@ -43,18 +43,36 @@ import java.util.List;
                 query = "select movementDetail " +
                         "from MovementDetail movementDetail " +
                         "where movementDetail.productItemCode =:productItemCode " +
-                        "and movementDetail.movementDetailDate between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
                         "and movementDetail.inventoryMovement.warehouseVoucher.state =:state " +
                         "and movementDetail.inventoryMovement.warehouseVoucher.productionOrder is null " +
                         "and movementDetail.inventoryMovement.warehouseVoucher.baseProduct is null "),
+
+        /** ? **/
+        /*@NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndType",
+                query = "select movementDetail " +
+                        "from MovementDetail movementDetail " +
+                        "where movementDetail.warehouseCode =:warehouseCode " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state " +
+                        "and movementDetail.movementType =:movementType "),*/
 
         @NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndType",
                 query = "select movementDetail " +
                         "from MovementDetail movementDetail " +
                         "where movementDetail.warehouseCode =:warehouseCode " +
-                        "and movementDetail.movementDetailDate between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.state =:state "),
+
+        /** Solo para Inv.P.T.**/
+        @NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndTypeNull",
+                query = "select movementDetail " +
+                        "from MovementDetail movementDetail " +
+                        "where movementDetail.warehouseCode =:warehouseCode " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
                         "and movementDetail.inventoryMovement.warehouseVoucher.state =:state " +
-                        "and movementDetail.movementType =:movementType "),
+                        "and movementDetail.inventoryMovement.warehouseVoucher.productionOrder is null " +
+                        "and movementDetail.inventoryMovement.warehouseVoucher.baseProduct is null "),
 
 
         @NamedQuery(name = "MovementDetail.findProductCodeByVoucher",

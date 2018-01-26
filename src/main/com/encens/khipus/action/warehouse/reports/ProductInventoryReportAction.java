@@ -3,8 +3,12 @@ package com.encens.khipus.action.warehouse.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.employees.MovementType;
+import com.encens.khipus.model.production.BaseProduct;
+import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.ArticleOrderService;
+import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductInventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -54,6 +58,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private ProductItemService productItemService;
     @In
     private ProductInventoryService productInventoryService;
+    @In
+    private ProductionOrderService productionOrderService;
 
     @Create
     public void init() {
@@ -92,15 +98,21 @@ public class ProductInventoryReportAction extends GenericReportAction {
     public Collection<CollectionData> calculateCollectionData(){
 
         Collection<CollectionData> beanCollection = new ArrayList();
-
         List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
-        List<MovementDetail> entryMovementDetailList  = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, MovementDetailType.E);
-        List<MovementDetail> outputMovementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, MovementDetailType.S);
+
+        List<MovementDetail> movementDetailList;
+        if (warehouse.getWarehouseCode().equals("2"))
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
+        else
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
+
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
+        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(startDate, endDate);
         List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(startDate, endDate);
 
-
+        /** Inventario inicial inv_inicio **/
         for (InitialInventory initialInventory:initialInventoryList){
             CollectionData data = new CollectionData(
                     initialInventory.getProductItemCode(),
@@ -110,17 +122,30 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO);
-            /** Sum entry **/
-            for (MovementDetail detail:entryMovementDetailList){
-                if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
+
+            /** Ordenes de produccion **/
+            for (ProductionOrder productionOrder:productionOrderList){
+                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 2));
                 }
             }
+            /** Reprocesos **/
+            for (BaseProduct baseProduct:baseProductList){
+                for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
+                    if (initialInventory.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2));
+                    }
+                }
 
-            /** Sum output **/
-            for (MovementDetail detail:outputMovementDetailList){
+            }
+
+            /** Sum Entry an Output **/
+            for (MovementDetail detail:movementDetailList){
                 if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 2));
+                    if (detail.getMovementType().equals(MovementDetailType.E))
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
+                    if (detail.getMovementType().equals(MovementDetailType.S))
+                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 2));
                 }
             }
 
@@ -153,13 +178,6 @@ public class ProductInventoryReportAction extends GenericReportAction {
         return beanCollection;
     }
 
-    /*public BigDecimal calculateInitialAmountToKardex(String productItemCode, Date initDate){
-
-        Calendar calendar = Calendar.getInstance();
-        BigDecimal initialQuantity = BigDecimal.ZERO;
-
-        return  initialQuantity;
-    }*/
 
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
 
