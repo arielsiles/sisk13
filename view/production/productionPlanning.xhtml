@@ -870,18 +870,18 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
                 <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
                     #{messages['ProductionOrder.producingAmount']}
                 </rich:column>
-                <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+                <!--<rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
                     #{messages['ProductionOrder.producingAmountResposible']}
-                </rich:column>
+                </rich:column>-->
                 <rich:column rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
                     #{messages['ProductionOrder.choice']}
                 </rich:column>
                 <rich:column>
                     #{messages['ProductionOrder.estateOrderProduction']}
                 </rich:column>
-                <rich:column>
+                <!--<rich:column>
                     #{messages['ProductionOrder.percentajeGrease']}
-                </rich:column>
+                </rich:column>-->
                 <rich:column styleClass="center">
                     #{messages['Common.action']}
                 </rich:column>
@@ -896,22 +896,32 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
         <rich:column>
             <h:outputText value="#{productionOrderItem.expendAmount}"/>
         </rich:column>
-        <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
-            <h:inputText id = "producedAmountField"
+        <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}" style="text-align: center">
+            <!--<h:inputText id = "producedAmountField"
                          value="#{productionOrderItem.producedAmount}"
                          maxlength="7" styleClass="inputSmall"
                          disabled="#{productionOrderItem.estateOrder != 'EXECUTED'}"
                          size="10"
-                         required="false">
+                         required="false">-->
+                <!--<h:commandButton action="#{productionPlanningAction.saveProduccingAmount()}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productionOrderItem.estateOrder eq 'EXECUTED' and s:hasPermission('SETAMOUNTPRODECER','VIEW')}">-->
+                <h:inputText id = "producedAmountField" value="#{productionOrderItem.producedAmount}"
+                         maxlength="7" styleClass="inputSmall"
+                         disabled="#{productionOrderItem.estateOrder == 'FINALIZED' or
+                                     productionOrderItem.estateOrder == 'INSTOCK'   or
+                                     productionOrderItem.estateOrder == 'TABULATED'}"
+                         size="10" required="false">
+                </h:inputText>
                 <h:commandButton action="#{productionPlanningAction.saveProduccingAmount()}" value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{productionOrderItem.estateOrder eq 'EXECUTED' and s:hasPermission('SETAMOUNTPRODECER','VIEW')}">
-
+                                 rendered="#{(productionOrderItem.estateOrder eq 'PENDING' or
+                                              productionOrderItem.estateOrder eq 'EXECUTED' ) and s:hasPermission('SETAMOUNTPRODECER','VIEW')}">
                     <s:defaultAction/>
                 </h:commandButton>
-            </h:inputText>
         </rich:column>
-        <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+        <!-- Cantidad -> Responsable PT -->
+        <!--<rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
             <h:inputText id = "producedAmountReponsibleField"
                          value="#{productionOrderItem.producedAmountResponsible}"
                          maxlength="7" styleClass="inputSmall"
@@ -924,7 +934,7 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
                     <s:defaultAction/>
                 </h:commandButton>
             </h:inputText>
-        </rich:column>
+        </rich:column>-->
         <rich:column styleClass="center" rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
             <h:selectBooleanCheckbox id="selectCheckboxItem"
                                      immediate="true"
@@ -947,7 +957,7 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
                     rendered="#{productionOrderItem.estateOrder eq 'EXECUTED' and s:hasPermission('CHANGESTATEORDER','VIEW')}"
                     reRender="productionList"/>
         </rich:column>
-        <rich:column>
+        <!--<rich:column>
             <h:inputText id = "greasePercentageField"
                          value="#{productionOrderItem.greasePercentage}"
                          maxlength="5" styleClass="inputSmall"
@@ -962,7 +972,7 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
                 </h:commandButton>
             </h:inputText>
 
-        </rich:column>
+        </rich:column>-->
 
         <rich:column styleClass="center">
 

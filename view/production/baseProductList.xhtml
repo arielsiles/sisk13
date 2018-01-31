@@ -49,9 +49,9 @@
                                 #{messages['ProductionPlanning.producingAmount']}
                             </rich:column>
 
-                            <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+                            <!--<rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
                                 #{messages['ProductionOrder.producingAmountResposible']}
-                            </rich:column>
+                            </rich:column>-->
 
                             <rich:column rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
                                 #{messages['BaseProduct.choice']}
@@ -61,9 +61,9 @@
                                 #{messages['BaseProduct.state']}
                             </rich:column>
 
-                            <rich:column>
+                            <!--<rich:column>
                                 #{messages['BaseProduct.percentajeGrease']}
-                            </rich:column>
+                            </rich:column>-->
 
                             <rich:column styleClass="center">
                                 #{messages['Common.action']}
@@ -75,7 +75,7 @@
                     <rich:column>
                         <h:outputText value="#{singleProduct.productProcessingSingle.metaProduct.fullName}"/>
                     </rich:column>
-                    <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
+                    <!--<rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
                         <h:inputText id = "producedAmountField"
                                      value="#{singleProduct.amount}"
                                      maxlength="7" styleClass="input"
@@ -89,8 +89,25 @@
                                 <s:defaultAction/>
                             </h:commandButton>
                         </h:inputText>
+                    </rich:column>-->
+                    <rich:column rendered="#{s:hasPermission('VIEWAMOUNTPRODUCERCOLUMN','VIEW')}">
+                        <h:inputText id = "producedAmountField"
+                                     value="#{singleProduct.amount}"
+                                     maxlength="7" styleClass="inputSmall"
+                                     disabled="#{singleProduct.state eq 'FINALIZED' or
+                                                 singleProduct.state eq 'INSTOCK'   or
+                                                 singleProduct.state eq 'TABULATED'}"
+                                     size="10"
+                                     required="false">
+                            <h:commandButton action="#{productionPlanningAction.saveProduccingAmount()}" value="#{messages['Common.save']}"
+                                             styleClass="button"
+                                             rendered="#{(singleProduct.state eq 'PENDING' or singleProduct.state eq 'EXECUTED') and s:hasPermission('SETAMOUNTPRODECER','VIEW')}">
+
+                                <s:defaultAction/>
+                            </h:commandButton>
+                        </h:inputText>
                     </rich:column>
-                    <rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
+                    <!--<rich:column rendered="#{s:hasPermission('COLUMNAMOUNTPRODUCERRESPONSIBLE','VIEW')}">
                         <h:inputText id = "producedAmountResponsibleField"
                                      value="#{singleProduct.amountResponsible}"
                                      maxlength="7" styleClass="input"
@@ -103,7 +120,7 @@
                                 <s:defaultAction/>
                             </h:commandButton>
                         </h:inputText>
-                    </rich:column>
+                    </rich:column>-->
                     <rich:column styleClass="center" rendered="#{s:hasPermission('GENERATEREQUESTBYPLANNIG','VIEW') and ( productionPlanning.state eq 'PENDING' or  productionPlanning.state eq 'EXECUTED')}">
                         <h:selectBooleanCheckbox id="selectCheckboxItem"
                                                  immediate="true"
@@ -113,8 +130,7 @@
                         </h:selectBooleanCheckbox>
                     </rich:column>
                     <rich:column>
-                        <h:outputText
-                                style="font-weight: bold; color: #{singleProduct.state == 'PENDING' ? 'red' :(singleProduct.state == 'EXECUTED' ? 'blue' : (singleProduct.state == 'TABULATED' ? 'fuchsia' : (singleProduct.state == 'INSTOCK' ? 'fuchsia' : 'green')))}"
+                        <h:outputText style="font-weight: bold; color: #{singleProduct.state == 'PENDING' ? 'red' :(singleProduct.state == 'EXECUTED' ? 'blue' : (singleProduct.state == 'TABULATED' ? 'fuchsia' : (singleProduct.state == 'INSTOCK' ? 'fuchsia' : 'green')))}"
                                 value="#{singleProduct.state == 'PENDING' ? messages['productionOrderForPlanning.estateOrder.pending'] : (singleProduct.state == 'EXECUTED' ? messages['productionOrderForPlanning.estateOrder.executed'] : (singleProduct.state == 'TABULATED' ? messages['productionOrderForPlanning.estateOrder.ab.tabulated'] : (singleProduct.state == 'INSTOCK' ? messages['productionOrderForPlanning.estateOrder.ab.instock'] : messages['productionOrderForPlanning.estateOrder.finalized'])))}"
                                 rendered="#{singleProduct.state != 'EXECUTED'}"
                                 />
@@ -127,7 +143,7 @@
                                 reRender="baseProductionList"></a4j:commandLink>
                     </rich:column>
 
-                    <rich:column>
+                    <!--<rich:column>
                         <h:inputText value="#{singleProduct.greasePorentage}"
                                      maxlength="4" styleClass="input"
                                      disabled="#{singleProduct.state eq 'FINALIZED' or  singleProduct.state eq 'TABULATED' ? true : false}"
@@ -140,7 +156,7 @@
                             </h:commandButton>
                         </h:inputText>
 
-                    </rich:column>
+                    </rich:column>-->
 
                     <rich:column styleClass="center">
 

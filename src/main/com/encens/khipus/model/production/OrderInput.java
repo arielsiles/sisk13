@@ -24,7 +24,7 @@ public class OrderInput implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "OrderInput_Generator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "CANTIDAD", nullable = false, columnDefinition = "DECIMAL(16,6)")
     private Double amount;
 
     /* TODO: cambiar nullable a false */
