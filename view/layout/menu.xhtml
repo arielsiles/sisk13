@@ -422,11 +422,20 @@
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}"> <!-- cambiar permisos -->
+            <s:link view="/warehouse/kardexProductMovementReport.xhtml"
+                    value="#{messages['Reports.kardex.movement.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <!-- Estado del Inventario -->
+        <!--<rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
                        rendered="#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}">
             <s:link view="/warehouse/productItemCostUnitReport.xhtml"
                     value="#{messages['menu.warehouse.report.unitCost']}"
                     propagation="none"/>
-        </rich:menuItem>
+        </rich:menuItem>-->
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
@@ -441,14 +450,6 @@
                        rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}">
             <s:link view="/warehouse/kardexSumaryReport.xhtml"
                     value="#{messages['Reports.kardex.summary.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}"> <!-- cambiar permisos -->
-            <s:link view="/warehouse/kardexProductMovementReport.xhtml"
-                    value="#{messages['Reports.kardex.movement.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
 
