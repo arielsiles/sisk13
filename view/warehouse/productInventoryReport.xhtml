@@ -79,6 +79,13 @@
                     </rich:calendar>
                 </s:decorate>
 
+                <s:decorate id="compareFlagField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.inventoryReport.articlesOnlyMovement']}</ui:define>
+                    <h:selectBooleanCheckbox id="compareFlag"
+                                             value="#{productInventoryReportAction.articlesWithMovement}"
+                                             tabindex="3"/>
+                </s:decorate>
+
             </rich:panel>
 
             <app:reportDefaultOptions reportAction="#{productInventoryReportAction}" showPageFormat="false"

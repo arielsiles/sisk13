@@ -21,7 +21,8 @@ import java.util.List;
                 query = "select initialInventory " +
                         "from InitialInventory initialInventory " +
                         "where initialInventory.warehouseCode =:warehouseCode " +
-                        "and initialInventory.year =:year ")
+                        "and initialInventory.year =:year " +
+                        "order by initialInventory.productItemName asc ")
 })
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "InitialInventory.tableGenerator",
@@ -52,6 +53,9 @@ public class InitialInventory implements BaseModel {
 
     @Column(name = "ALM")
     private String warehouseCode;
+
+    @Column(name = "COSTO_UNI")
+    private BigDecimal unitCost;
 
     @Column(name = "GESTION")
     private String year;
@@ -137,5 +141,13 @@ public class InitialInventory implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
+    }
+
+    public BigDecimal getUnitCost() {
+        return unitCost;
+    }
+
+    public void setUnitCost(BigDecimal unitCost) {
+        this.unitCost = unitCost;
     }
 }

@@ -60,8 +60,8 @@ import java.util.List;
         @NamedQuery(name = "MovementDetail.findListMovementByWarehouseAndType",
                 query = "select movementDetail " +
                         "from MovementDetail movementDetail " +
-                        "where movementDetail.warehouseCode =:warehouseCode " +
-                        "and movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
+                        /*"where movementDetail.warehouseCode =:warehouseCode " +*/
+                        "where movementDetail.inventoryMovement.warehouseVoucher.date between :startDate and :endDate " +
                         "and movementDetail.inventoryMovement.warehouseVoucher.state =:state "),
 
         /** Solo para Inv.P.T.**/
