@@ -198,3 +198,16 @@ UPDATE inv_inicio SET cantidad = 	0.00	 , costo_uni = 	314.870400	 WHERE cod_art
 UPDATE inv_inicio SET cantidad = 	0.00	 , costo_uni = 	31.320000	 WHERE cod_art = 	605	 AND gestion = 2017;
 UPDATE inv_inicio SET cantidad = 	0.00	 , costo_uni = 	133.458000	 WHERE cod_art = 	614	 AND gestion = 2017;
 UPDATE inv_inicio SET cantidad = 	0.00	 , costo_uni = 	11.310000	 WHERE cod_art = 	635	 AND gestion = 2017;
+
+/** ********** */
+
+SELECT *
+FROM inv_inicio i
+-- update inv_inicio i set i.`costo_uni` = (i.`costo_uni` * 100)/87
+WHERE i.`alm` NOT IN (2, 5) AND i.`costo_uni` > 0
+;
+
+
+
+
+

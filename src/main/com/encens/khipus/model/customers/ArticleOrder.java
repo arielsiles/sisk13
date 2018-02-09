@@ -43,7 +43,17 @@ import java.math.BigDecimal;
                         "left join articleOrder.customerOrder customerOrder " +
                         "where customerOrder.estado <> 'ANULADO' " +
                         "and customerOrder.fechaEntrega between :startDate and :endDate " +
-                        "group by articleOrder.codArt ")
+                        "group by articleOrder.codArt "),
+        @NamedQuery(name  = "ArticleOrder.findCashSaleDetailList",
+                query = "select articleOrder " +
+                        "from ArticleOrder articleOrder " +
+                        "where articleOrder.ventaDirecta.estado <> 'ANULADO' " +
+                        "and articleOrder.ventaDirecta.fechaPedido between :startDate and :endDate "),
+        @NamedQuery(name  = "ArticleOrder.findCustomerOrderDetailList",
+                query = "select articleOrder " +
+                        "from ArticleOrder articleOrder " +
+                        "where articleOrder.customerOrder.estado <> 'ANULADO' " +
+                        "and articleOrder.customerOrder.fechaEntrega between :startDate and :endDate ")
         })
 
 @Entity

@@ -1,6 +1,8 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.SingleProduct;
@@ -30,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -101,35 +104,41 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         Collection<CollectionData> beanCollection = new ArrayList();
 
-        /** Inventario inicio gestion **/
+
+        /** 1.- Listado de articulos con saldos iniciales de gestion **/
+        // Inventario inicio gestion
         List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
 
-        /** Vales de movimiento **/
+        /** 2.- Obtiene en listas entradas y salidas de articulos: vales, ordenes de produccion, ventas, pedidos, etc. **/
+        // Vales de movimiento
         List<MovementDetail> movementDetailList;
         if (warehouse.getWarehouseCode().equals("2"))
             movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
         else
             movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
 
-        /** Ordenes de produccion **/
+        // Ordenes de produccion
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
-        /** Ventas al contado y pedidos **/
+        // Ventas al contado y pedidos
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(startDate, endDate);
         List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(startDate, endDate);
 
-        /** Saldos iniciales de gestion calculados **/
+        /** 3.-  Calcula (x almacen) en la lista los saldos de los articulos, desde el 1er dia de la gestion hasta la fecha de inicio seleccionada **/
+        // solo calcula correctamente saldos fisicos ?
         Collection<CollectionData> initialArticleList = calculateInitialArticle(warehouse.getWarehouseCode(), startDate);
 
-        /** Inventario inicial inv_inicio **/
+        /** Se va llenando la lista final, con saldos fisicos a la fecha de inicio seleccionada **/
+        /**  **/
+        //* Inventario inicial inv_inicio **/
         for (InitialInventory initialInventory:initialInventoryList){
 
             /** Fijando el saldo inicial de un articulo **/
             BigDecimal initQuantity = BigDecimal.ZERO;
             for (CollectionData article:initialArticleList){
                 if (initialInventory.getProductItemCode().equals(article.getCode())){
-                    initQuantity = article.getBalance();
+                    initQuantity = article.getBalance(); // Fijando solo el saldo fisico inicial
                     break;
                 }
             }
@@ -141,74 +150,57 @@ public class ProductInventoryReportAction extends GenericReportAction {
                                                         BigDecimal.ZERO,
                                                         BigDecimal.ZERO,
                                                         BigDecimal.ZERO,
-                                                        initialInventory.getUnitCost()
+                                                        //initialInventory.getUnitCost()
+                                                        BigDecimal.ZERO
                                                     );
             /** Ordenes de produccion **/
             for (ProductionOrder productionOrder:productionOrderList){
                 if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 2));
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6));
                 }
             }
             /** Reprocesos **/
             for (BaseProduct baseProduct:baseProductList){
                 for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
                     if (initialInventory.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2));
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 6));
                     }
                 }
 
             }
 
             /** Sum Entry an Output **/
-            //BigDecimal quantity  = BigDecimal.ZERO;
-            //BigDecimal totalCost = BigDecimal.ZERO;
             for (MovementDetail detail:movementDetailList){
                 if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
                     if (detail.getMovementType().equals(MovementDetailType.E)) {
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
-
-                        //quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6);
-                        //totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getPurchasePrice()), 6);
-                        //if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
-
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 6));
                     }
                     if (detail.getMovementType().equals(MovementDetailType.S))
-                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 2));
+                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 6));
                 }
             }
 
+            /** Ventas al contado **/
             for (int i = 0; i < cashSaleDetailList.size(); i++) {
                 Object[] row = (Object[]) cashSaleDetailList.get(i);
                 String codart = (String)row[0];
                 Long total = (Long) row[1];
                 if (initialInventory.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 2));
+                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
                 }
             }
 
+            /** Pedidos **/
             for (int i = 0; i < orderDetailList.size(); i++) {
                 Object[] row = (Object[]) orderDetailList.get(i);
                 String codart = (String)row[0];
                 Long total = (Long) row[1];
                 if (initialInventory.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 2));
+                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
                 }
             }
 
-            /** Unit cost **/
-            //quantity  = BigDecimal.ZERO;
-            //totalCost = BigDecimal.ZERO;
-            /*
-            for (ProductionOrder productionOrder:productionOrderList){
-                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
-                    quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6);
-                    totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(productionOrder.getTotalCostProduction()), 6);
-
-                    if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
-
-                }
-            }*/
-
+            /** Añade a la lista Todos los articulos ó solo los con movimiento, segun se elija en la vista**/
             if (articlesWithMovement){ // Articulos solo con Movimiento o inventario inicial
                 if (data.getInitialAmount().compareTo(BigDecimal.ZERO) > 0 ||
                         data.getEntryAmount().compareTo(BigDecimal.ZERO)   > 0 ||
@@ -221,22 +213,23 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         }
 
-        /** ------------------------------------------------------------------------------ **/
-
+        /** ---------------------------------------------------------------------------------------------------- **/
+        /** ---------------------------------------------------------------------------------------------------- **/
+        /** Se crea una lista con todos los articulos como Entrada (E) ó Salida (S) considerando Cantidad, Costo Unit, Costo Total**/
         List<ArticleMovement> resultList = new ArrayList<ArticleMovement>();
 
         for (InitialInventory initialInventory:initialInventoryList){
-            ArticleMovement articleMovement = new ArticleMovement(
-                    DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate)),
-                    initialInventory.getProductItemCode(),
-                    MovementDetailType.E,
-                    initialInventory.getQuantity(),
-                    initialInventory.getUnitCost(),
-                    BigDecimalUtil.multiply(initialInventory.getQuantity(), initialInventory.getUnitCost(), 6));
-            resultList.add(articleMovement);
+                ArticleMovement articleMovement = new ArticleMovement(
+                        DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate)),
+                        initialInventory.getProductItemCode(),
+                        MovementDetailType.E,
+                        initialInventory.getQuantity(),
+                        initialInventory.getUnitCost(),
+                        BigDecimalUtil.multiply(initialInventory.getQuantity(), initialInventory.getUnitCost(), 6));
+                resultList.add(articleMovement);
         }
 
-        // Vales de movimiento
+        /** Vales de movimiento **/
         List<MovementDetail> detailList;
         if (warehouse.getWarehouseCode().equals("2"))
             detailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate)), endDate, null);
@@ -245,7 +238,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         for (MovementDetail detail:detailList){
             ArticleMovement articleMovement = new ArticleMovement(
-                    detail.getMovementDetailDate(),
+                    //detail.getMovementDetailDate(),
+                    DateUtils.parse(DateUtils.format(detail.getMovementDetailDate(), "yyyy-MM-dd"), "yyyy-MM-dd"),
                     detail.getProductItemCode(),
                     detail.getMovementType(),
                     detail.getQuantity(),
@@ -255,9 +249,83 @@ public class ProductInventoryReportAction extends GenericReportAction {
             resultList.add(articleMovement);
         }
 
+        /** Ordenes de produccion **/
+        for (ProductionOrder productionOrder:productionOrderList){
+            //data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 2));
+            ArticleMovement articleMovement = new ArticleMovement(
+                    //productionOrder.getProductionPlanning().getDate(),
+                    DateUtils.parse(DateUtils.format(productionOrder.getProductionPlanning().getDate(), "yyyy-MM-dd"), "yyyy-MM-dd"),
+                    productionOrder.getProductComposition().getProcessedProduct().getProductItemCode(),
+                    MovementDetailType.E,
+                    BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()),
+                    BigDecimalUtil.toBigDecimal(productionOrder.getUnitCost()),
+                    BigDecimalUtil.toBigDecimal(productionOrder.getTotalCostProduction())
+            );
+            resultList.add(articleMovement);
+
+        }
+        /** Reprocesos **/
+        for (BaseProduct baseProduct:baseProductList){
+            for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
+                //data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2));
+                ArticleMovement articleMovement = new ArticleMovement(
+                        //singleProduct.getBaseProduct().getProductionPlanningBase().getDate(),
+                        DateUtils.parse(DateUtils.format(singleProduct.getBaseProduct().getProductionPlanningBase().getDate(), "yyyy-MM-dd"), "yyyy-MM-dd"),
+                        singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode(),
+                        MovementDetailType.E,
+                        BigDecimalUtil.toBigDecimal(singleProduct.getAmount()),
+                        BigDecimalUtil.toBigDecimal(singleProduct.getUnitCost()),
+                        BigDecimalUtil.toBigDecimal(singleProduct.getTotalCostProduction())
+                );
+                resultList.add(articleMovement);
+            }
+        }
+
+        /** Ventas al contado **/
+        List<ArticleOrder> cashSaleArticleOrderList = articleOrderService.findCashSaleDetailList(startDate, endDate);
+
+        for (ArticleOrder articleOrder:cashSaleArticleOrderList){
+            ArticleMovement articleMovement = new ArticleMovement(
+                    articleOrder.getVentaDirecta().getFechaPedido(),
+                    articleOrder.getCodArt(),
+                    MovementDetailType.S,
+                    BigDecimalUtil.toBigDecimal(articleOrder.getTotal()),
+                    BigDecimalUtil.toBigDecimal(articleOrder.getCu()),
+                    BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getTotal()), BigDecimalUtil.toBigDecimal(articleOrder.getCu()), 6)
+                    );
+            resultList.add(articleMovement);
+        }
+
+        /** Pedidos **/
+        List<ArticleOrder> orderCustomerDetailList = articleOrderService.findCustomerOrderDetailList(startDate, endDate);
+        for (ArticleOrder articleOrder:orderCustomerDetailList){
+            ArticleMovement articleMovement = new ArticleMovement(
+                    articleOrder.getCustomerOrder().getFechaEntrega(),
+                    articleOrder.getCodArt(),
+                    MovementDetailType.S,
+                    BigDecimalUtil.toBigDecimal(articleOrder.getTotal()),
+                    BigDecimalUtil.toBigDecimal(articleOrder.getCu()),
+                    BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getTotal()), BigDecimalUtil.toBigDecimal(articleOrder.getCu()), 6)
+            );
+            resultList.add(articleMovement);
+        }
+        /** ---------------------------------------------------------------------------------------------------- **/
+        //----------------------------------------------------------------
+        // Ordenamiento de la Lista por fecha
+        Collections.sort(resultList, new Comparator<ArticleMovement>() {
+            @Override
+            public int compare(ArticleMovement o1, ArticleMovement o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+        //----------------------------------------------------------------
+        /** -------------------------------------------------------------------------------------- **/
+        /** Calculo del COSTO UNITARIO segun Costo Promedio **/
+        /** Si hay irregularidad en el calculo, valores negativos, toma como costo unitario la ultima Entrada **/
         BigDecimal quantity  = BigDecimal.ZERO;
         BigDecimal unitCost  = BigDecimal.ZERO;
         BigDecimal totalCost = BigDecimal.ZERO;
+        boolean band = false;
 
         for (CollectionData data:beanCollection){
 
@@ -267,31 +335,41 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     if (art.getMovementType().equals(MovementDetailType.E)){
                         quantity  = BigDecimalUtil.sum(quantity, art.getQuantity(), 6);
                         totalCost = BigDecimalUtil.sum(totalCost, art.getTotalCost(), 6);
+                        if (quantity.doubleValue() > 0) unitCost = BigDecimalUtil.divide(totalCost, quantity, 6);
+
+                        if (quantity.doubleValue() < 0) band = true;
+
                     }
 
                     if (art.getMovementType().equals(MovementDetailType.S)){
                         quantity  = BigDecimalUtil.subtract(quantity, art.getQuantity(), 6);
-                        totalCost = BigDecimalUtil.subtract(totalCost, art.getTotalCost(), 6);
+                        totalCost = BigDecimalUtil.subtract(totalCost,
+                                                            BigDecimalUtil.multiply(art.getQuantity(), unitCost, 6),
+                                                            6);
+                        if (quantity.doubleValue() < 0) band = true;
                     }
+                    /** Si hay irregularidad en el calculo, valores negativos, toma como costo unitario la ultima Entrada **/
+                    if (!band)
+                        data.setUnitCost(unitCost);
+                    else
+                        if (art.getMovementType().equals(MovementDetailType.E))
+                            data.setUnitCost(art.getUnitCost());
+
                 }
-
             }
-            if (quantity.doubleValue() > 0)
-                unitCost = BigDecimalUtil.divide(totalCost, quantity, 6);
-
-            data.setUnitCost(unitCost);
 
             quantity  = BigDecimal.ZERO;
             unitCost  = BigDecimal.ZERO;
             totalCost = BigDecimal.ZERO;
+            band = false;
         }
 
         /** ------------------------------------------------------------------------------ **/
 
         for (CollectionData data:beanCollection){
-            data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 2));
-            data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 2));
-            data.setValuedBalance(BigDecimalUtil.multiply(data.getBalance(), data.getUnitCost(), 2));
+            data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 6));
+            data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 6));
+            data.setValuedBalance(BigDecimalUtil.multiply(data.getBalance(), data.getUnitCost(), 6));
         }
 
         return beanCollection;

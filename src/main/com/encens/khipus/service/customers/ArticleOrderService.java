@@ -9,6 +9,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.warehouse.*;
 
@@ -29,4 +30,6 @@ public interface ArticleOrderService extends GenericService {
     public List<ArticleOrder> findOrderDetailByCodeAndDate(String productItemCode, Date startDate, Date endDate);
     public List findCashSaleDetailListGroupBy(Date startDate, Date endDate);
     public List findCustomerOrderDetailListGroupBy(Date startDate, Date endDate);
+    public List<ArticleOrder> findCashSaleDetailList(Date startDate, Date endDate);
+    public List<ArticleOrder> findCustomerOrderDetailList(Date startDate, Date endDate);
 }

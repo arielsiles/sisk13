@@ -16,6 +16,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.interceptor.FinancesUser;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
@@ -93,4 +94,21 @@ public class ArticleOrderServiceBean extends GenericServiceBean implements Artic
                 .setParameter("endDate", endDate)
                 .getResultList();
     }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ArticleOrder> findCashSaleDetailList(Date startDate, Date endDate){
+        return em.createNamedQuery("ArticleOrder.findCashSaleDetailList")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ArticleOrder> findCustomerOrderDetailList(Date startDate, Date endDate){
+        return em.createNamedQuery("ArticleOrder.findCustomerOrderDetailList")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
 }
