@@ -100,6 +100,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
     }
 
+    /**
+     * 1. Calcula inventario de articulos por almacen dadas Fecha inicio y Fecha fin
+     * 2. Calcula Costo unitario promedio segun el movimiento entre las fechas dadas (Inicio y Fin)
+     *
+     *
+     * @return
+     */
     public Collection<CollectionData> calculateCollectionData(){
 
         Collection<CollectionData> beanCollection = new ArrayList();
@@ -334,6 +341,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
                     if (art.getMovementType().equals(MovementDetailType.E)){
                         quantity  = BigDecimalUtil.sum(quantity, art.getQuantity(), 6);
+                        System.out.println("..........................>>> " + data.getCode() + " - " + totalCost + " - " + art);
                         totalCost = BigDecimalUtil.sum(totalCost, art.getTotalCost(), 6);
                         if (quantity.doubleValue() > 0) unitCost = BigDecimalUtil.divide(totalCost, quantity, 6);
 
