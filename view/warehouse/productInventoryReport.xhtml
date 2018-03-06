@@ -98,6 +98,15 @@
                                  value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
                     <s:defaultAction/>
                 </h:commandButton>
+
+                <h:commandButton action="#{productInventoryReportAction.startInventoryAnnual}"
+                                 styleClass="button"
+                                 value="#{messages['ProductInventory.startAnnualInventory']}" id="inventoryInitButtonId" tabindex="5"
+                                 onclick="Richfaces.showModalPanel('progressModalPanel');"
+                                 rendered="#{s:hasPermission('PRODUCTINVENTORYSTART','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
             </div>
 
         </h:form>
@@ -115,6 +124,20 @@
                                    oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
             </ui:define>
         </s:decorate>
+
+        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+
+
 
     </ui:define>
 </ui:composition>

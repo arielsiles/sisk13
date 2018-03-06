@@ -60,7 +60,7 @@ public class InitialInventory implements BaseModel {
     @Column(name = "GESTION")
     private String year;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false)
+    @Column(name = "NO_CIA")
     @Length(max = 2)
     private String companyNumber;
 

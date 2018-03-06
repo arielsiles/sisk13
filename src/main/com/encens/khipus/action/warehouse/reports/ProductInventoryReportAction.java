@@ -9,6 +9,7 @@ import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.production.ProductionOrderService;
+import com.encens.khipus.service.warehouse.InitialInventoryService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductInventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -66,6 +67,9 @@ public class ProductInventoryReportAction extends GenericReportAction {
     @In(create = true)
     KardexProductMovementAction kardexProductMovementAction;
 
+    @In
+    private InitialInventoryService initialInventoryService;
+
     @Create
     public void init() {
         restrictions = new String[]{};
@@ -74,6 +78,14 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
     protected String getEjbql() {
         return "";
+    }
+
+    public void startInventoryAnnual(){
+
+        Collection<CollectionData> beanCollection = calculateCollectionData();
+
+        initialInventoryService.createInitialInventory(beanCollection, warehouse.getWarehouseCode(), startDate);
+
     }
 
     public void generateReport() {
