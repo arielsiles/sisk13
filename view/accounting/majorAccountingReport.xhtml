@@ -78,6 +78,15 @@
                                   showReportTitle="false"/>
 
         <div class="buttons">
+
+            <h:commandButton action="#{majorAccountingReportAction.generateCSV}"
+                             styleClass="button"
+                             value="#{messages['MajorAccounting.generateCSV']}" id="csvButtonId" tabindex="12"
+                             rendered="#{s:hasPermission('MAJORACCOUNTINGCSV','VIEW')}"
+                             onclick="Richfaces.showModalPanel('progressModalPanel');">
+                <s:defaultAction/>
+            </h:commandButton>
+
             <h:commandButton action="#{majorAccountingReportAction.generateReport}"
                              styleClass="button"
                              value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
@@ -98,6 +107,18 @@
                                styleClass="select-image-middle"
                                reRender="itemAccountField"
                                oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+
+    <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+        <ui:param name="dialogId" value="progressModalPanel"/>
+        <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+        <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+            </p>
         </ui:define>
     </s:decorate>
 

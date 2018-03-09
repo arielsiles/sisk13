@@ -288,11 +288,14 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
         getInstance().setFinancesEntity(financesEntity);
         if (financesEntity != null) {
             getInstance().setNit(financesEntity.getNitNumber());
+            getInstance().setName(financesEntity.getAcronym());
         }
     }
 
     public void clearFinancesEntity() {
         getInstance().setFinancesEntity(null);
+        getInstance().setNit(null);
+        getInstance().setName(null);
     }
 
     public void updateDocumentType() {

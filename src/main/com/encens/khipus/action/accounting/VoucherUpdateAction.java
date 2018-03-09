@@ -246,6 +246,11 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         purchaseDocumentAction.assignFinancesEntity(financesEntity);
     }
 
+    public void assignProviderAndFinancesEntity(Provider provider) {
+        setProvider(provider);
+        purchaseDocumentAction.assignFinancesEntity(provider.getEntity());
+    }
+
     /**
      * End Purchase Document
      */
@@ -366,4 +371,10 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     public void clearProvider(){
         setProvider(null);
     }
+
+    public void clearFinancesEntityAndProvider() {
+        setProvider(null);
+        purchaseDocumentAction.clearFinancesEntity();
+    }
+
 }

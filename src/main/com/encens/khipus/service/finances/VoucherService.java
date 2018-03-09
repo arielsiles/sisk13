@@ -3,10 +3,7 @@ package com.encens.khipus.service.finances;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.BusinessUnit;
-import com.encens.khipus.model.finances.FinanceUser;
-import com.encens.khipus.model.finances.FinancesModule;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.*;
 
 import javax.ejb.Local;
 import java.util.Date;
@@ -53,4 +50,6 @@ public interface VoucherService {
     DocType getDocType(String name);
 
     Voucher findVoucherByNoTrans(String transactionNumber);
+
+    List<VoucherServiceBean.VoucherTransaction>getTransactionMajorAccounting(String start, String end, String cashAccount);
 }

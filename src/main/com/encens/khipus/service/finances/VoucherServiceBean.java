@@ -8,6 +8,7 @@ import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.ValidatorUtil;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -16,6 +17,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -251,6 +253,105 @@ public class VoucherServiceBean implements VoucherService {
         Voucher voucher = (Voucher)em.createNamedQuery("Voucher.findVoucherByNoTrans").setParameter("transactionNumber", transactionNumber).getSingleResult();
 
         return voucher;
+    }
+
+    public List<VoucherTransaction> getTransactionMajorAccounting(String start, String end, String cashAccount){
+
+        List<VoucherTransaction> voucherTransactionList = new ArrayList<VoucherTransaction>();
+
+        List<Object[]> resultList = em.createNativeQuery("select " +
+                "e.fecha, d.cuenta, e.tipo_doc, e.no_doc, e.glosa, d.debe, d.haber " +
+                "from sf_tmpdet d " +
+                "left join sf_tmpenc e on d.id_tmpenc = e.id_tmpenc " +
+                "where e.fecha BETWEEN '"+start+"' and '"+end+"' " +
+                "and d.cuenta = '"+cashAccount+"' " +
+                "and e.estado <> 'ANL' " +
+                "order by e.fecha").getResultList();
+
+        for(Object[] data:resultList){
+
+            voucherTransactionList.add(new VoucherTransaction(DateUtils.format((Date)data[0], "dd/MM/yyyy"), (String)data[1], (String)data[2], (String)data[3], (String)data[4], (BigDecimal)data[5], (BigDecimal)data[6]));
+        }
+
+
+        return  voucherTransactionList;
+    }
+
+    public class VoucherTransaction{
+
+        private String date;
+        private String account;
+        private String documentType;
+        private String documentNumber;
+        private String gloss;
+        private BigDecimal debit;
+        private BigDecimal credit;
+
+        VoucherTransaction(String date, String account, String documentType, String documentNumber, String gloss, BigDecimal debit, BigDecimal credit){
+            setDate(date);
+            setAccount(account);
+            setDocumentType(documentType);
+            setDocumentNumber(documentNumber);
+            setGloss(gloss);
+            setDebit(debit);
+            setCredit(credit);
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getAccount() {
+            return account;
+        }
+
+        public void setAccount(String account) {
+            this.account = account;
+        }
+
+        public String getDocumentType() {
+            return documentType;
+        }
+
+        public void setDocumentType(String documentType) {
+            this.documentType = documentType;
+        }
+
+        public String getDocumentNumber() {
+            return documentNumber;
+        }
+
+        public void setDocumentNumber(String documentNumber) {
+            this.documentNumber = documentNumber;
+        }
+
+        public String getGloss() {
+            return gloss;
+        }
+
+        public void setGloss(String gloss) {
+            this.gloss = gloss;
+        }
+
+        public BigDecimal getDebit() {
+            return debit;
+        }
+
+        public void setDebit(BigDecimal debit) {
+            this.debit = debit;
+        }
+
+        public BigDecimal getCredit() {
+            return credit;
+        }
+
+        public void setCredit(BigDecimal credit) {
+            this.credit = credit;
+        }
     }
 
     public class ObsApprovedEntries{

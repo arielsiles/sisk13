@@ -3,6 +3,7 @@ package com.encens.khipus.service.finances;
 import com.encens.khipus.model.finances.CashAccount;
 
 import javax.ejb.Local;
+import java.util.List;
 
 /**
  * CashAccountService
@@ -17,4 +18,7 @@ public interface CashAccountService {
     CashAccount findByAccountCode(String accountCode);
 
     Boolean isActiveAccount(String accountCode);
+
+    public List<CashAccount> findCashAccountList();
+
 }

@@ -8,6 +8,9 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CashAccountServiceBean
@@ -50,4 +53,13 @@ public class CashAccountServiceBean implements CashAccountService {
         }
         return false;
     }
+
+    public List<CashAccount> findCashAccountList(){
+        try {
+            return em.createNamedQuery("CashAccount.findCashAccountList").getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<CashAccount>();
+        }
+    }
+
 }
