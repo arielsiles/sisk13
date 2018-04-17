@@ -106,6 +106,8 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     private Boolean hasMainProduction = false;
 
+    private Date productionDay;
+
     @In
     private SessionUser sessionUser;
     @In
@@ -2177,6 +2179,14 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         productionPlanningService.deleteOrderInput(orderInput);
     }
 
+    public Date getProductionDay() {
+        return productionDay;
+    }
+
+    public void setProductionDay(Date productionDay) {
+        this.productionDay = productionDay;
+    }
+
     public class AccountOrderProduction{
 
         private BusinessUnit executorUnit;
@@ -4146,4 +4156,13 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
     public void setShowMainProduct(boolean showMainProduct) {
         this.showMainProduct = showMainProduct;
     }
+
+    public void createProductionPlanningSingle(){
+        try {
+            productionPlanningService.createProductionPlanningSingle(productionDay);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }
