@@ -850,8 +850,6 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
 </h:panelGroup>
 </rich:panel>
 
-
-
 <h:panelGrid id="productionList" columns="2" columnClasses="top-aligned" width="100%">
     <rich:dataTable value="#{productionPlanning.productionOrderList}" var="productionOrderItem" id="productionOrderList"
                     width="100%"
@@ -1006,28 +1004,28 @@ value="#{productionOrderForPlanning.estateOrder == 'PENDING' ? messages['product
 <s:div>
     <ui:include src="/production/baseProductList.xhtml"/>
 </s:div>
+    <!--
+    <div class="buttons">
+        <s:div id="ruleBotton2">
 
-<div class="buttons">
-    <s:div id="ruleBotton2">
+            <h:commandButton action="#{productionPlanningAction.createNewPlannig()}" value="#{messages['Common.save']}" //corregir si se descomenta
+                             styleClass="button"
+                             rendered="#{!productionPlanningAction.managed and s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
 
-            <h:commandButton action="#{productionPlanningAction.createNewPlannig()}" value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{!productionPlanningAction.managed and s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"
-                         tabindex="1">
-            <s:defaultAction/>
-        </h:commandButton>
+            <h:commandButton value="#{messages['ProductionPlanning.deletePlannigDay']}"
+                             styleClass="button"
+                             rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','DELETE')}" //corregir si se descomenta
+                             tabindex="3">
+                <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+            </h:commandButton>
 
-        <h:commandButton value="#{messages['ProductionPlanning.deletePlannigDay']}"
-                         styleClass="button"
-                         rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','DELETE')}"
-                         tabindex="3">
-            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
-        </h:commandButton>
-
-        <h:commandButton action="#{productionPlanningAction.cancel}" value="#{messages['Common.back']}"
-                         styleClass="button" tabindex="21" immediate="true"/>
-    </s:div>
-</div>
+            <h:commandButton action="#{productionPlanningAction.cancel}" value="#{messages['Common.back']}"
+                             styleClass="button" tabindex="21" immediate="true"/>
+        </s:div>
+    </div>-->
 </h:form>
 
 <s:decorate template="/include/modalDialog.xhtml"

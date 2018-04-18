@@ -208,6 +208,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String createNew() {
+        initEditFormula();
         return Outcome.SUCCESS;
     }
 
@@ -4155,14 +4156,6 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     public void setShowMainProduct(boolean showMainProduct) {
         this.showMainProduct = showMainProduct;
-    }
-
-    public void createProductionPlanningSingle(){
-        try {
-            productionPlanningService.createProductionPlanningSingle(productionDay);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
 }

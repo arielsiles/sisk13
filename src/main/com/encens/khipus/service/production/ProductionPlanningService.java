@@ -75,5 +75,4 @@ public interface ProductionPlanningService extends GenericService {
 
     Double getReproSNGbyDateAndCodArt(String codArt, Date date);
 
-    public void createProductionPlanningSingle(Date date)throws EntryDuplicatedException, ConcurrencyException;
 }

@@ -79,15 +79,6 @@
                                  styleClass="button"
                                  rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"/>
 
-                <a4j:commandButton id="addProductionDayButton"
-                                   action="#{cashAccountDataModel.reset()}"
-                                   value="#{messages['Production.addProductionDay']}"
-                                   styleClass="button"
-                                   immediate="true"
-                                   oncomplete="Richfaces.showModalPanel('addProductionDayModalPanel');"
-                                   actionListener="#{selectPopUpAction.select}">
-                </a4j:commandButton>
-
             </div>
 
           <!--  <div class="buttons">
@@ -221,13 +212,6 @@
 
         </h:form>
 
-
-        <s:div id="addProductionDayModalPanelDiv">
-            <s:decorate id="addProductionDayModalPanelContainer" template="/production/addProductionDay.xhtml">
-                <ui:param name="containerId" value="addProductionDayPanelContainer"/>
-                <ui:param name="dialogId" value="addProductionDayModalPanel"/>
-            </s:decorate>
-        </s:div>
 
     </ui:define>
 </ui:composition>

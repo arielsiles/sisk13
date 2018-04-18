@@ -586,11 +586,4 @@ public class ProductionPlanningServiceBean extends ExtendedGenericServiceBean im
                 .setParameter("id",singleProduct.getId())
                 .executeUpdate();
     }
-
-    public void createProductionPlanningSingle(Date date)throws EntryDuplicatedException, ConcurrencyException {
-        ProductionPlanning productionPlanning = new ProductionPlanning();
-        productionPlanning.setDate(date);
-        super.create(productionPlanning);
-    }
-
 }
