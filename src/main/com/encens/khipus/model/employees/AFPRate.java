@@ -46,7 +46,7 @@ public class AFPRate implements BaseModel {
     private Boolean active;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "TIPOTASAAFP", length = 30, nullable = false)
+    @Column(name = "TIPOTASAAFP", length = 100, nullable = false)
     @NotNull
     private AFPRateType afpRateType;
 

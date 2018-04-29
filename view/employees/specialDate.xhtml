@@ -29,7 +29,8 @@
 
 <div class="buttons">
 
-    <h:commandButton action="#{specialDateAction.create}"4
+    <h:commandButton action="#{specialDateAction.create}"
+                     value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{!specialDateAction.managed and s:hasPermission('SPECIALDATE','CREATE')}"
                      id="createButtonId">
