@@ -80,9 +80,9 @@
                         <rich:column>
                             #{messages['RHMark.marIpPc']}
                         </rich:column>
-                        <rich:column>
+                        <!--<rich:column>
                             #{messages['RHMark.control']}
-                        </rich:column>
+                        </rich:column>-->
                         <rich:column>
                             #{messages['RHMark.state']}
                         </rich:column>
@@ -104,12 +104,12 @@
                 <rich:column>
                     <h:outputText value="#{markItem.marIpPc}"/>
                 </rich:column>
-                <rich:column>
+                <!--<rich:column>
                     <h:panelGroup rendered="#{not empty markItem.marInOut}">
                         <h:graphicImage value="/img/employees/#{markItem.marInOut=='Entrada'?'in':'out'}.gif"/>
                         <h:outputText value="#{messages[markItem.marInOut=='Entrada'?'RHMark.in':'RHMark.out']}"/>
                     </h:panelGroup>
-                </rich:column>
+                </rich:column>-->
                 <rich:column>
                     <h:outputText value="#{messages[markItem.horaryBandStateType.resourceKey]}"
                                   rendered="#{not empty markItem.horaryBandStateType}"/>
