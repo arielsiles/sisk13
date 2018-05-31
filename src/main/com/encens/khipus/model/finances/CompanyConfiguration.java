@@ -451,6 +451,20 @@ public class CompanyConfiguration {
     @Length(max = 8)
     private String costCenterCode;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAMERMABAJ", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount lowAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAREPROC", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount reworkAccount;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1133,5 +1147,21 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPV(CashAccount ctaAlmPV) {
         this.ctaAlmPV = ctaAlmPV;
+    }
+
+    public CashAccount getLowAccount() {
+        return lowAccount;
+    }
+
+    public void setLowAccount(CashAccount lowAccount) {
+        this.lowAccount = lowAccount;
+    }
+
+    public CashAccount getReworkAccount() {
+        return reworkAccount;
+    }
+
+    public void setReworkAccount(CashAccount reworkAccount) {
+        this.reworkAccount = reworkAccount;
     }
 }

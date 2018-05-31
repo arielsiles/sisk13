@@ -29,7 +29,9 @@ public class MovementDetailUIController {
                 || voucher.isOutput()
                 || voucher.isExecutorUnitTransfer()
                 || voucher.isDevolution()
-                || voucher.isConsumption());
+                || voucher.isConsumption())
+                || voucher.isLow()
+                || voucher.isRework();
     }
 
     public boolean isEnabledAmountField() {
@@ -45,7 +47,9 @@ public class MovementDetailUIController {
                 || voucher.isExecutorUnitTransfer()
                 || voucher.isDevolution()
                 || voucher.isInput()
-                || voucher.isOutput();
+                || voucher.isOutput()
+                || voucher.isLow()
+                || voucher.isRework();
     }
 
     public boolean isEnabledUnitCostField() {

@@ -13,10 +13,7 @@ import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.purchases.PurchaseOrderPayment;
 import com.encens.khipus.model.purchases.PurchaseOrderPaymentState;
 import com.encens.khipus.model.purchases.PurchaseOrderPaymentType;
-import com.encens.khipus.model.warehouse.MovementDetail;
-import com.encens.khipus.model.warehouse.MovementDetailType;
-import com.encens.khipus.model.warehouse.Warehouse;
-import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.finances.*;
@@ -1032,6 +1029,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             throws CompanyConfigurationNotFoundException,
             FinancesCurrencyNotFoundException,
             FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException {
+
+        System.out.println("0.----------> : createAccountEntry(...");
+
         if (warehouseVoucher.isTransfer()) {
             log.debug("The account entry should not be generated for transference vouchers.");
             return;
@@ -1046,46 +1046,55 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         log.debug("Generating the account entry for warehouse voucher Nro: " + warehouseVoucher.getNumber());
 
         if (warehouseVoucher.isReception()) {
+            System.out.println("------------------->: createAccountEntryForReception(warehouseVoucher,...");
             createAccountEntryForReception(warehouseVoucher,
                     warehouseVoucher.getExecutorUnit(),
                     warehouseVoucher.getCostCenterCode(),
                     gloss[0]);
-        } else if (warehouseVoucher.isExecutorUnitTransfer()) {
-            createAccountEntryForExecutorUnitTransfer(warehouseVoucher, gloss);
-        } else if ((warehouseVoucher.isInput() || warehouseVoucher.isOutput()) &&
-                (warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ||
-                        warehouseVoucher.getDocumentType().isContraAccountDefinedByDefault())) {
-            CashAccount contraAccount = warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ?
-                    warehouseVoucher.getContraAccount() : warehouseVoucher.getDocumentType().getContraAccount();
-            if (warehouseVoucher.isInput()) {
-                createAccountEntryForInputsAndContraAccount(warehouseVoucher,
-                        contraAccount,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            } else {
-                createAccountEntryForOutputsAndContraAccount(warehouseVoucher,
-                        contraAccount,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            }
         } else {
-            MovementDetailType movementDetailType =
-                    WarehouseUtil.getMovementTye(warehouseVoucher.getDocumentType());
+            if (warehouseVoucher.isExecutorUnitTransfer()) {
+                System.out.println("------------------->: if (warehouseVoucher.isExecutorUnitTransfer())");
+                createAccountEntryForExecutorUnitTransfer(warehouseVoucher, gloss);
+            } else {
+                if ((warehouseVoucher.isInput() || warehouseVoucher.isOutput()) && (warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ||
+                                                                                    warehouseVoucher.getDocumentType().isContraAccountDefinedByDefault()))
+                {
+                    CashAccount contraAccount = warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ? warehouseVoucher.getContraAccount() : warehouseVoucher.getDocumentType().getContraAccount();
 
-            if (MovementDetailType.E.equals(movementDetailType)) {
-                createAccountEntryForInputs(warehouseVoucher,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            }
+                    if (warehouseVoucher.isInput()) {
+                        System.out.println("1---------------------->: createAccountEntryForInputsAndContraAccount(warehouseVoucher...");
+                        createAccountEntryForInputsAndContraAccount(warehouseVoucher,
+                                contraAccount,
+                                warehouseVoucher.getExecutorUnit(),
+                                warehouseVoucher.getCostCenterCode(),
+                                gloss[0]);
+                    } else {
+                        System.out.println("2---------------------> : createAccountEntryForOutputsAndContraAccount(warehouseVoucher...");
+                        createAccountEntryForOutputsAndContraAccount(warehouseVoucher,
+                                contraAccount,
+                                warehouseVoucher.getExecutorUnit(),
+                                warehouseVoucher.getCostCenterCode(),
+                                gloss[0]);
+                    }
+                } else {
+                    MovementDetailType movementDetailType = WarehouseUtil.getMovementTye(warehouseVoucher.getDocumentType());
 
-            if (MovementDetailType.S.equals(movementDetailType)) {
-                createAccountEntryForOutputs(warehouseVoucher,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
+                    if (MovementDetailType.E.equals(movementDetailType)) {
+                        System.out.println("3---------------------------->: createAccountEntryForInputs(warehouseVoucher...");
+                        createAccountEntryForInputs(warehouseVoucher,
+                                warehouseVoucher.getExecutorUnit(),
+                                warehouseVoucher.getCostCenterCode(),
+                                gloss[0]);
+                    }
+
+                    if (MovementDetailType.S.equals(movementDetailType)) {
+                        System.out.println("4--------------------->: createAccountEntryForOutputs(warehouseVoucher...");
+                        createAccountEntryForOutputs(warehouseVoucher,
+                                warehouseVoucher.getExecutorUnit(),
+                                warehouseVoucher.getCostCenterCode(),
+                                gloss[0]);
+                    }
+                }
             }
         }
     }
@@ -1485,10 +1494,21 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
             BigDecimal detailAmount = BigDecimalUtil.roundBigDecimal(movementDetail.getAmount());
             total = BigDecimalUtil.sum(total, detailAmount);
+
+            CashAccount debitCashAccount = movementDetail.getProductItemCashAccount();
+
+            /** Cuenta para Baja de productos **/
+            if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.B))
+                debitCashAccount = companyConfiguration.getLowAccount();
+
+            /** Cuenta para reprocesos **/
+            if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.W))
+                debitCashAccount = companyConfiguration.getReworkAccount();
+
             voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnit.getExecutorUnitCode(),
                     costCenterCode,
-                    movementDetail.getProductItemCashAccount(),
+                    debitCashAccount,
                     detailAmount,
                     movementDetail.getProductItemCashAccount().getCurrency(),
                     financesExchangeRateService.getExchangeRateByCurrencyType(movementDetail.getProductItemCashAccount().getCurrency(), BigDecimal.ONE)));

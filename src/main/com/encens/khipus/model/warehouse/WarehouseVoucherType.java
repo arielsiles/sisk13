@@ -12,6 +12,8 @@ public enum WarehouseVoucherType {
     D("WarehouseVoucherType.devolution"),
     T("WarehouseVoucherType.transfer"),
     M("WarehouseVoucherType.executorUnitTransfer"),
+    B("WarehouseVoucherType.low"),
+    W("WarehouseVoucherType.reworkOutput"),
 
     R("WarehouseVoucherType.reception"),
     E("WarehouseVoucherType.input"),
@@ -35,7 +37,7 @@ public enum WarehouseVoucherType {
     }
 
     public static List<WarehouseVoucherType> getOutputTypes() {
-        return Arrays.asList(WarehouseVoucherType.C, WarehouseVoucherType.S);
+        return Arrays.asList(WarehouseVoucherType.C, WarehouseVoucherType.S, WarehouseVoucherType.B, WarehouseVoucherType.W);
     }
 
     public static boolean isSpecialVoucherType(WarehouseVoucherType warehouseVoucherType) {

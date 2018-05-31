@@ -365,6 +365,14 @@ public class WarehouseVoucher implements BaseModel {
         return null != documentType && WarehouseVoucherType.S.equals(documentType.getWarehouseVoucherType());
     }
 
+    public boolean isLow() {
+        return null != documentType && WarehouseVoucherType.B.equals(documentType.getWarehouseVoucherType());
+    }
+
+    public boolean isRework() {
+        return null != documentType && WarehouseVoucherType.W.equals(documentType.getWarehouseVoucherType());
+    }
+
     public boolean isExecutorUnitTransfer() {
         return null != documentType && WarehouseVoucherType.M.equals(documentType.getWarehouseVoucherType());
     }
