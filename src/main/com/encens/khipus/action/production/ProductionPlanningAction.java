@@ -1062,6 +1062,8 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         else
         addMessageOrderCreateSuccess(productionOrder.getCode(), productionOrder.getProductOrders().get(0).getProcessedProduct().getFullName());
 
+        productionOrder.setProducedAmount(productionOrder.getExpendAmount());
+
         clearFormulation();
         disableEditingFormula();
         showProductionOrders = true;

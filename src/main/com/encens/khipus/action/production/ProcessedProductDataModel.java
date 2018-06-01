@@ -23,7 +23,8 @@ public class ProcessedProductDataModel extends QueryDataModel<Long, ProcessedPro
     private static final String[] RESTRICTIONS = {
             "upper(processedProduct.name) like concat(concat('%',upper(#{processedProductDataModel.criteria.name})), '%')",
             "upper(processedProduct.code) like concat(concat('%',upper(#{processedProductDataModel.criteria.code})), '%')",
-            "upper(processedProduct.description) like concat(concat('%',upper(#{processedProductDataModel.criteria.description})), '%')"
+            "upper(processedProduct.description) like concat(concat('%',upper(#{processedProductDataModel.criteria.description})), '%')",
+            "processedProduct.productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"
     };
 
     @Create
