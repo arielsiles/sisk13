@@ -14,12 +14,24 @@ import java.util.Date;
  */
 @NamedQueries(
         {
-                @NamedQuery(name = "VentaDirecta.findByDatesForCosts",
+                /*@NamedQuery(name = "VentaDirecta.findByDatesForCosts",
                         query = "select v from VentaDirecta v " +
                                 "where v.fechaPedido between :startDate and :endDate " +
                                 "and v.estado <> 'ANULADO' " +
                                 "and v.cvFlag = 0 " +
-                                "and v.userId =:userId")
+                                "and v.userId =:userId"),*/
+                @NamedQuery(name = "VentaDirecta.findByDatesForCostsLac",
+                        query = "select v from VentaDirecta v " +
+                                "where v.fechaPedido between :startDate and :endDate " +
+                                "and v.estado <> 'ANULADO' " +
+                                "and v.cvFlag = 0 " +
+                                "and (v.userId = 6 or v.userId = 404)"), /** mflorero, breque **/
+                @NamedQuery(name = "VentaDirecta.findByDatesForCostsVet",
+                        query = "select v from VentaDirecta v " +
+                                "where v.fechaPedido between :startDate and :endDate " +
+                                "and v.estado <> 'ANULADO' " +
+                                "and v.cvFlag = 0 " +
+                                "and v.userId = 5 ") /** cisc **/
         }
 )
 

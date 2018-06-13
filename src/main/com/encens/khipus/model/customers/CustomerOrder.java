@@ -21,7 +21,23 @@ import java.util.Date;
                                 "where c.fechaEntrega between :startDate and :endDate " +
                                 "and c.estado = 'CONTABILIZADO' " +
                                 "and c.cvFlag = 0 " +
-                                "and c.customerOrderTypeId = 1 ")
+                                "and c.customerOrderTypeId = 1 "),
+
+                @NamedQuery(name = "CustomerOrder.findByDatesForCostsLac",
+                        query = "select c from CustomerOrder c " +
+                                "where c.fechaEntrega between :startDate and :endDate " +
+                                "and c.estado = 'CONTABILIZADO' " +
+                                "and c.cvFlag = 0 " +
+                                "and c.customerOrderTypeId = 1 " +
+                                "and c.userId <> 5 "), /** breque y comercial **/
+
+                @NamedQuery(name = "CustomerOrder.findByDatesForCostsVet",
+                        query = "select c from CustomerOrder c " +
+                                "where c.fechaEntrega between :startDate and :endDate " +
+                                "and c.estado = 'CONTABILIZADO' " +
+                                "and c.cvFlag = 0 " +
+                                "and c.customerOrderTypeId = 1 " +
+                                "and c.userId = 5 ") /** cisc **/
         }
 )
 
@@ -93,6 +109,9 @@ public class CustomerOrder implements BaseModel  {
 
     @Column(name = "IDTIPOPEDIDO")
     private Long customerOrderTypeId;
+
+    @Column(name = "IDUSUARIO")
+    private Long userId;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "customerOrder")
     private Collection<ArticleOrder> articulosPedidos ;
@@ -292,5 +311,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setCustomerOrderTypeId(Long customerOrderTypeId) {
         this.customerOrderTypeId = customerOrderTypeId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

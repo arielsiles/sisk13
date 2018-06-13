@@ -94,7 +94,7 @@ public class VoucherAction extends GenericAction<Voucher> {
         }
 
         if (this.saleType.equals(SaleType.CREDIT_SALE)) {
-            voucherAccoutingService.createCostOfSalesCredit(startDate, endDate);
+            voucherAccoutingService.createCostOfSalesCredit(startDate, endDate, productSaleType);
         }
 
 

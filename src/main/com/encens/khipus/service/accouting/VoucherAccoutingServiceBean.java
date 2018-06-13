@@ -8,6 +8,7 @@ import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
+import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -731,27 +732,49 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<VentaDirecta> sales = null;
         BigDecimal totalCost = new BigDecimal(0.0);
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas al contado " + productSaleType + ". Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
-        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
 
         /** DAIRY_PRODUCT **/
         CashAccount ctaCost = companyConfiguration.getCtaCostPT();
         CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
-        Long userId = new Long(6); // Todo: cambiar el uso de id (user mflorero)
+        String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
-        if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
+        //Long userId = new Long(6); // Todo: cambiar el uso de id (user mflorero)
+        /*if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
             ctaCost = companyConfiguration.getCtaCostPV();
             ctaAlm  = companyConfiguration.getCtaAlmPV();
             userId  = new Long(5); // Todo: cambiar el uso de id (user cisc)
-        }
+        }*/
 
         try {
-            sales = em.createNamedQuery("VentaDirecta.findByDatesForCosts")
+
+            if (ProductSaleType.DAIRY_PRODUCT.equals(productSaleType)){
+                sales = em.createNamedQuery("VentaDirecta.findByDatesForCostsLac")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+            }
+
+            if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
+                ctaCost = companyConfiguration.getCtaCostPV();
+                ctaAlm  = companyConfiguration.getCtaAlmPV();
+                sales = em.createNamedQuery("VentaDirecta.findByDatesForCostsVet")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+                produtTypeMessage = MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey());
+            }
+
+            /*sales = em.createNamedQuery("VentaDirecta.findByDatesForCosts")
                     .setParameter("startDate", startDate)
                     .setParameter("endDate", endDate)
                     .setParameter("userId", userId)
-                    .getResultList();
+                    .getResultList();*/
+
         } catch (NoResultException e) {}
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas al contado " + produtTypeMessage + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
 
         if (sales.size() > 0) {
             for (VentaDirecta sale : sales) {
@@ -776,20 +799,46 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }
     }
 
-    public void createCostOfSalesCredit(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException{
+    public void createCostOfSalesCredit(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException{
 
         List<CustomerOrder> sales = null;
         BigDecimal totalCost = new BigDecimal(0.0);
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas a credito. Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
-        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+
+
+        /** DAIRY_PRODUCT **/
+        CashAccount ctaCost = companyConfiguration.getCtaCostPT();
+        CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
+        String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
         try {
-            sales = em.createNamedQuery("CustomerOrder.findByDatesForCosts")
+
+            if (ProductSaleType.DAIRY_PRODUCT.equals(productSaleType)){
+                sales = em.createNamedQuery("CustomerOrder.findByDatesForCostsLac")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+            }
+
+            if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
+                ctaCost = companyConfiguration.getCtaCostPV();
+                ctaAlm  = companyConfiguration.getCtaAlmPV();
+                sales = em.createNamedQuery("CustomerOrder.findByDatesForCostsVet")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+                produtTypeMessage = MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey());
+            }
+
+            /*sales = em.createNamedQuery("CustomerOrder.findByDatesForCosts")
                     .setParameter("startDate", startDate)
                     .setParameter("endDate", endDate)
-                    .getResultList();
+                    .getResultList();*/
         } catch (NoResultException e) {}
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas a credito " + produtTypeMessage + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
 
         if (sales.size() > 0) {
             for (CustomerOrder sale : sales) {
@@ -799,12 +848,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
 
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                    companyConfiguration.getCtaCostPT(),
+                    ctaCost,
                     totalCost,
                     FinancesCurrencyType.P, null));
 
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                    companyConfiguration.getCtaAlmPT(),
+                    ctaAlm,
                     totalCost,
                     FinancesCurrencyType.P, null));
 
