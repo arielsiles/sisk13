@@ -738,13 +738,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
         String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
-        //Long userId = new Long(6); // Todo: cambiar el uso de id (user mflorero)
-        /*if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
-            ctaCost = companyConfiguration.getCtaCostPV();
-            ctaAlm  = companyConfiguration.getCtaAlmPV();
-            userId  = new Long(5); // Todo: cambiar el uso de id (user cisc)
-        }*/
-
         try {
 
             if (ProductSaleType.DAIRY_PRODUCT.equals(productSaleType)){
@@ -763,12 +756,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                         .getResultList();
                 produtTypeMessage = MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey());
             }
-
-            /*sales = em.createNamedQuery("VentaDirecta.findByDatesForCosts")
-                    .setParameter("startDate", startDate)
-                    .setParameter("endDate", endDate)
-                    .setParameter("userId", userId)
-                    .getResultList();*/
 
         } catch (NoResultException e) {}
 
@@ -830,10 +817,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 produtTypeMessage = MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey());
             }
 
-            /*sales = em.createNamedQuery("CustomerOrder.findByDatesForCosts")
-                    .setParameter("startDate", startDate)
-                    .setParameter("endDate", endDate)
-                    .getResultList();*/
         } catch (NoResultException e) {}
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
