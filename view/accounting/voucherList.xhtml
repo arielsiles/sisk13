@@ -188,6 +188,12 @@
                        action="#{voucherUpdateAction.select(voucherItem)}">
             <s:conversationPropagation value="none"/>
         </h:commandLink>
+        &#160;
+        <h:commandLink action="#{voucherUpdateAction.generateReport(voucherItem)}"
+                       immediate="true">
+            <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                            title="#{messages['Voucher.report.generateReport']}"/>
+        </h:commandLink>
     </rich:column>
 </rich:dataTable>
 <app:dataScroller id="dataScroller" for="voucherList" dataModel="#{voucherDataModel}"/>

@@ -1,5 +1,6 @@
 package com.encens.khipus.action.accounting;
 
+import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
@@ -52,6 +53,8 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private VoucherService voucherService;
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
+    @In(create = true)
+    private VoucherReportAction voucherReportAction;
 
     @Factory(value = "voucherUpdate", scope = ScopeType.STATELESS)
     public Voucher initVoucher() {
@@ -67,6 +70,11 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
 
         return outCome;
+    }
+
+    public void generateReport(Voucher instance){
+        select(instance);
+        voucherReportAction.generateReport(instance);
     }
 
     @Override
