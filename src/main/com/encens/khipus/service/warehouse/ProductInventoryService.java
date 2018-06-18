@@ -8,6 +8,7 @@ import com.encens.khipus.model.warehouse.ProductInventory;
 import com.encens.khipus.model.warehouse.ProductInventoryRecordType;
 
 import javax.ejb.Local;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -30,4 +31,6 @@ public interface ProductInventoryService extends GenericService {
     public void updateProductInventory(String productItemCode, Double quantity, ProductInventoryRecordType typeRecord, String description);
 
     public List<InitialInventory> findInitialInventory(String warehouseCode, String year);
+
+    public BigDecimal findUnitCostbyCode(String productItemCode, String year);
 }

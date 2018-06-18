@@ -22,7 +22,12 @@ import java.util.List;
                         "from InitialInventory initialInventory " +
                         "where initialInventory.warehouseCode =:warehouseCode " +
                         "and initialInventory.year =:year " +
-                        "order by initialInventory.productItemName asc ")
+                        "order by initialInventory.productItemName asc "),
+        @NamedQuery(name = "initialInventory.findUnitCostbyCode",
+                query = "select initialInventory " +
+                        "from InitialInventory initialInventory " +
+                        "where initialInventory.productItemCode =:productItemCode " +
+                        "and initialInventory.year =:year ")
 })
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "InitialInventory.tableGenerator",

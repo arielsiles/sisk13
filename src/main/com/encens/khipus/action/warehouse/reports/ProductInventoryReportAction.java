@@ -225,11 +225,11 @@ public class ProductInventoryReportAction extends GenericReportAction {
                         data.getEntryAmount().compareTo(BigDecimal.ZERO)   > 0 ||
                         data.getOutputAmount().compareTo(BigDecimal.ZERO)  > 0){
                     beanCollection.add(data);
+                    System.out.println("BeanCollection: " + data.getCode() + " - " + data.getProductName() + " - " + data.getUnitCost());
                 }
             }else {
                 beanCollection.add(data);
             }
-
         }
 
         /** ---------------------------------------------------------------------------------------------------- **/
@@ -371,10 +371,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     /** Si hay irregularidad en el calculo, valores negativos, toma como costo unitario la ultima Entrada **/
                     if (!band)
                         data.setUnitCost(unitCost);
-                    else
+                    else {
                         if (art.getMovementType().equals(MovementDetailType.E))
                             data.setUnitCost(art.getUnitCost());
-
+                        else /** Si no hay ultima entrada del producto, asigna el costo unitario de inv_inicio **/
+                            data.setUnitCost(productInventoryService.findUnitCostbyCode(art.getProductCode(), DateUtils.getCurrentYear(startDate).toString()));
+                    }
                 }
             }
 

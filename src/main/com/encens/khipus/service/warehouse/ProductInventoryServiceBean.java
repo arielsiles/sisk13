@@ -159,4 +159,12 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
 
     }
 
+    public BigDecimal findUnitCostbyCode(String productItemCode, String year){
+        InitialInventory product = (InitialInventory) em.createNamedQuery("initialInventory.findUnitCostbyCode")
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("year", year).getSingleResult();
+
+        return product.getUnitCost();
+    }
+
 }
