@@ -225,7 +225,6 @@ public class ProductInventoryReportAction extends GenericReportAction {
                         data.getEntryAmount().compareTo(BigDecimal.ZERO)   > 0 ||
                         data.getOutputAmount().compareTo(BigDecimal.ZERO)  > 0){
                     beanCollection.add(data);
-                    System.out.println("BeanCollection: " + data.getCode() + " - " + data.getProductName() + " - " + data.getUnitCost());
                 }
             }else {
                 beanCollection.add(data);
@@ -262,8 +261,10 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     detail.getProductItemCode(),
                     detail.getMovementType(),
                     detail.getQuantity(),
-                    detail.getUnitPurchasePrice(),
-                    detail.getPurchasePrice()
+                    //detail.getUnitPurchasePrice(),
+                    detail.getUnitCost(),
+                    //detail.getPurchasePrice()
+                    detail.getAmount()
             );
             resultList.add(articleMovement);
         }
@@ -337,6 +338,16 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 return o1.getDate().compareTo(o2.getDate());
             }
         });
+
+        /*
+        System.out.println("------- RESULT LIST  -------- ");
+        for (ArticleMovement article: resultList){
+            if (article.getProductCode().equals("118")){
+                System.out.println(article.getDate() + "\t" + article.getMovementType() + "\t" + article.getUnitCost() + "\t\t" + article.getQuantity() + "\t" + article.getTotalCost());
+            }
+        }
+        */
+
         //----------------------------------------------------------------
         /** -------------------------------------------------------------------------------------- **/
         /** Calculo del COSTO UNITARIO segun Costo Promedio **/
@@ -353,7 +364,6 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
                     if (art.getMovementType().equals(MovementDetailType.E)){
                         quantity  = BigDecimalUtil.sum(quantity, art.getQuantity(), 6);
-                        System.out.println("..........................>>> " + data.getCode() + " - " + totalCost + " - " + art);
                         totalCost = BigDecimalUtil.sum(totalCost, art.getTotalCost(), 6);
                         if (quantity.doubleValue() > 0) unitCost = BigDecimalUtil.divide(totalCost, quantity, 6);
 
@@ -374,8 +384,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     else {
                         if (art.getMovementType().equals(MovementDetailType.E))
                             data.setUnitCost(art.getUnitCost());
-                        else /** Si no hay ultima entrada del producto, asigna el costo unitario de inv_inicio **/
+
+                        /** Si no hay ultima entrada del producto, asigna el costo unitario de inv_inicio **/
+                        if (BigDecimalUtil.compareTo(data.getUnitCost(), BigDecimal.ZERO) == 0) {
+                            //System.out.println("====> COSTO UNIT ZERO: " + data.getCode() + " - " + data.getProductName());
                             data.setUnitCost(productInventoryService.findUnitCostbyCode(art.getProductCode(), DateUtils.getCurrentYear(startDate).toString()));
+                        }
                     }
                 }
             }
@@ -466,7 +480,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
                         data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
 
                         quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6);
-                        totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getPurchasePrice()), 6);
+                        totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getAmount()), 6);
                         if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
 
                     }
@@ -523,7 +537,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        response.addHeader("Content-disposition", "attachment; filename=kardexProductMovement.pdf");
+        response.addHeader("Content-disposition", "attachment; filename=ReporteGeneralInv.pdf");
         ServletOutputStream stream = response.getOutputStream();
         JasperExportManager.exportReportToPdfStream(jasperPrint, stream);
         stream.flush();
