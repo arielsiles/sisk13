@@ -6,6 +6,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.CashSale;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
@@ -844,6 +845,60 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
             saveVoucher(voucher);
         }
+    }
+
+    public Double calculateCashTransferAmount(Date startDate, Date endDate){
+
+        Double result = (Double) em.createNamedQuery("CashSale.calculateCashTransferAmount")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("flagct", Boolean.FALSE)
+                .getSingleResult();
+        System.out.println("===================>: " + result);
+
+        if (result == null)
+            result = new Double(0);
+
+        return  result;
+    }
+
+    public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double transferAmount, String gloss) throws CompanyConfigurationNotFoundException{
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        // Double transferAmount = calculateCashTransferAmount(startDate, endDate);
+        List<CashSale> cashSaleList = em.createNamedQuery("CashSale.findBetweenDates")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("flagct", Boolean.FALSE)
+                .getResultList();
+
+        //Double transferAmount = 0.0;
+        for (CashSale cashSale:cashSaleList){
+            //transferAmount = transferAmount + cashSale.getTotal();
+            cashSale.setFlagct(true);
+            em.flush();
+        }
+
+        if (transferAmount > 0){
+            Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
+            voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
+
+            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                    companyConfiguration.getSavingsBankAccount(),
+                    BigDecimalUtil.toBigDecimal(transferAmount),
+                    FinancesCurrencyType.P, null));
+
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                    companyConfiguration.getVeterinaryCashAccount(),
+                    BigDecimalUtil.toBigDecimal(transferAmount),
+                    FinancesCurrencyType.P, null));
+
+            voucher.setDate(endDate);
+            voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
+            saveVoucher(voucher);
+        }
+
+
     }
 
 }

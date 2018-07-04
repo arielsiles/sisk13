@@ -465,6 +465,21 @@ public class CompanyConfiguration {
     })
     private CashAccount reworkAccount;
 
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CT_CAJAAHORRO", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount SavingsBankAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CT_CAJAVETER", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount VeterinaryCashAccount;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1163,5 +1178,21 @@ public class CompanyConfiguration {
 
     public void setReworkAccount(CashAccount reworkAccount) {
         this.reworkAccount = reworkAccount;
+    }
+
+    public CashAccount getSavingsBankAccount() {
+        return SavingsBankAccount;
+    }
+
+    public void setSavingsBankAccount(CashAccount savingsBankAccount) {
+        SavingsBankAccount = savingsBankAccount;
+    }
+
+    public CashAccount getVeterinaryCashAccount() {
+        return VeterinaryCashAccount;
+    }
+
+    public void setVeterinaryCashAccount(CashAccount veterinaryCashAccount) {
+        VeterinaryCashAccount = veterinaryCashAccount;
     }
 }

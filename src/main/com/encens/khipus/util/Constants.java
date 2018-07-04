@@ -54,6 +54,7 @@ public final class Constants {
     public static final String CP_VOUCHER_DOCTYPE = "CP";
     public static final String IA_VOUCHER_DOCTYPE = "IA";
     public static final String CV_VOUCHER_DOCTYPE = "CV";
+    public static final String CT_VOUCHER_DOCTYPE = "CT";
 
     public static final BigDecimal BASE_CURRENCY_EXCHANGE_RATE = BigDecimal.ONE;
 

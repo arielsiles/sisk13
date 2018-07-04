@@ -315,6 +315,10 @@ input, select, textarea {
     width: 300px;
 }
 
+.inputLarge400 {
+    width: 400px;
+}
+
 .inputNumber {
     width: 200px;
     text-align: right;

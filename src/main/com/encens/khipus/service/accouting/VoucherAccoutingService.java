@@ -64,4 +64,8 @@ public interface VoucherAccoutingService extends GenericService {
     public void createCostOfCashSales(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
 
     public void createCostOfSalesCredit(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
+
+    public Double calculateCashTransferAmount(Date startDate, Date endDate);
+
+    public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double amountTransfer, String gloss) throws CompanyConfigurationNotFoundException;
 }
