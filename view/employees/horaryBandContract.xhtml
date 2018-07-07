@@ -32,6 +32,11 @@
         <s:defaultAction/>
     </h:commandButton>
 
+    <h:commandButton action="#{horaryBandContractAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','CREATE')}"/>
+
     <h:commandButton action="#{horaryBandContractAction.update}" value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','UPDATE')}"
@@ -190,7 +195,7 @@
                 </h:inputText>
             </s:decorate>
 
-            <s:decorate id="timerTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!--<s:decorate id="timerTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['HoraryBandContract.timerType']}</ui:define>
                 <h:selectOneMenu id="timeType" value="#{horaryBandContract.timeType}" styleClass="input"
                                  required="true" tabindex="16">
@@ -198,6 +203,17 @@
                                    itemValue="#{messages[tte.resourceKey]}"
                                    label="#{messages[tte.resourceKey]}"
                                    noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>-->
+
+            <s:decorate id="timerTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['HoraryBandContract.timerType']}</ui:define>
+                <h:selectOneMenu id="timeType" value="#{horaryBandContract.timeType}" styleClass="input"
+                                 required="true" tabindex="16">
+                    <s:selectItems value="#{horaryBandTimeTypeEnum}" var="tte"
+                                   itemValue="#{messages[tte.resourceKey]}"
+                                   label="#{messages[tte.resourceKey]}"
                                    hideNoSelectionLabel="false"/>
                 </h:selectOneMenu>
             </s:decorate>
@@ -239,6 +255,11 @@
                      rendered="#{!horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','CREATE')}"
                      tabindex="19">
     </h:commandButton>
+
+    <h:commandButton action="#{horaryBandContractAction.createAndNew}"
+                     value="#{messages['Common.saveAndNew']}"
+                     styleClass="button"
+                     rendered="#{!horaryBandContractAction.managed and s:hasPermission('HORARYBANDCONTRACT','CREATE')}"/>
 
     <h:commandButton action="#{horaryBandContractAction.update}" value="#{messages['Common.save']}"
                      styleClass="button"

@@ -7,10 +7,10 @@ package com.encens.khipus.model.employees;
  * @version 1.1.0
  */
 public enum HoraryBandTimeType {
+    HR("HoraryBandTimeType.hr"),
     HTE("HoraryBandTimeType.hte"),
     HCL("HoraryBandTimeType.hcl"),
     HPR("HoraryBandTimeType.hrp"),
-    HR("HoraryBandTimeType.hr"),
     HLB("HoraryBandTimeType.hlb"),
     HCP("HoraryBandTimeType.hcp"),
     ANP("HoraryBandTimeType.anp"),

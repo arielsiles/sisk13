@@ -61,7 +61,7 @@ public class HoraryBand implements BaseModel {
     private Integer everyOtherDay = 0;
 
     @Column(name = "duracion")
-    private Integer duration;
+    private Integer duration = 0;
 
     @Version
     @Column(name = "version", nullable = false)

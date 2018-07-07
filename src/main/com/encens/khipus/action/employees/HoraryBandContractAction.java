@@ -219,6 +219,52 @@ public class HoraryBandContractAction extends GenericAction<HoraryBandContract> 
     }
 
     @Override
+    @Restrict("#{s:hasPermission('HORARYBANDCONTRACT','CREATE')}")
+    public void createAndNew() {
+        if (getInstance().getJobContract() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "HoraryBandContract.error.horaryBandToleranceRequired");
+            //return Outcome.REDISPLAY;
+        }
+
+        if (getHoraryBand().getDuration() > 0 && getHoraryBand().getDuration() % 45 > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "HoraryBandContract.error.duration");
+            //return Outcome.REDISPLAY;
+        }
+        if (DayMap.dayStringToInt(getHoraryBand().getEndDay()) < DayMap.dayStringToInt(getHoraryBand().getInitDay())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "HoraryBandContract.error.endDayLessThanInitDay");
+            //return Outcome.REDISPLAY;
+        }
+        if (horaryBandContractService.checkOverlapWithoutReference(
+                getChangeEmployee().getIdNumber(),
+                getInstance().getInitDate(),
+                getInstance().getEndDate(),
+                getHoraryBand().getInitHour(),
+                getHoraryBand().getEndHour(),
+                getHoraryBand().getInitDay(),
+                getHoraryBand().getEndDay())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "HoraryBandContract.error.overlap");
+            //return Outcome.REDISPLAY;
+        }
+
+        if (!(horaryBandContractService.checkContractRange(getChangeEmployee(), getInstance().getJobContract().getJob().getOrganizationalUnit(), getInstance().getInitDate())
+                && horaryBandContractService.checkContractRange(getChangeEmployee(), getInstance().getJobContract().getJob().getOrganizationalUnit(), getInstance().getEndDate()))) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "HoraryBandContract.error.dateOutOfContratRange", getChangeEmployee().getFullName());
+            //return Outcome.REDISPLAY;
+        }
+
+        try {
+            horaryBandContractService.create(getInstance(), getHoraryBand());
+            addCreatedMessage();
+            //return Outcome.SUCCESS;
+            //createInstance();
+
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+            //return Outcome.REDISPLAY;
+        }
+    }
+
+    @Override
     @End
     @Restrict("#{s:hasPermission('HORARYBANDCONTRACT','UPDATE')}")
     public String update() {
