@@ -26,6 +26,7 @@ public class GeneralBonusCalculator extends Calculator<CategoryTributaryPayroll>
         instance.setProductionBonus(BigDecimal.ZERO);
 
         BigDecimal otherBonus = BigDecimal.ZERO;
+        BigDecimal sundayBonus = BigDecimal.ZERO;
 
         if (null != grantedBonus) {
             for (GrantedBonus element : grantedBonus) {
@@ -34,9 +35,14 @@ public class GeneralBonusCalculator extends Calculator<CategoryTributaryPayroll>
                 if (BonusType.REGULAR_BONUS.equals(bonusType)) {
                     otherBonus = BigDecimalUtil.sum(otherBonus, element.getAmount());
                 }
+
+                if (BonusType.SUNDAYS_BONUS.equals(bonusType)) {
+                    sundayBonus = BigDecimalUtil.sum(sundayBonus, element.getAmount());
+                }
             }
         }
 
         instance.setOtherBonus(otherBonus);
+        instance.setSundayBonus(sundayBonus);
     }
 }

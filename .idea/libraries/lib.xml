@@ -72,6 +72,8 @@
       <root url="jar://$PROJECT_DIR$/lib/jboss-seam-ui.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ideaLibSources/jasperreports-3.7.4-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

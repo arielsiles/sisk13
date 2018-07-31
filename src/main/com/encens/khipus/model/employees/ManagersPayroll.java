@@ -92,6 +92,11 @@ import java.util.Date;
                 " left join fetch mp.employee employee" +
                 " left join fetch mp.jobCategory jobCategory" +
                 " where mp.generatedPayroll=:generatedPayroll"),
+        @NamedQuery(name = "ManagersPayroll.findByGeneratedPayrollAndDefaultAccount", query = "select mp from ManagersPayroll mp" +
+                " LEFT JOIN FETCH mp.employee employee" +
+                " LEFT JOIN FETCH mp.employee.bankAccountList bankAccount" +
+                " WHERE mp.generatedPayroll=:generatedPayroll" +
+                " AND bankAccount.defaultAccount=:BOOLEAN_TRUE"),
         @NamedQuery(name = "ManagersPayroll.countPayrollWithNegativeAmount", query = "select count(mp) from ManagersPayroll mp where mp.generatedPayroll=:generatedPayroll and mp.liquid<0"),
         @NamedQuery(name = "ManagersPayroll.findOfficialGeneratedPayroll", query = "SELECT generatedPayroll FROM ManagersPayroll managersPayroll " +
                 " LEFT JOIN managersPayroll.generatedPayroll generatedPayroll" +

@@ -427,7 +427,7 @@
     <framework:entity-query name="activeBonusListQuery" ejbql="select o from Bonus o ">
         <framework:restrictions>
             <value>
-                o.bonusType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.BonusType', 'REGULAR_BONUS')}
+                o.bonusType!=#{enumerationUtil.getEnumValue('com.encens.khipus.model.employees.BonusType', 'SENIORITY_BONUS')}
             </value>
             <value>
                 o.active=#{true}

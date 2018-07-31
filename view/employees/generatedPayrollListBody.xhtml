@@ -293,6 +293,13 @@
                                value="#{messages['Reports.payrollBankReport']}"
                                action="#{payrollBankReportAction.generateReport(generatedPayrollItem)}"
                                rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
+                <rich:menuItem styleClass="left"
+                               icon="/img/moneyicon.png"
+                               value="#{messages['Reports.payrollBankUnisueldoReport']}"
+                               action="#{payrollBankUnisueldoReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"/>
+
                 <rich:menuItem styleClass="left"
                                icon="/img/excelIcon.gif"
                                value="#{messages['GeneratedPayroll.exportControlreport']}"

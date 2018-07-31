@@ -1,8 +1,10 @@
 package com.encens.khipus.service.employees;
 
+import com.encens.khipus.model.employees.GeneratedPayroll;
 import com.encens.khipus.model.finances.BankAccount;
 
 import javax.ejb.Local;
+import java.util.List;
 import java.util.Map;
 
 /**

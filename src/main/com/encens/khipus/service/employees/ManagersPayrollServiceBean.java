@@ -4,6 +4,7 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.employees.GeneratedPayroll;
 import com.encens.khipus.model.employees.GestionPayroll;
+import com.encens.khipus.model.employees.ManagersPayroll;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.annotations.AutoCreate;
@@ -86,6 +87,18 @@ public class ManagersPayrollServiceBean extends GenericServiceBean implements Ma
                     .getResultList();
         } catch (NoResultException e) {
             return new ArrayList<Object[]>();
+        }
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ManagersPayroll> getManagersPayrollToUnisueldo(GeneratedPayroll generatedPayroll) {
+        try {
+            return (List<ManagersPayroll>) getEntityManager().createNamedQuery("ManagersPayroll.findByGeneratedPayrollAndDefaultAccount")
+                    .setParameter("generatedPayroll", generatedPayroll)
+                    .setParameter("BOOLEAN_TRUE", Boolean.TRUE)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
         }
     }
 }

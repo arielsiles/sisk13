@@ -35,7 +35,7 @@
                     </s:decorate>
                     <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Person.firstName']}</ui:define>
-                        <h:inputText id="firstName" value="#{dataModel.criteria.firstName}"
+                        <h:inputText id="#{dialogId}-firstName" value="#{dataModel.criteria.firstName}"
                                      maxlength="100" styleClass="input"
                                      tabindex="2"/>
                     </s:decorate>
@@ -126,7 +126,7 @@
         <app:dataScroller id="dataScroller" for="generalEmployeeList" dataModel="#{dataModel}"/>
         <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
     </h:form>
-    <c:set var="firstInputToFocusId" value="#{dialogId}-idNumber"/>
+    <c:set var="firstInputToFocusId" value="#{dialogId}-firstName"/>
     <script type="text/javascript">
         function focusFirstElement() {
             document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
