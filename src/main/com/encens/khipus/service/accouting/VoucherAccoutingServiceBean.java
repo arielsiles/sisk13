@@ -854,7 +854,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 .setParameter("endDate", endDate)
                 .setParameter("flagct", Boolean.FALSE)
                 .getSingleResult();
-        System.out.println("===================>: " + result);
+        System.out.println("===================> start: " + startDate.toString() + " - " + result);
+        System.out.println("===================>   end: " + endDate.toString() + " - " + result);
 
         if (result == null)
             result = new Double(0);
@@ -865,21 +866,44 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double transferAmount, String gloss) throws CompanyConfigurationNotFoundException{
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        // Double transferAmount = calculateCashTransferAmount(startDate, endDate);
+
         List<CashSale> cashSaleList = em.createNamedQuery("CashSale.findBetweenDates")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("flagct", Boolean.FALSE)
                 .getResultList();
 
-        //Double transferAmount = 0.0;
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
+        voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
+
+        DateIterator iDate = new DateIterator(startDate, endDate);
+        while (iDate.hasNext()) {
+            Double amount = calculateCashTransferAmount(iDate.getCurrent(), iDate.getCurrent());
+            if (amount > 0){
+                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                        companyConfiguration.getSavingsBankAccount(),
+                        BigDecimalUtil.toBigDecimal(amount),
+                        FinancesCurrencyType.P, null));
+            }
+            iDate.next();
+        }
+
+        voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getVeterinaryCashAccount(),
+                BigDecimalUtil.toBigDecimal(transferAmount),
+                FinancesCurrencyType.P, null));
+
+
         for (CashSale cashSale:cashSaleList){
-            //transferAmount = transferAmount + cashSale.getTotal();
             cashSale.setFlagct(true);
             em.flush();
         }
 
-        if (transferAmount > 0){
+        voucher.setDate(endDate);
+        voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
+        saveVoucher(voucher);
+
+        /*if (transferAmount > 0){
             Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
             voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
 
@@ -896,9 +920,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucher.setDate(endDate);
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
             saveVoucher(voucher);
-        }
-
+        }*/
 
     }
-
 }
