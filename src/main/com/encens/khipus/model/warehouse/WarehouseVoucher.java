@@ -8,6 +8,7 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.JobContract;
+import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -193,6 +194,10 @@ public class WarehouseVoucher implements BaseModel {
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "IDPRODUCTOBASE", nullable = true, updatable = false, insertable = true)
     private BaseProduct baseProduct;
+
+    @ManyToOne
+    @JoinColumn(name = "idtmpenc", nullable = true)
+    private Voucher voucher;
 
     public WarehouseVoucherPK getId() {
         return id;
@@ -514,5 +519,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;
+    }
+
+    public Voucher getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
     }
 }

@@ -1275,6 +1275,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucherForGeneration.setDate(warehouseVoucher.getDate());
         //check transactionNumber
         //voucherService.create(voucherForGeneration);
+        warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
 
         return voucherForGeneration.getTransactionNumber();
@@ -1318,6 +1319,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 BigDecimal.ONE));
         //check transactionNumber
         //voucherService.create(voucherForGeneration);
+        warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
 
     }
@@ -1352,6 +1354,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 BigDecimal.ONE));
         //check transactionNumber
         //voucherService.create(voucherForGeneration);
+        warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
         return voucherForGeneration.getTransactionNumber();
     }
@@ -1383,6 +1386,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 BigDecimal.ONE));
         //check transactionNumber
         //voucherService.create(sourceVoucherForGeneration);
+        warehouseVoucher.setVoucher(sourceVoucherForGeneration);
         voucherAccoutingService.saveVoucher(sourceVoucherForGeneration);
 
         // Target
@@ -1404,6 +1408,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));
         //check transactionNumber
+        warehouseVoucher.setVoucher(targetVoucherForGeneration);
         voucherService.create(targetVoucherForGeneration);
         voucherAccoutingService.saveVoucher(targetVoucherForGeneration);
     }
@@ -1527,6 +1532,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             //check transactionNumber
             System.out.println("--------> * " + voucherForGeneration.getTransactionNumber());
             //voucherService.create(voucherForGeneration);
+            warehouseVoucher.setVoucher(voucherForGeneration);
             voucherAccoutingService.saveVoucher(voucherForGeneration);
         }
     }
@@ -1622,6 +1628,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 financesExchangeRateService.getExchangeRateByCurrencyType(contraAccount.getCurrency(), BigDecimal.ONE)));
         //check transactionNumber
         //voucherService.create(voucherForGeneration);
+        warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
     }
 
