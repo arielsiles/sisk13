@@ -28,7 +28,7 @@ import java.util.Date;
                                 "where c.fechaEntrega between :startDate and :endDate " +
                                 "and c.estado <> 'ANULADO' " +
                                 "and c.cvFlag = 0 " +
-                                "and c.customerOrderTypeId = 1 " +
+                                "and c.customerOrderTypeId in (1,5) " +
                                 "and c.userId <> 5 "), /** breque y comercial **/
 
                 @NamedQuery(name = "CustomerOrder.findByDatesForCostsVet",
@@ -36,7 +36,7 @@ import java.util.Date;
                                 "where c.fechaEntrega between :startDate and :endDate " +
                                 "and c.estado <> 'ANULADO' " +
                                 "and c.cvFlag = 0 " +
-                                "and c.customerOrderTypeId = 1 " +
+                                "and c.customerOrderTypeId in (1,6) " +
                                 "and c.userId = 5 ") /** cisc **/
         }
 )

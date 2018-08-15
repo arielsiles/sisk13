@@ -12,6 +12,7 @@ public enum WarehouseVoucherType {
     D("WarehouseVoucherType.devolution"),
     T("WarehouseVoucherType.transfer"),
     M("WarehouseVoucherType.executorUnitTransfer"),
+    P("WarehouseVoucherType.productTransfer"),
     B("WarehouseVoucherType.low"),
     W("WarehouseVoucherType.reworkOutput"),
 
