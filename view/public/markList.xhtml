@@ -44,7 +44,7 @@
                     </s:decorate>
                     <s:decorate id="marRefCardField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
-                        <h:inputText id="marRefCard" value="#{markDataModel.criteria.marRefCard}"
+                        <h:inputText id="marRefCard" value="#{markDataModel.criteria.marPerId}"
                                      styleClass="input"
                                      required="true"/>
                     </s:decorate>
@@ -55,10 +55,10 @@
                                            value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
                             <s:defaultAction/>
                         </a4j:commandButton>
-                        <a4j:commandLink title="#{messages['Common.help']}"
+                        <!--<a4j:commandLink title="#{messages['Common.help']}"
                                          oncomplete="Richfaces.showModalPanel('rhMarkHelpModalPanel');">
                             <h:graphicImage value="/img/help.gif" style="cursor:pointer;border:0px;"/>
-                        </a4j:commandLink>
+                        </a4j:commandLink>-->
                     </s:decorate>
                 </h:panelGrid>
             </rich:panel>
@@ -84,12 +84,12 @@
                             #{messages['RHMark.control']}
                         </rich:column>-->
                         <rich:column>
-                            #{messages['RHMark.state']}
+                            #{messages['RHMark.control']}
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
                 <rich:column>
-                    <h:outputText value="#{markItem.marRefCard}"/>
+                    <h:outputText value="#{markItem.marPerId}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{markItem.marDate}">
@@ -104,16 +104,19 @@
                 <rich:column>
                     <h:outputText value="#{markItem.marIpPc}"/>
                 </rich:column>
+                <rich:column>
+                    <h:outputText value="#{markItem.control}"/>
+                </rich:column>
                 <!--<rich:column>
-                    <h:panelGroup rendered="#{not empty markItem.marInOut}">
-                        <h:graphicImage value="/img/employees/#{markItem.marInOut=='Entrada'?'in':'out'}.gif"/>
-                        <h:outputText value="#{messages[markItem.marInOut=='Entrada'?'RHMark.in':'RHMark.out']}"/>
+                    <h:panelGroup rendered="#{not empty markItem.control}">
+                        <h:graphicImage value="/img/employees/#{markItem.marInOut=='1'?'in':'out'}.gif"/>
+                        <h:outputText value="#{messages[markItem.marInOut=='1'?'RHMark.in':'RHMark.out']}"/>
                     </h:panelGroup>
                 </rich:column>-->
-                <rich:column>
+                <!--<rich:column>
                     <h:outputText value="#{messages[markItem.horaryBandStateType.resourceKey]}"
                                   rendered="#{not empty markItem.horaryBandStateType}"/>
-                </rich:column>
+                </rich:column>-->
             </rich:dataTable>
 
             <app:dataScroller id="dataScroller" for="markList" dataModel="#{markDataModel}"/>

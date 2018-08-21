@@ -4,16 +4,13 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.employees.Mark;
 import com.encens.khipus.model.employees.RHMark;
-import com.encens.khipus.service.employees.RHMarkService;
+import com.encens.khipus.model.employees.RH_Mark;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.util.Reflections;
-
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -29,19 +26,20 @@ import java.util.List;
  * @author
  */
 
-@Name("rHMarkAction")
+@Name("rH_MarkAction")
 @Scope(ScopeType.CONVERSATION)
-public class RHMarkAction extends GenericAction<RHMark> {
+public class RH_MarkAction extends GenericAction<RH_Mark> {
 
     @In("#{entityManager}")
     private EntityManager em;
 
+    private String control;
     private Date dateRegister;
     private Object displayPropertyValueMarak;
 
-    @Factory(value = "rHMark", scope = ScopeType.STATELESS)
+    @Factory(value = "rH_Mark", scope = ScopeType.STATELESS)
     //@Restrict("#{s:hasPermission('RHMARK','VIEW')}")
-    public RHMark initRHMark() {
+    public RH_Mark initRHMark() {
         return getInstance();
     }
 
@@ -54,7 +52,7 @@ public class RHMarkAction extends GenericAction<RHMark> {
     @End(beforeRedirect=true)
     public String create() {
         try {
-            RHMark rhMark = getInstance();
+            RH_Mark rhMark = getInstance();
 
             List<Object[]> result = em.createQuery("select p.markCode,p.firstName, p.lastName , p.maidenName from Employee p where p.markCode = :markCode")
                     .setParameter("markCode", rhMark.getMarPerId().toString()).getResultList();
@@ -65,16 +63,17 @@ public class RHMarkAction extends GenericAction<RHMark> {
                 rhMark = createInstance();
                 return Outcome.REDISPLAY;
             }
-            rhMark.setCompany(new Company(Constants.defaultCompanyId, Constants.defaultCompanyName));
-            rhMark.setSeat("1");
-            rhMark.setMarRefCard((String)result.get(0)[0]);
-            rhMark.setMarIpPc("10.0.0.200");//ip por defecto del servidor
-            rhMark.setControl(1);
-            //rhMark.setMarState("ACTIVO");
+
+            rhMark.setMarPerId(new Integer((String)result.get(0)[0]));
+            rhMark.setMarIpPc("8.8.8.8");
+            rhMark.setControl(new Integer(control));
             rhMark.setMarTime(rhMark.getStartMarDate());
             getService().create(rhMark);
             addCreateRegisterMessage(rhMark,(String)result.get(0)[1] +" "+(String)result.get(0)[2]+" "+(String)result.get(0)[3]);
             rhMark = createInstance();
+
+            setControl(null);
+
             return Outcome.SUCCESS;
         } catch (NoResultException e) {
             return Outcome.REDISPLAY;
@@ -90,12 +89,12 @@ public class RHMarkAction extends GenericAction<RHMark> {
         rhMark.setMarPerId(0);
     }
 
-    protected void addNoFoundCIMessage(RHMark rhMark) {
+    protected void addNoFoundCIMessage(RH_Mark rhMark) {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                 "Common.message.idPerson", rhMark.getMarPerId().toString());
     }
 
-    protected void addCreateRegisterMessage(RHMark rhMark,String name) {
+    protected void addCreateRegisterMessage(RH_Mark rhMark,String name) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         //Date myDate = fmt.parse(rhMark.getMarTime());
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
@@ -134,4 +133,11 @@ public class RHMarkAction extends GenericAction<RHMark> {
         }
     }
 
+    public String getControl() {
+        return control;
+    }
+
+    public void setControl(String control) {
+        this.control = control;
+    }
 }

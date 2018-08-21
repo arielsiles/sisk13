@@ -43,14 +43,14 @@ public class Mark implements BaseModel {
     @Column(name = "MARREFTARJETA", insertable = false, updatable = false)
     private String marRefCard;
 
-    @Column(name = "MARESTADO", insertable = false, updatable = false)
-    private String marState;
+    /*@Column(name = "MARESTADO", insertable = false, updatable = false)
+    private String marState;*/
 
-    @Column(name = "SEDE", insertable = false, updatable = false)
+    /*@Column(name = "SEDE", insertable = false, updatable = false)
     private String seat;
 
     @Column(name = "IDCOMPANIA", insertable = false, updatable = false)
-    private Long companyId;
+    private Long companyId;*/
 
     /*@Column(name = "MAR_IN_OUT", insertable = false, updatable = false)
     private Number marInOut;*/
@@ -58,6 +58,9 @@ public class Mark implements BaseModel {
     @Column(name = "MARHORA", insertable = false, updatable = false)
     @Temporal(TemporalType.TIME)
     private Date marTime;
+
+    @Column(name = "CONTROL", insertable = false, updatable = false)
+    private Integer control;
 
     @Transient
     private Date startMarDate = new Date();
@@ -81,9 +84,9 @@ public class Mark implements BaseModel {
         this.marIpPc = mark.getMarIpPc();
         this.marPerId = mark.getMarPerId();
         this.marRefCard = mark.getMarRefCard();
-        this.marState = mark.getMarState();
-        this.seat = mark.getSeat();
-        this.companyId = mark.getCompanyId();
+        //this.marState = mark.getMarState();
+        //this.seat = mark.getSeat();
+        //this.companyId = mark.getCompanyId();
         /*this.marInOut = mark.getMarInOut();*/
         this.marTime = mark.getMarTime();
         this.startMarDate = mark.getStartMarDate();
@@ -132,15 +135,15 @@ public class Mark implements BaseModel {
         this.marRefCard = marRefCard;
     }
 
-    public String getMarState() {
+    /*public String getMarState() {
         return marState;
     }
 
     public void setMarState(String marState) {
         this.marState = marState;
-    }
+    }*/
 
-    public String getSeat() {
+    /*public String getSeat() {
         return seat;
     }
 
@@ -154,7 +157,7 @@ public class Mark implements BaseModel {
 
     public void setCompanyId(Long companyId) {
         this.companyId = companyId;
-    }
+    }*/
 
     /*public String getMarInOut() {
         return marInOut;
@@ -203,4 +206,13 @@ public class Mark implements BaseModel {
     public void setMarkStateList(List<MarkState> markStateList) {
         this.markStateList = markStateList;
     }
+
+    public Integer getControl() {
+        return control;
+    }
+
+    public void setControl(Integer control) {
+        this.control = control;
+    }
+
 }

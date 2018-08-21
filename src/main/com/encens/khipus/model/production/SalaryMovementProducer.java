@@ -23,7 +23,7 @@ import java.util.Date;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "MOVIMIENTOSALARIOPRODUCTOR",
-        allocationSize = 10)
+        allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "MOVIMIENTOSALARIOPRODUCTOR", uniqueConstraints = @UniqueConstraint(columnNames = {"IDMOVIMIENTOSALARIOPRODUCTOR", "IDCOMPANIA"}))

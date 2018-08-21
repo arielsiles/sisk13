@@ -1293,7 +1293,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
             }
-            voucherService.create(voucher);
+            //voucherService.create(voucher);
+            voucherAccoutingService.saveVoucher(voucher);
 
             fixedAssetPayment.setTransactionNumber(voucher.getTransactionNumber());
             fixedAssetMovement.setTransactionNumber(voucher.getTransactionNumber());

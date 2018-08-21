@@ -22,7 +22,7 @@ import java.util.List;
 public class MarkDataModel extends QueryDataModel<Long, Mark> {
 
     private static final String[] RESTRICTIONS =
-            {"mark.marRefCard = #{markDataModel.criteria.marRefCard}",
+            {"mark.marPerId = #{markDataModel.criteria.marPerId}",
                     "mark.marDate >= #{markDataModel.criteria.startMarDate}",
                     "mark.marDate <= #{markDataModel.criteria.endMarDate}"};
 
@@ -37,8 +37,17 @@ public class MarkDataModel extends QueryDataModel<Long, Mark> {
                 " left join mark.markStateList markState" +
                 " left join markState.markStateHoraryBandStateList markStateHoraryBandState" +
                 " left join markStateHoraryBandState.horaryBandState horaryBandState" +
-                " where #{true}=#{not empty markDataModel.criteria.marRefCard}";
+                " where #{true}=#{not empty markDataModel.criteria.marPerId}";
     }
+
+    /*@Override
+    public String getEjbql() {
+        return "select new com.encens.khipus.model.employees.Mark(mark,horaryBandState.type) from Mark mark " +
+                " left join mark.markStateList markState" +
+                " left join markState.markStateHoraryBandStateList markStateHoraryBandState" +
+                " left join markStateHoraryBandState.horaryBandState horaryBandState" +
+                " where #{true}=#{not empty markDataModel.criteria.marPerId}";
+    }*/
 
     @Override
     public List<String> getRestrictions() {
