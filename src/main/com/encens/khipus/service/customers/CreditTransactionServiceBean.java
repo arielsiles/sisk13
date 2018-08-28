@@ -90,7 +90,7 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         creditTransaction.setInterest(BigDecimal.ZERO);
         creditTransaction.setAmount(credit.getAmount());
         creditTransaction.setGloss(gloss);
-        creditTransaction.setDate(new Date());
+        //creditTransaction.setDate(new Date());
         creditTransaction.setDays(0);
         creditTransaction.setCapitalBalance(credit.getAmount());
         creditTransaction.setCreditTransactionType(CreditTransactionType.EGR);

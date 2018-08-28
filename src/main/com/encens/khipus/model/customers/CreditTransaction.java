@@ -58,7 +58,7 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     @Column(name = "fechatransaccion", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date = new Date();
+    private Date date;
 
     @Column(name = "dias", nullable = true)
     private Integer days;

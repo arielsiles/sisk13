@@ -42,6 +42,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     @In(create = true)
     private CreditReportAction creditReportAction;
 
+    private Date dateTransaction = new Date();
+    private BigDecimal interestValue;
+
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
         return getInstance();
@@ -64,7 +67,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         try {
             //creditTransaction.setDate(new Date());
-            creditTransaction.setDate(creditTransaction.getDate());
+            creditTransaction.setDate(dateTransaction);
             creditTransaction.setDays(0);
             creditTransaction.setCapitalBalance(capitalBalance);
             creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
@@ -97,6 +100,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public String createCreditTransactionPayout(Credit credit){
 
         CreditTransaction creditTransaction = getInstance();
+        creditTransaction.setDate(dateTransaction);
         creditTransactionService.createCreditTransactionPayout(credit, creditTransaction);
         return  Outcome.SUCCESS;
     }
@@ -121,6 +125,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         setOp(OP_CREATE);
         //set a null v in the current instance to force a create the new instance.
         setInstance(null);
+
+        System.out.println(".....CALCULANDO INTERES.....: " + calculateInterest());
+
         return Outcome.SUCCESS;
     }
 
@@ -136,7 +143,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Credit credit = creditAction.getInstance();
         BigDecimal saldoCapital = credit.getCapitalBalance();
 
-        Date currentPaymentDate = getInstance().getDate();
+        System.out.println("--------------------------> Capital: " + getInstance().getCapital());
+        System.out.println("--------------------------> Interes: " + getInstance().getInterest());
+        System.out.println("--------------------------> Total  : " + getInstance().getAmount());
+
+        Date currentPaymentDate = dateTransaction;
         currentPaymentDate      = DateUtils.removeTime(currentPaymentDate);
         Date lastPaymentDate    = creditTransactionService.findLastPaymentForInterest(credit);
 
@@ -155,13 +166,19 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
 
+        this.interestValue = interest;
+
+        System.out.println("--------------------------> Capital: " + getInstance().getCapital());
+        System.out.println("--------------------------> Interes: " + getInstance().getInterest());
+        System.out.println("--------------------------> Total  : " + getInstance().getAmount());
+
         return interest;
     }
 
     public BigDecimal calculateSimpleCapital(Credit credit){
 
         Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
-        Date currentPaymentDate = getInstance().getDate();
+        Date currentPaymentDate = dateTransaction;
         BigDecimal totalPaidCapital = creditService.getTotalPaidCapital(credit); // Capital Total Pagado
         BigDecimal totalPayableCapital = BigDecimal.ZERO;   // Capital Total x Pagar
         BigDecimal totalBalancePayableCapital = BigDecimal.ZERO;   // Capital SALDO Total x Pagar
@@ -270,6 +287,30 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setAmount(totalAmount);
     }
 
+    public void calculateTotalCapital(){
+
+        //BigDecimal totalCapital = null;
+        if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
+            //totalCapital = BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6);
+            getInstance().setCapital(BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6));
+        }
+    }
+
+    public Date getDateTransaction() {
+        return dateTransaction;
+    }
+
+    public void setDateTransaction(Date dateTransaction) {
+        this.dateTransaction = dateTransaction;
+    }
+
+    public BigDecimal getInterestValue() {
+        return interestValue;
+    }
+
+    public void setInterestValue(BigDecimal interestValue) {
+        this.interestValue = interestValue;
+    }
 }
 
 

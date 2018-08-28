@@ -49,7 +49,7 @@
             <f:facet name="header">#{messages['CreditTransaction.newPayout']}</f:facet>
             <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
-                <rich:calendar value="#{creditTransaction.date}"
+                <rich:calendar value="#{creditTransactionAction.dateTransaction}"
                                popup="true"
                                required="true"
                                datePattern="#{messages['patterns.date']}"

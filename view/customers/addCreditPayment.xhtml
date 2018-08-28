@@ -50,7 +50,7 @@
             <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
                 <rich:calendar id="paymentDate"
-                               value="#{creditTransaction.date}"
+                               value="#{creditTransactionAction.dateTransaction}"
                                popup="true"
                                required="true"
                                datePattern="#{messages['patterns.date']}"
@@ -66,7 +66,7 @@
                                  action="#{creditTransactionAction.calculateInterest()}"
                                  tabindex="6">
                     <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
-                    <a4j:support event="onclick" reRender="capital, interest, amount"/>
+                    <a4j:support event="onclick" reRender="interestField, capitalField, amountField, interest, capital, amount"/>
                 </a4j:commandLink>
             </s:decorate>
 
@@ -95,13 +95,24 @@
                         </h:outputText>
                     </s:decorate>
 
-                    <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <!--<s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.interest']}</ui:define>
                         <h:outputText id="interest"
                                       value="#{creditTransactionAction.calculateInterest()}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
                         </h:outputText>
+                    </s:decorate>-->
+
+                    <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.interest']}</ui:define>
+                        <h:outputText id="interest"
+                                      value="#{creditTransaction.interest}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                        </h:outputText>
                     </s:decorate>
+
+
+
 
                     <s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.capital']}</ui:define>
@@ -110,9 +121,6 @@
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
                             <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField"/>
-                            <!--<app:keyUpEvent focus="capital"
-                                            reRender="amountField, capitalField"
-                                            action="#{creditTransactionAction.calculateTotalAmount()}"/>-->
                         </h:inputText>
                     </s:decorate>
 
@@ -121,10 +129,11 @@
                         <h:inputText id="amount"
                                      value="#{creditTransaction.amount}"
                                      styleClass="input"
-                                     readonly="true"
+                                     readonly="false"
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="amountField, capitalField"/>
                         </h:inputText>
                     </s:decorate>
                 </c:when>
