@@ -31,6 +31,7 @@ public class SessionUser implements Serializable, HttpSessionBindingListener {
     private Log log;
     private Long userId;
     private Integer rowsPerPage = 10; //default
+    private Integer rowsPerPage50 = 50; //default
     private Integer maxFilesQuantity = 10; //default
     private TimeZone timeZone = TimeZone.getTimeZone("GMT-4"); //default
     private Locale locale = new Locale("es");
@@ -118,5 +119,13 @@ public class SessionUser implements Serializable, HttpSessionBindingListener {
             Events.instance().raiseEvent("SessionUserLogAction.userAction", userId);
             log.debug("raised event: SessionUserLogAction.userAction");
         }
+    }
+
+    public Integer getRowsPerPage50() {
+        return rowsPerPage50;
+    }
+
+    public void setRowsPerPage50(Integer rowsPerPage50) {
+        this.rowsPerPage50 = rowsPerPage50;
     }
 }

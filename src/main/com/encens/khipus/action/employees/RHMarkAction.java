@@ -65,7 +65,7 @@ public class RHMarkAction extends GenericAction<RHMark> {
                 rhMark = createInstance();
                 return Outcome.REDISPLAY;
             }
-            rhMark.setCompany(new Company(Constants.defaultCompanyId, Constants.defaultCompanyName));
+            //rhMark.setCompany(new Company(Constants.defaultCompanyId, Constants.defaultCompanyName));
             rhMark.setSeat("1");
             rhMark.setMarRefCard((String)result.get(0)[0]);
             rhMark.setMarIpPc("10.0.0.200");//ip por defecto del servidor

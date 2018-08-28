@@ -4,6 +4,7 @@ import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
+import com.encens.khipus.model.employees.SalaryMovement;
 import org.hibernate.Session;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;

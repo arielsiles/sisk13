@@ -41,9 +41,10 @@ import java.util.List;
 )
 @Entity
 @Name("rhmark")
-@Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
+//@Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "rhmarcado")
+//@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "rhmarcado")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "vmarcado")
 public class RHMark implements BaseModel, Comparable {
 
     @Id
@@ -60,17 +61,17 @@ public class RHMark implements BaseModel, Comparable {
 
     @Column(name = "marfecha", nullable = false, updatable = false)
     @Temporal(TemporalType.DATE)
-    private Date marDate = new Date();
+    private Date marDate;
 
     @Transient
-    private Date startMarDate = new Date();
+    private Date startMarDate;
 
     @Transient
-    private Date endMarDate = new Date();
+    private Date endMarDate;
 
     @Column(name = "marhora", nullable = false, updatable = false)
     @Temporal(TemporalType.TIME)
-    private Date marTime = new Date();
+    private Date marTime;
 
     @Column(name = "marreftarjeta", nullable = false, length = 200)
     private String marRefCard;
@@ -84,13 +85,18 @@ public class RHMark implements BaseModel, Comparable {
     @Column(name = "control", nullable = true)
     private Integer control;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    /*@ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
-    private Company company;
+    private Company company;*/
 
     @Column(name = "descripcion", nullable = true)
     @Lob
     private String description;
+
+    @Column(name = "nombre", columnDefinition = "TEXT", nullable = true)
+    private String name;
+
+
 
     public Integer getControl() {
         return control;
@@ -117,7 +123,6 @@ public class RHMark implements BaseModel, Comparable {
     }
 
     public Date getMarDate() {
-        this.marDate = new Date();
         return  this.marDate;
     }
 
@@ -126,12 +131,6 @@ public class RHMark implements BaseModel, Comparable {
     }
 
     public Date getMarTime() {
-       /* Date date = new Date();
-        if (null == marTime) {
-            marTime = new Date();
-            return marTime;
-        }*/
-        this.marTime = new Date();
         return marTime;
     }
 
@@ -155,13 +154,13 @@ public class RHMark implements BaseModel, Comparable {
         this.marIpPc = marIpPc;
     }
 
-    public Company getCompany() {
+    /*public Company getCompany() {
         return company;
     }
 
     public void setCompany(Company company) {
         this.company = company;
-    }
+    }*/
 
     // makes this object comparable in order to sort any list of this kind
 
@@ -212,5 +211,13 @@ public class RHMark implements BaseModel, Comparable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

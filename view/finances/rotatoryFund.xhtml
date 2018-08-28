@@ -405,12 +405,18 @@
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
         <ui:define name="label">#{messages['RotatoryFund.includePayment']}</ui:define>
-        <h:selectBooleanCheckbox id="includePayment"
+        <!--<h:selectBooleanCheckbox id="includePayment"
                                  value="#{rotatoryFundAction.includePayment}"
                                  valueChangeListener="#{rotatoryFundAction.changeIncludePayment}"
                                  readonly="#{rotatoryFundAction.limitedToOtherReceivables}"
                                  tabindex="19">
             <a4j:support event="onclick" ajaxSingle="true" reRender="includePaymentDiv,includePaymentFieldSetDiv"/>
+        </h:selectBooleanCheckbox>-->
+        <h:selectBooleanCheckbox id="includePayment"
+                                 value="#{rotatoryFundAction.includePayment}"
+                                 readonly="#{rotatoryFundAction.limitedToOtherReceivables}"
+                                 tabindex="19">
+            <a4j:support event="onclick" ajaxSingle="true" reRender="includePaymentFieldSetDiv"/>
         </h:selectBooleanCheckbox>
     </s:decorate>
 </s:div>

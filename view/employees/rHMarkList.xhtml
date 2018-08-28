@@ -27,14 +27,22 @@
                                  styleClass="input"/>
                 </s:decorate>
 
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RHMark.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{rHMarkDataModel.criteria.name}"
+                                 tabindex="2"
+                                 styleClass="input"/>
+                </s:decorate>
+
                 <s:decorate id="marDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['RHMark.marDate']}</ui:define>
                     <rich:calendar id="marDate"
-                                   value="#{rHMarkDataModel.criteria.marDate}"
+                                   value="#{rHMarkDataModel.marDate}"
                                    styleClass="input"
                                    enableManualInput="true"
                                    popup="true"
-                                   tabindex="2"
+                                   tabindex="3"
                                    datePattern="#{messages['patterns.date']}">
                         <a4j:support event="oninputchange" reRender="marDateField"/>
                     </rich:calendar>
@@ -43,12 +51,12 @@
                                        styleClass="button"
                                        value="#{messages['Common.search']}"
                                        id="searchButtonId"
-                                       tabindex="3">
+                                       tabindex="4">
                         <s:defaultAction/>
                     </a4j:commandButton>
                 </s:decorate>
 
-                <rich:jQuery selector="#marRefCard" query="focus()" timing="onload"/>
+                <rich:jQuery selector="#nameField" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 
             <rich:spacer height="15px"/>
@@ -56,24 +64,28 @@
             <rich:dataTable id="rHMarkList"
                             value="#{rHMarkDataModel}"
                             var="rHMarkItem"
-                            rows="#{sessionUser.rowsPerPage}"
+                            rows="#{sessionUser.rowsPerPage50}"
                             width="100%"
-                            columnsWidth="20%, 25%, 20%, 20%, 15%">
+                            columnsWidth="15%, 30%, 15%, 15%, 15%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="rHMark.marRefCard"
-                                                   dataModel="#{rHMarkDataModel}"
-                                                   reRender="rHMarkList, dataScroller">
-                                #{messages['RHMark.marRefCard']}
-                            </app:commandSortHeader>
-                        </rich:column>
-
                         <rich:column>
                             <app:commandSortHeader sortProperty="rHMark.marDate"
                                                    dataModel="#{rHMarkDataModel}"
                                                    reRender="rHMarkList, dataScroller">
                                 #{messages['RHMark.marDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            #{messages['RHMark.name']}
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rHMark.marRefCard"
+                                                   dataModel="#{rHMarkDataModel}"
+                                                   reRender="rHMarkList, dataScroller">
+                                #{messages['RHMark.marRefCard']}
                             </app:commandSortHeader>
                         </rich:column>
 
@@ -86,27 +98,28 @@
                         </rich:column>
 
                         <rich:column>
-                            <app:commandSortHeader sortProperty="rHMark.marIpPc"
-                                                   dataModel="#{rHMarkDataModel}"
-                                                   reRender="rHMarkList, dataScroller">
-                                #{messages['RHMark.marIpPc']}
-                            </app:commandSortHeader>
+                            #{messages['RHMark.control']}
                         </rich:column>
 
-                        <rich:column styleClass="center">
-                            #{messages['Common.action']}
+                        <rich:column>
+                                #{messages['RHMark.marIpPc']}
                         </rich:column>
+
                     </rich:columnGroup>
                 </f:facet>
-
-                <rich:column>
-                    <h:outputText value="#{rHMarkItem.marRefCard}"/>
-                </rich:column>
 
                 <rich:column>
                     <h:outputText value="#{rHMarkItem.marDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}"/>
                     </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{rHMarkItem.marRefCard}"/>
                 </rich:column>
 
                 <rich:column>
@@ -117,17 +130,16 @@
                 </rich:column>
 
                 <rich:column>
+                    <h:panelGroup rendered="#{not empty rHMarkItem.control and markItem.control != 0}">
+                        <h:graphicImage value="/img/employees/#{rHMarkItem.control==1?'in':'out'}.gif"/>
+                        <h:outputText value="#{messages[rHMarkItem.control==1?'RHMark.in':'RHMark.out']}"/>
+                    </h:panelGroup>
+                </rich:column>
+
+                <rich:column>
                     <h:outputText value="#{rHMarkItem.marIpPc}"/>
                 </rich:column>
 
-                <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
-                                   action="#{rHMarkAction.select(rHMarkItem)}"
-                                   immediate="true"
-                                   rendered="#{s:hasPermission('RHMARK','VIEW')}">
-                        <s:conversationPropagation value="none"/>
-                    </h:commandLink>
-                </rich:column>
             </rich:dataTable>
 
             <app:dataScroller id="dataScroller" for="rHMarkList" dataModel="#{rHMarkDataModel}"/>

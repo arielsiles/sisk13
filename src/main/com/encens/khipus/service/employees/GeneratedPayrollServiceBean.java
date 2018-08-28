@@ -166,7 +166,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             if (payrollGenerationType.equals(PayrollGenerationType.GENERATION_BY_TIME)) {
                 genericPayrollList = getGeneralPayrollList(generatedPayroll4Operations);
             }
-            salaryMovementService.matchGeneratedSalaryMovement(generatedPayroll4Operations, genericPayrollList);
+            /** 23/08/2018 Planilla OFICIAL, comentado para obiar error **/
+            //salaryMovementService.matchGeneratedSalaryMovement(generatedPayroll4Operations, genericPayrollList);
         }
         /* any to outdated*/
         if (!dataBaseGeneratedPayrollType.equals(GeneratedPayrollType.OUTDATED) &&
@@ -1138,6 +1139,19 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.OTHER_INCOME) && !activeForTaxPayrollGeneration) {
                         totalOtherIncomes += amount;
                     }
+
+                    //if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.OTHER_DISCOUNT) && !activeForTaxPayrollGeneration) {
+                    if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.OTHER_DISCOUNT)) {
+                        totalOtherDiscount += amount;
+                    }
+
+                    //if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.WIN) && !activeForTaxPayrollGeneration) {
+                    if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.WIN)) {
+                        totalWinDiscount += amount;
+                    }
+
+
+
                 }
                 // round to 2 decimal points
                 perMinuteDiscount = BigDecimalUtil.toBigDecimal(perMinuteDiscount).doubleValue();
@@ -1223,6 +1237,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
 
                 /*TODO the process of collections have to be changed to take into account many contracts by employee*/
+                /*TODO FONDOS ROTARIOS*/
                 /*------since here loan and advance discount-------*/
                 BigDecimal liquid = BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva + totalSumOfIncomesOutOfIva - totalSumOfDiscounts);
                 if (liquid.doubleValue() >= 0) {

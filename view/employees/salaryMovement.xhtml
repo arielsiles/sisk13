@@ -104,7 +104,7 @@
                              required="true"
                              textValue="#{salaryMovement.employee.fullName}"
                              value="#{salaryMovement.employee}"
-                             dataModel="#{employeeContractDataModel}"
+                             dataModel="#{generalEmployeeDataModel}"
                              clearAction="salaryMovementAction.clearEmployee()"
                              searchModalPanel="employeeContractListModalPanel"
                              reRender="employeeField"
@@ -233,7 +233,8 @@
             template="/employees/generalEmployeeListModalPanel.xhtml"
             rendered="#{not salaryMovementAction.managed}">
     <ui:param name="dialogId" value="employeeContractListModalPanel"/>
-    <ui:param name="dataModel" value="#{employeeContractDataModel}"/>
+    <!--<ui:param name="dataModel" value="#{employeeContractDataModel}"/>-->
+    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton"
                            action="#{salaryMovementAction.assingEmployee(employeeItem)}"

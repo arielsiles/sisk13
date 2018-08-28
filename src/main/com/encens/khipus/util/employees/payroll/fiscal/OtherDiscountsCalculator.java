@@ -13,13 +13,24 @@ import java.math.BigDecimal;
 public class OtherDiscountsCalculator extends Calculator<CategoryFiscalPayroll> {
 
     @Override
-    public void execute(CategoryFiscalPayroll instance) {
+    /*public void execute(CategoryFiscalPayroll instance) {
         BigDecimal result = BigDecimalUtil.sum(
                 instance.getAbsenceMinutesDiscount(),
                 instance.getTardinessMinutesDiscount(),
                 instance.getLoanDiscount(),
                 instance.getAdvanceDiscount(),
                 instance.getWinDiscount(),
+                instance.getOtherSalaryMovementDiscount()
+        );
+        instance.setOtherDiscount(result);
+    }*/
+    public void execute(CategoryFiscalPayroll instance) {
+        BigDecimal result = BigDecimalUtil.sum(
+                //instance.getAbsenceMinutesDiscount(),
+                //instance.getTardinessMinutesDiscount(),
+                //instance.getLoanDiscount(),
+                //instance.getAdvanceDiscount(),
+                //instance.getWinDiscount(),
                 instance.getOtherSalaryMovementDiscount()
         );
         instance.setOtherDiscount(result);

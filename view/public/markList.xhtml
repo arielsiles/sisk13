@@ -2,6 +2,7 @@
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
@@ -80,9 +81,6 @@
                         <rich:column>
                             #{messages['RHMark.marIpPc']}
                         </rich:column>
-                        <!--<rich:column>
-                            #{messages['RHMark.control']}
-                        </rich:column>-->
                         <rich:column>
                             #{messages['RHMark.control']}
                         </rich:column>
@@ -104,19 +102,13 @@
                 <rich:column>
                     <h:outputText value="#{markItem.marIpPc}"/>
                 </rich:column>
+
                 <rich:column>
-                    <h:outputText value="#{markItem.control}"/>
-                </rich:column>
-                <!--<rich:column>
-                    <h:panelGroup rendered="#{not empty markItem.control}">
-                        <h:graphicImage value="/img/employees/#{markItem.marInOut=='1'?'in':'out'}.gif"/>
-                        <h:outputText value="#{messages[markItem.marInOut=='1'?'RHMark.in':'RHMark.out']}"/>
+                    <h:panelGroup rendered="#{not empty markItem.control and markItem.control != 0}">
+                        <h:graphicImage value="/img/employees/#{markItem.control==1?'in':'out'}.gif"/>
+                        <h:outputText value="#{messages[markItem.control==1?'RHMark.in':'RHMark.out']}"/>
                     </h:panelGroup>
-                </rich:column>-->
-                <!--<rich:column>
-                    <h:outputText value="#{messages[markItem.horaryBandStateType.resourceKey]}"
-                                  rendered="#{not empty markItem.horaryBandStateType}"/>
-                </rich:column>-->
+                </rich:column>
             </rich:dataTable>
 
             <app:dataScroller id="dataScroller" for="markList" dataModel="#{markDataModel}"/>

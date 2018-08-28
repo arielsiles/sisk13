@@ -548,7 +548,7 @@ public class MarkProcessorServiceBean extends CustomQuartzProcessorServiceBean i
         } else {
             markState.setIdentified(false);
         }
-        markState.setCompany(mark.getCompany());
+        //markState.setCompany(mark.getCompany());
         try {
             getEntityManager().persist(markState);
             getEntityManager().flush();

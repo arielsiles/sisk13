@@ -84,6 +84,7 @@ public class Mark implements BaseModel {
         this.marIpPc = mark.getMarIpPc();
         this.marPerId = mark.getMarPerId();
         this.marRefCard = mark.getMarRefCard();
+        this.control = mark.getControl();
         //this.marState = mark.getMarState();
         //this.seat = mark.getSeat();
         //this.companyId = mark.getCompanyId();

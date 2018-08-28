@@ -9,6 +9,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,22 +23,24 @@ import java.util.List;
 @Restrict("#{s:hasPermission('RHMARK','VIEW')}")
 public class RHMarkDataModel extends QueryDataModel<Long, RHMark> {
 
-    private RHMark criteria;
+//    private RHMark criteria;
+
+    private Date marDate = new Date();
 
     private static final String[] RESTRICTIONS = {
             "rHMark.marRefCard like concat(#{rHMarkDataModel.criteria.marRefCard}, '%')",
-            "rHMark.marDate = #{rHMarkDataModel.criteria.marDate}"};
+            "lower(rHMark.name) like concat(lower(#{rHMarkDataModel.criteria.name}), '%')",
+            "rHMark.marDate = #{rHMarkDataModel.marDate}"};
 
     @Create
     public void init() {
-        sortProperty = "rHMark.marRefCard";
-        criteria = new RHMark();
-        criteria.setMarDate(null);
+        sortProperty = "rHMark.marDate, rHMark.marTime";
+        sortAsc = false;
     }
 
     @Override
     public String getEjbql() {
-        return "select rHMark from RegisterMarkAction rHMark";
+        return "select rHMark from RHMark rHMark";
     }
 
     @Override
@@ -45,7 +48,15 @@ public class RHMarkDataModel extends QueryDataModel<Long, RHMark> {
         return Arrays.asList(RESTRICTIONS);
     }
 
-    @Override
+    public Date getMarDate() {
+        return marDate;
+    }
+
+    public void setMarDate(Date marDate) {
+        this.marDate = marDate;
+    }
+
+    /*@Override
     public void setCriteria(RHMark criteria) {
         this.criteria = criteria;
     }
@@ -53,5 +64,5 @@ public class RHMarkDataModel extends QueryDataModel<Long, RHMark> {
     @Override
     public RHMark getCriteria() {
         return this.criteria;
-    }
+    }*/
 }

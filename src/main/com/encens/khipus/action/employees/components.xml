@@ -305,9 +305,9 @@
     <factory name="salaryMovementTypeByAccessRightList" value="#{salaryMovementTypeListByAccessRightQuery}"/>
     <framework:entity-query name="salaryMovementTypeListByAccessRightQuery"
                             ejbql="select smt from SalaryMovementType smt">
-        <framework:restrictions>
+        <!--<framework:restrictions>
             <value>smt.movementType in (#{salaryMovementAction.salaryMovementTypeByAccessRight})</value>
-        </framework:restrictions>
+        </framework:restrictions>-->
         <framework:order>smt.name asc</framework:order>
     </framework:entity-query>
 
