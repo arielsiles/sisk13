@@ -43,7 +43,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private CreditReportAction creditReportAction;
 
     private Date dateTransaction = new Date();
+
     private BigDecimal interestValue;
+    private BigDecimal capitalValue;
+    private BigDecimal totalAmountValue;
+
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
@@ -143,10 +147,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Credit credit = creditAction.getInstance();
         BigDecimal saldoCapital = credit.getCapitalBalance();
 
-        System.out.println("--------------------------> Capital: " + getInstance().getCapital());
-        System.out.println("--------------------------> Interes: " + getInstance().getInterest());
-        System.out.println("--------------------------> Total  : " + getInstance().getAmount());
-
         Date currentPaymentDate = dateTransaction;
         currentPaymentDate      = DateUtils.removeTime(currentPaymentDate);
         Date lastPaymentDate    = creditTransactionService.findLastPaymentForInterest(credit);
@@ -167,10 +167,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setAmount(totalPayment);
 
         this.interestValue = interest;
+        this.capitalValue = currentCapital;
+        this.totalAmountValue = totalPayment;
 
-        System.out.println("--------------------------> Capital: " + getInstance().getCapital());
-        System.out.println("--------------------------> Interes: " + getInstance().getInterest());
-        System.out.println("--------------------------> Total  : " + getInstance().getAmount());
+        System.out.println("--------------------------> Capital: " + capitalValue);
+        System.out.println("--------------------------> Interes: " + interestValue);
+        System.out.println("--------------------------> Total  : " + totalAmountValue);
 
         return interest;
     }
@@ -282,9 +284,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public void calculateTotalAmount() {
         BigDecimal totalAmount = null;
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
-            totalAmount = BigDecimalUtil.sum(getInstance().getCapital(), getInstance().getInterest(), 6);
+            totalAmount = BigDecimalUtil.sum(capitalValue, interestValue, 6);
         }
-        getInstance().setAmount(totalAmount);
+        //getInstance().setAmount(totalAmount);
+        setTotalAmountValue(totalAmount);
     }
 
     public void calculateTotalCapital(){
@@ -292,8 +295,24 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         //BigDecimal totalCapital = null;
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             //totalCapital = BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6);
-            getInstance().setCapital(BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6));
+            //getInstance().setCapital(BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6));
+            setCapitalValue(BigDecimalUtil.subtract(totalAmountValue, interestValue, 6));
+
         }
+    }
+
+    public void recalculate(){
+
+        if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
+
+            BigDecimal diff = BigDecimalUtil.subtract(getInstance().getInterest(), interestValue);
+            setCapitalValue(BigDecimalUtil.sum(capitalValue, diff, 6));
+            setTotalAmountValue(BigDecimalUtil.sum(interestValue, capitalValue, 6));
+
+            getInstance().setInterest(interestValue);
+
+        }
+
     }
 
     public Date getDateTransaction() {
@@ -310,6 +329,22 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void setInterestValue(BigDecimal interestValue) {
         this.interestValue = interestValue;
+    }
+
+    public BigDecimal getCapitalValue() {
+        return capitalValue;
+    }
+
+    public void setCapitalValue(BigDecimal capitalValue) {
+        this.capitalValue = capitalValue;
+    }
+
+    public BigDecimal getTotalAmountValue() {
+        return totalAmountValue;
+    }
+
+    public void setTotalAmountValue(BigDecimal totalAmountValue) {
+        this.totalAmountValue = totalAmountValue;
     }
 }
 
