@@ -18,7 +18,7 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="bodyWidth" value="90%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
 
@@ -45,13 +45,13 @@
                                  rendered="#{!creditAction.managed and s:hasPermission('CREDIT','CREATE')}">
                 </h:commandButton>
 
-                <h:commandButton id="updateButtonId"
+                <!--<h:commandButton id="updateButtonId"
                                  action="#{creditAction.update}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
                                  rendered="#{creditAction.managed}">
                     <s:defaultAction/>
-                </h:commandButton>
+                </h:commandButton>-->
 
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
@@ -96,6 +96,13 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="previousCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.previousCode']}</ui:define>
+                    <h:inputText id="previousCode" value="#{credit.previousCode}" required="true"
+                                 maxlength="15" tabindex="2" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
                 <!--<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
                     <h:inputText id="bankNumber" value="#{credit.code}" styleClass="input"
@@ -117,14 +124,6 @@
                     <ui:define name="label">#{messages['Credit.annualRate']}</ui:define>
                     <h:inputText id="annualRate" value="#{credit.annualRate}" styleClass="input"
                                  required="true" tabindex="4">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:inputText>
-                </s:decorate>
-
-                <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.term']}</ui:define>
-                    <h:inputText id="term" value="#{credit.term}" styleClass="input"
-                                 required="true" tabindex="5">
                         <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
                     </h:inputText>
                 </s:decorate>
@@ -163,6 +162,16 @@
                     </rich:calendar>
                 </s:decorate>
 
+                <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.term']}</ui:define>
+                    <h:inputText id="term" value="#{credit.term}" styleClass="input"
+                                 required="true" tabindex="5">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <a4j:support event="onchange" action="#{creditAction.calculateQuota()}" reRender="quotaField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <c:if test="#{creditAction.managed}">
                 <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.quota']}</ui:define>
                     <h:inputText id="quota" value="#{credit.quota}"
@@ -173,6 +182,21 @@
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
                     </h:inputText>
                 </s:decorate>
+                </c:if>
+
+                <c:if test="#{!creditAction.managed}">
+                    <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                        <h:inputText id="quota" value="#{creditAction.quotaValue}"
+                                     styleClass="input"
+                                     required="true"
+                                     maxlength="20"
+                                     tabindex="9">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
+                        </h:inputText>
+                    </s:decorate>
+                </c:if>
+
                 <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.creditStatus']}</ui:define>
                     <h:outputText value="#{messages[credit.state.resourceKey]}"/>
@@ -197,18 +221,29 @@
                                     var="creditTransactionItem"
                                     rows="#{sessionUser.rowsPerPage}"
                                     width="100%"
-                                    columnsWidth="20%, 20%, 50%, 10%">
+                                    > <!--columnsWidth="10%, 15%, 15% 15%, 35%"-->
                         <f:facet name="header">
                             <rich:columnGroup>
                                 <rich:column>
                                     <h:outputText value="#{messages['CreditTransaction.paymentDate']}"/>
                                 </rich:column>
+
+                                <rich:column>
+                                    <h:outputText value="#{messages['CreditTransaction.capital']}"/>
+                                </rich:column>
+
+                                <rich:column>
+                                    <h:outputText value="#{messages['CreditTransaction.interest']}"/>
+                                </rich:column>
+
                                 <rich:column>
                                     <h:outputText value="#{messages['CreditTransaction.amount']}"/>
                                 </rich:column>
+
                                 <rich:column>
                                     <h:outputText value="#{messages['CreditTransaction.gloss']}"/>
                                 </rich:column>
+
                                 <rich:column styleClass="center">
                                     <h:outputText value="#{messages['Common.action']}"/>
                                 </rich:column>
@@ -222,11 +257,25 @@
                                                    type="date"/>
                             </h:outputText>
                         </rich:column>
+
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{creditTransactionItem.capital}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{creditTransactionItem.interest}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+
                         <rich:column styleClass="right">
                             <h:outputText value="#{creditTransactionItem.amount}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                         </rich:column>
+
                         <rich:column>
                             <h:outputText value="#{creditTransactionItem.gloss}"/>
                         </rich:column>

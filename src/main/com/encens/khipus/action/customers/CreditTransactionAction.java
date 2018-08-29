@@ -67,13 +67,18 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public String create(Credit creditItem) {
         CreditTransaction creditTransaction = getInstance();
         BigDecimal capitalBalance = creditItem.getCapitalBalance();
-        capitalBalance = BigDecimalUtil.subtract(capitalBalance, getInstance().getCapital(), 6);
+        capitalBalance = BigDecimalUtil.subtract(capitalBalance, capitalValue, 6);
 
         try {
             //creditTransaction.setDate(new Date());
             creditTransaction.setDate(dateTransaction);
             creditTransaction.setDays(0);
             creditTransaction.setCapitalBalance(capitalBalance);
+
+            creditTransaction.setInterest(interestValue);
+            creditTransaction.setCapital(capitalValue);
+            creditTransaction.setAmount(totalAmountValue);
+
             creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
             creditTransaction.setCredit(creditItem);
 
@@ -94,10 +99,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     public  void cleanValues(){
-        getInstance().setCapital(BigDecimal.ZERO);
-        getInstance().setAmount(BigDecimal.ZERO);
-        getInstance().setDate(null);
-        getInstance().setInterest(BigDecimal.ZERO);
+        setInterestValue(BigDecimal.ZERO);
+        setCapitalValue(BigDecimal.ZERO);
+        setTotalAmountValue(BigDecimal.ZERO);
+        setDateTransaction(null);
     }
 
     @End(beforeRedirect = true)
@@ -160,8 +165,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         //BigDecimal fullPayment = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
 
         getInstance().setInterest(interest);
-        //BigDecimal currentCapital = calculateCapital(credit);
-        BigDecimal currentCapital = calculateSimpleCapital(credit);
+        BigDecimal currentCapital = calculateCapital(credit);
+        //BigDecimal currentCapital = calculateSimpleCapital(credit); // errore al calcular capital
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
@@ -301,17 +306,16 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         }
     }
 
-    public void recalculate(){
+    public void adjustCents(){
 
-        if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
+        BigDecimal diff = BigDecimalUtil.subtract(totalAmountValue, BigDecimalUtil.toBigDecimal(totalAmountValue.intValue()), 6 );
 
-            BigDecimal diff = BigDecimalUtil.subtract(getInstance().getInterest(), interestValue);
-            setCapitalValue(BigDecimalUtil.sum(capitalValue, diff, 6));
-            setTotalAmountValue(BigDecimalUtil.sum(interestValue, capitalValue, 6));
+        if (diff.doubleValue() >= 0.5)
+            interestValue = BigDecimalUtil.sum(interestValue, diff, 6);
+        else
+            interestValue = BigDecimalUtil.subtract(interestValue, diff, 6);
 
-            getInstance().setInterest(interestValue);
-
-        }
+        totalAmountValue = BigDecimalUtil.subtract(totalAmountValue, diff, 6);
 
     }
 

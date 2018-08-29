@@ -110,7 +110,7 @@
                                      value="#{creditTransactionAction.interestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.recalculate()}" reRender="interestField, amountField, capitalField"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, amountField, capitalField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -161,6 +161,13 @@
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
                             <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, amountField, capitalField"/>
                         </h:inputText>
+                        <a4j:commandLink id="adjustCents" ajaxSingle="true" immediate="true"
+                                         tabindex="5"
+                                         title="#{messages['CreditTransaction.adjustCents']}"
+                                         action="#{creditTransactionAction.adjustCents()}"
+                                         reRender="interestField, amountField">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
                     </s:decorate>
 
                 </c:when>

@@ -50,6 +50,10 @@ public class Credit implements BaseModel {
     @Length(max = 25)
     private String code;
 
+    @Column(name = "codigoant", nullable = false, length = 15)
+    @Length(max = 15)
+    private String previousCode;
+
     @Column(name = "importe", precision = 13, scale = 2, nullable = false)
     private BigDecimal amount;
 
@@ -235,5 +239,13 @@ public class Credit implements BaseModel {
 
     public void setDelivered(Boolean delivered) {
         this.delivered = delivered;
+    }
+
+    public String getPreviousCode() {
+        return previousCode;
+    }
+
+    public void setPreviousCode(String previousCode) {
+        this.previousCode = previousCode;
     }
 }

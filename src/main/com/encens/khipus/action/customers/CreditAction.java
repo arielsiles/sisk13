@@ -40,12 +40,13 @@ public class CreditAction extends GenericAction<Credit> {
     private CreditTransactionAction creditTransactionAction;
 
     private BigDecimal totalPayment;
-
+    private BigDecimal quotaValue;
     private Date paymentDate = new Date();
 
     @Factory(value = "credit", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('CREDIT','VIEW')}")
     public Credit initCredit() {
+        quotaValue = BigDecimal.ZERO;
         return getInstance();
     }
 
@@ -66,6 +67,7 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setCode(creditNumber);
         getInstance().setState(CreditState.VIG);
         getInstance().setCapitalBalance(instance.getAmount());
+        getInstance().setQuota(quotaValue);
         super.create();
         sequenceGeneratorService.nextCreditNumber(getInstance().getPartner().getId());
         return Outcome.SUCCESS;
@@ -97,6 +99,15 @@ public class CreditAction extends GenericAction<Credit> {
 
     }
 
+    public void calculateQuota(){
+        Credit credit = getInstance();
+        quotaValue = BigDecimal.ZERO;
+
+        if (credit.getTerm() != 0)
+            quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getTerm()), 2);
+
+    }
+
     public Date getPaymentDate() {
         return paymentDate;
     }
@@ -111,5 +122,13 @@ public class CreditAction extends GenericAction<Credit> {
 
     public void setTotalPayment(BigDecimal totalPayment) {
         this.totalPayment = totalPayment;
+    }
+
+    public BigDecimal getQuotaValue() {
+        return quotaValue;
+    }
+
+    public void setQuotaValue(BigDecimal quotaValue) {
+        this.quotaValue = quotaValue;
     }
 }

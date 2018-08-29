@@ -115,6 +115,13 @@ public class CreditReportAction extends GenericReportAction {
             }
             BigDecimal totalCuota = BigDecimalUtil.sum(paymentQuota, interes, 6);
             System.out.println(q + "\t\t" + sdf.format(fechaUltimoPago) + "\t\t" + fecha + "\t\t" + dias + "\t\t" + paymentQuota + "\t\t" + interes + "\t\t" + totalCuota + "\t\t" + saldoCapital);
+
+
+            BigDecimal totalCuotaValue = BigDecimalUtil.toBigDecimal(Math.round(totalCuota.doubleValue()));
+            BigDecimal diff = BigDecimalUtil.subtract(totalCuotaValue, totalCuota , 6 );
+            interes = BigDecimalUtil.sum(interes, diff, 6);
+            totalCuota = totalCuotaValue;
+
             PaymentPlanData paymentPlanData = new PaymentPlanData(q, saldoCapital, paymentQuota, interes, totalCuota, fecha);
             beanCollection.add(paymentPlanData);
 

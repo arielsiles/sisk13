@@ -35,6 +35,9 @@ public class Partner extends Person {
     @Column(name = "nosocio", length = 100)
     private String number;
 
+    @Column(name = "nsocio", length = 10)
+    private String nPartner;
+
     @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private PartnerState state;
@@ -179,5 +182,13 @@ public class Partner extends Person {
 
     public void setNumberCredit(Integer numberCredit) {
         this.numberCredit = numberCredit;
+    }
+
+    public String getnPartner() {
+        return nPartner;
+    }
+
+    public void setnPartner(String nPartner) {
+        this.nPartner = nPartner;
     }
 }

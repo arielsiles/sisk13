@@ -75,7 +75,7 @@
     <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
         <h:inputText id="productiveZone" styleClass="input" value="#{partner.productiveZone.fullName}"
-                     readonly="true" required="true">
+                     readonly="true" required="true" tabindex="1">
         </h:inputText>
         <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
                          title="#{messages['RawMaterialProducer.selectProductiveZone']}"
@@ -93,7 +93,7 @@
                      required="true"
                      maxlength="100"
                      styleClass="input"
-                     tabindex="5">
+                     tabindex="2">
             <app:naturalNumberConverter forId="idNumber"/>
         </h:inputText>
     </s:decorate>
@@ -105,7 +105,7 @@
                              value="#{partner.documentType}"
                              styleClass="input"
                              required="true"
-                             tabindex="6">
+                             tabindex="3">
                 <s:selectItems value="#{personDocumentTypeList}" var="documentType"
                                label="#{documentType.name}"
                                noSelectionLabel=""
@@ -125,7 +125,7 @@
                              value="#{partner.extensionSite}"
                              styleClass="input"
                              required="false"
-                             tabindex="7">
+                             tabindex="4">
                 <s:selectItems value="#{extensionList}"
                                var="extension"
                                label="#{extension.extension}"
@@ -155,7 +155,7 @@
 
     <s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['City.country']}</ui:define>
-        <h:selectOneMenu id="country" value="#{partner.country}" styleClass="input" tabindex="1">
+        <h:selectOneMenu id="country" value="#{partner.country}" styleClass="input" tabindex="5">
             <s:selectItems value="#{countryList.resultList}" var="country" label="#{country.name}"
                            noSelectionLabel=""
                            hideNoSelectionLabel="false"/>
@@ -167,7 +167,7 @@
     <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['City.department']}</ui:define>
         <h:selectOneMenu id="department" value="#{partner.department}" styleClass="input" required="true"
-                         tabindex="2">
+                         tabindex="6">
             <s:selectItems value="#{departmentList.resultList}" var="department" label="#{department.name}"
                            noSelectionLabel="" hideNoSelectionLabel="false"/>
             <s:convertEntity/>
@@ -181,7 +181,7 @@
                        datePattern="#{messages['patterns.date']}"
                        styleClass="input"
                        enableManualInput="true"
-                       tabindex="9">
+                       tabindex="7">
             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
                                type="date"/>
         </rich:calendar>
@@ -189,13 +189,13 @@
 
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.phone']}</ui:define>
-        <h:inputText id="phone" value="#{partner.phone}" maxlength="20" tabindex="14" styleClass="input">
+        <h:inputText id="phone" value="#{partner.phone}" maxlength="20" tabindex="8" styleClass="input">
         </h:inputText>
     </s:decorate>
 
     <s:decorate id="cellphoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.cellphone']}</ui:define>
-        <h:inputText id="cellphone" value="#{partner.cellphone}" maxlength="20" tabindex="14" styleClass="input">
+        <h:inputText id="cellphone" value="#{partner.cellphone}" maxlength="20" tabindex="9" styleClass="input">
         </h:inputText>
     </s:decorate>
 
@@ -204,7 +204,7 @@
         <h:inputTextarea id="homeAddress"
                          value="#{partner.homeAddress}"
                          styleClass="textarea"
-                         tabindex="15"
+                         tabindex="10"
                          style="width:200px;height:40px;"/>
     </s:decorate>
 
@@ -212,22 +212,28 @@
 
 <s:div>
 
+    <s:decorate id="nPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Partner.nPartner']}</ui:define>
+        <h:inputText id="nPartner" value="#{partner.nPartner}" required="true"
+                     maxlength="200" tabindex="11" styleClass="input">
+        </h:inputText>
+    </s:decorate>
     <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
         <h:inputText id="firstName" value="#{partner.firstName}" required="true"
-                     maxlength="200" tabindex="11" styleClass="input">
+                     maxlength="200" tabindex="12" styleClass="input">
         </h:inputText>
     </s:decorate>
     <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
         <h:inputText id="lastName" value="#{partner.lastName}" required="true"
-                     maxlength="80" tabindex="12" styleClass="input">
+                     maxlength="80" tabindex="13" styleClass="input">
         </h:inputText>
     </s:decorate>
     <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
         <h:inputText id="maidenName" value="#{partner.maidenName}" required="true"
-                     maxlength="200" tabindex="13" styleClass="input">
+                     maxlength="200" tabindex="14" styleClass="input">
         </h:inputText>
     </s:decorate>
     <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -252,7 +258,7 @@
                          value="#{partner.maritalStatus}"
                          styleClass="input"
                          required="true"
-                         tabindex="15">
+                         tabindex="16">
             <s:selectItems value="#{maritalStatusList.resultList}" var="maritalStatus"
                            label="#{maritalStatus.name}"
                            noSelectionLabel=""
@@ -264,14 +270,14 @@
     <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.profession']}</ui:define>
         <h:inputText id="maidenName" value="#{partner.profession}"
-                     maxlength="200" tabindex="14" styleClass="input">
+                     maxlength="200" tabindex="17" styleClass="input">
         </h:inputText>
     </s:decorate>
 
     <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Partner.salutation']}</ui:define>
         <h:selectOneMenu id="salutation" value="#{partner.salutation}" styleClass="input"
-                         required="true" tabindex="15">
+                         required="true" tabindex="18">
             <s:selectItems value="#{salutationList.resultList}" var="salutation"
                            label="#{salutation.name}"
                            noSelectionLabel=""
@@ -286,7 +292,7 @@
                      value="#{partner.numberChildren}"
                      required="true"
                      styleClass="inputNumberSmall"
-                     tabindex="5">
+                     tabindex="19">
             <app:naturalNumberConverter forId="numberChildren"/>
         </h:inputText>
     </s:decorate>
@@ -296,7 +302,7 @@
                      value="#{partner.numberCredit}"
                      required="true"
                      styleClass="inputNumberSmall"
-                     tabindex="5">
+                     tabindex="20">
             <app:naturalNumberConverter forId="numberCredits"/>
         </h:inputText>
     </s:decorate>
@@ -310,19 +316,19 @@
     <s:div>
         <s:decorate id="spouseField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Partner.spouse']}</ui:define>
-            <h:inputText id="spouse" value="#{partner.spouse}" maxlength="100" tabindex="14" styleClass="input">
+            <h:inputText id="spouse" value="#{partner.spouse}" maxlength="100" tabindex="21" styleClass="input">
             </h:inputText>
         </s:decorate>
 
         <s:decorate id="contactPersonField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Partner.contactPerson']}</ui:define>
-            <h:inputText id="contactPerson" value="#{partner.contactPerson}" maxlength="100" tabindex="14" styleClass="input">
+            <h:inputText id="contactPerson" value="#{partner.contactPerson}" maxlength="100" tabindex="22" styleClass="input">
             </h:inputText>
         </s:decorate>
 
         <s:decorate id="phoneContactField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Partner.phoneContact']}</ui:define>
-            <h:inputText id="phoneContact" value="#{partner.phoneContact}" maxlength="20" tabindex="14" styleClass="input">
+            <h:inputText id="phoneContact" value="#{partner.phoneContact}" maxlength="20" tabindex="23" styleClass="input">
             </h:inputText>
         </s:decorate>
     </s:div>
