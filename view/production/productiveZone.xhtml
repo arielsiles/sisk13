@@ -71,13 +71,14 @@
                     </h:inputText>
                 </s:decorate>
 
-                <!--<s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
                     <h:inputText id="group" value="#{productiveZone.group}" styleClass="input" required="true"
-                                 maxlength="100" tabindex="3">
+                                 maxlength="100" tabindex="4">
                         <a4j:support event="onblur" reRender="groupField"/>
                     </h:inputText>
-                </s:decorate>-->
+                    <h:outputText value="#{ProductiveZone.groupOpc}" />
+                </s:decorate>
             </rich:panel>
 
             <div class="buttons">

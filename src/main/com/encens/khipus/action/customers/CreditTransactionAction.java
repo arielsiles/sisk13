@@ -85,6 +85,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             creditItem.setCapitalBalance(capitalBalance);
             genericService.create(creditTransaction);
             addCreatedMessage();
+            cleanValues();
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
@@ -102,7 +103,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         setInterestValue(BigDecimal.ZERO);
         setCapitalValue(BigDecimal.ZERO);
         setTotalAmountValue(BigDecimal.ZERO);
-        setDateTransaction(null);
+        setDateTransaction(new Date());
     }
 
     @End(beforeRedirect = true)
@@ -182,6 +183,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return interest;
     }
 
+    /** error al calcular capital **/
     public BigDecimal calculateSimpleCapital(Credit credit){
 
         Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
@@ -308,14 +310,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void adjustCents(){
 
-        BigDecimal diff = BigDecimalUtil.subtract(totalAmountValue, BigDecimalUtil.toBigDecimal(totalAmountValue.intValue()), 6 );
+        BigDecimal totalAmountRound = BigDecimalUtil.toBigDecimal(Math.round(totalAmountValue.doubleValue()));
+        BigDecimal diff = BigDecimalUtil.subtract(totalAmountRound, totalAmountValue, 6 );
 
-        if (diff.doubleValue() >= 0.5)
-            interestValue = BigDecimalUtil.sum(interestValue, diff, 6);
-        else
-            interestValue = BigDecimalUtil.subtract(interestValue, diff, 6);
-
-        totalAmountValue = BigDecimalUtil.subtract(totalAmountValue, diff, 6);
+        interestValue    = BigDecimalUtil.sum(interestValue, diff, 6);
+        totalAmountValue = totalAmountRound;
 
     }
 

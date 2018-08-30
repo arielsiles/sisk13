@@ -57,8 +57,12 @@ public class CreditTransaction implements Serializable, BaseModel {
     private String gloss;
 
     @Column(name = "fechatransaccion", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date date;
+
+    @Column(name = "fechacreacion", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date creationDate = new Date();
 
     @Column(name = "dias", nullable = true)
     private Integer days;
@@ -177,5 +181,13 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setCreditTransactionType(CreditTransactionType creditTransactionType) {
         this.creditTransactionType = creditTransactionType;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 }

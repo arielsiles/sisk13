@@ -2,6 +2,7 @@ package com.encens.khipus.model.production;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
@@ -37,7 +38,7 @@ import java.util.List;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "PRODUCTIVEZONE",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "ZONAPRODUCTIVA", uniqueConstraints = @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"}))
