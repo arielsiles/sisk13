@@ -28,7 +28,7 @@ public class CreditDataModel extends QueryDataModel<Long, Credit> {
     private static final String[] RESTRICTIONS = {
             "lower(credit.partner.firstName) like concat('%', concat(lower(#{creditDataModel.firstName}), '%'))",
             "lower(credit.partner.lastName) like concat('%', concat(lower(#{creditDataModel.lastName}), '%'))",
-            "lower(credit.code) like concat('%', concat(lower(#{creditDataModel.criteria.code}), '%'))"
+            "lower(credit.previousCode) like concat('%', concat(lower(#{creditDataModel.criteria.previousCode}), '%'))"
     };
 
     @Create

@@ -63,6 +63,9 @@ public class Credit implements BaseModel {
     @Column(name = "plazo", nullable = false)
     private Integer term;
 
+    @Column(name = "cuotas", nullable = false)
+    private Integer numberQuota;
+
     @Column(name = "amortiza", nullable = false)
     private Integer amortization;
 
@@ -247,5 +250,13 @@ public class Credit implements BaseModel {
 
     public void setPreviousCode(String previousCode) {
         this.previousCode = previousCode;
+    }
+
+    public Integer getNumberQuota() {
+        return numberQuota;
+    }
+
+    public void setNumberQuota(Integer numberQuota) {
+        this.numberQuota = numberQuota;
     }
 }

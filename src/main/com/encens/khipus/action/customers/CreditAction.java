@@ -103,8 +103,8 @@ public class CreditAction extends GenericAction<Credit> {
         Credit credit = getInstance();
         quotaValue = BigDecimal.ZERO;
 
-        if (credit.getTerm() != 0)
-            quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getTerm()), 2);
+        if (credit.getNumberQuota() != 0)
+            quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2);
 
     }
 

@@ -131,7 +131,7 @@
                 <s:decorate id="amortizationField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.amortization']}</ui:define>
                     <h:inputText id="amortization" value="#{credit.amortization}" styleClass="input"
-                                 required="true" tabindex="6">
+                                 required="true" tabindex="5">
                         <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
                     </h:inputText>
                 </s:decorate>
@@ -144,7 +144,7 @@
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
                                    enableManualInput="true"
-                                   tabindex="7">
+                                   tabindex="6">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </rich:calendar>
                 </s:decorate>
@@ -157,7 +157,7 @@
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
                                    enableManualInput="true"
-                                   tabindex="8">
+                                   tabindex="7">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </rich:calendar>
                 </s:decorate>
@@ -165,7 +165,15 @@
                 <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.term']}</ui:define>
                     <h:inputText id="term" value="#{credit.term}" styleClass="input"
-                                 required="true" tabindex="5">
+                                 required="true" tabindex="8">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="numberQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.numberQuota']}</ui:define>
+                    <h:inputText id="numberQuota" value="#{credit.numberQuota}" styleClass="input"
+                                 required="true" tabindex="9">
                         <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
                         <a4j:support event="onchange" action="#{creditAction.calculateQuota()}" reRender="quotaField"/>
                     </h:inputText>
@@ -178,7 +186,7 @@
                                  styleClass="input"
                                  required="true"
                                  maxlength="20"
-                                 tabindex="9">
+                                 tabindex="10">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
                     </h:inputText>
                 </s:decorate>
@@ -191,7 +199,7 @@
                                      styleClass="input"
                                      required="true"
                                      maxlength="20"
-                                     tabindex="9">
+                                     tabindex="11">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
                         </h:inputText>
                     </s:decorate>
@@ -221,31 +229,31 @@
                                     var="creditTransactionItem"
                                     rows="#{sessionUser.rowsPerPage}"
                                     width="100%"
-                                    > <!--columnsWidth="10%, 15%, 15% 15%, 35%"-->
+                                    columnsWidth="10%, 10%, 10%, 10%, 50%, 10%">
                         <f:facet name="header">
                             <rich:columnGroup>
                                 <rich:column>
-                                    <h:outputText value="#{messages['CreditTransaction.paymentDate']}"/>
+                                    <h:outputText value="#{messages['CreditTransaction.paymentDate']}" />
                                 </rich:column>
 
                                 <rich:column>
-                                    <h:outputText value="#{messages['CreditTransaction.capital']}"/>
+                                    <h:outputText value="#{messages['CreditTransaction.capital']}" />
                                 </rich:column>
 
                                 <rich:column>
-                                    <h:outputText value="#{messages['CreditTransaction.interest']}"/>
+                                    <h:outputText value="#{messages['CreditTransaction.interest']}" />
                                 </rich:column>
 
                                 <rich:column>
-                                    <h:outputText value="#{messages['CreditTransaction.amount']}"/>
+                                    <h:outputText value="#{messages['CreditTransaction.amount']}" />
                                 </rich:column>
 
                                 <rich:column>
-                                    <h:outputText value="#{messages['CreditTransaction.gloss']}"/>
+                                    <h:outputText value="#{messages['CreditTransaction.gloss']}" />
                                 </rich:column>
 
                                 <rich:column styleClass="center">
-                                    <h:outputText value="#{messages['Common.action']}"/>
+                                    <h:outputText value="#{messages['Common.action']}" />
                                 </rich:column>
                             </rich:columnGroup>
                         </f:facet>
@@ -284,8 +292,7 @@
                             <h:commandLink value="#{messages['Common.select']}"
                                            immediate="true"
                                            action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
-                                           rendered="#{s:hasPermission('CREDIT','VIEW')}">
-                            </h:commandLink>
+                                           rendered="#{s:hasPermission('CREDIT','VIEW')}" />
                         </rich:column>
                     </rich:dataTable>
                     <app:dataScroller id="ListIdListDataScrollerId"

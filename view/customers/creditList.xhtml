@@ -38,7 +38,7 @@
             <s:div>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
-                    <h:inputText id="code" value="#{creditDataModel.criteria.code}"
+                    <h:inputText id="code" value="#{creditDataModel.criteria.previousCode}"
                                  maxlength="80" tabindex="3" styleClass="inputMedium">
                     </h:inputText>
                 </s:decorate>
@@ -100,7 +100,7 @@
                 </f:facet>
 
                 <rich:column>
-                    <h:outputText value="#{creditItem.code}"/>
+                    <h:outputText value="#{creditItem.previousCode}"/>
                 </rich:column>
 
                 <rich:column>
