@@ -1156,7 +1156,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 // round to 2 decimal points
                 perMinuteDiscount = BigDecimalUtil.toBigDecimal(perMinuteDiscount).doubleValue();
 
-                // Discount per lateness accumulated in the month
+                /*// Discount per lateness accumulated in the month
                 if (tardinessTotal == 30) {
                     totalSumOfDiscountsPerLateness = basicSalary / 30 / 2;
                 }
@@ -1168,23 +1168,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 }
                 if (tardinessTotal > 90) {
                     totalSumOfDiscountsPerLateness = basicSalary / 30 * 3;
-                }
+                }*/
 
-                int totalBandAbsenceMinutes = 0;
-                for (Integer integer : totalSumOfMinuteBandAbsencesList) {
-                    totalBandAbsenceMinutes += integer;
-                }
 
-                double absenceDiscount = dayAbsences * basicSalary / 30;
-
-                //Todo this code part must be confirmed by customer
-/*
-                if ((absenceDiscount + tardinessTotal) > basicSalary * 0.2) {
-                    absenceDiscount = basicSalary * 0.2 - tardinessTotal;
-                }
-*/
-
-                totalSumOfDiscounts += totalSumOfDiscountsPerLateness + totalWinDiscount + totalOtherDiscount;
 
                 CategoryTributaryPayroll categoryTributaryPayroll = null;
                 CategoryFiscalPayroll categoryFiscalPayroll = null;
@@ -1234,6 +1220,45 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 totalSumOfDiscounts += totalRCIvaDiscount + totalAfpDiscount;
 
                 mensualTotalSalary = BigDecimalUtil.toBigDecimal(mensualTotalSalary).doubleValue();
+
+                BigDecimal totalIncome = BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva); // Total Ingresos, Total Ganado
+
+                /** -------- Discount per lateness accumulated in the month ------- **/
+                if (tardinessTotal >= 31 && tardinessTotal <= 60) {
+                    //totalSumOfDiscountsPerLateness = basicSalary / 30 / 2;  // 1/2 día
+                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 / 2;  // 1/2 día
+                }
+                if (tardinessTotal >= 61 && tardinessTotal <= 90) {
+                    //totalSumOfDiscountsPerLateness = basicSalary / 30;      // 1 día
+                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30;      // 1 día
+                }
+                if (tardinessTotal >= 91 && tardinessTotal <= 120) {
+                    //totalSumOfDiscountsPerLateness = basicSalary / 30 * 2;  // 2 días
+                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 * 2;  // 2 días
+                }
+                if (tardinessTotal >= 121) {
+                    //totalSumOfDiscountsPerLateness = basicSalary / 30 * 3;  // 3 días
+                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 * 3;  // 3 días
+                }
+
+
+                int totalBandAbsenceMinutes = 0;
+                for (Integer integer : totalSumOfMinuteBandAbsencesList) {
+                    totalBandAbsenceMinutes += integer;
+                }
+
+                double absenceDiscount = dayAbsences * basicSalary / 30;
+
+                //Todo this code part must be confirmed by customer
+/*
+                if ((absenceDiscount + tardinessTotal) > basicSalary * 0.2) {
+                    absenceDiscount = basicSalary * 0.2 - tardinessTotal;
+                }
+*/
+
+                totalSumOfDiscounts += totalSumOfDiscountsPerLateness + totalWinDiscount + totalOtherDiscount;
+
+                /** ---------------------------------------------------------------------------------------- **/
 
 
                 /*TODO the process of collections have to be changed to take into account many contracts by employee*/
