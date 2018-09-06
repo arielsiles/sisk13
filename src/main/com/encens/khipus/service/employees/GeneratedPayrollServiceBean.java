@@ -1120,7 +1120,10 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
                 log.debug(">>> WORKED DAYS: " + workedDays);
                 log.debug(">>> day Absences: " + dayAbsences);
-                mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
+                //mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
+                mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences*2);
+
+                System.out.println("======> mensualTotalSalary: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + mensualTotalSalary);
 
                 // calculate discounts
                 // Salary movement list of employee that has relationship with gestion payroll
@@ -1248,6 +1251,11 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 }
 
                 double absenceDiscount = dayAbsences * basicSalary / 30;
+                System.out.println("====> absenceDiscount: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
+                //absenceDiscount = dayAbsences * totalIncome.doubleValue() / 30;
+                //System.out.println("====> absenceDiscount: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
+                absenceDiscount = absenceDiscount * 2;
+                System.out.println("====> absenceDiscount*2: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
 
                 //Todo this code part must be confirmed by customer
 /*
