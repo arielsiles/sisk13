@@ -16,11 +16,27 @@
             <rich:simpleTogglePanel label="#{messages['Partner.search']}" switchType="client">
 
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.name']}</ui:define>
-                    <h:inputText id="name" value="#{partnerDataModel.criteria.name}"
+                    <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+                    <h:inputText id="firstName" value="#{partnerDataModel.criteria.firstName}"
                                  maxlength="80" tabindex="1" styleClass="input">
                     </h:inputText>
                 </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+                    <h:inputText id="lastName" value="#{partnerDataModel.criteria.lastName}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+                    <h:inputText id="maidenName" value="#{partnerDataModel.criteria.maidenName}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+
 
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.idNumber']}</ui:define>

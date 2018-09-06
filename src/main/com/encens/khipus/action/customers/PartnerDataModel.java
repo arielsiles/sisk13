@@ -23,7 +23,9 @@ public class PartnerDataModel extends QueryDataModel<Long, Partner> {
 
     private static final String[] RESTRICTIONS = {
             "lower(partner.idNumber) like concat(lower(#{partnerDataModel.criteria.idNumber}), '%')",
-            "lower(partner.firstName) like concat(lower(#{partnerDataModel.criteria.firstName}), '%')"};
+            "lower(partner.firstName) like concat(lower(#{partnerDataModel.criteria.firstName}), '%')",
+            "lower(partner.lastName) like concat(lower(#{partnerDataModel.criteria.lastName}), '%')",
+            "lower(partner.maidenName) like concat(lower(#{partnerDataModel.criteria.maidenName}), '%')"};
 
     @Override
     public String getEjbql() {
