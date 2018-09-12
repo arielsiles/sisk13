@@ -310,21 +310,24 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
             List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
             for (ProductiveZone productiveZone : productiveZones) {
-                RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
-                payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
-                payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
-                payRoll.setCompany(rawMaterialPayRoll.getCompany());
-                payRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
-                payRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
-                payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                payRoll.setProductiveZone(productiveZone);
-                payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                payRoll.setIt(rawMaterialPayRoll.getIt());
-                payRoll.setIue(rawMaterialPayRoll.getIue());
-                rawMaterialPayRollService.validate(payRoll);
-                rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                rawMaterialPayRollService.generatePayroll(payRoll,discountProducer);
-                rawMaterialPayRollService.createAll(payRoll);
+
+                if (productiveZone.getGroup().equals("ILVA")) { /** MODIFYID **/
+                    RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
+                    payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
+                    payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
+                    payRoll.setCompany(rawMaterialPayRoll.getCompany());
+                    payRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
+                    payRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
+                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
+                    payRoll.setProductiveZone(productiveZone);
+                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
+                    payRoll.setIt(rawMaterialPayRoll.getIt());
+                    payRoll.setIue(rawMaterialPayRoll.getIue());
+                    rawMaterialPayRollService.validate(payRoll);
+                    rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
+                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer);
+                    rawMaterialPayRollService.createAll(payRoll);
+                }
             }
 
         } catch (RawMaterialPayRollException ex) {

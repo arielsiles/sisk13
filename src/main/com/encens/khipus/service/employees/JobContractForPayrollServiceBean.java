@@ -74,9 +74,11 @@ public class JobContractForPayrollServiceBean implements JobContractForPayrollSe
         if (null != selectedJobContractIdList) {
             queryString.append(" and jobContract.id not in(:idList) ");
         }
-        if (null != bonus) {
+        /** Comentado para que no filtre Contratos de un ciclo a otro en jobContractForTaxPayrollBonusListModalPanel.xhtml **/
+        /*if (null != bonus) {
             queryString.append(" and jobContract not in (select jc from GrantedBonus grantedBonus join grantedBonus.jobContract jc where grantedBonus.bonus=:bonus) ");
-        }
+        }*/
+
         if (idNumber != null) {
             queryString.append(" and employee.idNumber like concat(:idNumber, '%')");
         }
@@ -102,9 +104,10 @@ public class JobContractForPayrollServiceBean implements JobContractForPayrollSe
         if (null != selectedJobContractIdList) {
             query.setParameter("idList", selectedJobContractIdList);
         }
-        if (null != bonus) {
+        /** Comentado para que no filtre Contratos de un ciclo a otro en jobContractForTaxPayrollBonusListModalPanel.xhtml **/
+        /*if (null != bonus) {
             query.setParameter("bonus", bonus);
-        }
+        }*/
         if (idNumber != null) {
             query.setParameter("idNumber", idNumber);
         }

@@ -166,7 +166,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             if (payrollGenerationType.equals(PayrollGenerationType.GENERATION_BY_TIME)) {
                 genericPayrollList = getGeneralPayrollList(generatedPayroll4Operations);
             }
-            /** 23/08/2018 Planilla OFICIAL, comentado para obiar error **/
+            /** 23/08/2018 Planilla OFICIAL, comentado para obviar error **/
             //salaryMovementService.matchGeneratedSalaryMovement(generatedPayroll4Operations, genericPayrollList);
         }
         /* any to outdated*/

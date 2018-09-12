@@ -173,6 +173,7 @@ public class SalaryMovementServiceBean extends GenericServiceBean implements Sal
 
     @SuppressWarnings({"unchecked"})
     private void createOrUpdate(GeneratedPayroll generatedPayroll, Employee employee, Map<MovementType, SalaryMovementType> defaultSalaryMovementTypeMap, MovementType movementType, Currency currency, BigDecimal amount) throws ConcurrencyException, EntryDuplicatedException {
+
         if (BigDecimalUtil.isPositive(amount)) {
             List<SalaryMovement> salaryMovementList = getEntityManager().createNamedQuery("SalaryMovement.findSalaryMovementByMovementTypeAndEmployeeAndGestionPayroll")
                     .setParameter("gestionPayroll", generatedPayroll.getGestionPayroll())
@@ -180,6 +181,9 @@ public class SalaryMovementServiceBean extends GenericServiceBean implements Sal
                     .setParameter("movementType", movementType)
                     .getResultList();
             SalaryMovement salaryMovement = null;
+
+            System.out.println("============> : " + ValidatorUtil.isEmptyOrNull(salaryMovementList)  + " - " + employee.getFullName() + "movementType: " + movementType.toString() + " - " + amount);
+
             if (!ValidatorUtil.isEmptyOrNull(salaryMovementList)) {
                 if (salaryMovementList.size() == 1) {
                     salaryMovement = salaryMovementList.get(0);
@@ -194,7 +198,18 @@ public class SalaryMovementServiceBean extends GenericServiceBean implements Sal
                 update(salaryMovement);
             } else {
                 String defaultDescription = generateDefaultDescription(generatedPayroll, movementType);
-                salaryMovement = new SalaryMovement(generatedPayroll.getGestionPayroll().getEndDate(), defaultDescription, amount, generatedPayroll.getGestionPayroll(), currency, getDefaultMovementType(defaultSalaryMovementTypeMap, movementType), employee);
+                salaryMovement = new SalaryMovement(generatedPayroll.getGestionPayroll().getEndDate(),
+                                                    defaultDescription,
+                                                    amount,
+                                                    generatedPayroll.getGestionPayroll(),
+                                                    currency,
+                                                    getDefaultMovementType(defaultSalaryMovementTypeMap, movementType), employee);
+
+                System.out.println("======> movementType: " + movementType.toString());
+                System.out.println("======> defaultSalaryMovementTypeMap: " + defaultSalaryMovementTypeMap);
+                System.out.println("======> getDefaultMovementType: " + getDefaultMovementType(defaultSalaryMovementTypeMap, movementType));
+
+                System.out.println(">>>>>>>> salaryMovement: " + salaryMovement);
                 create(salaryMovement);
             }
         } else {
