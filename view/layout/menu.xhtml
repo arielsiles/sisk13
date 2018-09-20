@@ -371,6 +371,15 @@
                 value="#{messages['menu.warehouse.warehouseVoucher']}"
                 propagation="none"/>
     </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}">
+        <s:link view="/warehouse/warehouseProductTransferList.xhtml"
+                value="#{messages['menu.warehouse.productTransfer']}"
+                propagation="none"/>
+    </rich:menuItem>
+
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item"
                    rendered="#{s:hasPermission('PRODUCTDELIVERY','VIEW')}">

@@ -181,6 +181,9 @@ public final class Constants {
     public static final String ID_ART_RAW_MILK = "1";
     public static final WarehousePK COD_WAREHUOSE_MILK_COLLECTED = new WarehousePK("01","4");
 
+    public static final String ILVA_CATEGORY = "ILVA";
+    public static final String CISC_CATEGORY = "CISC";
+
     public static final String COD_ART_WATER = "152";
     public static final String ID_ART_GROUP_CHEESE = "6";
     public static final String ID_ART_GROUP_UHT = "4";

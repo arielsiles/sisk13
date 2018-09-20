@@ -1,0 +1,279 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['WarehouseVoucher.new']}
+</ui:define>
+
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="95%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<c:set var="selectList" value="#{warehouseSpecialDocumentTypeList}"/>
+<c:set var="isEnabledSpecialOperations" value="#{s:hasPermission('WAREHOUSESPECIALOPERATIONS','VIEW')}"/>
+<c:if test="#{not isEnabledSpecialOperations}">
+    <c:set var="selectList" value="#{warehouseDocumentTypeList}"/>
+</c:if>
+
+<c:set var="mainComponentIdsToRerender"
+       value="documentTypeField, descriptionField"/>
+
+<c:set var="elementsToReRenderForPetitionerJobContractChange"
+       value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
+
+<c:set var="movementDetailRowsToRefresh"
+       value="productItemField, measureUnitField, unitCostField, quantityField, amountField"/>
+
+<h:form id="warehouseVoucherForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{warehouseVoucherCreateAction.createTransfer}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehouseVoucherCreateAction.managed and s:hasPermission('WAREHOUSEVOUCHER','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{warehouseVoucherCreateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"/>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    #{messages['WarehouseVoucher.new']}
+</f:facet>
+<app:fieldset id="warehouseVoucherFields" title="#{messages['WarehouseVoucher.title']}">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div id="leftSidePanel">
+
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:param name="validateId" value="documentType"/>
+        <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+        <app:quickSearch id="documentTypeSearch"
+                         textValue="warehouseVoucherCreateAction.warehouseVoucher.documentType.documentCode"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.documentType}"
+                         searchField="documentCode"
+                         alias="documentType"
+                         postSearchAction="warehouseVoucherCreateAction.cleanMainFields()"
+                         reRender="#{mainComponentIdsToRerender}"
+                         tabindex="1">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="documentType.warehouseVoucherType = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType','P')}"/>
+            </ui:define>
+        </app:quickSearch>
+        <h:selectOneMenu id="documentType"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.documentType}"
+                         styleClass="input"
+                         required="true">
+            <s:selectItems value="#{selectList}"
+                           var="element"
+                           label="#{element.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         action="#{warehouseVoucherCreateAction.cleanMainFields()}"
+                         reRender="#{mainComponentIdsToRerender}"
+                         ajaxSingle="true"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+
+
+<!--<s:div id="executorUnitLeftSidePanel">-->
+
+    <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehouseVoucher.warehouse']}"/>
+        </ui:define>
+        <app:quickSearch id="quickSearchWarehouseField"
+                         textValue="warehouseVoucherCreateAction.warehouseVoucher.warehouse.warehouseCode"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.warehouse}"
+                         searchField="warehouseCode"
+                         postSearchAction="warehouseVoucherCreateAction.assignResponsible()"
+                         alias="warehouse"
+                         reRender="warehouseField, responsibleField"
+                         rendered="true"
+                         tabindex="4">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="warehouseSelectPopup"
+                         required="true"
+                         textValue="#{warehouseVoucherCreateAction.warehouseVoucher.warehouse.fullName}"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.warehouse}"
+                         clearAction="warehouseVoucherCreateAction.clearWarehouse()"
+                         searchModalPanel="warehouseModalPanel"
+                         reRender="warehouseField"
+                         renderedSelectLink="true"
+                         renderedClearLink="true"
+                         dataModel="#{warehouseSearchDataModel}"
+                         hotKeySelect="alt+3">
+            <ui:define name="criteriaValues">
+                <app:criteriaValue fieldName="executorUnit"
+                                   value="#{warehouseVoucherCreateAction.warehouseVoucher.executorUnit}"/>
+            </ui:define>
+        </app:selectPopUp>
+    </s:decorate>
+
+    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.transferFrom']}</ui:define>
+        <app:quickSearch id="productItemQuickSearch"
+                         textValue="warehouseVoucherCreateAction.productItemFrom.productItemCode"
+                         value="#{warehouseVoucherCreateAction.productItemFrom}"
+                         searchField="productItemCode"
+                         alias="productItem"
+                         reRender="productItemField"
+                         tabindex="5">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="productItem"
+                         textValue="#{warehouseVoucherCreateAction.productItemFrom.name}"
+                         value="#{warehouseVoucherCreateAction.productItemFrom}"
+                         clearAction="kardexProductMovementAction.cleanProductItem()"
+                         searchModalPanel="productItemListModalPanel"
+                         dataModel="#{productItemSearchDataModel}"
+                         reRender="productItemField"
+                         hotKeySelect="alt+2"/>
+    </s:decorate>
+
+    <s:decorate id="productItemToField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.transferTo']}</ui:define>
+        <app:quickSearch id="productItemToQuickSearch"
+                         textValue="warehouseVoucherCreateAction.productItemTo.productItemCode"
+                         value="#{warehouseVoucherCreateAction.productItemTo}"
+                         searchField="productItemCode"
+                         alias="productItem"
+                         reRender="productItemToField"
+                         tabindex="5">
+            <ui:define name="restrictions">
+                <app:restriction
+                        condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+            </ui:define>
+        </app:quickSearch>
+        <app:selectPopUp id="productItemTo"
+                         textValue="#{warehouseVoucherCreateAction.productItemTo.name}"
+                         value="#{warehouseVoucherCreateAction.productItemTo}"
+                         clearAction="kardexProductMovementAction.cleanProductItem()"
+                         searchModalPanel="productItemToListModalPanel"
+                         dataModel="#{productItemSearchDataModel}"
+                         reRender="productItemToField"
+                         hotKeySelect="alt+2"/>
+    </s:decorate>
+
+    <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseVoucher.amount']}</ui:define>
+        <h:inputText id="amount"
+                     value="#{warehouseVoucherCreateAction.amount}"
+                     styleClass="inputSmall"
+                     required="true"
+                     maxlength="10"
+                     tabindex="3">
+            <a4j:support event="onchange" reRender="amountField"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+        </h:inputText>
+
+    </s:decorate>
+
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
+        <h:inputTextarea id="description"
+                         value="#{warehouseVoucherCreateAction.description}"
+                         required="true"
+                         styleClass="input textarea-medium"
+                         tabindex="10">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+
+<!--</s:div>-->
+
+</s:div>
+
+<s:div id="rightSidePanel">
+</s:div>
+
+</h:panelGrid>
+</app:fieldset>
+
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{warehouseVoucherCreateAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!warehouseVoucherCreateAction.managed and s:hasPermission('WAREHOUSEVOUCHER','CREATE')}"
+                     tabindex="40"/>
+
+    <h:commandButton action="#{warehouseVoucherCreateAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true"
+                     tabindex="41"/>
+</div>
+</h:form>
+
+    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{warehouseVoucherCreateAction.setProductItemFrom(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="productItemToListModalPanelContainer" template="/warehouse/productItemToListModalPanel.xhtml">
+        <ui:define name="assignButton2">
+            <a4j:commandButton id="assignButton2"
+                               action="#{warehouseVoucherCreateAction.setProductItemTo(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemToField"
+                               oncomplete="Richfaces.hideModalPanel('productItemToListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="warehouseModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{warehouseVoucherCreateAction.assignWarehouse(warehouseItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="warehouseField"
+                               oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+<!--Set selector Id to enable focus-->
+<rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

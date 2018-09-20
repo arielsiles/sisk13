@@ -7,7 +7,6 @@ import com.encens.khipus.exception.warehouse.WarehouseVoucherPendantException;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
-import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.MonthProcessService;
@@ -52,6 +51,11 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     @In
     private ApprovalWarehouseVoucherService approvalWarehouseVoucherService;
 
+    private ProductItem productItemFrom;
+    private ProductItem productItemTo;
+    private BigDecimal amount;
+    private String description;
+
 
     @Override
     @End
@@ -80,6 +84,17 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
             return Outcome.FAIL;
         }
     }
+
+    public String createTransfer(){
+
+        System.out.println("===> origen: " + this.productItemFrom.getFullName());
+        System.out.println("===> destino: " + this.productItemTo.getFullName());
+        System.out.println("===> Cant: " + this.getAmount());
+        System.out.println("===> Glosa: " + this.getDescription());
+
+        return Outcome.SUCCESS;
+    }
+
 
     /*public void createWarehouseForInputOfInputsAndMateriales(List<ProductionOrder> productionOrders) {
         String validationsOutcome = validations();
@@ -199,6 +214,9 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
             movementDetails.add(detail);
         }
     }
+
+
+
 
     public boolean isShownAmountField() {
         return null != uiController && uiController.isShownAmountField();
@@ -362,5 +380,39 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
                 productItem.getUsageMeasureCode());
 
         return warehouseCatalogService.findWarehouseCatalog(MeasureUnit.class, measureUnitPk);
+    }
+
+    public ProductItem getProductItemFrom() {
+        return productItemFrom;
+    }
+
+    public void setProductItemFrom(ProductItem productItemFrom) {
+        this.productItemFrom = productItemFrom;
+    }
+
+    public ProductItem getProductItemTo() {
+        return productItemTo;
+    }
+
+    public void setProductItemTo(ProductItem productItemTo) {
+        this.productItemTo = productItemTo;
+    }
+
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

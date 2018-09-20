@@ -82,8 +82,8 @@ public class CollectionFormServiceBean extends ExtendedGenericServiceBean implem
     public void updateProductiveZone(CollectionForm collectionForm)
     {
 
-            List<ProductiveZone> datas = getEntityManager().createQuery("SELECT productiveZone " +
-                    "from ProductiveZone productiveZone")
+            List<ProductiveZone> datas = getEntityManager().createQuery("SELECT productiveZone from ProductiveZone productiveZone where productiveZone.group =:group ")
+                    .setParameter("group", Constants.ILVA_CATEGORY)
                     .getResultList();
 
             if(datas.size() > collectionForm.getCollectionRecordList().size())

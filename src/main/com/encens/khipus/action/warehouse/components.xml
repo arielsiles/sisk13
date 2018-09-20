@@ -40,9 +40,8 @@
     <framework:entity-query name="warehouseSpecialDocumentTypeQuery"
                             ejbql="select documentType from WarehouseDocumentType documentType">
         <framework:restrictions>
-            <value>documentType.state !=
-                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}
-            </value>
+            <value>documentType.state != #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}</value>
+            <value>documentType.warehouseVoucherType = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType', 'P')}</value>
         </framework:restrictions>
     </framework:entity-query>
 

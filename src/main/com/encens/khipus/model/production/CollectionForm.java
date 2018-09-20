@@ -59,7 +59,7 @@ import java.util.List;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "PLANILLAACOPIO",
-        allocationSize = 10)
+        allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "PLANILLAACOPIO", uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "FECHA"}))
