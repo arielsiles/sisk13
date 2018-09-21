@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 @NamedQueries({
-        @NamedQuery(name = "ProductiveZone.findAll", query = "select productiveZone from ProductiveZone productiveZone"),
+        @NamedQuery(name = "ProductiveZone.findAll", query = "select productiveZone from ProductiveZone productiveZone where productiveZone.group <> 'CISC' "), /** MODIDYID **/
         @NamedQuery(name = "ProductiveZone.findAllThatDoNotHavePayRollOnDate",
                 query = " SELECT productiveZone " +
                         " FROM ProductiveZone productiveZone " +
