@@ -14,6 +14,7 @@ import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.purchases.PurchaseOrderDetail;
 import com.encens.khipus.model.purchases.PurchaseOrderPayment;
+import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.service.purchases.PurchaseOrderService;
 
 import javax.ejb.Local;
@@ -152,5 +153,7 @@ public interface WarehousePurchaseOrderService extends PurchaseOrderService {
                                  List<PurchaseOrderDetail> purchaseOrderDetailWithoutWarnings);
 
     public void updateliquidatePurchaseOrder(PurchaseOrder purchaseOrder) throws CompanyConfigurationNotFoundException;
+
+    WarehouseDocumentType getFirstReceptionType();
 }
 

@@ -382,6 +382,10 @@ public class WarehouseVoucher implements BaseModel {
         return null != documentType && WarehouseVoucherType.M.equals(documentType.getWarehouseVoucherType());
     }
 
+    public boolean isTransferProduct() {
+        return null != documentType && WarehouseVoucherType.P.equals(documentType.getWarehouseVoucherType());
+    }
+
     public boolean isRelatedWithPurchaseOrder() {
         return null != purchaseOrderId;
     }

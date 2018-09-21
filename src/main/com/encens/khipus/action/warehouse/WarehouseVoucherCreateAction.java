@@ -11,6 +11,7 @@ import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.MonthProcessService;
 import com.encens.khipus.service.warehouse.WarehouseCatalogService;
+import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
@@ -53,7 +54,7 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
 
     private ProductItem productItemFrom;
     private ProductItem productItemTo;
-    private BigDecimal amount;
+    private BigDecimal quantity;
     private String description;
 
 
@@ -85,14 +86,123 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         }
     }
 
+    @End
     public String createTransfer(){
 
-        System.out.println("===> origen: " + this.productItemFrom.getFullName());
-        System.out.println("===> destino: " + this.productItemTo.getFullName());
-        System.out.println("===> Cant: " + this.getAmount());
-        System.out.println("===> Glosa: " + this.getDescription());
 
-        return Outcome.SUCCESS;
+        /** Transfer from **/
+        WarehouseVoucher warehouseVoucherFrom = new WarehouseVoucher();
+        warehouseVoucherFrom.setCostCenter(warehouseVoucher.getCostCenter());
+        warehouseVoucherFrom.setExecutorUnit(warehouseVoucher.getExecutorUnit());
+        warehouseVoucherFrom.setDate(new Date());
+        warehouseVoucherFrom.setDocumentType(warehouseService.findWarehouseDocumentType(WarehouseVoucherType.C));
+        warehouseVoucherFrom.setState(WarehouseVoucherState.PEN);
+        warehouseVoucherFrom.setWarehouse(warehouseVoucher.getWarehouse());
+
+
+        InventoryMovement inventoryMovementFrom = new InventoryMovement();
+        inventoryMovementFrom.setCreationDate(new Date());
+        inventoryMovementFrom.setDescription(description);
+        inventoryMovementFrom.setMovementDate(new Date());
+
+        MovementDetail movementDetail = new MovementDetail();
+        movementDetail.setMovementDetailDate(new Date());
+        movementDetail.setProductItem(productItemFrom);
+        movementDetail.setProductItemCode(productItemFrom.getProductItemCode());
+        movementDetail.setQuantity(quantity);
+        movementDetail.setMeasureCode(productItemFrom.getUsageMeasureCode());
+        movementDetail.setWarehouse(warehouseVoucher.getWarehouse());
+        movementDetail.setUnitCost(productItemFrom.getUnitCost());
+        movementDetail.setAmount(BigDecimalUtil.multiply(quantity, productItemFrom.getUnitCost(), 6));
+        movementDetail.setUnitPurchasePrice(productItemFrom.getCu());
+        movementDetail.setPurchasePrice(BigDecimalUtil.multiply(quantity, productItemFrom.getCu(), 6));
+        movementDetail.setMovementType(MovementDetailType.S);
+        movementDetail.setCashAccount(productItemFrom.getCashAccount());
+
+
+        /** Transfer to **/
+        WarehouseVoucher warehouseVoucherTo = new WarehouseVoucher();
+        warehouseVoucherTo.setCostCenter(warehouseVoucher.getCostCenter());
+        warehouseVoucherTo.setExecutorUnit(warehouseVoucher.getExecutorUnit());
+        warehouseVoucherTo.setDate(new Date());
+        warehouseVoucherTo.setDocumentType(warehouseService.findWarehouseDocumentType(WarehouseVoucherType.R));
+        warehouseVoucherTo.setState(WarehouseVoucherState.PEN);
+        warehouseVoucherTo.setWarehouse(warehouseVoucher.getWarehouse());
+
+        InventoryMovement inventoryMovementTo = new InventoryMovement();
+        inventoryMovementTo.setCreationDate(new Date());
+        inventoryMovementTo.setDescription(description);
+        inventoryMovementTo.setMovementDate(new Date());
+
+
+        MovementDetail movementDetail2 = new MovementDetail();
+        movementDetail2.setMovementDetailDate(new Date());
+        movementDetail2.setProductItem(productItemTo);
+        movementDetail2.setProductItemCode(productItemTo.getProductItemCode());
+        movementDetail2.setQuantity(quantity);
+        movementDetail2.setMeasureCode(productItemTo.getUsageMeasureCode());
+        movementDetail2.setWarehouse(warehouseVoucher.getWarehouse());
+        movementDetail2.setUnitCost(productItemTo.getUnitCost());
+        movementDetail2.setAmount(BigDecimalUtil.multiply(quantity, productItemTo.getUnitCost(), 6));
+        movementDetail2.setUnitPurchasePrice(productItemTo.getCu());
+        movementDetail2.setPurchasePrice(BigDecimalUtil.multiply(quantity, productItemTo.getCu(), 6));
+        movementDetail2.setMovementType(MovementDetailType.E);
+        movementDetail2.setCashAccount(productItemTo.getCashAccount());
+
+        List<MovementDetail> movementDetailsTo = new ArrayList<MovementDetail>();
+
+        movementDetailsTo.add(movementDetail2);
+
+        /** End Transfer to **/
+        movementDetails.add(movementDetail);
+
+        try {
+
+            warehouseService.saveWarehouseVoucher(warehouseVoucherFrom, inventoryMovementFrom, movementDetails,
+                    movementDetailUnderMinimalStockMap,
+                    movementDetailOverMaximumStockMap,
+                    movementDetailWithoutWarnings);
+
+            warehouseVoucherUpdateAction.putWarehouseVoucher(warehouseVoucherFrom.getId());
+
+
+            warehouseService.saveWarehouseVoucher(warehouseVoucherTo, inventoryMovementTo, movementDetailsTo,
+                    movementDetailUnderMinimalStockMap,
+                    movementDetailOverMaximumStockMap,
+                    movementDetailWithoutWarnings);
+
+            warehouseVoucherUpdateAction.putWarehouseVoucher(warehouseVoucherTo.getId());
+
+
+            try {
+
+                approvalWarehouseVoucherService.approveWarehouseVoucherTransferProduct(warehouseVoucherFrom.getId(), description,
+                        movementDetailUnderMinimalStockMap,
+                        movementDetailOverMaximumStockMap,
+                        movementDetailWithoutWarnings);
+
+                approvalWarehouseVoucherService.approveWarehouseVoucherTransferProduct(warehouseVoucherTo.getId(), description,
+                        movementDetailUnderMinimalStockMap,
+                        movementDetailOverMaximumStockMap,
+                        movementDetailWithoutWarnings);
+
+            } catch (Exception e){
+                e.printStackTrace();
+                return Outcome.FAIL;
+            }
+
+            showMovementDetailWarningMessages();
+            return Outcome.SUCCESS;
+        } catch (InventoryException e) {
+            addInventoryMessages(e.getInventoryMessages());
+            return Outcome.REDISPLAY;
+        } catch (ProductItemNotFoundException e) {
+            addProductItemNotFoundMessage(e.getProductItem().getFullName());
+            return Outcome.FAIL;
+        }
+
+
+
     }
 
 
@@ -408,11 +518,11 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         this.description = description;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public BigDecimal getQuantity() {
+        return quantity;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
     }
 }

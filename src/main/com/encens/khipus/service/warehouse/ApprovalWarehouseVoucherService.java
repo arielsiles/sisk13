@@ -130,4 +130,22 @@ public interface ApprovalWarehouseVoucherService extends GenericService {
     public InventoryMovement getMovement(WarehouseVoucher warehouseVoucher);
 
     void resetChangeCheeseEdam(WarehouseVoucherPK id,int pos);
+
+    public void approveWarehouseVoucherTransferProduct(WarehouseVoucherPK id, String gloss,
+                                                       Map<MovementDetail, BigDecimal> movementDetailUnderMinimalStockMap,
+                                                       Map<MovementDetail, BigDecimal> movementDetailOverMaximumStockMap,
+                                                       List<MovementDetail> movementDetailWithoutWarnings)
+            throws InventoryException,
+            WarehouseVoucherApprovedException,
+            WarehouseVoucherNotFoundException,
+            WarehouseVoucherEmptyException,
+            ProductItemAmountException,
+            InventoryUnitaryBalanceException,
+            InventoryProductItemNotFoundException,
+            CompanyConfigurationNotFoundException,
+            FinancesCurrencyNotFoundException,
+            FinancesExchangeRateNotFoundException,
+            ConcurrencyException,
+            ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException;
+
 }

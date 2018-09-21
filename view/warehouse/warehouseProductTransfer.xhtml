@@ -101,6 +101,59 @@
 
 <!--<s:div id="executorUnitLeftSidePanel">-->
 
+    <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:param name="validateId" value="executorUnitCode"/>
+        <ui:define name="label">
+            <h:outputText
+                    value="#{warehouseVoucherCreateAction.executorUnitTransference ? messages['WarehouseVoucher.sourceExecutorUnitCode'] : messages['WarehouseVoucher.executorUnitCode']}"/>
+        </ui:define>
+        <app:quickSearch id="quickSearchExecutorUnit"
+                         textValue="warehouseVoucherCreateAction.warehouseVoucher.executorUnit.executorUnitCode"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.executorUnit}"
+                         postSearchAction="warehouseVoucherCreateAction.clearWarehouses()"
+                         searchField="executorUnitCode"
+                         filters="businessUnitFilter"
+                         reRender="#{warehouseVoucherCreateAction.elementsToReReder}"
+                         tabindex="2"/>
+        <h:selectOneMenu id="executorUnitCode"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.executorUnit}"
+                         styleClass="input"
+                         required="true">
+            <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('businessUnitList')}"
+                           var="executorUnit"
+                           label="#{executorUnit.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <a4j:support event="onchange"
+                         reRender="#{warehouseVoucherCreateAction.elementsToReReder}"
+                         action="#{warehouseVoucherCreateAction.clearWarehouses()}"
+                         ajaxSingle="true"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText
+                    value="#{messages['WarehouseVoucher.costCenter']}"/>
+        </ui:define>
+        <app:quickSearch id="quickSearchCostCenterField"
+                         textValue="warehouseVoucherCreateAction.warehouseVoucher.costCenter.code"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.costCenter}"
+                         searchField="code"
+                         reRender="costCenterCodeField"
+                         tabindex="3"/>
+        <app:selectPopUp id="costCenter"
+                         required="true"
+                         textValue="#{warehouseVoucherCreateAction.warehouseVoucher.costCenter.fullName}"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.costCenter}"
+                         clearAction="warehouseVoucherCreateAction.clearCostCenter()"
+                         searchModalPanel="costCenterListModalPanel"
+                         dataModel="#{costCenterDataModel}"
+                         reRender="costCenterCodeField"
+                         hotKeySelect="alt+2"/>
+    </s:decorate>
+
     <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">
             <h:outputText value="#{messages['WarehouseVoucher.warehouse']}"/>
@@ -188,7 +241,7 @@
     <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseVoucher.amount']}</ui:define>
         <h:inputText id="amount"
-                     value="#{warehouseVoucherCreateAction.amount}"
+                     value="#{warehouseVoucherCreateAction.quantity}"
                      styleClass="inputSmall"
                      required="true"
                      maxlength="10"
@@ -223,18 +276,8 @@
 </rich:panel>
 
 <div class="buttons">
-    <h:commandButton action="#{warehouseVoucherCreateAction.create}"
-                     value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{!warehouseVoucherCreateAction.managed and s:hasPermission('WAREHOUSEVOUCHER','CREATE')}"
-                     tabindex="40"/>
-
-    <h:commandButton action="#{warehouseVoucherCreateAction.cancel}"
-                     value="#{messages['Common.cancel']}"
-                     styleClass="button"
-                     immediate="true"
-                     tabindex="41"/>
 </div>
+
 </h:form>
 
     <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
@@ -270,6 +313,20 @@
                                styleClass="select-image"
                                reRender="warehouseField"
                                oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
+        <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
+        <ui:param name="dialogId" value="costCenterListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                               action="#{warehouseVoucherCreateAction.assignCostCenter(costCenterItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               immediate="true"
+                               reRender="costCenterCodeField"
+                               oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
         </ui:define>
     </s:decorate>
 

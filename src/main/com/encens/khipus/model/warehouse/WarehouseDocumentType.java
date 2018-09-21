@@ -16,7 +16,8 @@ import javax.persistence.*;
 @NamedQueries({
         @NamedQuery(name = "WarehouseDocumentType.findByType", query = "select w from WarehouseDocumentType w" +
                 " where w.id.companyNumber=:companyNumber and w.warehouseVoucherType=:warehouseVoucherType" +
-                " order by w.id.documentCode")
+                " order by w.id.documentCode"),
+        @NamedQuery(name  = "WarehouseDocumentType.findWarehouseDocumentType", query ="select w from WarehouseDocumentType w where w.warehouseVoucherType=:warehouseVoucherType ")
 })
 @Entity
 @Table(name = "inv_tipodocs", schema = Constants.FINANCES_SCHEMA)

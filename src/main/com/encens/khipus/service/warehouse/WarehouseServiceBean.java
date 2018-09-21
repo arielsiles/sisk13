@@ -19,10 +19,7 @@ import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.finances.FinancesUserService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.Constants;
-import com.encens.khipus.util.DateUtils;
-import com.encens.khipus.util.MessageUtils;
+import com.encens.khipus.util.*;
 import com.encens.khipus.util.query.QueryUtils;
 import com.encens.khipus.util.warehouse.WarehouseUtil;
 import org.jboss.seam.Component;
@@ -268,6 +265,8 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
             System.out.println("---> newPrecioUnitCompra: " + newPrecioUnitCompra);
             movementDetail.setUnitPurchasePrice(newPrecioUnitCompra);
             movementDetail.setPurchasePrice(BigDecimalUtil.multiply(movementDetail.getQuantity(), newPrecioUnitCompra, 6));
+
+            System.out.println("===> movementDetail.getMovementType(): " + movementDetail.getMovementType());
 
             persistMovementDetail(warehouseVoucher, movementDetail,
                     movementDetailUnderMinimalStockMap,
@@ -663,7 +662,7 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
         WarehouseVoucherGeneralAction warehouseVoucherGeneralAction = warehouseVoucherCreateAction != null ? warehouseVoucherCreateAction : warehouseVoucherUpdateAction;
 
         MovementDetailType detailType = WarehouseUtil.getMovementTye(warehouseVoucher.getDocumentType());
-        if (warehouseVoucher.isTransfer() || warehouseVoucher.isExecutorUnitTransfer()) {
+        if (warehouseVoucher.isTransfer() || warehouseVoucher.isExecutorUnitTransfer() || warehouseVoucher.isTransferProduct()) {
             detailType = MovementDetailType.S;
         }
         movementDetail.setMovementType(detailType);
@@ -819,6 +818,7 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
         if (null != movementDetail && (warehouseVoucher.isConsumption()
                 || warehouseVoucher.isOutput()
                 || warehouseVoucher.isTransfer()
+                || warehouseVoucher.isTransferProduct()
                 || warehouseVoucher.isExecutorUnitTransfer())) {
             approvalWarehouseVoucherService.validateOutputMovementDetail(warehouseVoucher,
                     warehouseVoucher.getWarehouse(), movementDetail, false);
@@ -1004,4 +1004,14 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
 
         return producedAmountOrderProduction;
     }
+
+    public WarehouseDocumentType findWarehouseDocumentType(WarehouseVoucherType warehouseVoucherType){
+
+        WarehouseDocumentType warehouseDocumentType = (WarehouseDocumentType)getEntityManager()
+                .createNamedQuery("WarehouseDocumentType.findWarehouseDocumentType")
+                .setParameter("warehouseVoucherType", warehouseVoucherType).getSingleResult();
+
+        return warehouseDocumentType;
+    }
+
 }

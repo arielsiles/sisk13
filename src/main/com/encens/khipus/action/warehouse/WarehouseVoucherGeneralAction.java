@@ -291,6 +291,9 @@ public class WarehouseVoucherGeneralAction extends GenericAction<WarehouseVouche
             BigDecimal minimalStock = productItem.getMinimalStock();
             BigDecimal maximumStock = productItem.getMaximumStock();
             BigDecimal unitaryBalance = inventoryService.findUnitaryBalanceByProductItemAndArticle(warehouse.getId(), productItem.getId());
+            System.out.println("===> movementDetail.getMovementType(): " + movementDetail.getMovementType());
+            System.out.println("===> unitaryBalance: " + unitaryBalance);
+            System.out.println("===> requiredQuantity: " + requiredQuantity);
             BigDecimal totalQuantity = movementDetail.getMovementType().equals(MovementDetailType.E) ?
                     BigDecimalUtil.sum(unitaryBalance, requiredQuantity, SCALE) :
                     BigDecimalUtil.subtract(unitaryBalance, requiredQuantity, SCALE);

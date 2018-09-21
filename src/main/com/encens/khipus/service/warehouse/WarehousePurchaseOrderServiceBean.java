@@ -705,7 +705,7 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
     }
 
     @SuppressWarnings(value = "unchecked")
-    private WarehouseDocumentType getFirstReceptionType() {
+    public WarehouseDocumentType getFirstReceptionType() {
         List<WarehouseDocumentType> warehouseDocumentTypeList = getEntityManager()
                 .createNamedQuery("WarehouseDocumentType.findByType")
                 .setParameter("companyNumber", Constants.defaultCompanyNumber)

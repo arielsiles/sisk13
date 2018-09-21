@@ -127,4 +127,6 @@ public interface WarehouseService extends GenericService {
     public BigDecimal findProducedAmountRepro(String codArt,Gestion gestion);
 
     BigDecimal findAmountOrderByCodArt(String codArt,Gestion gestion);
+
+    public WarehouseDocumentType findWarehouseDocumentType(WarehouseVoucherType warehouseVoucherType);
 }
