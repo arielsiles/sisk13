@@ -1324,6 +1324,77 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
     }
 
+
+    public void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucher, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException{
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
+
+        Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.WAREHOUSE_VOUCHER_FORM, gloss);
+        voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
+
+        String transactionNumber = financesPkGeneratorService.getNextNoTransTmpenc();
+
+        Long id_tmpenc = financesPkGeneratorService.newId_sf_tmpenc();
+        String docNumber = financesPkGeneratorService.getNextNoTransByDocumentType("TR");
+
+
+        System.out.println("-------------------------------> transactionNumber: " + transactionNumber);
+        System.out.println("-------------------------------> newId_sf_tmpenc: " + id_tmpenc);
+
+        voucherForGeneration.setTransactionNumber(transactionNumber);
+        voucherForGeneration.setDocumentNumber(docNumber);
+
+        voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                executorUnit.getExecutorUnitCode(),
+                costCenterCode,
+                cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                voucherAmount,
+                FinancesCurrencyType.P,
+                BigDecimal.ONE));
+
+        voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                executorUnit.getExecutorUnitCode(),
+                costCenterCode,
+                cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                voucherAmount,
+                FinancesCurrencyType.P,
+                BigDecimal.ONE));
+
+        warehouseVoucher.setVoucher(voucherForGeneration);
+
+        /** **/
+        Voucher voucher = voucherForGeneration;
+        voucher.setId(id_tmpenc);
+
+        System.out.println("-------- VOUCHER ENCABEZADO -------");
+        System.out.println("ID: " + voucher.getId());
+        System.out.println("Fecha: " + voucher.getDate());
+        System.out.println("NoTrans: " + voucher.getTransactionNumber());
+        System.out.println("Tipo Doc: " + voucher.getDocumentType());
+        System.out.println("Descripcion: " + voucher.getDescription());
+        System.out.println("Glosa: " + voucher.getGloss());
+
+        em.persist(voucher);
+        em.flush();
+
+        System.out.println("-------- VOUCHER DETAILS -------");
+        for (VoucherDetail voucherDetail : voucher.getDetails()) {
+            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
+            voucherDetail.setVoucher(voucher);
+
+            System.out.println("CUENTA: " + voucherDetail.getAccount() + " NOTRANS:" + voucherDetail.getTransactionNumber() + " D:" + voucherDetail.getDebit() + " H:" + voucherDetail.getCredit());
+
+            em.persist(voucherDetail);
+            em.flush();
+        }
+
+        /** **/
+        //voucherAccoutingService.saveVoucher(voucherForGeneration);
+
+    }
+
     private String createAccountEntryForReceptionFromCollection(WarehouseVoucher warehouseVoucher,
                                                               BusinessUnit executorUnit,
                                                               String costCenterCode,

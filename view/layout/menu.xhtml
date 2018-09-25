@@ -375,9 +375,9 @@
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item"
                    rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}">
-        <s:link view="/warehouse/warehouseProductTransferList.xhtml"
+        <s:link view="/warehouse/warehouseProductTransfer.xhtml"
                 value="#{messages['menu.warehouse.productTransfer']}"
-                propagation="none"/>
+                propagation="begin"/>
     </rich:menuItem>
 
     <rich:menuItem submitMode="none"

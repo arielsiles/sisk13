@@ -994,8 +994,10 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                 setParameter("articleNumber", productItem.getId().getProductItemCode()).
                 setParameter("companyNumber", movementDetail.getCompanyNumber()).getSingleResult();
 
-        if (warehouseVoucher.isDevolution()
-                && productItem.getControlValued()) {
+        System.out.println(">>>>> sumUnitaryBalances : " + sumUnitaryBalances);
+
+        if (warehouseVoucher.isDevolution() && productItem.getControlValued()) {
+            System.out.println(">>>>>>>> isDevolution...");
             BigDecimal newInvestmentAmount = BigDecimalUtil.multiply(sumUnitaryBalances, productItem.getUnitCost(), 6);
             productItem.setInvestmentAmount(newInvestmentAmount);
         }
@@ -1008,14 +1010,31 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             System.out.println("======> newInvestmentAmount = " + productItem.getInvestmentAmount() + " + " + movementDetail.getAmount() + " : " + newInvestmentAmount);
             System.out.println("======> DIVISOR: " + productItem.getFullName() + " : " + sumUnitaryBalances);
 
-            BigDecimal newUnitCost = BigDecimalUtil.divide(newInvestmentAmount, sumUnitaryBalances, 6);
-            BigDecimal newCU = BigDecimalUtil.divide(newCTAmount, sumUnitaryBalances, 6);
+            BigDecimal newUnitCost = BigDecimal.ZERO;
+            BigDecimal newCU = BigDecimal.ZERO;
 
-            productItem.setInvestmentAmount(newInvestmentAmount);
-            productItem.setCt(newCTAmount);
 
-            productItem.setUnitCost(newUnitCost);
-            productItem.setCu(newCU);
+            if(sumUnitaryBalances.doubleValue() > 0){
+                newUnitCost = BigDecimalUtil.divide(newInvestmentAmount, sumUnitaryBalances, 6);
+                newCU = BigDecimalUtil.divide(newCTAmount, sumUnitaryBalances, 6);
+
+                productItem.setUnitCost(newUnitCost);
+                productItem.setCu(newCU);
+
+            }else {
+                productItem.setInvestmentAmount(BigDecimal.ZERO);
+                productItem.setCt(BigDecimal.ZERO);
+            }
+
+
+            System.out.println("----FIJANDO VALORES A PRODUCT ITEM----");
+            System.out.println("----> newInvestmentAmount: " + newInvestmentAmount);
+            System.out.println("----> newCTAmount: " + newCTAmount);
+            System.out.println("----> newUnitCost: " + newUnitCost);
+            System.out.println("----> newCU: " + newCU);
+            System.out.println("--------------------------------------");
+
+
 
         }
 

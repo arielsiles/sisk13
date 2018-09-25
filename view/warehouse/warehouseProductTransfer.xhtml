@@ -10,16 +10,17 @@
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
-    #{messages['WarehouseVoucher.new']}
+    #{messages['WarehouseVoucher.productTransfer']}
 </ui:define>
 
 <ui:param name="bodyAlign" value="center"/>
-<ui:param name="bodyWidth" value="95%"/>
+<ui:param name="bodyWidth" value="60%"/>
 
 <ui:param name="selectedTab" value="finances"/>
 <ui:define name="body">
 
 <c:set var="selectList" value="#{warehouseSpecialDocumentTypeList}"/>
+
 <c:set var="isEnabledSpecialOperations" value="#{s:hasPermission('WAREHOUSESPECIALOPERATIONS','VIEW')}"/>
 <c:if test="#{not isEnabledSpecialOperations}">
     <c:set var="selectList" value="#{warehouseDocumentTypeList}"/>
@@ -39,9 +40,11 @@
 <div class="buttons">
     <h:commandButton id="createButtonId"
                      action="#{warehouseVoucherCreateAction.createTransfer}"
-                     value="#{messages['Common.save']}"
+                     value="#{messages['Common.accept']}"
                      styleClass="button"
-                     rendered="#{!warehouseVoucherCreateAction.managed and s:hasPermission('WAREHOUSEVOUCHER','CREATE')}">
+                     rendered="#{s:hasPermission('WAREHOUSEVOUCHER','CREATE')}">
+        <!--<rich:componentControl for="createConfirmation" event="onclick" disableDefault="true"
+                               operation="show"/>-->
         <s:defaultAction/>
     </h:commandButton>
 
@@ -52,17 +55,7 @@
 </div>
 
 <rich:panel id="formPanel">
-<f:facet name="header">
-    #{messages['WarehouseVoucher.new']}
-</f:facet>
-<app:fieldset id="warehouseVoucherFields" title="#{messages['WarehouseVoucher.title']}">
-<h:panelGrid columns="2"
-             width="100%"
-             cellpadding="0"
-             cellspacing="0"
-             border="0"
-             columnClasses="width50percent, width50percent">
-<s:div id="leftSidePanel">
+<f:facet name="header">#{messages['WarehouseVoucher.productTransfer']}</f:facet>
 
     <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:param name="validateId" value="documentType"/>
@@ -84,7 +77,7 @@
                          value="#{warehouseVoucherCreateAction.warehouseVoucher.documentType}"
                          styleClass="input"
                          required="true">
-            <s:selectItems value="#{selectList}"
+            <s:selectItems value="#{productTransferDocumentTypeList}"
                            var="element"
                            label="#{element.fullName}"
                            noSelectionLabel=""
@@ -96,10 +89,6 @@
             <s:convertEntity/>
         </h:selectOneMenu>
     </s:decorate>
-
-
-
-<!--<s:div id="executorUnitLeftSidePanel">-->
 
     <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:param name="validateId" value="executorUnitCode"/>
@@ -263,20 +252,7 @@
         </h:inputTextarea>
     </s:decorate>
 
-<!--</s:div>-->
-
-</s:div>
-
-<s:div id="rightSidePanel">
-</s:div>
-
-</h:panelGrid>
-</app:fieldset>
-
 </rich:panel>
-
-<div class="buttons">
-</div>
 
 </h:form>
 
@@ -329,6 +305,26 @@
                                oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
         </ui:define>
     </s:decorate>
+
+
+    <s:decorate template="/include/modalDialog.xhtml">
+        <ui:param name="dialogId" value="createConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['WarehouseVoucher.productTransfer.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{warehouseVoucherCreateAction.createTransfer}"
+                               value="#{messages['Common.accept']}"
+                               immediate="true"
+                               styleClass="button"
+                               tabindex="1000"/>
+            <s:defaultAction/>
+        </ui:define>
+    </s:decorate>
+
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>

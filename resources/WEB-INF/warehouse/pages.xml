@@ -595,6 +595,18 @@
         </navigation>
     </page>
 
+    <page view-id="/warehouse/warehouseProductTransfer.xhtml" no-conversation-view-id="/home.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+
+        </navigation>
+    </page>
+
     <page view-id="/warehouse/productDeliveryList.xhtml">
         <end-conversation/>
         <navigation from-action="#{productDeliveryAction.select(productDeliveryItem)}">

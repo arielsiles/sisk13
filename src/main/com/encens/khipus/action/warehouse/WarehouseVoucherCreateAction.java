@@ -8,10 +8,7 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
-import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
-import com.encens.khipus.service.warehouse.MonthProcessService;
-import com.encens.khipus.service.warehouse.WarehouseCatalogService;
-import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
+import com.encens.khipus.service.warehouse.*;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
@@ -51,6 +48,9 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
 
     @In
     private ApprovalWarehouseVoucherService approvalWarehouseVoucherService;
+
+    @In
+    private WarehouseAccountEntryService warehouseAccountEntryService;
 
     private ProductItem productItemFrom;
     private ProductItem productItemTo;
@@ -142,10 +142,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         movementDetail2.setQuantity(quantity);
         movementDetail2.setMeasureCode(productItemTo.getUsageMeasureCode());
         movementDetail2.setWarehouse(warehouseVoucher.getWarehouse());
-        movementDetail2.setUnitCost(productItemTo.getUnitCost());
-        movementDetail2.setAmount(BigDecimalUtil.multiply(quantity, productItemTo.getUnitCost(), 6));
-        movementDetail2.setUnitPurchasePrice(productItemTo.getCu());
-        movementDetail2.setPurchasePrice(BigDecimalUtil.multiply(quantity, productItemTo.getCu(), 6));
+        movementDetail2.setUnitCost(movementDetail.getUnitCost());
+        movementDetail2.setAmount(movementDetail.getAmount());
+        movementDetail2.setUnitPurchasePrice(movementDetail.getUnitPurchasePrice());
+        movementDetail2.setPurchasePrice(movementDetail.getPurchasePrice());
         movementDetail2.setMovementType(MovementDetailType.E);
         movementDetail2.setCashAccount(productItemTo.getCashAccount());
 
@@ -173,7 +173,6 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
 
             warehouseVoucherUpdateAction.putWarehouseVoucher(warehouseVoucherTo.getId());
 
-
             try {
 
                 approvalWarehouseVoucherService.approveWarehouseVoucherTransferProduct(warehouseVoucherFrom.getId(), description,
@@ -186,13 +185,25 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
                         movementDetailOverMaximumStockMap,
                         movementDetailWithoutWarnings);
 
+
             } catch (Exception e){
                 e.printStackTrace();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"WarehouseVoucher.productTransfer.message.approveError");
                 return Outcome.FAIL;
             }
 
-            showMovementDetailWarningMessages();
+            try {
+                warehouseAccountEntryService.createAccountEntryForProductTransfer(warehouseVoucherFrom, warehouseVoucherFrom.getExecutorUnit(),warehouseVoucherFrom.getCostCenter().getCode(), description );
+
+            }catch (Exception e){
+                e.printStackTrace();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"WarehouseVoucher.productTransfer.message.AccountEntryError");
+                return Outcome.FAIL;
+            }
+
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"WarehouseVoucher.productTransfer.message.created");
             return Outcome.SUCCESS;
+
         } catch (InventoryException e) {
             addInventoryMessages(e.getInventoryMessages());
             return Outcome.REDISPLAY;

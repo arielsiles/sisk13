@@ -45,6 +45,15 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <factory name="productTransferDocumentTypeList" value="#{productTransferDocumentTypeQuery}"/>
+    <framework:entity-query name="productTransferDocumentTypeQuery"
+                            ejbql="select documentType from WarehouseDocumentType documentType">
+        <framework:restrictions>
+            <value>documentType.state != #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}</value>
+            <value>documentType.warehouseVoucherType = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType', 'P')}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
     <factory name="warehouseList" value="#{warehouseQuery}"/>
     <framework:entity-query name="warehouseQuery"
                             ejbql="select warehouse from Warehouse warehouse">

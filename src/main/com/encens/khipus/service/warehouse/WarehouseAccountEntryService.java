@@ -68,4 +68,6 @@ public interface WarehouseAccountEntryService extends GenericService {
                                                   String gloss,
                                                   List<ProductionPlanningAction.AccountOrderProduction> accountOrderProductions)
             throws CompanyConfigurationNotFoundException;
+
+    void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucher, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException;
 }
