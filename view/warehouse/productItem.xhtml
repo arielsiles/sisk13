@@ -143,7 +143,7 @@
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
-                <a4j:support event="onchange" reRender="minimalStockField, maximumStockField" ajaxSingle="true"/>
+                <a4j:support event="onchange" reRender="minimalStockField, measureUnitField, maximumStockField" ajaxSingle="true"/>
             </h:selectOneMenu>
         </c:otherwise>
     </c:choose>
@@ -178,6 +178,41 @@
         </c:otherwise>
     </c:choose>
 </s:decorate>
+
+    <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehousePurchaseOrder.warehouse']}</ui:define>
+        <h:selectOneMenu id="warehouseField"
+                         value="#{productItem.warehouse}"
+                         styleClass="input"
+                         tabindex="13">
+            <s:selectItems value="#{warehouseList.resultList}"
+                           var="element"
+                           label="#{element.name}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>-->
+
+    <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehouseVoucher.warehouse']}"/>
+        </ui:define>
+
+        <app:selectPopUp id="warehouseSelectPopup"
+                         required="true"
+                         textValue="#{productItem.warehouse.fullName}"
+                         value="#{productItem.warehouse}"
+                         clearAction="#{productItemAction.clearWarehouse()}"
+                         searchModalPanel="warehouseModalPanel"
+                         reRender="warehouseField"
+                         renderedSelectLink="true"
+                         renderedClearLink="true"
+                         dataModel="#{warehouseSearchDataModel}"
+                         styleClass="inputLarge"
+                         hotKeySelect="alt+3">
+        </app:selectPopUp>
+    </s:decorate>
 
 <s:decorate id="minimalStockField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['ProductItem.minimalStock']}</ui:define>
@@ -364,6 +399,21 @@
                            oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
     </ui:define>
 </s:decorate>
+
+    <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="warehouseModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{productItemAction.assignWarehouse(warehouseItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="warehouseField"
+                               oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#name" query="focus()" timing="onload"/>
 </ui:define>

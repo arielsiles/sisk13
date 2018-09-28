@@ -4,15 +4,22 @@ import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.warehouse.ProductItemMinimalStockIsGreaterThanMaximumStockException;
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
+import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.framework.service.GenericServiceBean;
+import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.ArticulosPromocion;
 import com.encens.khipus.model.customers.Promocion;
 import com.encens.khipus.model.customers.Ventaarticulo;
-import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CompanyConfiguration;
+import com.encens.khipus.model.finances.CostCenter;
+import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.service.admin.BusinessUnitService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.employees.AccountingRecordResult;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -22,8 +29,10 @@ import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
+import javax.transaction.SystemException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
@@ -39,9 +48,12 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
 
     @In(value = "#{entityManager}")
     private EntityManager em;
-
     @In
     private SequenceGeneratorService sequenceGeneratorService;
+    @In
+    private GenericService genericService;
+    @In
+    BusinessUnitService businessUnitService;
 
     @Override
     @TransactionAttribute(REQUIRES_NEW)
@@ -60,9 +72,53 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
             productItem.getId().setProductItemCode(String.valueOf(sequenceGeneratorService.nextValue(Constants.WAREHOUSE_PRODUCT_ITEM_SEQUENCE)));
             getEntityManager().persist(productItem);
             getEntityManager().flush();
+
+            InitialInventory inv = new InitialInventory();
+            inv.setProductItemCode(productItem.getId().getProductItemCode());
+            inv.setQuantity(BigDecimal.ZERO);
+            inv.setProductItemName(productItem.getName());
+            inv.setUnitCost(BigDecimal.ZERO);
+            inv.setCompanyNumber(productItem.getCompanyNumber());
+            inv.setYear(DateUtils.getCurrentYear(new Date()).toString());
+            inv.setWarehouseCode(productItem.getWarehouse().getWarehouseCode());
+
+            getEntityManager().persist(inv);
+            createProductInventory(productItem); //Crea inv_inventario
+            getEntityManager().flush();
+
         } catch (PersistenceException e) {
             throw new EntryDuplicatedException();
         }
+    }
+
+    public void createProductInventory(ProductItem productItem){
+
+
+        try {
+            CompanyConfiguration companyConfiguration = genericService.findById(CompanyConfiguration.class, Constants.defaultCompanyNumber);
+            BusinessUnit businessUnit = businessUnitService.findBusinessUnitByExecutorUnitCode(companyConfiguration.getCompanyNumber());
+
+            Inventory inventory = new Inventory();
+            inventory.setId(new InventoryPK(productItem.getId().getCompanyNumber(), productItem.getWarehouseCode(), productItem.getId().getProductItemCode()));
+            inventory.setUnitaryBalance(BigDecimal.ZERO);
+
+            InventoryDetail inventoryDetail = new InventoryDetail();
+            inventoryDetail.setCostCenterCode(companyConfiguration.getExchangeRateBalanceCostCenter().getId().getCode());
+            inventoryDetail.setCostCenter(companyConfiguration.getExchangeRateBalanceCostCenter());
+            inventoryDetail.setCompanyNumber(companyConfiguration.getCompanyNumber());
+            inventoryDetail.setWarehouseCode(productItem.getWarehouseCode());
+            inventoryDetail.setProductItem(productItem);
+            inventoryDetail.setProductItemCode(productItem.getId().getProductItemCode());
+            inventoryDetail.setQuantity(BigDecimal.ZERO);
+            inventoryDetail.setExecutorUnit(businessUnit);
+
+            getEntityManager().persist(inventory);
+            getEntityManager().persist(inventoryDetail);
+
+        }catch (Exception e) {
+            log.error("Unexpected error ", e);
+        }
+
     }
 
     @Override

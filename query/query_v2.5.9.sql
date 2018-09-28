@@ -26,3 +26,9 @@ WHERE s.`idzonaproductiva` IN (
 );
 
 -- -----------------------------------------------------
+
+ALTER TABLE inv_articulos ADD COLUMN cod_alm VARCHAR(255) AFTER cod_art;
+UPDATE configuracion c SET c.`cod_cc` = '0111';
+
+
+

@@ -50,6 +50,9 @@ public class ProductItem implements BaseModel {
     @Column(name = "COD_ART", insertable = false, updatable = false)
     private String productItemCode;
 
+    @Column(name = "COD_ALM")
+    private String warehouseCode;
+
     @Column(name = "DESCRI", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
@@ -109,6 +112,13 @@ public class ProductItem implements BaseModel {
     @Version
     @Column(name = "version")
     private long version;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "COD_ALM", nullable = false, insertable = false, updatable = false)
+    })
+    private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
@@ -405,5 +415,21 @@ public class ProductItem implements BaseModel {
 
     public void setCt(BigDecimal ct) {
         this.ct = ct;
+    }
+
+    public String getWarehouseCode() {
+        return warehouseCode;
+    }
+
+    public void setWarehouseCode(String warehouseCode) {
+        this.warehouseCode = warehouseCode;
+    }
+
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 }

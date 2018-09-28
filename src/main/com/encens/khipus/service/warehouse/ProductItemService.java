@@ -59,4 +59,7 @@ public interface ProductItemService extends GenericService {
 
     @SuppressWarnings(value = "unchecked")
     public BigDecimal getInitialInventoryYear(String productItemCode, String year);
+
+    void createProductInventory(ProductItem productItem);
+
 }

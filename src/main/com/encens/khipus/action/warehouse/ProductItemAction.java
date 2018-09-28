@@ -10,10 +10,7 @@ import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.warehouse.ProductItemState;
-import com.encens.khipus.model.warehouse.SubGroup;
-import com.encens.khipus.model.warehouse.SubGroupState;
+import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.production.ProcessedProductService;
 import com.encens.khipus.service.production.ProductionInputService;
@@ -205,8 +202,18 @@ public class ProductItemAction extends GenericAction<ProductItem> {
         getInstance().setSubGroup(subGroup);
     }
 
+    public void assignWarehouse(Warehouse warehouse) {
+        getInstance().setWarehouseCode(warehouse.getWarehouseCode());
+        getInstance().setWarehouse(warehouse);
+    }
+
     public void clearSubGroup() {
         getInstance().setSubGroup(null);
+    }
+
+    public void clearWarehouse() {
+        getInstance().setWarehouseCode(null);
+        getInstance().setWarehouse(null);
     }
 
     public String getAccountClass() {

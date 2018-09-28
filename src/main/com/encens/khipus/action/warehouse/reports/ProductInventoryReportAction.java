@@ -163,7 +163,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
             }
 
             CollectionData data = new CollectionData(   initialInventory.getProductItemCode(),
-                                                        initialInventory.getProductItemName(),
+                                                        initialInventory.getProductItem().getName(),
                                                         initialInventory.getProductItem().getUsageMeasureCode(),
                                                         initQuantity,
                                                         BigDecimal.ZERO,
@@ -446,7 +446,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         for (InitialInventory initialInventory:initialInventoryList){
             CollectionData data = new CollectionData(
                     initialInventory.getProductItemCode(),
-                    initialInventory.getProductItemName(),
+                    initialInventory.getProductItem().getName(),
                     initialInventory.getProductItem().getUsageMeasureCode(),
                     initialInventory.getQuantity(),
                     //kardexProductMovementAction.calculateInitialAmountToKardex(initialInventory.getProductItemCode(), startDate),
