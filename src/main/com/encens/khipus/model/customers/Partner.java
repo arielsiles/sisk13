@@ -1,14 +1,18 @@
 package com.encens.khipus.model.customers;
 
+import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.contacts.Department;
-import com.encens.khipus.model.contacts.Person;
+import com.encens.khipus.model.contacts.*;
 import com.encens.khipus.model.production.ProductiveZone;
+import org.hibernate.annotations.Filter;
+import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import java.util.Date;
 
 /**
  * Customer entity
@@ -22,15 +26,68 @@ import javax.persistence.Entity;
         @NamedQuery(name = "Partner.findPartnerById", query = "select o from Partner o WHERE o.id=:id order by o.id")
 })
 
-@Entity
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "socio")
-@DiscriminatorValue("socio")
-@PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "idsocio", referencedColumnName = "idpersona")
-})
-@EntityListeners(UpperCaseStringListener.class)
-public class Partner extends Person {
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Partner.tableGenerator",
+        table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "socio",
+        allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
+@Entity
+@Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
+@EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "socio")
+public class Partner implements BaseModel {
+
+    @Id
+    @Column(name = "idsocio", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Partner.tableGenerator")
+    private Long id;
+
+    @Column(name = "noidentificacion", nullable = false, length = 100)
+    @Length(max = 100)
+    private String idNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idexttipodocumento", referencedColumnName = "IDEXTTIPODOCUMENTO")
+    private Extension extensionSite;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipodocumento", nullable = false)
+    private DocumentType documentType;
+
+    @Column(name = "apellidopaterno", length = 200)
+    private String lastName;
+
+    @Column(name = "apellidomaterno", length = 200)
+    private String maidenName;
+
+    @Column(name = "nombres", nullable = false)
+    @NotNull
+    private String firstName;
+
+    @Column(name = "fechanacimiento")
+    @Temporal(TemporalType.DATE)
+    private Date birthDay;
+
+    @Column(name = "profesion", length = 100)
+    private String profession;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idsaludo")
+    private Salutation salutation;
+
+    @Column(name = "genero")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idestadocivil")
+    private MaritalStatus maritalStatus;
+
+    @Column(name = "domicilio", length = 500)
+    @Length(max = 500)
+    private String homeAddress;
 
     @Column(name = "nosocio", length = 100)
     private String number;
@@ -76,6 +133,13 @@ public class Partner extends Person {
     @NotNull
     private Company company;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNumber() {
         return number;
@@ -95,13 +159,7 @@ public class Partner extends Person {
 
     @Override
     public String toString() {
-        return "Partner{" +
-                "getId()='" + getId() + '\'' +
-                ", getIdNumber='" + getIdNumber() + '\'' +
-                ", getLastName='" + getLastName() + '\'' +
-                ", getMaidenName='" + getMaidenName() + '\'' +
-                ", getFirstName='" + getFirstName() + '\'' +
-                '}';
+        return "";
     }
 
     public PartnerState getState() {
@@ -191,4 +249,106 @@ public class Partner extends Person {
     public void setnPartner(String nPartner) {
         this.nPartner = nPartner;
     }
+
+
+    public String getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    public Extension getExtensionSite() {
+        return extensionSite;
+    }
+
+    public void setExtensionSite(Extension extensionSite) {
+        this.extensionSite = extensionSite;
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getMaidenName() {
+        return maidenName;
+    }
+
+    public void setMaidenName(String maidenName) {
+        this.maidenName = maidenName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public Date getBirthDay() {
+        return birthDay;
+    }
+
+    public void setBirthDay(Date birthDay) {
+        this.birthDay = birthDay;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public Salutation getSalutation() {
+        return salutation;
+    }
+
+    public void setSalutation(Salutation salutation) {
+        this.salutation = salutation;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public MaritalStatus getMaritalStatus() {
+        return maritalStatus;
+    }
+
+    public void setMaritalStatus(MaritalStatus maritalStatus) {
+        this.maritalStatus = maritalStatus;
+    }
+
+    public String getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public String getFullName() {
+        return (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName + " " : "") + (firstName != null ? firstName : "");
+    }
+
 }

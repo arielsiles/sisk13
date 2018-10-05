@@ -5,6 +5,7 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.contacts.Country;
 import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.contacts.Extension;
+import com.encens.khipus.model.contacts.Person;
 import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.customers.PartnerState;
 import com.encens.khipus.model.production.ProductiveZone;
