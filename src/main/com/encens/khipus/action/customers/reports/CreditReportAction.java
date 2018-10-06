@@ -55,7 +55,7 @@ public class CreditReportAction extends GenericReportAction {
         log.debug("generating Payment Plan......................................id: " + credit.getCode());
         Collection<PaymentPlanData> beanCollection = calculatePaymentPlan(credit);
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        String partnerName = credit.getPartner().getName();
+        String partnerName = credit.getPartner().getFullName();
         String partnerCode = credit.getPartner().getNumber();
         String term = credit.getTerm().toString() + " MESES";
         String amortiza = "C/ " + credit.getAmortization().toString() + " DIAS";
