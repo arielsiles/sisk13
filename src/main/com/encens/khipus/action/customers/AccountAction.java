@@ -2,10 +2,7 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.customers.Account;
-import com.encens.khipus.model.customers.AccountState;
-import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.customers.CreditTransaction;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -48,4 +45,13 @@ public class AccountAction extends GenericAction<Account> {
         return super.select(instance);
 
     }
+
+    public void assignPartner(Partner partner){
+        getInstance().setPartner(partner);
+    }
+
+    public void clearPartner(){
+        getInstance().setPartner(null);
+    }
+
 }

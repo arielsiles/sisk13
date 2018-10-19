@@ -91,6 +91,15 @@ public class CreditAction extends GenericAction<Credit> {
         return creditTransactionAction.select(creditTransaction);
     }
 
+
+    public void assignPartner(Partner partner){
+        getInstance().setPartner(partner);
+    }
+
+    public void clearPartner(){
+        getInstance().setPartner(null);
+    }
+
     public void checkCreditStatus(){
 
         for (Credit credit : creditService.getAllCredits()){

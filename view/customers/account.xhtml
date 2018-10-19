@@ -74,7 +74,7 @@
                     </c:choose>
                 </f:facet>
 
-                <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.partner']}</ui:define>
                     <h:selectOneMenu id="partnerId" value="#{account.partner}"
                                      styleClass="input"
@@ -87,7 +87,23 @@
                                        hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>
+                </s:decorate>-->
+
+
+                <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+                    <app:selectPopUp id="partnerFieldId"
+                                     required="true"
+                                     textValue="#{account.partner.fullName}"
+                                     value="#{account.partner}"
+                                     clearAction="#{accountAction.clearPartner()}"
+                                     searchModalPanel="partnerListModalPanel"
+                                     dataModel="#{partnerDataModel}"
+                                     reRender="partnerField"
+                                     tabindex="12">
+                    </app:selectPopUp>
                 </s:decorate>
+
 
                 <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
@@ -140,6 +156,22 @@
                                    styleClass="button"/>
             </ui:define>
         </s:decorate>-->
+
+
+        <s:div id="partnerListModalPanelDiv">
+            <s:decorate id="partnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">
+                <ui:param name="containerId" value="partnerListModalPanelContainer"/>
+                <ui:param name="dialogId" value="partnerListModalPanel"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton"
+                                       action="#{accountAction.assignPartner(partnerItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image-middle"
+                                       reRender="partnerField"
+                                       oncomplete="Richfaces.hideModalPanel('partnerListModalPanel');"/>
+                </ui:define>
+            </s:decorate>
+        </s:div>
 
         <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
     </ui:define>
