@@ -52,6 +52,11 @@ body {
 
 }
 
+.body3 {
+    height: 100px;
+    overflow: auto;
+}
+
 a:hover {
     color: #000;
 }

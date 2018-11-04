@@ -18,18 +18,25 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="bodyWidth" value="90%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
 
         <h:form id="accountForm">
 
             <div class="buttons">
-                <!--<h:commandButton action="#{creditAction.addCreditPayment}"
-                                 value="#{messages['CreditTransaction.newPayment']}"
+
+                <h:commandButton action="#"
+                                 value="#{messages['Account.withdrawal']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed}"/>-->
+                                 rendered="#{accountAction.managed}"/>
+
+                <h:commandButton action="#{accountAction.addPayment}"
+                                 value="#{messages['Account.newDeposit']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 rendered="#{accountAction.managed}"/>
 
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.create}"
@@ -74,21 +81,6 @@
                     </c:choose>
                 </f:facet>
 
-                <!--<s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.partner']}</ui:define>
-                    <h:selectOneMenu id="partnerId" value="#{account.partner}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="1">
-                        <s:selectItems value="#{partnerList.resultList}"
-                                       var="partner"
-                                       label="#{partner.fullName}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>-->
-
 
                 <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
@@ -122,6 +114,21 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                    <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{accountTypeList.resultList}"
+                                       var="accountType"
+                                       label="#{accountType.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="accountStateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.state']}</ui:define>
                     <h:selectOneMenu id="accountState" value="#{account.accountState}" styleClass="input"
@@ -134,29 +141,87 @@
                 </s:decorate>
 
             </rich:panel>
+
+            <c:if test="#{accountAction.managed}">
+                <rich:tabPanel switchType="ajax" selectedTab="accountTransactionTab">
+                    <rich:tab name="accountTransactionTab"
+                              label="#{messages['Account.transactions']}"
+                              ajaxSingle="true">
+                        <rich:dataTable id="accountTransactionListId"
+                                        value="#{accountTransactionDataModel}"
+                                        var="accountTransactionItem"
+                                        rows="#{sessionUser.rowsPerPage}"
+                                        width="100%"
+                                        columnsWidth="15%, 30%, 15%, 15%, 15%, 10%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.date']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.gloss']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.amount']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.balance']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.type']}" />
+                                    </rich:column>
+
+                                    <rich:column styleClass="center">
+                                        <h:outputText value="#{messages['Common.action']}" />
+                                    </rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+
+                            <rich:column>
+                                <h:outputText value="#{accountTransactionItem.date}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}"
+                                                       type="date"/>
+                                </h:outputText>
+                            </rich:column>
+
+                            <rich:column>
+                                <h:outputText value="#{accountTransactionItem.gloss}"/>
+                            </rich:column>
+
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{accountTransactionItem.amount}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{accountTransactionItem.account.balance}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+
+
+                            <!--<rich:column styleClass="center">
+                                <h:commandLink value="#{messages['Common.select']}"
+                                               immediate="true"
+                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
+                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
+                            </rich:column>-->
+
+                        </rich:dataTable>
+                        <app:dataScroller id="ListIdListDataScrollerId"
+                                          for="accountTransactionListId"
+                                          dataModel="#{accountTransactionDataModel}"/>
+                    </rich:tab>
+                </rich:tabPanel>
+            </c:if>
+
         </h:form>
-
-        <!--<s:decorate template="/include/modalDialog.xhtml"
-                    rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}">
-            <ui:param name="dialogId" value="deleteConfirmation"/>
-            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
-            <ui:define name="dialogContent">
-                <p>
-                    <h:outputFormat value="#{messages['Credit.delete.confirmation']}">
-                        <f:param value="#{credit.amount}"/>
-                        <f:param value="#{credit.partner.name}"/>
-                    </h:outputFormat>
-                </p>
-            </ui:define>
-            <ui:define name="dialogOption">
-                <a4j:commandButton action="#{creditAction.delete}"
-                                   value="#{messages['Common.delete']}"
-                                   immediate="true"
-                                   rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}"
-                                   styleClass="button"/>
-            </ui:define>
-        </s:decorate>-->
-
 
         <s:div id="partnerListModalPanelDiv">
             <s:decorate id="partnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">

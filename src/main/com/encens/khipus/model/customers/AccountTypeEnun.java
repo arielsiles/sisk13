@@ -6,15 +6,13 @@ package com.encens.khipus.model.customers;
  * @author:
  */
 
-public enum AccountTransactionType {
-    DEPOSIT("AccountTransactionType.deposit"),
-    INTEREST("AccountTransactionType.withdrawal"),
-    WITHDRAWAL("AccountTransactionType.withdrawal"),
-    TAX("AccountTransactionType.tax");
+public enum AccountTypeEnun {
+    SAVINGS_BANK("Account.savingsBank"),
+    CURRENT_ACCOUNT("Account.currentAccount");
 
     private String resourceKey;
 
-    AccountTransactionType(String resourceKey) {
+    AccountTypeEnun(String resourceKey) {
         this.resourceKey = resourceKey;
     }
 

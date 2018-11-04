@@ -34,8 +34,7 @@
             s:hasPermission('CUSTOMERCATEGORY','VIEW') or
             s:hasPermission('PRINTINVOICE','VIEW') or
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
-    <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0"
-                 columnClasses="tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="8" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
@@ -80,6 +79,11 @@
                         value="#{messages['menu.customers.sales.cashBoxTransaction']}"/>
             </rich:menuItem>
         </rich:dropDownMenu>
+
+        <s:link view="/customers/salesBox.xhtml"
+                value="#{messages['menu.customers.box']}"
+                styleClass="tab-cell"
+                propagation="begin"/>
 
         <s:link view="/customers/cashSaleList.xhtml"
                 value="#{messages['menu.customers.sales.cashSales']}"
