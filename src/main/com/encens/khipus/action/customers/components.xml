@@ -17,6 +17,9 @@
     <factory name="partnerList" value="#{partnerQuery}"/>
     <framework:entity-query name="partnerQuery" ejbql="select p from Partner p"/>
 
+    <factory name="accountTypeList" value="#{accountTypeQuery}"/>
+    <framework:entity-query name="accountTypeQuery" ejbql="select p from AccountType p"/>
+
     <factory name="discountPolicyTypeList" value="#{discountPolicyTypeQuery}"/>
     <framework:entity-query name="discountPolicyTypeQuery" ejbql="select d from DiscountPolicyType d"
                             order="d.measurement DESC">

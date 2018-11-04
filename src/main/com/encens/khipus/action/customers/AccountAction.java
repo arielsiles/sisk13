@@ -12,7 +12,9 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Actions for Credit
@@ -24,8 +26,11 @@ import java.util.Date;
 @Scope(ScopeType.CONVERSATION)
 public class AccountAction extends GenericAction<Account> {
 
+
+    private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
+
     @Factory(value = "account", scope = ScopeType.STATELESS)
-    public Account initCredit() {
+    public Account initAccount() {
         return getInstance();
     }
 
@@ -46,6 +51,13 @@ public class AccountAction extends GenericAction<Account> {
 
     }
 
+    @Begin(nested = true, flushMode = FlushModeType.MANUAL)
+    public String addPayment() {
+        //setOp(OP_UPDATE);
+        //return creditTransactionAction.addCreditTransaction();
+        return Outcome.SUCCESS;
+    }
+
     public void assignPartner(Partner partner){
         getInstance().setPartner(partner);
     }
@@ -54,4 +66,11 @@ public class AccountAction extends GenericAction<Account> {
         getInstance().setPartner(null);
     }
 
+    public List<AccountTransaction> getAccountTransactionList() {
+        return accountTransactionList;
+    }
+
+    public void setAccountTransactionList(List<AccountTransaction> accountTransactionList) {
+        this.accountTransactionList = accountTransactionList;
+    }
 }

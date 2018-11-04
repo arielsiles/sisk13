@@ -53,9 +53,16 @@ public class Account implements BaseModel {
     @Enumerated(EnumType.STRING)
     private AccountState accountState;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Column(name = "saldo", precision = 13, scale = 2, nullable = false)
+    private BigDecimal balance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipocuenta", nullable = false)
+    private AccountType accountType;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -122,5 +129,21 @@ public class Account implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }

@@ -143,16 +143,6 @@
         <param name="id" value="#{invoicePrintAction.invoiceId}"/>
     </page>
 
-
-    <page view-id="/customers/creditList.xhtml">
-        <end-conversation/>
-        <navigation from-action="#{creditAction.select(creditItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/customers/credit.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
     <page view-id="/customers/account.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
         <navigation>
             <rule if-outcome="Success">
@@ -160,6 +150,52 @@
             </rule>
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/accountList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{accountAction.addPayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/addPaymentAccount.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/addPaymentAccount.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
+        <!--<navigation from-action="#{creditTransactionAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>-->
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/accountList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{accountAction.select(accountItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/creditList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{creditAction.select(creditItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
             </rule>
         </navigation>
     </page>

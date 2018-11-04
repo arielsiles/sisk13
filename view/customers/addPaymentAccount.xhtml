@@ -1,0 +1,206 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">
+    #{messages['PurchaseOrderPayment.new']}
+</ui:define>
+<ui:param name="bodyWidth" value="65%"/>
+<!--<ui:param name="bodyAlign" value="center"/>-->
+<ui:param name="selectedTab" value="customers"/>
+
+<ui:define name="body">
+    <h:form id="creditTransactionPaymentForm">
+
+        <c:set var="payAmountId" value="payAmount"/>
+
+        <div class="buttons">
+            <h:commandButton id="createButtonId"
+                             action="#{creditTransactionAction.create(credit)}"
+                             value="#{messages['CreditTransaction.save']}"
+                             styleClass="button"
+                             rendered="#{!creditTransactionAction.managed}">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{creditTransactionAction.managed}">
+                <rich:componentControl for="deleteConfirmation"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="show"/>
+            </h:commandButton>
+
+            <h:commandButton action="#{accountAction.cancel}"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true"/>
+        </div>
+
+        <rich:panel id="formPanel">
+            <f:facet name="header">#{messages['PurchaseOrderPayment.new']}</f:facet>
+
+            <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
+                <rich:calendar id="paymentDate"
+                               value="#{creditTransactionAction.dateTransaction}"
+                               popup="true"
+                               required="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               tabindex="1">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                </rich:calendar>
+            </s:decorate>
+
+
+            <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Account.partner']}</ui:define>
+                <h:outputText>#{account.partner.fullName}</h:outputText>
+            </s:decorate>
+
+            <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
+                <h:inputText id="accountNumber" value="#{account.accountNumber}" styleClass="input" maxlength="25" tabindex="2" required="true"/>
+            </s:decorate>
+
+
+            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CreditTransaction.gloss']}</ui:define>
+                <h:inputText id="gloss"
+                                 value="#{creditTransaction.gloss}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="8">
+                    <f:validateLength maximum="255"/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:div>-</s:div>
+
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <!--<s:div id="movementDetailListPanel">-->
+                <s:div id="accountTransactionDetailListPanel">
+
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                        <thead class="rich-table-thead">
+                        <tr class="rich-table-header">
+                            <th class="rich-table-headercell">#{messages['AccountTransaction.description']}</th>
+                            <th class="rich-table-headercell">#{messages['AccountTransaction.amount']}</th>
+                            <th class="rich-table-headercell">#{messages['Common.action']}</th>
+                        </tr>
+                        </thead>
+
+                        <c:forEach var="accountTransaction" items="#{accountAction.accountTransactionList}" varStatus="row">
+                            <c:set var="amountFieldId" value="amountField_#{row.index}"/>
+                            <c:set var="amountInputFieldId" value="amountInputField_#{row.index}"/>
+
+                            <tr class="rich-table-row">
+
+                                <td class="rich-table-cell">
+                                    <h:outputText value="#{accountTransaction.fullCashAccount}"/>
+                                </td>
+
+                                <td class="rich-table-cell center">
+                                    <s:div id="#{debitFieldId}">
+                                        <h:inputText id="#{debitInputFieldId}"
+                                                     value="#{voucherDetail.debit}"
+                                                     styleClass="inputSmall right"
+                                                     required="true"
+                                                     rendered="true">
+                                            <app:realNumberConverter minimum="0"
+                                                                     pattern="#{messages['patterns.decimalNumber']}"
+                                                                     forId="#{debitInputFieldId}"/>
+                                            <a4j:support event="onblur" ajaxSingle="true" reRender="movementDetailListPanel"/>
+                                        </h:inputText>
+                                        <h:message for="#{debitInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
+                                    </s:div>
+                                </td>
+
+                                <td class="rich-table-cell center">
+                                    <s:div id="#{creditFieldId}">
+                                        <h:inputText id="#{creditInputFieldId}"
+                                                     value="#{voucherDetail.credit}"
+                                                     styleClass="inputSmall right"
+                                                     required="true"
+                                                     rendered="true">
+                                            <app:realNumberConverter minimum="0"
+                                                                     pattern="#{messages['patterns.decimalNumber']}"
+                                                                     forId="#{creditInputFieldId}"/>
+                                            <a4j:support event="onblur" ajaxSingle="true" reRender="#{creditFieldId}, totalCredit"/>
+                                        </h:inputText>
+                                        <h:message for="#{creditInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
+                                    </s:div>
+                                </td>
+
+                                <td class="rich-table-cell center">
+                                    <a4j:commandLink immediate="true"
+                                                     title="#{messages['Common.remove']}"
+                                                     action="#{voucherCreateAction.removeVoucherDetail(voucherDetail)}"
+                                                     ajaxSingle="true"
+                                                     reRender="movementDetailListPanel">
+                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                    </a4j:commandLink>
+                                </td>
+                            </tr>
+                        </c:forEach>
+
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell center">-</td>
+                            <td class="rich-table-cell center">
+                                <s:div id="totalDebit">
+                                    <h:outputText value="#{voucherCreateAction.totalsDebit}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
+                                </s:div>
+                            </td>
+                            <td class="rich-table-cell center">
+                                <s:div id="totalCredit">
+                                    <h:outputText value="#{voucherCreateAction.totalsCredit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
+                                </s:div>
+                            </td>
+                            <td class="rich-table-cell center">-</td>
+                        </tr>
+                    </table>
+                </s:div>
+            </h:panelGrid>
+
+
+
+
+        </rich:panel>
+    </h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml"
+                rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['CreditTransaction.delete.confirmation']}">
+                    <f:param value="#{creditTransaction.amount}"/>
+                    <f:param value="#{creditTransaction.credit.code}"/>
+                </h:outputFormat>
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{creditTransactionAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               rendered="#{creditAction.managed}"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
+
+    <!--Set selector Id to enable focus-->
+    <rich:jQuery selector="#amount" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>

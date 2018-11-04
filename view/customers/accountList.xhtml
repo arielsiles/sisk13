@@ -64,7 +64,7 @@
             <rich:dataTable value="#{accountDataModel}" var="accountItem" id="accountList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="20%, 15%, 40%, 15%, 10%">
+                            columnsWidth="10%, 15%, 40%, 15%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -73,6 +73,8 @@
                         <rich:column>#{messages['Account.currency']}</rich:column>
 
                         <rich:column>#{messages['Account.partner']}</rich:column>
+
+                        <rich:column>#{messages['Account.accountType']}</rich:column>
 
                         <rich:column>#{messages['Account.state']}</rich:column>
 
@@ -92,6 +94,10 @@
 
                 <rich:column>
                     <h:outputText value="#{accountItem.partner.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{accountItem.accountType.name}"/>
                 </rich:column>
 
                 <rich:column>
