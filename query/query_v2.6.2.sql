@@ -14,5 +14,7 @@ ALTER TABLE cuenta ADD FOREIGN KEY (idtipocuenta) REFERENCES tipocuenta(idtipocu
 
 /** 23/10/2018 **/
 ALTER TABLE transaccioncuenta CHANGE tipo tipotrans VARCHAR(32) NULL;
-
 ALTER TABLE cuenta ADD COLUMN saldo DECIMAL(13,2) NOT NULL AFTER estado;
+
+/** 01-11-2018 **/
+INSERT INTO tipocuenta (idtipocuenta, nombre, interes, activo, VERSION, idcompania) VALUES (1, "CAJA DE AHORRO", 3, 1 , 0, 1);

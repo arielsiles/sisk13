@@ -54,7 +54,7 @@ public class Account implements BaseModel {
     private AccountState accountState;
 
     @Column(name = "saldo", precision = 13, scale = 2, nullable = false)
-    private BigDecimal balance;
+    private BigDecimal balance = new BigDecimal(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsocio", nullable = false)

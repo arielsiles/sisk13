@@ -86,13 +86,13 @@
 
         <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
-            <h:inputTextarea id="description"
+            <h:inputText  id="description"
                              value="#{voucherCreateAction.voucher.gloss}"
                              required="true"
-                             styleClass="input textarea-medium"
+                             styleClass="inputLarge"
                              tabindex="3">
                 <f:validateLength maximum="500"/>
-            </h:inputTextarea>
+            </h:inputText>
         </s:decorate>
 
     </s:div>
@@ -180,7 +180,9 @@
 
 </h:panelGrid>
 
-<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
+    <rich:spacer height="5" />
+
+<!--<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">-->
     <h:panelGrid columns="1"
                  width="100%"
                  cellpadding="0"
@@ -275,7 +277,7 @@
             </table>
         </s:div>
     </h:panelGrid>
-</app:fieldset>
+<!--</app:fieldset>-->
 </rich:panel>
 
 <div class="buttons"></div>
