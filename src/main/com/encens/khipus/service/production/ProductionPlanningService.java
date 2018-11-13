@@ -75,4 +75,6 @@ public interface ProductionPlanningService extends GenericService {
 
     Double getReproSNGbyDateAndCodArt(String codArt, Date date);
 
+    List<ProductionOrder> getProductionOrderList(Date date);
+
 }

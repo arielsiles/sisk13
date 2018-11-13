@@ -36,6 +36,8 @@ import org.jboss.seam.international.StatusMessage;
 import javax.faces.event.ActionEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.encens.khipus.model.production.ProductionPlanningState.*;
@@ -331,6 +333,34 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
                 sueldosEventualesProduccion += costs.get(9).getAmountBs().doubleValue();
             }
         }
+
+    }
+
+    public void generateVouchers(){
+
+        getInstance().setDate(DateUtils.getDate(2018, 9, 3));
+        System.out.println("------> date: " + getInstance().getDate());
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String stringFecha = "2018-09-03";
+
+        Date fecha = null;
+
+        try {
+            fecha = sdf.parse(stringFecha);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        List<ProductionOrder> productionOrderList = productionPlanningService.getProductionOrderList(fecha);
+
+        setProductionOrder(productionOrderList.get(0));
+        setInstance(productionOrderList.get(0).getProductionPlanning());
+
+        makeExecutedOrder();
+        generateOnlyAllVoucher();
 
     }
 

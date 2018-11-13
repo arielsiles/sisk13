@@ -75,6 +75,10 @@
 
 
             <div class="buttons">
+
+                <h:commandButton value="Ingresar Alm" action="#{productionPlanningAction.generateVouchers}"
+                                 styleClass="button" />
+
                 <h:commandButton value="#{messages['Common.new']}" action="#{productionPlanningAction.createNew}"
                                  styleClass="button"
                                  rendered="#{s:hasPermission('PRODUCTDISTRIBUTION','CREATE')}"/>

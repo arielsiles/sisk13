@@ -264,6 +264,21 @@ public class ProductionPlanningServiceBean extends ExtendedGenericServiceBean im
     }
 
     @Override
+    public List<ProductionOrder> getProductionOrderList(Date date){
+
+        List<ProductionOrder> productionOrderList = new ArrayList<ProductionOrder>();
+
+        ProductionPlanning productionPlanning = (ProductionPlanning)getEntityManager().createNamedQuery("ProductionPlanning.findByDate")
+                .setParameter("date", date)
+                .getSingleResult();
+
+        System.out.println("----> PP: " + productionPlanning.toString());
+
+        return productionPlanning.getProductionOrderList();
+
+    }
+
+    @Override
     public void updateOrder(ProductionOrder order) {
         getEntityManager().createNativeQuery("update ORDENPRODUCCION set PORCENTAJEGRASA = :percentage where IDORDENPRODUCCION = :order")
                           .setParameter("percentage",order.getGreasePercentage())
