@@ -29,10 +29,16 @@ import java.util.List;
                         "left join fetch productionOrder.productComposition productComposition " +
                         "left join fetch productComposition.processedProduct " +
                         "where productionPlanning.id = :id"),
+
         @NamedQuery(name = "ProductionPlanning.findByDate",
                 query = "select productionPlanning " +
                         "from ProductionPlanning productionPlanning " +
-                        "where productionPlanning.date = :date")
+                        "where productionPlanning.date = :date"),
+
+        @NamedQuery(name = "ProductionPlanning.findProductionPlanningList",
+                query = "select productionPlanning " +
+                        "from ProductionPlanning productionPlanning " +
+                        "where productionPlanning.date between :startDate and :endDate")
 })
 @TableGenerator(name = "ProductionPlanning_Generator",
         table = "SECUENCIA",

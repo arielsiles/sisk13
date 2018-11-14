@@ -110,6 +110,9 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     private Date productionDay;
 
+    private Date start;
+    private Date end;
+
     @In
     private SessionUser sessionUser;
     @In
@@ -336,32 +339,46 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     }
 
-    public void generateVouchers(){
+    public void setPendingProductionOrder(){
+        productionPlanningService.setProductionOrdersState(start, end, ProductionPlanningState.PENDING);
+    }
 
-        getInstance().setDate(DateUtils.getDate(2018, 9, 3));
-        System.out.println("------> date: " + getInstance().getDate());
+    public void recalculate(){
 
+        List<ProductionPlanning> productionPlanningList =  productionPlanningService.getProductionPlanningList(start, end);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String stringFecha = "2018-09-03";
+        for (ProductionPlanning productionPlanning : productionPlanningList){
 
-        Date fecha = null;
-
-        try {
-            fecha = sdf.parse(stringFecha);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            System.out.println("==========> DATE PP: " + productionPlanning.getDate());
+            List<ProductionOrder> productionOrderList = productionPlanning.getProductionOrderList();
+            setProductionOrder(productionOrderList.get(0));
+            setInstance(productionOrderList.get(0).getProductionPlanning());
+            makeExecutedOrder();
+            //generateOnlyAllVoucher();
         }
+        productionPlanningService.setProductionOrdersState(start, end, ProductionPlanningState.FINALIZED);
+    }
 
+    public void enterProductsWarehouse(){
 
-        List<ProductionOrder> productionOrderList = productionPlanningService.getProductionOrderList(fecha);
+        List<ProductionPlanning> productionPlanningList =  productionPlanningService.getProductionPlanningList(start, end);
 
-        setProductionOrder(productionOrderList.get(0));
-        setInstance(productionOrderList.get(0).getProductionPlanning());
+        for (ProductionPlanning productionPlanning : productionPlanningList){
+            System.out.println("==========> Ingreso Almacen: " + productionPlanning.getDate());
+            setInstance(productionPlanning);
+            generateOnlyAllVoucher();
+        }
+    }
 
-        makeExecutedOrder();
-        generateOnlyAllVoucher();
+    public void accountingProductionOrders(){
 
+        List<ProductionPlanning> productionPlanningList =  productionPlanningService.getProductionPlanningList(start, end);
+
+        for (ProductionPlanning productionPlanning : productionPlanningList){
+            System.out.println("==========> Contabilizando: " + productionPlanning.getDate());
+            setInstance(productionPlanning);
+            generateAllAccountingEntries();
+        }
     }
 
     public void generateOnlyAllVoucher(){
@@ -2218,6 +2235,22 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     public void setProductionDay(Date productionDay) {
         this.productionDay = productionDay;
+    }
+
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getEnd() {
+        return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
     }
 
     public class AccountOrderProduction{

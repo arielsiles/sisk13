@@ -279,6 +279,54 @@ public class ProductionPlanningServiceBean extends ExtendedGenericServiceBean im
     }
 
     @Override
+    public List<ProductionPlanning> getProductionPlanningList(Date startDate, Date endDate){
+
+        List<ProductionPlanning> productionPlanningList = new ArrayList<ProductionPlanning>();
+
+        productionPlanningList = getEntityManager().createNamedQuery("ProductionPlanning.findProductionPlanningList")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+
+        return productionPlanningList;
+
+    }
+
+    @Override
+    public void setStateProductionOrders(ProductionOrder productionOrder){
+
+        productionOrder.setEstateOrder(ProductionPlanningState.PENDING);
+        getEntityManager().merge(productionOrder);
+        getEntityManager().flush();
+
+        /*getEntityManager().createNativeQuery("UPDATE ordenproduccion o JOIN planificacionproduccion p ON o.idplanificacionproduccion = p.idplanificacionproduccion " +
+                "WHERE p.fecha BETWEEN :startDate AND :endDate SET o.estadoorden =:state ")
+                .setParameter("startDate", startDate )
+                .setParameter("endDate", endDate )
+                .setParameter("state", state )
+                .executeUpdate();
+        */
+    }
+
+
+    public void setProductionOrdersState(Date startDate, Date endDate, ProductionPlanningState state){
+
+        List<ProductionPlanning> productionPlanningList = getEntityManager().createNamedQuery("ProductionPlanning.findProductionPlanningList")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+
+
+        for (ProductionPlanning productionPlanning:productionPlanningList){
+            for (ProductionOrder productionOrder : productionPlanning.getProductionOrderList()){
+                productionOrder.setEstateOrder(state);
+                getEntityManager().merge(productionOrder);
+                getEntityManager().flush();
+            }
+        }
+    }
+
+    @Override
     public void updateOrder(ProductionOrder order) {
         getEntityManager().createNativeQuery("update ORDENPRODUCCION set PORCENTAJEGRASA = :percentage where IDORDENPRODUCCION = :order")
                           .setParameter("percentage",order.getGreasePercentage())

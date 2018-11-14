@@ -9,7 +9,7 @@ CREATE TABLE tipocuenta (
 	PRIMARY KEY (idtipocuenta)
 );
 
-ALTER TABLE cuenta ADD COLUMN idtipocuenta BIGINT(20) NOT NULL AFTER idsocio;
+-- ALTER TABLE cuenta ADD COLUMN idtipocuenta BIGINT(20) NOT NULL AFTER idsocio; -- REVISAR
 ALTER TABLE cuenta ADD FOREIGN KEY (idtipocuenta) REFERENCES tipocuenta(idtipocuenta);
 
 /** 23/10/2018 **/

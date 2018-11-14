@@ -48,6 +48,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     public void saveVoucher(Voucher voucher){
 
+        System.out.println("----->>>>>>> newId_sf_tmpenc(): " + financesPkGeneratorService.newId_sf_tmpenc());
+
         voucher.setId(financesPkGeneratorService.newId_sf_tmpenc());
 
         if (voucher.getTransactionNumber() == null){

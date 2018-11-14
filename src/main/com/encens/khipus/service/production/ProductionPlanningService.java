@@ -77,4 +77,9 @@ public interface ProductionPlanningService extends GenericService {
 
     List<ProductionOrder> getProductionOrderList(Date date);
 
+    List<ProductionPlanning> getProductionPlanningList(Date startDate, Date endDate);
+
+    void setStateProductionOrders(ProductionOrder productionOrder);
+
+    void setProductionOrdersState(Date startDate, Date endDate, ProductionPlanningState state);
 }
