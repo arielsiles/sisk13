@@ -22,6 +22,7 @@ import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.admin.BusinessUnitService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.finances.CostCenterService;
+import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.finances.VoucherServiceBean;
 import com.encens.khipus.service.production.*;
@@ -157,6 +158,9 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     @In(create = true)
     private SingleProductAction singleProductAction;
+
+    @In
+    private FinancesPkGeneratorService financesPkGeneratorService;
 
     private boolean showButtonAddInput = false;
     private Double volumeTotalInputMain = 0.0;
@@ -444,22 +448,18 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         update();
     }
 
-    public void generateAllAccountingEntries()
-    {
+    public void generateAllAccountingEntries(){
 
-        if(!wasInStockAllOrders())
-        {
+        if(!wasInStockAllOrders()){
             showErrorVoucherNotstock();
             return;
         }
-        if(!wasInStockAllReProcessed())
-        {
+        if(!wasInStockAllReProcessed()){
             showErrorVoucherNotstock();
             return;
         }
 
-        for(BaseProduct base : getInstance().getBaseProducts())
-        {
+        for(BaseProduct base : getInstance().getBaseProducts()){
             if(base.getSingleProducts().size() ==0)
             {
                 showErrorVoucherNotsingles();
@@ -1747,8 +1747,8 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
         }
     }
 
-    public String generateAccountToWarehouseVoucher(InventoryMovement inventoryMovement)
-    { String numTrans = "";
+    public String generateAccountToWarehouseVoucher(InventoryMovement inventoryMovement){
+        String numTrans = "";
         try {
             numTrans = approvalWarehouseVoucherService.crateAccountEntry(warehouseVoucherSelect,getGlossMessage(inventoryMovement),accountOrderProductions);
         } catch (CompanyConfigurationNotFoundException e) {

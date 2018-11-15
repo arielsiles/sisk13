@@ -6,6 +6,7 @@ import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
+import javax.persistence.Transient;
 
 /**
  * @author
@@ -54,6 +55,21 @@ public class FinancesPkGeneratorServiceBean extends GenericServiceBean implement
     public Long newId_sf_tmpenc(){
         return ((Integer)getEntityManager().createNativeQuery("select " + FinancesUtil.addSchema("newId_sf_tmpenc()")).getSingleResult()).longValue();
     }
+
+    /*public Long newId_sf_tmpenc(){
+        Long valor = null;
+        valor = (Long)getEntityManager().createNativeQuery("SELECT valor where talbla = 'sf_tmpenc'").getSingleResult();
+        getEntityManager().createNativeQuery("update secuencia set valor = valor+1 where tabla = 'sf_tmpenc'").executeUpdate();
+        return valor+1;
+    }*/
+
+    /** Error **/
+    public Long getNextIdSftmpenc(){
+        Long valor = null;
+        valor = (Long)getEntityManager().createNativeQuery("SELECT valor where talbla = 'sf_tmpenc'").getSingleResult();
+        return valor+1;
+    }
+
 
     public Long newId_sf_tmpdet(){
         return ((Integer)getEntityManager().createNativeQuery("select " + FinancesUtil.addSchema("newId_sf_tmpdet()")).getSingleResult()).longValue();
