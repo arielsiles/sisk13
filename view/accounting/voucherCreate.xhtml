@@ -48,163 +48,156 @@
 <rich:panel id="formPanel">
 <f:facet name="header">#{messages['Voucher.new']}</f:facet>
 
-<app:fieldset id="warehouseVoucherFields" title="#{messages['Voucher.header']}">
-<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width70percent, width30percent">
+<h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
 
-<s:div id="leftSidePanel">
-    <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Voucher.date']}</ui:define>
-        <rich:calendar value="#{voucherCreateAction.voucher.date}"
-                       popup="true"
-                       datePattern="#{messages['patterns.date']}"
-                       styleClass="input"
-                       enableManualInput="true"
-                       tabindex="1"
-                       required="true">
-        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-        </rich:calendar>
-    </s:decorate>
+    <s:div id="leftSidePanel">
+        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Voucher.date']}</ui:define>
+            <rich:calendar value="#{voucherCreateAction.voucher.date}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="1"
+                           required="true">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+            </rich:calendar>
+        </s:decorate>
 
-    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
-        <h:selectOneMenu id="documentType"
-                         value="#{voucherCreateAction.docType}"
-                         styleClass="input"
-                         required="true">
-            <s:selectItems value="#{selectList}"
-                           var="element"
-                           label="#{element.fullName}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <a4j:support event="onchange"
-                         action="#{voucherCreateAction.cleanMainFields()}"
-                         reRender="#{mainComponentIdsToRerender}"
-                         ajaxSingle="true"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
+        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Voucher.documentType']}</ui:define>
+            <h:selectOneMenu id="documentType"
+                             value="#{voucherCreateAction.docType}"
+                             styleClass="input"
+                             required="true">
+                <s:selectItems value="#{selectList}"
+                               var="element"
+                               label="#{element.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{voucherCreateAction.cleanMainFields()}"
+                             reRender="#{mainComponentIdsToRerender}"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
-    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
-        <h:inputTextarea id="description"
-                         value="#{voucherCreateAction.voucher.gloss}"
-                         required="true"
-                         styleClass="input textarea-largest"
-                         tabindex="3">
-            <f:validateLength maximum="500"/>
-        </h:inputTextarea>
-    </s:decorate>
+        <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
+            <app:selectPopUp id="productItemAccount"
+                             required="false"
+                             textValue="#{voucherCreateAction.account.fullName}"
+                             value="#{voucherCreateAction.account}"
+                             clearAction="voucherCreateAction.clearAccount()"
+                             searchModalPanel="cashAccountListModalPanel"
+                             dataModel="#{cashAccountDataModel}"
+                             reRender="itemAccountField, debitInputField, creditInputField, debitField, creditField"
+                             tabindex="11">
+            </app:selectPopUp>
 
-</s:div>
+            <a4j:commandButton id="newRegisterId"
+                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
 
-<s:div id="rightSidePanel">
-</s:div>
+        </s:decorate>
 
-</h:panelGrid>
-</app:fieldset>
+    </s:div>
 
+    <s:div id="rightSidePanel">
 
-<s:div id="dataVoucherFields">
-    <h:form id="inputVoucherForm">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
-        <tr class="rich-table-row">
-            <td class="rich-table-cell">
-                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
-                    <app:selectPopUp id="productItemAccount"
-                                     required="false"
-                                     textValue="#{voucherCreateAction.account.fullName}"
-                                     value="#{voucherCreateAction.account}"
-                                     clearAction="voucherCreateAction.clearAccount()"
-                                     searchModalPanel="cashAccountListModalPanel"
-                                     dataModel="#{cashAccountDataModel}"
-                                     reRender="itemAccountField, debitInputField, creditInputField, debitField, creditField"
-                                     tabindex="11">
-                    </app:selectPopUp>
-                </s:decorate>
-            </td>
-            <td class="rich-table-cell">
-                <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label"><h:outputText value="#{messages['Client.client']}"/></ui:define>
-                    <app:selectPopUp id="clientFieldId"
-                                     required="false"
-                                     textValue="#{voucherCreateAction.client.fullName}"
-                                     value="#{voucherCreateAction.client}"
-                                     clearAction="voucherCreateAction.clearClient()"
-                                     searchModalPanel="clientListModalPanel"
-                                     dataModel="#{clientDataModel}"
-                                     reRender="clientField"
-                                     tabindex="12">
-                    </app:selectPopUp>
-                </s:decorate>
-            </td>
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <h:inputTextarea  id="description"
+                              value="#{voucherCreateAction.voucher.gloss}"
+                              required="false"
+                              styleClass="textarea-largest2"
+                              rows="3"
+                              tabindex="3">
+                <f:validateLength maximum="500"/>
+            </h:inputTextarea>
+        </s:decorate>
 
-            <td class="rich-table-cell">
+        <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+            <s:span id="clientField">
+                <h:outputText value="#{messages['Client.client']}"/>
+                <rich:spacer width="2" />
+                <app:selectPopUp id="clientFieldId"
+                                 required="false"
+                                 textValue="#{voucherCreateAction.client.fullName}"
+                                 value="#{voucherCreateAction.client}"
+                                 clearAction="voucherCreateAction.clearClient()"
+                                 searchModalPanel="clientListModalPanel"
+                                 dataModel="#{clientDataModel}"
+                                 reRender="clientField"
+                                 tabindex="12">
+                </app:selectPopUp>
+            </s:span>
+            <rich:spacer width="3" />
 
-                <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">
-                        <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
-                    </ui:define>
-                    <app:selectPopUp id="provider"
-                                     required="false"
-                                     textValue="#{voucherCreateAction.provider.fullName}"
-                                     value="#{voucherCreateAction.provider}"
-                                     clearAction="voucherCreateAction.clearProvider()"
-                                     searchModalPanel="providerListModalPanel"
-                                     dataModel="#{providerDataModel}"
-                                     reRender="providerField"
-                                     hotKeySelect="alt+3">
-                    </app:selectPopUp>
-                </s:decorate>
-            </td>
+            <s:span id="providerField">
+                <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
+                <rich:spacer width="2" />
+                <app:selectPopUp id="provider"
+                                 required="false"
+                                 textValue="#{voucherCreateAction.provider.fullName}"
+                                 value="#{voucherCreateAction.provider}"
+                                 clearAction="voucherCreateAction.clearProvider()"
+                                 searchModalPanel="providerListModalPanel"
+                                 dataModel="#{providerDataModel}"
+                                 reRender="providerField"
+                                 hotKeySelect="alt+3">
+                </app:selectPopUp>
+            </s:span>
 
-            <td class="rich-table-cell center">
-                <s:div id="debitField">
-                    <h:inputText id="debitInputField"
-                                 value="#{voucherCreateAction.debit}"
-                                 styleClass="inputSmall right"
-                                 required="false">
+        </s:decorate>
+
+        <!--<s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+
+        </s:decorate>-->
+
+        <!--<s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
+            <span id="debitField">
+                <h:inputText id="debitInputField"
+                             value="#{voucherCreateAction.debit}"
+                             styleClass="inputSmall right"
+                             required="false">
                         <app:realNumberConverter minimum="0"
                                                  pattern="#{messages['patterns.decimalNumber']}"
                                                  forId="debitInputField"/>
                         <a4j:support event="onblur" ajaxSingle="true" reRender="debitField"/>
                     </h:inputText>
                     <h:message for="debitInputField" styleClass="errors" style="display:block;" rendered="true"/>
-                </s:div>
-            </td>
-
-            <td class="rich-table-cell center">
-                <s:div id="creditField">
-                    <h:inputText id="creditInputField"
-                                 value="#{voucherCreateAction.credit}"
-                                 styleClass="inputSmall right"
-                                 required="false">
+            </span>
+            <span id="creditField">
+                <h:inputText id="creditInputField"
+                             value="#{voucherCreateAction.credit}"
+                             styleClass="inputSmall right"
+                             required="false">
                         <app:realNumberConverter minimum="0"
                                                  pattern="#{messages['patterns.decimalNumber']}"
                                                  forId="creditInputField"/>
                         <a4j:support event="onblur" ajaxSingle="true" reRender="creditField"/>
                     </h:inputText>
                     <h:message for="creditInputField" styleClass="errors" style="display:block;" rendered="true"/>
-                </s:div>
-            </td>
+            </span>
+            <a4j:commandButton id="newRegisterId"
+                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+        </s:decorate>-->
+    </s:div>
 
-            <td class="rich-table-cell center">
-                <div class="buttons">
-                <a4j:commandButton id="newRegisterId"
-                                   action="#{voucherCreateAction.assignInputVoucherDetail()}"
-                                   value=" + "
-                                   styleClass="button"
-                                   immediate="true"
-                                   reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
-                </a4j:commandButton>
-                </div>
-            </td>
-        </tr>
-    </table>
-    </h:form>
-</s:div>
+</h:panelGrid>
 
-<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
+    <rich:spacer height="5" />
+
     <h:panelGrid columns="1"
                  width="100%"
                  cellpadding="0"
@@ -311,7 +304,6 @@
             </table>
         </s:div>
     </h:panelGrid>
-</app:fieldset>
 </rich:panel>
 
 <div class="buttons"></div>

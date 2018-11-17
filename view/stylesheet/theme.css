@@ -357,6 +357,11 @@ input, select, textarea {
     width: 200px;
 }
 
+.textarea-small2 {
+    height: 40px;
+    width: 230px;
+}
+
 .textarea-medium {
     height: 40px;
     width: 380px;
@@ -364,6 +369,10 @@ input, select, textarea {
 
 .textarea-largest {
     height: 60px;
+    width: 550px;
+}
+
+.textarea-largest2 {
     width: 550px;
 }
 

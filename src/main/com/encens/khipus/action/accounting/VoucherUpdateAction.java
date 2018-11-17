@@ -30,8 +30,8 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     public static String ANNUL_OUTCOME = "Annul";
 
     CashAccount cashAccount = null;
-    private BigDecimal debit;
-    private BigDecimal credit;
+    private BigDecimal debit = new BigDecimal("0.00");
+    private BigDecimal credit = new BigDecimal("0.00");
     private String documentTypeCode = "";
 
     private DocType docType = new DocType();
