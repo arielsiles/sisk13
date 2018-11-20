@@ -56,23 +56,23 @@
             <rich:calendar value="#{voucherCreateAction.voucher.date}"
                            popup="true"
                            datePattern="#{messages['patterns.date']}"
-                           styleClass="input"
+                           inputClass="inputSmall"
                            enableManualInput="true"
                            tabindex="1"
                            required="true">
             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
             </rich:calendar>
-        </s:decorate>
 
-        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Voucher.documentType']}</ui:define>
+            <rich:spacer width="5" />
+            <h:outputText value="#{messages['Product.type']}"/>
+            <rich:spacer width="3" />
             <h:selectOneMenu id="documentType"
                              value="#{voucherCreateAction.docType}"
-                             styleClass="input"
+                             styleClass="inputTiny"
                              required="true">
                 <s:selectItems value="#{selectList}"
                                var="element"
-                               label="#{element.fullName}"
+                               label="#{element.name}"
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <a4j:support event="onchange"
@@ -81,7 +81,27 @@
                              ajaxSingle="true"/>
                 <s:convertEntity/>
             </h:selectOneMenu>
+
         </s:decorate>
+
+        <!--<s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Product.type']}</ui:define>
+            <h:selectOneMenu id="documentType"
+                             value="#{voucherCreateAction.docType}"
+                             styleClass="inputTiny"
+                             required="true">
+                <s:selectItems value="#{selectList}"
+                               var="element"
+                               label="#{element.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{voucherCreateAction.cleanMainFields()}"
+                             reRender="#{mainComponentIdsToRerender}"
+                             ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>-->
 
         <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
@@ -103,7 +123,29 @@
                                immediate="true"
                                reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
             </a4j:commandButton>
+        </s:decorate>
 
+        <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Reports.kardex.productItem']}</ui:define>
+            <app:quickSearch id="productItemQuickSearch"
+                             textValue="kardexProductMovementAction.productItem.productItemCode"
+                             value="#{kardexProductMovementAction.productItem}"
+                             searchField="productItemCode"
+                             alias="productItem"
+                             reRender="productItemField"
+                             tabindex="5">
+                <ui:define name="restrictions">
+                    <app:restriction condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                </ui:define>
+            </app:quickSearch>
+            <app:selectPopUp id="productItem"
+                             textValue="#{kardexProductMovementAction.productItem.name}"
+                             value="#{kardexProductMovementAction.productItem}"
+                             clearAction="kardexProductMovementAction.cleanProductItem()"
+                             searchModalPanel="productItemListModalPanel"
+                             dataModel="#{productItemSearchDataModel}"
+                             reRender="productItemField"
+                             hotKeySelect="alt+2"/>
         </s:decorate>
 
     </s:div>
@@ -309,53 +351,61 @@
 <div class="buttons"></div>
 </h:form>
 
-<s:div id="cashAccountListModalPanelDiv">
+    <s:div id="cashAccountListModalPanelDiv">
 
-    <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-        <ui:param name="hasWarehousePermission" value="true"/>
-        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
-        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{voucherCreateAction.setAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField, debitInputField, creditInputField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </s:div>
+
+    <s:div id="clientListModalPanelDiv">
+        <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
+            <ui:param name="containerId" value="clientListModalPanelContainer"/>
+            <ui:param name="dialogId" value="clientListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{voucherCreateAction.setClient(clientItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="clientField"
+                                   oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
         <ui:define name="assignButton">
             <a4j:commandButton id="assignButton"
-                               action="#{voucherCreateAction.setAccount(cashAccountItem)}"
+                               title="#{messages['Common.choose']}"
+                               action="#{voucherCreateAction.assignProvider(providerItem)}"
                                image="/img/active.gif"
-                               styleClass="select-image-middle"
-                               reRender="itemAccountField, debitInputField, creditInputField"
-                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+                               styleClass="select-image"
+                               reRender="providerField"
+                               oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
         </ui:define>
     </s:decorate>
 
-</s:div>
-
-<s:div id="clientListModalPanelDiv">
-    <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
-        <ui:param name="containerId" value="clientListModalPanelContainer"/>
-        <ui:param name="dialogId" value="clientListModalPanel"/>
+    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
         <ui:define name="assignButton">
             <a4j:commandButton id="assignButton"
-                               action="#{voucherCreateAction.setClient(clientItem)}"
+                               action="#{kardexProductMovementAction.assignProductItem(productItemItem)}"
                                image="/img/active.gif"
                                styleClass="select-image-middle"
-                               reRender="clientField"
-                               oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
+                               reRender="productItemField"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
         </ui:define>
     </s:decorate>
-</s:div>
-
-<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           title="#{messages['Common.choose']}"
-                           action="#{voucherCreateAction.assignProvider(providerItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image"
-                           reRender="providerField"
-                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
-    </ui:define>
-</s:decorate>
-
-<!---->
-
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>
