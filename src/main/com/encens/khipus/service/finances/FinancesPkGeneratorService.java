@@ -49,4 +49,7 @@ public interface FinancesPkGeneratorService extends GenericService {
     Long newId_sf_tmpdet();
 
     public Long newId_inv_inventario_detalle();
+
+    public Long getNextIdSftmpenc();
+
 }

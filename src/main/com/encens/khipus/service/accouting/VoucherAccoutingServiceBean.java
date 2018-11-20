@@ -11,6 +11,7 @@ import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
+import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.*;
@@ -18,6 +19,7 @@ import com.encens.khipus.util.query.EntityQueryFactory;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.util.id.ID;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -40,15 +42,22 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     @In(value = "#{entityManager}")
     private EntityManager em;
 
-    @In
+    @In(create = true)
     private FinancesPkGeneratorService financesPkGeneratorService;
-
     @In
     private CompanyConfigurationService companyConfigurationService;
+    @In
+    private SequenceService sequenceService;
 
     public void saveVoucher(Voucher voucher){
 
-        System.out.println("----->>>>>>> newId_sf_tmpenc(): " + financesPkGeneratorService.newId_sf_tmpenc());
+        //System.out.println("----->>>>>>> newId_sf_tmpenc(): " + financesPkGeneratorService.newId_sf_tmpenc());
+        //Long id = financesPkGeneratorService.getNextIdSftmpenc();
+
+        Long id = financesPkGeneratorService.newId_sf_tmpenc();
+
+        System.out.println("------------> ID_TMPENC: " + id);
+        voucher.setId(id);
 
         voucher.setId(financesPkGeneratorService.newId_sf_tmpenc());
 
