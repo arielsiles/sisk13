@@ -90,6 +90,9 @@ public class ProductItem implements BaseModel {
     @Column(name = "COSTO_UNI", precision = 16, scale = 6, nullable = true)
     private BigDecimal unitCost;
 
+    @Column(name = "PRECIO_VENTA", precision = 10, scale = 2, nullable = true)
+    private BigDecimal salePrice;
+
     @Column(name = "CU", precision = 16, scale = 6, nullable = true)
     private BigDecimal cu;
 
@@ -113,7 +116,7 @@ public class ProductItem implements BaseModel {
     @Column(name = "version")
     private long version;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
             @JoinColumn(name = "COD_ALM", nullable = false, insertable = false, updatable = false)
@@ -431,5 +434,13 @@ public class ProductItem implements BaseModel {
 
     public void setWarehouse(Warehouse warehouse) {
         this.warehouse = warehouse;
+    }
+
+    public BigDecimal getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
     }
 }

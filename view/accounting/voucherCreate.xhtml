@@ -128,8 +128,8 @@
         <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Reports.kardex.productItem']}</ui:define>
             <app:quickSearch id="productItemQuickSearch"
-                             textValue="kardexProductMovementAction.productItem.productItemCode"
-                             value="#{kardexProductMovementAction.productItem}"
+                             textValue="#{voucherCreateAction.productItem.productItemCode}"
+                             value="#{voucherCreateAction.productItem}"
                              searchField="productItemCode"
                              alias="productItem"
                              reRender="productItemField"
@@ -139,13 +139,48 @@
                 </ui:define>
             </app:quickSearch>
             <app:selectPopUp id="productItem"
-                             textValue="#{kardexProductMovementAction.productItem.name}"
-                             value="#{kardexProductMovementAction.productItem}"
+                             textValue="#{voucherCreateAction.productItem.name}"
+                             value="#{voucherCreateAction.productItem}"
                              clearAction="kardexProductMovementAction.cleanProductItem()"
                              searchModalPanel="productItemListModalPanel"
                              dataModel="#{productItemSearchDataModel}"
                              reRender="productItemField"
                              hotKeySelect="alt+2"/>
+
+            <h:inputText id="quantityId"
+                         value="#{voucherCreateAction.quantity}"
+                         styleClass="inputNumberTiny"
+                         required="true"
+                         rendered="true">
+                <app:realNumberConverter minimum="0" pattern="#{messages['patterns.number']}" forId="quantityId"/>
+                <a4j:support event="onblur" ajaxSingle="true" reRender="quantityId"/>
+            </h:inputText>
+            <h:message for="quantityId" styleClass="errors" style="display:block;" rendered="true"/>
+
+
+            <a4j:commandButton id="newProductItemId"
+                               action="#{voucherCreateAction.assignProductItemVoucherDetail()}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+
+
+        </s:decorate>
+
+        <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label"><h:outputText value="#{messages['Partner.account']}"/></ui:define>
+            <app:selectPopUp id="accountFieldId"
+                             required="true"
+                             textValue="#{voucherCreateAction.partnerAccount.fullAccountName}"
+                             value="#{voucherCreateAction.partnerAccount}"
+                             clearAction="#{voucherCreateAction.cleanMainFields()}"
+                             searchModalPanel="accountListModalPanel"
+                             dataModel="#{accountDataModel}"
+                             reRender="accountField"
+                             tabindex="12">
+            </app:selectPopUp>
         </s:decorate>
 
     </s:div>
@@ -369,6 +404,30 @@
 
     </s:div>
 
+    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{voucherCreateAction.setProductItem(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="accountListModalPanelContainer" template="/customer/accountListModalPanel.xhtml">
+        <ui:param name="containerId" value="accountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="accountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{voucherCreateAction.setPartnerAccount(accountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="accountField"
+                               oncomplete="Richfaces.hideModalPanel('accountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
     <s:div id="clientListModalPanelDiv">
         <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
             <ui:param name="containerId" value="clientListModalPanelContainer"/>
@@ -393,17 +452,6 @@
                                styleClass="select-image"
                                reRender="providerField"
                                oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
-        </ui:define>
-    </s:decorate>
-
-    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
-        <ui:define name="assignButton">
-            <a4j:commandButton id="assignButton"
-                               action="#{kardexProductMovementAction.assignProductItem(productItemItem)}"
-                               image="/img/active.gif"
-                               styleClass="select-image-middle"
-                               reRender="productItemField"
-                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
         </ui:define>
     </s:decorate>
 

@@ -146,4 +146,9 @@ public class Account implements BaseModel {
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
+
+    public String getFullAccountName(){
+        return getAccountNumber() + " - " + partner.getFullName();
+    }
+
 }

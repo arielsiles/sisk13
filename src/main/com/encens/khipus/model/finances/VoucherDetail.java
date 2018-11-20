@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
 
@@ -107,6 +108,19 @@ public class VoucherDetail implements BaseModel {
     @Column(name = "COD_PROV", length = 6)
     @Length(max = 6)
     private String providerCode;
+
+
+    @Column(name = "COD_ART", length = 6)
+    @Length(max = 6)
+    private String productItemCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
+            @JoinColumn(name = "COD_ART", updatable = false, insertable = false)
+    })
+    private ProductItem productItem;
+
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
@@ -275,6 +289,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" + client.getFullName() + ")";
         if (provider != null)
             fullCashAccount = fullCashAccount + " (" +  provider.getFullName() + ")";
+        if (productItem != null)
+            fullCashAccount = fullCashAccount + " (" +  productItem.getFullName() + ")";
 
         return fullCashAccount;
 
@@ -308,5 +324,21 @@ public class VoucherDetail implements BaseModel {
 
     public void setProviderCode(String providerCode) {
         this.providerCode = providerCode;
+    }
+
+    public ProductItem getProductItem() {
+        return productItem;
+    }
+
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
+    }
+
+    public String getProductItemCode() {
+        return productItemCode;
+    }
+
+    public void setProductItemCode(String productItemCode) {
+        this.productItemCode = productItemCode;
     }
 }

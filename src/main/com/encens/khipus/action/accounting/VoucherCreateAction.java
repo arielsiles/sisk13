@@ -3,14 +3,18 @@ package com.encens.khipus.action.accounting;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
+import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.In;
@@ -43,6 +47,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private Provider provider;
     private CashAccount account;
     private Client client;
+    private ProductItem productItem;
+    private Account partnerAccount;
+
+    private Integer quantity;
 
     private List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -67,6 +75,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     @In
     private ClientService clientService;
+
+    @In
+    private CashAccountService cashAccountService;
 
     @Override
     @End
@@ -149,6 +160,57 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             clearProvider();
             setDebit(new BigDecimal("0.00"));
             setCredit(new BigDecimal("0.00"));
+        }catch (NullPointerException e){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+        }
+
+    }
+
+    public void assignProductItemVoucherDetail(){
+
+        try {
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode("1110110100");
+            CashAccount ctaIngreso  = cashAccountService.findByAccountCode("5451010000");
+
+            VoucherDetail voucherCaja = new VoucherDetail();
+            voucherCaja.setCashAccount(ctaCaja);
+            voucherCaja.setAccount(ctaCaja.getAccountCode());
+            voucherCaja.setDebit(BigDecimalUtil.multiply(productItem.getSalePrice(), BigDecimalUtil.toBigDecimal(quantity), 2));
+            voucherCaja.setCredit(BigDecimal.ZERO);
+
+            VoucherDetail voucherIngreso = new VoucherDetail();
+            voucherIngreso.setCashAccount(ctaIngreso);
+            voucherIngreso.setAccount(ctaIngreso.getAccountCode());
+
+
+            VoucherDetail voucherDetail = new VoucherDetail(); //Cta Almacen
+            voucherDetail.setCashAccount(productItem.getWarehouse().getWarehouseCashAccount());
+            voucherDetail.setAccount(productItem.getWarehouse().getWarehouseCashAccount().getAccountCode());
+            voucherDetail.setClient(this.client);
+            voucherDetail.setProvider(this.provider);
+            voucherDetail.setProductItem(productItem);
+
+            if (this.provider != null)
+                voucherDetail.setProviderCode(this.provider.getProviderCode());
+            if (productItem != null)
+                voucherDetail.setProductItemCode(productItem.getProductItemCode());
+
+            voucherDetail.setDebit(BigDecimal.ZERO);
+            voucherDetail.setCredit(BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(quantity), 2));
+
+            voucherIngreso.setDebit(BigDecimal.ZERO);
+            voucherIngreso.setCredit(BigDecimalUtil.subtract(voucherCaja.getDebit(), voucherDetail.getCredit(), 2));
+
+            voucherDetails.add(voucherCaja);
+            voucherDetails.add(voucherDetail);
+            voucherDetails.add(voucherIngreso);
+
+            clearAccount();
+            clearClient();
+            clearProvider();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
+
         }catch (NullPointerException e){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
         }
@@ -345,5 +407,29 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearProvider(){
         setProvider(null);
+    }
+
+    public ProductItem getProductItem() {
+        return productItem;
+    }
+
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Account getPartnerAccount() {
+        return partnerAccount;
+    }
+
+    public void setPartnerAccount(Account partnerAccount) {
+        this.partnerAccount = partnerAccount;
     }
 }

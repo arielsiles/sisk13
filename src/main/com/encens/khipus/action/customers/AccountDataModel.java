@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Data model for Credit
+ * Data model for Account
  *
  * @author:
  */
