@@ -21,3 +21,11 @@ INSERT INTO tipocuenta (idtipocuenta, nombre, interes, activo, VERSION, idcompan
 
 /** 20-11-2018 **/
 ALTER TABLE sf_tmpdet ADD COLUMN cod_art VARCHAR(6) NULL;
+
+/** 21-11-2018 **/
+DELETE FROM tipodoc WHERE nombre = 'CHQ';
+
+ALTER TABLE tipocuenta ADD COLUMN ctap_mn VARCHAR(20) NOT NULL AFTER activo;
+ALTER TABLE tipocuenta ADD COLUMN ctap_me VARCHAR(20) NOT NULL AFTER ctap_mn;
+
+UPDATE tipocuenta t SET t.`ctap_mn` = '2120110000', t.`ctap_me` = '2120120000' WHERE t.`idtipocuenta` = 1;

@@ -95,7 +95,7 @@ public class Voucher implements BaseModel{
 
     @Column(name = "FECHA", updatable = true)
     @Temporal(TemporalType.DATE)
-    private Date date;
+    private Date date = new Date();
 
     @Column(name = "ESTADO", updatable = true, length = 3)
     @Length(max = 3)

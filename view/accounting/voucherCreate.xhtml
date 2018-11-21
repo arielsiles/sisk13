@@ -150,8 +150,7 @@
             <h:inputText id="quantityId"
                          value="#{voucherCreateAction.quantity}"
                          styleClass="inputNumberTiny"
-                         required="true"
-                         rendered="true">
+                         required="false">
                 <app:naturalNumberConverter minimum="0" pattern="#{messages['patterns.number']}" forId="quantityId"/>
                 <a4j:support event="onblur" ajaxSingle="true" reRender="quantityId"/>
             </h:inputText>
@@ -172,7 +171,7 @@
         <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
             <app:selectPopUp id="accountFieldId"
-                             required="true"
+                             required="false"
                              textValue="#{voucherCreateAction.partnerAccount.fullAccountName}"
                              value="#{voucherCreateAction.partnerAccount}"
                              clearAction="#{voucherCreateAction.cleanMainFields()}"
