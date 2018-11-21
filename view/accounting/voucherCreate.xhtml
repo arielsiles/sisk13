@@ -152,7 +152,7 @@
                          styleClass="inputNumberTiny"
                          required="true"
                          rendered="true">
-                <app:realNumberConverter minimum="0" pattern="#{messages['patterns.number']}" forId="quantityId"/>
+                <app:naturalNumberConverter minimum="0" pattern="#{messages['patterns.number']}" forId="quantityId"/>
                 <a4j:support event="onblur" ajaxSingle="true" reRender="quantityId"/>
             </h:inputText>
             <h:message for="quantityId" styleClass="errors" style="display:block;" rendered="true"/>
@@ -170,7 +170,7 @@
         </s:decorate>
 
         <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label"><h:outputText value="#{messages['Partner.account']}"/></ui:define>
+            <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
             <app:selectPopUp id="accountFieldId"
                              required="true"
                              textValue="#{voucherCreateAction.partnerAccount.fullAccountName}"
@@ -415,7 +415,7 @@
         </ui:define>
     </s:decorate>
 
-    <s:decorate id="accountListModalPanelContainer" template="/customer/accountListModalPanel.xhtml">
+    <s:decorate id="accountListModalPanelContainer" template="/customers/accountListModalPanel.xhtml">
         <ui:param name="containerId" value="accountListModalPanelContainer"/>
         <ui:param name="dialogId" value="accountListModalPanel"/>
         <ui:define name="assignButton">

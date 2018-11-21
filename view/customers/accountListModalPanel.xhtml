@@ -27,21 +27,21 @@
                          columnClasses="width50percent,width50percent">
                 <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.name']}</ui:define>
-                    <h:inputText id="firstName" value="#{dataModel.criteria.firstName}" maxlength="20"
+                    <h:inputText id="firstName" value="#{dataModel.firstName}" maxlength="20"
                                  styleClass="input"
                                  tabindex="2001"/>
                 </s:decorate>
 
                 <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
-                    <h:inputText id="lastName" value="#{dataModel.criteria.lastName}" maxlength="100"
+                    <h:inputText id="lastName" value="#{dataModel.lastName}" maxlength="100"
                                  styleClass="input"
                                  tabindex="2002"/>
                 </s:decorate>
 
-                <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.account']}</ui:define>
-                    <h:inputText id="maidenName" value="#{dataModel.criteria.accountNumber}" maxlength="100"
+                    <h:inputText id="accountNumber" value="#{dataModel.criteria.accountNumber}" maxlength="100"
                                  styleClass="input"
                                  tabindex="2002"/>
                 </s:decorate>
