@@ -3,6 +3,7 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
@@ -53,6 +54,21 @@ public class AccountType implements BaseModel {
     @Version
     @Column(name = "version", nullable = false)
     private long version;
+
+    /*@ManyToOne(fetch = FetchType.LAZY)*/
+    @ManyToOne
+    @JoinColumns({
+            /*@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),*/
+            @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountMn;
+
+    @ManyToOne
+    @JoinColumns({
+            /*@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),*/
+            @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountMe;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -106,5 +122,21 @@ public class AccountType implements BaseModel {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public CashAccount getCashAccountMn() {
+        return cashAccountMn;
+    }
+
+    public void setCashAccountMn(CashAccount cashAccountMn) {
+        this.cashAccountMn = cashAccountMn;
+    }
+
+    public CashAccount getCashAccountMe() {
+        return cashAccountMe;
+    }
+
+    public void setCashAccountMe(CashAccount cashAccountMe) {
+        this.cashAccountMe = cashAccountMe;
     }
 }

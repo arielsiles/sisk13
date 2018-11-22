@@ -180,6 +180,15 @@
                              reRender="accountField"
                              tabindex="12">
             </app:selectPopUp>
+
+            <a4j:commandButton id="partnerAccountId"
+                               action="#{voucherCreateAction.assignPartnerAccountVoucherDetail()}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+
         </s:decorate>
 
     </s:div>

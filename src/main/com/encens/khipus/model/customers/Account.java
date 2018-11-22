@@ -60,7 +60,7 @@ public class Account implements BaseModel {
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idtipocuenta", nullable = false)
     private AccountType accountType;
 

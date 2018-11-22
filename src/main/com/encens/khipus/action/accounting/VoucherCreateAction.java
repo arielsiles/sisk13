@@ -217,6 +217,51 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     }
 
+    public void assignPartnerAccountVoucherDetail(){
+
+        System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
+        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
+        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
+        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
+
+        try {
+
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode("1110110100");
+
+            VoucherDetail voucherCaja = new VoucherDetail();
+            voucherCaja.setCashAccount(ctaCaja);
+            voucherCaja.setAccount(ctaCaja.getAccountCode());
+            voucherCaja.setDebit(BigDecimal.ZERO);
+            voucherCaja.setCredit(BigDecimal.ZERO);
+
+
+            VoucherDetail voucherDetail = new VoucherDetail();
+
+            voucherDetail.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
+            voucherDetail.setAccount(partnerAccount.getAccountType().getCashAccountMn().getAccountCode());
+            voucherDetail.setClient(this.client);
+            voucherDetail.setProvider(this.provider);
+
+            if (this.provider != null)
+                voucherDetail.setProviderCode(this.provider.getProviderCode());
+
+            voucherDetail.setDebit(BigDecimal.ZERO);
+            voucherDetail.setCredit(BigDecimal.ZERO);
+
+            voucherDetails.add(voucherCaja);
+            voucherDetails.add(voucherDetail);
+
+            clearAccount();
+            clearClient();
+            clearProvider();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
+        }catch (NullPointerException e){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+        }
+
+    }
+
 
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
