@@ -16,6 +16,7 @@ import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
@@ -87,12 +88,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     @In
     private CashAccountService cashAccountService;
 
+    @In
+    private PurchaseDocumentService purchaseDocumentService;
+
     @Override
     @End
     public String create() {
 
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
+
+        //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
         BigDecimal totalD = new BigDecimal("0.00");
         BigDecimal totalC = new BigDecimal("0.00");
@@ -116,8 +122,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherUpdateAction.setVoucher(voucher);
             voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
             voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-
             voucherUpdateAction.setInstance(voucher);
+
+
+            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
+                //purchaseDocument.setVoucher(voucher);
+                purchaseDocumentService.createDocumentSimple(purchaseDocument);
+
+            }
+
 
             return Outcome.SUCCESS;
 
@@ -160,8 +173,33 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         }else {
             assignInputVoucherDetail();
         }
-
     }
+
+    public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
+
+        BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
+        try {
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setCashAccount(this.account);
+            voucherDetail.setAccount(this.account.getAccountCode());
+            voucherDetail.setClient(this.client);
+            voucherDetail.setProvider(this.provider);
+
+            if (this.provider != null)
+                voucherDetail.setProviderCode(this.provider.getProviderCode());
+
+            voucherDetail.setDebit(fiscalCredit);
+            voucherDetail.setCredit(this.credit);
+
+            voucherDetails.add(voucherDetail);
+            clearAll();
+            //setDebit(BigDecimal.ZERO);
+            //setCredit(BigDecimal.ZERO);
+        } catch (NullPointerException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
+        }
+    }
+
 
     public void assignInputVoucherDetail(){
 
@@ -179,14 +217,18 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setCredit(this.credit);
 
                 voucherDetails.add(voucherDetail);
-                clearAccount();
-                clearClient();
-                clearProvider();
+                clearAll();
                 setDebit(BigDecimal.ZERO);
                 setCredit(BigDecimal.ZERO);
             } catch (NullPointerException e) {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
             }
+    }
+
+    public void clearAll(){
+        clearAccount();
+        clearClient();
+        clearProvider();
     }
 
     public void assignProductItemVoucherDetail(){
@@ -289,6 +331,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
+    }
+
+    public void removePurchaseDocument(PurchaseDocument purchaseDocument){
+        purchaseDocumentList.remove(purchaseDocument);
     }
 
     public void assignProvider(Provider provider) {
