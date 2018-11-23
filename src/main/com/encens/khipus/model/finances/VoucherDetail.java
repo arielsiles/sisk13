@@ -2,6 +2,7 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
@@ -121,6 +122,9 @@ public class VoucherDetail implements BaseModel {
     })
     private ProductItem productItem;
 
+    @ManyToOne
+    @JoinColumn(name = "IDCUENTA", referencedColumnName = "IDCUENTA")
+    private Account partnerAccount;
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
@@ -291,6 +295,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" +  provider.getFullName() + ")";
         if (productItem != null)
             fullCashAccount = fullCashAccount + " (" +  productItem.getFullName() + ")";
+        if (partnerAccount != null)
+            fullCashAccount = fullCashAccount + " (" +  partnerAccount.getAccountNumber() + " " + partnerAccount.getPartner().getFirstAndMaidenName() + ")";
 
         return fullCashAccount;
 
@@ -340,5 +346,13 @@ public class VoucherDetail implements BaseModel {
 
     public void setProductItemCode(String productItemCode) {
         this.productItemCode = productItemCode;
+    }
+
+    public Account getPartnerAccount() {
+        return partnerAccount;
+    }
+
+    public void setPartnerAccount(Account partnerAccount) {
+        this.partnerAccount = partnerAccount;
     }
 }

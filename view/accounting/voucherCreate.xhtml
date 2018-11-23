@@ -181,6 +181,15 @@
                              tabindex="12">
             </app:selectPopUp>
 
+            <h:inputText id="amountDepositId"
+                         value="#{voucherCreateAction.amountDeposit}"
+                         styleClass="inputNumberTiny"
+                         required="false">
+                <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="amountDepositId"/>
+                <a4j:support event="onblur" ajaxSingle="true" reRender="depositId"/>
+            </h:inputText>
+            <h:message for="amountDepositId" styleClass="errors" style="display:block;" rendered="true"/>
+
             <a4j:commandButton id="partnerAccountId"
                                action="#{voucherCreateAction.assignPartnerAccountVoucherDetail()}"
                                value=" + "

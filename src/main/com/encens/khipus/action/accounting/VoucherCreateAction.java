@@ -51,6 +51,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private Account partnerAccount;
 
     private Integer quantity;
+    private BigDecimal amountDeposit;
 
     private List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -231,25 +232,26 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             VoucherDetail voucherCaja = new VoucherDetail();
             voucherCaja.setCashAccount(ctaCaja);
             voucherCaja.setAccount(ctaCaja.getAccountCode());
-            voucherCaja.setDebit(BigDecimal.ZERO);
+            voucherCaja.setDebit(amountDeposit);
             voucherCaja.setCredit(BigDecimal.ZERO);
 
 
-            VoucherDetail voucherDetail = new VoucherDetail();
+            VoucherDetail voucherSaving = new VoucherDetail();
 
-            voucherDetail.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
-            voucherDetail.setAccount(partnerAccount.getAccountType().getCashAccountMn().getAccountCode());
-            voucherDetail.setClient(this.client);
-            voucherDetail.setProvider(this.provider);
+            voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
+            voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMn().getAccountCode());
+            voucherSaving.setClient(this.client);
+            voucherSaving.setProvider(this.provider);
+            voucherSaving.setPartnerAccount(partnerAccount);
 
             if (this.provider != null)
-                voucherDetail.setProviderCode(this.provider.getProviderCode());
+                voucherSaving.setProviderCode(this.provider.getProviderCode());
 
-            voucherDetail.setDebit(BigDecimal.ZERO);
-            voucherDetail.setCredit(BigDecimal.ZERO);
+            voucherSaving.setDebit(BigDecimal.ZERO);
+            voucherSaving.setCredit(amountDeposit);
 
             voucherDetails.add(voucherCaja);
-            voucherDetails.add(voucherDetail);
+            voucherDetails.add(voucherSaving);
 
             clearAccount();
             clearClient();
@@ -476,5 +478,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setPartnerAccount(Account partnerAccount) {
         this.partnerAccount = partnerAccount;
+    }
+
+    public BigDecimal getAmountDeposit() {
+        return amountDeposit;
+    }
+
+    public void setAmountDeposit(BigDecimal amountDeposit) {
+        this.amountDeposit = amountDeposit;
     }
 }
