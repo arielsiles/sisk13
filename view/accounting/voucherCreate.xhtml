@@ -84,25 +84,6 @@
 
         </s:decorate>
 
-        <!--<s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Product.type']}</ui:define>
-            <h:selectOneMenu id="documentType"
-                             value="#{voucherCreateAction.docType}"
-                             styleClass="inputTiny"
-                             required="true">
-                <s:selectItems value="#{selectList}"
-                               var="element"
-                               label="#{element.name}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <a4j:support event="onchange"
-                             action="#{voucherCreateAction.cleanMainFields()}"
-                             reRender="#{mainComponentIdsToRerender}"
-                             ajaxSingle="true"/>
-                <s:convertEntity/>
-            </h:selectOneMenu>
-        </s:decorate>-->
-
         <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
             <app:selectPopUp id="productItemAccount"
@@ -117,11 +98,11 @@
             </app:selectPopUp>
 
             <a4j:commandButton id="newRegisterId"
-                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
+                               action="#{voucherCreateAction.assignCashAccountVoucherDetail()}"
                                value=" + "
                                styleClass="button"
                                immediate="true"
-                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
             </a4j:commandButton>
         </s:decorate>
 
@@ -240,54 +221,13 @@
 
         </s:decorate>
 
-        <!--<s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
-
-        </s:decorate>-->
-
-        <!--<s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
-            <span id="debitField">
-                <h:inputText id="debitInputField"
-                             value="#{voucherCreateAction.debit}"
-                             styleClass="inputSmall right"
-                             required="false">
-                        <app:realNumberConverter minimum="0"
-                                                 pattern="#{messages['patterns.decimalNumber']}"
-                                                 forId="debitInputField"/>
-                        <a4j:support event="onblur" ajaxSingle="true" reRender="debitField"/>
-                    </h:inputText>
-                    <h:message for="debitInputField" styleClass="errors" style="display:block;" rendered="true"/>
-            </span>
-            <span id="creditField">
-                <h:inputText id="creditInputField"
-                             value="#{voucherCreateAction.credit}"
-                             styleClass="inputSmall right"
-                             required="false">
-                        <app:realNumberConverter minimum="0"
-                                                 pattern="#{messages['patterns.decimalNumber']}"
-                                                 forId="creditInputField"/>
-                        <a4j:support event="onblur" ajaxSingle="true" reRender="creditField"/>
-                    </h:inputText>
-                    <h:message for="creditInputField" styleClass="errors" style="display:block;" rendered="true"/>
-            </span>
-            <a4j:commandButton id="newRegisterId"
-                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
-                               value=" + "
-                               styleClass="button"
-                               immediate="true"
-                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
-            </a4j:commandButton>
-        </s:decorate>-->
     </s:div>
 
 </h:panelGrid>
 
     <rich:spacer height="5" />
 
-    <h:panelGrid columns="1"
-                 width="100%"
-                 cellpadding="0"
-                 cellspacing="0"
-                 border="0">
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
         <s:div id="movementDetailListPanel">
             <!--<div class="buttons">
                 <a4j:commandButton id="addProductItemCommandButton2"
@@ -319,13 +259,8 @@
                     <c:set var="creditInputFieldId" value="creditInputField_#{row.index}"/>
 
                     <tr class="rich-table-row">
-                        <!--<td class="rich-table-cell"><h:outputText value="#{voucherDetail.cashAccount.accountCode}"/></td>-->
-                        <!--<td class="rich-table-cell"><h:outputText value="#{voucherDetail.cashAccount.description}"/></td>-->
-
                         <td class="rich-table-cell">
-                            <!--<h:outputText value="#{voucherDetail.cashAccount.fullName}"/>-->
                             <h:outputText value="#{voucherDetail.fullCashAccount}"/>
-                            <!--<h:outputText value="#{voucherDetail.fullCashAccount}"/>-->
                         </td>
 
                         <td class="rich-table-cell center">
@@ -372,7 +307,7 @@
                     </tr>
                 </c:forEach>
 
-                <tr class="rich-table-row">
+                <!--<tr class="rich-table-row">
                     <td class="rich-table-cell center">-</td>
                     <td class="rich-table-cell center">
                         <s:div id="totalDebit">
@@ -385,11 +320,141 @@
                         </s:div>
                     </td>
                     <td class="rich-table-cell center">-</td>
-                </tr>
+                </tr>-->
             </table>
         </s:div>
     </h:panelGrid>
+
 </rich:panel>
+
+<rich:tabPanel switchType="ajax" selectedTab="purchaseDocumentTab">
+    <rich:tab name="purchaseDocumentTab" label="#{messages['Voucher.tab.title']}" ajaxSingle="true">
+        <s:div id="invoiceDetailListPanel">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell">Fecha</th>
+                    <th class="rich-table-headercell">R.Social</th>
+                    <th class="rich-table-headercell">Nit</th>
+                    <th class="rich-table-headercell">N.Fact</th>
+                    <th class="rich-table-headercell">Auto</th>
+                    <th class="rich-table-headercell">Monto</th>
+                    <th class="rich-table-headercell">C.Control</th>
+                    <th class="rich-table-headercell">Excento</th>
+                    <th class="rich-table-headercell">Accion</th>
+
+                </tr>
+                </thead>
+
+                <c:forEach var="purchaseDocument" items="#{voucherCreateAction.purchaseDocumentList}" varStatus="row">
+                    <c:set var="field01Id" value="field01_#{row.index}"/>
+                    <c:set var="field02Id" value="field02_#{row.index}"/>
+                    <c:set var="field03Id" value="field03_#{row.index}"/>
+                    <c:set var="field04Id" value="field04_#{row.index}"/>
+                    <c:set var="field05Id" value="field05_#{row.index}"/>
+                    <c:set var="field06Id" value="field06_#{row.index}"/>
+                    <c:set var="field07Id" value="field07_#{row.index}"/>
+                    <c:set var="field08Id" value="field08_#{row.index}"/>
+                    <c:set var="field09Id" value="field09_#{row.index}"/>
+
+                    <c:set var="fieldInput01Id" value="fieldInput01_#{row.index}"/>
+                    <c:set var="fieldInput02Id" value="fieldInput02_#{row.index}"/>
+                    <c:set var="fieldInput03Id" value="fieldInput03_#{row.index}"/>
+                    <c:set var="fieldInput04Id" value="fieldInput04_#{row.index}"/>
+                    <c:set var="fieldInput05Id" value="fieldInput05_#{row.index}"/>
+                    <c:set var="fieldInput06Id" value="fieldInput06_#{row.index}"/>
+                    <c:set var="fieldInput07Id" value="fieldInput07_#{row.index}"/>
+                    <c:set var="fieldInput08Id" value="fieldInput08_#{row.index}"/>
+                    <c:set var="fieldInput09Id" value="fieldInput09_#{row.index}"/>
+
+
+                    <tr class="rich-table-row">
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field01Id}">
+                                <h:inputText id="#{fieldInput01Id}"
+                                             value="#{purchaseDocument.date}"
+                                             styleClass="inputSmall">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </h:inputText>
+                                <h:message for="#{field01Id}" styleClass="errors" style="display:block;" rendered="true"/>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field02Id}">
+                                <h:inputText id="#{fieldInput02Id}" value="#{purchaseDocument.name}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field03Id}">
+                                <h:inputText id="#{fieldInput03Id}" value="#{purchaseDocument.nit}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field04Id}">
+                                <h:inputText id="#{fieldInput04Id}" value="#{purchaseDocument.number}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field05Id}">
+                                <h:inputText id="#{fieldInput05Id}" value="#{purchaseDocument.authorizationNumber}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field06Id}">
+                                <h:inputText id="#{fieldInput06Id}" value="#{purchaseDocument.amount}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field07Id}">
+                                <h:inputText id="#{fieldInput07Id}" value="#{purchaseDocument.controlCode}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field08Id}">
+                                <h:inputText id="#{fieldInput08Id}" value="#{purchaseDocument.exempt}" styleClass="inputSmall"></h:inputText>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{field09Id}">
+                                <a4j:commandButton id="#{fieldInput09Id}"
+                                                   action="#{voucherCreateAction.assignCashAccountVoucherDetail()}"
+                                                   value=" + "
+                                                   styleClass="button"
+                                                   immediate="true"
+                                                   reRender="" />
+                            </s:div>
+                        </td>
+
+                    </tr>
+                </c:forEach>
+
+                <!--<tr class="rich-table-row">
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">
+                        <s:div id="totalDebit">
+                            <h:outputText value="#{voucherCreateAction.totalsDebit}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
+                        </s:div>
+                    </td>
+                    <td class="rich-table-cell center">
+                        <s:div id="totalCredit">
+                            <h:outputText value="#{voucherCreateAction.totalsCredit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
+                        </s:div>
+                    </td>
+                    <td class="rich-table-cell center">-</td>
+                </tr>-->
+            </table>
+        </s:div>
+    </rich:tab>
+</rich:tabPanel>
 
 <div class="buttons"></div>
 </h:form>
