@@ -30,7 +30,7 @@ import java.util.Date;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DOCUMENTOCONTABLE")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "documentocontable")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountingDocument implements BaseModel {
     @Id

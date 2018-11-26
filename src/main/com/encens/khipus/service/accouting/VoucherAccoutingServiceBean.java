@@ -51,17 +51,39 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     @In
     private SequenceService sequenceService;
 
-    public void saveVoucher(Voucher voucher){
 
-        //System.out.println("----->>>>>>> newId_sf_tmpenc(): " + financesPkGeneratorService.newId_sf_tmpenc());
-        //Long id = financesPkGeneratorService.getNextIdSftmpenc();
+    public void savePurchaseDocument(){
+
+        PurchaseDocument pd = new PurchaseDocument();
+        pd.setDate(new Date());
+        pd.setNumber("164898028");
+        pd.setName("ENCENS SRL");
+
+        em.persist(pd);
+        em.flush();
+
+    }
+
+    public void saveVoucher(Voucher voucher){
 
         Long id = financesPkGeneratorService.newId_sf_tmpenc();
 
         System.out.println("------------> ID_TMPENC: " + id);
         voucher.setId(id);
+        //voucher.setId(financesPkGeneratorService.newId_sf_tmpenc());
 
-        voucher.setId(financesPkGeneratorService.newId_sf_tmpenc());
+        /*System.out.println("------->!!!!! PurchaseDocument");
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()){
+            System.out.println("-------->>>>> FACT: " + purchaseDocument.getName());
+            purchaseDocument.setNetAmount(purchaseDocument.getAmount());
+            purchaseDocument.setType(CollectionDocumentType.INVOICE);
+            purchaseDocument.setState(PurchaseDocumentState.PENDING);
+            //purchaseDocument.setVoucher(voucher);
+            //purchaseDocument.setVoucher();
+            em.persist(purchaseDocument);
+            //em.flush();
+        }*/
+
 
         if (voucher.getTransactionNumber() == null){
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
@@ -93,16 +115,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             em.persist(voucherDetail);
             em.flush();
         }
-
-        /*for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()){
-
-            System.out.println("-------->>>>> FACT: " + purchaseDocument.getName());
-            purchaseDocument.setState(PurchaseDocumentState.PENDING);
-            purchaseDocument.setVoucher(voucher);
-            em.persist(purchaseDocument);
-            em.flush();
-
-        }*/
 
     }
 
@@ -136,6 +148,18 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         em.merge(voucher);
         em.flush();
+    }
+
+    @Override
+    public void updateVoucher(Voucher voucher, PurchaseDocument purchaseDocument){
+
+        purchaseDocument.setVoucher(voucher);
+
+        em.merge(purchaseDocument);
+        em.merge(voucher);
+
+        em.flush();
+
     }
 
     @Override

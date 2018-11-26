@@ -205,7 +205,7 @@
 
             <rich:spacer width="3" />
 
-            <!--<s:span id="providerField">
+            <s:span id="providerField">
                 <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
                 <rich:spacer width="2" />
                 <app:selectPopUp id="provider"
@@ -218,7 +218,7 @@
                                  reRender="providerField"
                                  hotKeySelect="alt+3">
                 </app:selectPopUp>
-            </s:span>-->
+            </s:span>
 
         </s:decorate>
 
@@ -361,7 +361,7 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field01Id}">
-                                <h:inputText id="#{fieldInput01Id}" value="#{purchaseDocument.date}" styleClass="inputSmall" required="true">
+                                <h:inputText id="#{fieldInput01Id}" value="#{purchaseDocument.date}" alt="dd/MM/yyyy" styleClass="inputSmall" required="true">
                                     <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="#{field01Id}"/>
                                 </h:inputText>
@@ -371,22 +371,34 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field02Id}">
-                                <h:inputText id="#{fieldInput02Id}" value="#{purchaseDocument.name}" styleClass="inputSmall" required="true">
+                                <!--<h:inputText id="#{fieldInput02Id}" value="#{purchaseDocument.name}" styleClass="inputSmall" required="true">
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="#{field02Id}"/>
                                 </h:inputText>
-                                <h:message for="#{fieldInput02Id}" styleClass="errors" style="display:block;" rendered="true"/>
-
-                                <!--<app:selectPopUp id="#{fieldInput02Id}"
-                                                 required="true"
-                                                 textValue="#{voucherCreateAction.provider.fullName}"
-                                                 value="#{voucherCreateAction.provider}"
-                                                 clearAction="voucherCreateAction.clearProvider()"
-                                                 searchModalPanel="providerListModalPanel"
-                                                 dataModel="#{providerDataModel}"
-                                                 reRender="#{fieldInput02Id}"
-                                                 hotKeySelect="alt+3">
-                                </app:selectPopUp>
                                 <h:message for="#{fieldInput02Id}" styleClass="errors" style="display:block;" rendered="true"/>-->
+
+                                <s:decorate id="#{fieldInput02Id}" template="/include/inputField.xhtml" styleClass="formRow">
+                                    <!--<ui:param name="required" value="#{true}"/>-->
+                                    <app:suggestionBox id="payableAccountSuggestionBox"
+                                                       value="#{purchaseDocument.entityId}"
+                                                       entity="#{purchaseDocument.financesEntity}"
+                                                       styleClass="input"
+                                                       entityAlias="financesEntity"
+                                                       searchField="fullName"
+                                                       searchCompoundFields="financesEntity.id, financesEntity.acronym"
+                                                       searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
+                                                       updateFocusOnSelect="true">
+                                        <ui:define name="columns">
+                                            <h:column>
+                                                <h:outputText value="#{entityItem.fullName}"/>
+                                            </h:column>
+                                        </ui:define>
+                                        <ui:define name="restrictions">
+                                            <!--<app:restriction condition="payableAccount.active = #{true}"/>
+                                            <app:restriction condition="payableAccount.movementAccount = #{true}"/>-->
+                                        </ui:define>
+                                    </app:suggestionBox>
+                                </s:decorate>
+
 
                             </s:div>
                         </td>
@@ -424,7 +436,7 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{fieldInput06Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field06Id}"/>
+                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field06Id}, totalInvoice"/>
                                 </h:inputText>
                                 <h:message for="#{fieldInput06Id}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
@@ -475,20 +487,21 @@
                     </tr>
                 </c:forEach>
 
-                <!--<tr class="rich-table-row">
+                <tr class="rich-table-row">
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">-</td>
                     <td class="rich-table-cell center">-</td>
                     <td class="rich-table-cell center">
-                        <s:div id="totalDebit">
-                            <h:outputText value="#{voucherCreateAction.totalsDebit}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
-                        </s:div>
-                    </td>
-                    <td class="rich-table-cell center">
-                        <s:div id="totalCredit">
-                            <h:outputText value="#{voucherCreateAction.totalsCredit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
+                        <s:div id="totalInvoice">
+                            <h:outputText value="#{voucherCreateAction.totalInvoice}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
                         </s:div>
                     </td>
                     <td class="rich-table-cell center">-</td>
-                </tr>-->
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">-</td>
+                </tr>
             </table>
         </s:div>
     </rich:tab>
