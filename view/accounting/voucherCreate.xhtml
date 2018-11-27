@@ -84,6 +84,43 @@
 
         </s:decorate>
 
+        <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!--<s:span>-->
+                <!--<h:outputText value="#{messages['Client.client']}"/>-->
+                <ui:define name="label">#{messages['Client.client']}</ui:define>
+                <rich:spacer width="2" />
+                <app:selectPopUp id="clientFieldId"
+                                 required="false"
+                                 textValue="#{voucherCreateAction.client.fullName}"
+                                 value="#{voucherCreateAction.client}"
+                                 clearAction="#{voucherCreateAction.clearClient()}"
+                                 searchModalPanel="clientListModalPanel"
+                                 dataModel="#{clientDataModel}"
+                                 reRender="clientField"
+                                 tabindex="12">
+                </app:selectPopUp>
+            <!--</s:span>-->
+        </s:decorate>
+
+        <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!--<rich:spacer width="3" />-->
+            <!--<s:span id="providerFieldId">-->
+                <!--<h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>-->
+                <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
+                <!--<rich:spacer width="2" />-->
+                <app:selectPopUp id="provider"
+                                 required="false"
+                                 textValue="#{voucherCreateAction.provider.fullName}"
+                                 value="#{voucherCreateAction.provider}"
+                                 clearAction="voucherCreateAction.clearProvider()"
+                                 searchModalPanel="providerListModalPanel"
+                                 dataModel="#{providerDataModel}"
+                                 reRender="providerField"
+                                 hotKeySelect="alt+3">
+                </app:selectPopUp>
+            <!--</s:span>-->
+        </s:decorate>
+
         <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
             <app:selectPopUp id="productItemAccount"
@@ -104,6 +141,46 @@
                                immediate="true"
                                reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
             </a4j:commandButton>
+
+            <a4j:commandButton id="newNationalCurrencyBoxId"
+                               action="#{voucherCreateAction.assignCashAccountDefault('1110110100')}"
+                               value="CN" title="1110110100 Caja General M.N."
+                               styleClass="button"
+                               immediate="true"
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+
+            <a4j:commandButton id="newFiscalCreditId"
+                               action="#{voucherCreateAction.assignCashAccountDefault('1420710000')}"
+                               value="CF" title="1420710000 Credito Fiscal IVA"
+                               styleClass="button"
+                               immediate="true"
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+
+            <a4j:commandButton id="newCreditorId"
+                               action="#{voucherCreateAction.assignCashAccountDefault('2420910300')}"
+                               value="AC" title="2420910300 Acreedores por bienes y servicios"
+                               styleClass="button"
+                               immediate="true"
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+            </a4j:commandButton>
+
+        </s:decorate>
+
+    </s:div>
+
+    <s:div id="rightSidePanel">
+
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <h:inputTextarea  id="description"
+                              value="#{voucherCreateAction.voucher.gloss}"
+                              required="false"
+                              styleClass="textarea-largest2"
+                              rows="3"
+                              tabindex="3">
+                <f:validateLength maximum="500"/>
+            </h:inputTextarea>
         </s:decorate>
 
         <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -122,7 +199,7 @@
             <app:selectPopUp id="productItem"
                              textValue="#{voucherCreateAction.productItem.name}"
                              value="#{voucherCreateAction.productItem}"
-                             clearAction="kardexProductMovementAction.cleanProductItem()"
+                             clearAction="#{voucherCreateAction.clearProductItem()}"
                              searchModalPanel="productItemListModalPanel"
                              dataModel="#{productItemSearchDataModel}"
                              reRender="productItemField"
@@ -145,8 +222,6 @@
                                immediate="true"
                                reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
             </a4j:commandButton>
-
-
         </s:decorate>
 
         <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -155,7 +230,7 @@
                              required="false"
                              textValue="#{voucherCreateAction.partnerAccount.fullAccountName}"
                              value="#{voucherCreateAction.partnerAccount}"
-                             clearAction="#{voucherCreateAction.cleanMainFields()}"
+                             clearAction="#{voucherCreateAction.clearPartnerAccount()}"
                              searchModalPanel="accountListModalPanel"
                              dataModel="#{accountDataModel}"
                              reRender="accountField"
@@ -169,57 +244,6 @@
                                immediate="true"
                                reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
             </a4j:commandButton>
-
-        </s:decorate>
-
-    </s:div>
-
-    <s:div id="rightSidePanel">
-
-        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-            <h:inputTextarea  id="description"
-                              value="#{voucherCreateAction.voucher.gloss}"
-                              required="false"
-                              styleClass="textarea-largest2"
-                              rows="3"
-                              tabindex="3">
-                <f:validateLength maximum="500"/>
-            </h:inputTextarea>
-        </s:decorate>
-
-        <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-            <s:span id="clientField">
-                <h:outputText value="#{messages['Client.client']}"/>
-                <rich:spacer width="2" />
-                <app:selectPopUp id="clientFieldId"
-                                 required="false"
-                                 textValue="#{voucherCreateAction.client.fullName}"
-                                 value="#{voucherCreateAction.client}"
-                                 clearAction="voucherCreateAction.clearClient()"
-                                 searchModalPanel="clientListModalPanel"
-                                 dataModel="#{clientDataModel}"
-                                 reRender="clientField"
-                                 tabindex="12">
-                </app:selectPopUp>
-            </s:span>
-
-            <rich:spacer width="3" />
-
-            <s:span id="providerField">
-                <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
-                <rich:spacer width="2" />
-                <app:selectPopUp id="provider"
-                                 required="false"
-                                 textValue="#{voucherCreateAction.provider.fullName}"
-                                 value="#{voucherCreateAction.provider}"
-                                 clearAction="voucherCreateAction.clearProvider()"
-                                 searchModalPanel="providerListModalPanel"
-                                 dataModel="#{providerDataModel}"
-                                 reRender="providerField"
-                                 hotKeySelect="alt+3">
-                </app:selectPopUp>
-            </s:span>
-
         </s:decorate>
 
     </s:div>
@@ -257,6 +281,7 @@
                                 <h:inputText id="#{debitInputFieldId}"
                                              value="#{voucherDetail.debit}"
                                              styleClass="inputSmall right"
+                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
                                              required="true"
                                              rendered="true">
                                     <app:realNumberConverter minimum="0"
@@ -273,6 +298,7 @@
                                 <h:inputText id="#{creditInputFieldId}"
                                              value="#{voucherDetail.credit}"
                                              styleClass="inputSmall right"
+                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
                                              required="true"
                                              rendered="true">
                                     <app:realNumberConverter minimum="0"
@@ -324,7 +350,7 @@
                 <tr class="rich-table-header">
                     <th class="rich-table-headercell">Fecha</th>
                     <th class="rich-table-headercell">R.Social</th>
-                    <th class="rich-table-headercell">Nit</th>
+                    <!--<th class="rich-table-headercell">Nit</th>-->
                     <th class="rich-table-headercell">N.Fact</th>
                     <th class="rich-table-headercell">Auto</th>
                     <th class="rich-table-headercell">Monto</th>
@@ -370,16 +396,16 @@
                         </td>
 
                         <td class="rich-table-cell center">
-                            <s:div id="#{field02Id}">
+                            <!--<s:div id="#{field02Id}">-->
                                 <!--<h:inputText id="#{fieldInput02Id}" value="#{purchaseDocument.name}" styleClass="inputSmall" required="true">
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="#{field02Id}"/>
                                 </h:inputText>
                                 <h:message for="#{fieldInput02Id}" styleClass="errors" style="display:block;" rendered="true"/>-->
 
-                                <s:decorate id="#{fieldInput02Id}" template="/include/inputField.xhtml" styleClass="formRow">
-                                    <!--<ui:param name="required" value="#{true}"/>-->
-                                    <app:suggestionBox id="payableAccountSuggestionBox"
-                                                       value="#{purchaseDocument.entityId}"
+                                <s:decorate id="#{field02Id}" template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:param name="required" value="#{true}"/>
+                                    <app:suggestionBox id="#{fieldInput02Id}"
+                                                       value="#{purchaseDocument.financesEntityFullName}"
                                                        entity="#{purchaseDocument.financesEntity}"
                                                        styleClass="input"
                                                        entityAlias="financesEntity"
@@ -388,29 +414,21 @@
                                                        searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
                                                        updateFocusOnSelect="true">
                                         <ui:define name="columns">
-                                            <h:column>
-                                                <h:outputText value="#{entityItem.fullName}"/>
-                                            </h:column>
-                                        </ui:define>
-                                        <ui:define name="restrictions">
-                                            <!--<app:restriction condition="payableAccount.active = #{true}"/>
-                                            <app:restriction condition="payableAccount.movementAccount = #{true}"/>-->
+                                            <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
                                         </ui:define>
                                     </app:suggestionBox>
                                 </s:decorate>
-
-
-                            </s:div>
+                            <!--</s:div>-->
                         </td>
 
-                        <td class="rich-table-cell center">
+                        <!--<td class="rich-table-cell center">
                             <s:div id="#{field03Id}">
                                 <h:inputText id="#{fieldInput03Id}" value="#{purchaseDocument.nit}" styleClass="inputSmall" required="true">
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="#{field03Id}"/>
                                 </h:inputText>
                                 <h:message for="#{fieldInput03Id}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
-                        </td>
+                        </td>-->
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field04Id}">
@@ -488,19 +506,18 @@
                 </c:forEach>
 
                 <tr class="rich-table-row">
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center">
                         <s:div id="totalInvoice">
                             <h:outputText value="#{voucherCreateAction.totalInvoice}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
                         </s:div>
                     </td>
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell center"></td>
                 </tr>
             </table>
         </s:div>

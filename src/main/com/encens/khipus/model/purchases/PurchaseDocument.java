@@ -82,9 +82,6 @@ public class PurchaseDocument extends AccountingDocument {
     @JoinColumn(name = "IDENTIDAD", referencedColumnName = "COD_ENTI", nullable = true, insertable = true, updatable = true)
     private FinancesEntity financesEntity;
 
-    @Transient
-    private Long entityId;
-
     @Column(name = "NO_CIA", length = 2)
     @Length(max = 2)
     private String companyNumber;
@@ -103,18 +100,12 @@ public class PurchaseDocument extends AccountingDocument {
     @Transient
     private String financesEntityFullName;
 
+    /*
     public String getFinancesEntityFullName(){
         if (financesEntityFullName == null && getFinancesEntity() != null){
             financesEntityFullName = getFinancesEntity().getNitNumber() + " " + getFinancesEntity().getAcronym();
         }
         return financesEntityFullName;
-    }
-
-    /*public String getPayableAccountFullName() {
-        if (payableAccountFullName == null && getPayableAccount() != null) {
-            payableAccountFullName = getPayableAccount().getFullName();
-        }
-        return payableAccountFullName;
     }*/
 
     public CollectionDocumentType getType() {
@@ -242,11 +233,11 @@ public class PurchaseDocument extends AccountingDocument {
         this.voucher = voucher;
     }
 
-    public Long getEntityId() {
-        return entityId;
+    public String getFinancesEntityFullName() {
+        return financesEntityFullName;
     }
 
-    public void setEntityId(Long entityId) {
-        this.entityId = entityId;
+    public void setFinancesEntityFullName(String financesEntityFullName) {
+        this.financesEntityFullName = financesEntityFullName;
     }
 }

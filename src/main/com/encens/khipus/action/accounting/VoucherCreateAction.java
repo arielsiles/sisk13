@@ -176,6 +176,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return result;
     }
 
+    public Boolean isFiscalCredit(VoucherDetail voucherDetail){
+        return voucherDetail.getAccount().equals("1420710000");
+    }
+
     public void assignVoucherDetail(CashAccount cashAccount){
         VoucherDetail voucherDetail = new VoucherDetail();
         voucherDetail.setCashAccount(cashAccount);
@@ -183,20 +187,38 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         voucherDetails.add(voucherDetail);
     }
 
+    /*public void assignCashAccountFiscalCredit(){
+        this.account = cashAccountService.findByAccountCode("1420710000");
+        assignCashAccountVoucherDetail();
+    }*/
+
+    public void assignCashAccountDefault(String accountCode){
+        this.account = cashAccountService.findByAccountCode(accountCode);
+        assignCashAccountVoucherDetail();
+    }
+
 
     public void assignCashAccountVoucherDetail(){
 
-        if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
-            setFiscalCredit(true);
-            PurchaseDocument purchaseDocument = new PurchaseDocument();
-            purchaseDocumentList.add(purchaseDocument);
+        if (account != null){
+            if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+                setFiscalCredit(true);
+                PurchaseDocument purchaseDocument = new PurchaseDocument();
+                purchaseDocumentList.add(purchaseDocument);
 
-        }else {
-            assignInputVoucherDetail();
+            }else {
+                assignInputVoucherDetail();
+            }
         }
     }
 
     public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
+
+        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntityFullName());
+        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntity());
+
+        purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
+        purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
 
         BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
         try {
@@ -304,13 +326,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void assignPartnerAccountVoucherDetail(){
-
-        System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
-
         try {
+
+            System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
 
             CashAccount ctaCaja     = cashAccountService.findByAccountCode("1110110100");
 
@@ -548,6 +569,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearClient(){
         setClient(null);
+    }
+
+    public void clearProductItem(){
+        setProductItem(null);
+    }
+
+    public void clearPartnerAccount(){
+        setPartnerAccount(null);
     }
 
     public void clearProvider(){

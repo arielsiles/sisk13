@@ -182,8 +182,8 @@
                 <h:outputText value="#{messages['FinanceProvider.cashAccount']}"/>
             </ui:define>
             <app:suggestionBox id="payableAccountSuggestionBox"
-                               value="#{providerEntity.payableAccountFullName}"
-                               entity="#{providerEntity.payableAccount}"
+                               value="#{financeProvider.payableAccountFullName}"
+                               entity="#{financeProvider.payableAccount}"
                                styleClass="input"
                                entityAlias="payableAccount"
                                searchField="fullName"
