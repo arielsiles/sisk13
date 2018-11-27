@@ -9,11 +9,13 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
@@ -24,6 +26,7 @@ import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -50,6 +53,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private ProductItem productItem;
     private Account partnerAccount;
 
+    //private PurchaseDocument purchaseDocument;
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
+
     private Integer quantity;
     private BigDecimal amountDeposit;
 
@@ -61,6 +67,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     private String clientFullName;
     private String providerFullName;
+
+    private Boolean fiscalCredit = false;
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
@@ -80,12 +88,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     @In
     private CashAccountService cashAccountService;
 
+    @In
+    private PurchaseDocumentService purchaseDocumentService;
+
     @Override
     @End
     public String create() {
 
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
+
+        //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
         BigDecimal totalD = new BigDecimal("0.00");
         BigDecimal totalC = new BigDecimal("0.00");
@@ -109,8 +122,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherUpdateAction.setVoucher(voucher);
             voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
             voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-
             voucherUpdateAction.setInstance(voucher);
+
+
+            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
+                //purchaseDocument.setVoucher(voucher);
+                purchaseDocumentService.createDocumentSimple(purchaseDocument);
+
+            }
+
 
             return Outcome.SUCCESS;
 
@@ -141,7 +161,23 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         voucherDetails.add(voucherDetail);
     }
 
-    public void assignInputVoucherDetail(){
+
+    public void assignCashAccountVoucherDetail(){
+
+        if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+            setFiscalCredit(true);
+            PurchaseDocument purchaseDocument = new PurchaseDocument();
+            purchaseDocument.setDate(new Date());
+            purchaseDocumentList.add(purchaseDocument);
+
+        }else {
+            assignInputVoucherDetail();
+        }
+    }
+
+    public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
+
+        BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
         try {
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setCashAccount(this.account);
@@ -152,19 +188,47 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if (this.provider != null)
                 voucherDetail.setProviderCode(this.provider.getProviderCode());
 
-            voucherDetail.setDebit(this.debit);
+            voucherDetail.setDebit(fiscalCredit);
             voucherDetail.setCredit(this.credit);
 
             voucherDetails.add(voucherDetail);
-            clearAccount();
-            clearClient();
-            clearProvider();
-            setDebit(new BigDecimal("0.00"));
-            setCredit(new BigDecimal("0.00"));
-        }catch (NullPointerException e){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+            clearAll();
+            //setDebit(BigDecimal.ZERO);
+            //setCredit(BigDecimal.ZERO);
+        } catch (NullPointerException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
         }
+    }
 
+
+    public void assignInputVoucherDetail(){
+
+            try {
+                VoucherDetail voucherDetail = new VoucherDetail();
+                voucherDetail.setCashAccount(this.account);
+                voucherDetail.setAccount(this.account.getAccountCode());
+                voucherDetail.setClient(this.client);
+                voucherDetail.setProvider(this.provider);
+
+                if (this.provider != null)
+                    voucherDetail.setProviderCode(this.provider.getProviderCode());
+
+                voucherDetail.setDebit(this.debit);
+                voucherDetail.setCredit(this.credit);
+
+                voucherDetails.add(voucherDetail);
+                clearAll();
+                setDebit(BigDecimal.ZERO);
+                setCredit(BigDecimal.ZERO);
+            } catch (NullPointerException e) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
+            }
+    }
+
+    public void clearAll(){
+        clearAccount();
+        clearClient();
+        clearProvider();
     }
 
     public void assignProductItemVoucherDetail(){
@@ -232,7 +296,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             VoucherDetail voucherCaja = new VoucherDetail();
             voucherCaja.setCashAccount(ctaCaja);
             voucherCaja.setAccount(ctaCaja.getAccountCode());
-            voucherCaja.setDebit(amountDeposit);
+            voucherCaja.setDebit(getAmountDeposit());
             voucherCaja.setCredit(BigDecimal.ZERO);
 
 
@@ -248,7 +312,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherSaving.setProviderCode(this.provider.getProviderCode());
 
             voucherSaving.setDebit(BigDecimal.ZERO);
-            voucherSaving.setCredit(amountDeposit);
+            voucherSaving.setCredit(getAmountDeposit());
 
             voucherDetails.add(voucherCaja);
             voucherDetails.add(voucherSaving);
@@ -268,6 +332,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
+    }
+
+    public void removePurchaseDocument(PurchaseDocument purchaseDocument){
+        purchaseDocumentList.remove(purchaseDocument);
     }
 
     public void assignProvider(Provider provider) {
@@ -478,6 +546,22 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setPartnerAccount(Account partnerAccount) {
         this.partnerAccount = partnerAccount;
+    }
+
+    public Boolean getFiscalCredit() {
+        return fiscalCredit;
+    }
+
+    public void setFiscalCredit(Boolean fiscalCredit) {
+        this.fiscalCredit = fiscalCredit;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentList() {
+        return purchaseDocumentList;
+    }
+
+    public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
+        this.purchaseDocumentList = purchaseDocumentList;
     }
 
     public BigDecimal getAmountDeposit() {

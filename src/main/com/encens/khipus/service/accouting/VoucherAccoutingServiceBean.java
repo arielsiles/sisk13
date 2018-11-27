@@ -11,6 +11,8 @@ import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -91,6 +93,17 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             em.persist(voucherDetail);
             em.flush();
         }
+
+        /*for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()){
+
+            System.out.println("-------->>>>> FACT: " + purchaseDocument.getName());
+            purchaseDocument.setState(PurchaseDocumentState.PENDING);
+            purchaseDocument.setVoucher(voucher);
+            em.persist(purchaseDocument);
+            em.flush();
+
+        }*/
+
     }
 
     @Override

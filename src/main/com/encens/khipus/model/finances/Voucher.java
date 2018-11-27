@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -179,6 +180,13 @@ public class Voucher implements BaseModel{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher", cascade = CascadeType.ALL)
     private List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>(0);
+
+    /*@OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher")
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);*/
+
+    @Transient
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);
+
 
     @PrePersist
     private void defineCurrentDate() {
@@ -486,6 +494,14 @@ public class Voucher implements BaseModel{
 
     public void setVoucherDetailList(List<VoucherDetail> voucherDetailList) {
         this.voucherDetailList = voucherDetailList;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentList() {
+        return purchaseDocumentList;
+    }
+
+    public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
+        this.purchaseDocumentList = purchaseDocumentList;
     }
 
     /*@Override
