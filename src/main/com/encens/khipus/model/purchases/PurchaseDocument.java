@@ -75,7 +75,7 @@ public class PurchaseDocument extends AccountingDocument {
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDTMPENC", nullable = true, insertable = true, updatable = false)
+    @JoinColumn(name = "IDTMPENC", nullable = true, insertable = true, updatable = true)
     private Voucher voucher;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -96,6 +96,17 @@ public class PurchaseDocument extends AccountingDocument {
             @JoinColumn(name = "CUENTAAJUSTE", referencedColumnName = "CUENTA", updatable = false, insertable = false)
     })
     private CashAccount cashAccountAdjustment;
+
+    @Transient
+    private String financesEntityFullName;
+
+    /*
+    public String getFinancesEntityFullName(){
+        if (financesEntityFullName == null && getFinancesEntity() != null){
+            financesEntityFullName = getFinancesEntity().getNitNumber() + " " + getFinancesEntity().getAcronym();
+        }
+        return financesEntityFullName;
+    }*/
 
     public CollectionDocumentType getType() {
         return type;
@@ -220,5 +231,13 @@ public class PurchaseDocument extends AccountingDocument {
 
     public void setVoucher(Voucher voucher) {
         this.voucher = voucher;
+    }
+
+    public String getFinancesEntityFullName() {
+        return financesEntityFullName;
+    }
+
+    public void setFinancesEntityFullName(String financesEntityFullName) {
+        this.financesEntityFullName = financesEntityFullName;
     }
 }

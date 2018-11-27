@@ -1,10 +1,14 @@
 package com.encens.khipus.action.accounting;
 
+import com.encens.khipus.action.purchases.PurchaseDocumentAction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.finances.Voucher;
@@ -91,22 +95,35 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     @In
     private PurchaseDocumentService purchaseDocumentService;
 
+    @In(create = true)
+    private PurchaseDocumentAction purchaseDocumentAction;
+
     @Override
     @End
     public String create() {
+
+
 
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
 
         //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
-        BigDecimal totalD = new BigDecimal("0.00");
-        BigDecimal totalC = new BigDecimal("0.00");
+        BigDecimal totalD = BigDecimal.ZERO;
+        BigDecimal totalC = BigDecimal.ZERO;
+        BigDecimal totalI = BigDecimal.ZERO;
+
         try {
+
             for (VoucherDetail voucherDetail : voucherDetails) {
                 totalD = totalD.add(voucherDetail.getDebit());
                 totalC = totalC.add(voucherDetail.getCredit());
             }
+
+            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
+                totalI = totalI.add(purchaseDocument.getAmount());
+            }
+
             //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SalaryMovementProducer.message.insufficientBalance",fullName,totalCollected);
             if(totalD.doubleValue() == 0.00 || totalC.doubleValue() == 0.00){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectAccountingEntry");
@@ -118,17 +135,28 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 return Outcome.REDISPLAY;
             }
 
+            if (totalI.doubleValue() != totalD.doubleValue()){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectFiscalCredit");
+                return Outcome.REDISPLAY;
+            }
+
+            /** For Create Invoice **/
+            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
+                //purchaseDocument.setVoucher(voucher);
+                purchaseDocument.setNetAmount(purchaseDocument.getAmount());
+                purchaseDocument.setType(CollectionDocumentType.INVOICE);
+                purchaseDocumentService.createDocumentSimple(purchaseDocument);
+            }
+
             voucherAccoutingService.saveVoucher(voucher);
             voucherUpdateAction.setVoucher(voucher);
             voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
             voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
             voucherUpdateAction.setInstance(voucher);
 
-
+            System.out.println("-------------> Relacionando....");
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
-                //purchaseDocument.setVoucher(voucher);
-                purchaseDocumentService.createDocumentSimple(purchaseDocument);
-
+                voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
 
@@ -154,6 +182,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return result;
     }
 
+    public Boolean isFiscalCredit(VoucherDetail voucherDetail){
+        return voucherDetail.getAccount().equals("1420710000");
+    }
+
     public void assignVoucherDetail(CashAccount cashAccount){
         VoucherDetail voucherDetail = new VoucherDetail();
         voucherDetail.setCashAccount(cashAccount);
@@ -161,21 +193,38 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         voucherDetails.add(voucherDetail);
     }
 
+    /*public void assignCashAccountFiscalCredit(){
+        this.account = cashAccountService.findByAccountCode("1420710000");
+        assignCashAccountVoucherDetail();
+    }*/
+
+    public void assignCashAccountDefault(String accountCode){
+        this.account = cashAccountService.findByAccountCode(accountCode);
+        assignCashAccountVoucherDetail();
+    }
+
 
     public void assignCashAccountVoucherDetail(){
 
-        if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
-            setFiscalCredit(true);
-            PurchaseDocument purchaseDocument = new PurchaseDocument();
-            purchaseDocument.setDate(new Date());
-            purchaseDocumentList.add(purchaseDocument);
+        if (account != null){
+            if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+                setFiscalCredit(true);
+                PurchaseDocument purchaseDocument = new PurchaseDocument();
+                purchaseDocumentList.add(purchaseDocument);
 
-        }else {
-            assignInputVoucherDetail();
+            }else {
+                assignInputVoucherDetail();
+            }
         }
     }
 
     public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
+
+        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntityFullName());
+        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntity());
+
+        purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
+        purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
 
         BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
         try {
@@ -283,13 +332,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void assignPartnerAccountVoucherDetail(){
-
-        System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
-        System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
-
         try {
+
+            System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
 
             CashAccount ctaCaja     = cashAccountService.findByAccountCode("1110110100");
 
@@ -365,6 +413,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 total = total.add(voucherDetail.getDebit());
         }
         System.out.println("....getTotalsDebit:::: " + total);
+        return total;
+    }
+
+    public BigDecimal getTotalInvoice(){
+        BigDecimal total = new BigDecimal("0.00");
+        for (PurchaseDocument purchaseDocument : purchaseDocumentList) {
+            if(purchaseDocument.getAmount() != null)
+                total = total.add(purchaseDocument.getAmount());
+        }
+        System.out.println("....TOTAL INVOICE:::: " + total);
         return total;
     }
 
@@ -518,6 +576,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearClient(){
         setClient(null);
+    }
+
+    public void clearProductItem(){
+        setProductItem(null);
+    }
+
+    public void clearPartnerAccount(){
+        setPartnerAccount(null);
     }
 
     public void clearProvider(){

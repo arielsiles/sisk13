@@ -63,8 +63,8 @@
         </navigation:resources>
     </navigation:pages>
 
-    <core:manager concurrent-request-timeout="10000"
-                  conversation-timeout="1800000"
+    <core:manager concurrent-request-timeout="20000"
+                  conversation-timeout="3600000"
                   conversation-id-parameter="cid"
                   parent-conversation-id-parameter="pid"/>
 

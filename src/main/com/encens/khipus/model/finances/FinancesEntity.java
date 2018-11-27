@@ -129,6 +129,10 @@ public class FinancesEntity implements BaseModel {
         return idNumber;
     }
 
+    public String getFullName(){
+        return getNitNumber() + " " + getAcronym();
+    }
+
     public void setIdNumber(String idNumber) {
         this.idNumber = idNumber;
     }

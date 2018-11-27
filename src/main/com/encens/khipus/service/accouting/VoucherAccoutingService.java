@@ -6,6 +6,7 @@ import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.purchases.PurchaseDocument;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -30,7 +31,11 @@ public interface VoucherAccoutingService extends GenericService {
 
     void saveVoucher(Voucher voucher);
 
+    void savePurchaseDocument();
+
     void updateVoucher(Voucher voucher);
+
+    void updateVoucher(Voucher voucher, PurchaseDocument purchaseDocument);
 
     void approveVoucher(Voucher voucher);
 
