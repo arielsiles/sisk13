@@ -70,29 +70,11 @@
 
                         <s:div id="leftSidePanel" style="text-align: center;">
                             <s:decorate id="transactionNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['Voucher.documentNumber']}</ui:define>
-                                <h:outputText value="#{voucherUpdateAction.voucher.documentNumber}"/>
-                                <h:outputText value=" - "/>
-                                <h:outputText value="#{voucherUpdateAction.voucher.state}" style="font-weight: bold; color: #{voucherUpdateAction.pending ? '#313335' : (voucherUpdateAction.approved ? 'blue' : 'red')}" />
-                            </s:decorate>
-                            <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['Voucher.date']}</ui:define>
-                                <rich:calendar value="#{voucherUpdateAction.voucher.date}"
-                                               popup="true"
-                                               datePattern="#{messages['patterns.date']}"
-                                               styleClass="input"
-                                               enableManualInput="true"
-                                               tabindex="1"
-                                               required="true">
-                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                                </rich:calendar>
-                            </s:decorate>
+                                <ui:define name="label">#{messages['Voucher.type']}</ui:define>
 
-                            <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['Voucher.documentType']}</ui:define>
                                 <h:selectOneMenu id="documentType"
                                                  value="#{voucherUpdateAction.docType}"
-                                                 styleClass="input"
+                                                 styleClass="inputTiny"
                                                  required="true"
                                                  disabled="true">
                                     <s:selectItems value="#{selectList}"
@@ -106,6 +88,87 @@
                                                  ajaxSingle="true"/>
                                     <s:convertEntity/>
                                 </h:selectOneMenu>
+
+                                <rich:spacer width="5" />
+
+                                <h:outputText value="#{voucherUpdateAction.voucher.documentNumber}"/>
+                                <h:outputText value=" - "/>
+                                <h:outputText value="#{voucherUpdateAction.voucher.state}" style="font-weight: bold; color: #{voucherUpdateAction.pending ? '#313335' : (voucherUpdateAction.approved ? 'blue' : 'red')}" />
+
+                                <rich:spacer width="5" />
+
+                                <rich:calendar value="#{voucherUpdateAction.voucher.date}"
+                                               popup="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               styleClass="inputSmall"
+                                               enableManualInput="true"
+                                               tabindex="1"
+                                               required="true">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </rich:calendar>
+
+                            </s:decorate>
+                            <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Voucher.date']}</ui:define>
+                                <rich:calendar value="#{voucherUpdateAction.voucher.date}"
+                                               popup="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               styleClass="input"
+                                               enableManualInput="true"
+                                               tabindex="1"
+                                               required="true">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </rich:calendar>
+                            </s:decorate>-->
+
+                            <!--<s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Voucher.documentType']}</ui:define>
+                                <h:selectOneMenu id="documentType"
+                                                 value="#{voucherUpdateAction.docType}"
+                                                 styleClass="inputTiny"
+                                                 required="true"
+                                                 disabled="true">
+                                    <s:selectItems value="#{selectList}"
+                                                   var="element"
+                                                   label="#{element.fullName}"
+                                                   noSelectionLabel=""
+                                                   hideNoSelectionLabel="false"/>
+                                    <a4j:support event="onchange"
+                                                 action="#{voucherUpdateAction.cleanMainFields()}"
+                                                 reRender="#{mainComponentIdsToRerender}"
+                                                 ajaxSingle="true"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>-->
+
+                            <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Client.client']}</ui:define>
+                                <rich:spacer width="2" />
+                                <app:selectPopUp id="clientFieldId"
+                                                 required="false"
+                                                 textValue="#{voucherUpdateAction.client.fullName}"
+                                                 value="#{voucherUpdateAction.client}"
+                                                 clearAction="voucherUpdateAction.clearClient()"
+                                                 searchModalPanel="clientListModalPanel"
+                                                 dataModel="#{clientDataModel}"
+                                                 reRender="clientField"
+                                                 tabindex="12">
+                                </app:selectPopUp>
+                            </s:decorate>
+
+                            <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
+                                <rich:spacer width="2" />
+                                <app:selectPopUp id="provider"
+                                                 required="false"
+                                                 textValue="#{voucherUpdateAction.provider.fullName}"
+                                                 value="#{voucherUpdateAction.provider}"
+                                                 clearAction="voucherUpdateAction.clearProvider()"
+                                                 searchModalPanel="providerListModalPanel"
+                                                 dataModel="#{providerDataModel}"
+                                                 reRender="providerField"
+                                                 hotKeySelect="alt+3">
+                                </app:selectPopUp>
                             </s:decorate>
 
                             <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -122,11 +185,19 @@
                                 </app:selectPopUp>
 
                                 <a4j:commandButton id="newRegisterId"
-                                                   action="#{voucherUpdateAction.assignInputVoucherDetail()}"
+                                                   action="#{voucherUpdateAction.assignCashAccountVoucherDetail()}"
                                                    value=" + "
                                                    styleClass="button"
                                                    immediate="true"
                                                    reRender="movementDetailListPanel,dataVoucherFields,inputVoucherForm,itemAccountField,clientField,providerField, debitInputField, creditInputField">
+                                </a4j:commandButton>
+
+                                <a4j:commandButton id="newFiscalCreditId"
+                                                   action="#{voucherUpdateAction.assignCashAccountDefault('1420710000')}"
+                                                   value="CF" title="1420710000 Credito Fiscal IVA"
+                                                   styleClass="button"
+                                                   immediate="true"
+                                                   reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
                                 </a4j:commandButton>
 
                             </s:decorate>
@@ -146,7 +217,7 @@
                                 </h:inputTextarea>
                             </s:decorate>
 
-                            <s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <!--<s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
                                 <s:span id="clientField">
                                     <h:outputText value="#{messages['Client.client']}"/>
                                     <rich:spacer width="2" />
@@ -176,7 +247,7 @@
                                                      hotKeySelect="alt+3">
                                     </app:selectPopUp>
                                 </s:span>
-                            </s:decorate>
+                            </s:decorate>-->
                         </s:div>
 
                     </h:panelGrid>

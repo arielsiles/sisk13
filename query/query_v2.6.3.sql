@@ -32,7 +32,7 @@ UPDATE tipocuenta t SET t.`ctap_mn` = '2120110000', t.`ctap_me` = '2120120000' W
 
 /** 22-11-2018 **/
 ALTER TABLE sf_tmpdet ADD COLUMN idcuenta BIGINT(20) NULL;
-
-
+/** 28-11-2018 **/
+ALTER TABLE sf_tmpdet ADD COLUMN iddocumentocompra BIGINT(20) NULL;
 
 

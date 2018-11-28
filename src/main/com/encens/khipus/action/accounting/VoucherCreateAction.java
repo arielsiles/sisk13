@@ -220,9 +220,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
 
-        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntityFullName());
-        System.out.println("----->>> FinancesEntityFullName: " + purchaseDocument.getFinancesEntity());
-
         purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
         purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
 
@@ -239,6 +236,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             voucherDetail.setDebit(fiscalCredit);
             voucherDetail.setCredit(this.credit);
+
+            voucherDetail.setPurchaseDocument(purchaseDocument);
 
             voucherDetails.add(voucherDetail);
             clearAll();
@@ -259,8 +258,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setClient(this.client);
                 voucherDetail.setProvider(this.provider);
 
-                if (this.provider != null)
-                    voucherDetail.setProviderCode(this.provider.getProviderCode());
+                if (this.provider != null) voucherDetail.setProviderCode(this.provider.getProviderCode());
 
                 voucherDetail.setDebit(this.debit);
                 voucherDetail.setCredit(this.credit);
@@ -368,6 +366,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             clearAccount();
             clearClient();
             clearProvider();
+            clearPartnerAccount();
             setDebit(BigDecimal.ZERO);
             setCredit(BigDecimal.ZERO);
         }catch (NullPointerException e){
@@ -584,6 +583,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearPartnerAccount(){
         setPartnerAccount(null);
+        setAmountDeposit(BigDecimal.ZERO);
     }
 
     public void clearProvider(){

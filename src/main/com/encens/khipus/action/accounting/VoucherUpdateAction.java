@@ -9,7 +9,9 @@ import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
@@ -36,6 +38,8 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
 
     private DocType docType = new DocType();
     private Voucher voucher;
+
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
     private List<VoucherDetail> voucherDetails;
 
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -47,6 +51,10 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private CashAccount account;
     private Client client;
 
+    private Boolean fiscalCredit = false;
+
+    @In
+    private CashAccountService cashAccountService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
     @In
@@ -152,6 +160,55 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         System.out.println("... ... ... Add Voucher Detail: " + cashAccount.getFullName());
     }
 
+    public void assignCashAccountDefault(String accountCode){
+        this.account = cashAccountService.findByAccountCode(accountCode);
+        assignCashAccountVoucherDetail();
+    }
+
+    public void assignCashAccountVoucherDetail(){
+
+        if (account != null){
+            if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+                setFiscalCredit(true);
+                PurchaseDocument purchaseDocument = new PurchaseDocument();
+                getPurchaseDocumentList().add(purchaseDocument);
+
+            }else {
+                assignInputVoucherDetail();
+            }
+        }
+    }
+
+    public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
+
+        purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
+        purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
+
+        BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
+        try {
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setCashAccount(this.account);
+            voucherDetail.setAccount(this.account.getAccountCode());
+            voucherDetail.setClient(this.client);
+            voucherDetail.setProvider(this.provider);
+
+            if (this.provider != null)
+                voucherDetail.setProviderCode(this.provider.getProviderCode());
+
+            voucherDetail.setDebit(fiscalCredit);
+            voucherDetail.setCredit(this.credit);
+
+            voucherDetail.setPurchaseDocument(purchaseDocument);
+
+            voucherDetails.add(voucherDetail);
+            clearAll();
+            //setDebit(BigDecimal.ZERO);
+            //setCredit(BigDecimal.ZERO);
+        } catch (NullPointerException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
+        }
+    }
+
     public void assignInputVoucherDetail(){
         try {
             VoucherDetail voucherDetail = new VoucherDetail();
@@ -166,15 +223,19 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
             voucherDetail.setCredit(this.credit);
 
             voucherDetails.add(voucherDetail);
-            clearAccount();
-            clearClient();
-            clearProvider();
-            setDebit(new BigDecimal("0.00"));
-            setCredit(new BigDecimal("0.00"));
+            clearAll();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
         }catch (NullPointerException e){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Los valores del asiento son incompletos");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
         }
 
+    }
+
+    public void clearAll(){
+        clearAccount();
+        clearClient();
+        clearProvider();
     }
 
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
@@ -385,4 +446,19 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         purchaseDocumentAction.clearFinancesEntity();
     }
 
+    public Boolean getFiscalCredit() {
+        return fiscalCredit;
+    }
+
+    public void setFiscalCredit(Boolean fiscalCredit) {
+        this.fiscalCredit = fiscalCredit;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentList() {
+        return purchaseDocumentList;
+    }
+
+    public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
+        this.purchaseDocumentList = purchaseDocumentList;
+    }
 }

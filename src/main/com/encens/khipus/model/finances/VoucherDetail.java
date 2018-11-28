@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
@@ -125,6 +126,10 @@ public class VoucherDetail implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "IDCUENTA", referencedColumnName = "IDCUENTA")
     private Account partnerAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
+    private PurchaseDocument purchaseDocument;
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
@@ -354,5 +359,13 @@ public class VoucherDetail implements BaseModel {
 
     public void setPartnerAccount(Account partnerAccount) {
         this.partnerAccount = partnerAccount;
+    }
+
+    public PurchaseDocument getPurchaseDocument() {
+        return purchaseDocument;
+    }
+
+    public void setPurchaseDocument(PurchaseDocument purchaseDocument) {
+        this.purchaseDocument = purchaseDocument;
     }
 }

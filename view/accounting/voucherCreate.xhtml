@@ -53,7 +53,7 @@
     <s:div id="leftSidePanel">
         <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
             <!--<ui:define name="label">#{messages['Voucher.date']}</ui:define>-->
-            <ui:define name="label">#{messages['Product.type']}</ui:define>
+            <ui:define name="label">#{messages['Voucher.type']}</ui:define>
             <h:selectOneMenu id="documentType"
                              value="#{voucherCreateAction.docType}"
                              styleClass="inputTiny"
@@ -130,7 +130,7 @@
                              clearAction="voucherCreateAction.clearAccount()"
                              searchModalPanel="cashAccountListModalPanel"
                              dataModel="#{cashAccountDataModel}"
-                             reRender="itemAccountField, debitInputField, creditInputField, debitField, creditField"
+                             reRender="itemAccountField, debitField, creditField"
                              tabindex="11">
             </app:selectPopUp>
 
@@ -139,7 +139,7 @@
                                value=" + "
                                styleClass="button"
                                immediate="true"
-                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
             </a4j:commandButton>
 
             <a4j:commandButton id="newNationalCurrencyBoxId"
@@ -147,7 +147,7 @@
                                value="CN" title="1110110100 Caja General M.N."
                                styleClass="button"
                                immediate="true"
-                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
             </a4j:commandButton>
 
             <a4j:commandButton id="newFiscalCreditId"
@@ -155,7 +155,7 @@
                                value="CF" title="1420710000 Credito Fiscal IVA"
                                styleClass="button"
                                immediate="true"
-                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
             </a4j:commandButton>
 
             <a4j:commandButton id="newCreditorId"
@@ -163,7 +163,7 @@
                                value="AC" title="2420910300 Acreedores por bienes y servicios"
                                styleClass="button"
                                immediate="true"
-                               reRender="invoiceDetailListPanel,movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
             </a4j:commandButton>
 
         </s:decorate>
@@ -220,7 +220,7 @@
                                value=" + "
                                styleClass="button"
                                immediate="true"
-                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="movementDetailListPanel,itemAccountField,clientField, providerField">
             </a4j:commandButton>
         </s:decorate>
 
@@ -242,16 +242,15 @@
                          styleClass="inputNumberTiny"
                          required="false">
                 <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="amountDepositId"/>
-                <a4j:support event="onblur" ajaxSingle="true" reRender="depositId"/>
+                <a4j:support event="onblur" ajaxSingle="true" reRender="amountDepositId"/>
+                <h:message for="amountDepositId" styleClass="errors" style="display:block;" rendered="true"/>
             </h:inputText>
-            <h:message for="amountDepositId" styleClass="errors" style="display:block;" rendered="true"/>
-
             <a4j:commandButton id="partnerAccountId"
                                action="#{voucherCreateAction.assignPartnerAccountVoucherDetail()}"
                                value=" + "
                                styleClass="button"
                                immediate="true"
-                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
+                               reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId">
             </a4j:commandButton>
         </s:decorate>
 
@@ -547,7 +546,7 @@
                                    action="#{voucherCreateAction.setAccount(cashAccountItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="itemAccountField, debitInputField, creditInputField"
+                                   reRender="itemAccountField"
                                    oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>
@@ -573,7 +572,7 @@
                                action="#{voucherCreateAction.setPartnerAccount(accountItem)}"
                                image="/img/active.gif"
                                styleClass="select-image-middle"
-                               reRender="accountField"
+                               reRender="accountField,amountDepositId"
                                oncomplete="Richfaces.hideModalPanel('accountListModalPanel');"/>
         </ui:define>
     </s:decorate>
