@@ -102,12 +102,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     @End
     public String create() {
 
-
-
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
 
         //voucher.setPurchaseDocumentList(purchaseDocumentList);
+
+        Boolean hasFiscalCredit = false;
 
         BigDecimal totalD = BigDecimal.ZERO;
         BigDecimal totalC = BigDecimal.ZERO;
@@ -118,6 +118,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             for (VoucherDetail voucherDetail : voucherDetails) {
                 totalD = totalD.add(voucherDetail.getDebit());
                 totalC = totalC.add(voucherDetail.getCredit());
+
+                if (isFiscalCredit(voucherDetail)) hasFiscalCredit = true;
+
             }
 
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
@@ -135,7 +138,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 return Outcome.REDISPLAY;
             }
 
-            if (totalI.doubleValue() != totalD.doubleValue()){
+            if ((totalI.doubleValue() != totalD.doubleValue()) && hasFiscalCredit ){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectFiscalCredit");
                 return Outcome.REDISPLAY;
             }
