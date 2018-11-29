@@ -147,6 +147,8 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
             /*updateAdjustmentValues();*/
             System.out.println("............>> PurchaseDocument : " + getInstance().toString());
 
+            //voucherUpdateAction.assignCashAccountDefault("1420710000", getInstance()); //err
+
             Voucher voucher = voucherUpdateAction.getInstance();
             getInstance().setVoucher(voucher);
             purchaseDocumentService.createDocumentSimple(getInstance());

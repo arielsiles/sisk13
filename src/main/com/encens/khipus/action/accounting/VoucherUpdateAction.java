@@ -39,7 +39,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private DocType docType = new DocType();
     private Voucher voucher;
 
-    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
+    //private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
     private List<VoucherDetail> voucherDetails;
 
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -165,13 +165,34 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         assignCashAccountVoucherDetail();
     }
 
+    public void assignCashAccountDefault(String accountCode, PurchaseDocument purchaseDocument){
+        this.account = cashAccountService.findByAccountCode(accountCode);
+        assignCashAccountVoucherDetail(purchaseDocument);
+    }
+
+    public void assignCashAccountVoucherDetail(PurchaseDocument purchaseDocument){
+
+        if (account != null){
+            if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+                setFiscalCredit(true);
+                //PurchaseDocument purchaseDocument = new PurchaseDocument();
+                //getPurchaseDocumentList().add(purchaseDocument);
+                addFiscalCreditCashAccount(purchaseDocument);
+
+            }else {
+                assignInputVoucherDetail();
+            }
+        }
+    }
+
     public void assignCashAccountVoucherDetail(){
 
         if (account != null){
             if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
                 setFiscalCredit(true);
                 PurchaseDocument purchaseDocument = new PurchaseDocument();
-                getPurchaseDocumentList().add(purchaseDocument);
+                //getPurchaseDocumentList().add(purchaseDocument);
+                addFiscalCreditCashAccount(purchaseDocument);
 
             }else {
                 assignInputVoucherDetail();
@@ -454,11 +475,11 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         this.fiscalCredit = fiscalCredit;
     }
 
-    public List<PurchaseDocument> getPurchaseDocumentList() {
+    /*public List<PurchaseDocument> getPurchaseDocumentList() {
         return purchaseDocumentList;
     }
 
     public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
         this.purchaseDocumentList = purchaseDocumentList;
-    }
+    }*/
 }
