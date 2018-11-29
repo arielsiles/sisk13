@@ -52,7 +52,6 @@
 
     <s:div id="leftSidePanel">
         <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-            <!--<ui:define name="label">#{messages['Voucher.date']}</ui:define>-->
             <ui:define name="label">#{messages['Voucher.type']}</ui:define>
             <h:selectOneMenu id="documentType"
                              value="#{voucherCreateAction.docType}"
@@ -79,14 +78,9 @@
                            required="true">
             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
             </rich:calendar>
-            <!--<h:outputText value="#{messages['Product.type']}"/>-->
-            <!--<rich:spacer width="3" />-->
-
         </s:decorate>
 
         <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-            <!--<s:span>-->
-                <!--<h:outputText value="#{messages['Client.client']}"/>-->
                 <ui:define name="label">#{messages['Client.client']}</ui:define>
                 <rich:spacer width="2" />
                 <app:selectPopUp id="clientFieldId"
@@ -99,15 +93,10 @@
                                  reRender="clientField"
                                  tabindex="12">
                 </app:selectPopUp>
-            <!--</s:span>-->
         </s:decorate>
 
         <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
-            <!--<rich:spacer width="3" />-->
-            <!--<s:span id="providerFieldId">-->
-                <!--<h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>-->
                 <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
-                <!--<rich:spacer width="2" />-->
                 <app:selectPopUp id="provider"
                                  required="false"
                                  textValue="#{voucherCreateAction.provider.fullName}"
@@ -118,7 +107,6 @@
                                  reRender="providerField"
                                  hotKeySelect="alt+3">
                 </app:selectPopUp>
-            <!--</s:span>-->
         </s:decorate>
 
         <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -173,10 +161,11 @@
     <s:div id="rightSidePanel">
 
         <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
             <h:inputTextarea  id="description"
                               value="#{voucherCreateAction.voucher.gloss}"
                               required="false"
-                              styleClass="textarea-largest2"
+                              styleClass="textarea-medium"
                               rows="3"
                               tabindex="3">
                 <f:validateLength maximum="500"/>
@@ -404,39 +393,23 @@
                         </td>
 
                         <td class="rich-table-cell center">
-                            <!--<s:div id="#{field02Id}">-->
-                                <!--<h:inputText id="#{fieldInput02Id}" value="#{purchaseDocument.name}" styleClass="inputSmall" required="true">
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field02Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput02Id}" styleClass="errors" style="display:block;" rendered="true"/>-->
-
-                                <s:decorate id="#{field02Id}" template="/include/inputField.xhtml" styleClass="formRow">
-                                    <ui:param name="required" value="#{true}"/>
-                                    <app:suggestionBox id="#{fieldInput02Id}"
-                                                       value="#{purchaseDocument.financesEntityFullName}"
-                                                       entity="#{purchaseDocument.financesEntity}"
-                                                       styleClass="input"
-                                                       entityAlias="financesEntity"
-                                                       searchField="fullName"
-                                                       searchCompoundFields="financesEntity.id, financesEntity.acronym"
-                                                       searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
-                                                       updateFocusOnSelect="true">
-                                        <ui:define name="columns">
-                                            <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
-                                        </ui:define>
-                                    </app:suggestionBox>
-                                </s:decorate>
-                            <!--</s:div>-->
+                            <!--<s:decorate id="#{field02Id}" template="/include/inputField.xhtml" styleClass="formRow">-->
+                                <!--<ui:param name="required" value="#{true}"/>-->
+                                <app:suggestionBox id="#{fieldInput02Id}"
+                                                   value="#{purchaseDocument.financesEntityFullName}"
+                                                   entity="#{purchaseDocument.financesEntity}"
+                                                   styleClass="input"
+                                                   entityAlias="financesEntity"
+                                                   searchField="fullName"
+                                                   searchCompoundFields="financesEntity.id, financesEntity.acronym"
+                                                   searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
+                                                   updateFocusOnSelect="true">
+                                    <ui:define name="columns">
+                                        <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
+                                    </ui:define>
+                                </app:suggestionBox>
+                            <!--</s:decorate>-->
                         </td>
-
-                        <!--<td class="rich-table-cell center">
-                            <s:div id="#{field03Id}">
-                                <h:inputText id="#{fieldInput03Id}" value="#{purchaseDocument.nit}" styleClass="inputSmall" required="true">
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field03Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput03Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>-->
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field04Id}">

@@ -11,7 +11,9 @@ import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
@@ -39,7 +41,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private DocType docType = new DocType();
     private Voucher voucher;
 
-    //private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
     private List<VoucherDetail> voucherDetails;
 
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -59,6 +61,9 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     private VoucherService voucherService;
+    @In
+    private PurchaseDocumentService purchaseDocumentService;
+
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
     @In(create = true)
@@ -76,6 +81,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         this.voucher = instance;
         this.docType = voucherService.getDocType(voucher.getDocumentType());
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+        setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
 
         return outCome;
     }
@@ -262,6 +268,34 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
+
+        if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.CASHACCOUNT_FISCAL_CREDIT)){
+            System.out.println("------> Eliminando Fact: " + voucherDetail.getPurchaseDocument() + " - " + purchaseDocumentList.size());
+
+            for (int i=0 ; i<purchaseDocumentList.size() ; i++){
+
+                PurchaseDocument pd = purchaseDocumentList.get(i);
+
+                System.out.println("---> OBJ 1: " + voucherDetail.getPurchaseDocument());
+                System.out.println("---> OBJ 2: " + pd);
+
+                if (    voucherDetail.getPurchaseDocument().getNit().equals(pd.getNit()) &&
+                        voucherDetail.getPurchaseDocument().getName().equals(pd.getName()) &&
+                        voucherDetail.getPurchaseDocument().getDate().equals(pd.getDate()) &&
+                        voucherDetail.getPurchaseDocument().getAmount().equals(pd.getAmount())
+                        ){
+                    purchaseDocumentList.remove(i);
+                    System.out.println("-----> remove: " + pd.getNumber());
+                }
+            }
+
+            purchaseDocumentList.remove(voucherDetail.getPurchaseDocument());
+            purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
+
+            System.out.println("------> Eliminando SIZE: " + purchaseDocumentList.size());
+        }
+
+
     }
 
     public boolean isApproved() {
@@ -473,6 +507,14 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
 
     public void setFiscalCredit(Boolean fiscalCredit) {
         this.fiscalCredit = fiscalCredit;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentList() {
+        return purchaseDocumentList;
+    }
+
+    public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
+        this.purchaseDocumentList = purchaseDocumentList;
     }
 
     /*public List<PurchaseDocument> getPurchaseDocumentList() {

@@ -23,6 +23,10 @@ import java.math.BigDecimal;
                         " where purchaseDocument.purchaseOrderId =:purchaseOrderId and purchaseDocument.type not in(:typeEnumList) and purchaseDocument.state<>:state"),
         @NamedQuery(name = "PurchaseDocument.findByState",
                 query = "select purchaseDocument from PurchaseDocument purchaseDocument where purchaseDocument.state =:state and purchaseDocument.purchaseOrderId =:purchaseOrderId"),
+
+        @NamedQuery(name = "PurchaseDocument.findByVoucher",
+                query = "select purchaseDocument from PurchaseDocument purchaseDocument where purchaseDocument.voucher =:voucher"),
+
         @NamedQuery(name = "PurchaseDocument.countByState",
                 query = "select count(purchaseDocument) from PurchaseDocument purchaseDocument where purchaseDocument.state=:state and purchaseDocument.purchaseOrderId=:purchaseOrderId "),
         @NamedQuery(name = "PurchaseDocument.findByStateAndVoucherState",

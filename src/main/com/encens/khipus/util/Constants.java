@@ -226,6 +226,9 @@ public final class Constants {
     public static final String STATE_ITEM_PRODUCT_NOPRODUCER = "NOPRODUCIDO";
 
 
+    /** Default CashAccount **/
+    public static final String CASHACCOUNT_FISCAL_CREDIT = "1420710000";  //Credito Fiscal IVA
+
     private Constants() {
     }
 }

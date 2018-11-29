@@ -38,7 +38,7 @@
                      styleClass="button"
                      rendered="#{action.managed and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"/>
     <!--<h:commandButton id="updateButtonId"
-                     action="#{action.update}"
+                     action="#{voucherUpdateAction.update}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}">

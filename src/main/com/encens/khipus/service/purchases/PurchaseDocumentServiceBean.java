@@ -10,6 +10,7 @@ import com.encens.khipus.exception.purchase.PurchaseDocumentNotFoundException;
 import com.encens.khipus.exception.purchase.PurchaseDocumentStateException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.finances.CollectionDocumentType;
+import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -129,6 +130,11 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
         }
     }
 
+    public void removeDocument(PurchaseDocument document){
+        getEntityManager().remove(document);
+
+    }
+
     public void approveDocument(PurchaseDocument document) throws PurchaseDocumentStateException,
             PurchaseDocumentNotFoundException,
             DuplicatedFinanceAccountingDocumentException,
@@ -219,6 +225,18 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
 
         if (null != result) {
             return result;
+        }
+
+        return new ArrayList<PurchaseDocument>();
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentsByVoucher(Voucher voucher){
+        List<PurchaseDocument> resultList = eventEm.createNamedQuery("PurchaseDocument.findByVoucher")
+                        .setParameter("voucher", voucher)
+                        .getResultList();
+
+        if (null != resultList) {
+            return resultList;
         }
 
         return new ArrayList<PurchaseDocument>();

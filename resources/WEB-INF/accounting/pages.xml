@@ -51,7 +51,6 @@
         </navigation>
         <navigation from-action="#{voucherUpdateAction.update}">
             <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
                 <redirect view-id="/accounting/voucherUpdate.xhtml"/>
             </rule>
         </navigation>

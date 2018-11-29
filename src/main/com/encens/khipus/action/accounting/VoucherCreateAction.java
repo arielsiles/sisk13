@@ -162,6 +162,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
+            voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+
 
             return Outcome.SUCCESS;
 
@@ -222,12 +224,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
-
-        purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
-        purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
-
-        BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
         try {
+            purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
+            purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
+
+            BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
+
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setCashAccount(this.account);
             voucherDetail.setAccount(this.account.getAccountCode());
@@ -239,13 +241,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             voucherDetail.setDebit(fiscalCredit);
             voucherDetail.setCredit(this.credit);
-
             voucherDetail.setPurchaseDocument(purchaseDocument);
 
             voucherDetails.add(voucherDetail);
             clearAll();
-            //setDebit(BigDecimal.ZERO);
-            //setCredit(BigDecimal.ZERO);
         } catch (NullPointerException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
         }

@@ -20,8 +20,7 @@
     <ui:define name="body">
 
         <c:set var="selectList" value="#{voucherDocumentTypeList}"/>
-        <c:set var="mainComponentIdsToRerender" value="documentTypeField,
-                                               movementDetailListPanel,
+        <c:set var="mainComponentIdsToRerender" value="movementDetailListPanel,
                                                descriptionField,
                                                cashAccountListModalPanelDiv"/>
         <h:form id="warehouseVoucherForm">
@@ -417,7 +416,7 @@
                                                              action="#{voucherUpdateAction.removeVoucherDetail(voucherDetail)}"
                                                              ajaxSingle="true"
                                                              rendered="#{s:hasPermission('VOUCHER','UPDATE')}"
-                                                             reRender="movementDetailListPanel">
+                                                             reRender="movementDetailListPanel, purchaseDocumentListId">
                                                 <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                             </a4j:commandLink>
                                         </td>
@@ -449,15 +448,20 @@
             <div class="buttons"><!-- ERROR WITH BUTTONS --></div>
 
             <rich:tabPanel switchType="ajax" selectedTab="purchaseDocumentTab">
-                <rich:tab name="purchaseDocumentTab"
-                          label="#{messages['Voucher.tab.title']}"
-                          ajaxSingle="true">
-                    <rich:dataTable id="purchaseDocumentListId"
+                <rich:tab name="purchaseDocumentTab" label="#{messages['Voucher.tab.title']}" ajaxSingle="true">
+                    <s:div id="invoiceDetailListPanel">
+                    <!--<rich:dataTable id="purchaseDocumentListId"
                                     value="#{accountingPurchaseDocumentDataModel}"
                                     var="purchaseDocumentItem"
                                     rows="#{sessionUser.rowsPerPage}"
                                     width="100%"
-                                    columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">
+                                    columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">-->
+                        <rich:dataTable id="purchaseDocumentListId"
+                                        value="#{voucherUpdateAction.purchaseDocumentList}"
+                                        var="purchaseDocumentItem"
+                                        rows="#{sessionUser.rowsPerPage}"
+                                        width="100%"
+                                        columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">
                         <f:facet name="header">
                             <rich:columnGroup>
                                 <rich:column>
@@ -524,6 +528,7 @@
                     <app:dataScroller id="purchaseDocumentListDataScrollerId"
                                       for="purchaseDocumentListId"
                                       dataModel="#{accountingPurchaseDocumentDataModel}"/>
+                    </s:div>
                 </rich:tab>
             </rich:tabPanel>
 

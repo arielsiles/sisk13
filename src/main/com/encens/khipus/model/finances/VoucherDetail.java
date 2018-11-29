@@ -302,6 +302,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" +  productItem.getFullName() + ")";
         if (partnerAccount != null)
             fullCashAccount = fullCashAccount + " (" +  partnerAccount.getAccountNumber() + " " + partnerAccount.getPartner().getFirstAndMaidenName() + ")";
+        if (purchaseDocument != null)
+            fullCashAccount = fullCashAccount + " (F." + purchaseDocument.getNumber() + ")";
 
         return fullCashAccount;
 
