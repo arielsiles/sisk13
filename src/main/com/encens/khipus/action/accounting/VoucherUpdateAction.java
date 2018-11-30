@@ -97,8 +97,8 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
 
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
-        BigDecimal totalD = new BigDecimal("0.00");
-        BigDecimal totalC = new BigDecimal("0.00");
+        BigDecimal totalD = BigDecimal.ZERO;
+        BigDecimal totalC = BigDecimal.ZERO;
 
         try {
             for (VoucherDetail voucherDetail : voucherDetails) {
@@ -303,7 +303,14 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     }
 
     public boolean isPending() {
-        return VoucherState.PEN.toString().equals(voucher.getState());
+        System.out.println("-----> isPending(): " + voucher);
+        boolean result = false;
+
+        if (voucher != null)
+            if (VoucherState.PEN.toString().equals(voucher.getState()))
+                result = true;
+
+        return result;
     }
 
     public void assignProvider(Provider provider) {

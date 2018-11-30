@@ -21,6 +21,7 @@ import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.In;
@@ -112,6 +113,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         BigDecimal totalD = BigDecimal.ZERO;
         BigDecimal totalC = BigDecimal.ZERO;
         BigDecimal totalI = BigDecimal.ZERO;
+        BigDecimal totalIVA = BigDecimal.ZERO;
+        BigDecimal totalFiscalCredit = BigDecimal.ZERO;
 
         try {
 
@@ -119,13 +122,21 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 totalD = totalD.add(voucherDetail.getDebit());
                 totalC = totalC.add(voucherDetail.getCredit());
 
-                if (isFiscalCredit(voucherDetail)) hasFiscalCredit = true;
+                if (isFiscalCredit(voucherDetail)){
+                    hasFiscalCredit = true;
+                    totalFiscalCredit = BigDecimalUtil.sum(totalFiscalCredit, voucherDetail.getDebit(), 2);
+                }
 
             }
 
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
                 totalI = totalI.add(purchaseDocument.getAmount());
+                BigDecimal partial = BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt());
+                totalIVA = BigDecimalUtil.sum(totalIVA, (BigDecimalUtil.multiply(partial, Constants.VAT)) , 2 );
             }
+
+            System.out.println("-----> Total IVA Asiento: " + totalFiscalCredit);
+            System.out.println("-----> Total IVA FActura: " + totalIVA);
 
             //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SalaryMovementProducer.message.insufficientBalance",fullName,totalCollected);
             if(totalD.doubleValue() == 0.00 || totalC.doubleValue() == 0.00){
@@ -138,7 +149,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 return Outcome.REDISPLAY;
             }
 
-            if ((totalI.doubleValue() != totalD.doubleValue()) && hasFiscalCredit ){
+            /** Controla Total de la factura con total del asiento **/
+            /*if ((totalI.doubleValue() != totalD.doubleValue()) && hasFiscalCredit ){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectFiscalCredit");
+                return Outcome.REDISPLAY;
+            }*/
+
+            if (totalFiscalCredit.compareTo(totalIVA) != 0){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectFiscalCredit");
                 return Outcome.REDISPLAY;
             }

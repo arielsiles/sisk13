@@ -44,15 +44,14 @@
                 <h:commandButton action="#{voucherReportAction.generateReport(voucherUpdate)}"
                                  styleClass="button"
                                  value="#{messages['Voucher.report.generateReport']}" id="generateButtonId" tabindex="4">
-                    <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="createButtonId"
                                  action="#{voucherUpdateAction.update}"
                                  value="#{messages['Common.save']}"
                                  rendered="#{voucherUpdateAction.pending and s:hasPermission('VOUCHER','UPDATE')}"
+                                 immediate="true"
                                  styleClass="button">
-                    <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton action="#{voucherUpdateAction.cancel}"
@@ -242,6 +241,7 @@
                                         </app:selectPopUp>
                                     </s:decorate>
                                 </td>
+
 
                                 <td class="rich-table-cell">
                                     <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">

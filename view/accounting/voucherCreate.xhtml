@@ -36,7 +36,6 @@
                      value="#{messages['Common.save']}"
                      rendered="#{s:hasPermission('VOUCHER','CREATE')}"
                      styleClass="button">
-        <s:defaultAction/>
     </h:commandButton>
 
     <h:commandButton action="#{voucherCreateAction.cancel}"
@@ -427,7 +426,7 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field05Id}">
-                                <h:inputText id="#{fieldInput05Id}" value="#{purchaseDocument.authorizationNumber}" styleClass="inputSmall" required="true">
+                                <h:inputText id="#{fieldInput05Id}" value="#{purchaseDocument.authorizationNumber}" styleClass="input105" required="true">
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="#{field05Id}"/>
                                 </h:inputText>
                                 <h:message for="#{fieldInput05Id}" styleClass="errors" style="display:block;" rendered="true"/>
@@ -582,7 +581,7 @@
         </ui:define>
     </s:decorate>
 
-    <s:decorate id="financesEntityListModalPanelContainer" template="/finances/financesEntityListModalPanel.xhtml">
+    <!--<s:decorate id="financesEntityListModalPanelContainer" template="/finances/financesEntityListModalPanel.xhtml">
         <ui:param name="containerId" value="financesEntityListModalPanelContainer"/>
         <ui:param name="dialogId" value="financesEntityListModalPanel"/>
         <ui:define name="assignButton">
@@ -594,7 +593,7 @@
                                reRender="financesEntityField, nameField, nitField"
                                oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
         </ui:define>
-    </s:decorate>
+    </s:decorate>-->
 
     <s:decorate id="financeProviderModalPanelContainer"
                 template="/finances/financeProviderModalPanel.xhtml">
