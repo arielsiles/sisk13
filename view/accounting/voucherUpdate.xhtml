@@ -210,43 +210,12 @@
                                                  value="#{voucherUpdateAction.voucher.gloss}"
                                                  required="false"
                                                  styleClass="textarea-largest2"
-                                                 rows="3"
+                                                 rows="4"
                                                  tabindex="3">
                                     <f:validateLength maximum="500"/>
                                 </h:inputTextarea>
                             </s:decorate>
 
-                            <!--<s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <s:span id="clientField">
-                                    <h:outputText value="#{messages['Client.client']}"/>
-                                    <rich:spacer width="2" />
-                                    <app:selectPopUp id="clientFieldId"
-                                                         required="false"
-                                                         textValue="#{voucherUpdateAction.client.fullName}"
-                                                         value="#{voucherUpdateAction.client}"
-                                                         clearAction="voucherUpdateAction.clearClient()"
-                                                         searchModalPanel="clientListModalPanel"
-                                                         dataModel="#{clientDataModel}"
-                                                         reRender="clientField"
-                                                         tabindex="12">
-                                    </app:selectPopUp>
-                                </s:span>
-                                <rich:spacer width="3" />
-                                <s:span id="providerField">
-                                    <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
-                                    <rich:spacer width="2" />
-                                    <app:selectPopUp id="provider"
-                                                     required="false"
-                                                     textValue="#{voucherUpdateAction.provider.fullName}"
-                                                     value="#{voucherUpdateAction.provider}"
-                                                     clearAction="voucherUpdateAction.clearProvider()"
-                                                     searchModalPanel="providerListModalPanel"
-                                                     dataModel="#{providerDataModel}"
-                                                     reRender="providerField"
-                                                     hotKeySelect="alt+3">
-                                    </app:selectPopUp>
-                                </s:span>
-                            </s:decorate>-->
                         </s:div>
 
                     </h:panelGrid>

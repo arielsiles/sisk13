@@ -105,6 +105,11 @@
                                  searchModalPanel="providerListModalPanel"
                                  dataModel="#{providerDataModel}"
                                  reRender="providerField"
+
+                                 newModalPanel="financeProviderModalPanel"
+                                 renderedNewLink="true"
+                                 newAction="#{financeProviderAction.newInstanceInModalPanel()}"
+                                 editModalPanel="financeProviderModalPanel"
                                  hotKeySelect="alt+3">
                 </app:selectPopUp>
         </s:decorate>
@@ -161,7 +166,7 @@
     <s:div id="rightSidePanel">
 
         <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
+            <!--<ui:define name="label">#{messages['Voucher.gloss']}</ui:define>-->
             <h:inputTextarea  id="description"
                               value="#{voucherCreateAction.voucher.gloss}"
                               required="false"
@@ -575,6 +580,33 @@
                                reRender="providerField"
                                oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
         </ui:define>
+    </s:decorate>
+
+    <s:decorate id="financesEntityListModalPanelContainer" template="/finances/financesEntityListModalPanel.xhtml">
+        <ui:param name="containerId" value="financesEntityListModalPanelContainer"/>
+        <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                               action="#{voucherUpdateAction.assignFinancesEntity(instance)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               immediate="true"
+                               reRender="financesEntityField, nameField, nitField"
+                               oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="financeProviderModalPanelContainer"
+                template="/finances/financeProviderModalPanel.xhtml">
+        <ui:param name="containerId" value="financeProviderModalPanelContainer"/>
+        <ui:param name="dialogId" value="financeProviderModalPanel"/>
+        <ui:param name="reRender" value="financesEntityField, nameField, nitField"/>
+
+        <ui:param name="postCreateAction"
+                  value="#{voucherUpdateAction.assignProviderAndFinancesEntity(financeProviderAction.instance)}"/>
+
+        <!--<ui:param name="postUpdateAction"
+                      value="#{voucherUpdateAction.assignFinancesEntity(financeProviderAction.instance)}"/>-->
     </s:decorate>
 
 <!--Set selector Id to enable focus-->
