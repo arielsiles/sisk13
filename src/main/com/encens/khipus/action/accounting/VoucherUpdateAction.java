@@ -37,6 +37,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     private BigDecimal debit = new BigDecimal("0.00");
     private BigDecimal credit = new BigDecimal("0.00");
     private String documentTypeCode = "";
+    private String gloss;
 
     private DocType docType = new DocType();
     private Voucher voucher;
@@ -79,6 +80,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     public String select(Voucher instance) {
         String outCome = super.select(instance);
         this.voucher = instance;
+        this.gloss = voucher.getGloss();
         this.docType = voucherService.getDocType(voucher.getDocumentType());
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
         setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
@@ -92,9 +94,11 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     }
 
     @Override
-    @End
     public String update(){
 
+        System.out.println("----> GLOSS: " + this.gloss);
+        voucher.setGloss(this.gloss);
+        System.out.println("----> Voucher Gloss: " + voucher.getGloss());
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
         BigDecimal totalD = BigDecimal.ZERO;
@@ -522,6 +526,14 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
 
     public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
         this.purchaseDocumentList = purchaseDocumentList;
+    }
+
+    public String getGloss() {
+        return gloss;
+    }
+
+    public void setGloss(String gloss) {
+        this.gloss = gloss;
     }
 
     /*public List<PurchaseDocument> getPurchaseDocumentList() {

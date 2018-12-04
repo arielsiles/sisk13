@@ -153,6 +153,9 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
             getInstance().setVoucher(voucher);
             purchaseDocumentService.createDocumentSimple(getInstance());
             addCreatedMessage();
+
+            voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+
             return Outcome.SUCCESS;
         } catch (PurchaseDocumentException e) {
             addPurchaseDocumentErrorMessages(e.getErrorTypes());

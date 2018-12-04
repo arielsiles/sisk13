@@ -206,9 +206,10 @@
                             <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
 
                                 <h:inputTextarea id="description"
-                                                 value="#{voucherUpdateAction.voucher.gloss}"
+                                                 value="#{voucherUpdateAction.gloss}"
                                                  required="false"
                                                  styleClass="textarea-largest2"
+                                                 immediate="true"
                                                  rows="4"
                                                  tabindex="3">
                                     <f:validateLength maximum="500"/>
