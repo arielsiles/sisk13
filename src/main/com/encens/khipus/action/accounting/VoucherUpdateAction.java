@@ -79,11 +79,11 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Voucher instance) {
         String outCome = super.select(instance);
-        this.voucher = instance;
-        this.gloss = voucher.getGloss();
-        this.docType = voucherService.getDocType(voucher.getDocumentType());
+        //this.voucher = instance;
+        //this.docType = voucherService.getDocType(voucher.getDocumentType());
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
         setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+        setGloss(voucher.getGloss());
 
         return outCome;
     }
@@ -96,9 +96,12 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     @Override
     public String update(){
 
-        System.out.println("----> GLOSS: " + this.gloss);
-        voucher.setGloss(this.gloss);
+        System.out.println("----> voucher: " + voucher);
+        System.out.println("----> voucher: " + getInstance());
+
+        System.out.println("----> Voucher Gloss: " + gloss);
         System.out.println("----> Voucher Gloss: " + voucher.getGloss());
+        System.out.println("----> Voucher Gloss: " + getInstance().getGloss());
         voucher.setDocumentType(docType.getName());
         voucher.setDetails(voucherDetails);
         BigDecimal totalD = BigDecimal.ZERO;
