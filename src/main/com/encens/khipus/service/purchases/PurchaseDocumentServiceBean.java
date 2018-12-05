@@ -11,6 +11,7 @@ import com.encens.khipus.exception.purchase.PurchaseDocumentStateException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.finances.CollectionDocumentType;
 import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -28,6 +29,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,6 +137,22 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
 
     }
 
+
+    public VoucherDetail getVoucherDetail(PurchaseDocument purchaseDocument){
+
+        VoucherDetail voucherDetail = null;
+        try {
+            voucherDetail = (VoucherDetail) eventEm.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+                    " where voucherDetail.purchaseDocument = :purchaseDocument ")
+                    .setParameter("purchaseDocument", purchaseDocument)
+                    .getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
+        return voucherDetail;
+
+    }
+
     public void approveDocument(PurchaseDocument document) throws PurchaseDocumentStateException,
             PurchaseDocumentNotFoundException,
             DuplicatedFinanceAccountingDocumentException,
@@ -230,7 +248,7 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
         return new ArrayList<PurchaseDocument>();
     }
 
-    public List<PurchaseDocument> getPurchaseDocumentsByVoucher(Voucher voucher){
+   /* public List<PurchaseDocument> getPurchaseDocumentsByVoucher(Voucher voucher){
         List<PurchaseDocument> resultList = eventEm.createNamedQuery("PurchaseDocument.findByVoucher")
                         .setParameter("voucher", voucher)
                         .getResultList();
@@ -240,7 +258,7 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
         }
 
         return new ArrayList<PurchaseDocument>();
-    }
+    }*/
 
     public Long countPendingPurchaseDocuments(PurchaseOrder purchaseOrder) {
         return (Long) eventEm.createNamedQuery("PurchaseDocument.countByState")

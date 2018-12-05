@@ -175,17 +175,17 @@ public class Voucher implements BaseModel{
     @Length(max = 2)
     private String pendantRegistry;
 
-    @Transient
-    private List<VoucherDetail> details = new ArrayList<VoucherDetail>(0);
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher", cascade = CascadeType.ALL)
     private List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>(0);
 
-    /*@OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher")
-    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);*/
+    @Transient
+    private List<VoucherDetail> details = new ArrayList<VoucherDetail>(0);
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher")
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);
 
     @Transient
-    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);
+    private List<PurchaseDocument> purchaseList = new ArrayList<PurchaseDocument>(0);
 
 
     @PrePersist
@@ -502,6 +502,14 @@ public class Voucher implements BaseModel{
 
     public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
         this.purchaseDocumentList = purchaseDocumentList;
+    }
+
+    public List<PurchaseDocument> getPurchaseList() {
+        return purchaseList;
+    }
+
+    public void setPurchaseList(List<PurchaseDocument> purchaseList) {
+        this.purchaseList = purchaseList;
     }
 
     /*@Override

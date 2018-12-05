@@ -24,8 +24,8 @@ import java.math.BigDecimal;
         @NamedQuery(name = "PurchaseDocument.findByState",
                 query = "select purchaseDocument from PurchaseDocument purchaseDocument where purchaseDocument.state =:state and purchaseDocument.purchaseOrderId =:purchaseOrderId"),
 
-        @NamedQuery(name = "PurchaseDocument.findByVoucher",
-                query = "select purchaseDocument from PurchaseDocument purchaseDocument where purchaseDocument.voucher =:voucher"),
+        /*@NamedQuery(name = "PurchaseDocument.findByVoucher",
+                query = "select purchaseDocument from PurchaseDocument purchaseDocument where purchaseDocument.voucher =:voucher"),*/
 
         @NamedQuery(name = "PurchaseDocument.countByState",
                 query = "select count(purchaseDocument) from PurchaseDocument purchaseDocument where purchaseDocument.state=:state and purchaseDocument.purchaseOrderId=:purchaseOrderId "),
@@ -103,14 +103,6 @@ public class PurchaseDocument extends AccountingDocument {
 
     @Transient
     private String financesEntityFullName;
-
-    /*
-    public String getFinancesEntityFullName(){
-        if (financesEntityFullName == null && getFinancesEntity() != null){
-            financesEntityFullName = getFinancesEntity().getNitNumber() + " " + getFinancesEntity().getAcronym();
-        }
-        return financesEntityFullName;
-    }*/
 
     public CollectionDocumentType getType() {
         return type;
@@ -243,5 +235,9 @@ public class PurchaseDocument extends AccountingDocument {
 
     public void setFinancesEntityFullName(String financesEntityFullName) {
         this.financesEntityFullName = financesEntityFullName;
+    }
+
+    public String getFullName(){
+        return getNit() + " " + getName();
     }
 }

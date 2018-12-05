@@ -1,6 +1,8 @@
 package com.encens.khipus.action.accounting;
 
+import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
+import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
@@ -23,10 +25,7 @@ import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.End;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
@@ -98,6 +97,24 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
+    @In(create = true)
+    private VoucherReportAction voucherReportAction;
+
+    @Factory(value = "voucherCreate")
+    public Voucher initVoucher() {
+        return getInstance();
+    }
+
+    @Override
+    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(Voucher instance) {
+        String outCome = super.select(instance);
+        voucher = getInstance();
+        this.docType = voucherService.getDocType(voucher.getDocumentType());
+        setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+        setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+        return outCome;
+    }
 
     @Override
     @End
@@ -179,14 +196,32 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
-            voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+            //voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+            voucherUpdateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
 
 
+            setOp(OP_UPDATE);
             return Outcome.SUCCESS;
 
         } catch (Exception e) {
             return Outcome.FAIL;
         }
+    }
+
+    @Override
+    public String update(){
+
+        //super.update();
+        try{
+
+            getInstance().setDetails(getVoucherDetails());
+            getInstance().setPurchaseList(getPurchaseDocumentList());
+            voucherAccoutingService.updateVoucher(getInstance());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return Outcome.SUCCESS;
     }
 
     public List<Client> autocomplete(Object suggest){
@@ -256,9 +291,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if (this.provider != null)
                 voucherDetail.setProviderCode(this.provider.getProviderCode());
 
+            if (this.voucher != null)
+                voucherDetail.setVoucher(voucher);
+
             voucherDetail.setDebit(fiscalCredit);
             voucherDetail.setCredit(this.credit);
             voucherDetail.setPurchaseDocument(purchaseDocument);
+
+            if (this.voucher.getTransactionNumber() != null) /** Crea PurchaseDocument al editar el asiento **/
+                voucherAccoutingService.createPurchaseDocumentVoucher(voucherDetail);
 
             voucherDetails.add(voucherDetail);
             clearAll();
@@ -398,10 +439,58 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
+
+        if (voucherDetail.getPurchaseDocument() != null) {
+            System.out.println("----> eliminando: " + voucherDetail.getPurchaseDocument().getFullName());
+            purchaseDocumentList.remove(voucherDetail.getPurchaseDocument());
+            purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
+        }
+
+        /*if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.CASHACCOUNT_FISCAL_CREDIT)){
+
+            for (int i=0 ; i<purchaseDocumentList.size() ; i++){
+
+                PurchaseDocument pd = purchaseDocumentList.get(i);
+
+                if (    voucherDetail.getPurchaseDocument().getNit().equals(pd.getNit()) &&
+                        voucherDetail.getPurchaseDocument().getNumber().equals(pd.getNumber()) &&
+                        voucherDetail.getPurchaseDocument().getName().equals(pd.getName()) &&
+                        voucherDetail.getPurchaseDocument().getDate().equals(pd.getDate()) &&
+                        voucherDetail.getPurchaseDocument().getAmount().equals(pd.getAmount())
+                        ){
+                            purchaseDocumentList.remove(i);
+                }
+            }
+
+            purchaseDocumentList.remove(voucherDetail.getPurchaseDocument());
+            purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
+
+            System.out.println("------> Eliminando SIZE: " + purchaseDocumentList.size());
+        }*/
+
+
     }
 
     public void removePurchaseDocument(PurchaseDocument purchaseDocument){
         purchaseDocumentList.remove(purchaseDocument);
+        //VoucherDetail voucherDetail = purchaseDocumentService.getVoucherDetail(purchaseDocument);
+        purchaseDocumentService.removeDocument(purchaseDocument);
+    }
+
+    public boolean incomplete(PurchaseDocument purchaseDocument){
+
+        boolean result = false;
+
+        VoucherDetail voucherDetail = purchaseDocumentService.getVoucherDetail(purchaseDocument);
+
+        if (voucherDetail == null)
+            result = true;
+
+
+        System.out.println("------> INCOMPLETE?: " + result);
+
+        return result;
+
     }
 
     public void assignProvider(Provider provider) {
@@ -562,6 +651,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("-> CLIENTE : " + client);
         System.out.println("-> PROVEEDOR : " + provider);
         System.out.println("-> ACCOUNT : " + account);
+    }
+
+    public void generateReport(Voucher instance){
+        select(instance);
+        voucherReportAction.generateReport(instance);
     }
 
     public CashAccount getAccount() {

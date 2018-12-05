@@ -10,6 +10,7 @@ import com.encens.khipus.exception.purchase.PurchaseDocumentStateException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.finances.CollectionDocumentType;
 import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 
@@ -46,7 +47,7 @@ public interface PurchaseDocumentService extends GenericService {
 
     List<PurchaseDocument> getPendingPurchaseDocuments(PurchaseOrder purchaseOrder);
 
-    List<PurchaseDocument> getPurchaseDocumentsByVoucher(Voucher voucher);
+    /*List<PurchaseDocument> getPurchaseDocumentsByVoucher(Voucher voucher);*/
 
     Long countDistinctByPurchaseOrder(PurchaseOrder purchaseOrder, CollectionDocumentType type);
 
@@ -57,4 +58,6 @@ public interface PurchaseDocumentService extends GenericService {
     Long countPendingPurchaseDocuments(PurchaseOrder purchaseOrder);
 
     void removeDocument(PurchaseDocument document);
+
+    VoucherDetail getVoucherDetail(PurchaseDocument purchaseDocument);
 }

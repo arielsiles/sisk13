@@ -1,5 +1,6 @@
 package com.encens.khipus.action.accounting.reports;
 
+import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
@@ -40,6 +41,8 @@ public class VoucherReportAction extends GenericReportAction {
 
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
+    @In(create = true)
+    VoucherCreateAction voucherCreateAction;
     @In
     private VoucherService voucherService;
 
@@ -93,8 +96,11 @@ public class VoucherReportAction extends GenericReportAction {
         this.voucher = voucher;
 
 
-        BigDecimal totalD = voucherUpdateAction.getTotalsDebit();
-        BigDecimal totalC = voucherUpdateAction.getTotalsCredit();
+        /*BigDecimal totalD = voucherUpdateAction.getTotalsDebit();
+        BigDecimal totalC = voucherUpdateAction.getTotalsCredit();*/
+        BigDecimal totalD = voucherCreateAction.getTotalsDebit();
+        BigDecimal totalC = voucherCreateAction.getTotalsCredit();
+
         String documentTitle = (voucherService.getDocType(voucher.getDocumentType())).getDescription();
 
         MoneyUtil money = new MoneyUtil();

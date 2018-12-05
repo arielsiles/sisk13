@@ -1,5 +1,6 @@
 package com.encens.khipus.action.accounting.reports;
 
+import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.service.production.ProductionPlanningService;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
@@ -20,6 +21,7 @@ public class VoucherReportScriptlet extends JRDefaultScriptlet {
     private ProductionPlanningService productionPlanningService = (ProductionPlanningService) Component.getInstance("productionPlanningService");
     private VoucherReportAction voucherReportAction = (VoucherReportAction) Component.getInstance("voucherReportAction");
     private VoucherUpdateAction voucherUpdateAction = (VoucherUpdateAction) Component.getInstance("voucherUpdateAction");
+    private VoucherCreateAction voucherCreateAction = (VoucherCreateAction) Component.getInstance("voucherCreateAction");
 
     public void beforeDetailEval() throws JRScriptletException {
         super.beforeDetailEval();
@@ -36,8 +38,10 @@ public class VoucherReportScriptlet extends JRDefaultScriptlet {
         this.setVariableValue("totalRepro", totalProducedRepro);
         this.setVariableValue("total", totalProducedOrder + totalProducedRepro);*/
 
-        BigDecimal totalDebits  = voucherUpdateAction.getTotalsDebit();
-        BigDecimal totalCredits = voucherUpdateAction.getTotalsCredit();
+        //BigDecimal totalDebits  = voucherUpdateAction.getTotalsDebit();
+        BigDecimal totalDebits  = voucherCreateAction.getTotalsDebit();
+        //BigDecimal totalCredits = voucherUpdateAction.getTotalsCredit();
+        BigDecimal totalCredits = voucherCreateAction.getTotalsCredit();
 
         System.out.println("===========> T. Debits: " + totalDebits);
         System.out.println("===========> T. Credits: " + totalCredits);

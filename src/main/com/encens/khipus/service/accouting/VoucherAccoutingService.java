@@ -23,6 +23,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     List<VoucherDetail> getVoucherDetailList(Voucher voucher);
 
+    List<PurchaseDocument> getPurchaseDcumentList(Voucher voucher);
+
     List<VoucherDetail> getVoucherDetailList(String transactionNumber);
 
     public Voucher getVoucher(String transactionNumber);
@@ -34,6 +36,8 @@ public interface VoucherAccoutingService extends GenericService {
     void savePurchaseDocument();
 
     void updateVoucher(Voucher voucher);
+
+    void updateVoucherModify(Voucher voucher, List<VoucherDetail> voucherDetailList);
 
     void updateVoucher(Voucher voucher, PurchaseDocument purchaseDocument);
 
@@ -73,4 +77,6 @@ public interface VoucherAccoutingService extends GenericService {
     public Double calculateCashTransferAmount(Date startDate, Date endDate);
 
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double amountTransfer, String gloss) throws CompanyConfigurationNotFoundException;
+
+    void createPurchaseDocumentVoucher(VoucherDetail voucherDetail);
 }

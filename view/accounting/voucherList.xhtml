@@ -183,13 +183,14 @@
         <h:outputText value="#{voucherItem.gloss}"/>
     </rich:column>
     <rich:column styleClass="center">
+        <!--<h:commandLink value="#{messages['Common.select']}" immediate="true" action="#{voucherUpdateAction.select(voucherItem)}">-->
         <h:commandLink value="#{messages['Common.select']}"
                        immediate="true"
-                       action="#{voucherUpdateAction.select(voucherItem)}">
+                       action="#{voucherCreateAction.select(voucherItem)}">
             <s:conversationPropagation value="none"/>
         </h:commandLink>
         &#160;
-        <h:commandLink action="#{voucherUpdateAction.generateReport(voucherItem)}"
+        <h:commandLink action="#{voucherCreateAction.generateReport(voucherItem)}"
                        immediate="true">
             <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
                             title="#{messages['Voucher.report.generateReport']}"/>

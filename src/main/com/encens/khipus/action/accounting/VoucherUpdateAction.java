@@ -79,11 +79,12 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Voucher instance) {
         String outCome = super.select(instance);
-        //this.voucher = instance;
-        //this.docType = voucherService.getDocType(voucher.getDocumentType());
+        this.voucher = instance;
+        this.docType = voucherService.getDocType(voucher.getDocumentType());
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-        setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
-        setGloss(voucher.getGloss());
+        //setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+        setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+        //setGloss(voucher.getGloss());
 
         return outCome;
     }
@@ -342,7 +343,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
             if(voucherDetail.getDebit() != null)
                 total = total.add(voucherDetail.getDebit());
         }
-        //System.out.println("_____getTotalsDebit::::" + total);
+        System.out.println("_____getTotalsDebit::::" + total);
         return total;
     }
 
@@ -352,7 +353,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
             if(voucherDetail.getCredit() != null)
                 total = total.add(voucherDetail.getCredit());
         }
-        //System.out.println("_____getTotalsCredit:::: " + total);
+        System.out.println("_____getTotalsCredit:::: " + total);
         return total;
     }
 

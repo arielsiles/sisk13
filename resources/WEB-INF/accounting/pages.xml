@@ -23,6 +23,13 @@
                 <redirect view-id="/accounting/voucherUpdate.xhtml"/>
             </rule>
         </navigation>
+
+        <navigation from-action="#{voucherCreateAction.select(voucherItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucherCreate.xhtml"/>
+            </rule>
+        </navigation>
+
     </page>
 
     <page view-id="/accounting/voucher.xhtml" no-conversation-view-id="/accounting/voucherList.xhtml">
@@ -115,7 +122,7 @@
         <navigation from-action="#{voucherCreateAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/accounting/voucherUpdate.xhtml"/>
+                <redirect view-id="/accounting/voucherCreate.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{voucherCreateAction.cancel}">

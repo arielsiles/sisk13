@@ -70,7 +70,7 @@
                                 <ui:define name="label">#{messages['Voucher.type']}</ui:define>
 
                                 <h:selectOneMenu id="documentType"
-                                                 value="#{voucherUpdate.docType}"
+                                                 value="#{voucherUpdateAction.docType}"
                                                  styleClass="inputTiny"
                                                  required="true"
                                                  disabled="true">
@@ -185,7 +185,7 @@
                 </s:div>
                 <!-- End Data Imput -->
 
-                <!--<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
+                <app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
                     <h:panelGrid columns="1"
                                  width="100%"
                                  cellpadding="0"
@@ -286,21 +286,21 @@
                             </table>
                         </s:div>
                     </h:panelGrid>
-                </app:fieldset>-->
+                </app:fieldset>
 
             </rich:panel>
 
             <div class="buttons"><!-- ERROR WITH BUTTONS --></div>
 
-            <!--<rich:tabPanel switchType="ajax" selectedTab="purchaseDocumentTab">
+            <rich:tabPanel switchType="ajax" selectedTab="purchaseDocumentTab">
                 <rich:tab name="purchaseDocumentTab" label="#{messages['Voucher.tab.title']}" ajaxSingle="true">
                     <s:div id="invoiceDetailListPanel">
-                    &lt;!&ndash;<rich:dataTable id="purchaseDocumentListId"
+                    <!--<rich:dataTable id="purchaseDocumentListId"
                                     value="#{accountingPurchaseDocumentDataModel}"
                                     var="purchaseDocumentItem"
                                     rows="#{sessionUser.rowsPerPage}"
                                     width="100%"
-                                    columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">&ndash;&gt;
+                                    columnsWidth="10%, 10%, 10%, 30%, 10%, 10%,  10%, 10%">-->
                         <rich:dataTable id="purchaseDocumentListId"
                                         value="#{voucherUpdateAction.purchaseDocumentList}"
                                         var="purchaseDocumentItem"
@@ -375,7 +375,7 @@
                                       dataModel="#{accountingPurchaseDocumentDataModel}"/>
                     </s:div>
                 </rich:tab>
-            </rich:tabPanel>-->
+            </rich:tabPanel>
 
         </h:form>
 

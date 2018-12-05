@@ -16,6 +16,7 @@ import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.*;
 import com.encens.khipus.util.query.EntityQueryFactory;
 import org.jboss.seam.annotations.AutoCreate;
@@ -50,7 +51,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     private CompanyConfigurationService companyConfigurationService;
     @In
     private SequenceService sequenceService;
-
+    @In
+    private PurchaseDocumentService purchaseDocumentService;
 
     public void savePurchaseDocument(){
 
@@ -133,6 +135,34 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     @TransactionAttribute(REQUIRES_NEW)
     public void updateVoucher(Voucher voucher) {
 
+        /** For PurchaseDocument **/
+        /*List<PurchaseDocument> purchaseDocumentDB = getPurchaseDcumentList(voucher);
+        for (PurchaseDocument purchaseDocument : purchaseDocumentDB) {
+            em.merge(purchaseDocument);
+            em.remove(purchaseDocument);
+            em.flush();
+        }
+
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()) {
+            if(purchaseDocument.getId() == null){
+                try {
+                    purchaseDocument.setVoucher(voucher);
+                    purchaseDocument.setNetAmount(purchaseDocument.getAmount());
+                    purchaseDocument.setType(CollectionDocumentType.INVOICE);
+                    purchaseDocumentService.createDocumentSimple(purchaseDocument);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }else{
+                em.merge(purchaseDocument);
+                em.merge(voucher);
+                em.flush();
+            }
+        }*/
+
+        /** For VoucherDetail **/
         List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
         for (VoucherDetail voucherDetail : voucherDetailsDB) {
             em.merge(voucherDetail);
@@ -157,8 +187,96 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
         }
 
+
+        /** Relacionando Voucher PurchaseDocument **/
+        /*System.out.println("-------------> Relacionando....");
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()){
+            updateVoucher(voucher, purchaseDocument);
+        }*/
+
         em.merge(voucher);
         em.flush();
+    }
+
+    public void createPurchaseDocumentVoucher(VoucherDetail voucherDetail){
+
+        try {
+
+            Voucher voucher = voucherDetail.getVoucher();
+
+            PurchaseDocument purchaseDocument = voucherDetail.getPurchaseDocument();
+            purchaseDocument.setVoucher(voucher);
+            purchaseDocument.setNetAmount(purchaseDocument.getAmount());
+            purchaseDocument.setType(CollectionDocumentType.INVOICE);
+            purchaseDocumentService.createDocumentSimple(purchaseDocument);
+
+
+
+            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
+            voucherDetail.setVoucher(voucher);
+
+            em.persist(voucherDetail);
+            em.merge(voucher);
+            em.flush();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //em.flush();
+    }
+
+    @Override
+    @TransactionAttribute(REQUIRES_NEW)
+    public void updateVoucherModify(Voucher voucher, List<VoucherDetail> voucherDetailList) {
+
+        System.out.println("--> Modify");
+        for (VoucherDetail voucherDetail : voucherDetailList){
+            System.out.println("--> " + voucherDetail.getFullCashAccount() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
+        }
+
+        List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
+        System.out.println("--> DB" + voucher.getGloss());
+        for (VoucherDetail voucherDetail : voucherDetailsDB) {
+            System.out.println("--> " + voucherDetail.getFullCashAccount() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
+        }
+
+
+        for (VoucherDetail voucherDetail : voucherDetailsDB){
+            em.remove(voucherDetail);
+            em.flush();
+        }
+
+
+        for (VoucherDetail voucherDetail : voucherDetailList){
+            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
+            voucherDetail.setVoucher(voucher);
+
+            em.persist(voucherDetail);
+            //em.flush();
+        }
+
+        /*for (VoucherDetail voucherDetail : voucher.getDetails()) {
+            if(voucherDetail.getTransactionNumber() == null){
+                voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+                voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
+                voucherDetail.setVoucher(voucher);
+
+                em.persist(voucherDetail);
+                em.merge(voucher);
+                em.flush();
+
+            }else{
+                em.merge(voucherDetail);
+                em.merge(voucher);
+                em.flush();
+            }
+        }
+
+        em.merge(voucher);
+        em.flush();*/
     }
 
     @Override
@@ -219,6 +337,22 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             return null;
         }
         return voucherDetails;
+    }
+
+    @Override
+    public List<PurchaseDocument> getPurchaseDcumentList(Voucher voucher){
+
+        List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
+
+        try {
+            purchaseDocumentList = (List<PurchaseDocument>) em.createQuery("select purchaseDocument from PurchaseDocument purchaseDocument " +
+                    " where purchaseDocument.voucher = :voucher ")
+                    .setParameter("voucher", voucher)
+                    .getResultList();
+        }catch (NoResultException e){
+            return null;
+        }
+        return purchaseDocumentList;
     }
 
     @Override

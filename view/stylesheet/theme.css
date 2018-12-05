@@ -312,6 +312,10 @@ input, select, textarea {
     width: 75px;
 }
 
+.input80 {
+    width: 80px;
+}
+
 .input100 {
     width:100px;
 }
