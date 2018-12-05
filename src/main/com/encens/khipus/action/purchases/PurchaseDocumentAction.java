@@ -2,6 +2,7 @@ package com.encens.khipus.action.purchases;
 
 import com.encens.khipus.action.AppIdentity;
 import com.encens.khipus.action.SessionUser;
+import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
@@ -18,6 +19,7 @@ import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.model.purchases.PurchaseOrder;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.FormatUtils;
@@ -46,6 +48,12 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
 
     @In(create = true)
     private VoucherUpdateAction voucherUpdateAction;
+
+    @In(create = true)
+    private VoucherCreateAction voucherCreateAction;
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     @In
     private FinancesExchangeRateService financesExchangeRateService;
@@ -154,7 +162,9 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
             purchaseDocumentService.createDocumentSimple(getInstance());
             addCreatedMessage();
 
-            voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+            //voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
+            voucherCreateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+
 
             return Outcome.SUCCESS;
         } catch (PurchaseDocumentException e) {
