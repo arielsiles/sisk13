@@ -31,7 +31,16 @@
 
 <div class="buttons">
 
-    <!--<h:commandButton action="#{voucherUpdateAction.generateReport(voucherCreate)}"-->
+    <h:commandButton action="#{voucherCreateAction.annulVoucher}"
+                     value="#{messages['Voucher.annul']}"
+                     styleClass="button"
+                     rendered="#{voucherCreateAction.pending and voucherCreateAction.managed and s:hasPermission('VOUCHER','DELETE')}"/>
+
+    <h:commandButton action="#{voucherCreateAction.approveVoucher}"
+                     value="#{messages['Voucher.approve']}"
+                     styleClass="button"
+                     rendered="#{voucherCreateAction.pending and voucherCreateAction.managed and s:hasPermission('VOUCHER','VIEW')}"/>
+
     <h:commandButton action="#{voucherCreateAction.generateReport(voucherCreateAction.voucher)}"
                      styleClass="button"
                      rendered="#{voucherCreateAction.managed}"
@@ -45,7 +54,7 @@
 
     <h:commandButton action="#{voucherCreateAction.update}" value="#{messages['Common.update']}"
                      styleClass="button"
-                     rendered="#{voucherCreateAction.managed}"
+                     rendered="#{voucherCreateAction.managed and voucherCreateAction.pending}"
                      tabindex="2"/>
 
     <h:commandButton action="#{voucherCreateAction.cancel}"
@@ -79,6 +88,10 @@
             </h:selectOneMenu>
             <rich:spacer width="5" />
             <h:outputText value="#{voucherCreateAction.voucher.documentNumber}" rendered="#{voucherCreateAction.managed}" />
+            <rich:spacer width="5" />
+            <h:outputText value="#{voucherCreateAction.voucher.state}"
+                          rendered="#{voucherCreateAction.managed}"
+                          style="font-weight: bold; color: #{voucherCreateAction.pending ? '#313335' : (voucherCreateAction.approved ? 'blue' : 'red')}" />
             <rich:spacer width="10" />
             <rich:calendar value="#{voucherCreateAction.voucher.date}"
                            popup="true"
@@ -140,6 +153,7 @@
 
             <a4j:commandButton id="newRegisterId"
                                action="#{voucherCreateAction.assignCashAccountVoucherDetail()}"
+                               rendered="#{voucherCreateAction.pending}"
                                value=" + "
                                styleClass="button"
                                immediate="true"
@@ -148,6 +162,7 @@
 
             <a4j:commandButton id="newNationalCurrencyBoxId"
                                action="#{voucherCreateAction.assignCashAccountDefault('1110110100')}"
+                               rendered="#{voucherCreateAction.pending}"
                                value="CN" title="1110110100 Caja General M.N."
                                styleClass="button"
                                immediate="true"
@@ -156,6 +171,7 @@
 
             <a4j:commandButton id="newFiscalCreditId"
                                action="#{voucherCreateAction.assignCashAccountDefault('1420710000')}"
+                               rendered="#{voucherCreateAction.pending}"
                                value="CF" title="1420710000 Credito Fiscal IVA"
                                styleClass="button"
                                immediate="true"
@@ -164,6 +180,7 @@
 
             <a4j:commandButton id="newCreditorId"
                                action="#{voucherCreateAction.assignCashAccountDefault('2420910300')}"
+                               rendered="#{voucherCreateAction.pending}"
                                value="AC" title="2420910300 Acreedores por bienes y servicios"
                                styleClass="button"
                                immediate="true"
@@ -482,15 +499,27 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{field09Id}">
-                                <a4j:commandButton
-                                                   action="#{voucherCreateAction.addFiscalCreditCashAccount(purchaseDocument)}"
-                                                   value=" + "
-                                                   styleClass="button"
-                                                   immediate="true"
-                                                   ajaxSingle="true"
-                                                   reRender="movementDetailListPanel,itemAccountField,invoiceDetailListPanel,#{field01Id},#{fieldInput01Id},#{field06Id},#{fieldInput06Id}">
-                                </a4j:commandButton>
 
+                                    <a4j:commandButton
+                                            action="#{voucherCreateAction.addFiscalCreditCashAccount(purchaseDocument)}"
+                                            value=" + "
+                                            styleClass="button"
+                                            immediate="true"
+                                            ajaxSingle="true"
+                                            reRender="movementDetailListPanel,itemAccountField,invoiceDetailListPanel,#{field01Id},#{fieldInput01Id},#{field06Id},#{fieldInput06Id}">
+                                    </a4j:commandButton>
+
+                                <!--<c:if test="#{purchaseDocument.financesEntity == null}">
+                                    <a4j:commandButton
+                                                       action="#{voucherCreateAction.addFiscalCreditCashAccount(purchaseDocument)}"
+                                                       value=" + "
+                                                       styleClass="button"
+                                                       rendered="#{voucherCreateAction.isRegistered(purchaseDocument)}"
+                                                       immediate="true"
+                                                       ajaxSingle="true"
+                                                       reRender="movementDetailListPanel,itemAccountField,invoiceDetailListPanel,#{field01Id},#{fieldInput01Id},#{field06Id},#{fieldInput06Id}">
+                                    </a4j:commandButton>
+                                </c:if>-->
 
                                     <!--<a4j:commandLink immediate="true"
                                                      title="#{messages['Common.remove']}"

@@ -43,6 +43,8 @@ import java.util.List;
 public class VoucherCreateAction extends GenericAction<Voucher> {
 
     CashAccount cashAccount = null;
+    public static String APPROVED_OUTCOME = "Approved";
+    public static String ANNUL_OUTCOME = "Annul";
 
     private BigDecimal debit = new BigDecimal("0.00");
     private BigDecimal credit = new BigDecimal("0.00");
@@ -239,6 +241,33 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return result;
     }
 
+    public String annulVoucher(){
+        voucher.setState(VoucherState.ANL.toString());
+        voucherAccoutingService.annulVoucher(voucher);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.annulAccountingEntry");
+        return ANNUL_OUTCOME;
+    }
+
+    public String approveVoucher(){
+        voucher.setState(VoucherState.APR.toString());
+        voucherAccoutingService.approveVoucher(voucher);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.approveAccountingEntry");
+        return APPROVED_OUTCOME;
+    }
+
+    public boolean isPending() {
+        boolean result = false;
+        if (voucher != null)
+            if (VoucherState.PEN.toString().equals(voucher.getState()))
+                result = true;
+
+        return result;
+    }
+
+    public boolean isApproved() {
+        return VoucherState.APR.toString().equals(voucher.getState());
+    }
+
     public Boolean isFiscalCredit(VoucherDetail voucherDetail){
         return voucherDetail.getAccount().equals("1420710000");
     }
@@ -275,8 +304,23 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         }
     }
 
+    public boolean isRegistered(PurchaseDocument purchaseDocument){
+
+        System.out.println("----> Registered: " + purchaseDocument.getVoucher());
+        System.out.println("----> Registered: " + purchaseDocument.getId());
+
+        return true;
+
+    }
+
     public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
         try {
+
+        System.out.println("----> PurchaseDocument: " + purchaseDocument.getName() + " - " + purchaseDocument.getNit());
+        System.out.println("----> getFinancesEntity(): " + purchaseDocument.getFinancesEntity());
+        System.out.println("----> nit: " + purchaseDocument.getFinancesEntity().getNitNumber());
+        System.out.println("----> name: " + purchaseDocument.getFinancesEntity().getAcronym());
+
             purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
             purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
 

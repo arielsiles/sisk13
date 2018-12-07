@@ -131,6 +131,17 @@
             </rule>
         </navigation>
 
+        <navigation from-action="#{voucherCreateAction.approveVoucher}">
+            <rule if-outcome="Approved">
+                <redirect view-id="/accounting/voucherCreate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{voucherCreateAction.annulVoucher}">
+            <rule if-outcome="Annul">
+                <redirect view-id="/accounting/voucherCreate.xhtml"/>
+            </rule>
+        </navigation>
+
     </page>
 
 </pages>        
