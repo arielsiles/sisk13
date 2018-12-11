@@ -17,7 +17,7 @@ import java.util.Date;
 
 @Entity
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(name = "cxp_movs", catalog = Constants.FINANCES_SCHEMA)
+@Table(name = "cxp_movs", schema = Constants.FINANCES_SCHEMA)
 public class PayableDocumentMovement implements BaseModel {
 
     @EmbeddedId
