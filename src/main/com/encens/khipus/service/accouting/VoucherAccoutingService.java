@@ -2,6 +2,7 @@ package com.encens.khipus.service.accouting;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.finances.Voucher;
@@ -79,4 +80,6 @@ public interface VoucherAccoutingService extends GenericService {
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double amountTransfer, String gloss) throws CompanyConfigurationNotFoundException;
 
     void createPurchaseDocumentVoucher(VoucherDetail voucherDetail);
+
+    public DocType getDocType(String name);
 }

@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
@@ -126,6 +127,11 @@ public class VoucherDetail implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "IDCUENTA", referencedColumnName = "IDCUENTA")
     private Account partnerAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "IDCREDITO", referencedColumnName = "IDCREDITO")
+    private Credit creditPartner;
+
 
     @ManyToOne
     @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
@@ -304,6 +310,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" +  partnerAccount.getAccountNumber() + " " + partnerAccount.getPartner().getFirstAndMaidenName() + ")";
         if (purchaseDocument != null)
             fullCashAccount = fullCashAccount + " (F." + purchaseDocument.getNumber() + ")";
+        if (creditPartner != null)
+            fullCashAccount = fullCashAccount + " (" + creditPartner.getPartner().getFullName() + ")";
 
         return fullCashAccount;
 
@@ -369,5 +377,13 @@ public class VoucherDetail implements BaseModel {
 
     public void setPurchaseDocument(PurchaseDocument purchaseDocument) {
         this.purchaseDocument = purchaseDocument;
+    }
+
+    public Credit getCreditPartner() {
+        return creditPartner;
+    }
+
+    public void setCreditPartner(Credit creditPartner) {
+        this.creditPartner = creditPartner;
     }
 }

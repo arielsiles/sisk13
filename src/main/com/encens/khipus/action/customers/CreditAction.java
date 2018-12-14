@@ -1,12 +1,18 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
@@ -29,15 +35,19 @@ public class CreditAction extends GenericAction<Credit> {
 
     @In
     private CreditTransactionService creditTransactionService;
-
     @In
     private CreditService creditService;
-
     @In
     private SequenceGeneratorService sequenceGeneratorService;
+    @In
+    private CashAccountService cashAccountService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     @In(create = true)
     private CreditTransactionAction creditTransactionAction;
+    @In(create = true)
+    private VoucherCreateAction voucherCreateAction;
 
     private BigDecimal totalPayment;
     private BigDecimal quotaValue;

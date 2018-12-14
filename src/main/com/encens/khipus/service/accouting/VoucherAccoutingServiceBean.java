@@ -3,6 +3,7 @@ package com.encens.khipus.service.accouting;
 import com.encens.khipus.converter.BigDecimalConverter;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericServiceBean;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.customers.ArticleOrder;
@@ -69,22 +70,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public void saveVoucher(Voucher voucher){
 
         Long id = financesPkGeneratorService.newId_sf_tmpenc();
-
         System.out.println("------------> ID_TMPENC: " + id);
         voucher.setId(id);
-        //voucher.setId(financesPkGeneratorService.newId_sf_tmpenc());
 
-        /*System.out.println("------->!!!!! PurchaseDocument");
-        for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()){
-            System.out.println("-------->>>>> FACT: " + purchaseDocument.getName());
-            purchaseDocument.setNetAmount(purchaseDocument.getAmount());
-            purchaseDocument.setType(CollectionDocumentType.INVOICE);
-            purchaseDocument.setState(PurchaseDocumentState.PENDING);
-            //purchaseDocument.setVoucher(voucher);
-            //purchaseDocument.setVoucher();
-            em.persist(purchaseDocument);
-            //em.flush();
-        }*/
 
 
         if (voucher.getTransactionNumber() == null){
@@ -100,6 +88,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         System.out.println("Fecha: " + voucher.getDate());
         System.out.println("NoTrans: " + voucher.getTransactionNumber());
         System.out.println("Tipo Doc: " + voucher.getDocumentType());
+        System.out.println("Num Doc: " + voucher.getDocumentNumber());
         System.out.println("Descripcion: " + voucher.getDescription());
         System.out.println("Glosa: " + voucher.getGloss());
 
@@ -1116,4 +1105,13 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }*/
 
     }
+
+    @Override
+    public DocType getDocType(String name) {
+
+        DocType docType = (DocType)em.createNamedQuery("DocType.findDocumentByName").setParameter("name", name).getSingleResult();
+
+        return docType;
+    }
+
 }

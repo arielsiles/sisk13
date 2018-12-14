@@ -55,6 +55,7 @@ public final class Constants {
     public static final String IA_VOUCHER_DOCTYPE = "IA";
     public static final String CV_VOUCHER_DOCTYPE = "CV";
     public static final String CT_VOUCHER_DOCTYPE = "CT";
+    public static final String CE_VOUCHER_DOCTYPE = "CE";
 
     public static final BigDecimal BASE_CURRENCY_EXCHANGE_RATE = BigDecimal.ONE;
 
@@ -227,7 +228,8 @@ public final class Constants {
 
 
     /** Default CashAccount **/
-    public static final String CASHACCOUNT_FISCAL_CREDIT = "1420710000";  //Credito Fiscal IVA
+    public static final String CASHACCOUNT_FISCAL_CREDIT = "1420710000";  // Credito Fiscal IVA
+    public static final String CASHACCOUNT_GENERALCASH = "1110110100";   // Caja General M.N.
 
     private Constants() {
     }

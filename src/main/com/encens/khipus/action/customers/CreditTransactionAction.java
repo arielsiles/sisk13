@@ -10,9 +10,14 @@ import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditTransaction;
 import com.encens.khipus.model.customers.CreditTransactionType;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.google.zxing.NotFoundException;
 import org.jboss.seam.ScopeType;
@@ -37,6 +42,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private CreditService creditService;
     @In
     private CreditTransactionService creditTransactionService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private CashAccountService cashAccountService;
+
     @In(create = true)
     private CreditAction creditAction;
     @In(create = true)
@@ -112,6 +122,30 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         CreditTransaction creditTransaction = getInstance();
         creditTransaction.setDate(dateTransaction);
         creditTransactionService.createCreditTransactionPayout(credit, creditTransaction);
+
+        //DocType doc = voucherAccoutingService.getDocType("CE");
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(Constants.CE_VOUCHER_DOCTYPE);
+
+        VoucherDetail voucherDetailDebit = new VoucherDetail();
+        //voucherDetailDebit.setCashAccount(cashAccountService.findByAccountCode("1310510100"));
+        voucherDetailDebit.setAccount("1310510100");
+        voucherDetailDebit.setDebit(getInstance().getAmount());
+        voucherDetailDebit.setCredit(BigDecimal.ZERO);
+        voucherDetailDebit.setCreditPartner(credit);
+
+        VoucherDetail voucherDetailCredit = new VoucherDetail();
+        //voucherDetailCredit.setCashAccount(cashAccountService.findByAccountCode("1110110100"));
+        voucherDetailCredit.setAccount(Constants.CASHACCOUNT_GENERALCASH);
+        voucherDetailCredit.setDebit(BigDecimal.ZERO);
+        voucherDetailCredit.setCredit(getInstance().getAmount());
+
+        voucher.getDetails().add(voucherDetailDebit);
+        voucher.getDetails().add(voucherDetailCredit);
+
+        voucher.setGloss("DESEMBOLSO CREDITO, " + credit.getPartner().getFullName());
+        voucherAccoutingService.saveVoucher(voucher);
+
         return  Outcome.SUCCESS;
     }
 
