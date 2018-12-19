@@ -751,8 +751,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void generateReport(Voucher instance){
-        select(instance);
-        voucherReportAction.generateReport(instance);
+        try{
+            select(instance);
+            voucherReportAction.generateReport(instance);
+        } catch (NullPointerException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
+        }
+
     }
 
     public CashAccount getAccount() {

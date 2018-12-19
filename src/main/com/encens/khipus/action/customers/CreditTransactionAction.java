@@ -96,11 +96,55 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             genericService.create(creditTransaction);
             addCreatedMessage();
             cleanValues();
+
+
+
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
             return Outcome.REDISPLAY;
         }
+    }
+
+
+    public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
+
+        if (creditTransaction.getCredit().getState().equals(CreditState.VIG)){
+
+            Voucher voucher = new Voucher();
+            voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+
+            VoucherDetail voucherDetailBox = new VoucherDetail();
+            voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH);
+            voucherDetailBox.setDebit(creditTransaction.getAmount());
+            voucherDetailBox.setCredit(BigDecimal.ZERO);
+
+
+            VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
+            voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
+            voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
+            voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
+
+            VoucherDetail voucherDetailInterest = new VoucherDetail();
+            voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_LOAN);
+            voucherDetailInterest.setDebit(BigDecimal.ZERO);
+            voucherDetailInterest.setCredit(creditTransaction.getInterest());
+
+
+            detailCurrentLoan.setCreditPartner(credit);
+
+
+            voucher.getDetails().add(voucherDetailBox);
+            voucher.getDetails().add(voucherDetailCurrentLoan);
+            voucher.getDetails().add(voucherDetailInterest);
+
+            voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
+            voucherAccoutingService.saveVoucher(voucher);
+
+            creditTransactionService.updateTransaction(creditTransaction, voucher);
+
+        }
+
     }
 
     @Override
@@ -128,7 +172,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         VoucherDetail voucherDetailDebit = new VoucherDetail();
         //voucherDetailDebit.setCashAccount(cashAccountService.findByAccountCode("1310510100"));
-        voucherDetailDebit.setAccount("1310510100");
+        voucherDetailDebit.setAccount(Constants.ACOUNT_CURRENT_LOAN);
         voucherDetailDebit.setDebit(getInstance().getAmount());
         voucherDetailDebit.setCredit(BigDecimal.ZERO);
         voucherDetailDebit.setCreditPartner(credit);
@@ -142,7 +186,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         voucher.getDetails().add(voucherDetailDebit);
         voucher.getDetails().add(voucherDetailCredit);
 
-        voucher.setGloss("DESEMBOLSO CREDITO, " + credit.getPartner().getFullName());
+        voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
         voucherAccoutingService.saveVoucher(voucher);
 
         creditTransactionService.updateTransaction(creditTransaction, voucher);
