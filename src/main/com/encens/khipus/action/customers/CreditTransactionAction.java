@@ -123,7 +123,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setDate(dateTransaction);
         creditTransactionService.createCreditTransactionPayout(credit, creditTransaction);
 
-        //DocType doc = voucherAccoutingService.getDocType("CE");
         Voucher voucher = new Voucher();
         voucher.setDocumentType(Constants.CE_VOUCHER_DOCTYPE);
 
@@ -136,7 +135,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         VoucherDetail voucherDetailCredit = new VoucherDetail();
         //voucherDetailCredit.setCashAccount(cashAccountService.findByAccountCode("1110110100"));
-        voucherDetailCredit.setAccount(Constants.CASHACCOUNT_GENERALCASH);
+        voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH);
         voucherDetailCredit.setDebit(BigDecimal.ZERO);
         voucherDetailCredit.setCredit(getInstance().getAmount());
 
@@ -145,6 +144,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         voucher.setGloss("DESEMBOLSO CREDITO, " + credit.getPartner().getFullName());
         voucherAccoutingService.saveVoucher(voucher);
+
+        creditTransactionService.updateTransaction(creditTransaction, voucher);
 
         return  Outcome.SUCCESS;
     }

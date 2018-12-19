@@ -5,6 +5,7 @@ import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.customers.Credit;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
@@ -112,6 +113,8 @@ public class VoucherDetail implements BaseModel {
     @Length(max = 6)
     private String providerCode;
 
+    @Column(name = "CANT_ART", nullable = true)
+    private Long quantityArt;
 
     @Column(name = "COD_ART", length = 6)
     @Length(max = 6)
@@ -127,6 +130,10 @@ public class VoucherDetail implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "IDCUENTA", referencedColumnName = "IDCUENTA")
     private Account partnerAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "IDSOCIO", referencedColumnName = "IDSOCIO")
+    private Partner partner;
 
     @ManyToOne
     @JoinColumn(name = "IDCREDITO", referencedColumnName = "IDCREDITO")
@@ -312,6 +319,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (F." + purchaseDocument.getNumber() + ")";
         if (creditPartner != null)
             fullCashAccount = fullCashAccount + " (" + creditPartner.getPartner().getFullName() + ")";
+        if (partner != null)
+            fullCashAccount = fullCashAccount + " (" + partner.getFullName() + ")";
 
         return fullCashAccount;
 
@@ -385,5 +394,21 @@ public class VoucherDetail implements BaseModel {
 
     public void setCreditPartner(Credit creditPartner) {
         this.creditPartner = creditPartner;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+
+    public Long getQuantityArt() {
+        return quantityArt;
+    }
+
+    public void setQuantityArt(Long quantityArt) {
+        this.quantityArt = quantityArt;
     }
 }

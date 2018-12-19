@@ -8,6 +8,7 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -58,12 +59,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private Client client;
     private ProductItem productItem;
     private Account partnerAccount;
+    private Partner partner;
 
     //private PurchaseDocument purchaseDocument;
     private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
 
     private Integer quantity;
     private BigDecimal amountDeposit;
+    private BigDecimal contribution;
 
     private List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
     private List<CashAccount> cashAccounts = new ArrayList<CashAccount>();
@@ -385,23 +388,26 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignProductItemVoucherDetail(){
 
         try {
-            CashAccount ctaCaja     = cashAccountService.findByAccountCode("1110110100");
-            CashAccount ctaIngreso  = cashAccountService.findByAccountCode("5451010000");
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.CCOUNT_OTHER_OPERATING_INCOME);
 
             VoucherDetail voucherCaja = new VoucherDetail();
             voucherCaja.setCashAccount(ctaCaja);
             voucherCaja.setAccount(ctaCaja.getAccountCode());
             voucherCaja.setDebit(BigDecimalUtil.multiply(productItem.getSalePrice(), BigDecimalUtil.toBigDecimal(quantity), 2));
             voucherCaja.setCredit(BigDecimal.ZERO);
+            voucherCaja.setQuantityArt(quantity.longValue());
 
             VoucherDetail voucherIngreso = new VoucherDetail();
             voucherIngreso.setCashAccount(ctaIngreso);
             voucherIngreso.setAccount(ctaIngreso.getAccountCode());
-
+            voucherIngreso.setQuantityArt(quantity.longValue());
 
             VoucherDetail voucherDetail = new VoucherDetail(); //Cta Almacen
             voucherDetail.setCashAccount(productItem.getWarehouse().getWarehouseCashAccount());
             voucherDetail.setAccount(productItem.getWarehouse().getWarehouseCashAccount().getAccountCode());
+            voucherDetail.setQuantityArt(quantity.longValue());
+
             voucherDetail.setClient(this.client);
             voucherDetail.setProvider(this.provider);
             voucherDetail.setProductItem(productItem);
@@ -466,6 +472,53 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             voucherDetails.add(voucherCaja);
             voucherDetails.add(voucherSaving);
+
+            clearAccount();
+            clearClient();
+            clearProvider();
+            clearPartnerAccount();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
+        }catch (NullPointerException e){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+        }
+
+    }
+
+    public void assignPartnerVoucherDetail(){
+        try {
+            System.out.println("---> Partner: " + partner.getFullName());
+
+            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            CashAccount contributionAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_CONTRIBUTION);
+
+            VoucherDetail voucherBox = new VoucherDetail();
+            voucherBox.setCashAccount(boxAccount);
+            voucherBox.setAccount(boxAccount.getAccountCode());
+            voucherBox.setDebit(getContribution());
+            voucherBox.setCredit(BigDecimal.ZERO);
+
+
+            VoucherDetail voucherContribution = new VoucherDetail();
+
+            voucherContribution.setCashAccount(contributionAccount);
+            voucherContribution.setAccount(contributionAccount.getAccountCode());
+            voucherContribution.setPartner(this.partner);
+            //voucherContribution.setClient(this.client);
+            //voucherContribution.setProvider(this.provider);
+            //voucherContribution.setPartnerAccount(partnerAccount);
+
+            /*if (this.provider != null)
+                voucherContribution.setProviderCode(this.provider.getProviderCode());*/
+
+            voucherContribution.setDebit(BigDecimal.ZERO);
+            voucherContribution.setCredit(getContribution());
+
+            voucherDetails.add(voucherBox);
+            voucherDetails.add(voucherContribution);
+
+            clearPartner();
+            setContribution(null);
 
             clearAccount();
             clearClient();
@@ -730,6 +783,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         setAccount(null);
     }
 
+    public void clearPartner() {
+        setPartner(null);
+    }
+
     public void clearClient(){
         setClient(null);
     }
@@ -793,5 +850,25 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setAmountDeposit(BigDecimal amountDeposit) {
         this.amountDeposit = amountDeposit;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+
+    public void assignPartner(Partner partner){
+        setPartner(partner);
+    }
+
+    public BigDecimal getContribution() {
+        return contribution;
+    }
+
+    public void setContribution(BigDecimal contribution) {
+        this.contribution = contribution;
     }
 }

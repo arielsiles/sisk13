@@ -228,8 +228,10 @@ public final class Constants {
 
 
     /** Default CashAccount **/
-    public static final String CASHACCOUNT_FISCAL_CREDIT = "1420710000";  // Credito Fiscal IVA
-    public static final String CASHACCOUNT_GENERALCASH = "1110110100";   // Caja General M.N.
+    public static final String ACCOUNT_FISCAL_CREDIT = "1420710000";  // Credito Fiscal IVA
+    public static final String ACCOUNT_GENERALCASH = "1110110100";   // Caja General M.N.
+    public static final String ACCOUNT_CONTRIBUTION = "3110100000";   // Caja General M.N.
+    public static final String CCOUNT_OTHER_OPERATING_INCOME = "5451010000";   // Otros Ingresos Operativos diversos
 
     private Constants() {
     }

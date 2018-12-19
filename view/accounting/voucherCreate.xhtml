@@ -274,6 +274,36 @@
                                immediate="true"
                                reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId">
             </a4j:commandButton>
+            <h:outputLabel value="Bs." />
+        </s:decorate>
+
+        <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+            <app:selectPopUp id="partnerFieldId"
+                             textValue="#{voucherCreateAction.partner.fullName}"
+                             value="#{voucherCreateAction.partner}"
+                             clearAction="#{voucherCreateAction.clearPartner()}"
+                             searchModalPanel="partnerListModalPanel"
+                             dataModel="#{partnerDataModel}"
+                             reRender="partnerField"
+                             tabindex="12">
+            </app:selectPopUp>
+
+            <h:inputText id="contributionId"
+                         value="#{voucherCreateAction.contribution}"
+                         styleClass="inputNumberTiny"
+                         required="false">
+                <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="amountDepositId"/>
+                <a4j:support event="onblur" ajaxSingle="true" reRender="amountDepositId"/>
+                <h:message for="contributionId" styleClass="errors" style="display:block;" rendered="true"/>
+            </h:inputText>
+            <a4j:commandButton id="addPartnerId"
+                               action="#{voucherCreateAction.assignPartnerVoucherDetail()}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId,partnerFieldId,contributionId">
+            </a4j:commandButton>
         </s:decorate>
 
     </s:div>
@@ -651,6 +681,21 @@
         <!--<ui:param name="postUpdateAction"
                       value="#{voucherUpdateAction.assignFinancesEntity(financeProviderAction.instance)}"/>-->
     </s:decorate>
+
+    <s:div id="partnerListModalPanelDiv">
+        <s:decorate id="partnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">
+            <ui:param name="containerId" value="partnerListModalPanelContainer"/>
+            <ui:param name="dialogId" value="partnerListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{voucherCreateAction.assignPartner(partnerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="partnerField"
+                                   oncomplete="Richfaces.hideModalPanel('partnerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>

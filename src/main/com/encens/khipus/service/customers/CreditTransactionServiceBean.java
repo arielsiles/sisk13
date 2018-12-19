@@ -5,6 +5,7 @@ import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditTransaction;
 import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.customers.Invoice;
+import com.encens.khipus.model.finances.Voucher;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -100,4 +101,16 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         em.flush();
 
     }
+
+    public void updateTransaction(CreditTransaction creditTransaction, Voucher voucher){
+        System.out.println("---------> Relacionando Voucher, CreditTransaction.... idvoucher:" + voucher.getId());
+        creditTransaction.setVoucher(voucher);
+        creditTransaction.setVoucherId(voucher.getId());
+
+        em.merge(creditTransaction);
+        em.merge(voucher);
+        em.flush();
+
+    }
+
 }

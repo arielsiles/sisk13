@@ -3,6 +3,7 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.finances.Voucher;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
@@ -81,6 +82,17 @@ public class CreditTransaction implements Serializable, BaseModel {
     /*@OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idfactura", nullable = false)
     private Invoice invoice;*/
+
+    @ManyToOne
+    @JoinColumn(name = "id_tmpenc", nullable = true)
+    private Voucher voucher;
+
+    @Column(name = "id_tmpenc", nullable = true, updatable = false, insertable = false)
+    private Long voucherId;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -189,5 +201,29 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Voucher getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
+    }
+
+    public Long getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Long voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }
