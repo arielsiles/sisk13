@@ -229,14 +229,19 @@ public final class Constants {
 
 
     /** Default CashAccount **/
-    public static final String ACCOUNT_FISCAL_CREDIT = "1420710000";  // Credito Fiscal IVA
-    public static final String ACCOUNT_GENERALCASH = "1110110100";   // Caja General M.N.
-    public static final String ACCOUNT_CONTRIBUTION = "3110100000";   // Caja General M.N.
+    public static final String ACCOUNT_FISCAL_CREDIT = "1420710000";// Credito Fiscal IVA
+    public static final String ACCOUNT_GENERALCASH = "1110110100";  // Caja General M.N.
+    public static final String ACCOUNT_CONTRIBUTION = "3110100000"; // Certificados de Aportacion
     public static final String ACOUNT_OTHER_OPERATING_INCOME = "5451010000";   // Otros Ingresos Operativos diversos
-    public static final String ACOUNT_CURRENT_LOAN = "1310510100";   // Prestamos Amortizables Vigentes CIS M.N.
-    public static final String ACOUNT_LOAN_EXPIRED = "";   //
-    public static final String ACOUNT_LOAN_EXECUTION = "";   //
+
+    public static final String ACOUNT_CURRENT_LOAN = "1310510100";  //Prestamos Amortizables Vigentes CIS M.N.
     public static final String ACOUNT_INTEREST_ON_LOAN = "5130510100";   //Intereses Prestamos Amort. Vig. CIS M.N. - revisar no hay la cta 5130510600
+
+    public static final String ACOUNT_LOAN_EXPIRED = "1320510100";          //Prestamos Amortizables Vencidos CIS M.N.
+    public static final String ACOUNT_INTEREST_ON_EXPIRED = "5140510100";   //Intereses Prestamos Amort. Ven. CIS M.N.
+
+    public static final String ACOUNT_LOAN_EXECUTION = "";          //
+
 
     private Constants() {
     }

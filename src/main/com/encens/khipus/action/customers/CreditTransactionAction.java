@@ -22,6 +22,7 @@ import com.encens.khipus.util.DateUtils;
 import com.google.zxing.NotFoundException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.ws.core.soap.SOAPMessageUnMarshaller;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -132,7 +133,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
-        if (creditTransaction.getCredit().getState().equals(CreditState.VIG)){
+        if (creditTransaction.getCredit().getState().equals(CreditState.VIG) || creditTransaction.getCredit().getState().equals(CreditState.VEN)){
 
             Voucher voucher = new Voucher();
             voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
@@ -143,23 +144,42 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailBox.setCredit(BigDecimal.ZERO);
 
             VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
-            voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
+                System.out.println("====> 1 - " + Constants.ACOUNT_CURRENT_LOAN);
+                voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
+            }
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
+                System.out.println("====> 2 - " + Constants.ACOUNT_LOAN_EXPIRED);
+                voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_LOAN_EXPIRED);
+            }
+
             voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
             voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
 
             VoucherDetail voucherDetailInterest = new VoucherDetail();
-            voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_LOAN);
+            if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
+                System.out.println("====> 3 - " + Constants.ACOUNT_INTEREST_ON_LOAN);
+                voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_LOAN);
+            }
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
+                System.out.println("====> 4 - " + Constants.ACOUNT_INTEREST_ON_EXPIRED);
+                voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_EXPIRED);
+            }
+
             voucherDetailInterest.setDebit(BigDecimal.ZERO);
             voucherDetailInterest.setCredit(creditTransaction.getInterest());
 
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
 
+            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getCredit().getCode());
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
             voucher.getDetails().add(voucherDetailInterest);
 
-            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getCredit().getCode());
             voucherAccoutingService.saveVoucher(voucher);
 
             creditTransactionService.updateTransaction(creditTransaction, voucher);
@@ -344,7 +364,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
         }else {
             if (state.equals(CreditState.VEN)) {
-                quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30);
+                //quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30); revisar error
+                quotas = 1;
             }
         }
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
