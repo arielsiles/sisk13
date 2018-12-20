@@ -75,6 +75,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     @End(beforeRedirect = true)
     public String create(Credit creditItem) {
+
         CreditTransaction creditTransaction = getInstance();
         BigDecimal capitalBalance = creditItem.getCapitalBalance();
         capitalBalance = BigDecimalUtil.subtract(capitalBalance, capitalValue, 6);
@@ -106,6 +107,28 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         }
     }
 
+    @End(beforeRedirect = true)
+    public String createCreditTransaction(Credit creditItem){
+
+        CreditTransaction creditTransaction = getInstance();
+        BigDecimal capitalBalance = creditItem.getCapitalBalance();
+        capitalBalance = BigDecimalUtil.subtract(capitalBalance, capitalValue, 6);
+        creditTransaction.setDate(dateTransaction);
+        creditTransaction.setDays(0);
+        creditTransaction.setCapitalBalance(capitalBalance);
+        creditTransaction.setInterest(interestValue);
+        creditTransaction.setCapital(capitalValue);
+        creditTransaction.setAmount(totalAmountValue);
+        creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
+        creditTransaction.setCredit(creditItem);
+        creditItem.setCapitalBalance(capitalBalance);
+
+        creditTransactionService.createCreditTransactionPayFee(creditItem, creditTransaction);
+
+        createIncomeAccountingRecord(creditTransaction);
+
+        return  Outcome.SUCCESS;
+    }
 
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
@@ -119,7 +142,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailBox.setDebit(creditTransaction.getAmount());
             voucherDetailBox.setCredit(BigDecimal.ZERO);
 
-
             VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
             voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
             voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
@@ -130,15 +152,14 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailInterest.setDebit(BigDecimal.ZERO);
             voucherDetailInterest.setCredit(creditTransaction.getInterest());
 
-
-            detailCurrentLoan.setCreditPartner(credit);
-
+            voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
+            voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
 
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
             voucher.getDetails().add(voucherDetailInterest);
 
-            voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
+            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getCredit().getCode());
             voucherAccoutingService.saveVoucher(voucher);
 
             creditTransactionService.updateTransaction(creditTransaction, voucher);

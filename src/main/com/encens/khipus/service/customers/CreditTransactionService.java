@@ -18,5 +18,6 @@ public interface CreditTransactionService {
     Date findLastPayment(Credit credit);
     Date findLastPaymentForInterest(Credit credit);
     void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction);
+    void createCreditTransactionPayFee(Credit credit, CreditTransaction creditTransaction);
     public void updateTransaction(CreditTransaction creditTransaction, Voucher voucher);
 }

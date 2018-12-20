@@ -389,7 +389,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         try {
             CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
-            CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.CCOUNT_OTHER_OPERATING_INCOME);
+            CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.ACOUNT_OTHER_OPERATING_INCOME);
 
             VoucherDetail voucherCaja = new VoucherDetail();
             voucherCaja.setCashAccount(ctaCaja);

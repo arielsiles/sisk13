@@ -277,7 +277,7 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
 
-        if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.CASHACCOUNT_FISCAL_CREDIT)){
+        if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.ACCOUNT_FISCAL_CREDIT)){
             System.out.println("------> Eliminando Fact: " + voucherDetail.getPurchaseDocument() + " - " + purchaseDocumentList.size());
 
             for (int i=0 ; i<purchaseDocumentList.size() ; i++){

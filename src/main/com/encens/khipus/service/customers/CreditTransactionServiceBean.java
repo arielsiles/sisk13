@@ -102,6 +102,15 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
 
     }
 
+    public void createCreditTransactionPayFee(Credit credit, CreditTransaction creditTransaction){
+
+        creditTransaction.setCredit(credit);
+        em.merge(credit);
+        em.persist(creditTransaction);
+        em.flush();
+
+    }
+
     public void updateTransaction(CreditTransaction creditTransaction, Voucher voucher){
         System.out.println("---------> Relacionando Voucher, CreditTransaction.... idvoucher:" + voucher.getId());
         creditTransaction.setVoucher(voucher);
