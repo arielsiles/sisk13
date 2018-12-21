@@ -146,12 +146,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
-                System.out.println("====> 1 - " + Constants.ACOUNT_CURRENT_LOAN);
+                //System.out.println("====> 1 - " + Constants.ACOUNT_CURRENT_LOAN);
                 voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
             }
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
-                System.out.println("====> 2 - " + Constants.ACOUNT_LOAN_EXPIRED);
+                //System.out.println("====> 2 - " + Constants.ACOUNT_LOAN_EXPIRED);
                 voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_LOAN_EXPIRED);
             }
 
@@ -160,12 +160,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             VoucherDetail voucherDetailInterest = new VoucherDetail();
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
-                System.out.println("====> 3 - " + Constants.ACOUNT_INTEREST_ON_LOAN);
+                //System.out.println("====> 3 - " + Constants.ACOUNT_INTEREST_ON_LOAN);
                 voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_LOAN);
             }
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
-                System.out.println("====> 4 - " + Constants.ACOUNT_INTEREST_ON_EXPIRED);
+                //System.out.println("====> 4 - " + Constants.ACOUNT_INTEREST_ON_EXPIRED);
                 voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_EXPIRED);
             }
 
@@ -404,7 +404,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
 
             }else{
-                if (quotas < totalQuotas){
+
+                System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
+
+                if (quotas-1 < totalQuotas){
                     quotas++;
                     System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
                     calendarNext.add(Calendar.MONTH, amortize);
