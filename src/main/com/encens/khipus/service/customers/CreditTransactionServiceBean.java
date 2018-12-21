@@ -60,8 +60,10 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
             return null;
         }
 
-        if (result == null)
-            result = credit.getFirstPayment();
+        if (result == null){
+            //result = credit.getFirstPayment();
+            result = credit.getGrantDate();
+        }
 
         return result;
     }

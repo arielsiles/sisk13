@@ -350,11 +350,16 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         int quotas = 0;
 
         Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
+
+        System.out.println("--------> LASTPAYMENT: " + lastPaymentDate);
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastPaymentDate);
         lastPaymentDate = cal.getTime();
 
-        Date currentPaymentDate = getInstance().getDate();
+        //Date currentPaymentDate = getInstance().getDate();
+        Date currentPaymentDate = this.dateTransaction;
+
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
         CreditState state = credit.getState();
@@ -364,15 +369,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
         }else {
             if (state.equals(CreditState.VEN)) {
-                //quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30); revisar error
-                quotas = 1;
+                quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
+                //quotas = 1;
             }
         }
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
     }
 
     /** ? **/
-    public int calculateQuotasVen(Date lastPaymentDate, Date currentDate, int amortize){
+    public int calculateQuotasVen(Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
 
 
         Calendar calendar = Calendar.getInstance();
@@ -385,16 +390,26 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         int quotas = 1;
 
+        System.out.println("---> currentDate: " + currentDate);
+        System.out.println("---> lastPaymentDate: " + lastPaymentDate);
+        System.out.println("---> nextPaymentDate: " + nextPaymentDate);
+        System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
+        System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
+
         System.out.println("--------------------");
-        while (lastPaymentDate.before(currentDate) || lastPaymentDate.equals(currentDate)){
+        //while (lastPaymentDate.before(currentDate) || lastPaymentDate.equals(currentDate)){
+        while (lastPaymentDate.before(currentDate)){
 
             if (lastPaymentDate.before(nextPaymentDate)){
                 System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
+
             }else{
-                quotas++;
-                System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
-                calendarNext.add(Calendar.MONTH, amortize);
-                nextPaymentDate = calendarNext.getTime();
+                if (quotas < totalQuotas){
+                    quotas++;
+                    System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+                    calendarNext.add(Calendar.MONTH, amortize);
+                    nextPaymentDate = calendarNext.getTime();
+                }
             }
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
@@ -405,6 +420,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         System.out.println("--------------------");
         System.out.println("Last Payment   : " + lastPaymentDate);
         System.out.println("Current Payment: " + currentDate);
+        System.out.println("nextPaymentDate: " + nextPaymentDate);
 
         return quotas;
     }
