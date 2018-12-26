@@ -1,6 +1,7 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.accounting.VoucherCreateAction;
+import com.encens.khipus.action.customers.reports.CreditReportAction;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
@@ -20,8 +21,11 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Actions for Credit
@@ -48,6 +52,8 @@ public class CreditAction extends GenericAction<Credit> {
     private CreditTransactionAction creditTransactionAction;
     @In(create = true)
     private VoucherCreateAction voucherCreateAction;
+    @In(create = true)
+    private CreditReportAction creditReportAction;
 
     private BigDecimal totalPayment;
     private BigDecimal quotaValue;
@@ -111,8 +117,101 @@ public class CreditAction extends GenericAction<Credit> {
     }
 
     public void checkCreditStatus(){
-
+        System.out.println("-------------APERTURA DE CREDITOS-------------");
         for (Credit credit : creditService.getAllCredits()){
+
+            System.out.println(credit.getAmount() + " - " + credit.getCapitalBalance() + " - " + credit.getPartner().getFullName());
+            //Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
+
+            int paidQuotas = creditTransactionAction.calculatePaidQuotas(credit);
+            System.out.println("----> Coutas Pagadas: " + paidQuotas);
+
+            Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+
+            Integer i=1;
+            Date paidDate = null;
+            Date currentDate = new Date();
+
+            for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+
+                if (i == paidQuotas || paidQuotas == 0) {
+                    System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
+                    paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(paidDate);
+                    if (paidQuotas == 0) cal.setTime(credit.getGrantDate());
+
+                    cal.add(Calendar.DAY_OF_MONTH, credit.getAmortization());
+                    Date nextPaidDate = cal.getTime();
+
+                    long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
+
+                    System.out.println("===>>> Diff DAYS: " + diffDays);
+
+                    if (diffDays <= 0) {
+                        System.out.println("===> !!!!CREDITO VIGENTE!!!!");
+                        creditService.changeCreditState(credit, CreditState.VIG);
+                    }
+                    if (diffDays >= 1 &&  diffDays <= 90) {
+                        System.out.println("===> CREDITO VENCIDO...");
+                        creditService.changeCreditState(credit, CreditState.VEN);
+                    }
+                    if (diffDays >= 91) {
+                        System.out.println("===> CREDITO EJECUCION...");
+                        creditService.changeCreditState(credit, CreditState.EJE);
+                    }
+
+                }
+
+                i++;
+            }
+            /*for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+
+                if (paidQuotas == 0 && credit.getAmortization() > 30) {
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(credit.getGrantDate());
+                    cal.add(Calendar.DAY_OF_MONTH, credit.getAmortization());
+                    Date nextPaidDate = cal.getTime();
+                    long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
+                    System.out.println("--->>> Diff DAYS: " + diffDays);
+
+                    if (diffDays <= 0)
+                        System.out.println("---> !!!!CREDITO VIGENTE!!!!");
+                    if (diffDays >= 1 &&  diffDays <= 90)
+                        System.out.println("---> CREDITO VENCIDO...");
+                    if (diffDays >= 91)
+                        System.out.println("---> CREDITO EJECUCION...");
+
+
+                } else {
+                    if (i == paidQuotas) {
+                        System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
+                        paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(paidDate);
+                        cal.add(Calendar.MONTH, credit.getAmortization() / 30);
+                        Date nextPaidDate = cal.getTime();
+
+                        long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
+
+                        System.out.println("===>>> Diff DAYS: " + diffDays);
+
+                        if (diffDays <= 0)
+                            System.out.println("===> !!!!CREDITO GIGENTE!!!!");
+                        if (diffDays >= 1 &&  diffDays <= 90)
+                            System.out.println("===> CREDITO VENCIDO...");
+                        if (diffDays >= 91)
+                            System.out.println("===> CREDITO EJECUCION...");
+
+                    }
+                }
+                i++;
+            }*/
+
+            System.out.println("................................................");
 
         }
 

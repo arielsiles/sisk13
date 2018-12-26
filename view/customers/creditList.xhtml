@@ -71,11 +71,13 @@
             <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 20%, 15%, 15%, 15%, 15%">
+                            columnsWidth="10%, 10%, 20%, 15%, 15%, 15%, 15%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
                         <rich:column>#{messages['Credit.creditCode']}</rich:column>
+
+                        <rich:column>#{messages['Credit.state']}</rich:column>
 
                         <rich:column>#{messages['Credit.partnerName']}</rich:column>
 
@@ -101,6 +103,10 @@
 
                 <rich:column>
                     <h:outputText value="#{creditItem.previousCode}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.state}"/>
                 </rich:column>
 
                 <rich:column>

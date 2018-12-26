@@ -369,7 +369,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
         }else {
             if (state.equals(CreditState.VEN)) {
-                quotas = calculateQuotasVen(lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
+                quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
                 //quotas = 1;
             }
         }
@@ -377,8 +377,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     /** ? **/
-    public int calculateQuotasVen(Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
-
+    public int calculateQuotasVen(Credit credit, Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
 
         Calendar calendarLast = Calendar.getInstance();
         calendarLast.setTime(lastPaymentDate);
@@ -395,9 +394,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         System.out.println("---> nextPaymentDate: " + nextPaymentDate);
         System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
         System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
-
         System.out.println("--------------------");
-        //while (lastPaymentDate.before(currentDate) || lastPaymentDate.equals(currentDate)){
+
         while (lastPaymentDate.before(currentDate)){
 
             if (lastPaymentDate.before(nextPaymentDate)){
@@ -407,7 +405,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
                 System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
 
-                if (quotas < totalQuotas-2){
+                if (quotas < totalQuotas-calculatePaidQuotas(credit)){
                     quotas++;
                     System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
                     calendarNext.add(Calendar.MONTH, amortize);
@@ -428,7 +426,24 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return quotas;
     }
 
-    //public void
+    public Integer calculatePaidQuotas(Credit credit){
+
+        BigDecimal totalPaid = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2);
+        Integer quota = BigDecimalUtil.divide(totalPaid, credit.getQuota(), 2).intValue();
+
+        System.out.println("----> QUOTAS PAGADAS: " + quota);
+        return quota;
+
+    }
+
+    public Integer calculatePendingFees(Credit credit){
+
+        BigDecimal quota = BigDecimalUtil.divide(credit.getCapitalBalance(), credit.getQuota(), 2);
+
+        System.out.println("----> QUOTAS PENDIENTES: " + quota);
+        return quota.intValue();
+    }
+
 
     public void calculateTotalAmount() {
         BigDecimal totalAmount = null;

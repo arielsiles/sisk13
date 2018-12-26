@@ -92,6 +92,7 @@ public class CreditReportAction extends GenericReportAction {
         BigDecimal quotas       =  BigDecimalUtil.divide(credit.getAmount(), credit.getQuota(), 0);
 
         System.out.println(".....Numero de cuotas: " + quotas);
+        System.out.println(".....Amortizacion: " + credit.getAmortization());
 
         Date fechaUltimoPago    = credit.getGrantDate(); // Fecha concesion
         Date fechaPago          = credit.getFirstPayment();
