@@ -512,6 +512,10 @@ public class Voucher implements BaseModel{
         this.purchaseList = purchaseList;
     }
 
+    public String getFullDocument(){
+        return getDocumentType() + " " + getDocumentNumber();
+    }
+
     /*@Override
     public Object getId() {
         return this.transactionNumber.toString() ;

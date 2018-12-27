@@ -4,16 +4,14 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.service.customers.CreditTransactionService;
+import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.customers.AccountService;
 import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +25,14 @@ import java.util.List;
 public class AccountAction extends GenericAction<Account> {
 
 
+    @In
+    private AccountService accountService;
+
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
+    private BigDecimal totalCredit  = BigDecimal.ZERO;
+    private BigDecimal totalDebit   = BigDecimal.ZERO;
+    private BigDecimal totalBalance = BigDecimal.ZERO;
+
 
     @Factory(value = "account", scope = ScopeType.STATELESS)
     public Account initAccount() {
@@ -47,6 +52,7 @@ public class AccountAction extends GenericAction<Account> {
     @Override
     @Begin(join=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Account instance) {
+        calculateTotalAmounts(instance);
         return super.select(instance);
 
     }
@@ -56,6 +62,23 @@ public class AccountAction extends GenericAction<Account> {
         //setOp(OP_UPDATE);
         //return creditTransactionAction.addCreditTransaction();
         return Outcome.SUCCESS;
+    }
+
+    public List<VoucherDetail> getAccountDetailList(Account account){
+
+        List<VoucherDetail> voucherDetails = accountService.getAccountDetailList(account);
+
+        return voucherDetails;
+    }
+
+    public void calculateTotalAmounts(Account account){
+        List<VoucherDetail> voucherDetails = accountService.getAccountDetailList(account);
+
+        for (VoucherDetail voucherDetail : voucherDetails){
+            setTotalCredit(BigDecimalUtil.sum(getTotalCredit(), voucherDetail.getCredit(), 2));
+            setTotalDebit(BigDecimalUtil.sum(getTotalDebit(), voucherDetail.getDebit(), 2));
+        }
+        setTotalBalance(BigDecimalUtil.subtract(getTotalCredit(), getTotalDebit(), 2));
     }
 
     public void assignPartner(Partner partner){
@@ -72,5 +95,29 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setAccountTransactionList(List<AccountTransaction> accountTransactionList) {
         this.accountTransactionList = accountTransactionList;
+    }
+
+    public BigDecimal getTotalCredit() {
+        return totalCredit;
+    }
+
+    public void setTotalCredit(BigDecimal totalCredit) {
+        this.totalCredit = totalCredit;
+    }
+
+    public BigDecimal getTotalDebit() {
+        return totalDebit;
+    }
+
+    public void setTotalDebit(BigDecimal totalDebit) {
+        this.totalDebit = totalDebit;
+    }
+
+    public BigDecimal getTotalBalance() {
+        return totalBalance;
+    }
+
+    public void setTotalBalance(BigDecimal totalBalance) {
+        this.totalBalance = totalBalance;
     }
 }

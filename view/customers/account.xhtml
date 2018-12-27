@@ -81,64 +81,91 @@
                     </c:choose>
                 </f:facet>
 
+                <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
+                <s:div id="leftSidePanel">
+                    <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+                        <app:selectPopUp id="partnerFieldId"
+                                         required="true"
+                                         textValue="#{account.partner.fullName}"
+                                         value="#{account.partner}"
+                                         clearAction="#{accountAction.clearPartner()}"
+                                         searchModalPanel="partnerListModalPanel"
+                                         dataModel="#{partnerDataModel}"
+                                         reRender="partnerField"
+                                         tabindex="12">
+                        </app:selectPopUp>
+                    </s:decorate>
 
-                <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
-                    <app:selectPopUp id="partnerFieldId"
-                                     required="true"
-                                     textValue="#{account.partner.fullName}"
-                                     value="#{account.partner}"
-                                     clearAction="#{accountAction.clearPartner()}"
-                                     searchModalPanel="partnerListModalPanel"
-                                     dataModel="#{partnerDataModel}"
-                                     reRender="partnerField"
-                                     tabindex="12">
-                    </app:selectPopUp>
-                </s:decorate>
 
+                    <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
+                        <h:inputText id="accountNumber" value="#{account.accountNumber}" styleClass="input"
+                                     maxlength="25" tabindex="2" required="true"/>
+                    </s:decorate>
 
-                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
-                    <h:inputText id="accountNumber" value="#{account.accountNumber}" styleClass="input"
-                                 maxlength="25" tabindex="2" required="true"/>
-                </s:decorate>
+                    <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.currency']}</ui:define>
+                        <h:selectOneMenu id="currency" value="#{account.currency}" styleClass="input"
+                                         tabindex="3" required="true">
+                            <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
 
-                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.currency']}</ui:define>
-                    <h:selectOneMenu id="currency" value="#{account.currency}" styleClass="input"
-                                     tabindex="3" required="true">
-                        <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>
-                </s:decorate>
+                    <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                        <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="1">
+                            <s:selectItems value="#{accountTypeList.resultList}"
+                                           var="accountType"
+                                           label="#{accountType.name}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
 
-                <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
-                    <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="1">
-                        <s:selectItems value="#{accountTypeList.resultList}"
-                                       var="accountType"
-                                       label="#{accountType.name}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>
+                    <s:decorate id="accountStateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.state']}</ui:define>
+                        <h:selectOneMenu id="accountState" value="#{account.accountState}" styleClass="input"
+                                         tabindex="3" required="true">
+                            <s:selectItems value="#{accountStateEnum}" var="accountState" label="#{messages[accountState.resourceKey]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </s:div>
 
-                <s:decorate id="accountStateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.state']}</ui:define>
-                    <h:selectOneMenu id="accountState" value="#{account.accountState}" styleClass="input"
-                                     tabindex="3" required="true">
-                        <s:selectItems value="#{accountStateEnum}" var="accountState" label="#{messages[accountState.resourceKey]}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>
-                </s:decorate>
+                <s:div id="rightSidePanel">
+                    <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
+                        <h:outputText value="#{accountAction.totalCredit}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                        </h:outputText>
+                    </s:decorate>
+
+                    <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
+                        <h:outputText value="#{accountAction.totalDebit}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                        </h:outputText>
+                    </s:decorate>
+
+                    <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
+                        <h:outputText value="#{accountAction.totalBalance}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                        </h:outputText>
+                    </s:decorate>
+
+                </s:div>
+                </h:panelGrid>
 
             </rich:panel>
 
@@ -147,12 +174,13 @@
                     <rich:tab name="accountTransactionTab"
                               label="#{messages['Account.transactions']}"
                               ajaxSingle="true">
+                        <!--<rich:dataTable value="#{voucherAction.getVoucherDetailList(voucher.transactionNumber)}"-->
                         <rich:dataTable id="accountTransactionListId"
-                                        value="#{accountTransactionDataModel}"
-                                        var="accountTransactionItem"
+                                        value="#{accountAction.getAccountDetailList(account)}"
+                                        var="accountDetailItem"
                                         rows="#{sessionUser.rowsPerPage}"
                                         width="100%"
-                                        columnsWidth="15%, 30%, 15%, 15%, 15%, 10%">
+                                        columnsWidth="10%, 10%, 45%, 15%, 10%, 10%">
                             <f:facet name="header">
                                 <rich:columnGroup>
                                     <rich:column>
@@ -160,48 +188,63 @@
                                     </rich:column>
 
                                     <rich:column>
+                                        <h:outputText value="#{messages['AccountTransaction.account']}" />
+                                    </rich:column>
+
+                                    <rich:column>
                                         <h:outputText value="#{messages['AccountTransaction.gloss']}" />
                                     </rich:column>
 
                                     <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.amount']}" />
+                                        <h:outputText value="#{messages['AccountTransaction.document']}" />
                                     </rich:column>
 
                                     <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.balance']}" />
+                                        <h:outputText value="#{messages['AccountTransaction.debit']}" >
+                                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                        </h:outputText>
                                     </rich:column>
 
                                     <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.type']}" />
+                                        <h:outputText value="#{messages['AccountTransaction.credit']}" />
                                     </rich:column>
 
-                                    <rich:column styleClass="center">
+                                    <!--<rich:column styleClass="center">
                                         <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>
+                                    </rich:column>-->
+
                                 </rich:columnGroup>
                             </f:facet>
 
-                            <rich:column>
-                                <h:outputText value="#{accountTransactionItem.date}">
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{accountDetailItem.voucher.date}">
                                     <f:convertDateTime pattern="#{messages['patterns.date']}"
                                                        timeZone="#{sessionUser.timeZone}"
                                                        type="date"/>
                                 </h:outputText>
                             </rich:column>
 
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{accountDetailItem.account}"/>
+                            </rich:column>
+
                             <rich:column>
-                                <h:outputText value="#{accountTransactionItem.gloss}"/>
+                                <h:outputText value="#{accountDetailItem.voucher.gloss}"/>
+                            </rich:column>
+
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{accountDetailItem.voucher.fullDocument}"/>
                             </rich:column>
 
                             <rich:column styleClass="right">
-                                <h:outputText value="#{accountTransactionItem.amount}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                <h:outputText value="#{accountDetailItem.debit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                                 </h:outputText>
                             </rich:column>
 
                             <rich:column styleClass="right">
-                                <h:outputText value="#{accountTransactionItem.account.balance}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                <h:outputText value="#{accountDetailItem.credit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                                 </h:outputText>
                             </rich:column>
 
