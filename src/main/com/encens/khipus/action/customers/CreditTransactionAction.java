@@ -368,7 +368,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (state.equals(CreditState.VIG)) {
             quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
         }else {
-            if (state.equals(CreditState.VEN)) {
+            if (state.equals(CreditState.VEN) || state.equals(CreditState.EJE)) {
                 quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
                 //quotas = 1;
             }
