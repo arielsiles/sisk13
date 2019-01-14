@@ -87,9 +87,17 @@ public class Credit implements BaseModel {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate = new Date();
 
+    @Column(name = "ultimopago", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date lastPayment;
+
     @Column(name = "entregado", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean delivered = Boolean.FALSE;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipocredito", referencedColumnName = "idtipocredito", nullable = true)
+    private CreditType creditType;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -259,4 +267,21 @@ public class Credit implements BaseModel {
     public void setNumberQuota(Integer numberQuota) {
         this.numberQuota = numberQuota;
     }
+
+    public CreditType getCreditType() {
+        return creditType;
+    }
+
+    public void setCreditType(CreditType creditType) {
+        this.creditType = creditType;
+    }
+
+    public Date getLastPayment() {
+        return lastPayment;
+    }
+
+    public void setLastPayment(Date lastPayment) {
+        this.lastPayment = lastPayment;
+    }
+
 }

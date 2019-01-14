@@ -34,7 +34,7 @@
             s:hasPermission('CUSTOMERCATEGORY','VIEW') or
             s:hasPermission('PRINTINVOICE','VIEW') or
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
-    <h:panelGrid columns="8" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
@@ -105,6 +105,15 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
+        <rich:dropDownMenu value="#{messages['menu.customers.report']}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item">
+                <s:link view="/customers/creditStatusReport.xhtml"
+                        value="#{messages['menu.customers.report.creditStatus']}"
+                        propagation="none"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+
         <rich:dropDownMenu value="#{messages['menu.customers.configuration']}" rendered="#{
                 s:hasPermission('BANKENTITY','VIEW') or
                 s:hasPermission('CREDIT','VIEW') or
@@ -112,13 +121,6 @@
                 s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW') or
                 s:hasPermission('CUSTOMERCATEGORY','VIEW') or
                 s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{s:hasPermission('BANKENTITY','VIEW')}">
-                <s:link view="/contacts/bankList.xhtml"
-                        value="#{messages['menu.customers.configuration.bank']}"
-                        propagation="none"/>
-            </rich:menuItem>
 
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
@@ -135,6 +137,15 @@
                         value="#{messages['menu.customers.configuration.credit']}"
                         propagation="none"/>
             </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                <s:link view="/customers/creditTypeList.xhtml"
+                        value="#{messages['menu.customers.configuration.creditType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
                            rendered="#{s:hasPermission('DISCOUNTPOLICY','VIEW')}">
@@ -161,6 +172,13 @@
                            rendered="#{s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
                 <s:link view="/customers/partnerClubCategoryList.xhtml"
                         value="#{messages['menu.customers.configuration.partnerClubCategory']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BANKENTITY','VIEW')}">
+                <s:link view="/contacts/bankList.xhtml"
+                        value="#{messages['menu.customers.configuration.bank']}"
                         propagation="none"/>
             </rich:menuItem>
         </rich:dropDownMenu>

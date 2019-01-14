@@ -1,0 +1,264 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{salaryMovementTypeAction.managed}">
+                #{messages['CreditType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CreditType.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="creditTypeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{creditTypeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!creditTypeAction.managed}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{creditTypeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{creditTypeAction.managed}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{creditTypeAction.managed}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{creditTypeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="creditTypePanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{salaryMovementTypeAction.managed}">
+                            #{messages['CreditType.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CreditType.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{creditType.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="255"
+                                 rendered="#{not salaryMovementTypeAction.readOnly}"
+                                 tabindex="2"/>
+                    <h:outputText value="#{salaryMovementType.name}"
+                                  rendered="#{salaryMovementTypeAction.readOnly}"/>
+                </s:decorate>
+
+                <!--<s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{creditType.currency}" styleClass="input"
+                                     tabindex="3" required="true">
+                        <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>-->
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{creditType.currency}" styleClass="input" required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{currencyList.resultList}" var="currency" label="#{currency.fullName}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+
+                <s:decorate id="currentAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currentAccount']}</ui:define>
+                    <app:selectPopUp id="currentAccount"
+                                     required="true"
+                                     textValue="#{creditType.currentAccount.fullName}"
+                                     value="#{creditType.currentAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearCurrentAccount()}"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     reRender="currentAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="expiredAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.expiredAccount']}</ui:define>
+                    <app:selectPopUp id="expiredAccount"
+                                     required="true"
+                                     textValue="#{creditType.expiredAccount.fullName}"
+                                     value="#{creditType.expiredAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearExpiredAccount()}"
+                                     searchModalPanel="expiredAccountListModalPanel"
+                                     reRender="expiredAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="executedAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.executedAccount']}</ui:define>
+                    <app:selectPopUp id="executedAccount"
+                                     required="true"
+                                     textValue="#{creditType.executedAccount.fullName}"
+                                     value="#{creditType.executedAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearExecutedAccount()}"
+                                     searchModalPanel="executedAccountListModalPanel"
+                                     reRender="executedAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+
+
+                <s:decorate id="currentInterestAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currentInterestAccount']}</ui:define>
+                    <app:selectPopUp id="currentInterestAccount"
+                                     required="true"
+                                     textValue="#{creditType.currentInterestAccount.fullName}"
+                                     value="#{creditType.currentInterestAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearCurrentInterestAccount()}"
+                                     searchModalPanel="currentInterestAccountListModalPanel"
+                                     reRender="currentInterestAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="expiredInterestAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.expiredInterestAccount']}</ui:define>
+                    <app:selectPopUp id="expiredInterestAccount"
+                                     required="true"
+                                     textValue="#{creditType.expiredInterestAccount.fullName}"
+                                     value="#{creditType.expiredInterestAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearExpiredInterestAccount()}"
+                                     searchModalPanel="expiredInterestAccountListModalPanel"
+                                     reRender="expiredInterestAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+            </rich:panel>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CreditType.delete.confirmation']}" />
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{creditTypeAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignCurrentAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="currentAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="expiredAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="expiredAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="expiredAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignExpiredAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="expiredAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('expiredAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="executedAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="executedAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="executedAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignExecutedAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="executedAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('executedAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="currentInterestAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="currentInterestAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="currentInterestAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignCurrentInterestAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="currentInterestAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('currentInterestAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="expiredInterestAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="expiredInterestAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="expiredInterestAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignExpiredInterestAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="expiredInterestAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('expiredInterestAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
+

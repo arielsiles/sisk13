@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['CreditType.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="creditTypeSearch">
+            <rich:simpleTogglePanel id="searchPanelId"
+                                    label="#{messages['CreditType.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CreditType.name']}</ui:define>
+                        <h:inputText id="name"
+                                     value="#{creditTypeDataModel.criteria.name}"
+                                     tabindex="1"
+                                     styleClass="input"/>
+                        <a4j:commandButton action="#{creditTypeDataModel.search}"
+                                           reRender="creditTypeList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/creditType.xhtml"
+                          styleClass="button"
+                          propagation="begin" />
+            </div>
+
+
+            <rich:dataTable id="creditTypeList"
+                            value="#{creditTypeDataModel}"
+                            var="creditTypeItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="15%, 5%, 15%, 15%, 15%, 15%, 15%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>#{messages['CreditType.name']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.currency']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.currentAccount']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.expiredAccount']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.executedAccount']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.currentInterestAccount']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.expiredInterestAccount']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.name}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.currency.symbol}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.currentAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.expiredAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.executedAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.currentInterestAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.expiredInterestAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{creditTypeAction.select(creditTypeItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('SALARYMOVEMENT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="creditTypeList"
+                              dataModel="#{creditTypeDataModel}"/>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

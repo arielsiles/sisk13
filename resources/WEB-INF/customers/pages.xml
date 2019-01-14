@@ -50,6 +50,40 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/creditType.xhtml" no-conversation-view-id="/customers/creditTypeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/creditTypeList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/creditTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/transferCredit.xhtml" no-conversation-view-id="/customers/creditTypeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/customers/creditList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/creditTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{creditTypeAction.select(creditTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/creditType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/customers/customerCategoryList.xhtml">
         <end-conversation/>
         <navigation from-action="#{customerCategoryAction.select(customerCategoryItem)}">

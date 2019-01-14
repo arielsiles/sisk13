@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Credit.report.creditStatus.title']}
+                </f:facet>
+
+                <s:decorate id="creditStateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.state']}</ui:define>
+                    <h:selectOneMenu id="creditState"
+                                     value="#{creditStatusReportAction.creditState}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="4">
+                        <s:selectItems value="#{creditStateEnum}" var="creditState" label="#{messages[creditState.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
+                    <h:selectOneMenu id="creditTypeId" value="#{creditStatusReportAction.creditType}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="1">
+                        <s:selectItems value="#{creditTypeList.resultList}"
+                                       var="creditType"
+                                       label="#{creditType.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{creditStatusReportAction}" showPageFormat="false"
+                                      tabIndex="3"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{creditStatusReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+
+            </div>
+
+        </h:form>
+
+        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+
+
+
+    </ui:define>
+</ui:composition>

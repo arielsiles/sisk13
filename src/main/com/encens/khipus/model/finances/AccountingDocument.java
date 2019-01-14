@@ -73,8 +73,8 @@ public class AccountingDocument implements BaseModel {
     @Length(max = 20)
     private String nit;
 
-    @Column(name = "NOMBRE", length = 50)
-    @Length(max = 50)
+    @Column(name = "NOMBRE", length = 100)
+    @Length(max = 100)
     private String name;
 
     @Column(name = "NUMERO", nullable = false, length = 20)

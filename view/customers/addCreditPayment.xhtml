@@ -96,6 +96,13 @@
                         <h:outputText value="#{messages[credit.state.resourceKey]}"/>
                     </s:decorate>
 
+                    <s:decorate id="quotaCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                        <h:outputText id="quotaCredit" value="#{credit.quota}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quotaCredit"/>
+                        </h:outputText>
+                    </s:decorate>
+
                     <s:decorate id="capitalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.capitalBalance']}</ui:define>
                         <h:outputText id="capitalBalance"

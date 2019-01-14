@@ -20,6 +20,9 @@
     <factory name="accountTypeList" value="#{accountTypeQuery}"/>
     <framework:entity-query name="accountTypeQuery" ejbql="select p from AccountType p"/>
 
+    <factory name="creditTypeList" value="#{creditTypeQuery}"/>
+    <framework:entity-query name="creditTypeQuery" ejbql="select c from CreditType c"/>
+
     <factory name="discountPolicyTypeList" value="#{discountPolicyTypeQuery}"/>
     <framework:entity-query name="discountPolicyTypeQuery" ejbql="select d from DiscountPolicyType d"
                             order="d.measurement DESC">

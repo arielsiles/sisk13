@@ -19,7 +19,9 @@ import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
+import org.jboss.seam.international.StatusMessage;
 
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
@@ -59,11 +61,19 @@ public class CreditAction extends GenericAction<Credit> {
     private BigDecimal quotaValue;
     private Date paymentDate = new Date();
 
+    private Date transferDate;
+    private String gloss = "TRASPASO DE CARTERA POR MOROSIDAD AL ";
+
     @Factory(value = "credit", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('CREDIT','VIEW')}")
     public Credit initCredit() {
         quotaValue = BigDecimal.ZERO;
         return getInstance();
+    }
+
+    @Factory(value = "creditStateEnum")
+    public CreditState[] getExperienceType() {
+        return CreditState.values();
     }
 
     @Override
@@ -116,7 +126,16 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setPartner(null);
     }
 
-    public void checkCreditStatus(){
+    @End
+    public String generateTransferCredit(){
+
+        String outcome = Outcome.FAIL;
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType("CD");
+        voucher.setDate(this.transferDate);
+        voucher.setGloss(this.gloss);
+
         System.out.println("-------------APERTURA DE CREDITOS-------------");
         for (Credit credit : creditService.getAllCredits()){
 
@@ -130,7 +149,8 @@ public class CreditAction extends GenericAction<Credit> {
 
             Integer i=1;
             Date paidDate = null;
-            Date currentDate = new Date();
+            //Date currentDate = new Date();
+            Date currentDate = this.transferDate;
 
             for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
 
@@ -151,70 +171,106 @@ public class CreditAction extends GenericAction<Credit> {
 
                     if (diffDays <= 0) {
                         System.out.println("===> !!!!CREDITO VIGENTE!!!!");
-                        creditService.changeCreditState(credit, CreditState.VIG);
+                        if (credit.getState().equals(CreditState.VEN)){
+                            addVoucherDetailVenVig(credit, voucher);
+                            creditService.changeCreditState(credit, CreditState.VIG);
+                        }
                     }
                     if (diffDays >= 1 &&  diffDays <= 90) {
+
                         System.out.println("===> CREDITO VENCIDO...");
-                        creditService.changeCreditState(credit, CreditState.VEN);
+                        if (!credit.getState().equals(CreditState.VEN)){
+                            addVoucherDetailVigVen(credit, voucher);
+                            creditService.changeCreditState(credit, CreditState.VEN);
+                        }
+
                     }
                     if (diffDays >= 91) {
                         System.out.println("===> CREDITO EJECUCION...");
-                        creditService.changeCreditState(credit, CreditState.EJE);
+                        if (!credit.getState().equals(CreditState.EJE)) {
+                            addVoucherDetailVenEje(credit, voucher);
+                            creditService.changeCreditState(credit, CreditState.EJE);
+                        }
                     }
-
                 }
 
                 i++;
             }
-            /*for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
-
-                if (paidQuotas == 0 && credit.getAmortization() > 30) {
-
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(credit.getGrantDate());
-                    cal.add(Calendar.DAY_OF_MONTH, credit.getAmortization());
-                    Date nextPaidDate = cal.getTime();
-                    long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
-                    System.out.println("--->>> Diff DAYS: " + diffDays);
-
-                    if (diffDays <= 0)
-                        System.out.println("---> !!!!CREDITO VIGENTE!!!!");
-                    if (diffDays >= 1 &&  diffDays <= 90)
-                        System.out.println("---> CREDITO VENCIDO...");
-                    if (diffDays >= 91)
-                        System.out.println("---> CREDITO EJECUCION...");
-
-
-                } else {
-                    if (i == paidQuotas) {
-                        System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
-                        paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
-
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTime(paidDate);
-                        cal.add(Calendar.MONTH, credit.getAmortization() / 30);
-                        Date nextPaidDate = cal.getTime();
-
-                        long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
-
-                        System.out.println("===>>> Diff DAYS: " + diffDays);
-
-                        if (diffDays <= 0)
-                            System.out.println("===> !!!!CREDITO GIGENTE!!!!");
-                        if (diffDays >= 1 &&  diffDays <= 90)
-                            System.out.println("===> CREDITO VENCIDO...");
-                        if (diffDays >= 91)
-                            System.out.println("===> CREDITO EJECUCION...");
-
-                    }
-                }
-                i++;
-            }*/
-
             System.out.println("................................................");
-
         }
 
+        if (voucher.getDetails().size() > 0) {
+            voucherAccoutingService.saveVoucher(voucher);
+            outcome = Outcome.SUCCESS;
+        }
+
+        if (outcome.equals(Outcome.FAIL))
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Credit.message.transferWarn");
+        if (outcome.equals(Outcome.SUCCESS))
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Credit.message.transferSuccess");
+
+        return  outcome;
+
+    }
+
+    private void addVoucherDetailVigVen(Credit credit, Voucher voucher){
+
+        VoucherDetail detailExpiredAccount = new VoucherDetail();
+        detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+        detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+        detailExpiredAccount.setDebit(credit.getCapitalBalance());
+        detailExpiredAccount.setCredit(BigDecimal.ZERO);
+        detailExpiredAccount.setCreditPartner(credit);
+
+        VoucherDetail detailCurrentAccount = new VoucherDetail();
+        detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+        detailCurrentAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+        detailCurrentAccount.setDebit(BigDecimal.ZERO);
+        detailCurrentAccount.setCredit(credit.getCapitalBalance());
+        detailCurrentAccount.setCreditPartner(credit);
+
+        voucher.getDetails().add(detailExpiredAccount);
+        voucher.getDetails().add(detailCurrentAccount);
+    }
+
+    private void addVoucherDetailVenEje(Credit credit, Voucher voucher){
+
+        VoucherDetail detailExecutedAccount = new VoucherDetail();
+        detailExecutedAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
+        detailExecutedAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+        detailExecutedAccount.setDebit(credit.getCapitalBalance());
+        detailExecutedAccount.setCredit(BigDecimal.ZERO);
+        detailExecutedAccount.setCreditPartner(credit);
+
+        VoucherDetail detailExpiredAccount = new VoucherDetail();
+        detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+        detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+        detailExpiredAccount.setDebit(BigDecimal.ZERO);
+        detailExpiredAccount.setCredit(credit.getCapitalBalance());
+        detailExpiredAccount.setCreditPartner(credit);
+
+        voucher.getDetails().add(detailExecutedAccount);
+        voucher.getDetails().add(detailExpiredAccount);
+    }
+
+    private void addVoucherDetailVenVig(Credit credit, Voucher voucher){
+
+        VoucherDetail detailCurrentAccount = new VoucherDetail();
+        detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+        detailCurrentAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+        detailCurrentAccount.setDebit(credit.getCapitalBalance());
+        detailCurrentAccount.setCredit(BigDecimal.ZERO);
+        detailCurrentAccount.setCreditPartner(credit);
+
+        VoucherDetail detailExpiredAccount = new VoucherDetail();
+        detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+        detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+        detailExpiredAccount.setDebit(BigDecimal.ZERO);
+        detailExpiredAccount.setCredit(credit.getCapitalBalance());
+        detailExpiredAccount.setCreditPartner(credit);
+
+        voucher.getDetails().add(detailCurrentAccount);
+        voucher.getDetails().add(detailExpiredAccount);
     }
 
     public void calculateQuota(){
@@ -248,5 +304,21 @@ public class CreditAction extends GenericAction<Credit> {
 
     public void setQuotaValue(BigDecimal quotaValue) {
         this.quotaValue = quotaValue;
+    }
+
+    public Date getTransferDate() {
+        return transferDate;
+    }
+
+    public void setTransferDate(Date transferDate) {
+        this.transferDate = transferDate;
+    }
+
+    public String getGloss() {
+        return gloss;
+    }
+
+    public void setGloss(String gloss) {
+        this.gloss = gloss;
     }
 }

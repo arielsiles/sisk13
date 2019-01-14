@@ -9,7 +9,7 @@
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">#{messages['Credit.list']}</ui:define>
 
-    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyWidth" value="100%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
     <h:form id="creditSearch">
@@ -57,9 +57,9 @@
 
             <div class="buttons">
 
-                <s:button value="#{messages['Credit.creditOpening']}"
-                          action="#{creditAction.checkCreditStatus()}"
-                          styleClass="button"/>
+                <s:button value="#{messages['Credit.transfer']}"
+                          view="/customers/transferCredit.xhtml" styleClass="button"
+                          propagation="begin" />
 
                 <s:button value="#{messages['Common.new']}"
                           view="/customers/credit.xhtml"
@@ -71,7 +71,7 @@
             <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 10%, 20%, 15%, 15%, 15%, 15%">
+                            columnsWidth="10%, 5%, 20%, 10%, 15%, 20%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -84,6 +84,8 @@
                         <rich:column>#{messages['Credit.amount']}</rich:column>
 
                         <rich:column>#{messages['Credit.grantDate']}</rich:column>
+
+                        <rich:column>#{messages['Credit.creditType']}</rich:column>
 
                         <!--<rich:column>#{messages['Credit.createdOn']}</rich:column>-->
 
@@ -123,6 +125,10 @@
                     <h:outputText value="#{creditItem.grantDate}">
                         <s:convertDateTime pattern="#{messages['patterns.dateTime']}"/>
                     </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditItem.creditType.name}" />
                 </rich:column>
 
                 <rich:column>
