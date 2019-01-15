@@ -59,4 +59,45 @@ ALTER TABLE tipocredito ADD COLUMN ictaven VARCHAR(20) AFTER ictavig;
 /** 10-01-2018 **/
 ALTER TABLE credito ADD COLUMN ultimopago DATE AFTER fechacreacion;
 
+/** 15-01-2018 **/
+CREATE TABLE estadoahorro (
+	id  		BIGINT(20) NOT NULL,
+	cuenta 		VARCHAR(10),
+	descr 		VARCHAR(100), 
+	nsocio		VARCHAR(100), 
+	nombrecomp	VARCHAR(100), 	
+	nombres 	VARCHAR(100), 
+	ap 		VARCHAR(100), 
+	am 		VARCHAR(100), 
+	saldocuenta 	DECIMAL(16,2) ,	
+	interes 	DECIMAL(16,2), 
+	saldoaporte 	DECIMAL(16,2),	
+	unidad 		VARCHAR(10),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE estadocartera (
+	id  		BIGINT(20) NOT NULL,
+	cuenta 		VARCHAR(10),
+	descr 		VARCHAR(100), 
+	ngab 		VARCHAR(10), 
+	nrocred		VARCHAR(10), 
+	Moneda		VARCHAR(10), 
+	gabsocio	VARCHAR(10), 
+	nombrecomp	VARCHAR(100), 	
+	nombres 	VARCHAR(100), 
+	ap 		VARCHAR(100), 
+	am 		VARCHAR(100), 
+	fapertura	DATE,
+	ianual 		DECIMAL(16,2) , 
+	garantia	VARCHAR(10), 
+	objetivo	VARCHAR(20), 
+	saldoactual	DECIMAL(16,2) , 
+	ultimopago	DATE,
+	diasmora	INT,
+	interes		DECIMAL(16,2) , 
+	dias 		INT,
+	unidad 		VARCHAR(10),
+	PRIMARY KEY(id)
+);
 
