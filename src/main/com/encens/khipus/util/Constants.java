@@ -32,15 +32,16 @@ public final class Constants {
     public static final Long currencyIdSus = (long) 2;
 
     //Schema for KHIPUS
-    public static final String KHIPUS_SCHEMA = "khipus";
+    /*public static final String KHIPUS_SCHEMA    = "khipus";
+    public static final String FINANCES_SCHEMA  = "khipus";
+    public static final String CASHBOX_SCHEMA   = "khipus";
+    public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
-    public static final String FINANCES_SCHEMA = "khipus";
-
-    //Schema for cashbox
-    public static final String CASHBOX_SCHEMA = "khipus";
-
-    //Schema for Academic
-    public static final String ACADEMIC_SCHEMA = "khipus";
+    //Schema for KHIPUS
+    public static final String KHIPUS_SCHEMA    = "caisc";
+    public static final String FINANCES_SCHEMA  = "caisc";
+    public static final String CASHBOX_SCHEMA   = "caisc";
+    public static final String ACADEMIC_SCHEMA  = "caisc";
 
     public static final String SEQUENCE_TABLE_NAME = "secuencia";
     public static final String SEQUENCE_TABLE_PK_COLUMN_NAME = "tabla";

@@ -17,6 +17,7 @@ ALTER TABLE sf_tmpdet ADD COLUMN idcredito BIGINT(20) NULL AFTER idcuenta;
 
 ALTER TABLE sf_tmpdet ADD COLUMN idsocio BIGINT(20) NULL AFTER cod_art;
 ALTER TABLE sf_tmpdet ADD COLUMN cant_art BIGINT(20) NULL AFTER cod_art;
+
 ALTER TABLE transaccioncredito ADD COLUMN id_tmpenc BIGINT(20) AFTER idcredito;
 ALTER TABLE transaccioncredito ADD COLUMN VERSION BIGINT(20) NULL; 
 UPDATE transaccioncredito t SET t.`version` = 0;
