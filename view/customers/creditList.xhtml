@@ -59,7 +59,8 @@
 
                 <s:button value="#{messages['Credit.transfer']}"
                           view="/customers/transferCredit.xhtml" styleClass="button"
-                          propagation="begin" />
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CREDITTRANSFER','VIEW')}" />
 
                 <s:button value="#{messages['Common.new']}"
                           view="/customers/credit.xhtml"

@@ -36,7 +36,7 @@ import java.util.List;
         allocationSize = 2)
 
 @Entity
-@EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
+@EntityListeners({CompanyNumberListener.class})
 @Table(name = "sf_tmpenc", schema = Constants.FINANCES_SCHEMA)
 public class Voucher implements BaseModel{
 

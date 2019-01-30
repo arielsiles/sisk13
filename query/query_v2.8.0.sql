@@ -102,3 +102,16 @@ CREATE TABLE estadocartera (
 	PRIMARY KEY(id)
 );
 
+
+/** 30-01-2019 **/
+INSERT INTO funcionalidad (idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) VALUES (250, 'CREDITTRANSFER', 1, 1, 'Functionality.credit.transfer', 1);
+
+ALTER TABLE tipocredito ADD COLUMN ictaeje VARCHAR(20) AFTER ictaven;
+ALTER TABLE credito ADD COLUMN ipenal DECIMAL(5, 2) AFTER anual;
+UPDATE credito c SET c.`ipenal` = 7;
+
+-- actualizar secuencia idsocio
+-- actualizar secuencia nosocio
+
+
+

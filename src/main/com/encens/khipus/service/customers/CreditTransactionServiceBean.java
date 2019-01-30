@@ -88,17 +88,18 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
 
     public void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction){
 
-        String gloss = creditTransaction.getGloss() + " " + credit.getCode();
+        //String gloss = creditTransaction.getGloss() + " " + credit.getCode();
         creditTransaction.setCapital(BigDecimal.ZERO);
         creditTransaction.setInterest(BigDecimal.ZERO);
         creditTransaction.setAmount(credit.getAmount());
-        creditTransaction.setGloss(gloss);
+        //creditTransaction.setGloss(gloss);
         //creditTransaction.setDate(new Date());
         creditTransaction.setDays(0);
         creditTransaction.setCapitalBalance(credit.getAmount());
         creditTransaction.setCreditTransactionType(CreditTransactionType.EGR);
         creditTransaction.setCredit(credit);
         credit.setDelivered(true);
+        credit.setLastPayment(creditTransaction.getDate());
         em.persist(creditTransaction);
         em.flush();
 

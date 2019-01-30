@@ -60,6 +60,9 @@ public class Credit implements BaseModel {
     @Column(name = "anual", nullable = false)
     private Integer annualRate;
 
+    @Column(name = "ipenal", nullable = false)
+    private Integer criminalInterest;
+
     @Column(name = "plazo", nullable = false)
     private Integer term;
 
@@ -284,4 +287,11 @@ public class Credit implements BaseModel {
         this.lastPayment = lastPayment;
     }
 
+    public Integer getCriminalInterest() {
+        return criminalInterest;
+    }
+
+    public void setCriminalInterest(Integer criminalInterest) {
+        this.criminalInterest = criminalInterest;
+    }
 }

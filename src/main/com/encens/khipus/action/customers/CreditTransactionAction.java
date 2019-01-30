@@ -181,7 +181,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
 
-            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getCredit().getCode());
+            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getGloss());
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
             voucher.getDetails().add(voucherDetailInterest);
@@ -234,9 +234,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         voucher.getDetails().add(voucherDetailDebit);
         voucher.getDetails().add(voucherDetailCredit);
 
-        voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
+        //voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
+        voucher.setGloss(creditTransaction.getGloss());
         voucherAccoutingService.saveVoucher(voucher);
-
         creditTransactionService.updateTransaction(creditTransaction, voucher);
 
         return  Outcome.SUCCESS;

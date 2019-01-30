@@ -49,18 +49,18 @@
                                  action="#{creditAction.update}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{creditAction.managed}">
+                                 rendered="#{creditAction.managed and !credit.delivered}">
                     <s:defaultAction/>
                 </h:commandButton>
 
-                <h:commandButton value="#{messages['Common.delete']}"
+                <!--<h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
                                  rendered="#{creditAction.managed}">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
                                            operation="show"/>
-                </h:commandButton>
+                </h:commandButton>-->
 
                 <h:commandButton action="#{creditAction.cancel}"
                                  value="#{messages['Common.cancel']}"
@@ -155,6 +155,14 @@
                     <h:inputText id="annualRate" value="#{credit.annualRate}" styleClass="input"
                                  required="true" tabindex="4">
                         <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="criminalInterestField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.criminalInterest']}</ui:define>
+                    <h:inputText id="criminalInterest" value="#{credit.criminalInterest}" styleClass="input"
+                                 required="true" tabindex="4">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:inputText>
                 </s:decorate>
 
@@ -319,11 +327,11 @@
                         </rich:column>
 
                         <rich:column styleClass="center">
-                            <h:commandLink value="#{messages['Common.select']}"
+                            <!--<h:commandLink value="#{messages['Common.select']}"
                                            immediate="true"
                                            action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
                                            rendered="#{s:hasPermission('CREDIT','VIEW')}" />
-                            &#160;
+                            &#160;-->
                             <h:commandLink action="#{voucherCreateAction.generateReport(creditTransactionItem.voucher)}"
                                            immediate="true">
                                 <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"

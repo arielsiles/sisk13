@@ -83,7 +83,7 @@
                 <c:when test="#{!creditTransactionAction.managed}">
                     <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.credit']}</ui:define>
-                        <h:outputText>#{credit.code}</h:outputText>
+                        <h:outputText>#{credit.previousCode}</h:outputText>
                     </s:decorate>
 
                     <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
