@@ -128,7 +128,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         creditTransactionService.createCreditTransactionPayFee(creditItem, creditTransaction);
 
-        createIncomeAccountingRecord(creditTransaction);
+        /** Uncomment for Production **/
+        //createIncomeAccountingRecord(creditTransaction);
 
         return  Outcome.SUCCESS;
     }
@@ -214,19 +215,23 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setDate(dateTransaction);
         creditTransactionService.createCreditTransactionPayout(credit, creditTransaction);
 
+        /** Uncomment for Production **/
+        //createCashAccountForCreditTransactionPayout(credit, creditTransaction);
+
+        return  Outcome.SUCCESS;
+    }
+
+    public void createCashAccountForCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction){
         Voucher voucher = new Voucher();
         voucher.setDocumentType(Constants.CE_VOUCHER_DOCTYPE);
 
         VoucherDetail voucherDetailDebit = new VoucherDetail();
-        //voucherDetailDebit.setCashAccount(cashAccountService.findByAccountCode("1310510100"));
-        //voucherDetailDebit.setAccount(Constants.ACOUNT_CURRENT_LOAN);
         voucherDetailDebit.setAccount(credit.getCreditType().getCurrentAccountCode());
         voucherDetailDebit.setDebit(getInstance().getAmount());
         voucherDetailDebit.setCredit(BigDecimal.ZERO);
         voucherDetailDebit.setCreditPartner(credit);
 
         VoucherDetail voucherDetailCredit = new VoucherDetail();
-        //voucherDetailCredit.setCashAccount(cashAccountService.findByAccountCode("1110110100"));
         voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH);
         voucherDetailCredit.setDebit(BigDecimal.ZERO);
         voucherDetailCredit.setCredit(getInstance().getAmount());
@@ -234,12 +239,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         voucher.getDetails().add(voucherDetailDebit);
         voucher.getDetails().add(voucherDetailCredit);
 
-        //voucher.setGloss("DESEMBOLSO CREDITO APROBADO, " + credit.getPartner().getFullName());
         voucher.setGloss(creditTransaction.getGloss());
         voucherAccoutingService.saveVoucher(voucher);
         creditTransactionService.updateTransaction(creditTransaction, voucher);
-
-        return  Outcome.SUCCESS;
     }
 
     @End(beforeRedirect = true)
