@@ -139,10 +139,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (creditTransaction.getCredit().getState().equals(CreditState.VIG) || creditTransaction.getCredit().getState().equals(CreditState.VEN)){
 
             Voucher voucher = new Voucher();
-            voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+            voucher.setDocumentType(Constants.RI_VOUCHER_DOCTYPE);
 
             VoucherDetail voucherDetailBox = new VoucherDetail();
-            voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH);
+            voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             voucherDetailBox.setDebit(creditTransaction.getAmount());
             voucherDetailBox.setCredit(BigDecimal.ZERO);
 
@@ -232,7 +232,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         voucherDetailDebit.setCreditPartner(credit);
 
         VoucherDetail voucherDetailCredit = new VoucherDetail();
-        voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH);
+        voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
         voucherDetailCredit.setDebit(BigDecimal.ZERO);
         voucherDetailCredit.setCredit(getInstance().getAmount());
 

@@ -388,7 +388,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignProductItemVoucherDetail(){
 
         try {
-            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.ACOUNT_OTHER_OPERATING_INCOME);
 
             VoucherDetail voucherCaja = new VoucherDetail();
@@ -447,7 +447,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
 
-            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
 
             VoucherDetail voucherCaja = new VoucherDetail();
             voucherCaja.setCashAccount(ctaCaja);
@@ -456,6 +456,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherCaja.setCredit(BigDecimal.ZERO);
 
 
+            /** todo: Cuentas deben existir si no error Null **/
             VoucherDetail voucherSaving = new VoucherDetail();
             voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
             voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMn().getAccountCode());
@@ -464,6 +465,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMe());
                 voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMe().getAccountCode());
             }
+
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+                voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMv());
+                voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMv().getAccountCode());
+            }
+
+            /** ----- **/
 
             voucherSaving.setClient(this.client);
             voucherSaving.setProvider(this.provider);
@@ -494,7 +502,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         try {
             System.out.println("---> Partner: " + partner.getFullName());
 
-            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             CashAccount contributionAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_CONTRIBUTION);
 
             VoucherDetail voucherBox = new VoucherDetail();

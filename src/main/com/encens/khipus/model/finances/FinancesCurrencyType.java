@@ -9,6 +9,7 @@ package com.encens.khipus.model.finances;
 public enum FinancesCurrencyType {
     P("FinancesCurrencyType.P", "FinancesCurrencyType.symbol.P"),
     D("FinancesCurrencyType.D", "FinancesCurrencyType.symbol.D"),
+    M("FinancesCurrencyType.D", "FinancesCurrencyType.symbol.M"),
     U("FinancesCurrencyType.U", "FinancesCurrencyType.symbol.U");
     private String resourceKey;
     private String symbolResourceKey;

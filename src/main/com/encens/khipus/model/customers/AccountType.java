@@ -70,6 +70,12 @@ public class AccountType implements BaseModel {
     })
     private CashAccount cashAccountMe;
 
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CTAP_MV", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountMv;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -138,5 +144,13 @@ public class AccountType implements BaseModel {
 
     public void setCashAccountMe(CashAccount cashAccountMe) {
         this.cashAccountMe = cashAccountMe;
+    }
+
+    public CashAccount getCashAccountMv() {
+        return cashAccountMv;
+    }
+
+    public void setCashAccountMv(CashAccount cashAccountMv) {
+        this.cashAccountMv = cashAccountMv;
     }
 }
