@@ -129,7 +129,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransactionService.createCreditTransactionPayFee(creditItem, creditTransaction);
 
         /** Uncomment for Production **/
-        //createIncomeAccountingRecord(creditTransaction);
+        createIncomeAccountingRecord(creditTransaction);
 
         return  Outcome.SUCCESS;
     }
@@ -216,7 +216,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransactionService.createCreditTransactionPayout(credit, creditTransaction);
 
         /** Uncomment for Production **/
-        //createCashAccountForCreditTransactionPayout(credit, creditTransaction);
+        createCashAccountForCreditTransactionPayout(credit, creditTransaction);
 
         return  Outcome.SUCCESS;
     }

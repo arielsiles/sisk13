@@ -26,17 +26,11 @@
 
             <div class="buttons">
 
-                <h:commandButton action="#"
-                                 value="#{messages['Account.withdrawal']}"
-                                 styleClass="button"
-                                 immediate="true"
-                                 rendered="#{accountAction.managed}"/>
-
-                <h:commandButton action="#{accountAction.addPayment}"
+                <!--<h:commandButton action="#{accountAction.addPayment}"
                                  value="#{messages['Account.newDeposit']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{accountAction.managed}"/>
+                                 rendered="#{accountAction.managed}"/>-->
 
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.create}"

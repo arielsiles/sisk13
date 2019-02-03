@@ -152,6 +152,8 @@ public class CreditAction extends GenericAction<Credit> {
             //Date currentDate = new Date();
             Date currentDate = this.transferDate;
 
+            int cont = 1;
+
             for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
 
                 if (i == paidQuotas || paidQuotas == 0) {
@@ -170,26 +172,32 @@ public class CreditAction extends GenericAction<Credit> {
                     System.out.println("===>>> Diff DAYS: " + diffDays);
 
                     if (diffDays <= 0) {
-                        System.out.println("===> !!!!CREDITO VIGENTE!!!!");
+                        //System.out.println("===> !!!!CREDITO VIGENTE!!!!");
                         if (credit.getState().equals(CreditState.VEN)){
-                            addVoucherDetailVenVig(credit, voucher);
+                            addVoucherDetailVig(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VIG);
+                            System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VIG);
+                            cont++;
                         }
                     }
                     if (diffDays >= 1 &&  diffDays <= 90) {
 
-                        System.out.println("===> CREDITO VENCIDO...");
+                        //System.out.println("===> CREDITO VENCIDO...");
                         if (!credit.getState().equals(CreditState.VEN)){
-                            addVoucherDetailVigVen(credit, voucher);
+                            addVoucherDetailVen(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VEN);
+                            System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VEN);
+                            cont++;
                         }
 
                     }
                     if (diffDays >= 91) {
-                        System.out.println("===> CREDITO EJECUCION...");
+                        //System.out.println("===> CREDITO EJECUCION...");
                         if (!credit.getState().equals(CreditState.EJE)) {
-                            addVoucherDetailVenEje(credit, voucher);
+                            addVoucherDetailEje(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.EJE);
+                            System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.EJE);
+                            cont++;
                         }
                     }
                 }
@@ -213,7 +221,8 @@ public class CreditAction extends GenericAction<Credit> {
 
     }
 
-    private void addVoucherDetailVigVen(Credit credit, Voucher voucher){
+    //private void addVoucherDetailVigVen(Credit credit, Voucher voucher){
+    private void addVoucherDetailVen(Credit credit, Voucher voucher){
 
         VoucherDetail detailExpiredAccount = new VoucherDetail();
         detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
@@ -222,18 +231,25 @@ public class CreditAction extends GenericAction<Credit> {
         detailExpiredAccount.setCredit(BigDecimal.ZERO);
         detailExpiredAccount.setCreditPartner(credit);
 
-        VoucherDetail detailCurrentAccount = new VoucherDetail();
-        detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
-        detailCurrentAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
-        detailCurrentAccount.setDebit(BigDecimal.ZERO);
-        detailCurrentAccount.setCredit(credit.getCapitalBalance());
-        detailCurrentAccount.setCreditPartner(credit);
+        VoucherDetail detailAccount = new VoucherDetail();
+        if (credit.getState().equals(CreditState.VIG)){
+            detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+        }
+        if (credit.getState().equals(CreditState.EJE)){
+            detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+        }
+        detailAccount.setDebit(BigDecimal.ZERO);
+        detailAccount.setCredit(credit.getCapitalBalance());
+        detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailExpiredAccount);
-        voucher.getDetails().add(detailCurrentAccount);
+        voucher.getDetails().add(detailAccount);
     }
 
-    private void addVoucherDetailVenEje(Credit credit, Voucher voucher){
+    //private void addVoucherDetailVenEje(Credit credit, Voucher voucher){
+    private void addVoucherDetailEje(Credit credit, Voucher voucher){
 
         VoucherDetail detailExecutedAccount = new VoucherDetail();
         detailExecutedAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
@@ -242,18 +258,25 @@ public class CreditAction extends GenericAction<Credit> {
         detailExecutedAccount.setCredit(BigDecimal.ZERO);
         detailExecutedAccount.setCreditPartner(credit);
 
-        VoucherDetail detailExpiredAccount = new VoucherDetail();
-        detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
-        detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
-        detailExpiredAccount.setDebit(BigDecimal.ZERO);
-        detailExpiredAccount.setCredit(credit.getCapitalBalance());
-        detailExpiredAccount.setCreditPartner(credit);
+        VoucherDetail detailAccount = new VoucherDetail();
+        if (credit.getState().equals(CreditState.VIG)){
+            detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+        }
+        if (credit.getState().equals(CreditState.VEN)){
+            detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+        }
+        detailAccount.setDebit(BigDecimal.ZERO);
+        detailAccount.setCredit(credit.getCapitalBalance());
+        detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailExecutedAccount);
-        voucher.getDetails().add(detailExpiredAccount);
+        voucher.getDetails().add(detailAccount);
     }
 
-    private void addVoucherDetailVenVig(Credit credit, Voucher voucher){
+    //private void addVoucherDetailVenVig(Credit credit, Voucher voucher){
+    private void addVoucherDetailVig(Credit credit, Voucher voucher){
 
         VoucherDetail detailCurrentAccount = new VoucherDetail();
         detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
@@ -262,15 +285,21 @@ public class CreditAction extends GenericAction<Credit> {
         detailCurrentAccount.setCredit(BigDecimal.ZERO);
         detailCurrentAccount.setCreditPartner(credit);
 
-        VoucherDetail detailExpiredAccount = new VoucherDetail();
-        detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
-        detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
-        detailExpiredAccount.setDebit(BigDecimal.ZERO);
-        detailExpiredAccount.setCredit(credit.getCapitalBalance());
-        detailExpiredAccount.setCreditPartner(credit);
+        VoucherDetail detailAccount = new VoucherDetail();
+        if (credit.getState().equals(CreditState.VEN)){
+            detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+        }
+        if (credit.getState().equals(CreditState.EJE)){
+            detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+        }
+        detailAccount.setDebit(BigDecimal.ZERO);
+        detailAccount.setCredit(credit.getCapitalBalance());
+        detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailCurrentAccount);
-        voucher.getDetails().add(detailExpiredAccount);
+        voucher.getDetails().add(detailAccount);
     }
 
     public void calculateQuota(){

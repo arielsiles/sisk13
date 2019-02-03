@@ -72,7 +72,7 @@
             <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 5%, 20%, 10%, 15%, 20%, 10%, 10%">
+                            columnsWidth="8%, 5%, 25%, 10%, 10%, 10%, 25%, 7%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -82,21 +82,23 @@
 
                         <rich:column>#{messages['Credit.partnerName']}</rich:column>
 
+                        <rich:column>#{messages['Credit.grantDate']}</rich:column>
+
                         <rich:column>#{messages['Credit.amount']}</rich:column>
 
-                        <rich:column>#{messages['Credit.grantDate']}</rich:column>
+                        <rich:column>#{messages['Credit.capitalBalance']}</rich:column>
 
                         <rich:column>#{messages['Credit.creditType']}</rich:column>
 
                         <!--<rich:column>#{messages['Credit.createdOn']}</rich:column>-->
 
-                        <rich:column>
+                        <!--<rich:column>
                             <app:commandSortHeader sortProperty="credit.creationDate"
                                                    dataModel="#{creditDataModel}"
                                                    reRender="creditList, dataScroller">
                                 #{messages['Credit.createdOn']}
                             </app:commandSortHeader>
-                        </rich:column>
+                        </rich:column>-->
 
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
@@ -116,15 +118,21 @@
                     <h:outputText value="#{creditItem.partner.fullName}"/>
                 </rich:column>
 
+                <rich:column styleClass="center">
+                    <h:outputText value="#{creditItem.grantDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
+                </rich:column>
+
                 <rich:column styleClass="right">
                     <h:outputText value="#{creditItem.amount}">
                         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
 
-                <rich:column>
-                    <h:outputText value="#{creditItem.grantDate}">
-                        <s:convertDateTime pattern="#{messages['patterns.dateTime']}"/>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{creditItem.capitalBalance}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
 
@@ -132,11 +140,11 @@
                     <h:outputText value="#{creditItem.creditType.name}" />
                 </rich:column>
 
-                <rich:column>
+                <!--<rich:column>
                     <h:outputText value="#{creditItem.creationDate}">
                         <s:convertDateTime pattern="#{messages['patterns.dateTime']}"/>
                     </h:outputText>
-                </rich:column>
+                </rich:column>-->
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    action="#{creditAction.select(creditItem)}"

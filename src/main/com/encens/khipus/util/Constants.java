@@ -32,16 +32,16 @@ public final class Constants {
     public static final Long currencyIdSus = (long) 2;
 
     //Schema for KHIPUS
-    public static final String KHIPUS_SCHEMA    = "khipus";
+    /*public static final String KHIPUS_SCHEMA    = "khipus";
     public static final String FINANCES_SCHEMA  = "khipus";
     public static final String CASHBOX_SCHEMA   = "khipus";
-    public static final String ACADEMIC_SCHEMA  = "khipus";
+    public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
     //Schema for KHIPUS
-    /*public static final String KHIPUS_SCHEMA    = "caisc";
+    public static final String KHIPUS_SCHEMA    = "caisc";
     public static final String FINANCES_SCHEMA  = "caisc";
     public static final String CASHBOX_SCHEMA   = "caisc";
-    public static final String ACADEMIC_SCHEMA  = "caisc";*/
+    public static final String ACADEMIC_SCHEMA  = "caisc";
 
     public static final String SEQUENCE_TABLE_NAME = "secuencia";
     public static final String SEQUENCE_TABLE_PK_COLUMN_NAME = "tabla";
@@ -234,6 +234,7 @@ public final class Constants {
     public static final String ACCOUNT_FISCAL_CREDIT = "1420710000";// Credito Fiscal IVA
     public static final String ACCOUNT_GENERALCASH = "1110110100";  // Caja General M.N.
     public static final String ACCOUNT_GENERALCASH_CISC = "1110110101";  // Caja General CISC M.N. /** todo **/
+    public static final String ACCOUNT_GENERALCASH_ME = "1110220000";  // Billetes y Monedas Extranjeras /** todo **/
     public static final String ACCOUNT_CONTRIBUTION = "3110100000"; // Certificados de Aportacion
     public static final String ACOUNT_OTHER_OPERATING_INCOME = "5451010000";   // Otros Ingresos Operativos diversos
 

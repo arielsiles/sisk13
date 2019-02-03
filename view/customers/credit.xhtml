@@ -161,8 +161,8 @@
                 <s:decorate id="criminalInterestField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.criminalInterest']}</ui:define>
                     <h:inputText id="criminalInterest" value="#{credit.criminalInterest}" styleClass="input"
-                                 required="true" tabindex="4">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                 required="true" tabindex="41">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
                     </h:inputText>
                 </s:decorate>
 
