@@ -48,3 +48,7 @@ UPDATE tipocredito t SET t.`ictaeje` = '5150510600' WHERE idtipocredito = 1;
 -- Prestamos Amortizables M.E. BID
 -- 5150520600	Intereses Prestamos Amort.Ejec. ME BID
 UPDATE tipocredito t SET t.`ictaeje` = '5150520600' WHERE idtipocredito = 2;
+
+
+ALTER TABLE transaccioncredito ADD COLUMN interespenal DECIMAL(13,2) AFTER interes;
+UPDATE transaccioncredito t SET t.`interespenal` = 0;
