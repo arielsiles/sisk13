@@ -55,7 +55,7 @@
                             var="creditTypeItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="15%, 5%, 15%, 15%, 15%, 15%, 15%, 5%">
+                            columnsWidth="13%, 4%, 13%, 13%, 13%, 13%, 13%, 13%, 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -72,6 +72,8 @@
                         <rich:column>#{messages['CreditType.currentInterestAccount']}</rich:column>
 
                         <rich:column>#{messages['CreditType.expiredInterestAccount']}</rich:column>
+
+                        <rich:column>#{messages['CreditType.executedInterestAccount']}</rich:column>
 
                         <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
 
@@ -104,6 +106,10 @@
 
                 <rich:column>
                     <h:outputText value="#{creditTypeItem.expiredInterestAccount.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{creditTypeItem.executedInterestAccount.fullName}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">

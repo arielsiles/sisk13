@@ -52,6 +52,9 @@ public class CreditType implements BaseModel {
     @Column(name = "ictaven")
     private String expiredInterestAccountCode;
 
+    @Column(name = "ictaeje")
+    private String executedInterestAccountCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctavig", insertable = false, updatable = false, referencedColumnName = "cuenta")
     private CashAccount currentAccount;
@@ -71,6 +74,10 @@ public class CreditType implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ictaven", insertable = false, updatable = false, referencedColumnName = "cuenta")
     private CashAccount expiredInterestAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ictaeje", insertable = false, updatable = false, referencedColumnName = "cuenta")
+    private CashAccount executedInterestAccount;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -184,6 +191,14 @@ public class CreditType implements BaseModel {
         this.expiredInterestAccountCode = expiredInterestAccountCode;
     }
 
+    public String getExecutedInterestAccountCode() {
+        return executedInterestAccountCode;
+    }
+
+    public void setExecutedInterestAccountCode(String executedInterestAccountCode) {
+        this.executedInterestAccountCode = executedInterestAccountCode;
+    }
+
     public CashAccount getCurrentInterestAccount() {
         return currentInterestAccount;
     }
@@ -200,5 +215,14 @@ public class CreditType implements BaseModel {
     public void setExpiredInterestAccount(CashAccount expiredInterestAccount) {
         this.expiredInterestAccount = expiredInterestAccount;
         setExpiredInterestAccountCode(this.expiredInterestAccount != null ? this.expiredInterestAccount.getAccountCode() : null);
+    }
+
+    public CashAccount getExecutedInterestAccount() {
+        return executedInterestAccount;
+    }
+
+    public void setExecutedInterestAccount(CashAccount executedInterestAccount) {
+        this.executedInterestAccount = executedInterestAccount;
+        setExecutedInterestAccountCode(this.executedInterestAccount != null ? this.executedInterestAccount.getAccountCode() : null);
     }
 }

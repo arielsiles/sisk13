@@ -51,6 +51,9 @@ public class CreditTransaction implements Serializable, BaseModel {
     @Column(name = "interes", precision = 13, scale = 2, nullable = false)
     private BigDecimal interest;
 
+    @Column(name = "interespenal", precision = 13, scale = 2, nullable = false)
+    private BigDecimal criminalInterest;
+
     @Column(name = "importe", precision = 13, scale = 2, nullable = false)
     private BigDecimal amount;
 
@@ -225,5 +228,13 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public BigDecimal getCriminalInterest() {
+        return criminalInterest;
+    }
+
+    public void setCriminalInterest(BigDecimal criminalInterest) {
+        this.criminalInterest = criminalInterest;
     }
 }

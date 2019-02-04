@@ -54,6 +54,10 @@ public class CreditTypeAction extends GenericAction<CreditType> {
         getInstance().setExpiredInterestAccount(null);
     }
 
+    public void clearExecutedInterestAccount() {
+        getInstance().setExecutedInterestAccount(null);
+    }
+
 
     public void assignCurrentAccount(CashAccount cashAccount) {
         getInstance().setCurrentAccount(cashAccount);
@@ -74,5 +78,9 @@ public class CreditTypeAction extends GenericAction<CreditType> {
     public void assignExpiredInterestAccount(CashAccount cashAccount) {
         getInstance().setExpiredInterestAccount(cashAccount);
     }
+
+    public void assignExecutedInterestAccount(CashAccount cashAccount) {
+            getInstance().setExecutedInterestAccount(cashAccount);
+        }
 
 }

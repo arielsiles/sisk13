@@ -477,12 +477,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             /** ----- **/
 
-            voucherSaving.setClient(this.client);
-            voucherSaving.setProvider(this.provider);
+            //voucherSaving.setClient(this.client);
+            //voucherSaving.setProvider(this.provider);
             voucherSaving.setPartnerAccount(partnerAccount);
 
-            if (this.provider != null)
-                voucherSaving.setProviderCode(this.provider.getProviderCode());
+            //if (this.provider != null)
+            //    voucherSaving.setProviderCode(this.provider.getProviderCode());
 
             voucherSaving.setDebit(BigDecimal.ZERO);
             voucherSaving.setCredit(getAmountDeposit());
@@ -493,6 +493,61 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             clearAccount();
             clearClient();
             clearProvider();
+            clearPartnerAccount();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
+        }catch (NullPointerException e){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+        }
+
+    }
+
+    public void cashWithdrawalAccountVoucherDetail(){
+        try {
+
+            //System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
+            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
+            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
+            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
+
+            /** todo: Cuentas deben existir si no error Null **/
+            VoucherDetail voucherSaving = new VoucherDetail();
+            voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
+            voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMn().getAccountCode());
+
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D)) {
+                voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMe());
+                voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMe().getAccountCode());
+            }
+
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+                voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMv());
+                voucherSaving.setAccount(partnerAccount.getAccountType().getCashAccountMv().getAccountCode());
+            }
+
+            voucherSaving.setPartnerAccount(partnerAccount);
+            voucherSaving.setDebit(getAmountDeposit());
+            voucherSaving.setCredit(BigDecimal.ZERO);
+
+            /** **/
+            CashAccount ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+                ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
+            }
+
+            VoucherDetail voucherCaja = new VoucherDetail();
+            voucherCaja.setCashAccount(ctaCaja);
+            voucherCaja.setAccount(ctaCaja.getAccountCode());
+            voucherCaja.setDebit(BigDecimal.ZERO);
+            voucherCaja.setCredit(getAmountDeposit());
+
+            /** **/
+            voucherDetails.add(voucherSaving);
+            voucherDetails.add(voucherCaja);
+
+            //clearAccount();
+            //clearClient();
+            //clearProvider();
             clearPartnerAccount();
             setDebit(BigDecimal.ZERO);
             setCredit(BigDecimal.ZERO);

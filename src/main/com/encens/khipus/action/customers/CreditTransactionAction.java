@@ -56,6 +56,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private Date dateTransaction = new Date();
 
     private BigDecimal interestValue;
+    private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
 
@@ -118,6 +119,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setDays(0);
         creditTransaction.setCapitalBalance(capitalBalance);
         creditTransaction.setInterest(interestValue);
+        creditTransaction.setCriminalInterest(criminalInterestValue);
         creditTransaction.setCapital(capitalValue);
         creditTransaction.setAmount(totalAmountValue);
         creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
@@ -296,7 +298,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         getInstance().setInterest(interest);
         BigDecimal currentCapital = calculateCapital(credit);
-        //BigDecimal currentCapital = calculateSimpleCapital(credit); // errore al calcular capital
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
@@ -304,6 +305,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.interestValue = interest;
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;
+        this.criminalInterestValue = calculateCriminalInterest();
 
         System.out.println("--------------------------> Capital: " + capitalValue);
         System.out.println("--------------------------> Interes: " + interestValue);
@@ -312,45 +314,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return interest;
     }
 
-    /** error al calcular capital **/
-    public BigDecimal calculateSimpleCapital(Credit credit){
-
-        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
-        Date currentPaymentDate = dateTransaction;
-        BigDecimal totalPaidCapital = creditService.getTotalPaidCapital(credit); // Capital Total Pagado
-        BigDecimal totalPayableCapital = BigDecimal.ZERO;   // Capital Total x Pagar
-        BigDecimal totalBalancePayableCapital = BigDecimal.ZERO;   // Capital SALDO Total x Pagar
-
-        Integer nro = 0;
-        BigDecimal quotaPlan = BigDecimal.ZERO;
-
-        //Si la fecha actual es menor a la fecha del primer pago
-        if (currentPaymentDate.compareTo(credit.getFirstPayment()) < 0){
-            nro = 0;
-            quotaPlan = credit.getQuota();
-        }else {
-            for (CreditReportAction.PaymentPlanData paymentPlan : paymentPlanDatas) {
-                Date paymentPlanDate = DateUtils.parse(paymentPlan.getPaymentDate(), "dd/MM/yyyy");
-                if (paymentPlanDate.compareTo(currentPaymentDate) <= 0 ){
-                    nro = paymentPlan.getNro();
-                    //quotaPlan = paymentPlan.getQuota();
-                    quotaPlan = BigDecimalUtil.sum(quotaPlan, paymentPlan.getQuota(), 6);
-                    System.out.println("-----> " + nro + " - " + quotaPlan + " - " + paymentPlanDate + " - " + currentPaymentDate);
-                }
-
-            }
-        }
-
-
-        //totalPayableCapital = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(nro.doubleValue()), quotaPlan, 6);
-        totalPayableCapital = quotaPlan;
-        totalBalancePayableCapital = BigDecimalUtil.subtract(totalPayableCapital, totalPaidCapital, 6);
-
-        System.out.println("..................nro:::: " + nro);
-        System.out.println("..................totalPayableCapital:::: " + totalPayableCapital);
-        System.out.println("..................totalPaidCapital:::: " + totalPaidCapital);
-        System.out.println("..................totalBalancePayableCapital:::: " + totalBalancePayableCapital);
-        return totalBalancePayableCapital;
+    public BigDecimal calculateCriminalInterest(){
+        return BigDecimal.ZERO;
     }
 
     /** ? **/
@@ -456,8 +421,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void calculateTotalAmount() {
         BigDecimal totalAmount = null;
+        //if (null != getInstance().getCapital() && null != getInstance().getInterest() && null != getInstance().getCriminalInterest()) {
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             totalAmount = BigDecimalUtil.sum(capitalValue, interestValue, 6);
+            totalAmount = BigDecimalUtil.sum(totalAmount, criminalInterestValue, 6);
         }
         //getInstance().setAmount(totalAmount);
         setTotalAmountValue(totalAmount);
@@ -514,6 +481,14 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void setTotalAmountValue(BigDecimal totalAmountValue) {
         this.totalAmountValue = totalAmountValue;
+    }
+
+    public BigDecimal getCriminalInterestValue() {
+        return criminalInterestValue;
+    }
+
+    public void setCriminalInterestValue(BigDecimal criminalInterestValue) {
+        this.criminalInterestValue = criminalInterestValue;
     }
 }
 

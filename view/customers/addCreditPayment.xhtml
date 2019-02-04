@@ -72,7 +72,7 @@
                                  immediate="true"
                                  title="#{messages['Common.calculate']}"
                                  action="#{creditTransactionAction.calculateInterest()}"
-                                 reRender="interestField, capitalField, amountField"
+                                 reRender="interestField, capitalField, amountField, criminalInterestField"
                                  tabindex="6">
                     <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
                     <a4j:support event="onclick" reRender="interestField, capitalField, amountField"/>
@@ -111,36 +111,15 @@
                         </h:outputText>
                     </s:decorate>
 
-                    <!--<s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Credit.interest']}</ui:define>
-                        <h:outputText id="interest"
-                                      value="#{creditTransactionAction.calculateInterest()}">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                        </h:outputText>
-                    </s:decorate>-->
-
                     <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.interest']}</ui:define>
                         <h:inputText id="interest"
                                      value="#{creditTransactionAction.interestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, amountField, capitalField"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
                         </h:inputText>
                     </s:decorate>
-
-
-
-
-                    <!--<s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Credit.capital']}</ui:define>
-                        <h:inputText id="capital"
-                                     value="#{creditTransaction.capital}"
-                                     styleClass="input" required="true" tabindex="2">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField"/>
-                        </h:inputText>
-                    </s:decorate>-->
 
                     <s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.capital']}</ui:define>
@@ -152,18 +131,15 @@
                         </h:inputText>
                     </s:decorate>
 
-                    <!--<s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Credit.totalToPay']}</ui:define>
-                        <h:inputText id="amount"
-                                     value="#{creditTransaction.amount}"
-                                     styleClass="input"
-                                     readonly="false"
-                                     required="true"
-                                     tabindex="2">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="amountField, capitalField"/>
+                    <s:decorate id="criminalInterestField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.criminalInterest']}</ui:define>
+                        <h:inputText id="criminalInterest"
+                                     value="#{creditTransactionAction.criminalInterestValue}"
+                                     styleClass="input" required="true" tabindex="2">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="criminalInterest, amountField"/>
                         </h:inputText>
-                    </s:decorate>-->
+                    </s:decorate>
 
                     <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.totalToPay']}</ui:define>
@@ -174,7 +150,7 @@
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, amountField, capitalField"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
                         </h:inputText>
                         <a4j:commandLink id="adjustCents" ajaxSingle="true" immediate="true"
                                          tabindex="5"

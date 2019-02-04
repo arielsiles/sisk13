@@ -40,4 +40,11 @@ UPDATE sf_tmpenc e SET e.`tipo_doc` = 'RI'
 WHERE e.`tipo_doc` = 'CI'
 ;
 
-
+/** 03.02.2019 **/
+-- Lecheria
+-- Prestamos Amortizables CIS M.N.
+-- 5150510600	Intereses Prestamos Amortizables Ejec.MN
+UPDATE tipocredito t SET t.`ictaeje` = '5150510600' WHERE idtipocredito = 1;
+-- Prestamos Amortizables M.E. BID
+-- 5150520600	Intereses Prestamos Amort.Ejec. ME BID
+UPDATE tipocredito t SET t.`ictaeje` = '5150520600' WHERE idtipocredito = 2;

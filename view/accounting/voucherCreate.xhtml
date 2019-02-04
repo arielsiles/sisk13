@@ -274,6 +274,14 @@
                                immediate="true"
                                reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId">
             </a4j:commandButton>
+
+            <a4j:commandButton id="withdrawalButtonId"
+                               action="#{voucherCreateAction.cashWithdrawalAccountVoucherDetail()}"
+                               value=" - "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,itemAccountField,accountField,amountDepositId">
+            </a4j:commandButton>
             <!--<h:outputLabel value="Bs|$us" />-->
         </s:decorate>
 

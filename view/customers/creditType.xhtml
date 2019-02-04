@@ -172,6 +172,20 @@
                                      hotKeySelect="alt+1"/>
                 </s:decorate>
 
+                <s:decorate id="executedInterestAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.executedInterestAccount']}</ui:define>
+                    <app:selectPopUp id="executedInterestAccount"
+                                     required="true"
+                                     textValue="#{creditType.executedInterestAccount.fullName}"
+                                     value="#{creditType.executedInterestAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearExecutedInterestAccount()}"
+                                     searchModalPanel="executedInterestAccountListModalPanel"
+                                     reRender="executedInterestAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
             </rich:panel>
 
         </h:form>
@@ -254,6 +268,19 @@
                                    styleClass="select-image-middle"
                                    reRender="expiredInterestAccountField"
                                    oncomplete="Richfaces.hideModalPanel('expiredInterestAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="executedInterestAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="executedInterestAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="executedInterestAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignExecutedInterestAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="executedInterestAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('executedInterestAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>
 
