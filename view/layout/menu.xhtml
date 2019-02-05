@@ -106,12 +106,18 @@
                 propagation="none"/>
 
         <rich:dropDownMenu value="#{messages['menu.customers.report']}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditStatusReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatus']}"
                         propagation="none"/>
             </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/creditStatusZoneReport.xhtml"
+                        value="#{messages['menu.customers.report.creditStatusByGab']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.configuration']}" rendered="#{

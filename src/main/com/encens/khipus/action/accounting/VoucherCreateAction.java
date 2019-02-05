@@ -505,11 +505,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void cashWithdrawalAccountVoucherDetail(){
         try {
 
-            //System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
-            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
-            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
-            //System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
-
             /** todo: Cuentas deben existir si no error Null **/
             VoucherDetail voucherSaving = new VoucherDetail();
             voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
