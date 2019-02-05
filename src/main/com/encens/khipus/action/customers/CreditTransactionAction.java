@@ -314,6 +314,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return interest;
     }
 
+    public BigDecimal calculateInterestTodate(Credit credit, Date date){
+        return credit.getCapitalBalance();
+    }
+
+
     public BigDecimal calculateCriminalInterest(){
         return BigDecimal.ZERO;
     }

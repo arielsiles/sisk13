@@ -21,24 +21,24 @@
                     #{messages['Credit.report.creditStatus.title']}
                 </f:facet>
 
-                <!--<s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
-                    <h:inputText id="productiveZone" styleClass="input" value="#{partner.productiveZone.fullName}"
-                                 readonly="true" required="true" tabindex="1">
+                    <h:inputText id="productiveZone" styleClass="input" value="#{creditStatusZoneReportAction.productiveZone.fullName}"
+                                 readonly="true" required="false" tabindex="1">
                     </h:inputText>
                     <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
                                      title="#{messages['RawMaterialProducer.selectProductiveZone']}"
                                      onclick="Richfaces.showModalPanel('productiveZoneModalPanel');">
                         <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
                     </a4j:commandLink>
-                </s:decorate>-->
+                </s:decorate>
 
                 <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
                     <rich:calendar id="paymentDate"
-                                   value="#{creditTransactionAction.dateTransaction}"
+                                   value="#{creditStatusZoneReportAction.dateTransaction}"
                                    popup="true"
-                                   required="true"
+                                   required="false"
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
                                    enableManualInput="true"
@@ -64,6 +64,23 @@
             </div>
 
         </h:form>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{creditStatusZoneReportAction.assignProductiveZone(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="productiveZoneField"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
 
         <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
         <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">

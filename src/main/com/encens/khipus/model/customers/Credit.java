@@ -21,7 +21,8 @@ import java.util.Date;
 
 @NamedQueries(
         {
-                @NamedQuery(name = "Credit.findAllCredits", query = "select c from Credit c ")
+                @NamedQuery(name = "Credit.findAllCredits", query = "select c from Credit c "),
+                @NamedQuery(name = "Credit.findCreditById", query = "select c from Credit c where c.id=:creditId")
         }
 )
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Credit.tableGenerator",

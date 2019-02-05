@@ -18,7 +18,7 @@ import java.util.List;
 public interface CreditService {
 
     Credit findByEntity(Entity entity);
-
+    Credit findCreditById(Long creditId);
     BigDecimal getActualCreditBalance(Credit credit);
     BigDecimal getTotalPaidCapital(Credit credit);
     List<Credit> getAllCredits();

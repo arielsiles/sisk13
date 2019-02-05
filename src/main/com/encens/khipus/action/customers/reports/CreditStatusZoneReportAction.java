@@ -25,7 +25,7 @@ import java.util.HashMap;
 @Scope(ScopeType.PAGE)
 public class CreditStatusZoneReportAction extends GenericReportAction {
 
-    private Date date;
+    private Date dateTransaction;
     private ProductiveZone productiveZone;
 
     @Create
@@ -41,27 +41,26 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
         ejbql = " SELECT " +
                 " productiveZone.number || '-' || productiveZone.name as gabName, " +
                 " credit.previousCode as code," +
-                " partner.firstName || partner.lastName || partner.maidenName as partnerName," +
+                " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as partnerName," +
                 " credit.grantDate," +
                 " credit.annualRate," +
                 " credit.amount," +
                 " credit.lastPayment," +
                 " credit.capitalBalance," +
                 " credit.quota," +
-                " credit.state" +
+                " credit.state, " +
+                " credit.id as creditId" +
                 " FROM Credit credit" +
                 " LEFT JOIN credit.partner partner" +
                 " LEFT JOIN partner.productiveZone productiveZone" +
-                " ORDER BY productiveZone.number ";
+                " ORDER BY credit.previousCode ";
 
         if (productiveZone != null){
 
             ejbql = " SELECT " +
-                    " productiveZone.numero || '-' || productiveZone.name as gab, " +
+                    " productiveZone.number || '-' || productiveZone.name as gabName, " +
                     " credit.previousCode as code," +
-                    " partner.firstName," +
-                    " partner.lastName," +
-                    " partner.maidenName," +
+                    " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as partnerName," +
                     " credit.grantDate," +
                     " credit.annualRate," +
                     " credit.amount," +
@@ -72,8 +71,8 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                     " FROM Credit credit" +
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE productiveZone = " + productiveZone +
-                    " ORDER BY firstName ";
+                    " WHERE partner.productiveZone = " + productiveZone +
+                    " ORDER BY credit.previousCode ";
         }
 
         return ejbql;
@@ -82,31 +81,23 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-        String documentTitle = "ESTADO DE CARTERA";
+        String documentTitle = "ESTADO DE CARTERA POR GAB";
         log.debug("Generating credit status report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("documentTitle", documentTitle);
-        //reportParameters.put("startDate", startDate);
+        reportParameters.put("dateTransaction", dateTransaction);
         //reportParameters.put("endDate", endDate);
 
         super.generateReport(
                 "summaryProviderKardexReport",
                 "/customers/reports/creditStatusZoneReport.jrxml",
                 PageFormat.LETTER,
-                PageOrientation.PORTRAIT,
+                PageOrientation.LANDSCAPE,
                 messages.get("Reports.credit.creditStatus.title"),
                 reportParameters);
 
     }
 
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
 
     public ProductiveZone getProductiveZone() {
         return productiveZone;
@@ -114,5 +105,17 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
 
     public void setProductiveZone(ProductiveZone productiveZone) {
         this.productiveZone = productiveZone;
+    }
+
+    public void assignProductiveZone(ProductiveZone productiveZone){
+        setProductiveZone(productiveZone);
+    }
+
+    public Date getDateTransaction() {
+        return dateTransaction;
+    }
+
+    public void setDateTransaction(Date dateTransaction) {
+        this.dateTransaction = dateTransaction;
     }
 }

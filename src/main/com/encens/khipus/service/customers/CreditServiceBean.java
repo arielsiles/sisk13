@@ -38,6 +38,14 @@ public class CreditServiceBean implements CreditService {
         }
     }
 
+    public Credit findCreditById(Long creditId){
+
+        return (Credit) em.createNamedQuery("Credit.findCreditById")
+                .setParameter("creditId", creditId).getSingleResult();
+
+    }
+
+
     public BigDecimal getActualCreditBalance(Credit credit) {
 
         List<CreditTransaction> transactions = em.createNamedQuery("CreditTransaction.transactions")
