@@ -53,6 +53,7 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " FROM Credit credit" +
                 " LEFT JOIN credit.partner partner" +
                 " LEFT JOIN partner.productiveZone productiveZone" +
+                " WHERE credit.capitalBalance > 0" +
                 " ORDER BY credit.previousCode ";
 
         if (productiveZone != null){
@@ -67,11 +68,13 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                     " credit.lastPayment," +
                     " credit.capitalBalance," +
                     " credit.quota," +
-                    " credit.state" +
+                    " credit.state, " +
+                    " credit.id as creditId" +
                     " FROM Credit credit" +
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE partner.productiveZone = " + productiveZone +
+                    " WHERE credit.capitalBalance > 0" +
+                    " AND productiveZone.id = " + productiveZone.getId() +
                     " ORDER BY credit.previousCode ";
         }
 

@@ -8,12 +8,14 @@ import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.In;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -36,31 +38,12 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         String purchaseOrderGroupName = "purchaseOrderGroup";
 
         if (s.equals(purchaseOrderGroupName)) {
-
-            //Long creditId = (Long) getFieldValue("creditId");
-            //Credit credit = creditService.findCreditById(creditId);
-
-            //BigDecimal interestToDate = creditTransactionAction.calculateInterestTodate(credit, new Date());
-            //BigDecimal interestToDate = credit.getQuota();
-
-
-
-            /*if (initPeriodDateParam != null) {
-                initialQuantityValue = movementDetailService.calculateInitialQuantityToKardex(Constants.defaultCompanyNumber, productItemCode, initPeriodDateParam);
-                initialAmountValue = movementDetailService.calculateInitialAmountToKardex(Constants.defaultCompanyNumber, productItemCode, initPeriodDateParam);
-            }*/
-
-            //initialize group values
-            //this.setVariableValue("interestToDateVar", interestToDate);
-
         }
     }
 
 
     public void beforeDetailEval() throws JRScriptletException {
         super.beforeDetailEval();
-
-        String purchaseOrderGroupName = "purchaseOrderGroup";
 
         Date dateTransaction = (Date) getParameterValue("dateTransaction", false);
         Long creditId = (Long) getFieldValue("creditId");
@@ -70,9 +53,19 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         creditTransactionAction.setDateTransaction(dateTransaction);
         BigDecimal interestToDate = creditTransactionAction.calculateInterest();
 
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(credit.getFirstPayment());
+        cal.add(Calendar.MONTH, credit.getTerm()-1);
+        Date expirationDate = cal.getTime();
+
+        Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);
+
+        System.out.println("------------------> expiration Date: " + expirationDate);
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);
+        this.setVariableValue("expirationDateVar", expirationDate);
+        this.setVariableValue("expiredDaysVar", expiredDays);
 
     }
 

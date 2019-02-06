@@ -221,6 +221,66 @@ public class CreditAction extends GenericAction<Credit> {
 
     }
 
+
+    public Long calculateExpiredDays(Credit credit, Date dateTransaction){
+
+        Long result = new Long(0);
+
+        System.out.println(credit.getAmount() + " - " + credit.getCapitalBalance() + " - " + credit.getPartner().getFullName());
+        int paidQuotas = creditTransactionAction.calculatePaidQuotas(credit);
+        System.out.println("----> Coutas Pagadas: " + paidQuotas);
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+        Integer i=1;
+        Date paidDate = null;
+        Date currentDate = dateTransaction;
+
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+
+            if (i == paidQuotas || paidQuotas == 0) {
+                System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
+                paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(paidDate);
+                if (paidQuotas == 0) cal.setTime(credit.getGrantDate());
+
+                cal.add(Calendar.DAY_OF_MONTH, credit.getAmortization());
+                Date nextPaidDate = cal.getTime();
+
+                Long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
+
+                System.out.println("===>>> Diff DAYS: " + diffDays);
+
+                result = diffDays;
+
+                if (diffDays <= 0) {
+                    //System.out.println("===> !!!!CREDITO VIGENTE!!!!");
+                    if (credit.getState().equals(CreditState.VEN)){
+                        //creditService.changeCreditState(credit, CreditState.VIG);
+                    }
+                }
+                if (diffDays >= 1 &&  diffDays <= 90) {
+
+                    //System.out.println("===> CREDITO VENCIDO...");
+                    if (!credit.getState().equals(CreditState.VEN)){
+                        //creditService.changeCreditState(credit, CreditState.VEN);
+                    }
+                }
+                if (diffDays >= 91) {
+                    //System.out.println("===> CREDITO EJECUCION...");
+                    if (!credit.getState().equals(CreditState.EJE)) {
+                        //creditService.changeCreditState(credit, CreditState.EJE);
+                    }
+                }
+            }
+            i++;
+        }
+
+        return  result;
+
+    }
+
+
     //private void addVoucherDetailVigVen(Credit credit, Voucher voucher){
     private void addVoucherDetailVen(Credit credit, Voucher voucher){
 
