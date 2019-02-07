@@ -138,7 +138,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
-        if (creditTransaction.getCredit().getState().equals(CreditState.VIG) || creditTransaction.getCredit().getState().equals(CreditState.VEN)){
+        if (    creditTransaction.getCredit().getState().equals(CreditState.VIG) ||
+                creditTransaction.getCredit().getState().equals(CreditState.VEN) ||
+                creditTransaction.getCredit().getState().equals(CreditState.EJE)    ){
 
             Voucher voucher = new Voucher();
             voucher.setDocumentType(Constants.RI_VOUCHER_DOCTYPE);
@@ -151,15 +153,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
-                //System.out.println("====> 1 - " + Constants.ACOUNT_CURRENT_LOAN);
-                //voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_CURRENT_LOAN);
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getCurrentAccountCode());
             }
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
-                //System.out.println("====> 2 - " + Constants.ACOUNT_LOAN_EXPIRED);
-                //voucherDetailCurrentLoan.setAccount(Constants.ACOUNT_LOAN_EXPIRED);
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getExpiredAccountCode());
+            }
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.EJE)){
+                voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getExecutedAccountCode());
             }
 
             voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
@@ -167,15 +169,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             VoucherDetail voucherDetailInterest = new VoucherDetail();
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
-                //System.out.println("====> 3 - " + Constants.ACOUNT_INTEREST_ON_LOAN);
-                //voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_LOAN);
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getCurrentInterestAccountCode());
             }
 
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
-                //System.out.println("====> 4 - " + Constants.ACOUNT_INTEREST_ON_EXPIRED);
-                //voucherDetailInterest.setAccount(Constants.ACOUNT_INTEREST_ON_EXPIRED);
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getExpiredInterestAccountCode());
+            }
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.EJE)){
+                voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getExecutedInterestAccountCode());
             }
 
             voucherDetailInterest.setDebit(BigDecimal.ZERO);
@@ -184,7 +186,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
 
-            voucher.setGloss(creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getGloss());
+            voucher.setGloss(creditTransaction.getCredit().getPreviousCode() + " " + creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getGloss());
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
             voucher.getDetails().add(voucherDetailInterest);
