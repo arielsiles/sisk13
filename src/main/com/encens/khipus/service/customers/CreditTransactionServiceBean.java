@@ -91,6 +91,7 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         //String gloss = creditTransaction.getGloss() + " " + credit.getCode();
         creditTransaction.setCapital(BigDecimal.ZERO);
         creditTransaction.setInterest(BigDecimal.ZERO);
+        creditTransaction.setCriminalInterest(BigDecimal.ZERO);
         creditTransaction.setAmount(credit.getAmount());
         //creditTransaction.setGloss(gloss);
         //creditTransaction.setDate(new Date());
