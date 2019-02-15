@@ -136,29 +136,58 @@
                     </s:decorate>
                 </s:div>
 
-                <s:div id="rightSidePanel">
-                    <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
-                        <h:outputText value="#{accountAction.totalCredit}">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                        </h:outputText>
-                    </s:decorate>
+                    <!-- Moneda Extranjera -->
+                    <c:if test="#{accountAction.isForeignAccount()}">
+                    <s:div id="rightSidePanel">
+                        <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
+                            <h:outputText value="#{accountAction.totalCreditMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                            </h:outputText>
+                        </s:decorate>
 
-                    <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
-                        <h:outputText value="#{accountAction.totalDebit}">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                        </h:outputText>
-                    </s:decorate>
+                        <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
+                            <h:outputText value="#{accountAction.totalDebitMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                            </h:outputText>
+                        </s:decorate>
 
-                    <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
-                        <h:outputText value="#{accountAction.totalBalance}">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                        </h:outputText>
-                    </s:decorate>
+                        <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
+                            <h:outputText value="#{accountAction.totalBalanceMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                            </h:outputText>
+                        </s:decorate>
+                    </s:div>
+                    </c:if>
 
-                </s:div>
+                    <!-- Moneda Nacional -->
+                    <c:if test="#{!accountAction.isForeignAccount()}">
+                        <s:div id="rightSidePanel">
+                            <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
+                                <h:outputText value="#{accountAction.totalCredit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                </h:outputText>
+                            </s:decorate>
+
+                            <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
+                                <h:outputText value="#{accountAction.totalDebit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                </h:outputText>
+                            </s:decorate>
+
+                            <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
+                                <h:outputText value="#{accountAction.totalBalance}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                </h:outputText>
+                            </s:decorate>
+                        </s:div>
+                    </c:if>
+
                 </h:panelGrid>
 
             </rich:panel>
@@ -230,18 +259,33 @@
                                 <h:outputText value="#{accountDetailItem.voucher.fullDocument}"/>
                             </rich:column>
 
-                            <rich:column styleClass="right">
-                                <h:outputText value="#{accountDetailItem.debit}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                </h:outputText>
-                            </rich:column>
+                            <c:if test="#{accountAction.isForeignAccount()}">
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{accountDetailItem.debitMe}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                    </h:outputText>
+                                </rich:column>
 
-                            <rich:column styleClass="right">
-                                <h:outputText value="#{accountDetailItem.credit}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                </h:outputText>
-                            </rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{accountDetailItem.creditMe}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                    </h:outputText>
+                                </rich:column>
+                            </c:if>
 
+                            <c:if test="#{!accountAction.isForeignAccount()}">
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{accountDetailItem.debit}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                    </h:outputText>
+                                </rich:column>
+
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{accountDetailItem.credit}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                    </h:outputText>
+                                </rich:column>
+                            </c:if>
 
                             <!--<rich:column styleClass="center">
                                 <h:commandLink value="#{messages['Common.select']}"

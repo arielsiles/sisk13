@@ -70,10 +70,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public void saveVoucher(Voucher voucher){
 
         Long id = financesPkGeneratorService.newId_sf_tmpenc();
-        System.out.println("------------> ID_TMPENC: " + id);
         voucher.setId(id);
-
-
 
         if (voucher.getTransactionNumber() == null){
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
@@ -107,49 +104,11 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             em.flush();
         }
 
-        /*for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()){
-
-            System.out.println("-------->>>>> FACT: " + purchaseDocument.getName());
-            purchaseDocument.setState(PurchaseDocumentState.PENDING);
-            purchaseDocument.setVoucher(voucher);
-            em.persist(purchaseDocument);
-            em.flush();
-
-        }*/
-
-
     }
 
     @Override
     @TransactionAttribute(REQUIRES_NEW)
     public void updateVoucher(Voucher voucher) {
-
-        /** For PurchaseDocument **/
-        /*List<PurchaseDocument> purchaseDocumentDB = getPurchaseDcumentList(voucher);
-        for (PurchaseDocument purchaseDocument : purchaseDocumentDB) {
-            em.merge(purchaseDocument);
-            em.remove(purchaseDocument);
-            em.flush();
-        }
-
-        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()) {
-            if(purchaseDocument.getId() == null){
-                try {
-                    purchaseDocument.setVoucher(voucher);
-                    purchaseDocument.setNetAmount(purchaseDocument.getAmount());
-                    purchaseDocument.setType(CollectionDocumentType.INVOICE);
-                    purchaseDocumentService.createDocumentSimple(purchaseDocument);
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }else{
-                em.merge(purchaseDocument);
-                em.merge(voucher);
-                em.flush();
-            }
-        }*/
 
         /** For VoucherDetail **/
         List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
@@ -175,13 +134,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 em.flush();
             }
         }
-
-
-        /** Relacionando Voucher PurchaseDocument **/
-        /*System.out.println("-------------> Relacionando....");
-        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()){
-            updateVoucher(voucher, purchaseDocument);
-        }*/
 
         em.merge(voucher);
         em.flush();

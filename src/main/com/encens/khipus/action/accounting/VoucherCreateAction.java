@@ -3,6 +3,8 @@ package com.encens.khipus.action.accounting;
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
 import com.encens.khipus.exception.ConcurrencyException;
+import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
+import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
@@ -21,6 +23,7 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
+import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -99,6 +102,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     @In
     private PurchaseDocumentService purchaseDocumentService;
+
+    @In
+    private FinancesExchangeRateService financesExchangeRateService;
 
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
@@ -440,24 +446,59 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void assignPartnerAccountVoucherDetail(){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
         try {
 
+
+            System.out.println("---> Exchange Rate: " + exchangeRate);
             System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
 
+            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
 
-            CashAccount ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            /** Cuenta CAJA | Billetes Ext **/
+            VoucherDetail voucherCaja = new VoucherDetail();
+
             if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
-                ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
+
+                voucherCaja.setCashAccount(ctaCajaMe);
+                voucherCaja.setAccount(ctaCajaMe.getAccountCode());
+
+                voucherCaja.setDebitMe(getAmountDeposit());
+                voucherCaja.setCreditMe(BigDecimal.ZERO);
+
+                voucherCaja.setDebit(BigDecimalUtil.multiply(getAmountDeposit(), exchangeRate, 2));
+                voucherCaja.setCredit(BigDecimal.ZERO);
+
+                voucherCaja.setExchangeAmount(exchangeRate);
+
             }
 
-            VoucherDetail voucherCaja = new VoucherDetail();
-            voucherCaja.setCashAccount(ctaCaja);
-            voucherCaja.setAccount(ctaCaja.getAccountCode());
-            voucherCaja.setDebit(getAmountDeposit());
-            voucherCaja.setCredit(BigDecimal.ZERO);
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+                voucherCaja.setCashAccount(ctaCajaMn);
+                voucherCaja.setAccount(ctaCajaMn.getAccountCode());
+
+                voucherCaja.setDebit(getAmountDeposit());
+                voucherCaja.setCredit(BigDecimal.ZERO);
+
+                voucherCaja.setDebitMe(BigDecimal.ZERO);
+                voucherCaja.setCreditMe(BigDecimal.ZERO);
+
+                voucherCaja.setExchangeAmount(BigDecimal.ONE);
+            }
 
 
             /** todo: Cuentas deben existir si no error Null **/
@@ -476,16 +517,28 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             }
 
             /** ----- **/
-
-            //voucherSaving.setClient(this.client);
-            //voucherSaving.setProvider(this.provider);
             voucherSaving.setPartnerAccount(partnerAccount);
 
-            //if (this.provider != null)
-            //    voucherSaving.setProviderCode(this.provider.getProviderCode());
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
 
-            voucherSaving.setDebit(BigDecimal.ZERO);
-            voucherSaving.setCredit(getAmountDeposit());
+                voucherSaving.setDebitMe(BigDecimal.ZERO);
+                voucherSaving.setCreditMe(getAmountDeposit());
+
+                voucherSaving.setDebit(BigDecimal.ZERO);
+                voucherSaving.setCredit(BigDecimalUtil.multiply(getAmountDeposit(), exchangeRate, 2));
+
+                voucherSaving.setExchangeAmount(exchangeRate);
+            }
+
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+                voucherSaving.setDebit(BigDecimal.ZERO);
+                voucherSaving.setCredit(getAmountDeposit());
+
+                voucherSaving.setDebitMe(BigDecimal.ZERO);
+                voucherSaving.setCreditMe(BigDecimal.ZERO);
+
+                voucherSaving.setExchangeAmount(BigDecimal.ONE);
+            }
 
             voucherDetails.add(voucherCaja);
             voucherDetails.add(voucherSaving);
@@ -503,8 +556,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void cashWithdrawalAccountVoucherDetail(){
-        try {
 
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
+        try {
             /** todo: Cuentas deben existir si no error Null **/
             VoucherDetail voucherSaving = new VoucherDetail();
             voucherSaving.setCashAccount(partnerAccount.getAccountType().getCashAccountMn());
@@ -521,20 +583,62 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             }
 
             voucherSaving.setPartnerAccount(partnerAccount);
-            voucherSaving.setDebit(getAmountDeposit());
-            voucherSaving.setCredit(BigDecimal.ZERO);
 
-            /** **/
-            CashAccount ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
-                ctaCaja = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
+
+                voucherSaving.setDebitMe(getAmountDeposit());
+                voucherSaving.setCreditMe(BigDecimal.ZERO);
+                voucherSaving.setDebit(BigDecimalUtil.multiply(getAmountDeposit(), exchangeRate, 2));
+                voucherSaving.setCredit(BigDecimal.ZERO);
+
+                voucherSaving.setExchangeAmount(exchangeRate);
             }
 
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+
+                voucherSaving.setDebit(getAmountDeposit());
+                voucherSaving.setCredit(BigDecimal.ZERO);
+                voucherSaving.setDebitMe(BigDecimal.ZERO);
+                voucherSaving.setCreditMe(BigDecimal.ZERO);
+
+                voucherSaving.setExchangeAmount(BigDecimal.ONE);
+            }
+
+
+            /** **/
+            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
             VoucherDetail voucherCaja = new VoucherDetail();
-            voucherCaja.setCashAccount(ctaCaja);
-            voucherCaja.setAccount(ctaCaja.getAccountCode());
-            voucherCaja.setDebit(BigDecimal.ZERO);
-            voucherCaja.setCredit(getAmountDeposit());
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+
+                voucherCaja.setCashAccount(ctaCajaMe);
+                voucherCaja.setAccount(ctaCajaMe.getAccountCode());
+
+                voucherCaja.setDebitMe(BigDecimal.ZERO);
+                voucherCaja.setCreditMe(getAmountDeposit());
+                voucherCaja.setDebit(BigDecimal.ZERO);
+                voucherCaja.setCredit(BigDecimalUtil.multiply(getAmountDeposit(), exchangeRate, 2));
+
+                voucherCaja.setExchangeAmount(exchangeRate);
+
+            }
+
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+                voucherCaja.setCashAccount(ctaCajaMn);
+                voucherCaja.setAccount(ctaCajaMn.getAccountCode());
+
+                voucherCaja.setDebit(BigDecimal.ZERO);
+                voucherCaja.setCredit(getAmountDeposit());
+                voucherCaja.setDebitMe(BigDecimal.ZERO);
+                voucherCaja.setCreditMe(BigDecimal.ZERO);
+
+                voucherCaja.setExchangeAmount(BigDecimal.ONE);
+            }
+
+            //voucherCaja.setCashAccount(ctaCaja);
+            //voucherCaja.setAccount(ctaCaja.getAccountCode());
+            //voucherCaja.setDebit(BigDecimal.ZERO);
+            //voucherCaja.setCredit(getAmountDeposit());
 
             /** **/
             voucherDetails.add(voucherSaving);
@@ -942,5 +1046,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setContribution(BigDecimal contribution) {
         this.contribution = contribution;
+    }
+
+    private void addFinancesCurrencyNotFoundMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "FixedAssets.FinancesCurrencyNotFoundException");
+    }
+
+    private void addFinancesExchangeRateNotFoundExceptionMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "FixedAssets.FinancesExchangeRateNotFoundException");
     }
 }

@@ -66,6 +66,12 @@ public class VoucherDetail implements BaseModel {
     @Column(name = "HABER", precision = 16, scale = 2, updatable = true)
     private BigDecimal credit;
 
+    @Column(name = "DEBEME", precision = 16, scale = 2, updatable = true)
+    private BigDecimal debitMe;
+
+    @Column(name = "HABERME", precision = 16, scale = 2, updatable = true)
+    private BigDecimal creditMe;
+
     @Column(name = "MONEDA", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency = FinancesCurrencyType.P;
@@ -410,5 +416,21 @@ public class VoucherDetail implements BaseModel {
 
     public void setQuantityArt(Long quantityArt) {
         this.quantityArt = quantityArt;
+    }
+
+    public BigDecimal getDebitMe() {
+        return debitMe;
+    }
+
+    public void setDebitMe(BigDecimal debitMe) {
+        this.debitMe = debitMe;
+    }
+
+    public BigDecimal getCreditMe() {
+        return creditMe;
+    }
+
+    public void setCreditMe(BigDecimal creditMe) {
+        this.creditMe = creditMe;
     }
 }

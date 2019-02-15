@@ -29,9 +29,14 @@ public class AccountAction extends GenericAction<Account> {
     private AccountService accountService;
 
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
+
     private BigDecimal totalCredit  = BigDecimal.ZERO;
     private BigDecimal totalDebit   = BigDecimal.ZERO;
     private BigDecimal totalBalance = BigDecimal.ZERO;
+
+    private BigDecimal totalCreditMe  = BigDecimal.ZERO;
+    private BigDecimal totalDebitMe   = BigDecimal.ZERO;
+    private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
 
     @Factory(value = "account", scope = ScopeType.STATELESS)
@@ -77,8 +82,12 @@ public class AccountAction extends GenericAction<Account> {
         for (VoucherDetail voucherDetail : voucherDetails){
             setTotalCredit(BigDecimalUtil.sum(getTotalCredit(), voucherDetail.getCredit(), 2));
             setTotalDebit(BigDecimalUtil.sum(getTotalDebit(), voucherDetail.getDebit(), 2));
+
+            setTotalCreditMe(BigDecimalUtil.sum(getTotalCreditMe(), voucherDetail.getCreditMe(), 2));
+            setTotalDebitMe(BigDecimalUtil.sum(getTotalDebitMe(), voucherDetail.getDebitMe(), 2));
         }
         setTotalBalance(BigDecimalUtil.subtract(getTotalCredit(), getTotalDebit(), 2));
+        setTotalBalanceMe(BigDecimalUtil.subtract(getTotalCreditMe(), getTotalDebitMe(), 2));
     }
 
     public void assignPartner(Partner partner){
@@ -91,6 +100,15 @@ public class AccountAction extends GenericAction<Account> {
 
     public List<AccountTransaction> getAccountTransactionList() {
         return accountTransactionList;
+    }
+
+    public boolean isForeignAccount(){
+
+        boolean result = false;
+        if (getInstance().getCurrency().equals(FinancesCurrencyType.D) || getInstance().getCurrency().equals(FinancesCurrencyType.M))
+            result = true;
+
+        return result;
     }
 
     public void setAccountTransactionList(List<AccountTransaction> accountTransactionList) {
@@ -119,5 +137,29 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setTotalBalance(BigDecimal totalBalance) {
         this.totalBalance = totalBalance;
+    }
+
+    public BigDecimal getTotalCreditMe() {
+        return totalCreditMe;
+    }
+
+    public void setTotalCreditMe(BigDecimal totalCreditMe) {
+        this.totalCreditMe = totalCreditMe;
+    }
+
+    public BigDecimal getTotalDebitMe() {
+        return totalDebitMe;
+    }
+
+    public void setTotalDebitMe(BigDecimal totalDebitMe) {
+        this.totalDebitMe = totalDebitMe;
+    }
+
+    public BigDecimal getTotalBalanceMe() {
+        return totalBalanceMe;
+    }
+
+    public void setTotalBalanceMe(BigDecimal totalBalanceMe) {
+        this.totalBalanceMe = totalBalanceMe;
     }
 }
