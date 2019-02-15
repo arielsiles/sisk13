@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditStatusZoneReportScriptlet">
-	<property name="ireport.zoom" value="1.6105100000000125"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.771561000000014"/>
+	<property name="ireport.x" value="45"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="dateTransaction" class="java.util.Date"/>
@@ -246,11 +246,11 @@
 			<frame>
 				<reportElement x="0" y="0" width="742" height="20"/>
 				<staticText>
-					<reportElement x="0" y="0" width="161" height="10"/>
+					<reportElement x="0" y="0" width="214" height="10"/>
 					<textElement>
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
+					<text><![CDATA[COOPERATIVA INTEGRAL DE SERVICIOS CBBA LTDA]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="0" y="9" width="161" height="10"/>
@@ -333,7 +333,7 @@
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{quota}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;(-#,##0.00)">
+			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="431" y="0" width="34" height="11"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>

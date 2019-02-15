@@ -5,6 +5,7 @@ import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditType;
+import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.production.ProductiveZone;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -25,8 +26,9 @@ import java.util.HashMap;
 @Scope(ScopeType.PAGE)
 public class CreditStatusZoneReportAction extends GenericReportAction {
 
-    private Date dateTransaction;
+    private Date dateTransaction = new Date();
     private ProductiveZone productiveZone;
+    private Currency currency;
 
     @Create
     public void init() {
@@ -52,8 +54,11 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " credit.id as creditId" +
                 " FROM Credit credit" +
                 " LEFT JOIN credit.partner partner" +
+                /*" LEFT JOIN credit.creditType creditType" +
+                " LEFT JOIN creditType.currency currency" +*/
                 " LEFT JOIN partner.productiveZone productiveZone" +
                 " WHERE credit.capitalBalance > 0" +
+                " AND credit.creditType.currency.id = " + currency.getId() +
                 " ORDER BY credit.previousCode ";
 
         if (productiveZone != null){
@@ -74,6 +79,7 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone" +
                     " WHERE credit.capitalBalance > 0" +
+                    " AND credit.creditType.currency.id = " + currency.getId() +
                     " AND productiveZone.id = " + productiveZone.getId() +
                     " ORDER BY credit.previousCode ";
         }
@@ -120,5 +126,13 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
 
     public void setDateTransaction(Date dateTransaction) {
         this.dateTransaction = dateTransaction;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }

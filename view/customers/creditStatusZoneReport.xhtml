@@ -34,7 +34,7 @@
                 </s:decorate>
 
                 <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.paymentDate']}</ui:define>
+                    <ui:define name="label">#{messages['Credit.date']}</ui:define>
                     <rich:calendar id="paymentDate"
                                    value="#{creditStatusZoneReportAction.dateTransaction}"
                                    popup="true"
@@ -45,6 +45,16 @@
                                    tabindex="1">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{creditStatusZoneReportAction.currency}" styleClass="input" required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{currencyList.resultList}" var="currency" label="#{currency.fullName}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
                 </s:decorate>
 
             </rich:panel>
