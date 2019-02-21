@@ -10,9 +10,14 @@
         <param-value>com.sun.facelets.FaceletViewHandler</param-value>
     </context-param>
 
-    <context-param>
+    <!--<context-param>
         <param-name>org.richfaces.SKIN</param-name>
         <param-value>DEFAULT</param-value>
+    </context-param>-->
+
+    <context-param>
+        <param-name>org.richfaces.SKIN</param-name>
+        <param-value>glassX</param-value>
     </context-param>
 
     <context-param>

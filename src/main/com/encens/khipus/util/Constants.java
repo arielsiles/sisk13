@@ -246,6 +246,7 @@ public final class Constants {
 
     public static final String ACOUNT_LOAN_EXECUTION = "";          //
 
+    public static final BigDecimal EXCHANGE_RATE = new BigDecimal(6.96);
 
     private Constants() {
     }

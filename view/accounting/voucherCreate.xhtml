@@ -189,6 +189,15 @@
 
         </s:decorate>
 
+        <s:decorate id="payNowConditionsField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['Voucher.foreignCurrency']}"/>
+            </ui:define>
+            <h:selectBooleanCheckbox value="#{voucherCreateAction.currencyCondition}">
+                <a4j:support event="onchange" reRender="movementDetailListPanel" ajaxSingle="true"/>
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+
     </s:div>
 
     <s:div id="rightSidePanel">
@@ -329,6 +338,10 @@
                     <th class="rich-table-headercell">#{messages['Voucher.accountDescription']}</th>
                     <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
                     <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                    <c:if test="#{voucherCreateAction.currencyCondition}">
+                    <th class="rich-table-headercell">#{messages['Voucher.debitMe']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.creditMe']}</th>
+                    </c:if>
                     <th class="rich-table-headercell">#{messages['Common.action']}</th>
                 </tr>
                 </thead>
@@ -338,6 +351,11 @@
                     <c:set var="creditFieldId" value="creditField_#{row.index}"/>
                     <c:set var="debitInputFieldId" value="debitInputField_#{row.index}"/>
                     <c:set var="creditInputFieldId" value="creditInputField_#{row.index}"/>
+
+                    <c:set var="debitMeFieldId" value="debitMeField_#{row.index}"/>
+                    <c:set var="creditMeFieldId" value="creditMeField_#{row.index}"/>
+                    <c:set var="debitMeInputFieldId" value="debitMeInputField_#{row.index}"/>
+                    <c:set var="creditMeInputFieldId" value="creditMeInputField_#{row.index}"/>
 
                     <tr class="rich-table-row">
                         <td class="rich-table-cell">
@@ -355,7 +373,9 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{debitInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="movementDetailListPanel"/>
+                                    <a4j:support event="onblur" ajaxSingle="true"
+                                                 reRender="movementDetailListPanel"
+                                                 actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>
                                 </h:inputText>
                                 <h:message for="#{debitInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
@@ -372,11 +392,56 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{creditInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{creditFieldId}, totalCredit"/>
+                                    <!--<a4j:support event="onblur" ajaxSingle="true" reRender="#{creditFieldId}, totalCredit" actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>-->
+                                    <a4j:support event="onblur" ajaxSingle="true"
+                                                 reRender="movementDetailListPanel"
+                                                 actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>
                                 </h:inputText>
                                 <h:message for="#{creditInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
                         </td>
+                        <!-- ME -->
+                        <c:if test="#{voucherCreateAction.currencyCondition}">
+                        <td class="rich-table-cell center">
+                            <s:div id="#{debitMeFieldId}">
+                                <h:inputText id="#{debitMeInputFieldId}"
+                                             value="#{voucherDetail.debitMe}"
+                                             styleClass="inputSmall right"
+                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
+                                             required="true"
+                                             rendered="true">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="#{debitMeInputFieldId}"/>
+                                    <a4j:support event="onblur" ajaxSingle="true"
+                                                 reRender="movementDetailListPanel"
+                                                 actionListener="#{voucherCreateAction.convertToNationalCurrency(voucherDetail)}"/>
+                                </h:inputText>
+                                <h:message for="#{debitMeInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
+                            </s:div>
+                        </td>
+
+                        <td class="rich-table-cell center">
+                            <s:div id="#{creditMeFieldId}">
+                                <h:inputText id="#{creditMeInputFieldId}"
+                                             value="#{voucherDetail.creditMe}"
+                                             styleClass="inputSmall right"
+                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
+                                             required="true"
+                                             rendered="true">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="#{creditMeInputFieldId}"/>
+                                    <!--<a4j:support event="onblur" ajaxSingle="true" reRender="#{creditMeFieldId}, totalCredit" actionListener="#{voucherCreateAction.convertAmount(voucherDetail)}"/>-->
+                                    <a4j:support event="onblur" ajaxSingle="true"
+                                                 reRender="movementDetailListPanel"
+                                                 actionListener="#{voucherCreateAction.convertToNationalCurrency(voucherDetail)}"/>
+                                </h:inputText>
+                                <h:message for="#{creditMeInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
+                            </s:div>
+                        </td>
+                        </c:if>
+                        <!-- End ME -->
 
                         <td class="rich-table-cell center">
                             <a4j:commandLink immediate="true"
@@ -403,6 +468,10 @@
                         </s:div>
                     </td>
                     <td class="rich-table-cell center">-</td>
+                    <c:if test="#{voucherCreateAction.currencyCondition}">
+                    <td class="rich-table-cell center">-</td>
+                    <td class="rich-table-cell center">-</td>
+                    </c:if>
                 </tr>
             </table>
         </s:div>

@@ -198,10 +198,10 @@
                               label="#{messages['Account.transactions']}"
                               ajaxSingle="true">
                         <!--<rich:dataTable value="#{voucherAction.getVoucherDetailList(voucher.transactionNumber)}"-->
+                        <!--rows="#{sessionUser.rowsPerPage}"-->
                         <rich:dataTable id="accountTransactionListId"
                                         value="#{accountAction.getAccountDetailList(account)}"
                                         var="accountDetailItem"
-                                        rows="#{sessionUser.rowsPerPage}"
                                         width="100%"
                                         columnsWidth="10%, 10%, 45%, 15%, 10%, 10%">
                             <f:facet name="header">
@@ -295,9 +295,8 @@
                             </rich:column>-->
 
                         </rich:dataTable>
-                        <app:dataScroller id="ListIdListDataScrollerId"
-                                          for="accountTransactionListId"
-                                          dataModel="#{accountTransactionDataModel}"/>
+                        <!--<app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId" dataModel="#{accountTransactionDataModel}"/>-->
+                        <app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId"/>
                     </rich:tab>
                 </rich:tabPanel>
             </c:if>

@@ -50,8 +50,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public static String APPROVED_OUTCOME = "Approved";
     public static String ANNUL_OUTCOME = "Annul";
 
-    private BigDecimal debit = new BigDecimal("0.00");
-    private BigDecimal credit = new BigDecimal("0.00");
+    private BigDecimal debit = BigDecimal.ZERO;
+    private BigDecimal credit = BigDecimal.ZERO;
+    private BigDecimal debitMe = BigDecimal.ZERO;
+    private BigDecimal creditMe = BigDecimal.ZERO;
+
     private String documentTypeCode = "";
 
     private DocType docType = new DocType();
@@ -81,6 +84,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private String providerFullName;
 
     private Boolean fiscalCredit = false;
+    private Boolean currencyCondition = false;
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
@@ -128,7 +132,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     @Override
-    @End
+    /*@End*/
     public String create() {
 
         voucher.setDocumentType(docType.getName());
@@ -136,7 +140,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
-        Boolean hasFiscalCredit = false;
+        //Boolean hasFiscalCredit = false;
 
         BigDecimal totalD = BigDecimal.ZERO;
         BigDecimal totalC = BigDecimal.ZERO;
@@ -151,7 +155,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 totalC = totalC.add(voucherDetail.getCredit());
 
                 if (isFiscalCredit(voucherDetail)){
-                    hasFiscalCredit = true;
+                    //hasFiscalCredit = true;
                     totalFiscalCredit = BigDecimalUtil.sum(totalFiscalCredit, voucherDetail.getDebit(), 2);
                 }
 
@@ -197,19 +201,23 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             }
 
             voucherAccoutingService.saveVoucher(voucher);
-            voucherUpdateAction.setVoucher(voucher);
+
+            /*voucherUpdateAction.setVoucher(voucher);
             voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
             voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-            voucherUpdateAction.setInstance(voucher);
+            voucherUpdateAction.setInstance(voucher);*/
+            setVoucher(voucher);
+            setDocType(voucherService.getDocType(voucher.getDocumentType()));
+            setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+            setInstance(voucher);
 
             System.out.println("-------------> Relacionando....");
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
-            //voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
-            voucherUpdateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
-
+            //voucherUpdateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+            setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
 
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;
@@ -364,7 +372,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void assignInputVoucherDetail(){
 
-            try {
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
+        try {
                 VoucherDetail voucherDetail = new VoucherDetail();
                 voucherDetail.setCashAccount(this.account);
                 voucherDetail.setAccount(this.account.getAccountCode());
@@ -375,14 +392,28 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
                 voucherDetail.setDebit(this.debit);
                 voucherDetail.setCredit(this.credit);
+                voucherDetail.setDebitMe(this.debitMe);
+                voucherDetail.setCreditMe(this.creditMe);
+
+                if (voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.P)) {
+                    voucherDetail.setCurrency(FinancesCurrencyType.P);
+                    voucherDetail.setExchangeAmount(BigDecimal.ONE);
+                }
+                if (voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.D) || voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.M)){
+                    voucherDetail.setCurrency(FinancesCurrencyType.D);
+                    voucherDetail.setExchangeAmount(exchangeRate);
+                }
 
                 voucherDetails.add(voucherDetail);
                 clearAll();
                 setDebit(BigDecimal.ZERO);
                 setCredit(BigDecimal.ZERO);
-            } catch (NullPointerException e) {
+                setDebitMe(BigDecimal.ZERO);
+                setCreditMe(BigDecimal.ZERO);
+
+        } catch (NullPointerException e) {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
-            }
+        }
     }
 
     public void clearAll(){
@@ -448,7 +479,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignPartnerAccountVoucherDetail(){
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
-
         try {
             exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
         }catch (FinancesExchangeRateNotFoundException e){
@@ -458,14 +488,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         }
 
         try {
-
-
-            System.out.println("---> Exchange Rate: " + exchangeRate);
-            System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
-            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
-            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
-            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
-
             CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
 
@@ -484,6 +506,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherCaja.setCredit(BigDecimal.ZERO);
 
                 voucherCaja.setExchangeAmount(exchangeRate);
+                voucherCaja.setCurrency(FinancesCurrencyType.D);
 
             }
 
@@ -498,6 +521,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherCaja.setCreditMe(BigDecimal.ZERO);
 
                 voucherCaja.setExchangeAmount(BigDecimal.ONE);
+                voucherCaja.setCurrency(FinancesCurrencyType.P);
             }
 
 
@@ -528,6 +552,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherSaving.setCredit(BigDecimalUtil.multiply(getAmountDeposit(), exchangeRate, 2));
 
                 voucherSaving.setExchangeAmount(exchangeRate);
+                voucherSaving.setCurrency(FinancesCurrencyType.D);
             }
 
             if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P)) {
@@ -538,6 +563,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherSaving.setCreditMe(BigDecimal.ZERO);
 
                 voucherSaving.setExchangeAmount(BigDecimal.ONE);
+                voucherSaving.setCurrency(FinancesCurrencyType.P);
             }
 
             voucherDetails.add(voucherCaja);
@@ -835,6 +861,37 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         this.credit = credit;
     }
 
+    public void convertToNationalCurrency(VoucherDetail voucherDetail){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            if (voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.D) || voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.M)){
+                exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+                voucherDetail.setDebit(BigDecimalUtil.multiply(voucherDetail.getDebitMe(), exchangeRate, 2));
+                voucherDetail.setCredit(BigDecimalUtil.multiply(voucherDetail.getCreditMe(), exchangeRate, 2));
+            }
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+    }
+
+    public void convertToForeignCurrency(VoucherDetail voucherDetail){
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            if (voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.D) || voucherDetail.getCashAccount().getCurrency().equals(FinancesCurrencyType.M)){
+                exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+                voucherDetail.setDebitMe(BigDecimalUtil.divide(voucherDetail.getDebit(), exchangeRate, 2));
+                voucherDetail.setCreditMe(BigDecimalUtil.divide(voucherDetail.getCredit(), exchangeRate, 2));
+            }
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+    }
+
     public String getDocumentTypeCode() {
         return documentTypeCode;
     }
@@ -1056,5 +1113,29 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private void addFinancesExchangeRateNotFoundExceptionMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "FixedAssets.FinancesExchangeRateNotFoundException");
+    }
+
+    public BigDecimal getDebitMe() {
+        return debitMe;
+    }
+
+    public void setDebitMe(BigDecimal debitMe) {
+        this.debitMe = debitMe;
+    }
+
+    public BigDecimal getCreditMe() {
+        return creditMe;
+    }
+
+    public void setCreditMe(BigDecimal creditMe) {
+        this.creditMe = creditMe;
+    }
+
+    public Boolean getCurrencyCondition() {
+        return currencyCondition;
+    }
+
+    public void setCurrencyCondition(Boolean currencyCondition) {
+        this.currencyCondition = currencyCondition;
     }
 }

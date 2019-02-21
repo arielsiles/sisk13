@@ -9,6 +9,7 @@ import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.MessageUtils;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
@@ -328,8 +329,20 @@ public class VoucherDetail implements BaseModel {
         if (partner != null)
             fullCashAccount = fullCashAccount + " (" + partner.getFullName() + ")";
 
-        return fullCashAccount;
+        System.out.println("=======> getDebit(): " + getDebit());
+        System.out.println("=======> getCredit(): " + getCredit());
+        System.out.println("=======> getDebitMe(): " + getDebitMe());
+        System.out.println("=======> getCreditMe(): " + getCreditMe());
 
+
+        if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)){
+            if (getDebitMe().doubleValue() > 0)
+                fullCashAccount = fullCashAccount + " (" + getDebitMe() + " " + MessageUtils.getMessage(cashAccount.getCurrency().getSymbolResourceKey()) + ")";
+            if (getCreditMe().doubleValue() > 0)
+                fullCashAccount = fullCashAccount + " (" + getCreditMe() + " " + MessageUtils.getMessage(cashAccount.getCurrency().getSymbolResourceKey()) + ")";
+        }
+
+        return fullCashAccount;
     }
 
     public String getPayableAccountFullName() {
