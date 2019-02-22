@@ -132,7 +132,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     @Override
-    /*@End*/
+    @End
     public String create() {
 
         voucher.setDocumentType(docType.getName());
@@ -140,7 +140,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
-        //Boolean hasFiscalCredit = false;
+        Boolean hasFiscalCredit = false;
 
         BigDecimal totalD = BigDecimal.ZERO;
         BigDecimal totalC = BigDecimal.ZERO;
@@ -155,7 +155,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 totalC = totalC.add(voucherDetail.getCredit());
 
                 if (isFiscalCredit(voucherDetail)){
-                    //hasFiscalCredit = true;
+                    hasFiscalCredit = true;
                     totalFiscalCredit = BigDecimalUtil.sum(totalFiscalCredit, voucherDetail.getDebit(), 2);
                 }
 
@@ -202,13 +202,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             voucherAccoutingService.saveVoucher(voucher);
 
-            /*voucherUpdateAction.setVoucher(voucher);
+            /*
+            voucherUpdateAction.setVoucher(voucher);
             voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
             voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-            voucherUpdateAction.setInstance(voucher);*/
-            setVoucher(voucher);
-            setDocType(voucherService.getDocType(voucher.getDocumentType()));
-            setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+            voucherUpdateAction.setInstance(voucher);
+            */
+
+            //setVoucher(voucher);
+            //setDocType(voucherService.getDocType(voucher.getDocumentType()));
+            //setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+
             setInstance(voucher);
 
             System.out.println("-------------> Relacionando....");
@@ -216,8 +220,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
+            //voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
             //voucherUpdateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
-            setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+
 
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;
@@ -488,6 +493,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         }
 
         try {
+
+
+            System.out.println("---> Exchange Rate: " + exchangeRate);
+            System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
+            System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
+
             CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
             CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
 
@@ -986,6 +999,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
         }
 
+    }
+
+    public void assignProviderAndFinancesEntity(Provider provider) {
+        setProvider(provider);
+        purchaseDocumentAction.assignFinancesEntity(provider.getEntity());
     }
 
     public CashAccount getAccount() {

@@ -753,7 +753,10 @@
         <ui:param name="reRender" value="financesEntityField, nameField, nitField"/>
 
         <ui:param name="postCreateAction"
-                  value="#{voucherUpdateAction.assignProviderAndFinancesEntity(financeProviderAction.instance)}"/>
+                  value="#{voucherCreateAction.assignProviderAndFinancesEntity(financeProviderAction.instance)}"/>
+
+        <!--<ui:param name="postCreateAction"
+                  value="#{voucherUpdateAction.assignProviderAndFinancesEntity(financeProviderAction.instance)}"/>-->
 
         <!--<ui:param name="postUpdateAction"
                       value="#{voucherUpdateAction.assignFinancesEntity(financeProviderAction.instance)}"/>-->

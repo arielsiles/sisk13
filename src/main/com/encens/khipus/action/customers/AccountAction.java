@@ -105,8 +105,10 @@ public class AccountAction extends GenericAction<Account> {
     public boolean isForeignAccount(){
 
         boolean result = false;
-        if (getInstance().getCurrency().equals(FinancesCurrencyType.D) || getInstance().getCurrency().equals(FinancesCurrencyType.M))
-            result = true;
+        if (getInstance().getCurrency() != null){
+            if (getInstance().getCurrency().equals(FinancesCurrencyType.D) || getInstance().getCurrency().equals(FinancesCurrencyType.M))
+                result = true;
+        }
 
         return result;
     }
