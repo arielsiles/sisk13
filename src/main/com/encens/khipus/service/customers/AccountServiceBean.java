@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,7 +35,8 @@ public class AccountServiceBean implements AccountService {
 
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
-                    " where voucherDetail.partnerAccount = :account ")
+                    " where voucherDetail.partnerAccount = :account " +
+                    " order by voucherDetail.voucher.date asc ")
                     .setParameter("account", account)
                     .getResultList();
             
@@ -44,5 +46,33 @@ public class AccountServiceBean implements AccountService {
         return voucherDetails;
     }
 
+    public List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate){
+
+        List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
+        try {
+            voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+                    " where voucherDetail.partnerAccount = :account " +
+                    " and voucherDetail.voucher.date between :startDate and :endDate " +
+                    " order by voucherDetail.voucher.date asc ")
+                    .setParameter("account", account)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .getResultList();
+
+        }catch (NoResultException e){
+            return null;
+        }
+        return voucherDetails;
+    }
+
+    public List<Account> getAccountList(){
+        List<Account> accountList = new ArrayList<Account>();
+        accountList = (List<Account>) em.createQuery("select account from Account account " +
+                " where account.accountState = :state" +
+                " and account.id = 2065 ")
+                .setParameter("state", AccountState.ACTIVE)
+                .getResultList();
+        return accountList;
+    }
 
 }

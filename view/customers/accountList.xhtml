@@ -54,6 +54,12 @@
         <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
     </rich:simpleTogglePanel>
             <div class="buttons">
+
+                <s:button value="#{messages['Account.capitalizeInterest']}"
+                          view="/customers/capitalizeInterest.xhtml" styleClass="button"
+                          propagation="begin"
+                          />
+
                 <s:button value="#{messages['Common.new']}"
                           view="/customers/account.xhtml"
                           styleClass="button"

@@ -8,6 +8,7 @@ import com.encens.khipus.model.finances.VoucherDetail;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,5 +21,7 @@ import java.util.List;
 public interface AccountService {
 
     List<VoucherDetail> getAccountDetailList(Account account);
+    List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate);
+    List<Account> getAccountList();
 
 }
