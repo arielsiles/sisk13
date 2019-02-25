@@ -120,21 +120,25 @@ public class AccountAction extends GenericAction<Account> {
     public void capitaliationOfInterests(){
 
         BigDecimal totalInterest = BigDecimal.ZERO;
-
         List<Account> accountList = accountService.getAccountList();
-        for (Account account : accountList){
-            List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
 
-            List<AccountKardex> kardexList = calculateAccountKardex(accountMovements, account.getCurrency());
+        for (Account account : accountList){
+
+            List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
+            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency());
+
+            /** change for conditions: with credit, without credit **/
+            BigDecimal percentage = account.getAccountType().getInta();
 
             System.out.println(kardexList.get(0).getDate() + " - " + kardexList.get(0).getDebit() + " - " + kardexList.get(0).getCredit() + " - Diff: 0 - " + kardexList.get(0).getInterest());
             for (int i=1 ; i < kardexList.size() ; i++){
                 AccountKardex previous = kardexList.get(i-1);
                 AccountKardex current = kardexList.get(i);
                 Long days = DateUtils.daysBetween(previous.getDate(), current.getDate()) - 1;
-                current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance));
+                current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance, percentage));
 
                 totalInterest = BigDecimalUtil.sum(totalInterest, current.getInterest(), 6);
+
                 System.out.println(current.getDate() + " - " + current.getDebit() + " - " + current.getCredit() + " - Diff: " + days + " - " + current.getInterest());
             }
             System.out.println("====> TOTAL INTERES: " + totalInterest);
@@ -149,25 +153,14 @@ public class AccountAction extends GenericAction<Account> {
         /** For M.E. **/
         if (currencyType.equals(FinancesCurrencyType.P)){
             for (VoucherDetail detail : accountMovements){
+                balance = BigDecimalUtil.subtract(balance, detail.getDebit(), 6);
+                balance = BigDecimalUtil.sum(balance, detail.getCredit(), 6);
 
-                balance = BigDecimalUtil.subtract(balance, detail.getDebit(), 2);
-                balance = BigDecimalUtil.sum(balance, detail.getCredit(), 2);
-
-                char movType = 'E';
-                if (detail.getDebit().doubleValue()>0)
-                    movType = 'S';
-
-                AccountKardex data = new AccountKardex(
-                        detail.getVoucher().getDate(),
-                        movType,
-                        detail.getDebit(),
-                        detail.getCredit(),
-                        balance
-                );
-
+                AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebit(),detail.getCredit(),balance);
                 dataList.add(data);
             }
         }
+
         /** For M.N. **/
         if (currencyType.equals(FinancesCurrencyType.D) || currencyType.equals(FinancesCurrencyType.M)){
         /* todo */
@@ -175,14 +168,8 @@ public class AccountAction extends GenericAction<Account> {
         return dataList;
     }
 
-   /* public BigDecimal calculateInterest(BigDecimal amount, Integer days){
+    public BigDecimal calculateInterest(Date previousDate, Date currentDate, BigDecimal balance, BigDecimal percentage){
 
-        return BigDecimal.ZERO;
-    }
-*/
-    public BigDecimal calculateInterest(Date previousDate, Date currentDate, BigDecimal balance){
-
-        BigDecimal percentage = new BigDecimal(2); // %
         BigDecimal saldoCapital = balance;
 
         Date currentPaymentDate = currentDate;
@@ -274,15 +261,13 @@ public class AccountAction extends GenericAction<Account> {
     private class AccountKardex{
 
         private Date date;
-        private char movementType;
         private BigDecimal debit;
         private BigDecimal credit;
         private BigDecimal balance;
         private BigDecimal interest;
 
-        AccountKardex(Date date, char movementType, BigDecimal debit, BigDecimal credit, BigDecimal balance){
+        AccountKardex(Date date, BigDecimal debit, BigDecimal credit, BigDecimal balance){
             this.setDate(date);
-            this.setMovementType(movementType);
             this.setDebit(debit);
             this.setCredit(credit);
             this.setBalance(balance);
@@ -295,14 +280,6 @@ public class AccountAction extends GenericAction<Account> {
 
         public void setDate(Date date) {
             this.date = date;
-        }
-
-        public char getMovementType() {
-            return movementType;
-        }
-
-        public void setMovementType(char movementType) {
-            this.movementType = movementType;
         }
 
         public BigDecimal getDebit() {

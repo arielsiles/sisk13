@@ -44,8 +44,11 @@ public class AccountType implements BaseModel {
     @Length(max = 100)
     private String name;
 
-    @Column(name = "interes", precision = 4, scale = 2, nullable = false)
-    private BigDecimal interest;
+    @Column(name = "inta", precision = 4, scale = 2, nullable = false)
+    private BigDecimal inta;
+
+    @Column(name = "intb", precision = 4, scale = 2, nullable = false)
+    private BigDecimal intb;
 
     @Column(name = "activo")
     @Type(type = IntegerBooleanUserType.NAME)
@@ -114,14 +117,6 @@ public class AccountType implements BaseModel {
         this.name = name;
     }
 
-    public BigDecimal getInterest() {
-        return interest;
-    }
-
-    public void setInterest(BigDecimal interest) {
-        this.interest = interest;
-    }
-
     public Boolean getActive() {
         return active;
     }
@@ -152,5 +147,21 @@ public class AccountType implements BaseModel {
 
     public void setCashAccountMv(CashAccount cashAccountMv) {
         this.cashAccountMv = cashAccountMv;
+    }
+
+    public BigDecimal getInta() {
+        return inta;
+    }
+
+    public void setInta(BigDecimal inta) {
+        this.inta = inta;
+    }
+
+    public BigDecimal getIntb() {
+        return intb;
+    }
+
+    public void setIntb(BigDecimal intb) {
+        this.intb = intb;
     }
 }
