@@ -54,6 +54,10 @@ public class AccountType implements BaseModel {
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active;
 
+    @Column(name = "tipo", updatable = false)
+    @Enumerated(EnumType.STRING)
+    private SavingType savingType;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -163,5 +167,13 @@ public class AccountType implements BaseModel {
 
     public void setIntb(BigDecimal intb) {
         this.intb = intb;
+    }
+
+    public SavingType getSavingType() {
+        return savingType;
+    }
+
+    public void setSavingType(SavingType savingType) {
+        this.savingType = savingType;
     }
 }

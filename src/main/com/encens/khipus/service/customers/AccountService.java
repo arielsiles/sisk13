@@ -4,6 +4,8 @@ import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
+import com.encens.khipus.model.customers.SavingType;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.VoucherDetail;
 
 import javax.ejb.Local;
@@ -23,5 +25,7 @@ public interface AccountService {
     List<VoucherDetail> getAccountDetailList(Account account);
     List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate);
     List<Account> getAccountList();
+    List<Account> getSavingsAccounts(SavingType savingType);
+    List<Account> getSavingsAccounts(SavingType savingType, FinancesCurrencyType currencyType);
 
 }

@@ -45,10 +45,21 @@
                            datePattern="#{messages['patterns.date']}"
                            styleClass="input"
                            enableManualInput="true"
-                           tabindex="1"
+                           tabindex="2"
                            required="true">
                 <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
             </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="savingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Account.savingType']}</ui:define>
+            <h:selectOneMenu id="savingType" value="#{accountAction.savingType}" styleClass="input"
+                             tabindex="3" required="true">
+                <s:selectItems value="#{savingTypeEnum}" var="savingType" label="#{messages[savingType.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
         </s:decorate>
 
         <!--<s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -57,7 +68,7 @@
                              value="#{creditAction.gloss}"
                              required="true"
                              styleClass="input textarea-medium"
-                             tabindex="3">
+                             tabindex="4">
                 <f:validateLength maximum="500"/>
             </h:inputTextarea>
         </s:decorate>-->

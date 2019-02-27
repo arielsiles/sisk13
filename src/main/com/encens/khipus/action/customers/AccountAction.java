@@ -1,15 +1,22 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
+import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.AccountService;
+import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +36,10 @@ public class AccountAction extends GenericAction<Account> {
 
     @In
     private AccountService accountService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private FinancesExchangeRateService financesExchangeRateService;
 
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
 
@@ -40,8 +51,13 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    /** For capitalization **/
     private Date startDate;
     private Date endDate;
+
+    private SavingType savingType;
+
+    /** End **/
 
     @Factory(value = "account", scope = ScopeType.STATELESS)
     public Account initAccount() {
@@ -56,6 +72,11 @@ public class AccountAction extends GenericAction<Account> {
     @Factory(value = "accountStateEnum", scope = ScopeType.STATELESS)
     public AccountState[] getAccountStateEnum() {
         return AccountState.values();
+    }
+
+    @Factory(value = "savingTypeEnum", scope = ScopeType.STATELESS)
+    public SavingType[] getSavingTypeEnum() {
+        return SavingType.values();
     }
 
     @Override
@@ -117,13 +138,46 @@ public class AccountAction extends GenericAction<Account> {
         return result;
     }
 
+
     public void capitaliationOfInterests(){
+        if (this.savingType.equals(SavingType.SOC)){
 
-        BigDecimal totalInterest = BigDecimal.ZERO;
-        List<Account> accountList = accountService.getAccountList();
+        }
 
-        for (Account account : accountList){
+        if (this.savingType.equals(SavingType.CAJ)){
+            capitaliationOfInterestsCAJ();
+        }
 
+        if (this.savingType.equals(SavingType.DPF)){
+
+        }
+    }
+
+    public void capitaliationOfInterestsCAJ(){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {   exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){ addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType("CD");
+        voucher.setDate(this.endDate);
+        voucher.setGloss("Capitalizacion de intereses, Ahorros en cuentas...");
+
+
+        BigDecimal totalInterestME = BigDecimal.ZERO;
+        BigDecimal totalInterestMV = BigDecimal.ZERO;
+
+
+        /** For MN **/
+        //List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ, FinancesCurrencyType.P); /** MN **/
+        List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ); /** MN **/
+        BigDecimal totalInterestMN = BigDecimal.ZERO;
+        BigDecimal totalIvaTax = BigDecimal.ZERO;
+
+        for (Account account : accountsMnList){
+            BigDecimal accountInterest = BigDecimal.ZERO;
             List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
             List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency());
 
@@ -136,21 +190,120 @@ public class AccountAction extends GenericAction<Account> {
                 AccountKardex current = kardexList.get(i);
                 Long days = DateUtils.daysBetween(previous.getDate(), current.getDate()) - 1;
                 current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance, percentage));
-
-                totalInterest = BigDecimalUtil.sum(totalInterest, current.getInterest(), 6);
+                accountInterest = BigDecimalUtil.sum(accountInterest, current.getInterest(), 6);
 
                 System.out.println(current.getDate() + " - " + current.getDebit() + " - " + current.getCredit() + " - Diff: " + days + " - " + current.getInterest());
+
+                // Si ultima transaccion es menor al 31/mm/aaaaa
+                if (i == kardexList.size()-1){
+                    if (kardexList.get(i).getDate().compareTo(this.endDate) < 0){
+                        Long daysZ = DateUtils.daysBetween(kardexList.get(i).getDate(), this.endDate) - 1;
+                        BigDecimal endInterest = calculateInterest(kardexList.get(i).getDate(), this.endDate, current.getBalance(), percentage);
+                        accountInterest = BigDecimalUtil.sum(accountInterest, endInterest, 6);
+                        System.out.println(this.endDate + " - " + current.getDebit() + " - " + current.getCredit() + " - Diff: " + daysZ + " - " + endInterest);
+                    }
+                }
             }
-            System.out.println("====> TOTAL INTERES: " + totalInterest);
+            BigDecimal ivaTax = BigDecimalUtil.multiply(accountInterest, Constants.VAT, 6);
+
+            String cashAccountCode = "";
+            if (account.getCurrency().equals(FinancesCurrencyType.P))
+                cashAccountCode = account.getAccountType().getCashAccountMn().getAccountCode();
+            if (account.getCurrency().equals(FinancesCurrencyType.D))
+                cashAccountCode = account.getAccountType().getCashAccountMe().getAccountCode();
+            if (account.getCurrency().equals(FinancesCurrencyType.M))
+                cashAccountCode = account.getAccountType().getCashAccountMv().getAccountCode();
+
+            VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, accountInterest, "CREDIT", account.getCurrency());
+            VoucherDetail detailIvaTax   = buildAccountEntryDetail(cashAccountCode, ivaTax, "DEBIT", account.getCurrency());
+
+            detailInterest.setPartnerAccount(account);
+            detailIvaTax.setPartnerAccount(account);
+
+            voucher.getDetails().add(detailInterest);
+            voucher.getDetails().add(detailIvaTax);
+
+            totalInterestMN = BigDecimalUtil.sum(totalInterestMN, accountInterest, 6);
+            totalIvaTax     = BigDecimalUtil.sum(totalIvaTax,ivaTax, 6);
+
+            System.out.println("====> TOTAL INTERES: " + accountInterest);
         }
 
+        VoucherDetail detailTotalInterest = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210100, totalInterestMN, "DEBIT", FinancesCurrencyType.P);
+        VoucherDetail detailTotalIvaTax   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax, "CREDIT", FinancesCurrencyType.P);
+
+        voucher.getDetails().add(detailTotalInterest);
+        voucher.getDetails().add(detailTotalIvaTax);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+    }
+
+    public VoucherDetail buildAccountEntryDetail(String cashAccountCode, BigDecimal amount, String flag, FinancesCurrencyType currencyType){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
+        VoucherDetail detail = new VoucherDetail();
+
+        if (currencyType.equals(FinancesCurrencyType.P)){
+            if (flag.equals("DEBIT")){
+                detail.setDebit(amount);
+                detail.setCredit(BigDecimal.ZERO);
+                detail.setAccount(cashAccountCode);
+
+                detail.setExchangeAmount(BigDecimal.ONE);
+                detail.setDebitMe(BigDecimal.ZERO);
+                detail.setCreditMe(BigDecimal.ZERO);
+            }
+            if (flag.equals("CREDIT")){
+                detail.setDebit(BigDecimal.ZERO);
+                detail.setCredit(amount);
+                detail.setAccount(cashAccountCode);
+
+                detail.setExchangeAmount(BigDecimal.ONE);
+                detail.setDebitMe(BigDecimal.ZERO);
+                detail.setCreditMe(BigDecimal.ZERO);
+            }
+
+        }
+
+        if (currencyType.equals(FinancesCurrencyType.D) || currencyType.equals(FinancesCurrencyType.M)){
+            if (flag.equals("DEBIT")){
+                detail.setDebitMe(amount);
+                detail.setCreditMe(BigDecimal.ZERO);
+                detail.setAccount(cashAccountCode);
+
+                detail.setExchangeAmount(exchangeRate);
+                detail.setDebit(BigDecimalUtil.multiply(detail.getDebitMe(), exchangeRate, 2));
+                detail.setCredit(BigDecimal.ZERO);
+            }
+            if (flag.equals("CREDIT")){
+                detail.setDebitMe(BigDecimal.ZERO);
+                detail.setCreditMe(amount);
+                detail.setAccount(cashAccountCode);
+
+                detail.setExchangeAmount(exchangeRate);
+                detail.setDebit(BigDecimal.ZERO);
+                detail.setCredit(BigDecimalUtil.multiply(detail.getCreditMe(), exchangeRate, 2));
+            }
+
+        }
+
+        return detail;
     }
 
     public List<AccountKardex> calculateAccountKardex(List<VoucherDetail> accountMovements, FinancesCurrencyType currencyType){
 
         List<AccountKardex> dataList = new ArrayList<AccountKardex>();
         BigDecimal balance = BigDecimal.ZERO;
-        /** For M.E. **/
+        /** For M.N. **/
         if (currencyType.equals(FinancesCurrencyType.P)){
             for (VoucherDetail detail : accountMovements){
                 balance = BigDecimalUtil.subtract(balance, detail.getDebit(), 6);
@@ -161,9 +314,15 @@ public class AccountAction extends GenericAction<Account> {
             }
         }
 
-        /** For M.N. **/
+        /** For M.E. **/
         if (currencyType.equals(FinancesCurrencyType.D) || currencyType.equals(FinancesCurrencyType.M)){
-        /* todo */
+            for (VoucherDetail detail : accountMovements){
+                balance = BigDecimalUtil.subtract(balance, detail.getDebitMe(), 6);
+                balance = BigDecimalUtil.sum(balance, detail.getCreditMe(), 6);
+
+                AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebitMe(), detail.getCreditMe(), balance);
+                dataList.add(data);
+            }
         }
         return dataList;
     }
@@ -257,6 +416,14 @@ public class AccountAction extends GenericAction<Account> {
         this.endDate = endDate;
     }
 
+    public SavingType getSavingType() {
+        return savingType;
+    }
+
+    public void setSavingType(SavingType savingType) {
+        this.savingType = savingType;
+    }
+
 
     private class AccountKardex{
 
@@ -313,6 +480,16 @@ public class AccountAction extends GenericAction<Account> {
         public void setInterest(BigDecimal interest) {
             this.interest = interest;
         }
+    }
+
+    private void addFinancesCurrencyNotFoundMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "FixedAssets.FinancesCurrencyNotFoundException");
+    }
+
+    private void addFinancesExchangeRateNotFoundExceptionMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "FixedAssets.FinancesExchangeRateNotFoundException");
     }
 
 }

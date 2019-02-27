@@ -14,3 +14,18 @@ UPDATE tipocuenta t SET t.`intb` = 0 WHERE t.`idtipocuenta` IN (3);
 
 /* Para fondo Lechero */
 -- todo
+
+/* Para fondo CISC */
+ALTER TABLE tipocuenta ADD  COLUMN tipo VARCHAR(10) AFTER activo;
+UPDATE tipocuenta t SET t.`tipo` = 'AHO';
+UPDATE tipocuenta t SET t.`tipo` = 'DPF' WHERE t.`idtipocuenta` = 3;
+
+/** Para ambos **/
+DELETE FROM arcgms  WHERE cuenta IN (4110000000, 4110100000, 4110110000);
+-- upload csv
+
+
+SELECT *
+FROM sf_tmpdet d
+WHERE d.`cuenta` IN (4110100000, 4110110000)
+;

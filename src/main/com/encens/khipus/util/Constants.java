@@ -244,6 +244,12 @@ public final class Constants {
     public static final String ACOUNT_LOAN_EXPIRED = "1320510100";          //Prestamos Amortizables Vencidos CIS M.N.
     public static final String ACOUNT_INTEREST_ON_EXPIRED = "5140510100";   //Intereses Prestamos Amort. Ven. CIS M.N.
 
+    public static final String ACOUNT_INTEREST_4110210100 = "4110210100";   //Int.Obligaciones Cajas de Ahorros M.N.
+    public static final String ACOUNT_INTEREST_4110210200 = "4110210200";   //Int.Obligaciones Ahorros Socios M.N.
+
+    public static final String ACOUNT_RCIVA_2420310100 = "2420310100";   //RC IVA retenido a Clientes
+
+
     public static final String ACOUNT_LOAN_EXECUTION = "";          //
 
     public static final BigDecimal EXCHANGE_RATE = new BigDecimal(6.96);
