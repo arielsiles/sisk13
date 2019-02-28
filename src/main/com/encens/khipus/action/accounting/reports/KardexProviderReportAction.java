@@ -97,22 +97,6 @@ public class KardexProviderReportAction extends GenericReportAction {
                         "  group by voucherDetail.providerCode, entity.acronym " +
                         "  order by entity.acronym";
             }else{
-                /*ejbql = " SELECT " +
-                        " cashAccount.accountCode AS accountCode," +
-                        " cashAccount.description AS description," +
-                        " entity.id AS providerCode, " +
-                        " entity.acronym AS acronym," +
-                        " SUM(voucherDetail.debit) as debit, " +
-                        " SUM(voucherDetail.credit) as credit " +
-                        " FROM Voucher voucher" +
-                        " LEFT JOIN voucher.voucherDetailList voucherDetail" +
-                        " LEFT JOIN voucherDetail.provider.entity entity" +
-                        " LEFT JOIN voucherDetail.cashAccount cashAccount " +
-                        " WHERE voucher.date between '" + start + "' and '" + end + "' " +  <<--------- Modify
-                        " AND   voucher.state <> 'ANL' " +
-                        " AND   voucherDetail.providerCode IS NOT NULL " +
-                        " GROUP BY cashAccount.accountCode, cashAccount.description, entity.id, entity.acronym " +
-                        " ORDER BY cashAccount.accountCode, cashAccount.description, entity.acronym ";*/
                 ejbql = " SELECT " +
                         " cashAccount.accountCode AS accountCode," +
                         " cashAccount.description AS description," +

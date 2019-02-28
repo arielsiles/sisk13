@@ -46,9 +46,6 @@
 		<variableExpression><![CDATA[$V{totalDebit}.doubleValue()-$V{totalCredit}.doubleValue()]]></variableExpression>
 	</variable>
 	<variable name="balance" class="java.lang.Double" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
-	<variable name="totalBalance" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$V{diference}]]></variableExpression>
-	</variable>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[]]></groupExpression>
 		<groupHeader>
@@ -171,9 +168,9 @@
 					<textField pattern="#,##0.00;(#,##0.00)">
 						<reportElement x="491" y="0" width="65" height="16"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Arial" size="7"/>
+							<font fontName="Arial" size="7" isBold="false" isUnderline="false"/>
 						</textElement>
-						<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalBalance}]]></textFieldExpression>
+						<textFieldExpression class="java.lang.Double"><![CDATA[$V{diferenceTotal}]]></textFieldExpression>
 					</textField>
 				</frame>
 				<line>

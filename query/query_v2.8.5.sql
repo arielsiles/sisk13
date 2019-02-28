@@ -21,11 +21,24 @@ UPDATE tipocuenta t SET t.`tipo` = 'AHO';
 UPDATE tipocuenta t SET t.`tipo` = 'DPF' WHERE t.`idtipocuenta` = 3;
 
 /** Para ambos **/
-DELETE FROM arcgms  WHERE cuenta IN (4110000000, 4110100000, 4110110000);
+-- DELETE FROM arcgms  WHERE cuenta IN (4110000000, 4110100000, 4110110000);
 -- upload csv
 
+UPDATE sf_tmpdet d SET d.`cod_prov` = 62 WHERE d.`id_tmpdet` = 410263;
+UPDATE sf_tmpdet d SET d.`cod_prov` = 521 WHERE d.`id_tmpdet` = 437823;
+UPDATE sf_tmpdet d SET d.`cod_prov` = 74 WHERE d.`id_tmpdet` = 468218;
+UPDATE sf_tmpdet d SET d.`cod_prov` = 521 WHERE d.`id_tmpdet` = 478967;
+UPDATE sf_tmpdet d SET d.`cod_prov` = 67 WHERE d.`id_tmpdet` = 479875;
+UPDATE sf_tmpdet d SET d.`cod_prov` = 448 WHERE d.`id_tmpdet` IN (520831,520832,520899,520900);
 
-SELECT *
-FROM sf_tmpdet d
-WHERE d.`cuenta` IN (4110100000, 4110110000)
-;
+UPDATE inv_articulos i SET i.`cuenta_art` = '4460310208' WHERE i.`cod_art` = 600;
+UPDATE sf_tmpdet d SET d.`cuenta` = '4460114700' WHERE d.`id_tmpdet` = 408394;
+UPDATE sf_tmpdet d SET d.`cuenta` = '4460114700' WHERE d.`id_tmpdet` = 410800;
+
+UPDATE sf_tmpdet d SET d.`cod_prov` = 89 WHERE d.`id_tmpdet` = 428987;
+
+UPDATE sf_tmpdet d SET d.`cuenta` = '4460114700' 
+WHERE d.`id_tmpdet` IN (412222,412418,412574,412766,412874,413037,414380,414554,414669,414834);
+
+
+
