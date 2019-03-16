@@ -50,9 +50,14 @@ public class CashAccount implements BaseModel {
     @Column(name = "CTA_NIV3", nullable = false, updatable = false, insertable = false)
     private String accountLevel3Code;
 
-    @Column(name = "TIPO", length = 2, updatable = false)
+    /*@Column(name = "TIPO", length = 2, updatable = false)
     @Length(max = 2)
-    private String accountType;
+    private String accountType;*/
+
+    @Column(name = "TIPO", updatable = false)
+    @Enumerated(EnumType.STRING)
+    private CashAccountType accountType;
+
 
     @Column(name = "CLASE", length = 1, updatable = false)
     @Length(max = 1)
@@ -198,14 +203,6 @@ public class CashAccount implements BaseModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(String accountType) {
-        this.accountType = accountType;
     }
 
     public String getAccountClass() {
@@ -422,7 +419,7 @@ public class CashAccount implements BaseModel {
                 "accountCode='" + accountCode + '\'' +
                 ", companyNumber='" + companyNumber + '\'' +
                 ", description='" + description + '\'' +
-                ", accountType='" + accountType + '\'' +
+                ", accountType='" + getAccountType() + '\'' +
                 ", accountClass='" + accountClass + '\'' +
                 ", movementAccount='" + movementAccount + '\'' +
                 ", budgetAccount='" + budgetAccount + '\'' +
@@ -480,4 +477,21 @@ public class CashAccount implements BaseModel {
     public void setCashAccountLeve3(CashAccount cashAccountLeve3) {
         this.cashAccountLeve3 = cashAccountLeve3;
     }
+
+    public CashAccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(CashAccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    /*public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }*/
+
 }

@@ -82,4 +82,6 @@ public interface VoucherAccoutingService extends GenericService {
     void createPurchaseDocumentVoucher(VoucherDetail voucherDetail);
 
     public DocType getDocType(String name);
+
+    public List<Object[]> getSumsVoucherDetail(Date startDate, Date endDate);
 }

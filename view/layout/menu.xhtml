@@ -360,6 +360,14 @@
                 propagation="none" />
     </rich:menuItem>
 
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/closingResults.xhtml"
+                value="#{messages['menu.finances.accounting.generateClosingResults']}"
+                propagation="begin" />
+    </rich:menuItem>
+
 </rich:dropDownMenu>
 
 

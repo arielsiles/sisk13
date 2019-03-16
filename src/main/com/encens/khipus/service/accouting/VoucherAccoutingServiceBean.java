@@ -1066,4 +1066,46 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return docType;
     }
 
+    public List<Object[]> getSumsVoucherDetail(Date startDate, Date endDate){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        BigDecimal totalResult = new BigDecimal(0);
+        BigDecimal totalDebit   = new BigDecimal(0);
+        BigDecimal totalCredit  = new BigDecimal(0);
+
+        //try {
+
+
+            datas = em.createQuery(
+                    " SELECT " +
+                            " cashAccount.accountCode, " +
+                            " cashAccount.description, " +
+                            " SUM(voucherDetail.debit) AS debit, " +
+                            " SUM(voucherDetail.credit) AS credit" +
+                            " FROM VoucherDetail voucherDetail " +
+                            " LEFT JOIN voucherDetail.voucher voucher " +
+                            " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                            " WHERE voucher.state <> 'ANL' " +
+                            " AND voucher.date between :startDate and :endDate " +
+                            " AND (cashAccount.accountType =:typeE OR cashAccount.accountType =:typeI) " +
+                            " GROUP BY cashAccount.accountCode, cashAccount.description ")
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("typeE", CashAccountType.E)
+                    .setParameter("typeI", CashAccountType.I)
+                    .getResultList();
+
+            System.out.println("----------SUMAS-Y-SALDOS-------");
+            for(Object[] obj: datas){
+                //totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)obj[2]), 2);
+                //totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)obj[3]), 2);
+                System.out.println(obj[0] + " - " + obj[2] + " - " + obj[3] + " - " + obj[1] );
+            }
+            //totalResult = BigDecimalUtil.subtract(totalDebit, totalCredit, 2);
+
+        //}catch (NoResultException e){}
+        return datas;
+    }
+
 }

@@ -86,6 +86,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private Boolean fiscalCredit = false;
     private Boolean currencyCondition = false;
 
+    /** For closing results **/
+    private Date startDate;
+    private Date endDate;
+
     @In
     private VoucherAccoutingService voucherAccoutingService;
 
@@ -246,6 +250,64 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         }
 
         return Outcome.SUCCESS;
+    }
+
+    public void generateClosingResults(){
+
+        this.voucher.setDate(endDate);
+        this.voucher.setDocumentType(this.docType.getName());
+
+        BigDecimal totalResult = new BigDecimal(0);
+        BigDecimal totalDebit   = new BigDecimal(0);
+        BigDecimal totalCredit  = new BigDecimal(0);
+
+        List<Object[]> datas = voucherAccoutingService.getSumsVoucherDetail(this.startDate, this.endDate);
+
+        BigDecimal debit   = BigDecimal.ZERO;
+        BigDecimal credit  = BigDecimal.ZERO;
+        BigDecimal debitBalance  = BigDecimal.ZERO;
+        BigDecimal creditBalance = BigDecimal.ZERO;
+
+        for(Object[] data: datas){
+
+            debit  = (BigDecimal)data[2];
+            credit = (BigDecimal)data[3];
+
+            if (debit.compareTo(credit) > 0){
+                debitBalance = BigDecimalUtil.subtract(debit, credit, 2);
+            }
+            if (credit.compareTo(debit) > 0){
+                creditBalance = BigDecimalUtil.subtract(credit, debit, 2);
+            }
+
+            if (debitBalance.compareTo(creditBalance) != 0){
+                VoucherDetail voucherDetail = new VoucherDetail();
+                voucherDetail.setDebit(creditBalance);
+                voucherDetail.setCredit(debitBalance);
+                voucherDetail.setAccount((String)data[0]);
+                voucher.getDetails().add(voucherDetail);
+            }
+
+            //Totaling
+            totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)data[2]), 2);
+            totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)data[3]), 2);
+            debitBalance  = BigDecimal.ZERO;
+            creditBalance = BigDecimal.ZERO;
+        }
+
+        if (totalDebit.compareTo(totalCredit) > 0){ /** Perdida **/
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
+            voucherDetail.setCredit(BigDecimal.ZERO);
+            voucherDetail.setAccount("3530100000");
+            voucher.getDetails().add(voucherDetail);
+        }
+        if (totalCredit.compareTo(totalDebit) > 0){ /** Ganancia **/
+
+        }
+
+        voucherAccoutingService.saveVoucher(voucher);
+
     }
 
     public List<Client> autocomplete(Object suggest){
@@ -1155,5 +1217,21 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setCurrencyCondition(Boolean currencyCondition) {
         this.currencyCondition = currencyCondition;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
