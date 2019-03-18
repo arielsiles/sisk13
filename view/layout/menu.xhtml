@@ -363,8 +363,16 @@
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
-        <s:link view="/accounting/closingResults.xhtml"
+        <s:link view="/accounting/generateClosingResults.xhtml"
                 value="#{messages['menu.finances.accounting.generateClosingResults']}"
+                propagation="begin" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/generateBalanceClosure.xhtml"
+                value="#{messages['menu.finances.accounting.generateBalanceClosure']}"
                 propagation="begin" />
     </rich:menuItem>
 

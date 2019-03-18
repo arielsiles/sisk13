@@ -76,6 +76,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
         }
 
+        System.out.println("---> voucher.getDocumentNumber(): " + voucher.getDocumentNumber());
         if (voucher.getDocumentNumber() == null){
             voucher.setDocumentNumber(financesPkGeneratorService.getNextNoTransByDocumentType(voucher.getDocumentType()));
         }
@@ -1066,46 +1067,88 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return docType;
     }
 
-    public List<Object[]> getSumsVoucherDetail(Date startDate, Date endDate){
+    public List<Object[]> getSumsClosingResults(Date startDate, Date endDate){
 
         List<Object[]> datas = new ArrayList<Object[]>();
 
-        BigDecimal totalResult = new BigDecimal(0);
-        BigDecimal totalDebit   = new BigDecimal(0);
-        BigDecimal totalCredit  = new BigDecimal(0);
+        datas = em.createQuery(
+                " SELECT " +
+                        " cashAccount.accountCode, " +
+                        " cashAccount.description, " +
+                        " SUM(voucherDetail.debit) AS debit, " +
+                        " SUM(voucherDetail.credit) AS credit" +
+                        " FROM VoucherDetail voucherDetail " +
+                        " LEFT JOIN voucherDetail.voucher voucher " +
+                        " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                        " WHERE voucher.state <> 'ANL' " +
+                        " AND voucher.date between :startDate and :endDate " +
+                        " AND (cashAccount.accountType =:typeE OR cashAccount.accountType =:typeI) " +
+                        " GROUP BY cashAccount.accountCode, cashAccount.description ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("typeE", CashAccountType.E)
+                .setParameter("typeI", CashAccountType.I)
+                .getResultList();
 
-        //try {
+        System.out.println("----------SUMAS-Y-SALDOS-------");
+        for(Object[] obj: datas){
+            System.out.println(obj[0] + " - " + obj[2] + " - " + obj[3] + " - " + obj[1] );
+        }
 
-
-            datas = em.createQuery(
-                    " SELECT " +
-                            " cashAccount.accountCode, " +
-                            " cashAccount.description, " +
-                            " SUM(voucherDetail.debit) AS debit, " +
-                            " SUM(voucherDetail.credit) AS credit" +
-                            " FROM VoucherDetail voucherDetail " +
-                            " LEFT JOIN voucherDetail.voucher voucher " +
-                            " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                            " WHERE voucher.state <> 'ANL' " +
-                            " AND voucher.date between :startDate and :endDate " +
-                            " AND (cashAccount.accountType =:typeE OR cashAccount.accountType =:typeI) " +
-                            " GROUP BY cashAccount.accountCode, cashAccount.description ")
-                    .setParameter("startDate", startDate)
-                    .setParameter("endDate", endDate)
-                    .setParameter("typeE", CashAccountType.E)
-                    .setParameter("typeI", CashAccountType.I)
-                    .getResultList();
-
-            System.out.println("----------SUMAS-Y-SALDOS-------");
-            for(Object[] obj: datas){
-                //totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)obj[2]), 2);
-                //totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)obj[3]), 2);
-                System.out.println(obj[0] + " - " + obj[2] + " - " + obj[3] + " - " + obj[1] );
-            }
-            //totalResult = BigDecimalUtil.subtract(totalDebit, totalCredit, 2);
-
-        //}catch (NoResultException e){}
         return datas;
+    }
+
+    public List<Object[]> getSumsBalanceClosure(Date startDate, Date endDate){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        datas = em.createQuery(
+                " SELECT " +
+                        " cashAccount.accountCode, " +
+                        " cashAccount.description, " +
+                        " SUM(voucherDetail.debit) AS debit, " +
+                        " SUM(voucherDetail.credit) AS credit" +
+                        " FROM VoucherDetail voucherDetail " +
+                        " LEFT JOIN voucherDetail.voucher voucher " +
+                        " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                        " WHERE voucher.state <> 'ANL' " +
+                        " AND voucher.date between :startDate and :endDate " +
+                        " AND (cashAccount.accountType =:typeA OR " +
+                              "cashAccount.accountType =:typeP OR " +
+                              "cashAccount.accountType =:typeC OR " +
+                              "cashAccount.accountType =:typeOD OR " +
+                              "cashAccount.accountType =:typeOA) " +
+                        " GROUP BY cashAccount.accountCode, cashAccount.description ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("typeA", CashAccountType.A)
+                .setParameter("typeP", CashAccountType.P)
+                .setParameter("typeC", CashAccountType.C)
+                .setParameter("typeOD", CashAccountType.OD)
+                .setParameter("typeOA", CashAccountType.OA)
+                .getResultList();
+
+        System.out.println("----------SUMAS-Y-SALDOS-BALANCE------");
+        for(Object[] obj: datas){
+            System.out.println(obj[0] + " - " + obj[2] + " - " + obj[3] + " - " + obj[1] );
+        }
+
+        return datas;
+    }
+
+    public Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate){
+
+        BigDecimal number = (BigDecimal) em.createNativeQuery("SELECT MAX(CAST(no_doc AS DECIMAL)) FROM sf_tmpenc " +
+                "WHERE tipo_doc =:docType " +
+                "AND fecha between :startDate and :endDate ")
+                .setParameter("docType", docType)
+                .setParameter("startDate",startDate)
+                .setParameter("endDate",endDate)
+                .getSingleResult();
+
+        Integer result = new Integer(number.toString());
+        result++;
+        return result;
     }
 
 }

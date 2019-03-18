@@ -28,6 +28,7 @@ import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
@@ -256,12 +257,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         this.voucher.setDate(endDate);
         this.voucher.setDocumentType(this.docType.getName());
+        String number = voucherAccoutingService.getNextMaxNumberByDocType(this.docType.getName(), startDate, endDate).toString();
+        System.out.println("====> VOUCHER DOC: " + number);
+        voucher.setDocumentNumber(number);
 
-        BigDecimal totalResult = new BigDecimal(0);
         BigDecimal totalDebit   = new BigDecimal(0);
         BigDecimal totalCredit  = new BigDecimal(0);
 
-        List<Object[]> datas = voucherAccoutingService.getSumsVoucherDetail(this.startDate, this.endDate);
+        List<Object[]> datas = voucherAccoutingService.getSumsClosingResults(this.startDate, this.endDate);
 
         BigDecimal debit   = BigDecimal.ZERO;
         BigDecimal credit  = BigDecimal.ZERO;
@@ -295,19 +298,105 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             creditBalance = BigDecimal.ZERO;
         }
 
+
+        System.out.println("===> TOTAL DEBE: " + totalDebit);
+        System.out.println("===> TOTAL HABER: " + totalCredit);
+        System.out.println("===> TOTAL DIFF: " + BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
         if (totalDebit.compareTo(totalCredit) > 0){ /** Perdida **/
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
+            voucherDetail.setCredit(BigDecimal.ZERO);
+            voucherDetail.setAccount("3530100000"); /** MODIFYID **/
+            voucher.getDetails().add(voucherDetail);
+        }
+        if (totalCredit.compareTo(totalDebit) > 0){ /** Ganancia **/
+            /* todo */
+        }
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+    }
+
+    public void generateBalanceClosure(){
+
+        this.voucher.setDate(endDate);
+        this.voucher.setDocumentType(this.docType.getName());
+        voucher.setDocumentNumber(voucherAccoutingService.getNextMaxNumberByDocType(this.docType.getName(), startDate, endDate).toString());
+
+        BigDecimal totalDebit   = new BigDecimal(0);
+        BigDecimal totalCredit  = new BigDecimal(0);
+
+        List<Object[]> datas = voucherAccoutingService.getSumsBalanceClosure(this.startDate, this.endDate);
+
+        BigDecimal debit   = BigDecimal.ZERO;
+        BigDecimal credit  = BigDecimal.ZERO;
+        BigDecimal debitBalance  = BigDecimal.ZERO;
+        BigDecimal creditBalance = BigDecimal.ZERO;
+
+        for(Object[] data: datas){
+
+            debit  = (BigDecimal)data[2];
+            credit = (BigDecimal)data[3];
+
+            if (debit.compareTo(credit) > 0){
+                debitBalance = BigDecimalUtil.subtract(debit, credit, 2);
+            }
+            if (credit.compareTo(debit) > 0){
+                creditBalance = BigDecimalUtil.subtract(credit, debit, 2);
+            }
+
+            if (debitBalance.compareTo(creditBalance) != 0){
+                VoucherDetail voucherDetail = new VoucherDetail();
+                voucherDetail.setDebit(creditBalance);
+                voucherDetail.setCredit(debitBalance);
+                voucherDetail.setAccount((String)data[0]);
+                voucher.getDetails().add(voucherDetail);
+            }
+
+            //Totaling
+            totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)data[2]), 2);
+            totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)data[3]), 2);
+            debitBalance  = BigDecimal.ZERO;
+            creditBalance = BigDecimal.ZERO;
+        }
+
+        System.out.println("===> TOTAL DEBE: " + totalDebit);
+        System.out.println("===> TOTAL HABER: " + totalCredit);
+        System.out.println("===> TOTAL DIFF: " + BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
+        /*if (totalDebit.compareTo(totalCredit) > 0){ // Perdida
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
             voucherDetail.setCredit(BigDecimal.ZERO);
             voucherDetail.setAccount("3530100000");
             voucher.getDetails().add(voucherDetail);
         }
-        if (totalCredit.compareTo(totalDebit) > 0){ /** Ganancia **/
+        if (totalCredit.compareTo(totalDebit) > 0){ // Ganancia
 
-        }
+        }*/
 
         voucherAccoutingService.saveVoucher(voucher);
 
+    }
+
+    public void generateOpeningSeat(){
+
+        System.out.println("======> CIERRE: " + this.voucher.getDocumentType() + "-" + this.voucher.getDocumentNumber() + " - " + this.voucher.getGloss());
+
+        Voucher newVoucher = new Voucher();
+        Integer year = DateUtils.getCurrentYear(this.endDate);
+        newVoucher.setDate(DateUtils.firstDayOfYear(year+1));
+        newVoucher.setDocumentType(this.docType.getName());
+        newVoucher.setDocumentNumber("1");
+        newVoucher.setGloss("ASIENTO DE APERTURA GESTION " + year+1);
+
+        for (VoucherDetail voucherDetail : this.voucher.getDetails()){
+            VoucherDetail newVoucherDetail = new VoucherDetail();
+            newVoucherDetail.setAccount(voucherDetail.getAccount());
+            newVoucherDetail.setDebit(voucherDetail.getCredit());
+            newVoucherDetail.setCredit(voucherDetail.getDebit());
+            newVoucher.getDetails().add(newVoucherDetail);
+        }
+        voucherAccoutingService.saveVoucher(newVoucher);
     }
 
     public List<Client> autocomplete(Object suggest){

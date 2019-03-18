@@ -83,5 +83,9 @@ public interface VoucherAccoutingService extends GenericService {
 
     public DocType getDocType(String name);
 
-    public List<Object[]> getSumsVoucherDetail(Date startDate, Date endDate);
+    public List<Object[]> getSumsClosingResults(Date startDate, Date endDate);
+
+    public List<Object[]> getSumsBalanceClosure(Date startDate, Date endDate);
+
+    Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate);
 }

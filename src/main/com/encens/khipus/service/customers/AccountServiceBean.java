@@ -11,6 +11,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;

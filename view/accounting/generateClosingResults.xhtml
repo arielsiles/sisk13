@@ -11,13 +11,13 @@
 
 <ui:define name="pageTitle">#{messages['Voucher.closingResults']}</ui:define>
 <ui:param name="bodyWidth" value="60%"/>
-<ui:param name="selectedTab" value="customers"/>
+<ui:param name="selectedTab" value="finances"/>
 <ui:define name="body">
 <h:form id="bankForm">
 
     <div class="buttons">
         <h:commandButton action="#{voucherCreateAction.generateClosingResults}"
-                         value="#{messages['Voucher.generateClosure']}"
+                         value="#{messages['Voucher.generateClose']}"
                          styleClass="button" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}" />
 
         <h:commandButton action="#{cashSaleAction.cancel}" value="#{messages['Common.cancel']}"
