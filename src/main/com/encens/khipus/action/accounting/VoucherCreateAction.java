@@ -387,7 +387,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         newVoucher.setDate(DateUtils.firstDayOfYear(year+1));
         newVoucher.setDocumentType(this.docType.getName());
         newVoucher.setDocumentNumber("1");
-        newVoucher.setGloss("ASIENTO DE APERTURA GESTION " + year+1);
+        newVoucher.setGloss("ASIENTO DE APERTURA GESTION " + (year+1));
 
         for (VoucherDetail voucherDetail : this.voucher.getDetails()){
             VoucherDetail newVoucherDetail = new VoucherDetail();

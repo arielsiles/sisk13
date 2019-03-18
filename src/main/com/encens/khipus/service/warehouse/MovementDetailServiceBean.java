@@ -15,6 +15,7 @@ import org.jboss.seam.log.Log;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -438,4 +439,15 @@ public class MovementDetailServiceBean implements MovementDetailService {
                 .setParameter("state", WarehouseVoucherState.APR)
                 .getResultList();
     }
+
+    public String getCodeByNoTrans(String no_trans){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        return (String)em.createNativeQuery("select cod_art from inv_movdet where no_trans =:no_trans")
+                .setParameter("no_trans", no_trans)
+                .getSingleResult();
+
+    }
+
 }

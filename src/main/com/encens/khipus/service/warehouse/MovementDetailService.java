@@ -62,4 +62,6 @@ public interface MovementDetailService {
     public List<MovementDetail> findListMovementByWarehouseAndType(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
 
     public List<MovementDetail> findListMovementByWarehouseAndTypeNull(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
+
+    public String getCodeByNoTrans(String no_trans);
 }
