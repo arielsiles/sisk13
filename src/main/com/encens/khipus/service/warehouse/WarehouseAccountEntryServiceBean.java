@@ -1239,7 +1239,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
 
         String productItemCode = movementDetailService.getCodeByNoTrans(warehouseVoucher.getId().getTransactionNumber());
-        System.out.println("==============> productItemCode: " + productItemCode);
+        Long quantity = movementDetailService.getCantByNoTrans(warehouseVoucher.getId().getTransactionNumber());
+        System.out.println("==============> productItemCode: " + productItemCode + " - " + quantity);
 
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.INPUT_PROD_WAREHOUSE, gloss);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUserProduction().getId());
@@ -1273,7 +1274,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 cashAccountService.findByAccountCode(warehouse.getCashAccount()),
                 voucherAmount,
                 FinancesCurrencyType.P,
-                BigDecimal.ONE, productItemCode));
+                BigDecimal.ONE, productItemCode, quantity));
 
         voucherForGeneration.setDate(warehouseVoucher.getDate());
         //check transactionNumber

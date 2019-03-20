@@ -442,11 +442,19 @@ public class MovementDetailServiceBean implements MovementDetailService {
 
     public String getCodeByNoTrans(String no_trans){
 
-        List<Object[]> datas = new ArrayList<Object[]>();
-
         return (String)em.createNativeQuery("select cod_art from inv_movdet where no_trans =:no_trans")
                 .setParameter("no_trans", no_trans)
                 .getSingleResult();
+
+    }
+
+    public Long getCantByNoTrans(String no_trans){
+
+        BigDecimal result = (BigDecimal)em.createNativeQuery("select cantidad from inv_movdet where no_trans =:no_trans")
+                .setParameter("no_trans", no_trans)
+                .getSingleResult();
+
+        return result.toBigInteger().longValue();
 
     }
 
