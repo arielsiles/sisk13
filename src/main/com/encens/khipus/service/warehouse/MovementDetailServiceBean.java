@@ -440,6 +440,7 @@ public class MovementDetailServiceBean implements MovementDetailService {
                 .getResultList();
     }
 
+    /** Solo cuando el vale tiene 1 articulo **/
     public String getCodeByNoTrans(String no_trans){
 
         return (String)em.createNativeQuery("select cod_art from inv_movdet where no_trans =:no_trans")
@@ -448,6 +449,7 @@ public class MovementDetailServiceBean implements MovementDetailService {
 
     }
 
+    /** Solo cuando el vale tiene 1 articulo **/
     public Long getCantByNoTrans(String no_trans){
 
         BigDecimal result = (BigDecimal)em.createNativeQuery("select cantidad from inv_movdet where no_trans =:no_trans")

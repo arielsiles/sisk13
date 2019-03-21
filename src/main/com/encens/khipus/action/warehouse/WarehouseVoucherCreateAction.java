@@ -193,7 +193,7 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
             }
 
             try {
-                warehouseAccountEntryService.createAccountEntryForProductTransfer(warehouseVoucherFrom, warehouseVoucherFrom.getExecutorUnit(),warehouseVoucherFrom.getCostCenter().getCode(), description );
+                warehouseAccountEntryService.createAccountEntryForProductTransfer(warehouseVoucherFrom, warehouseVoucherTo, warehouseVoucherFrom.getExecutorUnit(),warehouseVoucherFrom.getCostCenter().getCode(), description );
 
             }catch (Exception e){
                 e.printStackTrace();

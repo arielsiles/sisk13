@@ -1329,10 +1329,16 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
     }
 
 
-    public void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucher, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException{
+    public void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucherFrom, WarehouseVoucher warehouseVoucherTo, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException{
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
+        BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucherFrom.getId().getCompanyNumber(), warehouseVoucherFrom.getState(), warehouseVoucherFrom.getId().getTransactionNumber());
+
+        String cod_art_from = movementDetailService.getCodeByNoTrans(warehouseVoucherFrom.getId().getTransactionNumber());
+        Long cant_art_from  = movementDetailService.getCantByNoTrans(warehouseVoucherFrom.getId().getTransactionNumber());
+
+        String cod_art_to = movementDetailService.getCodeByNoTrans(warehouseVoucherTo.getId().getTransactionNumber());
+        Long cant_art_to  = movementDetailService.getCantByNoTrans(warehouseVoucherTo.getId().getTransactionNumber());
 
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.WAREHOUSE_VOUCHER_FORM, gloss);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
@@ -1352,20 +1358,22 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
-                cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                cashAccountService.findByAccountCode(warehouseVoucherTo.getWarehouse().getCashAccount()),
                 voucherAmount,
                 FinancesCurrencyType.P,
-                BigDecimal.ONE));
+                BigDecimal.ONE, cod_art_to, cant_art_to));
 
         voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
-                cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                cashAccountService.findByAccountCode(warehouseVoucherFrom.getWarehouse().getCashAccount()),
                 voucherAmount,
                 FinancesCurrencyType.P,
-                BigDecimal.ONE));
+                BigDecimal.ONE, cod_art_from, cant_art_from));
 
-        warehouseVoucher.setVoucher(voucherForGeneration);
+        warehouseVoucherFrom.setVoucher(voucherForGeneration);
+        warehouseVoucherTo.setVoucher(voucherForGeneration);
+
 
         /** **/
         Voucher voucher = voucherForGeneration;
