@@ -4,7 +4,6 @@ import com.encens.khipus.action.production.ProductionPlanningAction;
 import com.encens.khipus.action.warehouse.WarehouseVoucherCreateAction;
 import com.encens.khipus.action.warehouse.WarehouseVoucherGeneralAction;
 import com.encens.khipus.action.warehouse.WarehouseVoucherUpdateAction;
-import com.encens.khipus.dataintegration.configuration.XmlConstants;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
@@ -936,37 +935,24 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                                      InventoryMovement pendantMovement,
                                      InventoryMovement approvedMovement,
                                      MovementDetailType movementDetailType) {
-        System.out.println("=====> 4.14 " + pendantMovement.getDescription());
-        System.out.println("=====> 4.15 " + movementDetailType.toString());
+
         List<MovementDetail> pendantDetails = getPendantDetails(pendantMovement, movementDetailType);
-        System.out.println("=====> 4.16 pendantDetails: " + pendantDetails.size());
+
         for (MovementDetail movementDetail : pendantDetails) {
-            System.out.println("=====> 4.17 init for");
+
             getEntityManager().refresh(movementDetail);
-            System.out.println("=====> 4.18");
             movementDetail.setState(warehouseVoucher.getState());
-            System.out.println("=====> 4.19");
             movementDetail.setMovementDetailDate(approvedMovement.getMovementDate());
-            System.out.println("=====> 4.20");
+
             if (!getEntityManager().contains(movementDetail)) {
-                System.out.println("=====> 4.21");
                 getEntityManager().merge(movementDetail);
-                System.out.println("=====> 4.22");
             }
-            System.out.println("=====> 4.23");
             getEntityManager().flush();
-            System.out.println("=====> 4.24");
-            System.out.println("=====> 4.24.1 movementDetail: " + movementDetail.getProductItemCode());
             addAtInventory(warehouseVoucher, warehouse, movementDetail);
-            System.out.println("=====> 4.25");
             //inventoryHistoryService.updateInventoryHistory(movementDetail);
-            System.out.println("=====> 4.26");
             updateProductItemInformationForInputs(warehouseVoucher, movementDetail);
-            System.out.println("=====> 4.27");
             getEntityManager().flush();
-            System.out.println("=====> 4.28");
             getEntityManager().refresh(movementDetail);
-            System.out.println("=====> 4.29");
         }
     }
 
@@ -1020,6 +1006,8 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
 
                 productItem.setUnitCost(newUnitCost);
                 productItem.setCu(newCU);
+                productItem.setInvestmentAmount(newInvestmentAmount);
+                productItem.setCt(newCTAmount);
 
             }else {
                 productItem.setInvestmentAmount(BigDecimal.ZERO);

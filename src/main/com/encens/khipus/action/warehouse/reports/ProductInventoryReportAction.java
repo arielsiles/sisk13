@@ -2,7 +2,6 @@ package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.SingleProduct;
@@ -33,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -102,6 +100,10 @@ public class ProductInventoryReportAction extends GenericReportAction {
         paramMap.put("warehouse", warehouse.getFullName());
 
         parameters.putAll(paramMap);
+
+        for (CollectionData data : beanCollection){
+            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getInitialAmount() +"|"+ data.getUnitCost() +"|"+ data.getBalance());
+        }
 
         try{
             File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));

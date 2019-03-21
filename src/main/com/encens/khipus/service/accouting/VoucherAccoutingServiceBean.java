@@ -1,10 +1,8 @@
 package com.encens.khipus.service.accouting;
 
-import com.encens.khipus.converter.BigDecimalConverter;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.accounting.DocType;
-import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CashSale;
@@ -13,24 +11,24 @@ import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.*;
-import com.encens.khipus.util.query.EntityQueryFactory;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.util.id.ID;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
@@ -928,7 +926,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         BigDecimal totalCost = new BigDecimal(0.0);
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
-
         /** DAIRY_PRODUCT **/
         CashAccount ctaCost = companyConfiguration.getCtaCostPT();
         CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
@@ -937,14 +934,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<Object[]> salesList = new ArrayList<Object[]>();
 
         try {
-
             if (ProductSaleType.DAIRY_PRODUCT.equals(productSaleType)){
-
-                salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad),  (sum(a.cantidad) * a.cu) " +
+                salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad), (sum(a.cantidad) * a.cu) " +
                         "from articulos_pedido a " +
                         "join pedidos p on a.idpedidos = p.idpedidos " +
                         "where p.fecha_entrega between :startDate and :endDate " +
-                        "and p.idtipopedido = 1 " +
+                        "and p.idtipopedido in (1, 5) " + //Pedido normal y desc. lacteo
                         "and p.estado <> 'ANULADO' " +
                         "and p.idusuario <> 5 " +
                         "group by a.cod_art ")
@@ -957,17 +952,26 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
                 ctaCost = companyConfiguration.getCtaCostPV();
                 ctaAlm  = companyConfiguration.getCtaAlmPV();
-                sales = em.createNamedQuery("CustomerOrder.findByDatesForCostsVet")
+
+                salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad), (sum(a.cantidad) * a.cu) " +
+                        "from articulos_pedido a " +
+                        "join pedidos p on a.idpedidos = p.idpedidos " +
+                        "where p.fecha_entrega between :startDate and :endDate " +
+                        "and p.idtipopedido in (1, 6) " + //Pedido normal y desc. veterinario
+                        "and p.estado <> 'ANULADO' " +
+                        "and p.idusuario = 5 " +
+                        "group by a.cod_art ")
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
                         .getResultList();
 
-                /*salesList = em.createNativeQuery("SELECT a.cod_art, (SUM(a.CANTIDAD) * a.cu) " +
+                /* VENTA AL CONTADO
+                    salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad),  (sum(a.cantidad) * a.cu) " +
                         "FROM articulos_pedido a " +
-                        "JOIN ventadirecta v 	ON a.IDVENTADIRECTA = v.IDVENTADIRECTA " +
-                        "WHERE v.FECHA_PEDIDO BETWEEN :startDate AND :endDate " +
-                        "AND v.ESTADO <> 'ANULADO' " +
-                        "AND v.IDUSUARIO <> 5 " +
+                        "JOIN ventadirecta v 	ON a.idventadirecta = v.idventadirecta " +
+                        "WHERE v.fecha_pedido BETWEEN :startDate AND :endDate " +
+                        "AND v.estado <> 'ANULADO' " +
+                        "AND v.idusuario = 5 " +
                         "GROUP BY a.cod_art")
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
@@ -1007,9 +1011,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         BigDecimal sumCost = BigDecimal.ZERO;
 
-        for (Object[] sale : salesList){
-            sumCost = BigDecimalUtil.sum(sumCost, (BigDecimal) sale[2], 6);
-        }
+        for (Object[] sale : salesList){ sumCost = BigDecimalUtil.sum(sumCost, (BigDecimal) sale[2], 6); }
+
         VoucherDetail voucherDebit = new VoucherDetail();
         voucherDebit.setAccount(ctaCost.getAccountCode());
         voucherDebit.setDebit(BigDecimalUtil.roundBigDecimal(sumCost,2));
@@ -1021,9 +1024,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         voucher.addVoucherDetail(voucherDebit);
 
         for (Object[] sale : salesList){
-            String codArt = (String)sale[0];
+            String codArt       = (String)sale[0];
             BigDecimal quantity = (BigDecimal) sale[1];
-            BigDecimal cost = (BigDecimal) sale[2];
+            BigDecimal cost     = (BigDecimal) sale[2];
 
             VoucherDetail voucherCredit = new VoucherDetail();
             voucherCredit.setAccount(ctaAlm.getAccountCode());
