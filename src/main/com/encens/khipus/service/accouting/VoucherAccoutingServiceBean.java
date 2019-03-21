@@ -934,13 +934,24 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
         String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
+        List<Object[]> salesList = new ArrayList<Object[]>();
+
         try {
 
             if (ProductSaleType.DAIRY_PRODUCT.equals(productSaleType)){
-                sales = em.createNamedQuery("CustomerOrder.findByDatesForCostsLac")
-                        .setParameter("startDate", startDate)
-                        .setParameter("endDate", endDate)
-                        .getResultList();
+
+                salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad),  (sum(a.cantidad) * a.cu) " +
+                        "from articulos_pedido a " +
+                        "join pedidos p on a.idpedidos = p.idpedidos " +
+                        "where p.fecha_entrega between :startDate and :endDate " +
+                        "and p.idtipopedido = 1 " +
+                        "and p.estado <> 'ANULADO' " +
+                        "and p.idusuario <> 5 " +
+                        "group by a.cod_art ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+
             }
 
             if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
@@ -950,6 +961,18 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
                         .getResultList();
+
+                /*salesList = em.createNativeQuery("SELECT a.cod_art, (SUM(a.CANTIDAD) * a.cu) " +
+                        "FROM articulos_pedido a " +
+                        "JOIN ventadirecta v 	ON a.IDVENTADIRECTA = v.IDVENTADIRECTA " +
+                        "WHERE v.FECHA_PEDIDO BETWEEN :startDate AND :endDate " +
+                        "AND v.ESTADO <> 'ANULADO' " +
+                        "AND v.IDUSUARIO <> 5 " +
+                        "GROUP BY a.cod_art")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();*/
+
                 produtTypeMessage = MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey());
             }
 
@@ -958,8 +981,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
         Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas a credito " + produtTypeMessage + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
 
-        if (sales.size() > 0) {
+        /*if (sales.size() > 0) {
             for (CustomerOrder sale : sales) {
                 for (ArticleOrder articleOrder : sale.getArticulosPedidos())
                     totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.multiply(articleOrder.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getAmount())));
@@ -979,7 +1003,43 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucher.setDate(endDate);
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
             saveVoucher(voucher);
+        }*/
+
+        BigDecimal sumCost = BigDecimal.ZERO;
+
+        for (Object[] sale : salesList){
+            sumCost = BigDecimalUtil.sum(sumCost, (BigDecimal) sale[2], 6);
         }
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucherDebit.setAccount(ctaCost.getAccountCode());
+        voucherDebit.setDebit(BigDecimalUtil.roundBigDecimal(sumCost,2));
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+        voucher.addVoucherDetail(voucherDebit);
+
+        for (Object[] sale : salesList){
+            String codArt = (String)sale[0];
+            BigDecimal quantity = (BigDecimal) sale[1];
+            BigDecimal cost = (BigDecimal) sale[2];
+
+            VoucherDetail voucherCredit = new VoucherDetail();
+            voucherCredit.setAccount(ctaAlm.getAccountCode());
+            voucherCredit.setDebit(BigDecimal.ZERO);
+            voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+
+            voucherCredit.setProductItemCode(codArt);
+            voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+
+            voucherCredit.setCurrency(FinancesCurrencyType.P);
+            voucherCredit.setExchangeAmount(BigDecimal.ONE);
+            voucherCredit.setDebitMe(BigDecimal.ZERO);
+            voucherCredit.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredit);
+        }
+        saveVoucher(voucher);
     }
 
     public Double calculateCashTransferAmount(Date startDate, Date endDate){

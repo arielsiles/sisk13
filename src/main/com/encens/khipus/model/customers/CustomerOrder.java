@@ -23,6 +23,7 @@ import java.util.Date;
                                 "and c.cvFlag = 0 " +
                                 "and c.customerOrderTypeId = 1 "),
 
+                /** NO USED **/
                 @NamedQuery(name = "CustomerOrder.findByDatesForCostsLac",
                         query = "select c from CustomerOrder c " +
                                 "where c.fechaEntrega between :startDate and :endDate " +
