@@ -1,6 +1,6 @@
 -- -----------------------------------------------------------------
 -- VISTAS PARA REPORTE DE PRODUCCIO DE PRODUCTOS
--- 1.-
+-- 1.- 
 CREATE OR REPLACE VIEW produccionreproceso AS
 SELECT PL.FECHA, M.CODIGO AS COD_ART, M.NOMBRE, O.CODIGO AS COD_ORD, o.`cantidadproducida` AS CANTIDAD_SC, O.CANTIDADPRODUCIDARESPONSABLE AS CANTIDAD_SP, 0 AS REPROCESO_SC, 0 AS REPROCESO_SP, o.costotoalproduccion AS COSTOTOTALPRODUCCION
 FROM ORDENPRODUCCION O
@@ -15,16 +15,21 @@ LEFT JOIN planificacionproduccion pp 	ON pb.`idplanificacionproduccion` = pp.`id
 LEFT JOIN productosimple ps		ON pb.`idproductobase` = ps.`idproductobase`
 LEFT JOIN productosimpleprocesado psp	ON ps.`idproductosimple` = psp.`idproductosimple`
 LEFT JOIN metaproductoproduccion mp 	ON psp.`idmetaproductoproduccion` = mp.`idmetaproductoproduccion`
+UNION
+SELECT STR_TO_DATE(CONCAT(i.`gestion`, '-01-01'),'%Y-%m-%d') AS fecha, i.`cod_art`, i.`nombre`, '0000-0000', i.`cantidad`, 0, 0, 0, (i.`cantidad` * i.`costo_uni`) AS COSTOTOTALPRODUCCION
+FROM inv_inicio i  WHERE i.`alm` = 2 AND i.`cantidad` > 0
 ;
 
--- 2.-
+
+-- 2.- 
 CREATE OR REPLACE VIEW producciontotal AS
 SELECT 	1 AS ID, FECHA, COD_ART, NOMBRE,
 	SUM(CANTIDAD_SC) AS CANTIDAD_SC,
 	SUM(CANTIDAD_SP) AS CANTIDAD_SP,
 	SUM(REPROCESO_SC) AS REPROCESO_SC,
 	SUM(REPROCESO_SP) AS REPROCESO_SP,
-	SUM(COSTOTOTALPRODUCCION) AS COSTOTOTALPRODUCCION
+	SUM(COSTOTOTALPRODUCCION) AS COSTOTOTALPRODUCCION,
+	SUM(CANTIDAD_SC) + SUM(REPROCESO_SC) AS CANT_TOTAL
 FROM produccionreproceso
 GROUP BY ID, FECHA, COD_ART, NOMBRE
 ;
@@ -49,12 +54,12 @@ WHERE e.estado <> 'ANL'
 
 -- 4. VISTA VENTAS union al contado y a credito (lacteos U veterinarios)
 CREATE OR REPLACE VIEW ventas AS
-	SELECT p.`FECHA_ENTREGA` AS FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`
+	SELECT p.`FECHA_ENTREGA` AS FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
 	FROM articulos_pedido ap
 	JOIN pedidos p 	 ON ap.`IDPEDIDOS` = p.`IDPEDIDOS`
 	AND p.estado <> 'ANULADO'
 	UNION
-	SELECT v.`FECHA_PEDIDO` AS FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`
+	SELECT v.`FECHA_PEDIDO` AS FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	FROM articulos_pedido ap
 	JOIN ventadirecta v ON ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
 	AND v.estado <> 'ANULADO'

@@ -89,15 +89,17 @@ public class VoucherAction extends GenericAction<Voucher> {
 
     public void generateCostOfSales()throws CompanyConfigurationNotFoundException {
 
-        if (this.saleType.equals(SaleType.CASH_SALE)){
+        /*if (this.saleType.equals(SaleType.CASH_SALE)){
             voucherAccoutingService.createCostOfCashSales(startDate, endDate, productSaleType);
         }
 
         if (this.saleType.equals(SaleType.CREDIT_SALE)) {
             voucherAccoutingService.createCostOfSalesCredit(startDate, endDate, productSaleType);
+        }*/
+
+        if (this.productSaleType.equals(ProductSaleType.DAIRY_PRODUCT)){
+            voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate);
         }
-
-
 
     }
 

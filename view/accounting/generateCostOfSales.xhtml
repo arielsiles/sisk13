@@ -3,10 +3,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
-                xmlns:c="http://java.sun.com/jstl/core"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['Accounting.generateCostOfSales']}</ui:define>
@@ -52,7 +49,7 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Product.saleType']}</ui:define>
                     <h:selectOneMenu id="saleType"
                                      value="#{voucherAction.saleType}"
@@ -65,7 +62,7 @@
                                        noSelectionLabel=""/>
                         <s:convertEnum/>
                     </h:selectOneMenu>
-                </s:decorate>
+                </s:decorate>-->
 
                 <s:decorate id="productSaleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Product.productSaleType']}</ui:define>

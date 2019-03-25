@@ -3,7 +3,6 @@ package com.encens.khipus.service.accouting;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.accounting.DocType;
-import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -72,8 +71,9 @@ public interface VoucherAccoutingService extends GenericService {
     public BigDecimal calculateLossesNiv2(String startDate, String endDate, String rootCashAccount);
 
     public void createCostOfCashSales(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
-
     public void createCostOfSalesCredit(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
+
+    public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException;
 
     public Double calculateCashTransferAmount(Date startDate, Date endDate);
 
