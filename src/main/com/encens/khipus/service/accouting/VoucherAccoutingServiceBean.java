@@ -865,53 +865,32 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     }
 
 
-        public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
-
-        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
-                "from ventas v " +
-                "left join inv_articulos a on v.cod_art = a.cod_art " +
-                "where v.fecha between :startDate and :endDate " +
-                "and v.idusuario <> 5 " +
-                "group by v.cod_art, a.descri ")
-        .setParameter("startDate", startDate)
-        .setParameter("endDate", endDate)
-        .getResultList();
+    /** MODIFYID **/
+    public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
+        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
+                "from ventas v " +
+                "where v.fecha between :startDate and :endDate " +
+                "and v.idusuario <> 5 " +
+                "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
+        HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
         BigDecimal totalCost = BigDecimal.ZERO;
-        CashAccount cashAccountCost = companyConfiguration.getCtaCostPT();
-        CashAccount cashAccountAlm  = companyConfiguration.getCtaAlmPT();
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas al contado " + produtTypeMessage + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
 
-        for ( Object[] sale : sales){
-            String codArt = (String)sale[0];
-            BigDecimal quantity = (BigDecimal) sale[1];
-            BigDecimal promotion = (BigDecimal) sale[2];
-            BigDecimal replacement = (BigDecimal) sale[3];
-            BigDecimal totalQuantity = (BigDecimal) sale[4];
-
-            if (quantity.doubleValue() > 0){
-
-                BigDecimal unitCost = getUnitCost_milkProduct(codArt, startDate, endDate); // servicio obtener costo unit del producto
-                BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
-                totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
-            }
-        }
-
         VoucherDetail voucherDebit = new VoucherDetail();
-        voucherDebit.setAccount(cashAccountCost.getAccountCode());
+        voucher.addVoucherDetail(voucherDebit);
+        voucherDebit.setAccount(companyConfiguration.getCtaCostPT().getAccountCode());
         voucherDebit.setDebit(totalCost);
         voucherDebit.setCredit(BigDecimal.ZERO);
         voucherDebit.setCurrency(FinancesCurrencyType.P);
         voucherDebit.setExchangeAmount(BigDecimal.ONE);
         voucherDebit.setDebitMe(BigDecimal.ZERO);
         voucherDebit.setCreditMe(BigDecimal.ZERO);
-        voucher.addVoucherDetail(voucherDebit);
 
         totalCost = BigDecimal.ZERO;
         for (Object[] sale : sales){
@@ -921,30 +900,166 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal replacement = (BigDecimal) sale[3];
             BigDecimal totalQuantity = (BigDecimal) sale[4];
 
-            //if (quantity.doubleValue() > 0 && (!codArt.equals("195") || !codArt.equals("196") || !codArt.equals("197") || !codArt.equals("490") || !codArt.equals("521"))){
             if (quantity.doubleValue() > 0){
+                BigDecimal unitCost = unitCostMilkProducts.get(codArt);
+                if (unitCost.doubleValue() > 0){
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
+                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
 
-                BigDecimal unitCost = getUnitCost_milkProduct(codArt, startDate, endDate); // servicio obtener costo unit del producto
-                BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
-                totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
+                    VoucherDetail voucherCredit = new VoucherDetail();
+                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setDebit(BigDecimal.ZERO);
+                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
-                VoucherDetail voucherCredit = new VoucherDetail();
-                voucherCredit.setAccount(cashAccountAlm.getAccountCode());
-                voucherCredit.setDebit(BigDecimal.ZERO);
-                voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+                    voucherCredit.setProductItemCode(codArt);
+                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
 
-                voucherCredit.setProductItemCode(codArt);
-                voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
-
-                voucherCredit.setCurrency(FinancesCurrencyType.P);
-                voucherCredit.setExchangeAmount(BigDecimal.ONE);
-                voucherCredit.setDebitMe(BigDecimal.ZERO);
-                voucherCredit.setCreditMe(BigDecimal.ZERO);
-                voucher.addVoucherDetail(voucherCredit);
-
+                    voucherCredit.setCurrency(FinancesCurrencyType.P);
+                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
+                    voucherCredit.setDebitMe(BigDecimal.ZERO);
+                    voucherCredit.setCreditMe(BigDecimal.ZERO);
+                    voucher.addVoucherDetail(voucherCredit);
+                }
             }
         }
+        voucherDebit.setDebit(totalCost);
         saveVoucher(voucher);
+    }
+
+    public void createCostOfSale_VeterinaryProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
+                "from ventas v where v.fecha between :startDate and :endDate " +
+                "and v.idusuario = 5 " +
+                "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
+
+        HashMap<String, BigDecimal> unitCostVeterinaryProducts = getUnitCost_veterinaryProducts(startDate, endDate);
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucher.addVoucherDetail(voucherDebit);
+        voucherDebit.setAccount(companyConfiguration.getCtaCostPV().getAccountCode());
+        voucherDebit.setDebit(totalCost);
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+
+        totalCost = BigDecimal.ZERO;
+        for (Object[] sale : sales){
+            String codArt = (String)sale[0];
+            BigDecimal quantity = (BigDecimal) sale[1];
+            //BigDecimal promotion = (BigDecimal) sale[2];
+            //BigDecimal replacement = (BigDecimal) sale[3];
+            //BigDecimal totalQuantity = (BigDecimal) sale[4];
+
+            if (quantity.doubleValue() > 0){
+                BigDecimal unitCost = unitCostVeterinaryProducts.get(codArt);
+                if (unitCost.doubleValue() > 0){
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
+                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
+
+                    VoucherDetail voucherCredit = new VoucherDetail();
+                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setDebit(BigDecimal.ZERO);
+                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+
+                    voucherCredit.setProductItemCode(codArt);
+                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+
+                    voucherCredit.setCurrency(FinancesCurrencyType.P);
+                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
+                    voucherCredit.setDebitMe(BigDecimal.ZERO);
+                    voucherCredit.setCreditMe(BigDecimal.ZERO);
+                    voucher.addVoucherDetail(voucherCredit);
+                }
+            }
+        }
+        voucherDebit.setDebit(totalCost);
+        saveVoucher(voucher);
+    }
+
+    public HashMap<String, BigDecimal> getUnitCost_veterinaryProducts(Date startDate, Date endDate){
+
+        HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
+        String gestion = DateUtils.getCurrentYear(startDate).toString();
+
+        List<Object[]> purchaseList = em.createNativeQuery("" +
+                "select z.cod_art, sum(z.monto) / sum(z.cantidad) from ( " +
+                "   select d.cod_art, d.monto, d.cantidad " +
+                "   from inv_movdet d " +
+                "   left join inv_vales v on d.no_trans = v.no_trans " +
+                "   where v.fecha between :startDate and :endDate " +
+                "   and v.cod_alm = 5 and d.tipo_mov = 'E' and v.id_com_encoc is not null " +
+                "   union " +
+                "   select i.cod_art, (i.costo_uni * i.cantidad) as monto, i.cantidad " +
+                "   from inv_inicio i " +
+                "   where i.gestion = :gestion " +
+                "   and i.alm = 5 " +
+                "   and i.cantidad > 0 " +
+                ") z " +
+                "group by z.cod_art " +
+                ";")
+                .setParameter("startDate", startDate).setParameter("endDate", endDate).setParameter("gestion", gestion).getResultList();
+
+        for (Object[] purchase : purchaseList){
+            String codArt = (String) purchase[0];
+            BigDecimal unitCost = (BigDecimal) purchase[1];
+            result.put(codArt, unitCost);
+            System.out.println("----> MAP: " + codArt + "\t " + unitCost);
+        }
+
+        return result;
+    }
+
+    public HashMap<String, BigDecimal> getUnitCost_milkProducts(Date startDate, Date endDate){
+
+        /** MODIFYID **/
+        /*if (codArt.equals("148") || codArt.equals("150"))
+            codArt = "151";
+        if (codArt.equals("643"))
+            codArt = "118";
+
+        if (codArt.equals("195") || codArt.equals("196") || codArt.equals("197") || codArt.equals("490") || codArt.equals("521"))
+            return BigDecimal.ZERO;*/
+
+        HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
+
+        List<Object[]> productList = em.createNativeQuery("select t.cod_art, (sum(t.costototalproduccion)/sum(t.cant_total))" +
+                "from producciontotal t " +
+                "where t.fecha between :startDate and :endDate " +
+                "group by t.cod_art, t.nombre")
+                .setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
+
+        for (Object[] product : productList){
+            String codArt = (String) product[0];
+            BigDecimal unitCost = (BigDecimal) product[1];
+            result.put(codArt, unitCost);
+            System.out.println("----> MAP PRODUCT: " + codArt + "\t " + unitCost);
+        }
+
+        result.put("148", result.get("151"));
+        result.put("150", result.get("151"));
+        result.put("643", result.get("118"));
+
+        result.put("195", BigDecimal.ZERO);
+        result.put("196", BigDecimal.ZERO);
+        result.put("197", BigDecimal.ZERO);
+        result.put("490", BigDecimal.ZERO);
+        result.put("521", BigDecimal.ZERO);
+
+
+        System.out.println("----> MAP PRODUCT: " + "148" + "\t " + result.get("148"));
+        System.out.println("----> MAP PRODUCT: " + "150" + "\t " + result.get("150"));
+        System.out.println("----> MAP PRODUCT: " + "643" + "\t " + result.get("643"));
+
+        return result;
     }
 
     public BigDecimal getUnitCost_milkProduct(String codArt, Date startDate, Date endDate){
@@ -958,7 +1073,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         if (codArt.equals("195") || codArt.equals("196") || codArt.equals("197") || codArt.equals("490") || codArt.equals("521"))
             return BigDecimal.ZERO;
 
-        BigDecimal result = (BigDecimal) em.createNativeQuery("select t.cod_art, t.nombre, sum(t.costototalproduccion), sum(t.cant_total), (sum(t.costototalproduccion)/sum(t.cant_total))" +
+        BigDecimal result = (BigDecimal) em.createNativeQuery("select (sum(t.costototalproduccion)/sum(t.cant_total))" +
                 "from producciontotal t " +
                 "where t.fecha between :startDate and :endDate " +
                 "and t.cod_art = :codArt " +

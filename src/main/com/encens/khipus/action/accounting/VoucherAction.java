@@ -101,6 +101,10 @@ public class VoucherAction extends GenericAction<Voucher> {
             voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate);
         }
 
+        if (this.productSaleType.equals(ProductSaleType.VETERINARY_PRODUCT)){
+            voucherAccoutingService.createCostOfSale_VeterinaryProducts(startDate, endDate);
+        }
+
     }
 
     public Voucher getVoucher() {
