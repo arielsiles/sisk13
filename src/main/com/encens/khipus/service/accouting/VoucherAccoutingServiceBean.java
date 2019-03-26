@@ -872,7 +872,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
                 "from ventas v " +
                 "where v.fecha between :startDate and :endDate " +
-                "and v.idusuario <> 5 " +
+                "and v.idusuario <> 5 and v.idtipopedido = 1 " +
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
@@ -881,6 +881,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
         Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
 
         VoucherDetail voucherDebit = new VoucherDetail();
         voucher.addVoucherDetail(voucherDebit);
@@ -940,6 +941,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
         Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
 
         VoucherDetail voucherDebit = new VoucherDetail();
         voucher.addVoucherDetail(voucherDebit);
@@ -1021,20 +1023,24 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public HashMap<String, BigDecimal> getUnitCost_milkProducts(Date startDate, Date endDate){
 
         /** MODIFYID **/
-        /*if (codArt.equals("148") || codArt.equals("150"))
-            codArt = "151";
-        if (codArt.equals("643"))
-            codArt = "118";
-
-        if (codArt.equals("195") || codArt.equals("196") || codArt.equals("197") || codArt.equals("490") || codArt.equals("521"))
-            return BigDecimal.ZERO;*/
-
         HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
 
-        List<Object[]> productList = em.createNativeQuery("select t.cod_art, (sum(t.costototalproduccion)/sum(t.cant_total))" +
-                "from producciontotal t " +
-                "where t.fecha between :startDate and :endDate " +
-                "group by t.cod_art, t.nombre")
+        List<Object[]> productList = em.createNativeQuery("" +
+                "select z.cod_art, sum(z.monto) / sum(z.cantidad) " +
+                "from ( " +
+                "   select d.cod_art, sum(d.monto) as monto, sum(d.cantidad) as cantidad " +
+                "   from inv_movdet d " +
+                "   left join inv_vales v on d.no_trans = v.no_trans " +
+                "   where v.fecha between :startDate and :endDate " +
+                "   and v.cod_alm = 2 and d.tipo_mov = 'e' and v.id_com_encoc is not null " +
+                "   group by d.cod_art " +
+                "   UNION " +
+                "   select t.cod_art, sum(t.costototalproduccion) as monto,   sum(t.cant_total) as cantidad " +
+                "   from producciontotal t " +
+                "   where t.fecha between :startDate and :endDate " +
+                "   group by t.cod_art " +
+                ") z " +
+                "group by z.cod_art ")
                 .setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         for (Object[] product : productList){
@@ -1044,9 +1050,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             System.out.println("----> MAP PRODUCT: " + codArt + "\t " + unitCost);
         }
 
-        result.put("148", result.get("151"));
-        result.put("150", result.get("151"));
-        result.put("643", result.get("118"));
+        result.put("148", result.get("151")); // EDAM
+        result.put("150", result.get("151")); // FRESCO
+        result.put("643", result.get("118")); // FLUIDA
 
         result.put("195", BigDecimal.ZERO);
         result.put("196", BigDecimal.ZERO);
