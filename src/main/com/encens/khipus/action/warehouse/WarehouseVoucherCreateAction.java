@@ -8,7 +8,10 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
-import com.encens.khipus.service.warehouse.*;
+import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
+import com.encens.khipus.service.warehouse.MonthProcessService;
+import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
+import com.encens.khipus.service.warehouse.WarehouseCatalogService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.End;
@@ -156,6 +159,9 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         /** End Transfer to **/
         movementDetails.add(movementDetail);
 
+        warehouseVoucherFrom.setOrigin(OriginModule.TP);
+        warehouseVoucherTo.setOrigin(OriginModule.TP);
+
         try {
 
             warehouseService.saveWarehouseVoucher(warehouseVoucherFrom, inventoryMovementFrom, movementDetails,
@@ -193,7 +199,8 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
             }
 
             try {
-                warehouseAccountEntryService.createAccountEntryForProductTransfer(warehouseVoucherFrom, warehouseVoucherTo, warehouseVoucherFrom.getExecutorUnit(),warehouseVoucherFrom.getCostCenter().getCode(), description );
+                //rebuild
+                //warehouseAccountEntryService.createAccountEntryForProductTransfer(warehouseVoucherFrom, warehouseVoucherTo, warehouseVoucherFrom.getExecutorUnit(),warehouseVoucherFrom.getCostCenter().getCode(), description );
 
             }catch (Exception e){
                 e.printStackTrace();

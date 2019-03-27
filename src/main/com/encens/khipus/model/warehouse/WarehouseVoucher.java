@@ -70,6 +70,10 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
 
+    @Column(name = "ORIG", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private OriginModule origin;
+
     @Column(name = "NO_TRANS_REC", nullable = true, length = 10)
     @Length(max = 10)
     private String receptionTransactionNumber;
@@ -531,5 +535,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setVoucher(Voucher voucher) {
         this.voucher = voucher;
+    }
+
+    public OriginModule getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(OriginModule origin) {
+        this.origin = origin;
     }
 }

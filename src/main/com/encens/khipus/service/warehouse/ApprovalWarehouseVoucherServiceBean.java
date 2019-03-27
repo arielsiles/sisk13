@@ -1611,12 +1611,6 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             }
         }
 
-        /*if(warehouseVoucher.getWarehouse().getId().equals(Constants.COD_WAREHUOSE_MILK_COLLECTED) && warehouseVoucher.getDocumentType().getName().equals("RECEPCION"))
-            warehouseAccountEntryService.createAccountEntryFromCollection(warehouseVoucher, gloss);
-        else
-            warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);*/
-
-        //updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
     }
 
 
