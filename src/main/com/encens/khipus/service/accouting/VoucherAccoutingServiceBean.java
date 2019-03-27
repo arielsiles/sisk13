@@ -876,59 +876,20 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "and v.idusuario <> 5 and v.idtipopedido in (1,5) " +
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
-        HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
-        BigDecimal totalCost = BigDecimal.ZERO;
-
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
         Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
         voucher.setDate(endDate);
 
-        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaAlmPT().getAccountCode(), startDate, endDate);
-
-        /*
-        VoucherDetail voucherDebit = new VoucherDetail();
-        voucher.addVoucherDetail(voucherDebit);
-        voucherDebit.setAccount(companyConfiguration.getCtaCostPT().getAccountCode());
-        voucherDebit.setDebit(totalCost);
-        voucherDebit.setCredit(BigDecimal.ZERO);
-        voucherDebit.setCurrency(FinancesCurrencyType.P);
-        voucherDebit.setExchangeAmount(BigDecimal.ONE);
-        voucherDebit.setDebitMe(BigDecimal.ZERO);
-        voucherDebit.setCreditMe(BigDecimal.ZERO);
-
-        totalCost = BigDecimal.ZERO;
+        System.out.println("----------SALES---------");
         for (Object[] sale : sales){
-            String codArt = (String)sale[0];
-            BigDecimal quantity = (BigDecimal) sale[1];
-            BigDecimal promotion = (BigDecimal) sale[2];
-            BigDecimal replacement = (BigDecimal) sale[3];
-            BigDecimal totalQuantity = (BigDecimal) sale[4];
-
-            if (quantity.doubleValue() > 0){
-                BigDecimal unitCost = unitCostMilkProducts.get(codArt);
-                if (unitCost.doubleValue() > 0){
-                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
-                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
-
-                    VoucherDetail voucherCredit = new VoucherDetail();
-                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
-                    voucherCredit.setDebit(BigDecimal.ZERO);
-                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
-
-                    voucherCredit.setProductItemCode(codArt);
-                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
-
-                    voucherCredit.setCurrency(FinancesCurrencyType.P);
-                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
-                    voucherCredit.setDebitMe(BigDecimal.ZERO);
-                    voucherCredit.setCreditMe(BigDecimal.ZERO);
-                    voucher.addVoucherDetail(voucherCredit);
-                }
-            }
+            System.out.println("---> sales: |" + (String)sale[0] + "|" + (BigDecimal)sale[1]);
         }
-        voucherDebit.setDebit(totalCost);
-        saveVoucher(voucher);*/
+        System.out.println("----------END SALES---------");
+
+        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaCostPT().getAccountCode(), startDate, endDate);
+
+
     }
 
     /** Reposiciones + Promociones **/
@@ -1010,22 +971,21 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostMilkProducts.get(codArt);
                 if (unitCost.doubleValue() > 0){
-                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
-                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
 
                     VoucherDetail voucherCredit = new VoucherDetail();
                     voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
-
                     voucherCredit.setProductItemCode(codArt);
                     voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
-
                     voucherCredit.setCurrency(FinancesCurrencyType.P);
                     voucherCredit.setExchangeAmount(BigDecimal.ONE);
                     voucherCredit.setDebitMe(BigDecimal.ZERO);
                     voucherCredit.setCreditMe(BigDecimal.ZERO);
                     voucher.addVoucherDetail(voucherCredit);
+
+                    totalCost = BigDecimalUtil.sum(totalCost, voucherCredit.getCredit(), 2);
                 }
             }
         }
@@ -1036,9 +996,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public void createCostOfSale_VeterinaryProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
-                "from ventas v where v.fecha between :startDate and :endDate " +
-                "and v.idusuario = 5 " +
+        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
+                "from ventas v where v.fecha between :startDate and :endDate and v.idusuario = 5 " +
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         HashMap<String, BigDecimal> unitCostVeterinaryProducts = getUnitCost_veterinaryProducts(startDate, endDate);
@@ -1063,9 +1022,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         for (Object[] sale : sales){
             String codArt = (String)sale[0];
             BigDecimal quantity = (BigDecimal) sale[1];
-            //BigDecimal promotion = (BigDecimal) sale[2];
-            //BigDecimal replacement = (BigDecimal) sale[3];
-            //BigDecimal totalQuantity = (BigDecimal) sale[4];
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostVeterinaryProducts.get(codArt);
@@ -1074,7 +1030,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
 
                     VoucherDetail voucherCredit = new VoucherDetail();
-                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPV().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
@@ -1130,35 +1086,44 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         /** MODIFYID **/
         HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
+        String gestion = DateUtils.getCurrentYear(startDate).toString();
 
         List<Object[]> productList = em.createNativeQuery("" +
-                "select z.cod_art, sum(z.monto) / sum(z.cantidad) " +
-                "from ( " +
-                "   select d.cod_art, sum(d.monto) as monto, sum(d.cantidad) as cantidad " +
-                "   from inv_movdet d " +
-                "   left join inv_vales v on d.no_trans = v.no_trans " +
-                "   where v.fecha between :startDate and :endDate " +
-                "   and v.cod_alm = 2 and d.tipo_mov = 'E' and v.id_com_encoc is not null " +
-                "   group by d.cod_art " +
-                "   UNION " +
-                "   select t.cod_art, sum(t.costototalproduccion) as monto,   sum(t.cant_total) as cantidad " +
-                "   from producciontotal t " +
-                "   where t.fecha between :startDate and :endDate " +
-                "   group by t.cod_art " +
-                ") z " +
-                "group by z.cod_art ")
-                .setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
+                "SELECT z.cod_art, SUM(z.monto) / SUM(z.cantidad) AS costo_uni " +
+                "FROM ( " +
+                "       SELECT i.cod_art, SUM(i.cantidad * i.costo_uni) AS monto, SUM(i.cantidad) AS cantidad " +
+                "       FROM inv_inicio i " +
+                "       WHERE i.gestion = :gestion AND i.alm = 2 AND i.cantidad > 0 " +
+                "       GROUP BY i.cod_art " +
+                "       UNION " +
+                "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
+                "       FROM inv_movdet d " +
+                "       LEFT JOIN inv_vales v ON d.no_trans = v.no_trans " +
+                "       WHERE v.fecha BETWEEN :startDate AND :endDate " +
+                "       AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
+                "       GROUP BY d.cod_art " +
+                "       UNION " +
+                "       SELECT t.cod_art, SUM(t.costototalproduccion) AS monto,   SUM(t.cant_total) AS cantidad " +
+                "       FROM producciontotal t " +
+                "       WHERE t.fecha BETWEEN :startDate AND :endDate " +
+                "       GROUP BY t.cod_art " +
+                "       ) z " +
+                "GROUP BY z.cod_art " +
+                ";")
+                .setParameter("gestion", gestion).setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
+        System.out.println("----------CALCULANDO--UNITCOST--PT------------");
         for (Object[] product : productList){
             String codArt = (String) product[0];
             BigDecimal unitCost = (BigDecimal) product[1];
             result.put(codArt, unitCost);
-            System.out.println("----> MAP PRODUCT: " + codArt + "\t " + unitCost);
+            System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
         }
+        System.out.println("---------------END------------");
 
         result.put("148", result.get("151")); // EDAM
         result.put("150", result.get("151")); // FRESCO
-        result.put("643", result.get("118")); // FLUIDA
+        result.put("643", result.get("118")); // FLUIDA // revisar, calcular cuando producen
 
         result.put("195", BigDecimal.ZERO);
         result.put("196", BigDecimal.ZERO);

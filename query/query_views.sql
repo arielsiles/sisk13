@@ -15,9 +15,9 @@ LEFT JOIN planificacionproduccion pp 	ON pb.`idplanificacionproduccion` = pp.`id
 LEFT JOIN productosimple ps		ON pb.`idproductobase` = ps.`idproductobase`
 LEFT JOIN productosimpleprocesado psp	ON ps.`idproductosimple` = psp.`idproductosimple`
 LEFT JOIN metaproductoproduccion mp 	ON psp.`idmetaproductoproduccion` = mp.`idmetaproductoproduccion`
-UNION
-SELECT STR_TO_DATE(CONCAT(i.`gestion`, '-01-01'),'%Y-%m-%d') AS fecha, i.`cod_art`, i.`nombre`, '0000-0000', i.`cantidad`, 0, 0, 0, (i.`cantidad` * i.`costo_uni`) AS COSTOTOTALPRODUCCION
-FROM inv_inicio i  WHERE i.`alm` = 2 AND i.`cantidad` > 0
+-- UNION
+-- SELECT STR_TO_DATE(CONCAT(i.`gestion`, '-01-01'),'%Y-%m-%d') AS fecha, i.`cod_art`, i.`nombre`, '0000-0000', i.`cantidad`, 0, 0, 0, (i.`cantidad` * i.`costo_uni`) AS COSTOTOTALPRODUCCION
+-- FROM inv_inicio i  WHERE i.`alm` = 2 AND i.`cantidad` > 0
 ;
 
 
