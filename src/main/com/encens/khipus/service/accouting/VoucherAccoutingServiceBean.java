@@ -866,13 +866,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
     /** MODIFYID **/
+
     public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad), sum(v.promocion), sum(v.reposicion), sum(v.total) " +
+        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
                 "from ventas v " +
                 "where v.fecha between :startDate and :endDate " +
-                "and v.idusuario <> 5 and v.idtipopedido = 1 " +
+                "and v.idusuario <> 5 and v.idtipopedido in (1,5) " +
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
@@ -883,6 +884,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
         voucher.setDate(endDate);
 
+        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaAlmPT().getAccountCode(), startDate, endDate);
+
+        /*
         VoucherDetail voucherDebit = new VoucherDetail();
         voucher.addVoucherDetail(voucherDebit);
         voucherDebit.setAccount(companyConfiguration.getCtaCostPT().getAccountCode());
@@ -900,6 +904,108 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal promotion = (BigDecimal) sale[2];
             BigDecimal replacement = (BigDecimal) sale[3];
             BigDecimal totalQuantity = (BigDecimal) sale[4];
+
+            if (quantity.doubleValue() > 0){
+                BigDecimal unitCost = unitCostMilkProducts.get(codArt);
+                if (unitCost.doubleValue() > 0){
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
+                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
+
+                    VoucherDetail voucherCredit = new VoucherDetail();
+                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setDebit(BigDecimal.ZERO);
+                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+
+                    voucherCredit.setProductItemCode(codArt);
+                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+
+                    voucherCredit.setCurrency(FinancesCurrencyType.P);
+                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
+                    voucherCredit.setDebitMe(BigDecimal.ZERO);
+                    voucherCredit.setCreditMe(BigDecimal.ZERO);
+                    voucher.addVoucherDetail(voucherCredit);
+                }
+            }
+        }
+        voucherDebit.setDebit(totalCost);
+        saveVoucher(voucher);*/
+    }
+
+    /** Reposiciones + Promociones **/
+    public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+
+        List<Object[]> sales = em.createNativeQuery("" +
+                "select z.cod_art, sum(z.cantidad) " +
+                "from ( " +
+                "       SELECT a.cod_art, SUM(a.REPOSICION) + SUM(a.PROMOCION) AS cantidad " +
+                "       from articulos_pedido a " +
+                "       left join pedidos p on a.idpedidos = p.idpedidos " +
+                "       where p.fecha_entrega between :startDate and :endDate " +
+                "       and p.idtipopedido = 1 and p.estado <> 'ANULADO' " +
+                "       group by a.cod_art " +
+                "       union " +
+                "       select a.cod_art, sum(a.cantidad) as cantidad " +
+                "       from articulos_pedido a " +
+                "       left join pedidos p on a.idpedidos = p.idpedidos " +
+                "       where p.fecha_entrega between :startDate and :endDate " +
+                "       and p.idtipopedido = 4 and p.estado <> 'ANULADO' " +
+                "       group by a.cod_art " +
+                ") z " +
+                "group by z.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
+
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por REPOSICIONES y PROMOCIONES en " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        createVoucherDetailForCostOfSales(sales, voucher, "4470510300", startDate, endDate);
+    }
+
+    /** Degustacion o Refrigerio **/
+    public void createCostOfSale_MilkProductsTastingOrRefreshment(Date startDate, Date endDate, Long orderTypeId, String costAccount) throws CompanyConfigurationNotFoundException {
+
+        List<Object[]> sales = em.createNativeQuery("" +
+                "select a.cod_art, sum(a.cantidad) as degustacion " +
+                "from articulos_pedido a " +
+                "left join pedidos p on a.idpedidos = p.idpedidos " +
+                "where p.fecha_entrega between :startDate and :endDate " +
+                "and p.idtipopedido = :orderTypeId and p.estado <> 'ANULADO' " +
+                "group by a.cod_art " ).setParameter("startDate", startDate).setParameter("endDate", endDate).setParameter("orderTypeId", orderTypeId).getResultList();
+
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+
+        String tastingOrRefreshment = "DEGUSTACIONES";
+        if (orderTypeId == 3)
+            tastingOrRefreshment = "REFRIGERIOS";
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por " + tastingOrRefreshment +" en " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        createVoucherDetailForCostOfSales(sales, voucher, costAccount, startDate, endDate);
+    }
+
+    public void createVoucherDetailForCostOfSales(List<Object[]> sales, Voucher voucher, String costAccount, Date startDate, Date endDate)throws CompanyConfigurationNotFoundException {
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucher.addVoucherDetail(voucherDebit);
+        voucherDebit.setAccount(costAccount);
+        voucherDebit.setDebit(totalCost);
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+
+        for (Object[] sale : sales){
+            String codArt = (String)sale[0];
+            BigDecimal quantity = (BigDecimal) sale[1];
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostMilkProducts.get(codArt);
@@ -1032,7 +1138,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "   from inv_movdet d " +
                 "   left join inv_vales v on d.no_trans = v.no_trans " +
                 "   where v.fecha between :startDate and :endDate " +
-                "   and v.cod_alm = 2 and d.tipo_mov = 'e' and v.id_com_encoc is not null " +
+                "   and v.cod_alm = 2 and d.tipo_mov = 'E' and v.id_com_encoc is not null " +
                 "   group by d.cod_art " +
                 "   UNION " +
                 "   select t.cod_art, sum(t.costototalproduccion) as monto,   sum(t.cant_total) as cantidad " +
