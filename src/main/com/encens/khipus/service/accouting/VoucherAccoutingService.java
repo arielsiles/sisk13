@@ -4,9 +4,11 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.ProductSaleType;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.warehouse.Warehouse;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -92,4 +94,7 @@ public interface VoucherAccoutingService extends GenericService {
     public List<Object[]> getSumsBalanceClosure(Date startDate, Date endDate);
 
     Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate);
+
+    public void getValuableInventory(Date staDate, Date endDate, CashAccount cashAccount, Warehouse warehouse);
+
 }

@@ -11,6 +11,7 @@ import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -1514,6 +1515,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         Integer result = new Integer(number.toString());
         result++;
         return result;
+    }
+
+    public void getValuableInventory(Date staDate, Date endDate, CashAccount cashAccount, Warehouse warehouse){
+
+        em.createNativeQuery("");
+
     }
 
 }
