@@ -5,8 +5,10 @@ package com.encens.khipus.model.warehouse;
  * @version 2.
  */
 public enum OriginModule {
-    OP("OriginModule.product"),
+    OP("OriginModule.productOrder"),
     OC("OriginModule.purchaseOrder"),
+    BA("OriginModule.productLow"),
+    DE("OriginModule.productReturn"),
     TP("OriginModule.productTransfer");
     private String resourceKey;
 

@@ -11,7 +11,6 @@ import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -1517,9 +1516,28 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return result;
     }
 
-    public void getValuableInventory(Date staDate, Date endDate, CashAccount cashAccount, Warehouse warehouse){
+    public List<Object[]> getValuedInventory(Date startDate, Date endDate, CashAccount cashAccount){
 
-        em.createNativeQuery("");
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        datas = em.createNativeQuery("" +
+                "SELECT d.cod_art, a.descri, a.cod_med, " +
+                "SUM(d.debe)     AS debe, " +
+                "SUM(d.haber)    AS haber, " +
+                "SUM(IF(d.debe>0, d.cant_art, 0))  AS cant_e, " +
+                "SUM(IF(d.haber>0, d.cant_art, 0)) AS cant_s " +
+                "FROM sf_tmpdet d " +
+                "LEFT JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
+                "LEFT JOIN inv_articulos a ON d.cod_art = a.cod_art " +
+                "WHERE d.cuenta = :cashAccount " +
+                "AND e.fecha BETWEEN :startDate AND :endDate " +
+                "AND e.estado <> 'ANL' " +
+                "GROUP BY d.cod_art, a.descri, a.cod_med ")
+        .setParameter("cashAccount", cashAccount.getAccountCode())
+        .setParameter("startDate", startDate)
+        .setParameter("endDate", endDate).getResultList();
+
+        return datas;
 
     }
 

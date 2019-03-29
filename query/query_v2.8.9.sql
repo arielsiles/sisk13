@@ -32,11 +32,12 @@ AND e.`fecha` BETWEEN '2019-01-01' AND '2019-01-31'
 AND e.`estado` <> 'ANL'
 ;
 
-SELECT d.`cod_art` ,SUM(d.`debe`) AS debe, SUM(d.`haber`) AS haber, SUM(d.`cant_art`) AS cant, SUM(IF(d.`debe`>0, d.`cant_art`, 0)) AS entrada, SUM(IF(d.`haber`>0, d.`cant_art`, 0)) AS salida
+SELECT d.`cod_art`, a.`descri`, SUM(d.`debe`) AS debe, SUM(d.`haber`) AS haber, SUM(d.`cant_art`) AS cant, SUM(IF(d.`debe`>0, d.`cant_art`, 0)) AS cant_e, SUM(IF(d.`haber`>0, d.`cant_art`, 0)) AS cant_s
 FROM sf_tmpdet d
 LEFT JOIN sf_tmpenc e ON d.`id_tmpenc` = e.`id_tmpenc`
+LEFT JOIN inv_articulos a ON d.`cod_art` = a.`cod_art`
 WHERE d.`cuenta` = 1510110201
 AND e.`fecha` BETWEEN '2019-01-01' AND '2019-01-31'
 AND e.`estado` <> 'ANL'
-GROUP BY d.`cod_art`
+GROUP BY d.`cod_art`, a.`descri`
 ;

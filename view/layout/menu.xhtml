@@ -489,6 +489,14 @@
                     propagation="none"/>
         </rich:menuItem>
 
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}">
+            <s:link view="/warehouse/valuedPhysicalInventory.xhtml"
+                    value="#{messages['menu.warehouse.report.valuedPhysicalInventory']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
         <!-- Estado del Inventario -->
         <!--<rich:menuItem submitMode="none"
                        styleClass="main-menu-item"

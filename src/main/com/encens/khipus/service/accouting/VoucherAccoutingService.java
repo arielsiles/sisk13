@@ -8,7 +8,6 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.warehouse.Warehouse;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -95,6 +94,6 @@ public interface VoucherAccoutingService extends GenericService {
 
     Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate);
 
-    public void getValuableInventory(Date staDate, Date endDate, CashAccount cashAccount, Warehouse warehouse);
+    public List<Object[]> getValuedInventory(Date startDate, Date endDate, CashAccount cashAccount);
 
 }

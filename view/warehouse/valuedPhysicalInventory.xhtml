@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.kardex.inventoryReport.titleReport']}
+                </f:facet>
+
+                <!--<s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="productInventoryReportAction.warehouse.warehouseCode"
+                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="3">
+
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{valuedPhysicalInventoryReportAction.warehouse.name}"
+                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
+                                     clearAction="valuedPhysicalInventoryReportAction.cleanWarehouseField()"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>-->
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{valuedPhysicalInventoryReportAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{valuedPhysicalInventoryReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                     required="true"
+                                     textValue="#{valuedPhysicalInventoryReportAction.cashAccount.fullName}"
+                                     value="#{valuedPhysicalInventoryReportAction.cashAccount}"
+                                     clearAction="#{valuedPhysicalInventoryReportAction.clearAccount()}"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="itemAccountField"
+                                     tabindex="3">
+                    </app:selectPopUp>
+                </s:decorate>
+
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{valuedPhysicalInventoryReportAction}" showPageFormat="false"
+                                      tabIndex="3"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+            </div>
+
+        </h:form>
+
+        <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="warehouseModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{valuedPhysicalInventoryReportAction.setWarehouse(warehouseItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="warehouseField"
+                                   oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{valuedPhysicalInventoryReportAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>
