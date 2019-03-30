@@ -1765,4 +1765,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         return false;
     }
+
+    public void getVouchersWithoutAccounting(){
+
+    }
 }
