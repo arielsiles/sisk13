@@ -1766,7 +1766,16 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         return false;
     }
 
-    public void getVouchersWithoutAccounting(){
+    public List<WarehouseVoucher> getVouchersWithoutAccounting(){
 
+        List<WarehouseVoucher> warehouseVoucherList = em.createQuery("" +
+                "select voucher from WarehouseVoucher voucher " +
+                " where voucher.operation in (:TP, :BA, :DE) ")
+                .setParameter("TP", VoucherOperation.TP)
+                .setParameter("BA", VoucherOperation.BA)
+                .setParameter("DE", VoucherOperation.DE)
+                .getResultList();
+
+        return warehouseVoucherList;
     }
 }

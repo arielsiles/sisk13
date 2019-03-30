@@ -33,8 +33,8 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
     private ProductItem productItem;
     private String inventoryMovementDescription;
     private Employee responsible;
-    private Date startDate;
-    private Date endDate;
+    private Date startDate = new Date();
+    private Date endDate = new Date();;
 
     private static final String[] RESTRICTIONS = {
             "lower(warehouseVoucher.number) like concat(lower(#{warehouseVoucherDataModel.criteria.number}), '%')",

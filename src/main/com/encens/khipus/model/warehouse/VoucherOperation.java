@@ -4,15 +4,15 @@ package com.encens.khipus.model.warehouse;
  * @author
  * @version 2.
  */
-public enum OriginModule {
-    OP("OriginModule.productOrder"),
-    OC("OriginModule.purchaseOrder"),
-    BA("OriginModule.productLow"),
-    DE("OriginModule.productReturn"),
-    TP("OriginModule.productTransfer");
+public enum VoucherOperation {
+    OP("VoucherOperation.productOrder"),
+    OC("VoucherOperation.purchaseOrder"),
+    BA("VoucherOperation.productLow"),
+    DE("VoucherOperation.productReturn"),
+    TP("VoucherOperation.productTransfer");
     private String resourceKey;
 
-    OriginModule(String resourceKey) {
+    VoucherOperation(String resourceKey) {
         this.resourceKey = resourceKey;
     }
 

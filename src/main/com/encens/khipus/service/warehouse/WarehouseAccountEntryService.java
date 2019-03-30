@@ -70,4 +70,7 @@ public interface WarehouseAccountEntryService extends GenericService {
             throws CompanyConfigurationNotFoundException;
 
     void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucherFrom, WarehouseVoucher warehouseVoucherTo, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException;
+
+    List<WarehouseVoucher> getVouchersWithoutAccounting();
+
 }

@@ -3,10 +3,14 @@ package com.encens.khipus.action.warehouse;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.model.warehouse.WarehouseVoucherState;
+import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+
+import java.util.List;
 
 /**
  * @author
@@ -15,6 +19,9 @@ import org.jboss.seam.annotations.Scope;
 @Name("warehouseVoucherAction")
 @Scope(ScopeType.CONVERSATION)
 public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
+
+    @In
+    private WarehouseAccountEntryService warehouseAccountEntryService;
 
     @Factory(value = "warehouseVoucher", scope = ScopeType.STATELESS)
     public WarehouseVoucher initWarehouseVoucher() {
@@ -25,4 +32,18 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
     public WarehouseVoucherState[] getWarehouseVoucherStates() {
         return WarehouseVoucherState.values();
     }
+
+    public void processVouchersWithoutAccounting(){
+
+        List<WarehouseVoucher> warehouseVoucherList = warehouseAccountEntryService.getVouchersWithoutAccounting();
+
+        for (WarehouseVoucher warehouseVoucher : warehouseVoucherList){
+
+            System.out.println("===> " + warehouseVoucher.getNumber() + " - " + warehouseVoucher.getOperation() + " - " + warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList().size());
+
+        }
+
+
+    }
+
 }

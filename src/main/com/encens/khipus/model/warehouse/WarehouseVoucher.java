@@ -17,6 +17,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,9 +71,9 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
 
-    @Column(name = "ORIG", nullable = true)
+    @Column(name = "OPER", nullable = true)
     @Enumerated(EnumType.STRING)
-    private OriginModule origin;
+    private VoucherOperation operation;
 
     @Column(name = "NO_TRANS_REC", nullable = true, length = 10)
     @Length(max = 10)
@@ -88,6 +89,10 @@ public class WarehouseVoucher implements BaseModel {
 
     @Column(name = "ID_COM_ENCOC", nullable = true, updatable = false, insertable = false)
     private Long purchaseOrderId;
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "warehouseVoucher")
+    private List<InventoryMovement> inventoryMovementList = new ArrayList<InventoryMovement>(0);
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
@@ -537,11 +542,20 @@ public class WarehouseVoucher implements BaseModel {
         this.voucher = voucher;
     }
 
-    public OriginModule getOrigin() {
-        return origin;
+
+    public VoucherOperation getOperation() {
+        return operation;
     }
 
-    public void setOrigin(OriginModule origin) {
-        this.origin = origin;
+    public void setOperation(VoucherOperation operation) {
+        this.operation = operation;
+    }
+
+    public List<InventoryMovement> getInventoryMovementList() {
+        return inventoryMovementList;
+    }
+
+    public void setInventoryMovementList(List<InventoryMovement> inventoryMovementList) {
+        this.inventoryMovementList = inventoryMovementList;
     }
 }

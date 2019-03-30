@@ -211,6 +211,11 @@
 </rich:simpleTogglePanel>
 
 <div class="buttons">
+
+    <h:commandButton action="#{warehouseVoucherAction.processVouchersWithoutAccounting}"
+                     value="#{messages['Warehouse.button.processVouchers']}"
+                     styleClass="button"/>
+
     <h:commandButton action="#{warehouseVoucherCreateAction.closeCurrentMonthProcess}"
                      value="#{messages['Warehouse.button.closeProcessMonth']}"
                      styleClass="button"/>

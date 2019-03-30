@@ -12,6 +12,10 @@ CREATE TABLE inv_periodo (
 	PRIMARY KEY (id_inv_periodo)
 );
 
+-- ALTER TABLE inv_vales CHANGE orig oper varchar(6);
+
+-- ---------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------
 
 SELECT e.`id_tmpenc`, e.`no_trans`, d.`id_tmpdet`, e.`fecha`, e.`tipo_doc`, e.`no_doc`, e.`cod_prov`, d.`cuenta`, a.`descri`, d.`debe`, d.`haber`, 
 e.`estado`, d.`cod_prov`, d.`cod_art`, d.`cant_art`, e.`glosa`

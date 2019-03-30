@@ -159,8 +159,8 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         /** End Transfer to **/
         movementDetails.add(movementDetail);
 
-        warehouseVoucherFrom.setOrigin(OriginModule.TP);
-        warehouseVoucherTo.setOrigin(OriginModule.TP);
+        warehouseVoucherFrom.setOperation(VoucherOperation.TP);
+        warehouseVoucherTo.setOperation(VoucherOperation.TP);
 
         try {
 
