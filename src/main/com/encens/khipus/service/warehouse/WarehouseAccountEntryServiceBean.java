@@ -1766,21 +1766,21 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         return false;
     }
 
-    public List<WarehouseVoucher> getVouchersWithoutAccounting(){
+    public List<WarehouseVoucher> getVouchersWithoutAccounting(Date startDate, Date endDate){
 
         List<WarehouseVoucher> warehouseVoucherList = em.createQuery("" +
                 "select voucher from WarehouseVoucher voucher " +
-                " where voucher.operation in (:TP, :BA, :DE) ")
+                " where voucher.operation in (:TP, :BA, :DE) " +
+                " and voucher.date between :startDate and :endDate ")
                 .setParameter("TP", VoucherOperation.TP)
                 .setParameter("BA", VoucherOperation.BA)
                 .setParameter("DE", VoucherOperation.DE)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return warehouseVoucherList;
     }
 
-    public void createAccountingForVoucherTP(List<WarehouseVoucher> warehouseVoucherList){
-
-    }
 
 }

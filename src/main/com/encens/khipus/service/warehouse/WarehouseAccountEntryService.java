@@ -14,6 +14,7 @@ import com.encens.khipus.model.warehouse.WarehouseVoucher;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +72,6 @@ public interface WarehouseAccountEntryService extends GenericService {
 
     void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucherFrom, WarehouseVoucher warehouseVoucherTo, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException;
 
-    List<WarehouseVoucher> getVouchersWithoutAccounting();
+    List<WarehouseVoucher> getVouchersWithoutAccounting(Date startDate, Date endDate);
 
 }
