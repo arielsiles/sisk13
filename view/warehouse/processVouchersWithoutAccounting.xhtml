@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.kardex.inventoryReport.titleReport']}
+                </f:facet>
+
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{warehouseVoucherAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{warehouseVoucherAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{warehouseVoucherAction.processVouchersWithoutAccounting}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

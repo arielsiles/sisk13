@@ -1778,4 +1778,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         return warehouseVoucherList;
     }
+
+    public void createAccountingForVoucherTP(List<WarehouseVoucher> warehouseVoucherList){
+
+    }
+
 }
