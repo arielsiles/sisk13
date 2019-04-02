@@ -148,4 +148,6 @@ public interface ApprovalWarehouseVoucherService extends GenericService {
             ConcurrencyException,
             ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException;
 
+    void updateSimpleWarehouseVoucher(WarehouseVoucher warehouseVoucher);
+
 }

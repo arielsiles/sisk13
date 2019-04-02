@@ -9,6 +9,7 @@ import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
@@ -40,6 +41,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     private CompanyConfigurationService companyConfigurationService;
+    @In
+    ApprovalWarehouseVoucherService approvalWarehouseVoucherService;
 
     @Factory(value = "warehouseVoucher", scope = ScopeType.STATELESS)
     public WarehouseVoucher initWarehouseVoucher() {
@@ -53,6 +56,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
 
 
+    /** Vales de P.T. **/
     public void processVouchersWithoutAccounting() throws CompanyConfigurationNotFoundException {
 
         List<WarehouseVoucher> warehouseVoucherList = warehouseAccountEntryService.getVouchersWithoutAccounting(startDate, endDate);
@@ -78,7 +82,6 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
     public void createAccountingForVoucherBA(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
-        //MovementDetail movementDetail =  warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList().get(0);
 
         Voucher voucher = new Voucher();
         voucher.setDate(endDate);
@@ -104,10 +107,40 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
         voucherDetailDebit.setDebit(totalAmount);
         voucherAccoutingService.saveVoucher(voucher);
+        warehouseVoucher.setVoucher(voucher);
+        approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
     public void createAccountingForVoucherDE(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
 
+        Voucher voucher = new Voucher();
+        voucher.setDate(endDate);
+        voucher.setDocumentType(Constants.TR_VOUCHER_DOCTYPE);
+        voucher.setGloss("DEVOLUCION/ENTRADA PT, " + warehouseVoucher.getInventoryMovementList().get(0).getDescription());
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
+            BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+            BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
+
+            VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+                    amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
+                    movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
+
+            voucher.getDetails().add(voucherDetailDebit);
+            totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);
+        }
+
+        VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaCostPT().getAccountCode(),
+                BigDecimal.ZERO, totalAmount, FinancesCurrencyType.P, BigDecimal.ONE,null, null);
+        voucher.getDetails().add(voucherDetailCredit);
+
+        voucherAccoutingService.saveVoucher(voucher);
+        warehouseVoucher.setVoucher(voucher);
+        approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
 
@@ -155,6 +188,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         }
 
         voucherAccoutingService.saveVoucher(voucher);
+        warehouseVoucher.setVoucher(voucher);
+        approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
 

@@ -211,8 +211,15 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
 
         if(warehouseVoucher.getWarehouse().getId().equals(Constants.COD_WAREHUOSE_MILK_COLLECTED) && warehouseVoucher.getDocumentType().getName().equals("RECEPCION"))
             warehouseAccountEntryService.createAccountEntryFromCollection(warehouseVoucher, gloss);
-        else
-            warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
+        else{
+
+            if (warehouseVoucher.getOperation() == null){
+                System.out.println("===> " + warehouseVoucher.getOperation());
+                System.out.println("===> " + warehouseVoucher.getDocumentType());
+                warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
+            }
+
+        }
 
         updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
     }
@@ -1470,6 +1477,13 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         getEntityManager().flush();
     }
 
+    public void updateSimpleWarehouseVoucher(WarehouseVoucher warehouseVoucher) {
+        //warehouseVoucher.setState(WarehouseVoucherState.APR);
+        //warehouseVoucher.setNumber(generateWarehouseVoucherNumber(warehouseVoucher));
+        getEntityManager().merge(warehouseVoucher);
+        getEntityManager().flush();
+    }
+
     private void updateWarehouseVoucherByState(WarehouseVoucher warehouseVoucher, WarehouseVoucherState warehouseVoucherState) {
         warehouseVoucher.setState(warehouseVoucherState);
         warehouseVoucher.setNumber(generateWarehouseVoucherNumber(warehouseVoucher));
@@ -1612,7 +1626,6 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         }
 
     }
-
 
 
 }

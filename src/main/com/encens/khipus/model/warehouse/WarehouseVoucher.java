@@ -273,6 +273,12 @@ public class WarehouseVoucher implements BaseModel {
 
         if (null != documentType) {
             setDocumentCode(documentType.getId().getDocumentCode());
+
+            if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.B))
+                setOperation(VoucherOperation.BA);
+            if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.D))
+                setOperation(VoucherOperation.DE);
+
         } else {
             setDocumentCode(null);
         }
