@@ -175,6 +175,16 @@ public class VoucherDetail implements BaseModel {
         this.quantityArt = quantityArt;
     }
 
+    public VoucherDetail(String account, BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, Long quantityArt) {
+        this.account = account;
+        this.debit = debit;
+        this.credit = credit;
+        this.currency = currency;
+        this.exchangeAmount = exchangeAmount;
+        this.productItemCode = productItemCode;
+        this.quantityArt = quantityArt;
+    }
+
     public VoucherDetail() {
     }
 

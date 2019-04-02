@@ -64,6 +64,7 @@ public final class Constants {
     public static final String CE_VOUCHER_DOCTYPE = "CE";
     public static final String CI_VOUCHER_DOCTYPE = "CI";
     public static final String RI_VOUCHER_DOCTYPE = "RI";
+    public static final String TR_VOUCHER_DOCTYPE = "TR";
 
     public static final BigDecimal BASE_CURRENCY_EXCHANGE_RATE = BigDecimal.ONE;
 
