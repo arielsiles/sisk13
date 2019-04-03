@@ -1103,10 +1103,17 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "       AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
                 "       GROUP BY d.cod_art " +
                 "       UNION " +
-                "       SELECT t.cod_art, SUM(t.costototalproduccion) AS monto,   SUM(t.cant_total) AS cantidad " +
+                "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
+                "       FROM inv_vales i " +
+                "       JOIN inv_movdet d ON i.no_trans = d.no_trans " +
+                "       WHERE i.fecha BETWEEN :startDate AND :endDate " +
+                "       AND i.cod_alm = 2 " +
+                "       AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL) " +
+                "       GROUP BY d.cod_art " +
+                /*"       SELECT t.cod_art, SUM(t.costototalproduccion) AS monto,   SUM(t.cant_total) AS cantidad " +
                 "       FROM producciontotal t " +
                 "       WHERE t.fecha BETWEEN :startDate AND :endDate " +
-                "       GROUP BY t.cod_art " +
+                "       GROUP BY t.cod_art " +*/
                 "       ) z " +
                 "GROUP BY z.cod_art " +
                 ";")
