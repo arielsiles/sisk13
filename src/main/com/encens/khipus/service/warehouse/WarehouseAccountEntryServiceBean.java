@@ -1279,6 +1279,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucherForGeneration.setDate(warehouseVoucher.getDate());
         //check transactionNumber
         //voucherService.create(voucherForGeneration);
+        voucherForGeneration.setDocumentType(Constants.PD_VOUCHER_DOCTYPE);
         warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
 
