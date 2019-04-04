@@ -1238,9 +1238,12 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
 
-        String productItemCode = movementDetailService.getCodeByNoTrans(warehouseVoucher.getId().getTransactionNumber());
-        Long quantity = movementDetailService.getCantByNoTrans(warehouseVoucher.getId().getTransactionNumber());
-        System.out.println("==============> productItemCode: " + productItemCode + " - " + quantity);
+        //String productItemCode = movementDetailService.getCodeByNoTrans(warehouseVoucher.getId().getTransactionNumber());
+
+
+        //Long quantity = movementDetailService.getCantByNoTrans(warehouseVoucher.getId().getTransactionNumber());
+
+        //System.out.println("==============> productItemCode: " + productItemCode + " - " + quantity);
 
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.INPUT_PROD_WAREHOUSE, gloss);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUserProduction().getId());
@@ -1251,6 +1254,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         Warehouse warehouse = warehouseService.findWarehouseByCode(warehouseVoucher.getWarehouseCode());
         BigDecimal total = BigDecimal.ZERO;
+
         for(ProductionPlanningAction.AccountOrderProduction accountOrderProduction :accountOrderProductions)
         {
             voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
@@ -1262,23 +1266,37 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     BigDecimal.ONE));
             total = total.add(accountOrderProduction.getVoucherAmount());
         }
+
         if(voucherAmount.doubleValue() != total.doubleValue())
         {
             voucherAmount = total;
             movementDetailService.updateAmountTotal(warehouseVoucher.getId().getTransactionNumber(),total);
         }
-        voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+
+        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByVoucher(warehouseVoucher);
+
+        for (MovementDetail detail : movementDetailList){
+            voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnit.getExecutorUnitCode(),
+                    costCenterCode,
+                    //companyConfiguration.getWarehouseNationalCurrencyTransientAccount2(),
+                    cashAccountService.findByAccountCode(warehouse.getCashAccount()),
+                    detail.getPurchasePrice(),
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE, detail.getProductItemCode(), detail.getQuantity().longValue()));
+        }
+
+        /*voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
                 //companyConfiguration.getWarehouseNationalCurrencyTransientAccount2(),
                 cashAccountService.findByAccountCode(warehouse.getCashAccount()),
                 voucherAmount,
                 FinancesCurrencyType.P,
-                BigDecimal.ONE, productItemCode, quantity));
+                BigDecimal.ONE, productItemCode, quantity));*/
 
         voucherForGeneration.setDate(warehouseVoucher.getDate());
         //check transactionNumber
-        //voucherService.create(voucherForGeneration);
         voucherForGeneration.setDocumentType(Constants.PD_VOUCHER_DOCTYPE);
         warehouseVoucher.setVoucher(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);
