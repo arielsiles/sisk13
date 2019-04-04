@@ -94,7 +94,7 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         parameters.putAll(paramMap);
 
         for (CollectionData data : beanCollection){
-            //System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getInitialAmount() +"|"+ data.getUnitCost() +"|"+ data.getBalance());
+            System.out.println("|"+ data.getCodeArt() +"|"+ data.getName() +"|"+ data.getUnitCost() +"|"+ data.getQuantity() + "|" + data.getAmount());
         }
 
         try{

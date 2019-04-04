@@ -970,6 +970,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostMilkProducts.get(codArt);
+                System.out.println("==========================> COD_ART: " + codArt);
                 if (unitCost.doubleValue() > 0){
                     BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
 
@@ -1087,14 +1088,21 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         /** MODIFYID **/
         HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
         String gestion = DateUtils.getCurrentYear(startDate).toString();
-
+        String month = DateUtils.getCurrentMonth(startDate).toString();
+        System.out.println("=============> MES : " + month);
         List<Object[]> productList = em.createNativeQuery("" +
                 "SELECT z.cod_art, SUM(z.monto) / SUM(z.cantidad) AS costo_uni " +
                 "FROM ( " +
-                "       SELECT i.cod_art, SUM(i.cantidad * i.costo_uni) AS monto, SUM(i.cantidad) AS cantidad " +
+                "       SELECT p.cod_art, (p.saldofis * p.costouni) AS monto, p.saldofis AS cantidad " +
+                "       FROM inv_periodo p " +
+                "       WHERE p.cod_alm = 2 " +
+                "       AND p.mes = :month " +
+                "       AND p.gestion = :gestion " +
+                "       AND p.saldofis > 0 " +
+                /*"       SELECT i.cod_art, SUM(i.cantidad * i.costo_uni) AS monto, SUM(i.cantidad) AS cantidad " +
                 "       FROM inv_inicio i " +
                 "       WHERE i.gestion = :gestion AND i.alm = 2 AND i.cantidad > 0 " +
-                "       GROUP BY i.cod_art " +
+                "       GROUP BY i.cod_art " +*/
                 "       UNION " +
                 "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
                 "       FROM inv_movdet d " +
@@ -1117,7 +1125,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "       ) z " +
                 "GROUP BY z.cod_art " +
                 ";")
-                .setParameter("gestion", gestion).setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
+                .setParameter("month", month).setParameter("gestion", gestion).setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         System.out.println("----------CALCULANDO--UNITCOST--PT------------");
         for (Object[] product : productList){
@@ -1131,12 +1139,27 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         result.put("148", result.get("151")); // EDAM
         result.put("150", result.get("151")); // FRESCO
         result.put("643", result.get("118")); // FLUIDA // revisar, calcular cuando producen
+        result.put("761", result.get("139")); // BEBIDA LACTEA FERMENTADA 100ML (FRUTILLA)/139 - YOGURT SACHET FRUTILLA 120 CC /
+        result.put("760", result.get("154")); // BEBIDA LACTEA FERMENTADA 100ML (DURAZNO)/154 - YOGURT SACHET DURAZNO 120 CC
+        result.put("762", result.get("157")); // BEBIDA LACTEA FERMENTADA 100ML (COCO)/154 - YOGURT SACHET COCO 120 CC
+        result.put("763", result.get("588")); // 763-BEBIDA LACTEA 120ML (MANZANA) / 588 - ILFRUT MANZANA 120 ML
+        result.put("764", result.get("589")); // 764-BEBIDA LACTEA 120ML (DURAZNO) / 589 - ILFRUT DURAZNO 120 ML
 
+        if (result.get("704") == null) //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
+            result.put("704", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
+
+        if (result.get("705") == null) //705-YOG BEBIBLE FAMILIAR coco 1L
+            result.put("705", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
+
+        result.put("188", BigDecimal.ZERO);
+        result.put("193", BigDecimal.ZERO);
         result.put("195", BigDecimal.ZERO);
         result.put("196", BigDecimal.ZERO);
         result.put("197", BigDecimal.ZERO);
         result.put("490", BigDecimal.ZERO);
+        result.put("493", BigDecimal.ZERO);
         result.put("521", BigDecimal.ZERO);
+        result.put("693", BigDecimal.ZERO);
 
 
         System.out.println("----> MAP PRODUCT: " + "148" + "\t " + result.get("148"));
