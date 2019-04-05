@@ -79,6 +79,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
                     "  group by client.id, client.nit, client.name, client.ap, client.am " +
                     "  order by client.name";*/
         ejbql = " SELECT " +
+                "        client.territoriotrabajo.nombre as group, " +
                 "        client.id, " +
                 "        client.nit, " +
                 "        client.name, " +
@@ -93,7 +94,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
                 "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
                 "  AND   voucher.state <> 'ANL' " +
                 "  group by client.id, client.nit, client.name, client.ap, client.am " +
-                "  order by client.name";
+                "  order by client.territoriotrabajo.nombre, client.name";
 
         return ejbql;
     }

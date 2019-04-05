@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summaryClientStateReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.SummaryClientReportScriptlet">
 	<property name="ireport.zoom" value="2.3579476910000166"/>
-	<property name="ireport.x" value="472"/>
+	<property name="ireport.x" value="33"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="cashAccount" class="java.lang.String"/>
 	<parameter name="cashAccountCode" class="java.lang.String"/>
-	<field name="id" class="java.lang.Long">
+	<field name="group" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
-	<field name="nit" class="java.lang.String">
+	<field name="id" class="java.lang.Long">
 		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
 	</field>
-	<field name="name" class="java.lang.String">
+	<field name="nit" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
 	</field>
-	<field name="ap" class="java.lang.String">
+	<field name="name" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
 	</field>
-	<field name="am" class="java.lang.String">
+	<field name="ap" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
 	</field>
-	<field name="debit" class="java.math.BigDecimal">
+	<field name="am" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
 	</field>
-	<field name="credit" class="java.math.BigDecimal">
+	<field name="debit" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+	</field>
+	<field name="credit" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
 	</field>
 	<variable name="totalCredit" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
@@ -140,8 +143,8 @@
 						<text><![CDATA[Saldo]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="0" y="1" width="17" height="15"/>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
+						<reportElement x="0" y="1" width="14" height="15"/>
+						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[N.]]></text>
@@ -152,6 +155,13 @@
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<text><![CDATA[Saldo Ant ]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="13" y="1" width="57" height="15"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<text><![CDATA[Grupo]]></text>
 					</staticText>
 				</frame>
 			</band>
@@ -245,18 +255,18 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="18" height="11"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
+				<reportElement x="0" y="0" width="15" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Inc_Var}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="25" y="0" width="281" height="11"/>
+				<reportElement x="71" y="0" width="235" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}+" "+$F{ap}+" "+$F{am}+" - ("+$F{nit}+")"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}+" "+$F{ap}+" "+$F{am}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="491" y="0" width="65" height="11"/>
@@ -271,6 +281,13 @@
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{balance}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="14" y="0" width="57" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{group}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
