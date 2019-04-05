@@ -1092,7 +1092,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         System.out.println("=============> MES : " + month);
         List<Object[]> productList = em.createNativeQuery("" +
                 "SELECT z.cod_art, SUM(z.monto) / SUM(z.cantidad) AS costo_uni " +
-                "FROM ( " +
+                "FROM ( " + /** Saldos iniciales, mes anterior **/
                 "       SELECT p.cod_art, (p.saldofis * p.costouni) AS monto, p.saldofis AS cantidad " +
                 "       FROM inv_periodo p " +
                 "       WHERE p.cod_alm = 2 " +
@@ -1103,14 +1103,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "       FROM inv_inicio i " +
                 "       WHERE i.gestion = :gestion AND i.alm = 2 AND i.cantidad > 0 " +
                 "       GROUP BY i.cod_art " +*/
-                "       UNION " +
+                "       UNION " + /** Compras **/
                 "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
                 "       FROM inv_movdet d " +
                 "       LEFT JOIN inv_vales v ON d.no_trans = v.no_trans " +
                 "       WHERE v.fecha BETWEEN :startDate AND :endDate " +
                 "       AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
                 "       GROUP BY d.cod_art " +
-                "       UNION " +
+                "       UNION " + /** Entradas de produccion **/
                 "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
                 "       FROM inv_vales i " +
                 "       JOIN inv_movdet d ON i.no_trans = d.no_trans " +

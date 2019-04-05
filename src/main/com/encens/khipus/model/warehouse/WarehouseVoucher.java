@@ -75,6 +75,14 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private VoucherOperation operation;
 
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "DEST", nullable = true, insertable = false, updatable = false)
+    private WarehouseVoucher destiny;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ORIG", nullable = true, insertable = false, updatable = false)
+    private WarehouseVoucher origin;
+
     @Column(name = "NO_TRANS_REC", nullable = true, length = 10)
     @Length(max = 10)
     private String receptionTransactionNumber;
@@ -563,5 +571,21 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setInventoryMovementList(List<InventoryMovement> inventoryMovementList) {
         this.inventoryMovementList = inventoryMovementList;
+    }
+
+    public WarehouseVoucher getDestiny() {
+        return destiny;
+    }
+
+    public void setDestiny(WarehouseVoucher destiny) {
+        this.destiny = destiny;
+    }
+
+    public WarehouseVoucher getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(WarehouseVoucher origin) {
+        this.origin = origin;
     }
 }

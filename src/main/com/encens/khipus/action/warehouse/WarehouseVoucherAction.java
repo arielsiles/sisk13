@@ -187,9 +187,12 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             voucher.getDetails().add(voucherDetailCredit);
         }
 
-        voucherAccoutingService.saveVoucher(voucher);
-        warehouseVoucher.setVoucher(voucher);
-        approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
+        System.out.println("======> DESTINO: " + warehouseVoucher.getDestiny());
+        System.out.println("======> ORIGEN: " + warehouseVoucher.getOrigin());
+
+        //voucherAccoutingService.saveVoucher(voucher);
+        //warehouseVoucher.setVoucher(voucher);
+        //approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
 
