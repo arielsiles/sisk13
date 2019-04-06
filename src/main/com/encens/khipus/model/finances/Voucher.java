@@ -2,7 +2,6 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
-import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Parameter;
@@ -175,7 +174,10 @@ public class Voucher implements BaseModel{
     @Length(max = 2)
     private String pendantRegistry;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher", cascade = CascadeType.ALL)
+    /*@OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher", cascade = CascadeType.ALL)
+    private List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>(0);*/
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher")
     private List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>(0);
 
     @Transient

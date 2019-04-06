@@ -102,7 +102,6 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         warehouseVoucherFrom.setState(WarehouseVoucherState.PEN);
         warehouseVoucherFrom.setWarehouse(warehouseVoucher.getWarehouse());
 
-
         InventoryMovement inventoryMovementFrom = new InventoryMovement();
         inventoryMovementFrom.setCreationDate(new Date());
         inventoryMovementFrom.setDescription(description);
@@ -191,6 +190,18 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
                         movementDetailOverMaximumStockMap,
                         movementDetailWithoutWarnings);
 
+                warehouseVoucherFrom.setDestiny(warehouseVoucherTo);
+                warehouseVoucherTo.setOrigin(warehouseVoucherFrom);
+
+                System.out.println("________From: " + warehouseVoucherFrom.getId().getTransactionNumber());
+                System.out.println("________To: " + warehouseVoucherTo.getId().getTransactionNumber());
+
+                warehouseVoucherFrom.setNotransDestiny(warehouseVoucherTo.getId().getTransactionNumber());
+                warehouseVoucherTo.setNotransOrigin(warehouseVoucherFrom.getId().getTransactionNumber());
+
+
+                approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucherFrom);
+                approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucherTo);
 
             } catch (Exception e){
                 e.printStackTrace();

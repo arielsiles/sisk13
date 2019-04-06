@@ -55,6 +55,10 @@ public class WarehouseVoucher implements BaseModel {
     @Length(max = 2)
     private String companyNumber;
 
+    @Column(name = "NO_TRANS", nullable = false, updatable = false, insertable = false, length = 10)
+    @Length(max = 10)
+    private String transactionNumber;
+
     @Column(name = "COD_DOC", nullable = true, length = 3)
     @Length(max = 3)
     private String documentCode;
@@ -75,13 +79,25 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private VoucherOperation operation;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "DEST", nullable = true, insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
+            @JoinColumn(name = "DEST", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+    })
     private WarehouseVoucher destiny;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ORIG", nullable = true, insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
+            @JoinColumn(name = "ORIG", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+    })
     private WarehouseVoucher origin;
+
+    @Column(name = "DEST")
+    private String notransDestiny;
+
+    @Column(name = "ORIG")
+    private String notransOrigin;
 
     @Column(name = "NO_TRANS_REC", nullable = true, length = 10)
     @Length(max = 10)
@@ -573,6 +589,7 @@ public class WarehouseVoucher implements BaseModel {
         this.inventoryMovementList = inventoryMovementList;
     }
 
+
     public WarehouseVoucher getDestiny() {
         return destiny;
     }
@@ -587,5 +604,29 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setOrigin(WarehouseVoucher origin) {
         this.origin = origin;
+    }
+
+    public String getTransactionNumber() {
+        return transactionNumber;
+    }
+
+    public void setTransactionNumber(String transactionNumber) {
+        this.transactionNumber = transactionNumber;
+    }
+
+    public String getNotransDestiny() {
+        return notransDestiny;
+    }
+
+    public void setNotransDestiny(String notransDestiny) {
+        this.notransDestiny = notransDestiny;
+    }
+
+    public String getNotransOrigin() {
+        return notransOrigin;
+    }
+
+    public void setNotransOrigin(String notransOrigin) {
+        this.notransOrigin = notransOrigin;
     }
 }
