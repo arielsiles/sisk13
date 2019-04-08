@@ -209,10 +209,13 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             gloss[1] = gloss[1].replaceAll(Constants.WAREHOUSEVOUCHER_NUMBER_PARAM, warehouseVoucher.getNumber());
         }
 
+        System.out.println("===> gloss: " + gloss);
+
         if(warehouseVoucher.getWarehouse().getId().equals(Constants.COD_WAREHUOSE_MILK_COLLECTED) && warehouseVoucher.getDocumentType().getName().equals("RECEPCION"))
             warehouseAccountEntryService.createAccountEntryFromCollection(warehouseVoucher, gloss);
         else{
 
+            /** Solo crea el asiento para vales que BO tienen operacion (TP, BA, DEV)**/
             if (warehouseVoucher.getOperation() == null){
                 System.out.println("===> " + warehouseVoucher.getOperation());
                 System.out.println("===> " + warehouseVoucher.getDocumentType());

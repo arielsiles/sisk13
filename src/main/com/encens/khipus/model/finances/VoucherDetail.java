@@ -121,7 +121,7 @@ public class VoucherDetail implements BaseModel {
     private String providerCode;
 
     @Column(name = "CANT_ART", nullable = true)
-    private Long quantityArt;
+    private BigDecimal quantityArt;
 
     @Column(name = "COD_ART", length = 6)
     @Length(max = 6)
@@ -163,7 +163,7 @@ public class VoucherDetail implements BaseModel {
     }
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
-                         BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, Long quantityArt) {
+                         BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, BigDecimal quantityArt) {
         this.businessUnitCode = businessUnitCode;
         this.costCenterCode = costCenterCode;
         this.account = account;
@@ -172,17 +172,17 @@ public class VoucherDetail implements BaseModel {
         this.currency = currency;
         this.exchangeAmount = exchangeAmount;
         this.productItemCode = productItemCode;
-        this.quantityArt = quantityArt;
+        this.setQuantityArt(quantityArt);
     }
 
-    public VoucherDetail(String account, BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, Long quantityArt) {
+    public VoucherDetail(String account, BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, BigDecimal quantityArt) {
         this.account = account;
         this.debit = debit;
         this.credit = credit;
         this.currency = currency;
         this.exchangeAmount = exchangeAmount;
         this.productItemCode = productItemCode;
-        this.quantityArt = quantityArt;
+        this.setQuantityArt(quantityArt);
     }
 
     public VoucherDetail() {
@@ -342,7 +342,7 @@ public class VoucherDetail implements BaseModel {
         if (provider != null)
             fullCashAccount = fullCashAccount + " (" +  provider.getFullName() + ")";
         if (productItem != null) {
-            String q = getQuantityArt() > 0 ? getQuantityArt().toString() : " " ;
+            String q = getQuantityArt().doubleValue() > 0 ? getQuantityArt().toString() : " " ;
             fullCashAccount = fullCashAccount + " (" + productItem.getFullName() + ")";
             fullCashAccount = fullCashAccount + " (" + q + ")";
         }
@@ -452,14 +452,6 @@ public class VoucherDetail implements BaseModel {
         this.partner = partner;
     }
 
-    public Long getQuantityArt() {
-        return quantityArt;
-    }
-
-    public void setQuantityArt(Long quantityArt) {
-        this.quantityArt = quantityArt;
-    }
-
     public BigDecimal getDebitMe() {
         return debitMe;
     }
@@ -474,5 +466,13 @@ public class VoucherDetail implements BaseModel {
 
     public void setCreditMe(BigDecimal creditMe) {
         this.creditMe = creditMe;
+    }
+
+    public BigDecimal getQuantityArt() {
+        return quantityArt;
+    }
+
+    public void setQuantityArt(BigDecimal quantityArt) {
+        this.quantityArt = quantityArt;
     }
 }

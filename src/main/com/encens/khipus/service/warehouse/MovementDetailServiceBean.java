@@ -2,8 +2,10 @@ package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.employees.MovementType;
-import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.warehouse.MovementDetail;
+import com.encens.khipus.model.warehouse.MovementDetailType;
+import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.model.warehouse.WarehouseVoucherState;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.ValidatorUtil;
 import org.jboss.seam.annotations.AutoCreate;
@@ -15,7 +17,6 @@ import org.jboss.seam.log.Log;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -450,13 +451,13 @@ public class MovementDetailServiceBean implements MovementDetailService {
     }
 
     /** Solo cuando el vale tiene 1 articulo **/
-    public Long getCantByNoTrans(String no_trans){
+    public BigDecimal getCantByNoTrans(String no_trans){
 
         BigDecimal result = (BigDecimal)em.createNativeQuery("select cantidad from inv_movdet where no_trans =:no_trans")
                 .setParameter("no_trans", no_trans)
                 .getSingleResult();
 
-        return result.toBigInteger().longValue();
+        return result;
 
     }
 

@@ -1283,7 +1283,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     cashAccountService.findByAccountCode(warehouse.getCashAccount()),
                     detail.getPurchasePrice(),
                     FinancesCurrencyType.P,
-                    BigDecimal.ONE, detail.getProductItemCode(), detail.getQuantity().longValue()));
+                    BigDecimal.ONE, detail.getProductItemCode(), detail.getQuantity()));
         }
 
         /*voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
@@ -1320,24 +1320,31 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         String transactionNumber = financesPkGeneratorService.getNextNoTransTmpenc();
         voucherForGeneration.setTransactionNumber(transactionNumber);
 
-        //System.out.println("----------> PROVIDER COD: " + warehouseVoucher.getPurchaseOrder().getProvider().getEntity().toString());
         if(warehouseVoucher.getPurchaseOrder() != null)
             voucherForGeneration.setProviderCode(warehouseVoucher.getPurchaseOrder().getProvider().getProviderCode());
 
-        voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
-                executorUnit.getExecutorUnitCode(),
-                costCenterCode,
-                //companyConfiguration.getWarehouseNationalCurrencyAccount(),
-                cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
-                voucherAmount,
-                FinancesCurrencyType.P,
-                BigDecimal.ONE));
+        /** Asocia Cuenta de Alm con producto **/
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<MovementDetail> movementDetailList = movementDetailService.findDetailListByVoucher(warehouseVoucher);
+        for (MovementDetail detail : movementDetailList){
+
+            voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnit.getExecutorUnitCode(),
+                    costCenterCode,
+                    //companyConfiguration.getWarehouseNationalCurrencyAccount(),
+                    cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                    detail.getAmount(),
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE,
+                    detail.getProductItemCode(), detail.getQuantity()));
+            totalAmount = BigDecimalUtil.sum(totalAmount, detail.getAmount(), 2);
+        }
 
         voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
                 companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
-                voucherAmount,
+                totalAmount,
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));
         //check transactionNumber
@@ -1354,10 +1361,10 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucherFrom.getId().getCompanyNumber(), warehouseVoucherFrom.getState(), warehouseVoucherFrom.getId().getTransactionNumber());
 
         String cod_art_from = movementDetailService.getCodeByNoTrans(warehouseVoucherFrom.getId().getTransactionNumber());
-        Long cant_art_from  = movementDetailService.getCantByNoTrans(warehouseVoucherFrom.getId().getTransactionNumber());
+        BigDecimal cant_art_from  = movementDetailService.getCantByNoTrans(warehouseVoucherFrom.getId().getTransactionNumber());
 
         String cod_art_to = movementDetailService.getCodeByNoTrans(warehouseVoucherTo.getId().getTransactionNumber());
-        Long cant_art_to  = movementDetailService.getCantByNoTrans(warehouseVoucherTo.getId().getTransactionNumber());
+        BigDecimal cant_art_to  = movementDetailService.getCantByNoTrans(warehouseVoucherTo.getId().getTransactionNumber());
 
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.WAREHOUSE_VOUCHER_FORM, gloss);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());

@@ -22,7 +22,7 @@ public class VoucherDetailBuilder {
     }
 
     public static VoucherDetail newDebitVoucherDetail(String businessUnitCode, String costCenterCode, CashAccount cashAccount,
-        BigDecimal amount, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, Long quantity) {
+        BigDecimal amount, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, BigDecimal quantity) {
         return new VoucherDetail(cashAccount.getHasCostCenter() ? businessUnitCode : null, cashAccount.getHasCostCenter() ? costCenterCode : null, cashAccount.getAccountCode(), amount, new BigDecimal(0), currency, exchangeAmount, productItemCode, quantity);
     }
 
@@ -32,7 +32,7 @@ public class VoucherDetailBuilder {
     }
 
     public static VoucherDetail newCreditVoucherDetail(String businessUnitCode, String costCenterCode, CashAccount cashAccount,
-                                                       BigDecimal amount, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, Long quantity) {
+                                                       BigDecimal amount, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, BigDecimal quantity) {
         return new VoucherDetail(cashAccount.getHasCostCenter() ? businessUnitCode : null, cashAccount.getHasCostCenter() ? costCenterCode : null, cashAccount.getAccountCode(), new BigDecimal(0), amount, currency, exchangeAmount, productItemCode, quantity);
     }
 

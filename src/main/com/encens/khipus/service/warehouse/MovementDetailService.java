@@ -1,7 +1,9 @@
 package com.encens.khipus.service.warehouse;
 
-import com.encens.khipus.model.employees.MovementType;
-import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.warehouse.MovementDetail;
+import com.encens.khipus.model.warehouse.MovementDetailType;
+import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.model.warehouse.WarehouseVoucherState;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -65,5 +67,5 @@ public interface MovementDetailService {
 
     public String getCodeByNoTrans(String no_trans);
 
-    public Long getCantByNoTrans(String no_trans);
+    public BigDecimal getCantByNoTrans(String no_trans);
 }

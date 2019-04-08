@@ -37,7 +37,7 @@ public final class Constants {
     public static final String CASHBOX_SCHEMA   = "khipus";
     public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
-    //Schema for CAISC
+    //Schema for CAISC - Fondo Lech
     /*public static final String KHIPUS_SCHEMA    = "caisc";
     public static final String FINANCES_SCHEMA  = "caisc";
     public static final String CASHBOX_SCHEMA   = "caisc";

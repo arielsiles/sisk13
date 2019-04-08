@@ -979,7 +979,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
                     voucherCredit.setProductItemCode(codArt);
-                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+                    voucherCredit.setQuantityArt(quantity);
                     voucherCredit.setCurrency(FinancesCurrencyType.P);
                     voucherCredit.setExchangeAmount(BigDecimal.ONE);
                     voucherCredit.setDebitMe(BigDecimal.ZERO);
@@ -1039,7 +1039,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
                     voucherCredit.setProductItemCode(codArt);
-                    voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+                    voucherCredit.setQuantityArt(quantity);
 
                     voucherCredit.setCurrency(FinancesCurrencyType.P);
                     voucherCredit.setExchangeAmount(BigDecimal.ONE);
@@ -1377,7 +1377,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
             voucherCredit.setProductItemCode(codArt);
-            voucherCredit.setQuantityArt(quantity.toBigInteger().longValue());
+            voucherCredit.setQuantityArt(quantity);
 
             voucherCredit.setCurrency(FinancesCurrencyType.P);
             voucherCredit.setExchangeAmount(BigDecimal.ONE);

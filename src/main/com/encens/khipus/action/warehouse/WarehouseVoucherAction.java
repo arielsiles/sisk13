@@ -99,7 +99,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
             VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
             BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
-            movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
+            movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
             voucher.getDetails().add(voucherDetailCredit);
             totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);
@@ -128,7 +128,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
                     amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
-                    movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
+                    movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
             voucher.getDetails().add(voucherDetailDebit);
             totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);
@@ -169,7 +169,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
             VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
                     BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
-                    movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
+                    movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
             voucher.getDetails().add(voucherDetailDebit);
             voucher.getDetails().add(voucherDetailCredit);
@@ -184,7 +184,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
                     amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
-                    movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
+                    movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
             VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getWarehouseNationalCurrencyTransientAccountCode(),
                     BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,

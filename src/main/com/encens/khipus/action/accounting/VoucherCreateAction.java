@@ -546,7 +546,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
                     voucherDetail.setProductItem(this.productItem);
                     voucherDetail.setProductItemCode(this.productItem.getProductItemCode());
-                    voucherDetail.setQuantityArt(this.quantity.longValue());
+                    voucherDetail.setQuantityArt(BigDecimalUtil.toBigDecimal(quantity));
 
                 }
 
@@ -593,17 +593,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherCaja.setAccount(ctaCaja.getAccountCode());
             voucherCaja.setDebit(BigDecimalUtil.multiply(productItem.getSalePrice(), BigDecimalUtil.toBigDecimal(quantity), 2));
             voucherCaja.setCredit(BigDecimal.ZERO);
-            voucherCaja.setQuantityArt(quantity.longValue());
+            voucherCaja.setQuantityArt(BigDecimalUtil.toBigDecimal(quantity));
 
             VoucherDetail voucherIngreso = new VoucherDetail();
             voucherIngreso.setCashAccount(ctaIngreso);
             voucherIngreso.setAccount(ctaIngreso.getAccountCode());
-            voucherIngreso.setQuantityArt(quantity.longValue());
+            voucherIngreso.setQuantityArt(BigDecimalUtil.toBigDecimal(quantity));
 
             VoucherDetail voucherDetail = new VoucherDetail(); //Cta Almacen
             voucherDetail.setCashAccount(productItem.getWarehouse().getWarehouseCashAccount());
             voucherDetail.setAccount(productItem.getWarehouse().getWarehouseCashAccount().getAccountCode());
-            voucherDetail.setQuantityArt(quantity.longValue());
+            voucherDetail.setQuantityArt(BigDecimalUtil.toBigDecimal(quantity));
 
             voucherDetail.setClient(this.client);
             voucherDetail.setProvider(this.provider);
