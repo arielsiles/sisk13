@@ -341,8 +341,12 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" + client.getFullName() + ")";
         if (provider != null)
             fullCashAccount = fullCashAccount + " (" +  provider.getFullName() + ")";
-        if (productItem != null)
-            fullCashAccount = fullCashAccount + " (" +  productItem.getFullName() + ")";
+        if (productItem != null) {
+            String q = getQuantityArt() > 0 ? getQuantityArt().toString() : " " ;
+            fullCashAccount = fullCashAccount + " (" + productItem.getFullName() + ")";
+            fullCashAccount = fullCashAccount + " (" + q + ")";
+        }
+
         if (partnerAccount != null)
             fullCashAccount = fullCashAccount + " (" +  partnerAccount.getAccountNumber() + " " + partnerAccount.getPartner().getFirstAndMaidenName() + ")";
         if (purchaseDocument != null)
@@ -351,6 +355,8 @@ public class VoucherDetail implements BaseModel {
             fullCashAccount = fullCashAccount + " (" + creditPartner.getPartner().getFullName() + ")";
         if (partner != null)
             fullCashAccount = fullCashAccount + " (" + partner.getFullName() + ")";
+
+
 
         System.out.println("=======> getDebit(): " + getDebit());
         System.out.println("=======> getCredit(): " + getCredit());

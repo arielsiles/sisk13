@@ -2,7 +2,6 @@ package com.encens.khipus.action.accounting;
 
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
-import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -12,12 +11,6 @@ import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.finances.*;
-import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.purchases.PurchaseOrder;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.Provider;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -545,6 +538,17 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setProvider(this.provider);
 
                 if (this.provider != null) voucherDetail.setProviderCode(this.provider.getProviderCode());
+
+                if (this.productItem != null){
+
+                    System.out.println("====> Product: " + this.productItem.getFullName());
+                    System.out.println("====> Cantidad: " + this.getQuantity());
+
+                    voucherDetail.setProductItem(this.productItem);
+                    voucherDetail.setProductItemCode(this.productItem.getProductItemCode());
+                    voucherDetail.setQuantityArt(this.quantity.longValue());
+
+                }
 
                 voucherDetail.setDebit(this.debit);
                 voucherDetail.setCredit(this.credit);

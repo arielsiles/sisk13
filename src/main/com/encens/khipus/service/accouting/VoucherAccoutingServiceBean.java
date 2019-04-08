@@ -1024,6 +1024,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             String codArt = (String)sale[0];
             BigDecimal quantity = (BigDecimal) sale[1];
 
+            /** Uncomment for test **/
+            //System.out.println("=============> Create CV for: " + codArt + " - " + quantity);
+
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostVeterinaryProducts.get(codArt);
                 if (unitCost.doubleValue() > 0){
@@ -1054,30 +1057,35 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         HashMap<String, BigDecimal> result = new HashMap<String, BigDecimal>();
         String gestion = DateUtils.getCurrentYear(startDate).toString();
+        String month = DateUtils.getCurrentMonth(startDate).toString();
 
         List<Object[]> purchaseList = em.createNativeQuery("" +
                 "select z.cod_art, sum(z.monto) / sum(z.cantidad) from ( " +
+                " " + /** Inventario inicio de periodo **/
+                "   SELECT p.cod_art, (p.saldofis * p.costouni) as monto, p.saldofis as cantidad " +
+                "   FROM inv_periodo p " +
+                "   WHERE p.cod_alm = 5 " +
+                "   AND p.mes = :month " +
+                "   AND p.gestion = :gestion " +
+                "   AND p.saldofis > 0 " +
+                "   UNION " +
+                " " + /** Compras **/
                 "   select d.cod_art, d.monto, d.cantidad " +
                 "   from inv_movdet d " +
                 "   left join inv_vales v on d.no_trans = v.no_trans " +
                 "   where v.fecha between :startDate and :endDate " +
                 "   and v.cod_alm = 5 and d.tipo_mov = 'E' and v.id_com_encoc is not null " +
-                "   union " +
-                "   select i.cod_art, (i.costo_uni * i.cantidad) as monto, i.cantidad " +
-                "   from inv_inicio i " +
-                "   where i.gestion = :gestion " +
-                "   and i.alm = 5 " +
-                "   and i.cantidad > 0 " +
                 ") z " +
                 "group by z.cod_art " +
                 ";")
-                .setParameter("startDate", startDate).setParameter("endDate", endDate).setParameter("gestion", gestion).getResultList();
+                .setParameter("month", month).setParameter("startDate", startDate).setParameter("endDate", endDate).setParameter("gestion", gestion).getResultList();
 
         for (Object[] purchase : purchaseList){
             String codArt = (String) purchase[0];
             BigDecimal unitCost = (BigDecimal) purchase[1];
             result.put(codArt, unitCost);
-            System.out.println("----> MAP: " + codArt + "\t " + unitCost);
+            /** Uncomment for test **/
+            //System.out.println("----> MAP: " + codArt + "\t " + unitCost);
         }
 
         return result;
@@ -1091,40 +1099,44 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         String month = DateUtils.getCurrentMonth(startDate).toString();
         System.out.println("=============> MES : " + month);
         List<Object[]> productList = em.createNativeQuery("" +
-                "SELECT z.cod_art, SUM(z.monto) / SUM(z.cantidad) AS costo_uni " +
-                "FROM ( " + /** Saldos iniciales, mes anterior **/
-                "       SELECT p.cod_art, (p.saldofis * p.costouni) AS monto, p.saldofis AS cantidad " +
-                "       FROM inv_periodo p " +
-                "       WHERE p.cod_alm = 2 " +
-                "       AND p.mes = :month " +
-                "       AND p.gestion = :gestion " +
-                "       AND p.saldofis > 0 " +
-                /*"       SELECT i.cod_art, SUM(i.cantidad * i.costo_uni) AS monto, SUM(i.cantidad) AS cantidad " +
-                "       FROM inv_inicio i " +
-                "       WHERE i.gestion = :gestion AND i.alm = 2 AND i.cantidad > 0 " +
-                "       GROUP BY i.cod_art " +*/
-                "       UNION " + /** Compras **/
-                "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
-                "       FROM inv_movdet d " +
-                "       LEFT JOIN inv_vales v ON d.no_trans = v.no_trans " +
-                "       WHERE v.fecha BETWEEN :startDate AND :endDate " +
-                "       AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
-                "       GROUP BY d.cod_art " +
-                "       UNION " + /** Entradas de produccion **/
-                "       SELECT d.cod_art, SUM(d.monto) AS monto, SUM(d.cantidad) AS cantidad " +
-                "       FROM inv_vales i " +
-                "       JOIN inv_movdet d ON i.no_trans = d.no_trans " +
-                "       WHERE i.fecha BETWEEN :startDate AND :endDate " +
-                "       AND i.cod_alm = 2 " +
-                "       AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL) " +
-                "       GROUP BY d.cod_art " +
-                /*"       SELECT t.cod_art, SUM(t.costototalproduccion) AS monto,   SUM(t.cant_total) AS cantidad " +
-                "       FROM producciontotal t " +
-                "       WHERE t.fecha BETWEEN :startDate AND :endDate " +
-                "       GROUP BY t.cod_art " +*/
-                "       ) z " +
-                "GROUP BY z.cod_art " +
-                ";")
+                "SELECT z.cod_art, (SUM(z.debe)-SUM(z.haber)) / (SUM(z.cant_d)-SUM(z.cant_h)) AS costo_uni " +
+                "FROM ( " +
+                "  " + /** Inventario inicio de periodo **/
+                " SELECT p.cod_art, (p.saldofis * p.costouni) AS debe, 0 AS haber, p.saldofis AS cant_d, 0 AS cant_h " +
+                " FROM inv_periodo p " +
+                " WHERE p.cod_alm = 2 " +
+                " AND p.mes = :month " +
+                " AND p.gestion = :gestion " +
+                " AND p.saldofis > 0 " +
+                " UNION " +
+                " " + /** Compras **/
+                " SELECT d.cod_art, SUM(d.monto) AS debe, 0 AS haber, SUM(d.cantidad) AS cant_d, 0 AS cant_h " +
+                " FROM inv_movdet d " +
+                " LEFT JOIN inv_vales v ON d.no_trans = v.no_trans " +
+                " WHERE v.fecha BETWEEN  :startDate AND  :endDate " +
+                " AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
+                " GROUP BY d.cod_art " +
+                " UNION " +
+                " " + /** Entradas de produccion **/
+                " SELECT d.cod_art, SUM(d.monto) AS debe, 0 AS haber, SUM(d.cantidad) cant_d, 0 AS cant_h " +
+                " FROM inv_vales i " +
+                " JOIN inv_movdet d ON i.no_trans = d.no_trans " +
+                " WHERE i.fecha BETWEEN  :startDate AND  :endDate " +
+                " AND i.cod_alm = 2 " +
+                " AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL) " +
+                " GROUP BY d.cod_art " +
+                " UNION " +
+                " " + /** Transferencias, Bajas, Devoluciones **/
+                " SELECT d. cod_art , SUM(t. debe ) AS debe, SUM(t. haber ) AS haber, SUM(IF(t.debe>0, d.cantidad, 0)) AS cant_d, SUM(IF(t.haber>0, d.cantidad, 0)) AS cant_h " +
+                " FROM inv_movdet d " +
+                " LEFT JOIN inv_vales v ON d. no_trans  = v. no_trans  " +
+                " LEFT JOIN sf_tmpdet t ON v. idtmpenc  = t. id_tmpenc  " +
+                " WHERE v. fecha  BETWEEN  :startDate AND  :endDate " +
+                " AND v. oper  IS NOT NULL " +
+                " AND d. cod_art  = t. cod_art  " +
+                " GROUP BY d. cod_art  " +
+                ") z " +
+                "GROUP BY z.cod_art")
                 .setParameter("month", month).setParameter("gestion", gestion).setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         System.out.println("----------CALCULANDO--UNITCOST--PT------------");
@@ -1132,24 +1144,28 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             String codArt = (String) product[0];
             BigDecimal unitCost = (BigDecimal) product[1];
             result.put(codArt, unitCost);
-            System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
+            /** Uncomment for test **/
+            //System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
         }
         System.out.println("---------------END------------");
 
-        result.put("148", result.get("151")); // EDAM
-        result.put("150", result.get("151")); // FRESCO
-        result.put("643", result.get("118")); // FLUIDA // revisar, calcular cuando producen
-        result.put("761", result.get("139")); // BEBIDA LACTEA FERMENTADA 100ML (FRUTILLA)/139 - YOGURT SACHET FRUTILLA 120 CC /
-        result.put("760", result.get("154")); // BEBIDA LACTEA FERMENTADA 100ML (DURAZNO)/154 - YOGURT SACHET DURAZNO 120 CC
-        result.put("762", result.get("157")); // BEBIDA LACTEA FERMENTADA 100ML (COCO)/154 - YOGURT SACHET COCO 120 CC
-        result.put("763", result.get("588")); // 763-BEBIDA LACTEA 120ML (MANZANA) / 588 - ILFRUT MANZANA 120 ML
-        result.put("764", result.get("589")); // 764-BEBIDA LACTEA 120ML (DURAZNO) / 589 - ILFRUT DURAZNO 120 ML
+        //result.put("148", result.get("151")); // EDAM
+        //result.put("150", result.get("151")); // FRESCO
+        //result.put("643", result.get("118")); // FLUIDA // revisar, calcular cuando producen
+        //result.put("761", result.get("139")); // BEBIDA LACTEA FERMENTADA 100ML (FRUTILLA)/139 - YOGURT SACHET FRUTILLA 120 CC /
+        //result.put("760", result.get("154")); // BEBIDA LACTEA FERMENTADA 100ML (DURAZNO)/154 - YOGURT SACHET DURAZNO 120 CC
+        //result.put("762", result.get("157")); // BEBIDA LACTEA FERMENTADA 100ML (COCO)/154 - YOGURT SACHET COCO 120 CC
+        //result.put("763", result.get("588")); // 763-BEBIDA LACTEA 120ML (MANZANA) / 588 - ILFRUT MANZANA 120 ML
+        //result.put("764", result.get("589")); // 764-BEBIDA LACTEA 120ML (DURAZNO) / 589 - ILFRUT DURAZNO 120 ML
 
-        if (result.get("704") == null) //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
+        //if (result.get("643") == null)              // 643-LECHE FLUIDA UHT 946 ML
+        //    result.put("643", result.get("118"));   // 118-LECHE UHT 950ML
+
+        /*if (result.get("704") == null) //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
             result.put("704", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
 
         if (result.get("705") == null) //705-YOG BEBIBLE FAMILIAR coco 1L
-            result.put("705", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
+            result.put("705", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L*/
 
         result.put("188", BigDecimal.ZERO);
         result.put("193", BigDecimal.ZERO);
@@ -1160,11 +1176,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         result.put("493", BigDecimal.ZERO);
         result.put("521", BigDecimal.ZERO);
         result.put("693", BigDecimal.ZERO);
-
-
-        System.out.println("----> MAP PRODUCT: " + "148" + "\t " + result.get("148"));
-        System.out.println("----> MAP PRODUCT: " + "150" + "\t " + result.get("150"));
-        System.out.println("----> MAP PRODUCT: " + "643" + "\t " + result.get("643"));
 
         return result;
     }

@@ -157,10 +157,11 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
         System.out.println("===> TRANSFER PRODUCT: " + movementDetail.getProductItem().getFullName() + " " + movementDetail.getQuantity() + " unds");
 
-        BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
-        BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
         if (movementDetail.getMovementType().equals(MovementDetailType.S)){
+
+            BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+            BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getWarehouseNationalCurrencyTransientAccountCode(),
                                                             amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
@@ -175,24 +176,11 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             System.out.println("=====> PROCESANDO SALIDA <======");
         }
 
-        /*if (movementDetail.getMovementType().equals(MovementDetailType.E)){
-            VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
-                    amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
-                    movementDetail.getProductItemCode(), movementDetail.getQuantity().longValue());
-
-            VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getWarehouseNationalCurrencyTransientAccountCode(),
-                    BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
-                    null, null);
-
-            voucher.getDetails().add(voucherDetailDebit);
-            voucher.getDetails().add(voucherDetailCredit);
-        }*/
-
         if (movementDetail.getMovementType().equals(MovementDetailType.E)){
             System.out.println("=====> PROCESANDO ENTRADA <======");
             Voucher origVoucher = warehouseVoucher.getOrigin().getVoucher();
             //System.out.println("=====> origVoucher: " + origVoucher.getId() + " - " + origVoucher.getDocumentType() + "-" + origVoucher.getDocumentNumber() + " - " + origVoucher.getDetails().size());
-            amount = origVoucher.getDetails().get(0).getDebit();
+            BigDecimal amount = origVoucher.getDetails().get(0).getDebit();
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
                     amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
