@@ -6,7 +6,6 @@ import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
-import com.encens.khipus.exception.purchase.*;
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
@@ -16,6 +15,7 @@ import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
+import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -59,6 +59,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
 
     @In(create = true, value = "liquidationPaymentAction")
     private LiquidationPaymentAction liquidationPaymentAction;
+
+    @In
+    private WarehouseAccountEntryService warehouseAccountEntryService;
 
     @Override
     @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}", postValidation = true)
@@ -145,22 +148,32 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
                 warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITH_BILL) &&
                 !warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH) )
             {
-                voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder());
+                System.out.println("=======> O.C. con Factura ");
+                //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/
+                voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
+                warehouseVoucher.setVoucher(voucher);
+                warehouseVoucher.setState(WarehouseVoucherState.APR);
+                approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
+
             }
 
             for (MovementDetail movementDetail : inventoryMovement.getMovementDetailList()) {
                 buildValidateQuantityMappings(movementDetail);
             }
-            approvalWarehouseVoucherService.approveWarehouseVoucher(warehouseVoucher.getId(), getGlossMessage(),
-                    movementDetailUnderMinimalStockMap,
-                    movementDetailOverMaximumStockMap,
-                    movementDetailWithoutWarnings);
+
+            if (!warehouseVoucher.hasPurchaseOrder()) {
+                approvalWarehouseVoucherService.approveWarehouseVoucher(warehouseVoucher.getId(), getGlossMessage(),
+                        movementDetailUnderMinimalStockMap,
+                        movementDetailOverMaximumStockMap,
+                        movementDetailWithoutWarnings);
+            }
+
             addWarehouseVoucherApproveMessage();
             showMovementDetailWarningMessages();
 
             //luego hace persistente los cambios si es que no hubo ningun error en ambos el vale y la orden de compra
 
-        } catch (WarehouseDocumentTypeNotFoundException e) {
+        } /*catch (WarehouseDocumentTypeNotFoundException e) {
             addWarehouseDocumentTypeErrorMessage();
             voucherService.deleteVoucher(voucher);
             return Outcome.REDISPLAY;
@@ -192,7 +205,7 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
             liquidationPaymentAction.addRotatoryFundConcurrencyMessage();
             voucherService.deleteVoucher(voucher);
             return Outcome.FAIL;
-        } catch (InventoryException e) {
+        }*/ catch (InventoryException e) {
             addInventoryMessages(e.getInventoryMessages());
             voucherService.deleteVoucher(voucher);
             return Outcome.REDISPLAY;

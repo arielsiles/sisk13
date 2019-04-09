@@ -41,6 +41,11 @@ public interface WarehouseAccountEntryService extends GenericService {
             FinancesCurrencyNotFoundException,
             FinancesExchangeRateNotFoundException;
 
+    public Voucher createEntryAccountForPurchaseOrder(WarehouseVoucher warehouseVoucher)
+            throws CompanyConfigurationNotFoundException,
+            FinancesCurrencyNotFoundException,
+            FinancesExchangeRateNotFoundException;
+
     void createEntryAccountForPurchaseOrderPayment(PurchaseOrder purchaseOrder, PurchaseOrderPayment purchaseOrderPayment)
             throws CompanyConfigurationNotFoundException,
             FinancesCurrencyNotFoundException,

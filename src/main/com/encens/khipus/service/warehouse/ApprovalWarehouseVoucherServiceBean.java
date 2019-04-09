@@ -105,6 +105,8 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             ConcurrencyException,
             ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException {
 
+        System.out.println(">>>>>>>>>>>>> APROBANDO VALE...");
+
         String financeUserCode = financesUserService.getFinancesUserCode();
 
         if (!warehouseService.existsWarehouseVoucherInDataBase(id)) {
@@ -217,9 +219,10 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
 
             /** Solo crea el asiento para vales que BO tienen operacion (TP, BA, DEV)**/
             if (warehouseVoucher.getOperation() == null){
-                System.out.println("===> " + warehouseVoucher.getOperation());
-                System.out.println("===> " + warehouseVoucher.getDocumentType());
-                warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
+
+                if (!warehouseVoucher.hasPurchaseOrder())
+                    warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
+
             }
 
         }

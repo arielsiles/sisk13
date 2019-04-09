@@ -364,6 +364,10 @@ public class WarehouseVoucher implements BaseModel {
         return purchaseOrder;
     }
 
+    public boolean hasPurchaseOrder(){
+        return (getPurchaseOrder() != null);
+    }
+
     public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
         this.purchaseOrder = purchaseOrder;
     }
