@@ -480,6 +480,13 @@ public class CompanyConfiguration {
     })
     private CashAccount VeterinaryCashAccount;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CAJAGRAL1MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount generalCashAccountNational;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1194,5 +1201,13 @@ public class CompanyConfiguration {
 
     public void setVeterinaryCashAccount(CashAccount veterinaryCashAccount) {
         VeterinaryCashAccount = veterinaryCashAccount;
+    }
+
+    public CashAccount getGeneralCashAccountNational() {
+        return generalCashAccountNational;
+    }
+
+    public void setGeneralCashAccountNational(CashAccount generalCashAccountNational) {
+        this.generalCashAccountNational = generalCashAccountNational;
     }
 }

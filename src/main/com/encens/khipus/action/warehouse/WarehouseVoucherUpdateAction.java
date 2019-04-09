@@ -142,26 +142,27 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         try {
             //primeramente ejecuta las operacion y verifica que no haya errores
 
-            /*if(warehouseVoucher.getPurchaseOrder() != null)*/
             /** O.C. & Pago con Factura **/
-            if( warehouseVoucher.getPurchaseOrder() != null &&
-                warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITH_BILL) &&
-                !warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH) )
-            {
+            if(     warehouseVoucher.hasPurchaseOrder() &&
+                   /*(warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITH_BILL) || warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITHOUT_BILL)) &&*/
+                    (warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CREDIT) ||
+                     warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH) ) ) {
+
                 System.out.println("=======> O.C. con Factura ");
-                //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/
+                //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/ // Before testing
                 voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
-                warehouseVoucher.setVoucher(voucher);
-                warehouseVoucher.setState(WarehouseVoucherState.APR);
-                approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
-
-            }
-
-            for (MovementDetail movementDetail : inventoryMovement.getMovementDetailList()) {
-                buildValidateQuantityMappings(movementDetail);
+                approvalWarehouseVoucherService.approveWarehouseVoucherForPurchaseOrder(warehouseVoucher.getId(), getGlossMessage(),
+                                                                                        movementDetailUnderMinimalStockMap,
+                                                                                        movementDetailOverMaximumStockMap,
+                                                                                        movementDetailWithoutWarnings);
             }
 
             if (!warehouseVoucher.hasPurchaseOrder()) {
+
+                for (MovementDetail movementDetail : inventoryMovement.getMovementDetailList()) {
+                    buildValidateQuantityMappings(movementDetail);
+                }
+
                 approvalWarehouseVoucherService.approveWarehouseVoucher(warehouseVoucher.getId(), getGlossMessage(),
                         movementDetailUnderMinimalStockMap,
                         movementDetailOverMaximumStockMap,

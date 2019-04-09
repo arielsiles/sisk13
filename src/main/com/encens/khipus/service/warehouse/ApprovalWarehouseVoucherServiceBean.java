@@ -106,17 +106,14 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException {
 
         System.out.println(">>>>>>>>>>>>> APROBANDO VALE...");
-
         String financeUserCode = financesUserService.getFinancesUserCode();
 
         if (!warehouseService.existsWarehouseVoucherInDataBase(id)) {
-            throw new WarehouseVoucherNotFoundException("Cannot approve the warehouse voucher because" +
-                    " it was deleted by other user.");
+            throw new WarehouseVoucherNotFoundException("Cannot approve the warehouse voucher because it was deleted by other user.");
         }
 
         if (warehouseService.isEmptyWarehouseVoucher(id)) {
-            throw new WarehouseVoucherEmptyException("Cannot approve the warehouse voucher because" +
-                    " it not contains movement details.");
+            throw new WarehouseVoucherEmptyException("Cannot approve the warehouse voucher because it not contains movement details.");
         }
 
         if (warehouseService.isWarehouseVoucherApproved(id)) {
@@ -225,6 +222,100 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
 
             }
 
+        }
+
+        updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
+    }
+
+    /** 2019 **/
+    public void approveWarehouseVoucherForPurchaseOrder(WarehouseVoucherPK id, String[] gloss,
+                                        Map<MovementDetail, BigDecimal> movementDetailUnderMinimalStockMap,
+                                        Map<MovementDetail, BigDecimal> movementDetailOverMaximumStockMap,
+                                        List<MovementDetail> movementDetailWithoutWarnings)
+            throws InventoryException,
+            WarehouseVoucherApprovedException,
+            WarehouseVoucherNotFoundException,
+            WarehouseVoucherEmptyException,
+            ProductItemAmountException,
+            InventoryUnitaryBalanceException,
+            InventoryProductItemNotFoundException,
+            CompanyConfigurationNotFoundException,
+            FinancesCurrencyNotFoundException,
+            FinancesExchangeRateNotFoundException,
+            ConcurrencyException,
+            ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException {
+
+        System.out.println("-------------->> APROBANDO VALE PARA ORDEN COMPRA...");
+
+        String financeUserCode = financesUserService.getFinancesUserCode();
+
+        if (!warehouseService.existsWarehouseVoucherInDataBase(id)) {
+            throw new WarehouseVoucherNotFoundException("Cannot approve the warehouse voucher because it was deleted by other user.");
+        }
+
+        if (warehouseService.isEmptyWarehouseVoucher(id)) {
+            throw new WarehouseVoucherEmptyException("Cannot approve the warehouse voucher because it not contains movement details.");
+        }
+
+        if (warehouseService.isWarehouseVoucherApproved(id)) {
+            throw new WarehouseVoucherApprovedException("The WarehouseVoucher cannot be approved twice.");
+        }
+
+        WarehouseVoucher warehouseVoucher = getEntityManager().find(WarehouseVoucher.class, id);
+        getEntityManager().refresh(warehouseVoucher);
+
+        InventoryMovement pendantInventoryMovement = getPendantMovement(warehouseVoucher);
+        getEntityManager().refresh(pendantInventoryMovement);
+        MovementDetailType movementDetailType = WarehouseUtil.getMovementTye(warehouseVoucher.getDocumentType());
+
+        if (MovementDetailType.E.equals(movementDetailType)) {
+
+            validateInputDetails(warehouseVoucher, warehouseVoucher.getWarehouse());
+            updateWarehouseVoucher(warehouseVoucher);
+
+            InventoryMovement approvedMovement = createApprovedInventoryMovement(pendantInventoryMovement, financeUserCode);
+            approveInputDetails(warehouseVoucher, warehouseVoucher.getWarehouse(), pendantInventoryMovement, approvedMovement, movementDetailType);
+        }
+
+        /*if (MovementDetailType.S.equals(movementDetailType)) {
+                validateOutputDetails(warehouseVoucher, warehouseVoucher.getWarehouse());
+                updateWarehouseVoucher(warehouseVoucher);
+
+                InventoryMovement approvedMovement = createApprovedInventoryMovement(pendantInventoryMovement, financeUserCode);
+
+                approveOutputDetails(warehouseVoucher,
+                        warehouseVoucher.getWarehouse(),
+                        pendantInventoryMovement,
+                        approvedMovement,
+                        movementDetailType);
+        }*/
+
+        delete(pendantInventoryMovement);
+
+        WarehouseVoucherCreateAction warehouseVoucherCreateAction = (WarehouseVoucherCreateAction) Component.getInstance("warehouseVoucherCreateAction");
+        WarehouseVoucherUpdateAction warehouseVoucherUpdateAction = (WarehouseVoucherUpdateAction) Component.getInstance("warehouseVoucherUpdateAction");
+        WarehouseVoucherGeneralAction warehouseVoucherGeneralAction = warehouseVoucherCreateAction != null ? warehouseVoucherCreateAction : warehouseVoucherUpdateAction;
+
+        warehouseVoucherGeneralAction.resetValidateQuantityMappings();
+        List<MovementDetail> inputMovementDetailList = movementDetailService.findDetailByVoucherAndType(warehouseVoucher, MovementDetailType.E);
+        List<MovementDetail> outputMovementDetailList = movementDetailService.findDetailByVoucherAndType(warehouseVoucher, MovementDetailType.S);
+        List<MovementDetail> approvedMovementDetailList = new ArrayList<MovementDetail>();
+        approvedMovementDetailList.addAll(inputMovementDetailList);
+        approvedMovementDetailList.addAll(outputMovementDetailList);
+        for (MovementDetail movementDetail : approvedMovementDetailList) {
+            warehouseVoucherGeneralAction.buildValidateQuantityMappings(movementDetail);
+        }
+
+        for (MovementDetail movementDetail : approvedMovementDetailList) {
+            // update detail warnings
+            warehouseService.fillMovementDetail(movementDetail, movementDetailUnderMinimalStockMap,
+                    movementDetailOverMaximumStockMap,
+                    movementDetailWithoutWarnings);
+            try {
+                update(movementDetail);
+            } catch (EntryDuplicatedException e) {
+                log.debug(e, "this won't happen because the attribute to update haven't a constraint");
+            }
         }
 
         updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
