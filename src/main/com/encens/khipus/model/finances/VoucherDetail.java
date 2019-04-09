@@ -342,9 +342,12 @@ public class VoucherDetail implements BaseModel {
         if (provider != null)
             fullCashAccount = fullCashAccount + " (" +  provider.getFullName() + ")";
         if (productItem != null) {
-            String q = getQuantityArt().doubleValue() > 0 ? getQuantityArt().toString() : " " ;
             fullCashAccount = fullCashAccount + " (" + productItem.getFullName() + ")";
-            fullCashAccount = fullCashAccount + " (" + q + ")";
+
+            if (getQuantityArt() != null) {
+                String q = getQuantityArt().doubleValue() > 0 ? getQuantityArt().toString() : " ";
+                fullCashAccount = fullCashAccount + " (" + q + ")";
+            }
         }
 
         if (partnerAccount != null)

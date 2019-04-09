@@ -212,7 +212,9 @@
                     value="#{messages[liquidationPaymentAction.liquidationPayment.sourceCurrency.symbolResourceKey]}"/>
         </s:decorate>
     </s:div>
+
 </s:div>
+
 <s:div>
     <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['PurchaseOrderPayment.description']}</ui:define>
@@ -229,7 +231,7 @@
                 styleClass="formRow">
         <ui:param name="required" value="falmse"/>
         <a4j:commandButton id="calculatePayentValues"
-                           action="#{liquidationPaymentAction.computePayment(mainAction.currentBalanceAmount)}"
+                           action="#{liquidationPaymentAction.computePayment(warehousePurchaseOrderAction.currentBalanceAmount)}"
                            value="#{messages['PurchaseOrderPayment.computePayment']}"
                            styleClass="button"
                            ajaxSingle="false"

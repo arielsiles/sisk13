@@ -951,6 +951,10 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
         }
     }
 
+    public boolean isCashPayment(){
+        return getInstance().getPayConditions().getName().equals(Constants.CONDITION_CASH);
+    }
+
     public Boolean getBillConditions() {
         return billConditions;
     }
