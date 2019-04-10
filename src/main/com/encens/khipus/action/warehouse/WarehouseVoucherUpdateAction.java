@@ -155,6 +155,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
                                                                                         movementDetailUnderMinimalStockMap,
                                                                                         movementDetailOverMaximumStockMap,
                                                                                         movementDetailWithoutWarnings);
+
+                if (warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH))
+                    warehousePurchaseOrderService.liquidateCashPurchaseOrder(warehouseVoucher.getPurchaseOrder());
             }
 
             if (!warehouseVoucher.hasPurchaseOrder()) {

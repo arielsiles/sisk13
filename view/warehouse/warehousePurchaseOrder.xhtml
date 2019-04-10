@@ -142,7 +142,7 @@
         </c:otherwise>
     </c:choose>
 
-    <c:if test="#{warehousePurchaseOrderAction.purchaseOrderFinalized and warehousePurchaseOrderAction.hasBalanceAmount() and warehousePurchaseOrderAction.cashPayment}">
+    <c:if test="#{warehousePurchaseOrderAction.purchaseOrderFinalized and warehousePurchaseOrderAction.hasBalanceAmount() and !warehousePurchaseOrderAction.cashPayment}">
         <ui:include src="/purchases/purchaseOrderLiquidationPayment.xhtml">
             <ui:param name="mainAction" value="#{warehousePurchaseOrderAction}"/>
             <ui:param name="purchaseOrder" value="#{warehousePurchaseOrderAction.purchaseOrder}"/>

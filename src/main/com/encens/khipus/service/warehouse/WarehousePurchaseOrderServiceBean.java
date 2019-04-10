@@ -481,6 +481,16 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
         financeAccountingDocumentService.createAccountingVoucherByPurchaseOrder(purchaseOrder);
     }
 
+    public void liquidateCashPurchaseOrder(PurchaseOrder purchaseOrder){
+        System.out.println("=======> Liquidando Orden de Compra Al contado...");
+        purchaseOrder.setState(PurchaseOrderState.LIQ);
+        purchaseOrder.setBalanceAmount(BigDecimal.ZERO);
+        purchaseOrder.setPaymentStatus(PurchaseOrderPaymentStatus.FULLY_PAID);
+        getEntityManager().merge(purchaseOrder);
+        getEntityManager().flush();
+
+    }
+
     public void onlyLiquidatePurchaseOrder(List<PurchaseOrder> purchaseOrders, PurchaseOrder entity)
             throws WarehouseDocumentTypeNotFoundException,
             PurchaseOrderDetailEmptyException,

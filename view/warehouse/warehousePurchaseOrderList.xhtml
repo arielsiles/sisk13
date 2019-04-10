@@ -219,7 +219,7 @@
                 id="purchaseOrderList"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="10%, 15%, 10%, 14%, 15%, 18%, 10%, 8%">
+                columnsWidth="10%, 8%, 10%, 10%, 10%, 15%, 18%, 8%, 8%">
 
     <f:facet name="header">
         <rich:columnGroup>
@@ -234,7 +234,13 @@
                 <app:commandSortHeader sortProperty="warehousePurchaseOrder.invoiceNumber"
                                        dataModel="#{warehousePurchaseOrderDataModel}"
                                        reRender="purchaseOrderList, dataScroller">
-                    #{messages['WarehousePurchaseOrder.invoiceNumber']}
+                    #{messages['WarehousePurchaseOrder.docNumber']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader dataModel="#{warehousePurchaseOrderDataModel}"
+                                       reRender="purchaseOrderList, dataScroller">
+                    #{messages['WarehousePurchaseOrder.paymentType']}
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
@@ -285,6 +291,9 @@
         <h:outputText value="#{purchaseOrderItem.invoiceNumber}"/>
     </rich:column>
     <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
+        <h:outputText value="#{purchaseOrderItem.payConditions.name}"/>
+    </rich:column>
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{purchaseOrderItem.date}">
             <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
                                timeZone="#{sessionUser.timeZone}"
@@ -292,7 +301,7 @@
         </h:outputText>
     </rich:column>
     <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText value="#{purchaseOrderItem.responsible.fullName}"/>
+        <h:outputText value="#{purchaseOrderItem.responsible.firstName}"/>
     </rich:column>
     <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{purchaseOrderItem.provider.fullName}"/>

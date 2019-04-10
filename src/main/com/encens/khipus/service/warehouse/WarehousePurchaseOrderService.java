@@ -97,6 +97,8 @@ public interface WarehousePurchaseOrderService extends PurchaseOrderService {
             CollectionSumExceedsRotatoryFundAmountException,
             RotatoryFundConcurrencyException;
 
+    void liquidateCashPurchaseOrder(PurchaseOrder purchaseOrder);
+
     void onlyLiquidatePurchaseOrder(List<PurchaseOrder> purchaseOrders, PurchaseOrder entity)
             throws WarehouseDocumentTypeNotFoundException,
             PurchaseOrderDetailEmptyException,
