@@ -1,89 +1,114 @@
 /** 11.04.2019 Para Modulo de produccion 2 **/
-DELETE FROM costosindirectos WHERE idcostosindirectos = 0;
-DELETE FROM productoprocesado WHERE idproductoprocesado = 550;
-DELETE FROM productoprocesado WHERE idproductoprocesado = 552;
-DELETE FROM productoprocesado WHERE idproductoprocesado = 551;
+delete from costosindirectos where idcostosindirectos = 0;
+delete from productoprocesado where idproductoprocesado = 550;
+delete from productoprocesado where idproductoprocesado = 552;
+delete from productoprocesado where idproductoprocesado = 551;
 
-ALTER TABLE costosindirectos ADD FOREIGN KEY (idperiodocostoindirecto) REFERENCES periodocostoindirecto(idperiodocostoindirecto);
-ALTER TABLE ingredienteproduccion ADD FOREIGN KEY (idcomposicionproducto) REFERENCES composicionproducto(idcomposicionproducto);
+alter table costosindirectos add foreign key (idperiodocostoindirecto) references periodocostoindirecto(idperiodocostoindirecto);
+alter table ingredienteproduccion add foreign key (idcomposicionproducto) references composicionproducto(idcomposicionproducto);
 
-UPDATE metaproductoproduccion m SET m.`cod_art` = 155 WHERE m.`idmetaproductoproduccion` = 161;
-UPDATE metaproductoproduccion m SET m.`cod_art` = 156 WHERE m.`idmetaproductoproduccion` = 162;
-UPDATE metaproductoproduccion m SET m.`cod_art` = 158 WHERE m.`idmetaproductoproduccion` = 164;
-UPDATE metaproductoproduccion m SET m.`cod_art` = 159 WHERE m.`idmetaproductoproduccion` = 165;
-UPDATE metaproductoproduccion m SET m.`cod_art` = 161 WHERE m.`idmetaproductoproduccion` = 170;
-UPDATE metaproductoproduccion m SET m.`cod_art` = 160 WHERE m.`idmetaproductoproduccion` = 166;
+update metaproductoproduccion m set m.`cod_art` = 155 where m.`idmetaproductoproduccion` = 161;
+update metaproductoproduccion m set m.`cod_art` = 156 where m.`idmetaproductoproduccion` = 162;
+update metaproductoproduccion m set m.`cod_art` = 158 where m.`idmetaproductoproduccion` = 164;
+update metaproductoproduccion m set m.`cod_art` = 159 where m.`idmetaproductoproduccion` = 165;
+update metaproductoproduccion m set m.`cod_art` = 161 where m.`idmetaproductoproduccion` = 170;
+update metaproductoproduccion m set m.`cod_art` = 160 where m.`idmetaproductoproduccion` = 166;
 
-DELETE FROM metaproductoproduccion WHERE idmetaproductoproduccion = 560;
-DELETE FROM productoprocesado WHERE idproductoprocesado = 560;
+delete from metaproductoproduccion where idmetaproductoproduccion = 560;
+delete from productoprocesado where idproductoprocesado = 560;
 
-ALTER TABLE metaproductoproduccion MODIFY COLUMN cod_art VARCHAR(6) NOT NULL;
+alter table metaproductoproduccion modify column cod_art varchar(6) not null;
 -- alter table inv_articulos add unique (cod_art);
-ALTER TABLE productoprocesado ADD FOREIGN KEY (idproductoprocesado) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
-ALTER TABLE insumoproduccion ADD FOREIGN KEY (idinsumoproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
-ALTER TABLE materialproduccion ADD FOREIGN KEY (idmaterialproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
-ALTER TABLE composicionproducto ADD FOREIGN KEY (idproductoprocesado) REFERENCES productoprocesado(idproductoprocesado);
-ALTER TABLE ingredienteproduccion ADD FOREIGN KEY (idmetaproductoproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
+alter table productoprocesado add foreign key (idproductoprocesado) references metaproductoproduccion(idmetaproductoproduccion);
+alter table insumoproduccion add foreign key (idinsumoproduccion) references metaproductoproduccion(idmetaproductoproduccion);
+alter table materialproduccion add foreign key (idmaterialproduccion) references metaproductoproduccion(idmetaproductoproduccion);
+alter table composicionproducto add foreign key (idproductoprocesado) references productoprocesado(idproductoprocesado);
+alter table ingredienteproduccion add foreign key (idmetaproductoproduccion) references metaproductoproduccion(idmetaproductoproduccion);
 
 -- ALTER TABLE metaproductoproduccion ADD constraint FK_ART_METAPROD FOREIGN KEY (no_cia,cod_art) REFERENCES inv_articulos(no_cia,cod_art); ERROR
 -- alter table metaproductoproduccion add constraint FK_INVARTICULOMETAPRODUCTO FOREIGN KEY (cod_art, no_cia) REFERENCES inv_articulos(cod_art, no_cia); ERROR
 
-CREATE TABLE formulacion (
-	idformulacion BIGINT(20) NOT NULL,
-	nombre VARCHAR(255) NOT NULL,
-	capacidad DECIMAL(16,2) NOT NULL,
-	PRIMARY KEY (idformulacion)
+drop table productoproducido;
+drop table insumosprod;
+drop table produccion;
+drop table tanqueprod;
+drop table insumoformula;
+drop table formulacion;
+
+create table pr_formula (
+	idformula bigint(20) not null,
+	nombre varchar(100) not null,
+	capacidad decimal(16, 2) not null,
+	activo int(1),
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idformula)
 );
 
-DROP TABLE insumoformula;
-
-CREATE TABLE insumoformula(
-	idinsumoformula BIGINT(20) NOT NULL,
-	cantidad DECIMAL(20, 6) NOT NULL,
-	cod_art VARCHAR(6) NOT NULL,
-	idformulacion BIGINT(20) NOT NULL,
-	PRIMARY KEY (idinsumoformula)
+create table pr_insumoformula(
+	idinsumoformula bigint(20) not null,
+	cantidad decimal(20, 6) not null,
+	cod_art varchar(6) not null,
+	idformula bigint(20) not null,
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idinsumoformula)
 );
 
-ALTER TABLE insumoformula ADD FOREIGN KEY (idformulacion) REFERENCES formulacion(idformulacion);
+alter table pr_insumoformula add foreign key (idformula) references pr_formula(idformula);
 
-CREATE TABLE tanqueprod(
-	idtanqueprod BIGINT(20) NOT NULL,
-	nombre VARCHAR(255) NOT NULL,
-	capacidad INT NOT NULL,
-	idunidadmedida BIGINT(20) NOT NULL,
-	PRIMARY KEY (idtanqueprod)
+create table pr_planprod (
+	idplanprod bigint(20) not null,
+	nombre varchar(100),
+	fecha date not null,
+	primary key (idplanprod)
 );
 
-ALTER TABLE unidadmedidaproduccion ADD PRIMARY KEY(idunidadmedidaproduccion);
-ALTER TABLE tanqueprod ADD FOREIGN KEY(idunidadmedida) REFERENCES unidadmedidaproduccion(idunidadmedidaproduccion);
-
-CREATE TABLE produccion(
-	idproduccion BIGINT(20) NOT NULL,
-	codigo INT,
-	descripcion VARCHAR(255),
-	idformulacion BIGINT(20),
-	idtanqueprod BIGINT(20),
-	PRIMARY KEY (idproduccion)
+create table pr_tanque(
+	idtanque bigint(20) not null,
+	nombre varchar(255) not null,
+	capacidad int not null,
+	idunidadmedida bigint(20) not null,
+	primary key (idtanque)
 );
 
-ALTER TABLE produccion ADD FOREIGN KEY (idformulacion) REFERENCES formulacion(idformulacion);
-ALTER TABLE produccion ADD FOREIGN KEY (idtanqueprod)  REFERENCES tanqueprod(idtanqueprod);
+alter table unidadmedidaproduccion add primary key(idunidadmedidaproduccion);
+alter table tanque add foreign key(idunidadmedida) references unidadmedidaproduccion(idunidadmedidaproduccion);
 
-
-CREATE TABLE insumosprod (
-	idinsumosprod BIGINT(20) NOT NULL,
-	cod_art VARCHAR(6),
-	cantidad DECIMAL(16, 6),
-	costouni DECIMAL(16, 6),
-	idproduccion BIGINT(20) NOT NULL,
-	PRIMARY KEY (idinsumosprod)
+create table produccion(
+	idproduccion bigint(20) not null,
+	codigo int,
+	descripcion varchar(255),
+	idformulacion bigint(20),
+	idtanqueprod bigint(20),
+	primary key (idproduccion)
 );
 
-ALTER TABLE insumosprod ADD FOREIGN KEY (idproduccion) REFERENCES produccion(idproduccion);
+alter table produccion add foreign key (idformulacion) references formulacion(idformulacion);
+alter table produccion add foreign key (idtanqueprod)  references tanqueprod(idtanqueprod);
 
+create table insumosprod (
+	idinsumosprod bigint(20) not null,
+	cod_art varchar(6),
+	cantidad decimal(16, 6),
+	costouni decimal(16, 6),
+	idproduccion bigint(20) not null,
+	primary key (idinsumosprod)
+);
 
+alter table insumosprod add foreign key (idproduccion) references produccion(idproduccion);
 
+create table productoproducido(
+	idproductoproducido bigint(20) not null,
+	fecha date,
+	cod_art varchar(6),
+	cantidad decimal(16, 2),
+	idproduccion bigint(20),
+	primary key (idproductoproducido)
+	
+);
+
+alter table productoproducido add foreign key (idproduccion) references produccion(idproduccion);
 
 
 
