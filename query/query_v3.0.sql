@@ -35,18 +35,52 @@ CREATE TABLE formulacion (
 	PRIMARY KEY (idformulacion)
 );
 
+DROP TABLE insumoformula;
+
 CREATE TABLE insumoformula(
 	idinsumoformula BIGINT(20) NOT NULL,
 	cantidad DECIMAL(20, 6) NOT NULL,
 	cod_art VARCHAR(6) NOT NULL,
+	idformulacion BIGINT(20) NOT NULL,
 	PRIMARY KEY (idinsumoformula)
 );
 
+ALTER TABLE insumoformula ADD FOREIGN KEY (idformulacion) REFERENCES formulacion(idformulacion);
+
+CREATE TABLE tanqueprod(
+	idtanqueprod BIGINT(20) NOT NULL,
+	nombre VARCHAR(255) NOT NULL,
+	capacidad INT NOT NULL,
+	idunidadmedida BIGINT(20) NOT NULL,
+	PRIMARY KEY (idtanqueprod)
+);
+
+ALTER TABLE unidadmedidaproduccion ADD PRIMARY KEY(idunidadmedidaproduccion);
+ALTER TABLE tanqueprod ADD FOREIGN KEY(idunidadmedida) REFERENCES unidadmedidaproduccion(idunidadmedidaproduccion);
+
+CREATE TABLE produccion(
+	idproduccion BIGINT(20) NOT NULL,
+	codigo INT,
+	descripcion VARCHAR(255),
+	idformulacion BIGINT(20),
+	idtanqueprod BIGINT(20),
+	PRIMARY KEY (idproduccion)
+);
+
+ALTER TABLE produccion ADD FOREIGN KEY (idformulacion) REFERENCES formulacion(idformulacion);
+ALTER TABLE produccion ADD FOREIGN KEY (idtanqueprod)  REFERENCES tanqueprod(idtanqueprod);
 
 
+CREATE TABLE insumosprod (
+	idinsumosprod BIGINT(20) NOT NULL,
+	cod_art VARCHAR(6),
+	cantidad DECIMAL(16, 6),
+	costouni DECIMAL(16, 6),
+	idproduccion BIGINT(20) NOT NULL,
+	PRIMARY KEY (idinsumosprod)
+);
 
-
-
+ALTER TABLE insumosprod ADD FOREIGN KEY (idproduccion) REFERENCES produccion(idproduccion);
 
 
 
