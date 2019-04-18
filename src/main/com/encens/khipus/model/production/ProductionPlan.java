@@ -3,12 +3,10 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Entity fo Product
@@ -18,33 +16,29 @@ import java.math.BigDecimal;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Formulation.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionPlan.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_formula",
+        pkColumnValue = "pr_plan",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_formula")
-public class Formulation implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_plan")
+public class ProductionPlan implements BaseModel {
 
     @Id
-    @Column(name = "idformula")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Formulation.tableGenerator")
+    @Column(name = "idplan")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionPlan.tableGenerator")
     private Long id;
 
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "nombre")
     private String name;
 
-    @Column(name = "capacidad", precision = 16, scale = 2)
-    private BigDecimal capacity;
-
-    @Column(name = "ACTIVO", nullable = false)
-    @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean active = Boolean.TRUE;
+    @Column(name = "fecha")
+    private Date date;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -62,29 +56,6 @@ public class Formulation implements BaseModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(BigDecimal capacity) {
-        this.capacity = capacity;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
 
     public Company getCompany() {
         return company;
@@ -100,5 +71,21 @@ public class Formulation implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

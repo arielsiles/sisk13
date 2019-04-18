@@ -3,9 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,33 +16,33 @@ import java.math.BigDecimal;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Formulation.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionTank.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_formula",
+        pkColumnValue = "pr_tanque",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_formula")
-public class Formulation implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_tanque")
+public class ProductionTank implements BaseModel {
 
     @Id
-    @Column(name = "idformula")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Formulation.tableGenerator")
+    @Column(name = "idtanque")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionTank.tableGenerator")
     private Long id;
 
     @Column(name = "nombre", nullable = false)
     private String name;
 
-    @Column(name = "capacidad", precision = 16, scale = 2)
+    @Column(name = "capacidad")
     private BigDecimal capacity;
 
-    @Column(name = "ACTIVO", nullable = false)
-    @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean active = Boolean.TRUE;
+    @Column(name = "codmed")
+    @Enumerated(EnumType.STRING)
+    private MeasurementUnit measureUnit;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -78,20 +76,12 @@ public class Formulation implements BaseModel {
         this.capacity = capacity;
     }
 
-    public Boolean getActive() {
-        return active;
+    public MeasurementUnit getMeasureUnit() {
+        return measureUnit;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setMeasureUnit(MeasurementUnit measureUnit) {
+        this.measureUnit = measureUnit;
     }
 
     public long getVersion() {
@@ -100,5 +90,13 @@ public class Formulation implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }

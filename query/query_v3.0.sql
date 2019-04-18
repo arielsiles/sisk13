@@ -35,13 +35,23 @@ drop table tanqueprod;
 drop table insumoformula;
 drop table formulacion;
 
+
+drop table pr_insumoformula;
+drop table pr_producido;
+drop table pr_insumo;
+drop table pr_produccion;
+drop table pr_formula;
+drop table pr_plan;
+drop table pr_tanque;
+
+
 create table pr_formula (
 	idformula bigint(20) not null,
 	nombre varchar(100) not null,
 	capacidad decimal(16, 2) not null,
 	activo int(1),
 	version bigint(20) not null,
-	idcompania bigint(20) not null,
+	idcompania bigint(20) not null,	
 	primary key (idformula)
 );
 
@@ -57,58 +67,67 @@ create table pr_insumoformula(
 
 alter table pr_insumoformula add foreign key (idformula) references pr_formula(idformula);
 
-create table pr_planprod (
-	idplanprod bigint(20) not null,
+create table pr_plan (
+	idplan bigint(20) not null,
 	nombre varchar(100),
 	fecha date not null,
-	primary key (idplanprod)
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idplan)
 );
 
 create table pr_tanque(
 	idtanque bigint(20) not null,
 	nombre varchar(255) not null,
-	capacidad int not null,
-	idunidadmedida bigint(20) not null,
+	capacidad decimal(16, 2) not null,
+	codmed varchar(6),
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
 	primary key (idtanque)
 );
 
-alter table unidadmedidaproduccion add primary key(idunidadmedidaproduccion);
-alter table tanque add foreign key(idunidadmedida) references unidadmedidaproduccion(idunidadmedidaproduccion);
 
-create table produccion(
+create table pr_produccion(
 	idproduccion bigint(20) not null,
 	codigo int,
 	descripcion varchar(255),
-	idformulacion bigint(20),
-	idtanqueprod bigint(20),
+	idformula bigint(20),
+	idtanque bigint(20),
+	idplan bigint(20),
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
 	primary key (idproduccion)
 );
 
-alter table produccion add foreign key (idformulacion) references formulacion(idformulacion);
-alter table produccion add foreign key (idtanqueprod)  references tanqueprod(idtanqueprod);
+alter table pr_produccion add foreign key (idformula) references pr_formula(idformula);
+alter table pr_produccion add foreign key (idtanque)  references pr_tanque(idtanque);
+alter table pr_produccion add foreign key (idplan) references pr_plan(idplan);
 
-create table insumosprod (
-	idinsumosprod bigint(20) not null,
+create table pr_insumo (
+	idinsumo bigint(20) not null,
 	cod_art varchar(6),
 	cantidad decimal(16, 6),
 	costouni decimal(16, 6),
 	idproduccion bigint(20) not null,
-	primary key (idinsumosprod)
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idinsumo)
 );
 
-alter table insumosprod add foreign key (idproduccion) references produccion(idproduccion);
+alter table pr_insumo add foreign key (idproduccion) references pr_produccion(idproduccion);
 
-create table productoproducido(
-	idproductoproducido bigint(20) not null,
+create table pr_producido(
+	idproductoprod bigint(20) not null,
 	fecha date,
 	cod_art varchar(6),
 	cantidad decimal(16, 2),
 	idproduccion bigint(20),
-	primary key (idproductoproducido)
-	
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idproductoprod)	
 );
 
-alter table productoproducido add foreign key (idproduccion) references produccion(idproduccion);
+alter table pr_producido add foreign key (idproduccion) references pr_produccion(idproduccion);
 
 
 
