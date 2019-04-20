@@ -1149,8 +1149,14 @@
               disabled="#{disableMenu}"
               rendered="#{s:hasPermission('PRODUCT','VIEW')}">
     <h:panelGrid columns="6" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator">
+
         <s:link view="/production/productionPlanningList.xhtml"
                 value="#{messages['menu.production.planification.distribution']}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <s:link view="/production/productionPlanList.xhtml"
+                value="#{messages['menu.production.productionPlan']}"
                 styleClass="tab-cell"
                 propagation="none"/>
 

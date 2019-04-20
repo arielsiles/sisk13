@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{productionPlanAction.managed}">
+            #{messages['ProductionPlan.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['ProductionPlan.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="70%"/>
+<ui:param name="selectedTab" value="production"/>
+<ui:define name="body">
+
+<h:form id="productionPlanForm">
+
+<div class="buttons">
+    <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{productionPlanAction.managed}">
+                #{messages['ProductionPlan.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductionPlan.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+
+        <s:div>
+            <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
+                <rich:calendar value="#{productionPlan.date}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               styleClass="input"
+                               enableManualInput="true"
+                               tabindex="9">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                </rich:calendar>
+            </s:decorate>
+        </s:div>
+
+        <c:if test="#{productionPlanAction.managed}">
+        <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
+            <h:selectOneMenu id="productionTank"
+                             value="#{productionPlanAction.productionTank}"
+                             styleClass="input"
+                             required="false"
+                             tabindex="7">
+                <s:selectItems value="#{productionTankList}"
+                               var="productionTank"
+                               label="#{productionTank.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        </c:if>
+
+        <s:div></s:div>
+    </h:panelGrid>
+    </rich:panel>
+
+
+</h:form>
+
+</ui:define>
+</ui:composition>
+

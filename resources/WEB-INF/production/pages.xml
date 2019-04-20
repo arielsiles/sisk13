@@ -511,4 +511,29 @@
         </navigation>
     </page>
 
+    <!-- -->
+
+    <page view-id="/production/productionPlanList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionPlanAction.select(productionPlanItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/productionPlan.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/production/productionPlan.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/productionPlanList.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/production/productionPlanList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>
