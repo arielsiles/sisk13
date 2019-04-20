@@ -129,16 +129,17 @@ CREATE TABLE pr_producido(
 
 ALTER TABLE pr_producido ADD FOREIGN KEY (idproduccion) REFERENCES pr_produccion(idproduccion);
 
--- ---------------------------------------------------------------------------------------------
+-- 
 /** 19.04.2019 **/
+
 INSERT INTO modulo(idmodulo, nombrerecurso, idcompania) VALUES(10, 'production', 1);
 INSERT INTO modulocompania VALUES(1, 10, 1);
-
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) VALUES(251, 'PRODUCTIONPLAN', 10, 15, 'Functionality.production.productionPlan', 1);
-
 INSERT INTO pr_tanque VALUES(1, "TAMQUE 1 -  4000 LT", 4000, 'LT', 0, 1);
 INSERT INTO pr_tanque VALUES(2, "TAMQUE 2 -  6000 LT", 6000, 'LT', 0, 1);
 INSERT INTO pr_tanque VALUES(3, "TAMQUE 3 -  8000 LT", 8000, 'LT', 0, 1);
 
+
+ALTER TABLE pr_plan ADD UNIQUE (fecha);
 
 
