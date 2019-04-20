@@ -9,6 +9,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity fo Product
@@ -45,6 +47,9 @@ public class Formulation implements BaseModel {
     @Column(name = "ACTIVO", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active = Boolean.TRUE;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formulation")
+    private List<FormulationInput> formulationInputList = new ArrayList<FormulationInput>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -100,5 +105,13 @@ public class Formulation implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public List<FormulationInput> getFormulationInputList() {
+        return formulationInputList;
+    }
+
+    public void setFormulationInputList(List<FormulationInput> formulationInputList) {
+        this.formulationInputList = formulationInputList;
     }
 }

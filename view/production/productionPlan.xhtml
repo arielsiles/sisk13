@@ -4,7 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:c="http://java.sun.com/jstl/core"
-                xmlns:rich="http://richfaces.org/rich"
+                xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
 <ui:define name="pageTitle">
     <c:choose>
@@ -66,25 +66,81 @@
         </s:div>
 
         <c:if test="#{productionPlanAction.managed}">
-        <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
-            <h:selectOneMenu id="productionTank"
-                             value="#{productionPlanAction.productionTank}"
-                             styleClass="input"
-                             required="false"
-                             tabindex="7">
-                <s:selectItems value="#{productionTankList}"
-                               var="productionTank"
-                               label="#{productionTank.name}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-            </h:selectOneMenu>
-        </s:decorate>
+            <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
+                <h:selectOneMenu id="productionTank"
+                                 value="#{productionPlanAction.productionTank}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="7">
+                    <s:selectItems value="#{productionTankList}"
+                                   var="productionTank"
+                                   label="#{productionTank.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="formulationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ProductionPlan.formulation']}</ui:define>
+                <h:selectOneMenu id="formulationTank"
+                                 value="#{productionPlanAction.formulation}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="7">
+                    <s:selectItems value="#{formulationList}"
+                                   var="formulation"
+                                   label="#{formulation.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+
+                    <a4j:support event="onchange"
+                                 reRender="supplyPanel"
+                                 ajaxSingle="true"/>
+
+                </h:selectOneMenu>
+            </s:decorate>
         </c:if>
 
         <s:div></s:div>
     </h:panelGrid>
+
+
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <s:div id="supplyPanel">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
+                    </tr>
+                </thead>
+                <c:forEach var="supplyDetail" items="#{productionPlanAction.formulation.formulationInputList}" varStatus="row">
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{supplyDetail.productItem.fullName}"/>
+                        </td>
+                    </tr>
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{supplyDetail.quantity}"/>
+                        </td>
+                    </tr>
+
+                </c:forEach>
+
+
+            </table>
+
+        </s:div>
+
+    </h:panelGrid>
+
+
+
+
     </rich:panel>
 
 

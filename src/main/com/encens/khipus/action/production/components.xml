@@ -85,4 +85,7 @@
     <factory name="productionTankList" value="#{productionTankQuery}"/>
     <framework:entity-query name="productionTankQuery" ejbql="select p from ProductionTank p"/>
 
+    <factory name="formulationList" value="#{formulationQuery}"/>
+    <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p"/>
+
 </components>

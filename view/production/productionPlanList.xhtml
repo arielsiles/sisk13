@@ -4,30 +4,51 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">#{messages['ProductionPlan.list']}</ui:define>
     <ui:param name="bodyWidth" value="50%"/>
 
     <ui:param name="selectedTab" value="production"/>
     <ui:define name="body">
-        <h:form id="gestionSearch">
+        <h:form id="productionPlanSearch">
 
-            <rich:simpleTogglePanel id="gestionSearchPanel" label="#{messages['Gestion.search']}" switchType="client">
+            <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['ProductionPlan.search']}" switchType="client">
 
-                <!--<s:decorate id="yearField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Gestion.year']}</ui:define>
-                    <h:inputText id="year" value="#{gestionDataModel.criteria.year}"
-                                 maxlength="5" tabindex="1" styleClass="input">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:inputText>
-                    <a4j:commandButton action="#{gestionDataModel.search}"
-                                       reRender="gestionSearchPanel, gestionList, dataScroller"
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlan.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{productionPlanDataModel.startDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlan.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{productionPlanDataModel.endDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+
+                    <a4j:commandButton action="#{productionPlanDataModel.search}"
+                                       reRender="productionPlanList, dataScroller"
                                        styleClass="button"
-                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
                         <s:defaultAction/>
                     </a4j:commandButton>
-                </s:decorate>-->
+                </s:decorate>
 
                 <!--<rich:jQuery selector="#year" query="focus()" timing="onload"/>-->
             </rich:simpleTogglePanel>
@@ -36,9 +57,9 @@
                 <s:button value="#{messages['Common.new']}"
                           view="/production/productionPlan.xhtml"
                           styleClass="button"
-                          rendered="#{s:hasPermission('GESTION','CREATE')}"
+                          rendered="#{s:hasPermission('PRODUCTIONPLAN','CREATE')}"
                           propagation="none"
-                          tabindex="3"/>
+                          tabindex="4"/>
             </div>
 
             <rich:dataTable value="#{productionPlanDataModel}" var="productionPlanItem" id="productionPlanList"

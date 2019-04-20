@@ -4,6 +4,7 @@ import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.production.Formulation;
 import com.encens.khipus.model.production.ProductionPlan;
 import com.encens.khipus.model.production.ProductionTank;
 import org.jboss.seam.ScopeType;
@@ -15,6 +16,7 @@ import org.jboss.seam.annotations.*;
 public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     private ProductionTank productionTank;
+    private Formulation formulation;
 
     @In
     private SessionUser sessionUser;
@@ -42,5 +44,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     public void setProductionTank(ProductionTank productionTank) {
         this.productionTank = productionTank;
+    }
+
+    public Formulation getFormulation() {
+        return formulation;
+    }
+
+    public void setFormulation(Formulation formulation) {
+        this.formulation = formulation;
     }
 }
