@@ -4,11 +4,12 @@ import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.production.Formulation;
-import com.encens.khipus.model.production.ProductionPlan;
-import com.encens.khipus.model.production.ProductionTank;
+import com.encens.khipus.model.production.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Name("productionPlanAction")
@@ -17,6 +18,8 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     private ProductionTank productionTank;
     private Formulation formulation;
+
+    private List<Supply> mainSupplyList = new ArrayList<Supply>();
 
     @In
     private SessionUser sessionUser;
@@ -37,6 +40,16 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return Outcome.REDISPLAY;
     }
 
+    public void loadSupplies(){
+        setMainSupplyList(new ArrayList<Supply>());
+        for (FormulationInput formulationInput : this.formulation.getFormulationInputList()){
+            Supply supply = new Supply();
+            supply.setProductItemCode(formulationInput.getProductItemCode());
+            supply.setProductItem(formulationInput.getProductItem());
+            supply.setQuantity(formulationInput.getQuantity());
+            mainSupplyList.add(supply);
+        }
+    }
 
     public ProductionTank getProductionTank() {
         return productionTank;
@@ -52,5 +65,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     public void setFormulation(Formulation formulation) {
         this.formulation = formulation;
+    }
+
+    public List<Supply> getMainSupplyList() {
+        return mainSupplyList;
+    }
+
+    public void setMainSupplyList(List<Supply> mainSupplyList) {
+        this.mainSupplyList = mainSupplyList;
     }
 }

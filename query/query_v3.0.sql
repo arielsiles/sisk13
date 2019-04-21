@@ -1,143 +1,144 @@
 /** 11.04.2019 Para Modulo de produccion 2 **/
-delete from costosindirectos where idcostosindirectos = 0;
-delete from productoprocesado where idproductoprocesado = 550;
-delete from productoprocesado where idproductoprocesado = 552;
-delete from productoprocesado where idproductoprocesado = 551;
+DELETE FROM costosindirectos WHERE idcostosindirectos = 0;
+DELETE FROM productoprocesado WHERE idproductoprocesado = 550;
+DELETE FROM productoprocesado WHERE idproductoprocesado = 552;
+DELETE FROM productoprocesado WHERE idproductoprocesado = 551;
 
-alter table costosindirectos add foreign key (idperiodocostoindirecto) references periodocostoindirecto(idperiodocostoindirecto);
-alter table ingredienteproduccion add foreign key (idcomposicionproducto) references composicionproducto(idcomposicionproducto);
+ALTER TABLE costosindirectos ADD FOREIGN KEY (idperiodocostoindirecto) REFERENCES periodocostoindirecto(idperiodocostoindirecto);
+ALTER TABLE ingredienteproduccion ADD FOREIGN KEY (idcomposicionproducto) REFERENCES composicionproducto(idcomposicionproducto);
 
-update metaproductoproduccion m set m.`cod_art` = 155 where m.`idmetaproductoproduccion` = 161;
-update metaproductoproduccion m set m.`cod_art` = 156 where m.`idmetaproductoproduccion` = 162;
-update metaproductoproduccion m set m.`cod_art` = 158 where m.`idmetaproductoproduccion` = 164;
-update metaproductoproduccion m set m.`cod_art` = 159 where m.`idmetaproductoproduccion` = 165;
-update metaproductoproduccion m set m.`cod_art` = 161 where m.`idmetaproductoproduccion` = 170;
-update metaproductoproduccion m set m.`cod_art` = 160 where m.`idmetaproductoproduccion` = 166;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 155 WHERE m.`idmetaproductoproduccion` = 161;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 156 WHERE m.`idmetaproductoproduccion` = 162;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 158 WHERE m.`idmetaproductoproduccion` = 164;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 159 WHERE m.`idmetaproductoproduccion` = 165;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 161 WHERE m.`idmetaproductoproduccion` = 170;
+UPDATE metaproductoproduccion m SET m.`cod_art` = 160 WHERE m.`idmetaproductoproduccion` = 166;
 
-delete from metaproductoproduccion where idmetaproductoproduccion = 560;
-delete from productoprocesado where idproductoprocesado = 560;
+DELETE FROM metaproductoproduccion WHERE idmetaproductoproduccion = 560;
+DELETE FROM productoprocesado WHERE idproductoprocesado = 560;
 
-alter table metaproductoproduccion modify column cod_art varchar(6) not null;
+ALTER TABLE metaproductoproduccion MODIFY COLUMN cod_art VARCHAR(6) NOT NULL;
 -- alter table inv_articulos add unique (cod_art);
-alter table productoprocesado add foreign key (idproductoprocesado) references metaproductoproduccion(idmetaproductoproduccion);
-alter table insumoproduccion add foreign key (idinsumoproduccion) references metaproductoproduccion(idmetaproductoproduccion);
-alter table materialproduccion add foreign key (idmaterialproduccion) references metaproductoproduccion(idmetaproductoproduccion);
-alter table composicionproducto add foreign key (idproductoprocesado) references productoprocesado(idproductoprocesado);
-alter table ingredienteproduccion add foreign key (idmetaproductoproduccion) references metaproductoproduccion(idmetaproductoproduccion);
+ALTER TABLE productoprocesado ADD FOREIGN KEY (idproductoprocesado) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
+ALTER TABLE insumoproduccion ADD FOREIGN KEY (idinsumoproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
+ALTER TABLE materialproduccion ADD FOREIGN KEY (idmaterialproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
+ALTER TABLE composicionproducto ADD FOREIGN KEY (idproductoprocesado) REFERENCES productoprocesado(idproductoprocesado);
+ALTER TABLE ingredienteproduccion ADD FOREIGN KEY (idmetaproductoproduccion) REFERENCES metaproductoproduccion(idmetaproductoproduccion);
 
 -- ALTER TABLE metaproductoproduccion ADD constraint FK_ART_METAPROD FOREIGN KEY (no_cia,cod_art) REFERENCES inv_articulos(no_cia,cod_art); ERROR
 -- alter table metaproductoproduccion add constraint FK_INVARTICULOMETAPRODUCTO FOREIGN KEY (cod_art, no_cia) REFERENCES inv_articulos(cod_art, no_cia); ERROR
 
-drop table productoproducido;
-drop table insumosprod;
-drop table produccion;
-drop table tanqueprod;
-drop table insumoformula;
-drop table formulacion;
+DROP TABLE productoproducido;
+DROP TABLE insumosprod;
+DROP TABLE produccion;
+DROP TABLE tanqueprod;
+DROP TABLE insumoformula;
+DROP TABLE formulacion;
 
 
-drop table pr_insumoformula;
-drop table pr_producido;
-drop table pr_insumo;
-drop table pr_produccion;
-drop table pr_formula;
-drop table pr_plan;
-drop table pr_tanque;
+DROP TABLE pr_insumoformula;
+DROP TABLE pr_producido;
+DROP TABLE pr_insumo;
+DROP TABLE pr_produccion;
+DROP TABLE pr_formula;
+DROP TABLE pr_plan;
+DROP TABLE pr_tanque;
 
 
-create table pr_formula (
-	idformula bigint(20) not null,
-	nombre varchar(100) not null,
-	capacidad decimal(16, 2) not null,
-	activo int(1),
-	version bigint(20) not null,
-	idcompania bigint(20) not null,	
-	primary key (idformula)
+CREATE TABLE pr_formula (
+	idformula BIGINT(20) NOT NULL,
+	nombre VARCHAR(100) NOT NULL,
+	capacidad DECIMAL(16, 2) NOT NULL,
+	activo INT(1),
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,	
+	PRIMARY KEY (idformula)
 );
 
-create table pr_insumoformula(
-	idinsumoformula bigint(20) not null,
-	cantidad decimal(20, 6) not null,
-	cod_art varchar(6) not null,
-	idformula bigint(20) not null,
-	version bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idinsumoformula)
+CREATE TABLE pr_insumoformula(
+	idinsumoformula BIGINT(20) NOT NULL,
+	cantidad DECIMAL(20, 6) NOT NULL,
+	cod_art VARCHAR(6) NOT NULL,
+	idformula BIGINT(20) NOT NULL,
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idinsumoformula)
 );
 
-alter table pr_insumoformula add foreign key (idformula) references pr_formula(idformula);
+ALTER TABLE pr_insumoformula ADD FOREIGN KEY (idformula) REFERENCES pr_formula(idformula);
 
-create table pr_plan (
-	idplan bigint(20) not null,
-	nombre varchar(100),
-	fecha date not null unique,
-	version bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idplan)
+CREATE TABLE pr_plan (
+	idplan BIGINT(20) NOT NULL,
+	nombre VARCHAR(100),
+	fecha DATE NOT NULL UNIQUE,
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idplan)
 );
 
-create table pr_tanque(
-	idtanque bigint(20) not null,
-	nombre varchar(255) not null,
-	capacidad decimal(16, 2) not null,
-	codmed varchar(6),
-	version bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idtanque)
+CREATE TABLE pr_tanque(
+	idtanque BIGINT(20) NOT NULL,
+	nombre VARCHAR(255) NOT NULL,
+	capacidad DECIMAL(16, 2) NOT NULL,
+	codmed VARCHAR(6),
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idtanque)
 );
 
 
-create table pr_produccion(
-	idproduccion bigint(20) not null,
-	codigo int,
-	descripcion varchar(255),
-	idformula bigint(20),
-	idtanque bigint(20),
-	idplan bigint(20),
-	version bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idproduccion)
+CREATE TABLE pr_produccion(
+	idproduccion BIGINT(20) NOT NULL,
+	codigo INT,
+	descripcion VARCHAR(255),
+	idformula BIGINT(20),
+	idtanque BIGINT(20),
+	idplan BIGINT(20),
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idproduccion)
 );
 
-alter table pr_produccion add foreign key (idformula) references pr_formula(idformula);
-alter table pr_produccion add foreign key (idtanque)  references pr_tanque(idtanque);
-alter table pr_produccion add foreign key (idplan) references pr_plan(idplan);
+ALTER TABLE pr_produccion ADD FOREIGN KEY (idformula) REFERENCES pr_formula(idformula);
+ALTER TABLE pr_produccion ADD FOREIGN KEY (idtanque)  REFERENCES pr_tanque(idtanque);
+ALTER TABLE pr_produccion ADD FOREIGN KEY (idplan) REFERENCES pr_plan(idplan);
 
-create table pr_insumo (
-	idinsumo bigint(20) not null,
-	cod_art varchar(6),
-	cantidad decimal(16, 6),
-	costouni decimal(16, 6),
-	idproduccion bigint(20) not null,
-	VERSION bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idinsumo)
+CREATE TABLE pr_insumo (
+	idinsumo BIGINT(20) NOT NULL,
+	cod_art VARCHAR(6),
+	cantidad DECIMAL(16, 6),
+	costouni DECIMAL(16, 6),
+	idproduccion BIGINT(20) NOT NULL,
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idinsumo)
 );
 
-alter table pr_insumo add foreign key (idproduccion) references pr_produccion(idproduccion);
+ALTER TABLE pr_insumo ADD FOREIGN KEY (idproduccion) REFERENCES pr_produccion(idproduccion);
 
-create table pr_producido(
-	idproductoprod bigint(20) not null,
-	fecha date,
-	cod_art varchar(6),
-	cantidad decimal(16, 2),
-	idproduccion bigint(20),
-	VERSION bigint(20) not null,
-	idcompania bigint(20) not null,
-	primary key (idproductoprod)	
+CREATE TABLE pr_producido(
+	idproductoprod BIGINT(20) NOT NULL,
+	fecha DATE,
+	cod_art VARCHAR(6),
+	cantidad DECIMAL(16, 2),
+	idproduccion BIGINT(20),
+	VERSION BIGINT(20) NOT NULL,
+	idcompania BIGINT(20) NOT NULL,
+	PRIMARY KEY (idproductoprod)	
 );
 
-alter table pr_producido add foreign key (idproduccion) references pr_produccion(idproduccion);
+ALTER TABLE pr_producido ADD FOREIGN KEY (idproduccion) REFERENCES pr_produccion(idproduccion);
 
 -- 
 /** 19.04.2019 **/
 
-insert into modulo(idmodulo, nombrerecurso, idcompania) values(10, 'production', 1);
-insert into modulocompania values(1, 10, 1);
-insert into funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) values(251, 'PRODUCTIONPLAN', 10, 15, 'Functionality.production.productionPlan', 1);
-insert into pr_tanque values(1, "TANQUE 1 -  4000 LT", 4000, 'LT', 0, 1);
-insert into pr_tanque values(2, "TANQUE 2 -  6000 LT", 6000, 'LT', 0, 1);
-insert into pr_tanque values(3, "TANQUE 3 -  8000 LT", 8000, 'LT', 0, 1);
+INSERT INTO modulo(idmodulo, nombrerecurso, idcompania) VALUES(10, 'production', 1);
+INSERT INTO modulocompania VALUES(1, 10, 1);
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) VALUES(251, 'PRODUCTIONPLAN', 10, 15, 'Functionality.production.productionPlan', 1);
+
+INSERT INTO pr_tanque VALUES(1, "TANQUE 1 -  4000 LT", 4000, 'LT', 0, 1);
+INSERT INTO pr_tanque VALUES(2, "TANQUE 2 -  6000 LT", 6000, 'LT', 0, 1);
+INSERT INTO pr_tanque VALUES(3, "TANQUE 3 -  8000 LT", 8000, 'LT', 0, 1);
 
 
 
