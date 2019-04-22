@@ -70,9 +70,9 @@
   KEY `idformula` (`idformula`),
   KEY `idtanque` (`idtanque`),
   KEY `idplan` (`idplan`),
+  CONSTRAINT `pr_produccion_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `pr_plan` (`idplan`),
   CONSTRAINT `pr_produccion_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `pr_formula` (`idformula`),
-  CONSTRAINT `pr_produccion_ibfk_2` FOREIGN KEY (`idtanque`) REFERENCES `pr_tanque` (`idtanque`),
-  CONSTRAINT `pr_produccion_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `pr_plan` (`idplan`)
+  CONSTRAINT `pr_produccion_ibfk_2` FOREIGN KEY (`idtanque`) REFERENCES `pr_tanque` (`idtanque`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_tanque" view="colnames">
@@ -101,7 +101,7 @@
   `cantidad` decimal(16,6) DEFAULT NULL,
   `costouni` decimal(16,6) DEFAULT NULL,
   `idproduccion` bigint(20) NOT NULL,
-  `version` bigint(20) NOT NULL,
+  `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idinsumo`),
   KEY `idproduccion` (`idproduccion`),

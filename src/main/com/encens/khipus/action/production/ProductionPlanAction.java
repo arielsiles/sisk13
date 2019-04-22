@@ -1,30 +1,18 @@
 package com.encens.khipus.action.production;
 
-import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.production.ProductionPlan;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Name("productionPlanAction")
 @Scope(ScopeType.CONVERSATION)
 public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
-    private ProductionTank productionTank;
-    private Formulation formulation;
-
-    private List<Supply> mainSupplyList = new ArrayList<Supply>();
-
-    @In
-    private SessionUser sessionUser;
-    @In
-    private User currentUser;
+    @In(create = true)
+    private ProductionAction productionAction;
 
     @Factory(value = "productionPlan", scope = ScopeType.STATELESS)
     public ProductionPlan initProductionPlan() {
@@ -40,38 +28,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return Outcome.REDISPLAY;
     }
 
-    public void loadSupplies(){
-        setMainSupplyList(new ArrayList<Supply>());
-        for (FormulationInput formulationInput : this.formulation.getFormulationInputList()){
-            Supply supply = new Supply();
-            supply.setProductItemCode(formulationInput.getProductItemCode());
-            supply.setProductItem(formulationInput.getProductItem());
-            supply.setQuantity(formulationInput.getQuantity());
-            mainSupplyList.add(supply);
-        }
+    @Begin(nested = true, flushMode = FlushModeType.MANUAL)
+    public String addProduction() {
+        productionAction.setProductionPlan(getInstance());
+        setOp(OP_UPDATE);
+        return Outcome.SUCCESS;
     }
 
-    public ProductionTank getProductionTank() {
-        return productionTank;
-    }
-
-    public void setProductionTank(ProductionTank productionTank) {
-        this.productionTank = productionTank;
-    }
-
-    public Formulation getFormulation() {
-        return formulation;
-    }
-
-    public void setFormulation(Formulation formulation) {
-        this.formulation = formulation;
-    }
-
-    public List<Supply> getMainSupplyList() {
-        return mainSupplyList;
-    }
-
-    public void setMainSupplyList(List<Supply> mainSupplyList) {
-        this.mainSupplyList = mainSupplyList;
-    }
 }

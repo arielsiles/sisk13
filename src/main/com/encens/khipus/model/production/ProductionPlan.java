@@ -6,7 +6,9 @@ import com.encens.khipus.model.admin.Company;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Entity fo Product
@@ -39,6 +41,9 @@ public class ProductionPlan implements BaseModel {
 
     @Column(name = "fecha")
     private Date date;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionPlan")
+    private List<Production> productionList = new ArrayList<Production>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -87,5 +92,13 @@ public class ProductionPlan implements BaseModel {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public List<Production> getProductionList() {
+        return productionList;
+    }
+
+    public void setProductionList(List<Production> productionList) {
+        this.productionList = productionList;
     }
 }

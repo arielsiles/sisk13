@@ -3,10 +3,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -25,131 +23,116 @@
 
 <h:form id="productionPlanForm">
 
-<div class="buttons">
-    <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{!productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
-                     tabindex="1">
-        <s:defaultAction/>
-    </h:commandButton>
+    <div class="buttons">
 
-    <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
-                     styleClass="button" immediate="true"
-                     tabindex="4">
-    </h:commandButton>
-</div>
+        <h:commandButton action="#{productionPlanAction.addProduction}"
+                         value="#{messages['ProductionPlan.addproduction']}"
+                         styleClass="button"
+                         immediate="true"
+                         rendered="#{productionPlanAction.managed}"/>
 
-<rich:panel id="formPanel">
+        <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <f:facet name="header">
-        <c:choose>
-            <c:when test="#{productionPlanAction.managed}">
-                #{messages['ProductionPlan.edit']}
-            </c:when>
-            <c:otherwise>
-                #{messages['ProductionPlan.new']}
-            </c:otherwise>
-        </c:choose>
-    </f:facet>
+        <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="4">
+        </h:commandButton>
+    </div>
 
-    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+    <rich:panel id="formPanel">
 
-        <s:div>
-            <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
-                <rich:calendar value="#{productionPlan.date}"
-                               popup="true"
-                               datePattern="#{messages['patterns.date']}"
-                               styleClass="input"
-                               enableManualInput="true"
-                               tabindex="9">
-                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                </rich:calendar>
-            </s:decorate>
-        </s:div>
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{productionPlanAction.managed}">
+                    #{messages['ProductionPlan.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['ProductionPlan.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
 
-        <c:if test="#{productionPlanAction.managed}">
-            <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
-                <h:selectOneMenu id="productionTank"
-                                 value="#{productionPlanAction.productionTank}"
-                                 styleClass="input"
-                                 required="false"
-                                 tabindex="7">
-                    <s:selectItems value="#{productionTankList}"
-                                   var="productionTank"
-                                   label="#{productionTank.name}"
-                                   noSelectionLabel=""
-                                   hideNoSelectionLabel="false"/>
-                    <s:convertEntity/>
-                </h:selectOneMenu>
-            </s:decorate>
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
 
-            <s:decorate id="formulationField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['ProductionPlan.formulation']}</ui:define>
-                <h:selectOneMenu id="formulationTank"
-                                 value="#{productionPlanAction.formulation}"
-                                 styleClass="input"
-                                 required="false"
-                                 tabindex="7">
-                    <s:selectItems value="#{formulationList}"
-                                   var="formulation"
-                                   label="#{formulation.name}"
-                                   noSelectionLabel=""
-                                   hideNoSelectionLabel="false"/>
-                    <s:convertEntity/>
-
-                    <a4j:support event="onchange"
-                                 action="#{productionPlanAction.loadSupplies()}"
-                                 reRender="supplyPanel"
-                                 ajaxSingle="true"/>
-
-                </h:selectOneMenu>
-            </s:decorate>
-        </c:if>
-
-        <s:div></s:div>
-    </h:panelGrid>
-</rich:panel>
-
-<rich:spacer height="5" />
+            <s:div>
+                <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
+                    <rich:calendar value="#{productionPlan.date}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="9">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+            </s:div>
 
 
+            <s:div></s:div>
+        </h:panelGrid>
+    </rich:panel>
 
-    <rich:dataTable></rich:dataTable>
+    <!--<rich:spacer height="5" />-->
+    <c:if test="#{productionPlanAction.managed}">
+    <rich:tabPanel switchType="ajax" selectedTab="productionTab">
+        <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true">
+            <rich:dataTable id="productionListId"
+                            value="#{productionPlan.productionList}"
+                            var="productionItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%, 30%, 30%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <h:outputText value="#{messages['Production.number']}" />
+                        </rich:column>
 
-    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <s:div id="supplyPanel">
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
-                <thead class="rich-table-thead">
-                <tr class="rich-table-header">
-                    <th class="rich-table-headercell">#{messages['Supply.name']}</th>
-                    <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
-                </tr>
-                </thead>
-                <c:forEach var="supplyDetail" items="#{productionPlanAction.mainSupplyList}" varStatus="row">
-                    <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
+                        <rich:column>
+                            <h:outputText value="#{messages['Production.tank']}" />
+                        </rich:column>
 
-                    <tr class="rich-table-row">
-                        <td class="rich-table-cell">
-                            <h:outputText value="#{supplyDetail.productItem.fullName}"/>
-                        </td>
-                        <td class="rich-table-cell">
-                            <!--<h:outputText value="#{supplyDetail.quantity}"/>-->
-                            <h:inputText id="#{quantityInputFieldId}"
-                                         value="#{supplyDetail.quantity}"
-                                         styleClass="inputSmall right">
-                                <app:realNumberConverter minimum="0"
-                                                         pattern="#{messages['patterns.decimal6FNumber']}"
-                                                         forId="#{quantityInputFieldId}"/>
-                            </h:inputText>
-                        </td>
-                    </tr>
-                </c:forEach>
+                        <rich:column>
+                            <h:outputText value="#{messages['Production.description']}" />
+                        </rich:column>
 
-            </table>
-        </s:div>
-    </h:panelGrid>
+                        <rich:column styleClass="center">
+                            <h:outputText value="#{messages['Common.action']}" />
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productionItem.code}" />
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productionItem.productionTank.name }" />
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productionItem.description}" />
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <!--<h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{creditAction.selectCreditTransaction(productionItem)}"
+                                   rendered="#{s:hasPermission('CREDIT','VIEW')}" />-->
+                </rich:column>
+            </rich:dataTable>
+            <!--<app:dataScroller id="productionListDataScrollerId"
+                              for="productionListId"
+                              dataModel="#{productionPlan.productionList}"/>-->
+        </rich:tab>
+    </rich:tabPanel>
+    </c:if>
 
 </h:form>
 </ui:define>

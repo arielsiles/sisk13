@@ -33,7 +33,7 @@ public class Production implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Production.tableGenerator")
     private Long id;
 
-    @Column(name = "codigo", nullable = false)
+    @Column(name = "codigo")
     private Integer code;
 
     @Column(name = "descripcion")
