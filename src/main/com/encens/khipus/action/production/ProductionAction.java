@@ -5,7 +5,10 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.production.ProductionService;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.*;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Scope;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,6 @@ public class ProductionAction extends GenericAction<Production> {
 
 
     @Override
-    @End
     public String create() {
 
         Production production = getInstance();
@@ -41,7 +43,7 @@ public class ProductionAction extends GenericAction<Production> {
         production.setProductionPlan(productionPlan);
         productionService.createProduction(production);
 
-        //setOp(OP_UPDATE);
+        /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
     }
 

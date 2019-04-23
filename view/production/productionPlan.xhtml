@@ -5,6 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -83,7 +84,7 @@
     <rich:tabPanel switchType="ajax" selectedTab="productionTab">
         <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true">
             <rich:dataTable id="productionListId"
-                            value="#{productionPlan.productionList}"
+                            value="#{productionDataModel}"
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
@@ -127,9 +128,9 @@
                                    rendered="#{s:hasPermission('CREDIT','VIEW')}" />-->
                 </rich:column>
             </rich:dataTable>
-            <!--<app:dataScroller id="productionListDataScrollerId"
+            <app:dataScroller id="productionListDataScrollerId"
                               for="productionListId"
-                              dataModel="#{productionPlan.productionList}"/>-->
+                              dataModel="#{productionDataModel}"/>
         </rich:tab>
     </rich:tabPanel>
     </c:if>

@@ -523,39 +523,48 @@
     </page>
 
     <page view-id="/production/productionPlan.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
-        <navigation>
+        <navigation from-action="#{productionPlanAction.create}">
             <rule if-outcome="Success">
                 <redirect view-id="/production/productionPlan.xhtml"/>
             </rule>
-            <rule if-outcome="Cancel">
-                <redirect view-id="/production/productionPlanList.xhtml"/>
-            </rule>
-            <rule if-outcome="Fail">
-                <redirect view-id="/production/productionPlanList.xhtml"/>
-            </rule>
         </navigation>
-
         <navigation from-action="#{productionPlanAction.addProduction}">
             <rule if-outcome="Success">
                 <redirect view-id="/production/production.xhtml"/>
             </rule>
         </navigation>
-    </page>
-
-    <page view-id="/production/production.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
-
-        <navigation from-action="#{productionAction.create}">
-            <rule if-outcome="Success">
-                <redirect view-id="/production/productionPlan.xhtml"/>
+        <navigation>
+            <rule>
+                <redirect view-id="/production/productionPlanList.xhtml"/>
             </rule>
         </navigation>
+    </page>
 
+    <page view-id="/production/production.xhtml" no-conversation-view-id="/production/productionPlan.xhtml">
+        <navigation from-action="#{productionAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/production.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule if-outcome="Cancel">
                 <redirect view-id="/production/productionPlan.xhtml"/>
             </rule>
         </navigation>
-
     </page>
+
+    <!--<page view-id="/customers/customerDiscountRule.xhtml" no-conversation-view-id="/customers/customerDiscountRuleList.xhtml">
+        <navigation from-action="#{customerDiscountRuleAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true"/>
+                <redirect view-id="/customers/customerDiscountRule.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/customers/customerDiscountRuleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>-->
 
 </pages>
