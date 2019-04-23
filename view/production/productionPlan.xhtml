@@ -88,19 +88,22 @@
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="30%, 30%, 30%, 10%">
+                            columnsWidth="10%, 40%, 30%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
-                            <h:outputText value="#{messages['Production.number']}" />
+                            <h:outputText value="#{messages['Production.code']}" />
                         </rich:column>
 
                         <rich:column>
                             <h:outputText value="#{messages['Production.tank']}" />
                         </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['Production.category']}" />
+                        </rich:column>
 
                         <rich:column>
-                            <h:outputText value="#{messages['Production.description']}" />
+                            <h:outputText value="#{messages['Production.state']}" />
                         </rich:column>
 
                         <rich:column styleClass="center">
@@ -114,18 +117,22 @@
                 </rich:column>
 
                 <rich:column>
-                    <h:outputText value="#{productionItem.productionTank.name }" />
+                    <h:outputText value="#{productionItem.productionTank.name}" />
                 </rich:column>
 
                 <rich:column>
-                    <h:outputText value="#{productionItem.description}" />
+                    <h:outputText value="#{productionItem.formulation.category.name}" />
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{messages[productionItem.state.resourceKey]}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    <!--<h:commandLink value="#{messages['Common.select']}"
+                    <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"
-                                   action="#{creditAction.selectCreditTransaction(productionItem)}"
-                                   rendered="#{s:hasPermission('CREDIT','VIEW')}" />-->
+                                   action="#{productionAction.select(productionItem)}"
+                                   rendered="#{s:hasPermission('PRODUCTION','VIEW')}" />
                 </rich:column>
             </rich:dataTable>
             <app:dataScroller id="productionListDataScrollerId"

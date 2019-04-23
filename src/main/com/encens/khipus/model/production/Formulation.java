@@ -48,6 +48,10 @@ public class Formulation implements BaseModel {
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active = Boolean.TRUE;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcategoria", nullable = true, updatable = false, insertable = true)
+    private ProductionCategory category;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "formulation")
     private List<FormulationInput> formulationInputList = new ArrayList<FormulationInput>(0);
 
@@ -113,5 +117,13 @@ public class Formulation implements BaseModel {
 
     public void setFormulationInputList(List<FormulationInput> formulationInputList) {
         this.formulationInputList = formulationInputList;
+    }
+
+    public ProductionCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductionCategory category) {
+        this.category = category;
     }
 }

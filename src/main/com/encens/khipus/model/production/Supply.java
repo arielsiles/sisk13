@@ -15,7 +15,8 @@ import java.math.BigDecimal;
  * @author:
  */
 
-@NamedQueries({})
+@NamedQueries({
+})
 
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Supply.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,

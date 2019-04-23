@@ -26,6 +26,39 @@
 <h:form id="productionForm">
 
 <div class="buttons">
+
+    <!--<a4j:commandButton id="addMaterialId"
+                       value="#{messages['Production.addMaterial']}"
+                       styleClass="button"
+                       immediate="true" ajaxSingle="true"
+                       onclick="Richfaces.showModalPanel('metaProductListModalPanel');"/>-->
+
+    <a4j:commandButton id="addMaterialCommandButton"
+                       action="#{productItemByWarehouseDataModel.reset()}"
+                       value="#{messages['Production.addMaterial']}"
+                       styleClass="button"
+                       immediate="true"
+                       oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                       actionListener="#{selectPopUpAction.select}"
+                       reRender="productItemsByWarehouseListModalPanel">
+        <f:attribute name="entityManagerName" value=""/>
+        <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+    </a4j:commandButton>
+
+
+    <a4j:commandButton id="addIngredientId"
+                       value="#{messages['Production.addIngredient']}"
+                       styleClass="button"
+                       immediate="true" ajaxSingle="true"
+                       onclick="Richfaces.showModalPanel('metaProductListModalPanel');"/>
+
+    <h:commandButton action="#{productionAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
     <h:commandButton action="#{productionAction.create}" value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{!productionAction.managed and s:hasPermission('PRODUCTION','CREATE')}"
@@ -61,7 +94,7 @@
                                popup="true"
                                datePattern="#{messages['patterns.date']}"
                                styleClass="input"
-                               enableManualInput="true"
+                               disabled="true"
                                tabindex="9">
                     <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                 </rich:calendar>
@@ -101,7 +134,7 @@
 
                     <a4j:support event="onchange"
                                  action="#{productionAction.loadSupplies()}"
-                                 reRender="supplyPanel"
+                                 reRender="ingredientPanel"
                                  ajaxSingle="true"/>
 
                 </h:selectOneMenu>
@@ -112,48 +145,101 @@
     </h:panelGrid>
 </rich:panel>
 
-<rich:spacer height="5" />
-
-
-
+    <rich:spacer height="5" />
     <rich:dataTable></rich:dataTable>
-
-    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <s:div id="supplyPanel">
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
-                <thead class="rich-table-thead">
-                <tr class="rich-table-header">
-                    <th class="rich-table-headercell">#{messages['Supply.name']}</th>
-                    <th class="rich-table-headercell">#{messages['Supply.unity']}</th>
-                    <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
-                </tr>
-                </thead>
-                <c:forEach var="supplyDetail" items="#{productionAction.mainSupplyList}" varStatus="row">
-                    <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
-
-                    <tr class="rich-table-row">
-                        <td class="rich-table-cell">
-                            <h:outputText value="#{supplyDetail.productItem.fullName}"/>
-                        </td>
-                        <td class="rich-table-cell">
-                            <h:outputText value="#{supplyDetail.productItem.usageMeasureCode}"/>
-                        </td>
-                        <td class="rich-table-cell">
-                            <h:inputText id="#{quantityInputFieldId}"
-                                         value="#{supplyDetail.quantity}"
-                                         styleClass="inputSmall right">
-                                <app:realNumberConverter minimum="0"
-                                                         pattern="#{messages['patterns.decimal6FNumber']}"
-                                                         forId="#{quantityInputFieldId}"/>
-                            </h:inputText>
-                        </td>
+    <!--<h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">-->
+    <rich:tabPanel selectedTab="ingredientTab">
+        <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">
+            <s:div id="ingredientPanel">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
                     </tr>
-                </c:forEach>
+                    </thead>
+                    <c:forEach var="supplyDetail" items="#{productionAction.ingredientSupplyList}" varStatus="row">
+                        <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
 
-            </table>
-        </s:div>
-    </h:panelGrid>
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{supplyDetail.productItem.fullName}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{supplyDetail.productItem.usageMeasureCode}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:inputText id="#{quantityInputFieldId}"
+                                             value="#{supplyDetail.quantity}"
+                                             styleClass="inputSmall right">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             forId="#{quantityInputFieldId}"/>
+                                </h:inputText>
+                            </td>
+                        </tr>
+                    </c:forEach>
 
+                </table>
+            </s:div>
+        </rich:tab>
+    </rich:tabPanel>
+    <rich:spacer height="5" />
+    <rich:tabPanel selectedTab="materialTab">
+        <rich:tab name="materialTab" label="#{messages['Production.material']}">
+            <s:div id="materialPanel">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
+                    </tr>
+                    </thead>
+                    <c:forEach var="materialDetail" items="#{productionAction.materialSupplyList}" varStatus="row">
+                        <c:set var="quantityMaterialInputFieldId" value="quantityMaterialInputField_#{row.index}"/>
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{materialDetail.productItem.fullName}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{materialDetail.productItem.usageMeasureCode}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:inputText id="#{quantityMaterialInputFieldId}"
+                                             value="#{materialDetail.quantity}"
+                                             styleClass="inputSmall right">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             forId="#{quantityMaterialInputFieldId}"/>
+                                </h:inputText>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </s:div>
+        </rich:tab>
+    </rich:tabPanel>
+    <!--</h:panelGrid>-->
 </h:form>
+
+    <s:decorate id="productItemsByWarehouseListModalPanelContainer"
+                template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+        <ui:define name="addButton">
+            <a4j:commandButton id="addButton"
+                               immediate="true"
+                               ajaxSingle="true"
+                               action="#{productionAction.addMaterialProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               value="#{messages['Common.add']}"
+                               reRender="materialPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+
 </ui:define>
 </ui:composition>

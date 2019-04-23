@@ -6,6 +6,8 @@ import com.encens.khipus.model.admin.Company;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity fo Product
@@ -36,6 +38,10 @@ public class Production implements BaseModel {
     @Column(name = "codigo")
     private Integer code;
 
+    @Column(name = "estado", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private ProductionState state;
+
     @Column(name = "descripcion")
     private String description;
 
@@ -50,6 +56,9 @@ public class Production implements BaseModel {
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
     private ProductionPlan productionPlan;
+
+    @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
+    private List<Supply> supplyList = new ArrayList<Supply>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -121,5 +130,21 @@ public class Production implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public List<Supply> getSupplyList() {
+        return supplyList;
+    }
+
+    public void setSupplyList(List<Supply> supplyList) {
+        this.supplyList = supplyList;
+    }
+
+    public ProductionState getState() {
+        return state;
+    }
+
+    public void setState(ProductionState state) {
+        this.state = state;
     }
 }

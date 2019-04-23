@@ -533,6 +533,11 @@
                 <redirect view-id="/production/production.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{productionAction.select(productionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/production.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule>
                 <redirect view-id="/production/productionPlanList.xhtml"/>
@@ -552,19 +557,5 @@
             </rule>
         </navigation>
     </page>
-
-    <!--<page view-id="/customers/customerDiscountRule.xhtml" no-conversation-view-id="/customers/customerDiscountRuleList.xhtml">
-        <navigation from-action="#{customerDiscountRuleAction.create}">
-            <rule if-outcome="Success">
-                <begin-conversation join="true"/>
-                <redirect view-id="/customers/customerDiscountRule.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation>
-            <rule>
-                <redirect view-id="/customers/customerDiscountRuleList.xhtml"/>
-            </rule>
-        </navigation>
-    </page>-->
 
 </pages>
