@@ -146,9 +146,24 @@ insert into funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecu
 alter table pr_produccion add column estado varchar(5) after codigo;
 insert into gensecuencia values(18, 'PRODUCTION_CODE', 100, 1);
 
+
 create table pr_categoria (
 	idcategoria bigint(20) not null,
 	nombre varchar(100),
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
 	primary key (idcategoria)
 );
+
+alter table pr_formula add column idcategoria bigint(20) after activo;
+alter table pr_formula add foreign key (idcategoria) references pr_categoria(idcategoria);
+
+insert into pr_categoria values(1, 'LECHE NATURAL', 0, 1);
+insert into pr_categoria values(2, 'LECHE SABORIZADA', 0, 1);
+insert into pr_categoria values(3, 'YOGURT', 0, 1);
+insert into pr_categoria values(4, 'JUGO LACTEO', 0, 1);
+insert into pr_categoria values(5, 'QUESO', 0, 1);
+
+
+
 
