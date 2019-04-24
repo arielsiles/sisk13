@@ -96,6 +96,20 @@ public class ProductionAction extends GenericAction<Production> {
         }
     }
 
+    public void addIngredientItems(List<ProductItem> productItems) {
+        for (ProductItem productItem : productItems) {
+            if (ingredientSupplyList.contains(productItem.getProductItemCode())) {
+                continue;
+            }
+
+            Supply supply = new Supply();
+            supply.setProductItemCode(productItem.getProductItemCode());
+            supply.setProductItem(productItem);
+
+            ingredientSupplyList.add(supply);
+        }
+    }
+
     public ProductionTank getProductionTank() {
         return productionTank;
     }
