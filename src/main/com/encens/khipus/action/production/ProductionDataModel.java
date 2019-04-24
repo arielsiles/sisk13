@@ -20,9 +20,7 @@ public class ProductionDataModel extends QueryDataModel<Long, Production> {
     private static final String[] RESTRICTIONS = {"production.productionPlan = #{productionPlan}"};
 
     @Create
-    public void init() {
-        sortProperty = "productionPlan.date";
-    }
+    public void init() {}
 
     @Override
     public String getEjbql() {

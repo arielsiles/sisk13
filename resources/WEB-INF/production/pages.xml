@@ -525,7 +525,7 @@
     <page view-id="/production/productionPlan.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
         <navigation from-action="#{productionPlanAction.create}">
             <rule if-outcome="Success">
-                <redirect view-id="/production/productionPlan.xhtml"/>
+                <redirect view-id="/production/productionPlanList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{productionPlanAction.addProduction}">

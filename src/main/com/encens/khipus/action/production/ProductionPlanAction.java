@@ -20,15 +20,6 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     }
 
 
-    /*@Override
-    @End
-    public String create() {
-        super.create();
-        setOp(OP_UPDATE);
-        return Outcome.REDISPLAY;
-    }*/
-
-
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String addProduction() {
         productionAction.setProductionPlan(getInstance());
