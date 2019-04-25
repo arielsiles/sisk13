@@ -165,7 +165,7 @@ INSERT INTO pr_categoria VALUES(4, 'JUGO LACTEO', 0, 1);
 INSERT INTO pr_categoria VALUES(5, 'QUESO', 0, 1);
 
 /** 24.04.2019 **/
-
+ALTER TABLE pr_insumo ADD COLUMN tipo VARCHAR(15) AFTER costouni;
 
 
 

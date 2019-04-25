@@ -51,6 +51,10 @@ public class Supply implements BaseModel {
     @Column(name = "costouni")
     private BigDecimal unitCost;
 
+    @Column(name = "tipo", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private SupplyType type;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = false, updatable = false, insertable = true)
     private Production production;
@@ -125,5 +129,13 @@ public class Supply implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public SupplyType getType() {
+        return type;
+    }
+
+    public void setType(SupplyType type) {
+        this.type = type;
     }
 }

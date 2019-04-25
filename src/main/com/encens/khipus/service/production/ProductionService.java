@@ -2,6 +2,7 @@ package com.encens.khipus.service.production;
 
 import com.encens.khipus.model.production.Production;
 import com.encens.khipus.model.production.Supply;
+import com.encens.khipus.model.production.SupplyType;
 
 import javax.ejb.Local;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 @Local
 public interface ProductionService {
 
-    void createProduction(Production production, List<Supply>mainSupplyList);
-    List<Supply> getSupplyList(Production production);
+    List<Supply> getSupplyList(Production production, SupplyType type);
+    void createProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
+    void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
 
 }

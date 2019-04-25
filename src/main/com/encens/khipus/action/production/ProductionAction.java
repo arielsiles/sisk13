@@ -41,15 +41,10 @@ public class ProductionAction extends GenericAction<Production> {
     @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Production instance) {
         String outCome = super.select(instance);
-
-
-        System.out.println("Produccion: " + getInstance().getId());
-        System.out.println("Formula: " + getInstance().getFormulation().getId() + " - " + getInstance().getFormulation().getName());
-        System.out.println("Tanque: " + getInstance().getProductionTank().getName());
-
         setFormulation(getInstance().getFormulation());
         setProductionTank(getInstance().getProductionTank());
-        setIngredientSupplyList(getInstance().getSupplyList());
+        setIngredientSupplyList(productionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
+        setMaterialSupplyList(productionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
 
         return outCome;
     }
@@ -65,11 +60,23 @@ public class ProductionAction extends GenericAction<Production> {
 
         Long seq = sequenceService.findNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
-        productionService.createProduction(production, ingredientSupplyList);
+        productionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
         /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
     }
+
+    @Override
+    public String update() {
+        Production production = getInstance();
+        production.setProductionTank(productionTank);
+        production.setFormulation(formulation);
+
+        productionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
+
+        return Outcome.SUCCESS;
+    }
+
 
     public void loadSupplies(){
         setIngredientSupplyList(new ArrayList<Supply>());
