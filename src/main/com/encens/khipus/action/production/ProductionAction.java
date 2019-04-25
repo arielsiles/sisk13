@@ -58,7 +58,7 @@ public class ProductionAction extends GenericAction<Production> {
         production.setFormulation(formulation);
         production.setProductionPlan(productionPlan);
 
-        Long seq = sequenceService.findNextSequenceValue(Constants.PRODUCTION_CODE);
+        Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
         productionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
@@ -77,6 +77,21 @@ public class ProductionAction extends GenericAction<Production> {
         return Outcome.SUCCESS;
     }
 
+    @Override
+    @End(beforeRedirect = true)
+    public String cancel() {
+        clearAction();
+        return Outcome.CANCEL;
+    }
+
+    public void clearAction(){
+        setOp(null);
+        setInstance(null);
+        setProductionTank(null);
+        setFormulation(null);
+        setIngredientSupplyList(new ArrayList<Supply>());
+        setMaterialSupplyList(new ArrayList<Supply>());
+    }
 
     public void loadSupplies(){
         setIngredientSupplyList(new ArrayList<Supply>());
@@ -91,6 +106,7 @@ public class ProductionAction extends GenericAction<Production> {
 
     public void addMaterialProductItems(List<ProductItem> productItems) {
         for (ProductItem productItem : productItems) {
+            /** does not work **/
             if (materialSupplyList.contains(productItem.getProductItemCode())) {
                 continue;
             }
@@ -105,6 +121,7 @@ public class ProductionAction extends GenericAction<Production> {
 
     public void addIngredientItems(List<ProductItem> productItems) {
         for (ProductItem productItem : productItems) {
+            /** does not work **/
             if (ingredientSupplyList.contains(productItem.getProductItemCode())) {
                 continue;
             }

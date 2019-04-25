@@ -51,7 +51,7 @@
         <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
     </a4j:commandButton>
 
-    <h:commandButton action="#{productionAction.update}" value="#{messages['Common.save']}"
+    <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
                      styleClass="button"
                      rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
                      tabindex="1">
@@ -76,10 +76,15 @@
     <f:facet name="header">
         <c:choose>
             <c:when test="#{productionAction.managed}">
-                #{messages['ProductionPlan.edit']}
+                <h:outputFormat value="{0, date, dd/MMMM/yyyy}">
+                    <f:param value="#{productionPlan.date}"/>
+                </h:outputFormat>
+                <!--<h:outputFormat value="#{productionPlan.date}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                </h:outputFormat>-->
             </c:when>
             <c:otherwise>
-                #{messages['ProductionPlan.new']}
+                #{messages['Production.new']}
             </c:otherwise>
         </c:choose>
     </f:facet>
@@ -87,7 +92,7 @@
     <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
 
         <s:div>
-            <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
                 <rich:calendar value="#{productionPlan.date}"
                                popup="true"
@@ -97,8 +102,7 @@
                                tabindex="9">
                     <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                 </rich:calendar>
-            </s:decorate>
-        </s:div>
+            </s:decorate>-->
 
             <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
@@ -138,6 +142,7 @@
                 </h:selectOneMenu>
             </s:decorate>
 
+        </s:div>
 
         <s:div></s:div>
     </h:panelGrid>
@@ -146,6 +151,7 @@
     <rich:spacer height="5" />
     <rich:dataTable></rich:dataTable>
     <!--<h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">-->
+
     <rich:tabPanel selectedTab="ingredientTab">
         <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">
             <s:div id="ingredientPanel">

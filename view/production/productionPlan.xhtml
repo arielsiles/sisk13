@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -26,11 +26,30 @@
 
     <div class="buttons">
 
+        <a4j:commandButton id="addProductCommandButton"
+                           action="#{productItemByWarehouseDataModel.reset()}"
+                           value="#{messages['ProductionPlan.addProduct']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           reRender="productItemsByWarehouseListModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+        </a4j:commandButton>
+
         <h:commandButton action="#{productionPlanAction.addProduction}"
-                         value="#{messages['ProductionPlan.addproduction']}"
+                         value="#{messages['ProductionPlan.addProduction']}"
                          styleClass="button"
                          immediate="true"
                          rendered="#{productionPlanAction.managed}"/>
+
+        <h:commandButton action="#{productionPlanAction.update}" value="#{messages['Common.update']}"
+                         styleClass="button"
+                         rendered="#{productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
         <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
@@ -79,7 +98,47 @@
         </h:panelGrid>
     </rich:panel>
 
-    <!--<rich:spacer height="5" />-->
+    <rich:tabPanel selectedTab="productsTab">
+        <rich:tab name="productsTab" label="#{messages['ProductionPlan.products']}">
+            <s:div id="productsPanel">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['ProductionPlan.product.code']}</th>
+                        <th class="rich-table-headercell">#{messages['ProductionPlan.product.name']}</th>
+                        <th class="rich-table-headercell">#{messages['ProductionPlan.product.quantity']}</th>
+                    </tr>
+                    </thead>
+                    <c:forEach var="productItem" items="#{productionPlanAction.productList}" varStatus="row">
+                        <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
+
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{productItem.productItemCode}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{productItem.productItem.name}"/>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:inputText id="#{quantityInputFieldId}"
+                                             value="#{productItem.quantity}"
+                                             styleClass="inputSmall right">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="#{quantityInputFieldId}"/>
+                                    <a4j:support event="onblur" ajaxSingle="true" reRender="productsPanel" />
+                                </h:inputText>
+                            </td>
+                        </tr>
+                    </c:forEach>
+
+                </table>
+            </s:div>
+        </rich:tab>
+    </rich:tabPanel>
+
+    <rich:spacer height="5" />
+
     <c:if test="#{productionPlanAction.managed}">
     <rich:tabPanel switchType="ajax" selectedTab="productionTab">
         <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true">
@@ -143,5 +202,23 @@
     </c:if>
 
 </h:form>
+
+
+    <s:decorate id="productItemsByWarehouseListModalPanelContainer" template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+        <ui:define name="addButton">
+            <a4j:commandButton id="addButton"
+                               immediate="true"
+                               ajaxSingle="true"
+                               action="#{productionPlanAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               value="#{messages['Common.add']}"
+                               reRender="productsPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+
 </ui:define>
 </ui:composition>
