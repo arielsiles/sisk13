@@ -8,6 +8,7 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,5 +39,16 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         }
     }
 
+    public List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan){
 
+        List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>();
+
+        productionProductList =  (List<ProductionProduct>) em.createQuery("select p from ProductionProduct p " +
+                " where p.productionPlan =:productionPlan " +
+                " ")
+                .setParameter("productionPlan", productionPlan)
+                .getResultList();
+
+        return  productionProductList;
+    }
 }

@@ -30,11 +30,26 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return getInstance();
     }
 
+    @Override
+    @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(ProductionPlan instance) {
+        String outCome = super.select(instance);
+        setProductList(getInstance().getProductionProductList());
+
+        return outCome;
+    }
+
+    /*@Override
+    public String create() {
+        String outcome = super.create();
+        addCreatedMessage();
+        return outcome;
+    }*/
 
     @Override
     public String update() {
-
         productionPlanService.updateProductionPlan(getInstance(), productList);
+        addUpdatedMessage();
         return Outcome.SUCCESS;
     }
 

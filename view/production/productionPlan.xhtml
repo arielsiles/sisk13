@@ -31,6 +31,7 @@
                            value="#{messages['ProductionPlan.addProduct']}"
                            styleClass="button"
                            immediate="true"
+                           rendered="#{productionPlanAction.managed}"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
                            reRender="productItemsByWarehouseListModalPanel">
@@ -119,7 +120,7 @@
                             <td class="rich-table-cell">
                                 <h:outputText value="#{productItem.productItem.name}"/>
                             </td>
-                            <td class="rich-table-cell">
+                            <td class="rich-table-cell" align="center">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{productItem.quantity}"
                                              styleClass="inputSmall right">

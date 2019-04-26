@@ -528,6 +528,11 @@
                 <redirect view-id="/production/productionPlanList.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{productionPlanAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
         <navigation from-action="#{productionPlanAction.addProduction}">
             <rule if-outcome="Success">
                 <redirect view-id="/production/production.xhtml"/>

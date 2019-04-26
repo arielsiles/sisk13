@@ -144,7 +144,29 @@
 
         </s:div>
 
-        <s:div></s:div>
+        <s:div>
+
+            <rich:dataTable value="#{productionAction.productionProductList}"
+                            var="productionProduct"
+                            id="productionProductList"
+                            width="100%" columnsWidth="70%, 30%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['ProductionPlan.products']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{productionProduct.productItem.fullName}" />
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                    />
+                </rich:column>
+            </rich:dataTable>
+
+        </s:div>
     </h:panelGrid>
 </rich:panel>
 

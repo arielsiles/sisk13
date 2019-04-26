@@ -5,6 +5,7 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.common.SequenceService;
+import com.encens.khipus.service.production.ProductionPlanService;
 import com.encens.khipus.service.production.ProductionService;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
@@ -28,6 +29,8 @@ public class ProductionAction extends GenericAction<Production> {
 
     @In
     private ProductionService productionService;
+    @In
+    private ProductionPlanService productionPlanService;
     @In
     private SequenceService sequenceService;
 
@@ -132,6 +135,13 @@ public class ProductionAction extends GenericAction<Production> {
 
             ingredientSupplyList.add(supply);
         }
+    }
+
+    public List<ProductionProduct> getProductionProductList(){
+
+        List<ProductionProduct> productionProductList = productionPlanService.getProductionProductList(getInstance().getProductionPlan());
+
+        return  productionProductList;
     }
 
     public ProductionTank getProductionTank() {

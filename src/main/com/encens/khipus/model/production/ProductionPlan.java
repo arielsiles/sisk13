@@ -45,6 +45,9 @@ public class ProductionPlan implements BaseModel {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionPlan")
     private List<Production> productionList = new ArrayList<Production>(0);
 
+    @OneToMany(mappedBy = "productionPlan", fetch = FetchType.LAZY)
+    private List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>(0);
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -100,5 +103,13 @@ public class ProductionPlan implements BaseModel {
 
     public void setProductionList(List<Production> productionList) {
         this.productionList = productionList;
+    }
+
+    public List<ProductionProduct> getProductionProductList() {
+        return productionProductList;
+    }
+
+    public void setProductionProductList(List<ProductionProduct> productionProductList) {
+        this.productionProductList = productionProductList;
     }
 }
