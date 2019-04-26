@@ -55,6 +55,14 @@ public class Supply implements BaseModel {
     @Enumerated(EnumType.STRING)
     private SupplyType type;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idinsumoformula", nullable = true, updatable = false, insertable = true)
+    private FormulationInput formulationInput;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idproducto", nullable = true, updatable = false, insertable = true)
+    private ProductionProduct productionProduct;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = false, updatable = false, insertable = true)
     private Production production;
@@ -137,5 +145,21 @@ public class Supply implements BaseModel {
 
     public void setType(SupplyType type) {
         this.type = type;
+    }
+
+    public FormulationInput getFormulationInput() {
+        return formulationInput;
+    }
+
+    public void setFormulationInput(FormulationInput formulationInput) {
+        this.formulationInput = formulationInput;
+    }
+
+    public ProductionProduct getProductionProduct() {
+        return productionProduct;
+    }
+
+    public void setProductionProduct(ProductionProduct productionProduct) {
+        this.productionProduct = productionProduct;
     }
 }

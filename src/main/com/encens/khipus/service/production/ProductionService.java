@@ -1,6 +1,7 @@
 package com.encens.khipus.service.production;
 
 import com.encens.khipus.model.production.Production;
+import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.production.Supply;
 import com.encens.khipus.model.production.SupplyType;
 
@@ -19,5 +20,6 @@ public interface ProductionService {
     List<Supply> getSupplyList(Production production, SupplyType type);
     void createProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
     void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
+    void assignProduct(Production production, ProductionProduct product);
 
 }

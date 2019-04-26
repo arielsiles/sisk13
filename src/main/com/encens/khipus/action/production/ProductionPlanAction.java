@@ -77,4 +77,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             productList.add(product);
         }
     }
+
+    public String hasProduction(ProductionProduct productionProduct){
+
+        String result = "NO";
+        if (productionProduct.getProduction() != null)
+            result = "SI";
+
+        return  result;
+    }
+
 }

@@ -103,6 +103,7 @@ public class ProductionAction extends GenericAction<Production> {
             supply.setProductItemCode(formulationInput.getProductItemCode());
             supply.setProductItem(formulationInput.getProductItem());
             supply.setQuantity(formulationInput.getQuantity());
+            supply.setFormulationInput(formulationInput);
             ingredientSupplyList.add(supply);
         }
     }
@@ -138,10 +139,21 @@ public class ProductionAction extends GenericAction<Production> {
     }
 
     public List<ProductionProduct> getProductionProductList(){
-
         List<ProductionProduct> productionProductList = productionPlanService.getProductionProductList(getInstance().getProductionPlan());
-
         return  productionProductList;
+    }
+
+    public void assignProduct(ProductionProduct product){
+        productionService.assignProduct(getInstance(), product);
+    }
+
+    public boolean hasFormula(Supply supply){
+
+        boolean result = false;
+        if (supply.getFormulationInput() != null)
+            result = true;
+
+        return result;
     }
 
     public ProductionTank getProductionTank() {

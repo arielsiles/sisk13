@@ -88,4 +88,11 @@
     <factory name="formulationList" value="#{formulationQuery}"/>
     <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p"/>
 
+    <factory name="productionProductList" value="#{productionProductQuery}"/>
+    <framework:entity-query name="productionProductQuery" ejbql="select p from ProductionProduct p">
+        <framework:restrictions>
+            <value>p.production = #{production}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
 </components>

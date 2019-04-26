@@ -1,6 +1,7 @@
 package com.encens.khipus.service.production;
 
 import com.encens.khipus.model.production.Production;
+import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.production.Supply;
 import com.encens.khipus.model.production.SupplyType;
 import org.jboss.seam.annotations.AutoCreate;
@@ -71,6 +72,20 @@ public class ProductionServiceBean implements ProductionService {
                 em.flush();
             }
         }
+    }
+
+    public void assignProduct(Production production, ProductionProduct product){
+
+        System.out.println("----> Asignando producto terminado: " + product.getProductItem().getFullName());
+        System.out.println("----> Produccion: " + production.getId());
+
+        product.setProduction(production);
+        em.merge(product);
+        em.flush();
+
+        em.refresh(production);
+        em.flush();
+
     }
 
     public List<Supply> getSupplyList(Production production, SupplyType type) {

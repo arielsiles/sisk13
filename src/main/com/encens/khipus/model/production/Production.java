@@ -60,6 +60,9 @@ public class Production implements BaseModel {
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<Supply> supplyList = new ArrayList<Supply>(0);
 
+    @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
+    private List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>(0);
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -146,5 +149,13 @@ public class Production implements BaseModel {
 
     public void setState(ProductionState state) {
         this.state = state;
+    }
+
+    public List<ProductionProduct> getProductionProductList() {
+        return productionProductList;
+    }
+
+    public void setProductionProductList(List<ProductionProduct> productionProductList) {
+        this.productionProductList = productionProductList;
     }
 }

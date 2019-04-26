@@ -45,7 +45,7 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
 
         productionProductList =  (List<ProductionProduct>) em.createQuery("select p from ProductionProduct p " +
                 " where p.productionPlan =:productionPlan " +
-                " ")
+                " and p.production is null ")
                 .setParameter("productionPlan", productionPlan)
                 .getResultList();
 

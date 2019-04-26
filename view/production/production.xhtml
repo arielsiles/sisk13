@@ -144,28 +144,34 @@
 
         </s:div>
 
-        <s:div>
-
+        <s:div id="assignProductionProduct">
+            <c:if test="#{productionAction.managed}">
             <rich:dataTable value="#{productionAction.productionProductList}"
                             var="productionProduct"
                             id="productionProductList"
-                            width="100%" columnsWidth="70%, 30%">
+                            width="100%" columnsWidth="65%, 20%, 15%">
                 <f:facet name="header">
-                    <rich:columnGroup>
-                        <rich:column>#{messages['ProductionPlan.products']}</rich:column>
-                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
-                    </rich:columnGroup>
+                        <h:outputText value="#{messages['ProductionPlan.assignProducts']}"/>
                 </f:facet>
+
                 <rich:column>
                     <h:outputText value="#{productionProduct.productItem.fullName}" />
                 </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{productionProduct.quantity}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                    </h:outputText>
+                </rich:column>
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
-                                   immediate="true"
-                                    />
+                    <a4j:commandLink id="assignCommandLink" value="#{messages['Common.assign']}"
+                                     ajaxSingle="true"
+                                     immediate="true"
+                                     action="#{productionAction.assignProduct(productionProduct)}"
+                                     reRender="assignProductionProduct, ingredientPanel, finalProductList">
+                    </a4j:commandLink>
                 </rich:column>
             </rich:dataTable>
-
+            </c:if>
         </s:div>
     </h:panelGrid>
 </rich:panel>
@@ -180,22 +186,24 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell">#{messages['Supply.name']}</th>
-                        <th class="rich-table-headercell">#{messages['Supply.unity']}</th>
-                        <th class="rich-table-headercell">#{messages['Supply.quantity']}</th>
+                        <th class="rich-table-headercell" width="60%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell" width="15%">#{messages['Supply.quantity']}</th>
+                        <th class="rich-table-headercell" width="15%">#{messages['Supply.affect']}</th>
                     </tr>
                     </thead>
                     <c:forEach var="supplyDetail" items="#{productionAction.ingredientSupplyList}" varStatus="row">
                         <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
+                        <c:set var="productInputFieldId" value="productInputField_#{row.index}"/>
 
-                        <tr class="rich-table-row">
+                        <tr class="rich-table-row" style="#{productionAction.hasFormula(supplyDetail)?'background-color: lightyellow':'' }">
                             <td class="rich-table-cell">
                                 <h:outputText value="#{supplyDetail.productItem.fullName}"/>
                             </td>
                             <td class="rich-table-cell">
                                 <h:outputText value="#{supplyDetail.productItem.usageMeasureCode}"/>
                             </td>
-                            <td class="rich-table-cell">
+                            <td class="rich-table-cell" align="center">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{supplyDetail.quantity}"
                                              styleClass="inputSmall right">
@@ -204,6 +212,20 @@
                                                              forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
                                 </h:inputText>
+                            </td>
+                            <td class="rich-table-cell">
+                                <h:selectOneMenu id="#{productInputFieldId}"
+                                                 value="#{supplyDetail.productionProduct}"
+                                                 styleClass="input"
+                                                 required="false"
+                                                 tabindex="7">
+                                    <s:selectItems value="#{productionProductList}"
+                                                   var="product"
+                                                   label="#{product.productItem.name}"
+                                                   noSelectionLabel=""
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
                             </td>
                         </tr>
                     </c:forEach>
@@ -250,7 +272,33 @@
             </s:div>
         </rich:tab>
     </rich:tabPanel>
-    <!--</h:panelGrid>-->
+
+    <rich:spacer height="5" />
+
+    <s:div id="finalProductList">
+    <rich:dataTable id="productList"
+                    value="#{production.productionProductList}"
+                    var="product"
+                    width="100%" columnsWidth="60%, 30%">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
+                <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{product.productItem.fullName}" />
+        </rich:column>
+        <rich:column styleClass="right">
+            <h:outputText value="#{product.quantity}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+            </h:outputText>
+        </rich:column>
+
+    </rich:dataTable>
+    </s:div>
+
 </h:form>
 
     <s:decorate id="productItemsByWarehouseListModalPanelContainer"

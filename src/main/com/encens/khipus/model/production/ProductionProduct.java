@@ -48,7 +48,7 @@ public class ProductionProduct implements BaseModel {
     private BigDecimal quantity;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "idproduccion", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproduccion", nullable = true, updatable = true, insertable = true)
     private Production production;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)

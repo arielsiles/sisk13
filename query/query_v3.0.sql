@@ -35,7 +35,6 @@ drop table tanqueprod;
 drop table insumoformula;
 drop table formulacion;
 
-
 drop table pr_insumoformula;
 drop table pr_producido;
 drop table pr_insumo;
@@ -43,7 +42,6 @@ drop table pr_produccion;
 drop table pr_formula;
 drop table pr_plan;
 drop table pr_tanque;
-
 
 create table pr_formula (
 	idformula bigint(20) not null,
@@ -169,6 +167,11 @@ insert into pr_categoria values(5, 'QUESO', 0, 1);
 
 /** 24.04.2019 **/
 alter table pr_insumo add column tipo varchar(15) after costouni;
+
+/** 26.04.2019 **/
+alter table pr_insumo add column idinsumoformula bigint(20) after tipo;
+alter table pr_insumo add column idproducto bigint(20) after idproduccion;
+
 
 
 
