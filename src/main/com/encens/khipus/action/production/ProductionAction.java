@@ -147,6 +147,14 @@ public class ProductionAction extends GenericAction<Production> {
         productionService.assignProduct(getInstance(), product);
     }
 
+    public void removeSupply(Supply supply){
+
+    }
+
+    public void removeProductionProduct(ProductionProduct product){
+        productionService.removeProductionProduct(product);
+    }
+
     public boolean hasFormula(Supply supply){
 
         boolean result = false;

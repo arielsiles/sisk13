@@ -60,7 +60,7 @@ public class Supply implements BaseModel {
     private FormulationInput formulationInput;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "idproducto", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproducto", nullable = true, updatable = true, insertable = true)
     private ProductionProduct productionProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

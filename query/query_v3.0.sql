@@ -172,7 +172,8 @@ alter table pr_insumo add column tipo varchar(15) after costouni;
 alter table pr_insumo add column idinsumoformula bigint(20) after tipo;
 alter table pr_insumo add column idproducto bigint(20) after idproduccion;
 
-
+alter table pr_insumo add foreign key (idinsumoformula) references pr_insumoformula(idinsumoformula);
+alter table pr_insumo add foreign key (idproducto) references pr_producto(idproducto);
 
 
 

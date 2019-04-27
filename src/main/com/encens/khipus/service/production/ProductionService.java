@@ -21,5 +21,5 @@ public interface ProductionService {
     void createProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
     void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
     void assignProduct(Production production, ProductionProduct product);
-
+    void removeProductionProduct(ProductionProduct product);
 }

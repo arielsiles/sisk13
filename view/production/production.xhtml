@@ -186,10 +186,11 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="60%">#{messages['Supply.name']}</th>
-                        <th class="rich-table-headercell" width="10%">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell" width="55%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="5%">#{messages['Supply.unity']}</th>
                         <th class="rich-table-headercell" width="15%">#{messages['Supply.quantity']}</th>
-                        <th class="rich-table-headercell" width="15%">#{messages['Supply.affect']}</th>
+                        <th class="rich-table-headercell" width="20%">#{messages['Supply.affect']}</th>
+                        <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
                     <c:forEach var="supplyDetail" items="#{productionAction.ingredientSupplyList}" varStatus="row">
@@ -208,7 +209,7 @@
                                              value="#{supplyDetail.quantity}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             pattern="#{messages['patterns.decimal4FNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
                                 </h:inputText>
@@ -217,15 +218,26 @@
                                 <h:selectOneMenu id="#{productInputFieldId}"
                                                  value="#{supplyDetail.productionProduct}"
                                                  styleClass="input"
+                                                 rendered="#{!productionAction.hasFormula(supplyDetail)}"
                                                  required="false"
                                                  tabindex="7">
                                     <s:selectItems value="#{productionProductList}"
                                                    var="product"
                                                    label="#{product.productItem.name}"
-                                                   noSelectionLabel=""
+                                                   noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
                                                    hideNoSelectionLabel="false"/>
                                     <s:convertEntity/>
                                 </h:selectOneMenu>
+                            </td>
+                            <td class="rich-table-cell center">
+                                <!-- todo -->
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{productionAction.removeSupply(supplyDetail)}"
+                                                 ajaxSingle="true"
+                                                 reRender="movementDetailListPanel, invoiceDetailListPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
                             </td>
                         </tr>
                     </c:forEach>
@@ -276,27 +288,47 @@
     <rich:spacer height="5" />
 
     <s:div id="finalProductList">
-    <rich:dataTable id="productList"
-                    value="#{production.productionProductList}"
-                    var="product"
-                    width="100%" columnsWidth="60%, 30%">
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
-                <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
-            </rich:columnGroup>
-        </f:facet>
+        <rich:dataTable id="productList"
+                        value="#{production.productionProductList}"
+                        var="product"
+                        width="100%" columnsWidth="60%, 30%, 10$">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
+                    <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
+                    <rich:column>#{messages['Common.action']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
 
-        <rich:column>
-            <h:outputText value="#{product.productItem.fullName}" />
-        </rich:column>
-        <rich:column styleClass="right">
-            <h:outputText value="#{product.quantity}">
-                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-            </h:outputText>
-        </rich:column>
+            <rich:column>
+                <h:outputText value="#{product.productItem.fullName}" />
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{product.quantity}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <!-- todo -->
+                <a4j:commandLink id="removeProductCommandLink"
+                                 title="#{messages['Common.remove']}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 action="#{productionAction.removeProductionProduct(product)}"
+                                 reRender="finalProductList, assignProductionProduct">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
 
-    </rich:dataTable>
+                <!--<a4j:commandLink id="assignCommandLink" value="#{messages['Common.assign']}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 action="#{productionAction.assignProduct(productionProduct)}"
+                                 reRender="assignProductionProduct, ingredientPanel, finalProductList">
+                </a4j:commandLink>-->
+
+            </rich:column>
+
+        </rich:dataTable>
     </s:div>
 
 </h:form>
