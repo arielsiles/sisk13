@@ -79,8 +79,8 @@ public class ProductionServiceBean implements ProductionService {
 
     public void assignProduct(Production production, ProductionProduct product){
 
-        System.out.println("----> Asignando producto terminado: " + product.getProductItem().getFullName());
-        System.out.println("----> Produccion: " + production.getId());
+        //System.out.println("----> Asignando producto terminado: " + product.getProductItem().getFullName());
+        //System.out.println("----> Produccion: " + production.getId());
 
         product.setProduction(production);
         em.merge(product);
@@ -103,9 +103,11 @@ public class ProductionServiceBean implements ProductionService {
         return supplyList;
     }
 
-    public void removeProductionProduct(ProductionProduct product){
+    public void removeProductionProduct(ProductionProduct product, Production production){
         product.setProduction(null);
         em.merge(product);
+        em.flush();
+        em.refresh(production);
         em.flush();
     }
 }
