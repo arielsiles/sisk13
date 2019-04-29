@@ -199,28 +199,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             }
 
             voucherAccoutingService.saveVoucher(voucher);
-
-            /*
-            voucherUpdateAction.setVoucher(voucher);
-            voucherUpdateAction.setDocType(voucherService.getDocType(voucher.getDocumentType()));
-            voucherUpdateAction.setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-            voucherUpdateAction.setInstance(voucher);
-            */
-
-            //setVoucher(voucher);
-            //setDocType(voucherService.getDocType(voucher.getDocumentType()));
-            //setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
-
             setInstance(voucher);
 
             System.out.println("-------------> Relacionando....");
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
-
-            //voucherUpdateAction.setPurchaseDocumentList(purchaseDocumentService.getPurchaseDocumentsByVoucher(voucher));
-            //voucherUpdateAction.setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
-
 
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;

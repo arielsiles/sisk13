@@ -39,12 +39,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return outCome;
     }
 
-    /*@Override
+    @Override
+    @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String create() {
         String outcome = super.create();
-        addCreatedMessage();
+        setOp(OP_UPDATE);
         return outcome;
-    }*/
+    }
 
     @Override
     public String update() {

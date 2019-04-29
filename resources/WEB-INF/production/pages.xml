@@ -513,6 +513,15 @@
 
     <!-- -->
 
+    <page view-id="/production/formulationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{formulationAction.select(formulationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/formulation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/production/productionPlanList.xhtml">
         <end-conversation/>
         <navigation from-action="#{productionPlanAction.select(productionPlanItem)}">
@@ -522,10 +531,28 @@
         </navigation>
     </page>
 
+    <page view-id="/production/formulation.xhtml" no-conversation-view-id="/production/formulationList.xhtml">
+        <navigation from-action="#{formulationAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/formulationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{formulationAction.select(formulationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/formulation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/formulationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/production/productionPlan.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
         <navigation from-action="#{productionPlanAction.create}">
             <rule if-outcome="Success">
-                <redirect view-id="/production/productionPlanList.xhtml"/>
+                <redirect view-id="/production/productionPlan.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{productionPlanAction.update}">

@@ -175,5 +175,7 @@ alter table pr_insumo add column idproducto bigint(20) after idproduccion;
 alter table pr_insumo add foreign key (idinsumoformula) references pr_insumoformula(idinsumoformula);
 alter table pr_insumo add foreign key (idproducto) references pr_producto(idproducto);
 
-
+/** 29.04.2019 **/
+insert into funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) 
+values(253, 'FORMULATION', 10, 15, 'Functionality.production.formulation', 1);
 

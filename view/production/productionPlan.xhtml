@@ -47,7 +47,7 @@
 
         <h:commandButton action="#{productionPlanAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                         rendered="#{productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
@@ -187,70 +187,6 @@
             </s:div>
         </rich:tab>
     </rich:tabPanel>
-    </c:if>
-
-    <rich:spacer height="5" />
-
-    <c:if test="#{productionPlanAction.managed}">
-        <!--<rich:tabPanel switchType="ajax" selectedTab="productionTab">
-            <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true">
-                <rich:dataTable id="productionListId"
-                                value="#{productionDataModel}"
-                                var="productionItem"
-                                rows="#{sessionUser.rowsPerPage}"
-                                width="100%"
-                                columnsWidth="10%, 40%, 30%, 10%, 10%">
-                    <f:facet name="header">
-                        <rich:columnGroup>
-                            <rich:column>
-                                <h:outputText value="#{messages['Production.code']}" />
-                            </rich:column>
-
-                            <rich:column>
-                                <h:outputText value="#{messages['Production.tank']}" />
-                            </rich:column>
-                            <rich:column>
-                                <h:outputText value="#{messages['Production.category']}" />
-                            </rich:column>
-
-                            <rich:column>
-                                <h:outputText value="#{messages['Production.state']}" />
-                            </rich:column>
-
-                            <rich:column styleClass="center">
-                                <h:outputText value="#{messages['Common.action']}" />
-                            </rich:column>
-                        </rich:columnGroup>
-                    </f:facet>
-
-                    <rich:column>
-                        <h:outputText value="#{productionItem.code}" />
-                    </rich:column>
-
-                    <rich:column>
-                        <h:outputText value="#{productionItem.productionTank.name}" />
-                    </rich:column>
-
-                    <rich:column>
-                        <h:outputText value="#{productionItem.formulation.category.name}" />
-                    </rich:column>
-
-                    <rich:column>
-                        <h:outputText value="#{messages[productionItem.state.resourceKey]}"/>
-                    </rich:column>
-
-                    <rich:column styleClass="center">
-                        <h:commandLink value="#{messages['Common.select']}"
-                                       immediate="true"
-                                       action="#{productionAction.select(productionItem)}"
-                                       rendered="#{s:hasPermission('PRODUCTION','VIEW')}" />
-                    </rich:column>
-                </rich:dataTable>
-                <app:dataScroller id="productionListDataScrollerId"
-                                  for="productionListId"
-                                  dataModel="#{productionDataModel}"/>
-            </rich:tab>
-        </rich:tabPanel>-->
     </c:if>
 
 </h:form>
