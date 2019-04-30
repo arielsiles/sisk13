@@ -10,6 +10,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -45,18 +46,41 @@ public class FormulationAction extends GenericAction<Formulation> {
 
     public void removeInput(FormulationInput formulationInput){
 
+        formulationService.removeInput(formulationInput);
+        formulationInputList.remove(formulationInput);
+
+        /*if (contains(formulationInput.getProductItemCode(), formulationInputList)){
+            boolean res = formulationInputList.remove(formulationInput);
+            System.out.println("---------------------> removio? : " + res);
+        }*/
     }
 
 
     public void addIngredientItems(List<ProductItem> productItems) {
+
         for (ProductItem productItem : productItems) {
-            FormulationInput input = new FormulationInput();
-            input.setProductItemCode(productItem.getProductItemCode());
-            input.setProductItem(productItem);
-            formulationInputList.add(input);
+            if (!contains(productItem.getProductItemCode(), formulationInputList)){
+                FormulationInput input = new FormulationInput();
+                input.setProductItemCode(productItem.getProductItemCode());
+                input.setProductItem(productItem);
+                formulationInputList.add(input);
+            }
         }
     }
 
+    private boolean contains(String productItemCode, List<FormulationInput> formulationInputList){
+
+        Iterator<FormulationInput> iterator = formulationInputList.iterator();
+        boolean result = false;
+        while (iterator.hasNext()){
+            FormulationInput item = iterator.next();
+            if (item.getProductItemCode().equals(productItemCode)){
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
     public List<FormulationInput> getFormulationInputList() {
         return formulationInputList;

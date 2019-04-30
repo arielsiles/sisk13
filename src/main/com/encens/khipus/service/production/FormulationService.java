@@ -16,5 +16,6 @@ import java.util.List;
 public interface FormulationService {
 
     void updateFormulation(Formulation formulation, List<FormulationInput> formulationInputList);
+    void removeInput(FormulationInput formulationInput);
 
 }

@@ -40,4 +40,11 @@ public class FormulationServiceBean implements FormulationService {
 
         }
     }
+
+    public void removeInput(FormulationInput formulationInput){
+        if (em.contains(formulationInput)){
+            em.remove(formulationInput);
+            em.flush();
+        }
+    }
 }
