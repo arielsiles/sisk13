@@ -542,6 +542,11 @@
                 <redirect view-id="/production/formulation.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{formulationAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/formulation.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule if-outcome="Cancel">
                 <redirect view-id="/production/formulationList.xhtml"/>

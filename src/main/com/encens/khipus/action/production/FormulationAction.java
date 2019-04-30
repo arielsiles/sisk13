@@ -5,6 +5,7 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.production.Formulation;
 import com.encens.khipus.model.production.FormulationInput;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.production.FormulationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -15,6 +16,9 @@ import java.util.List;
 @Name("formulationAction")
 @Scope(ScopeType.CONVERSATION)
 public class FormulationAction extends GenericAction<Formulation> {
+
+    @In
+    private FormulationService formulationService;
 
     private List<FormulationInput> formulationInputList = new ArrayList<FormulationInput>();
 
@@ -32,6 +36,12 @@ public class FormulationAction extends GenericAction<Formulation> {
         return outCome;
     }
 
+    @Override
+    public String update() {
+
+        formulationService.updateFormulation(getInstance(), formulationInputList);
+        return Outcome.SUCCESS;
+    }
 
     public void removeInput(FormulationInput formulationInput){
 

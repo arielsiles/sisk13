@@ -50,8 +50,6 @@ public class ProductionServiceBean implements ProductionService {
 
         for (Supply supply : ingredientSupplyList){
 
-            System.out.println("-----> supply : " + supply.getProductionProduct());
-
             if (supply.getId() == null){
                 supply.setProduction(production);
                 supply.setType(SupplyType.INGREDIENT);
