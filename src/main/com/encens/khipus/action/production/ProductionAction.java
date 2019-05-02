@@ -7,11 +7,14 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.production.ProductionPlanService;
 import com.encens.khipus.service.production.ProductionService;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -162,6 +165,38 @@ public class ProductionAction extends GenericAction<Production> {
             result = true;
 
         return result;
+    }
+
+    public void recalculateSupplies(){
+
+        List<FormulationInput> formulationInputList = getInstance().getFormulation().getFormulationInputList();
+        HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+        HashMap<String, BigDecimal> supplyMap = new HashMap<String, BigDecimal>();
+
+        String defaultInputCode = "";
+
+        for (FormulationInput formulationInput : formulationInputList){
+            formulationInputMap.put(formulationInput.getProductItemCode(), formulationInput.getQuantity());
+            if (formulationInput.getInputDefault())
+                defaultInputCode = formulationInput.getProductItemCode();
+        }
+
+        for (Supply supply : ingredientSupplyList){
+            supplyMap.put(supply.getProductItemCode(), supply.getQuantity());
+        }
+
+        BigDecimal defaultSupplyInput = supplyMap.get(defaultInputCode);
+
+        for (Supply supply : ingredientSupplyList){
+            if (!supply.getProductItemCode().equals(defaultInputCode) && supply.getFormulationInput() != null){
+                String supplyCode = supply.getProductItemCode();
+                BigDecimal newQuantity = BigDecimalUtil.multiply(formulationInputMap.get(supplyCode), supplyMap.get(defaultInputCode), 6);
+                newQuantity = BigDecimalUtil.divide(newQuantity, formulationInputMap.get(defaultInputCode), 6);
+
+                supply.setQuantity(newQuantity);
+            }
+            System.out.println("-------> Recalculado: " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
+        }
     }
 
     public ProductionTank getProductionTank() {

@@ -3,8 +3,10 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -40,6 +42,10 @@ public class FormulationInput implements BaseModel {
 
     @Column(name = "cod_art")
     private String productItemCode;
+
+    @Column(name = "DEFECTO")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean inputDefault = Boolean.TRUE;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -114,5 +120,13 @@ public class FormulationInput implements BaseModel {
 
     public void setFormulation(Formulation formulation) {
         this.formulation = formulation;
+    }
+
+    public Boolean getInputDefault() {
+        return inputDefault;
+    }
+
+    public void setInputDefault(Boolean inputDefault) {
+        this.inputDefault = inputDefault;
     }
 }

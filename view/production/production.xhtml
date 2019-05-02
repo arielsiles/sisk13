@@ -27,6 +27,16 @@
 
 <div class="buttons">
 
+
+    <a4j:commandButton id="recalculateCommandButton"
+                       action="#{productionAction.recalculateSupplies()}"
+                       value="#{messages['Production.recalculate']}"
+                       styleClass="button"
+                       ajaxSingle="true"
+                       immediate="true"
+                       reRender="ingredientPanel">
+    </a4j:commandButton>
+
     <a4j:commandButton id="addMaterialCommandButton"
                        action="#{productItemByWarehouseDataModel.reset()}"
                        value="#{messages['Production.addMaterial']}"
@@ -211,6 +221,7 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
+                                    <!--<a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" action="#{productionAction.recalculateSupplies()}" />-->
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
                                 </h:inputText>
                             </td>

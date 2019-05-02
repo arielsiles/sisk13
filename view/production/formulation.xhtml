@@ -19,7 +19,7 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyWidth" value="70%"/>
     <ui:param name="selectedTab" value="production"/>
     <ui:define name="body">
 
@@ -50,7 +50,7 @@
 
         <h:commandButton action="#{formulationAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!formulationAction.managed and s:hasPermission('FORMULATION    ','CREATE')}"
+                         rendered="#{!formulationAction.managed and s:hasPermission('FORMULATION','CREATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
@@ -74,40 +74,35 @@
         </c:choose>
     </f:facet>
 
-    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width60percent,width40percent">
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
 
-        <s:div>
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Formulation.state']}</ui:define>
+            <h:outputText value="#{messages[formulation.state.resourceKey]}"/>
+        </s:decorate>
 
-            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Formulation.name']}</ui:define>
-                <h:inputText id="name" value="#{formulation.name}" styleClass="inputLarge" required="true" tabindex="1">
-                </h:inputText>
-            </s:decorate>
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Formulation.name']}</ui:define>
+            <h:inputText id="name" value="#{formulation.name}" styleClass="inputLarge" required="true" tabindex="1">
+            </h:inputText>
+        </s:decorate>
 
-            <s:decorate id="categoryField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Formulation.category']}</ui:define>
-                <h:selectOneMenu id="categoryId"
-                                 value="#{formulation.category}"
-                                 styleClass="input"
-                                 required="false"
-                                 tabindex="7">
-                    <s:selectItems value="#{productionCategoryList}"
-                                   var="productionCategory"
-                                   label="#{productionCategory.name}"
-                                   noSelectionLabel=""
-                                   hideNoSelectionLabel="false"/>
-                    <s:convertEntity/>
-                </h:selectOneMenu>
-            </s:decorate>
+        <s:decorate id="categoryField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Formulation.category']}</ui:define>
+            <h:selectOneMenu id="categoryId"
+                             value="#{formulation.category}"
+                             styleClass="input"
+                             required="false"
+                             tabindex="7">
+                <s:selectItems value="#{productionCategoryList}"
+                               var="productionCategory"
+                               label="#{productionCategory.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
-        </s:div>
-
-        <s:div>
-            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Formulation.state']}</ui:define>
-                <h:outputText value="#{messages[formulation.state.resourceKey]}"/>
-            </s:decorate>
-        </s:div>
     </h:panelGrid>
     </rich:panel>
 
@@ -165,16 +160,21 @@
                             <td class="rich-table-cell">
                                 <h:outputText value="#{formulationInput.productItem.usageMeasureCode}"/>
                             </td>
+                            <c:if test="#{formulationAction.pending}">
                             <td class="rich-table-cell" align="center">
-                                <h:inputText id="#{quantityInputFieldId}"
-                                             value="#{formulationInput.quantity}"
-                                             styleClass="inputSmall right">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimal4FNumber']}"
-                                                             forId="#{quantityInputFieldId}"/>
+                                <h:inputText id="#{quantityInputFieldId}" value="#{formulationInput.quantity}" styleClass="inputSmall right">
+                                    <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimal4FNumber']}" forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
                                 </h:inputText>
                             </td>
+                            </c:if>
+                            <c:if test="#{!formulationAction.pending}">
+                                <td class="rich-table-cell" align="right">
+                                    <h:outputText value="#{formulationInput.quantity}" >
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}" />
+                                    </h:outputText>
+                                </td>
+                            </c:if>
 
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
