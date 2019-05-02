@@ -3,9 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -41,12 +39,12 @@ public class Formulation implements BaseModel {
     @Column(name = "nombre", nullable = false)
     private String name;
 
+    @Column(name = "estado")
+    @Enumerated(EnumType.STRING)
+    private FormulationState state = FormulationState.PEN;
+
     @Column(name = "capacidad", precision = 16, scale = 2)
     private BigDecimal capacity;
-
-    @Column(name = "ACTIVO", nullable = false)
-    @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean active = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoria", nullable = true, updatable = false, insertable = true)
@@ -87,14 +85,6 @@ public class Formulation implements BaseModel {
         this.capacity = capacity;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     public Company getCompany() {
         return company;
     }
@@ -125,5 +115,13 @@ public class Formulation implements BaseModel {
 
     public void setCategory(ProductionCategory category) {
         this.category = category;
+    }
+
+    public FormulationState getState() {
+        return state;
+    }
+
+    public void setState(FormulationState state) {
+        this.state = state;
     }
 }

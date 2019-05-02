@@ -44,13 +44,13 @@
 
             <rich:dataTable value="#{formulationDataModel}" var="formulationItem" id="formulationListId"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="60%, 20%, 20%">
+                            width="100%" columnsWidth="50%, 20%, 15%, 15%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
                         <rich:column>#{messages['Formulation.name']}</rich:column>
-
                         <rich:column>#{messages['Formulation.category']}</rich:column>
+                        <rich:column>#{messages['Formulation.state']}</rich:column>
 
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
@@ -63,6 +63,10 @@
 
                 <rich:column>
                     <h:outputText value="#{formulationItem.category.name}" />
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[formulationItem.state.resourceKey]}" />
                 </rich:column>
 
                 <rich:column styleClass="center">

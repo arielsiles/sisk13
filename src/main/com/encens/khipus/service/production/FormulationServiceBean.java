@@ -37,8 +37,9 @@ public class FormulationServiceBean implements FormulationService {
                 em.merge(formulationInput);
                 em.flush();
             }
-
         }
+        em.merge(formulation);
+        em.flush();
     }
 
     public void removeInput(FormulationInput formulationInput){

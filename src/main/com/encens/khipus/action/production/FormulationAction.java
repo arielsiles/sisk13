@@ -4,6 +4,7 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.production.Formulation;
 import com.encens.khipus.model.production.FormulationInput;
+import com.encens.khipus.model.production.FormulationState;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.production.FormulationService;
 import org.jboss.seam.ScopeType;
@@ -49,12 +50,19 @@ public class FormulationAction extends GenericAction<Formulation> {
         formulationService.removeInput(formulationInput);
         formulationInputList.remove(formulationInput);
 
-        /*if (contains(formulationInput.getProductItemCode(), formulationInputList)){
-            boolean res = formulationInputList.remove(formulationInput);
-            System.out.println("---------------------> removio? : " + res);
-        }*/
     }
 
+    public void approveFormulation(){
+        Formulation formulation = getInstance();
+        formulation.setState(FormulationState.APR);
+        formulationService.updateFormulation(formulation, formulationInputList);
+    }
+
+    public void annulFormulation(){
+        Formulation formulation = getInstance();
+        formulation.setState(FormulationState.ANL);
+        formulationService.updateFormulation(formulation, formulationInputList);
+    }
 
     public void addIngredientItems(List<ProductItem> productItems) {
 
@@ -80,6 +88,18 @@ public class FormulationAction extends GenericAction<Formulation> {
             }
         }
         return result;
+    }
+
+    public boolean isPending(){
+        return getInstance().getState().equals(FormulationState.PEN);
+    }
+
+    public boolean isApproved(){
+        return getInstance().getState().equals(FormulationState.APR);
+    }
+
+    public boolean isAnnulled(){
+        return getInstance().getState().equals(FormulationState.ANL);
     }
 
     public List<FormulationInput> getFormulationInputList() {

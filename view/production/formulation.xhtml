@@ -9,71 +9,59 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-<ui:define name="pageTitle">
-    <c:choose>
-        <c:when test="#{formulationAction.managed}">
-            #{messages['Formulation.edit']}
-        </c:when>
-        <c:otherwise>
-            #{messages['Formulation.new']}
-        </c:otherwise>
-    </c:choose>
-</ui:define>
-<ui:param name="bodyWidth" value="70%"/>
-<ui:param name="selectedTab" value="production"/>
-<ui:define name="body">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{formulationAction.managed}">
+                #{messages['Formulation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Formulation.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="production"/>
+    <ui:define name="body">
 
-<h:form id="productionForm">
+    <h:form id="productionForm">
 
-<div class="buttons">
+    <div class="buttons">
 
-    <a4j:commandButton id="addMaterialCommandButton"
-                       action="#{productItemByWarehouseDataModel.reset()}"
-                       value="#{messages['Production.addMaterial']}"
-                       styleClass="button"
-                       immediate="true"
-                       oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
-                       actionListener="#{selectPopUpAction.select}"
-                       rendered="#{formulationAction.managed}"
-                       reRender="productItemsByWarehouseListModalPanel">
-        <f:attribute name="entityManagerName" value=""/>
-        <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
-    </a4j:commandButton>
+        <h:commandButton action="#{formulationAction.annulFormulation}" value="#{messages['Common.annul']}"
+                         styleClass="button"
+                         rendered="#{formulationAction.managed and formulationAction.approved and s:hasPermission('FORMULATION','UPDATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <a4j:commandButton id="addIngredientCommandButton"
-                       action="#{productItemByWarehouseDataModel.reset()}"
-                       value="#{messages['Production.addIngredient']}"
-                       styleClass="button"
-                       immediate="true"
-                       oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
-                       actionListener="#{selectPopUpAction.select}"
-                       rendered="#{formulationAction.managed}"
-                       reRender="ingredientItemsByWarehouseListModalPanel">
-        <f:attribute name="entityManagerName" value=""/>
-        <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
-    </a4j:commandButton>
+        <h:commandButton action="#{formulationAction.approveFormulation}" value="#{messages['Common.approve']}"
+                         styleClass="button"
+                         rendered="#{formulationAction.managed and formulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <h:commandButton action="#{formulationAction.update}" value="#{messages['Common.update']}"
-                     styleClass="button"
-                     rendered="#{formulationAction.managed and s:hasPermission('FORMULATION','UPDATE')}"
-                     tabindex="1">
-        <s:defaultAction/>
-    </h:commandButton>
+        <h:commandButton action="#{formulationAction.update}" value="#{messages['Common.update']}"
+                         styleClass="button"
+                         rendered="#{formulationAction.managed and formulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <h:commandButton action="#{formulationAction.create}" value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{!formulationAction.managed and s:hasPermission('FORMULATION    ','CREATE')}"
-                     tabindex="1">
-        <s:defaultAction/>
-    </h:commandButton>
+        <h:commandButton action="#{formulationAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!formulationAction.managed and s:hasPermission('FORMULATION    ','CREATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <h:commandButton action="#{formulationAction.cancel}" value="#{messages['Common.cancel']}"
-                     styleClass="button" immediate="true"
-                     tabindex="4">
-    </h:commandButton>
-</div>
+        <h:commandButton action="#{formulationAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="4">
+        </h:commandButton>
+    </div>
 
-<rich:panel id="formPanel">
+    <rich:panel id="formPanel">
 
     <f:facet name="header">
         <c:choose>
@@ -86,13 +74,13 @@
         </c:choose>
     </f:facet>
 
-    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width60percent,width40percent">
 
         <s:div>
 
             <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Formulation.name']}</ui:define>
-                <h:inputText id="name" value="#{formulation.name}" styleClass="input" required="true" tabindex="1">
+                <h:inputText id="name" value="#{formulation.name}" styleClass="inputLarge" required="true" tabindex="1">
                 </h:inputText>
             </s:decorate>
 
@@ -114,26 +102,56 @@
 
         </s:div>
 
-        <s:div id="assignProductionProduct">
-
+        <s:div>
+            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Formulation.state']}</ui:define>
+                <h:outputText value="#{messages[formulation.state.resourceKey]}"/>
+            </s:decorate>
         </s:div>
     </h:panelGrid>
-</rich:panel>
+    </rich:panel>
 
-    <rich:spacer height="5" />
+    <div class="buttons">
+        <!--<a4j:commandButton id="addMaterialCommandButton"
+                               action="#{productItemByWarehouseDataModel.reset()}"
+                               value="#{messages['Production.addMaterial']}"
+                               styleClass="button"
+                               immediate="true"
+                               oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                               actionListener="#{selectPopUpAction.select}"
+                               rendered="#{formulationAction.managed}"
+                               reRender="productItemsByWarehouseListModalPanel">
+                <f:attribute name="entityManagerName" value=""/>
+                <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+            </a4j:commandButton>-->
+
+        <a4j:commandButton id="addIngredientCommandButton"
+                           action="#{productItemByWarehouseDataModel.reset()}"
+                           value="#{messages['Production.addIngredient']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           disabled="#{formulationAction.approved or formulationAction.annulled}"
+                           rendered="#{formulationAction.managed}"
+                           reRender="ingredientItemsByWarehouseListModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+        </a4j:commandButton>
+    </div>
+
     <rich:dataTable></rich:dataTable>
 
     <c:if test="#{formulationAction.managed}">
-    <rich:tabPanel selectedTab="ingredientTab">
-        <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">
+    <!--<rich:tabPanel selectedTab="ingredientTab">
+        <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">-->
             <s:div id="ingredientPanel">
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="55%">#{messages['Formulation.name']}</th>
+                        <th class="rich-table-headercell" width="60%">#{messages['Formulation.name']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Formulation.unity']}</th>
                         <th class="rich-table-headercell" width="15%">#{messages['Formulation.quantity']}</th>
-                        <th class="rich-table-headercell" width="20%">#{messages['Supply.affect']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
@@ -157,14 +175,13 @@
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
                                 </h:inputText>
                             </td>
-                            <td class="rich-table-cell">
 
-                            </td>
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
                                                  action="#{formulationAction.removeInput(formulationInput)}"
                                                  ajaxSingle="true"
+                                                 rendered="#{formulationAction.pending}"
                                                  reRender="ingredientPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -174,8 +191,8 @@
 
                 </table>
             </s:div>
-        </rich:tab>
-    </rich:tabPanel>
+        <!--</rich:tab>
+    </rich:tabPanel>-->
 
     <!--<rich:spacer height="5" />
     <rich:tabPanel selectedTab="materialTab">
