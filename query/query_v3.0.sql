@@ -48,7 +48,7 @@ create table pr_formula (
 	nombre varchar(100) not null,
 	capacidad decimal(16, 2) not null,
 	activo int(1),
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,	
 	primary key (idformula)
 );
@@ -58,7 +58,7 @@ create table pr_insumoformula(
 	cantidad decimal(20, 6) not null,
 	cod_art varchar(6) not null,
 	idformula bigint(20) not null,
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idinsumoformula)
 );
@@ -69,7 +69,7 @@ create table pr_plan (
 	idplan bigint(20) not null,
 	nombre varchar(100),
 	fecha date not null unique,
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idplan)
 );
@@ -79,7 +79,7 @@ create table pr_tanque(
 	nombre varchar(255) not null,
 	capacidad decimal(16, 2) not null,
 	codmed varchar(6),
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idtanque)
 );
@@ -92,7 +92,7 @@ create table pr_produccion(
 	idformula bigint(20),
 	idtanque bigint(20),
 	idplan bigint(20),
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idproduccion)
 );
@@ -107,7 +107,7 @@ create table pr_insumo (
 	cantidad decimal(16, 6),
 	costouni decimal(16, 6),
 	idproduccion bigint(20) not null,
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idinsumo)
 );
@@ -121,7 +121,7 @@ create table pr_producto(
 	cantidad decimal(16, 2),
 	idproduccion bigint(20),
 	idplan bigint(20),
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idproducto)	
 );
@@ -151,7 +151,7 @@ insert into gensecuencia values(18, 'PRODUCTION_CODE', 100, 1);
 create table pr_categoria (
 	idcategoria bigint(20) not null,
 	nombre varchar(100),
-	VERSION bigint(20) not null,
+	version bigint(20) not null,
 	idcompania bigint(20) not null,
 	primary key (idcategoria)
 );
@@ -188,3 +188,18 @@ alter table pr_insumoformula add column defecto int(1) after cod_art;
 
 update pr_insumoformula p set p.`defecto` = 0;
 update pr_insumoformula p set p.`defecto` = 1 where p.`cod_art` = 1;
+
+/** 03.05.2019 **/
+create table pr_material(
+	idmaterial bigint(20) not null,
+	cod_art varchar(6) not null,
+	cod_art_mat varchar(6) not null,
+	descri varchar(100),
+	version bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key (idmaterial)
+);
+
+alter table pr_material add foreign key (cod_art) references inv_articulos(cod_art);
+alter table pr_material add foreign key (cod_art_mat) references inv_articulos(cod_art);
+

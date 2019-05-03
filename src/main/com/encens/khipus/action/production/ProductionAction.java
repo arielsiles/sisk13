@@ -121,7 +121,7 @@ public class ProductionAction extends GenericAction<Production> {
             Supply supply = new Supply();
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
-
+            supply.setType(SupplyType.MATERIAL);
             materialSupplyList.add(supply);
         }
     }
@@ -136,7 +136,7 @@ public class ProductionAction extends GenericAction<Production> {
             Supply supply = new Supply();
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
-
+            supply.setType(SupplyType.INGREDIENT);
             ingredientSupplyList.add(supply);
         }
     }
@@ -148,10 +148,33 @@ public class ProductionAction extends GenericAction<Production> {
 
     public void assignProduct(ProductionProduct product){
         productionService.assignProduct(getInstance(), product);
+        addMaterialDefault(product, product.getQuantity());
+    }
+
+    private void addMaterialDefault(ProductionProduct product, BigDecimal quantity){
+
+        List<MaterialInput> materialInputList = productionService.getMaterialInput(product.getProductItemCode());
+
+        for (MaterialInput materialInput : materialInputList){
+            Supply supply = new Supply();
+            supply.setProductItemCode(materialInput.getProductItemMaterialCode());
+            supply.setProductItem(materialInput.getProductItemMaterial());
+            supply.setQuantity(quantity);
+
+            supply.setProductionProduct(product);
+
+            materialSupplyList.add(supply);
+            productionService.assignMaterial(getInstance(), supply);
+        }
+
     }
 
     public void removeSupply(Supply supply){
-
+        productionService.removeSupply(supply);
+        if (supply.getType().equals(SupplyType.INGREDIENT))
+            ingredientSupplyList.remove(supply);
+        if (supply.getType().equals(SupplyType.MATERIAL))
+            materialSupplyList.remove(supply);
     }
 
     public void removeProductionProduct(ProductionProduct product){

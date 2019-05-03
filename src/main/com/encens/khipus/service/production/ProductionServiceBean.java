@@ -1,15 +1,13 @@
 package com.encens.khipus.service.production;
 
-import com.encens.khipus.model.production.Production;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.Supply;
-import com.encens.khipus.model.production.SupplyType;
+import com.encens.khipus.model.production.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,16 +74,23 @@ public class ProductionServiceBean implements ProductionService {
     }
 
     public void assignProduct(Production production, ProductionProduct product){
-
-        //System.out.println("----> Asignando producto terminado: " + product.getProductItem().getFullName());
-        //System.out.println("----> Produccion: " + production.getId());
-
         product.setProduction(production);
         em.merge(product);
         em.flush();
-
         em.refresh(production);
         em.flush();
+    }
+
+    public void assignMaterial(Production production, Supply supply){
+        supply.setProduction(production);
+        if (supply.getId() == null){
+            supply.setType(SupplyType.MATERIAL);
+            em.persist(supply);
+            em.flush();
+        }else {
+            em.merge(supply);
+            em.flush();
+        }
 
     }
 
@@ -107,5 +112,26 @@ public class ProductionServiceBean implements ProductionService {
         em.flush();
         em.refresh(production);
         em.flush();
+    }
+
+    public void removeSupply(Supply supply){
+
+        if (em.contains(supply)){
+            em.remove(supply);
+            em.flush();
+        }
+    }
+
+    public List<MaterialInput> getMaterialInput(String productItemCode){
+
+        List<MaterialInput> materialInputList = new ArrayList<MaterialInput>();
+
+        materialInputList = (List<MaterialInput>)em.createQuery(
+                "select m from MaterialInput m " +
+                   "where m.productItemCode =:productItemCode ")
+                .setParameter("productItemCode", productItemCode)
+                .getResultList();
+
+        return materialInputList;
     }
 }
