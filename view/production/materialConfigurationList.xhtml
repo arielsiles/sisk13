@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ProductionPlan.list']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="production"/>
+    <ui:define name="body">
+        <h:form id="productionPlanSearch">
+
+            <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['ProductionPlan.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Formulation.name']}</ui:define>
+                    <h:inputText id="name" value="#{materialInputDataModel.name}"
+                                 tabindex="1"
+                                 styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{materialInputDataModel.search}"
+                                       reRender="materialInputListId, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <!--<rich:jQuery selector="#year" query="focus()" timing="onload"/>-->
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/production/materialConfiguration.xhtml"
+                          styleClass="button"
+                          rendered="#{s:hasPermission('FORMULATION','CREATE')}"
+                          propagation="none"
+                          tabindex="4"/>
+            </div>
+
+            <rich:dataTable value="#{materialInputDataModel}" var="materialInputItem" id="materialInputListId"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="40%, 40%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['MaterialInput.product']}</rich:column>
+                        <rich:column>#{messages['MaterialInput.material']}</rich:column>
+                        <rich:column>#{messages['MaterialInput.unity']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{materialInputItem.productItem.fullName}" />
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{materialInputItem.productItemMaterial.fullName}" />
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{materialInputItem.productItemMaterial.usageMeasureCode}" />
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{formulationAction.select(formulationItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="materialInputListId" dataModel="#{materialInputDataModel}"/>
+
+        </h:form>
+    </ui:define>
+</ui:composition>
