@@ -595,4 +595,31 @@
         </navigation>
     </page>
 
+    <page view-id="/production/materialConfigurationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{materialInputAction.select(materialInputItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/materialConfiguration.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/materialConfiguration.xhtml" no-conversation-view-id="/production/materialConfigurationList.xhtml">
+        <navigation from-action="#{materialInputAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{materialInputAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

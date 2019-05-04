@@ -203,3 +203,7 @@ create table pr_material(
 alter table pr_material add foreign key (cod_art) references inv_articulos(cod_art);
 alter table pr_material add foreign key (cod_art_mat) references inv_articulos(cod_art);
 
+/** 04.05.2019 **/
+alter table pr_material add column flag_cant int(1) after descri;
+
+

@@ -159,7 +159,9 @@ public class ProductionAction extends GenericAction<Production> {
             Supply supply = new Supply();
             supply.setProductItemCode(materialInput.getProductItemMaterialCode());
             supply.setProductItem(materialInput.getProductItemMaterial());
-            supply.setQuantity(quantity);
+
+            if (materialInput.getQuantityFlag())
+                supply.setQuantity(quantity);
 
             supply.setProductionProduct(product);
 

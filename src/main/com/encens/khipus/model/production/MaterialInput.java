@@ -5,6 +5,7 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -50,6 +51,10 @@ public class MaterialInput implements BaseModel {
     @JoinColumn(name = "cod_art_mat", referencedColumnName = "cod_art", updatable = false, insertable = false)
     private ProductItem productItemMaterial;
 
+    @Column(name = "flag_cant", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean quantityFlag = Boolean.FALSE;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -88,6 +93,7 @@ public class MaterialInput implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
+        setProductItemCode(productItem.getProductItemCode());
     }
 
     public ProductItem getProductItemMaterial() {
@@ -96,6 +102,7 @@ public class MaterialInput implements BaseModel {
 
     public void setProductItemMaterial(ProductItem productItemMaterial) {
         this.productItemMaterial = productItemMaterial;
+        setProductItemMaterialCode(productItemMaterial.getProductItemCode());
     }
 
     public long getVersion() {
@@ -112,5 +119,13 @@ public class MaterialInput implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public Boolean getQuantityFlag() {
+        return quantityFlag;
+    }
+
+    public void setQuantityFlag(Boolean quantityFlag) {
+        this.quantityFlag = quantityFlag;
     }
 }

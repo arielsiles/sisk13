@@ -39,4 +39,19 @@ public class MaterialInputAction extends GenericAction<MaterialInput> {
         getInstance().setProductItemCode(productItem.getProductItemCode());
     }
 
+    public void assignMaterial(ProductItem productItem){
+        getInstance().setProductItemMaterial(productItem);
+        getInstance().setProductItemMaterialCode(productItem.getProductItemCode());
+    }
+
+    public void clearProductItem(){
+        getInstance().setProductItem(null);
+        getInstance().setProductItemCode(null);
+    }
+
+    public void clearProductItemMaterial(){
+        getInstance().setProductItemMaterial(null);
+        getInstance().setProductItemMaterialCode(null);
+    }
+
 }
