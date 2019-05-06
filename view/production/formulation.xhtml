@@ -144,10 +144,11 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="60%">#{messages['Formulation.name']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Formulation.unity']}</th>
-                        <th class="rich-table-headercell" width="15%">#{messages['Formulation.quantity']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
+                        <th class="rich-table-headercell" width="50%">#{messages['Formulation.name']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Formulation.unity']}</th>
+                        <th class="rich-table-headercell" width="20%">#{messages['Formulation.quantity']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Formulation.default']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
                     <c:forEach var="formulationInput" items="#{formulationAction.formulationInputList}" varStatus="row">
@@ -157,7 +158,7 @@
                             <td class="rich-table-cell">
                                 <h:outputText value="#{formulationInput.productItem.fullName}"/>
                             </td>
-                            <td class="rich-table-cell">
+                            <td class="rich-table-cell center">
                                 <h:outputText value="#{formulationInput.productItem.usageMeasureCode}"/>
                             </td>
                             <c:if test="#{formulationAction.pending}">
@@ -175,6 +176,14 @@
                                     </h:outputText>
                                 </td>
                             </c:if>
+
+                            <td class="rich-table-cell center">
+                                <h:selectBooleanCheckbox 
+                                                         value="#{formulationInput.inputDefault}"
+                                                         disabled="false"
+                                                         tabindex="31">
+                                </h:selectBooleanCheckbox>
+                            </td>
 
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"

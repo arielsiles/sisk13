@@ -44,16 +44,17 @@
 
             <rich:dataTable value="#{materialInputDataModel}" var="materialInputItem" id="materialInputListId"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="40%, 40%, 10%, 10%">
+                            width="100%" columnsWidth="35%, 35%, 10%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>#{messages['MaterialInput.product']}</rich:column>
                         <rich:column>#{messages['MaterialInput.material']}</rich:column>
                         <rich:column>#{messages['MaterialInput.unity']}</rich:column>
+                        <rich:column>#{messages['MaterialInput.defaultQuantity']}</rich:column>
                         <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                     </rich:columnGroup>
                 </f:facet>
-                <rich:column>
+                <rich:column style="background-color: lightyellow">
                     <h:outputText value="#{materialInputItem.productItem.fullName}" />
                 </rich:column>
 
@@ -63,6 +64,10 @@
 
                 <rich:column styleClass="center">
                     <h:outputText value="#{materialInputItem.productItemMaterial.usageMeasureCode}" />
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{materialInputAction.isDefaultQuantity(materialInputItem)}" />
                 </rich:column>
 
                 <rich:column styleClass="center">

@@ -45,7 +45,7 @@ public class FormulationInput implements BaseModel {
 
     @Column(name = "DEFECTO")
     @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean inputDefault = Boolean.TRUE;
+    private Boolean inputDefault = Boolean.FALSE;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({

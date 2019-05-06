@@ -34,6 +34,7 @@
                            styleClass="button"
                            ajaxSingle="true"
                            immediate="true"
+                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientPanel">
         </a4j:commandButton>
 
@@ -44,6 +45,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
+                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="productItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -56,6 +58,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
+                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>

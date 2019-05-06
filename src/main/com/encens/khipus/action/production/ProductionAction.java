@@ -69,6 +69,7 @@ public class ProductionAction extends GenericAction<Production> {
         productionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
         /*setOp(OP_UPDATE);*/
+        super.select(production);
         return Outcome.SUCCESS;
     }
 
@@ -195,6 +196,11 @@ public class ProductionAction extends GenericAction<Production> {
     public void recalculateSupplies(){
 
         List<FormulationInput> formulationInputList = getInstance().getFormulation().getFormulationInputList();
+
+        for (FormulationInput formulationInput : formulationInputList){
+            System.out.println("--> " + formulationInput.getProductItem().getFullName() + " - " + formulationInput.getQuantity() + " - " + formulationInput.getInputDefault());
+        }
+
         HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
         HashMap<String, BigDecimal> supplyMap = new HashMap<String, BigDecimal>();
 
@@ -210,15 +216,16 @@ public class ProductionAction extends GenericAction<Production> {
             supplyMap.put(supply.getProductItemCode(), supply.getQuantity());
         }
 
-        BigDecimal defaultSupplyInput = supplyMap.get(defaultInputCode);
-
+        //BigDecimal defaultSupplyInput = supplyMap.get(defaultInputCode);
         for (Supply supply : ingredientSupplyList){
             if (!supply.getProductItemCode().equals(defaultInputCode) && supply.getFormulationInput() != null){
                 String supplyCode = supply.getProductItemCode();
-                BigDecimal newQuantity = BigDecimalUtil.multiply(formulationInputMap.get(supplyCode), supplyMap.get(defaultInputCode), 6);
-                newQuantity = BigDecimalUtil.divide(newQuantity, formulationInputMap.get(defaultInputCode), 6);
-
-                supply.setQuantity(newQuantity);
+                if (formulationInputMap.get(defaultInputCode).doubleValue() > 0) {
+                    BigDecimal newQuantity = BigDecimalUtil.multiply(formulationInputMap.get(supplyCode), supplyMap.get(defaultInputCode), 6);
+                    newQuantity = BigDecimalUtil.divide(newQuantity, formulationInputMap.get(defaultInputCode), 6);
+                    supply.setQuantity(newQuantity);
+                }else
+                    supply.setQuantity(BigDecimal.ZERO);
             }
             System.out.println("-------> Recalculado: " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
         }

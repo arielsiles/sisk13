@@ -54,4 +54,12 @@ public class MaterialInputAction extends GenericAction<MaterialInput> {
         getInstance().setProductItemMaterialCode(null);
     }
 
+    public String isDefaultQuantity(MaterialInput materialInput){
+        String result = "NO";
+        if (materialInput.getQuantityFlag())
+            result = "SI";
+
+        return result;
+    }
+
 }
