@@ -86,7 +86,11 @@
     <framework:entity-query name="productionTankQuery" ejbql="select p from ProductionTank p"/>
 
     <factory name="formulationList" value="#{formulationQuery}"/>
-    <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p"/>
+    <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p">
+        <framework:restrictions>
+            <value>p.state = #{FormulationState.APR}</value>
+        </framework:restrictions>
+    </framework:entity-query>
 
     <factory name="productionProductList" value="#{productionProductQuery}"/>
     <framework:entity-query name="productionProductQuery" ejbql="select p from ProductionProduct p">

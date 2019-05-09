@@ -11,6 +11,7 @@ import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -91,6 +92,31 @@ public class ProductionAction extends GenericAction<Production> {
         return Outcome.CANCEL;
     }
 
+    public void approve(){
+
+        getInstance().setState(ProductionState.APR);
+        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
+    }
+
+    public boolean isPending(){
+        boolean result = false;
+        if (getInstance().getState().equals(ProductionState.PEN))
+            result = true;
+
+        return result;
+    }
+
+    public boolean isApproved(){
+        boolean result = false;
+        if (isManaged()) {
+            if (getInstance().getState().equals(ProductionState.APR))
+                result = true;
+        }
+        return result;
+    }
+
     public void clearAction(){
         setOp(null);
         setInstance(null);
@@ -147,6 +173,14 @@ public class ProductionAction extends GenericAction<Production> {
         return  productionProductList;
     }
 
+    public boolean existProductionProducts(){
+        boolean result = false;
+        if (this.getProductionProductList().size() > 0)
+            result = true;
+
+        return result;
+    }
+
     public void assignProduct(ProductionProduct product){
         productionService.assignProduct(getInstance(), product);
         addMaterialDefault(product, product.getQuantity());
@@ -163,6 +197,8 @@ public class ProductionAction extends GenericAction<Production> {
 
             if (materialInput.getQuantityFlag())
                 supply.setQuantity(quantity);
+            else
+                supply.setQuantity(BigDecimal.ZERO);
 
             supply.setProductionProduct(product);
 

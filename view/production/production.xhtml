@@ -34,7 +34,7 @@
                            styleClass="button"
                            ajaxSingle="true"
                            immediate="true"
-                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientPanel">
         </a4j:commandButton>
 
@@ -45,7 +45,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="productItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -58,15 +58,25 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
         </a4j:commandButton>
 
+        <h:commandButton action="#{productionAction.approve}" value="#{messages['Common.approve']}"
+                         styleClass="button"
+                         rendered="#{productionAction.managed and
+                                     productionAction.pending and
+                                     !productionAction.existProductionProducts() and
+                                     s:hasPermission('PRODUCTION','UPDATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+
         <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{productionAction.managed and s:hasPermission('PRODUCTION','UPDATE')}"
+                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
@@ -117,12 +127,18 @@
                     </rich:calendar>
                 </s:decorate>-->
 
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Production.state']}</ui:define>
+                    <h:outputText value="#{messages[production.state.resourceKey]}"/>
+                </s:decorate>
+
                 <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
                     <h:selectOneMenu id="productionTank"
                                      value="#{productionAction.productionTank}"
                                      styleClass="input"
                                      required="false"
+                                     disabled="#{productionAction.approved}"
                                      tabindex="7">
                         <s:selectItems value="#{productionTankList}"
                                        var="productionTank"
@@ -139,6 +155,7 @@
                                      value="#{productionAction.formulation}"
                                      styleClass="input"
                                      required="false"
+                                     disabled="#{productionAction.approved}"
                                      tabindex="7">
                         <s:selectItems value="#{formulationList}"
                                        var="formulation"
@@ -220,6 +237,7 @@
                             <td class="rich-table-cell" align="center">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{supplyDetail.quantity}"
+                                             readonly="#{productionAction.approved}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
@@ -234,6 +252,7 @@
                                                  styleClass="input"
                                                  rendered="#{!productionAction.hasFormula(supplyDetail)}"
                                                  required="false"
+                                                 disabled="#{productionAction.approved}"
                                                  tabindex="7">
                                     <s:selectItems value="#{productionProductList}"
                                                    var="product"
@@ -248,6 +267,7 @@
                                                  title="#{messages['Common.remove']}"
                                                  action="#{productionAction.removeSupply(supplyDetail)}"
                                                  ajaxSingle="true"
+                                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
                                                  reRender="ingredientPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -288,9 +308,10 @@
                             <td class="rich-table-cell center">
                                 <h:inputText id="#{quantityMaterialInputFieldId}"
                                              value="#{materialDetail.quantity}"
+                                             required="true"
+                                             readonly="#{productionAction.approved}"
                                              styleClass="inputSmall right">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{quantityMaterialInputFieldId}"/>
 
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="materialPanel" />
@@ -298,11 +319,12 @@
                             </td>
                             <td class="rich-table-cell">
                                 <h:selectOneMenu id="#{productMaterialInputFieldId}"
-                                value="#{materialDetail.productionProduct}"
-                                styleClass="input"
-                                rendered="#{!productionAction.hasFormula(materialDetail)}"
-                                required="false"
-                                tabindex="7">
+                                                 value="#{materialDetail.productionProduct}"
+                                                 styleClass="input"
+                                                 rendered="#{!productionAction.hasFormula(materialDetail)}"
+                                                 required="false"
+                                                 disabled="#{productionAction.approved}"
+                                                 tabindex="7">
                                 <s:selectItems value="#{productionProductList}"
                                                var="product"
                                                label="#{product.productItem.name}"
@@ -318,6 +340,7 @@
                                                  ajaxSingle="true"
                                                  immediate="true"
                                                  action="#{productionAction.removeSupply(materialDetail)}"
+                                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
                                                  reRender="materialPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -360,7 +383,8 @@
                                  ajaxSingle="true"
                                  immediate="true"
                                  action="#{productionAction.removeProductionProduct(product)}"
-                                 reRender="finalProductList, assignProductionProduct">
+                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                 reRender="finalProductList, ingredientPanel, materialPanel, assignProductionProduct">
                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                 </a4j:commandLink>
             </rich:column>

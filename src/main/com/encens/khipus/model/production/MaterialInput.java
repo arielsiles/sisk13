@@ -93,7 +93,7 @@ public class MaterialInput implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
-        setProductItemCode(productItem.getProductItemCode());
+        if (productItem != null) setProductItemCode(productItem.getProductItemCode());
     }
 
     public ProductItem getProductItemMaterial() {
@@ -102,7 +102,7 @@ public class MaterialInput implements BaseModel {
 
     public void setProductItemMaterial(ProductItem productItemMaterial) {
         this.productItemMaterial = productItemMaterial;
-        setProductItemMaterialCode(productItemMaterial.getProductItemCode());
+        if (productItemMaterial != null) setProductItemMaterialCode(productItemMaterial.getProductItemCode());
     }
 
     public long getVersion() {

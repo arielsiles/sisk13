@@ -47,7 +47,6 @@ public class ProductionServiceBean implements ProductionService {
     public void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList){
 
         for (Supply supply : ingredientSupplyList){
-
             if (supply.getId() == null){
                 supply.setProduction(production);
                 supply.setType(SupplyType.INGREDIENT);
@@ -57,7 +56,6 @@ public class ProductionServiceBean implements ProductionService {
                 em.merge(supply);
                 em.flush();
             }
-
         }
 
         for (Supply supply : materialSupplyList){
@@ -71,6 +69,10 @@ public class ProductionServiceBean implements ProductionService {
                 em.flush();
             }
         }
+
+        em.merge(production);
+        em.flush();
+
     }
 
     public void assignProduct(Production production, ProductionProduct product){
