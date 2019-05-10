@@ -88,7 +88,7 @@
     <factory name="formulationList" value="#{formulationQuery}"/>
     <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p">
         <framework:restrictions>
-            <value>p.state = #{FormulationState.APR}</value>
+            <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>
         </framework:restrictions>
     </framework:entity-query>
 
