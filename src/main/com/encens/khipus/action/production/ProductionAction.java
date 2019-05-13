@@ -102,9 +102,10 @@ public class ProductionAction extends GenericAction<Production> {
 
     public boolean isPending(){
         boolean result = false;
-        if (getInstance().getState().equals(ProductionState.PEN))
-            result = true;
-
+        if (isManaged()) {
+            if (getInstance().getState().equals(ProductionState.PEN))
+                result = true;
+        }
         return result;
     }
 
