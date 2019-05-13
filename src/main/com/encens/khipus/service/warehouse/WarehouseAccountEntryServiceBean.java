@@ -527,10 +527,27 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         BigDecimal balanceAmount = BigDecimalUtil.subtract(totalDebitAmount, totalCreditAmount);
 
+        System.out.println("---> Total Debit =  " + totalDebitAmount);
+        System.out.println("---> Total Credit =  " + totalCreditAmount);
+
+
+        /** En caso de haber diferencias, se ajusta en el articulo **/
         if (balanceAmount.doubleValue() > 0) { // Debit major
-            voucherDetail.setCredit(BigDecimalUtil.sum(totalCreditAmount, balanceAmount));
+            System.out.println("----->>>----->>> DIFF: " + balanceAmount);
+            for (VoucherDetail detail : voucher.getDetails()){
+                if (detail.getProductItemCode() != null && detail.getDebit().doubleValue() > 0){
+                    detail.setDebit(BigDecimalUtil.subtract(detail.getDebit(), balanceAmount, 2));
+                    break;
+                }
+            }
         } else if (balanceAmount.doubleValue() < 0) {
-            voucherDetail.setCredit(BigDecimalUtil.subtract(totalCreditAmount, balanceAmount));
+            System.out.println("----->>>----->>> DIFF: " + balanceAmount);
+            for (VoucherDetail detail : voucher.getDetails()){
+                if (detail.getProductItemCode() != null && detail.getDebit().doubleValue() > 0){
+                    detail.setDebit(BigDecimalUtil.sum(detail.getDebit(), BigDecimalUtil.abs(balanceAmount), 2));
+                    break;
+                }
+            }
         }
 
         voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
@@ -1329,13 +1346,6 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
 
-        //String productItemCode = movementDetailService.getCodeByNoTrans(warehouseVoucher.getId().getTransactionNumber());
-
-
-        //Long quantity = movementDetailService.getCantByNoTrans(warehouseVoucher.getId().getTransactionNumber());
-
-        //System.out.println("==============> productItemCode: " + productItemCode + " - " + quantity);
-
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.INPUT_PROD_WAREHOUSE, gloss);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUserProduction().getId());
 
@@ -1714,6 +1724,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             /** Cuenta para reprocesos **/
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.W))
                 debitCashAccount = companyConfiguration.getReworkAccount();
+
+            System.out.println("======> aaaaa : " + movementDetail.getProductItem().getFullName() + " - " + detailAmount);
 
             voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnit.getExecutorUnitCode(),
