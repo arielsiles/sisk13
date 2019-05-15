@@ -67,18 +67,6 @@ CREATE OR REPLACE VIEW ventas AS
 
 -- ----------------------------------------------------------------------
 -- 5. VISTA Bajas de Productos
--- CREATE VIEW inv_bajas AS
-SELECT d.`cod_art`, a.`descri`, SUM(d.`cantidad`) AS cantidad
-FROM inv_movdet d
-LEFT JOIN inv_mov m   ON d.`no_trans` = m.`no_trans`
-LEFT JOIN inv_vales v ON m.`no_trans` = v.`no_trans`
-LEFT JOIN inv_articulos a ON d.`cod_art` = a.`cod_art`
-WHERE v.`cod_doc` = 'BAJ'
-AND v.`fecha` BETWEEN '2017-01-01' AND '2017-12-31'
-AND v.`estado` IN ('APR', 'PEN')
-GROUP BY d.`cod_art`, a.`descri`;
-
---
 -- CREATE OR REPLACE VIEW inv_bajas AS
 SELECT d.`no_trans`,v.fecha, m.`fecha_cre`, d.`cod_art`, a.`descri`, d.`cantidad`, d.`costounitario`, d.`preciounitcompra`, v.cod_alm
 FROM inv_movdet d

@@ -7,7 +7,7 @@ FROM (
 	SELECT p.cod_art, (p.saldofis * p.costouni) AS debe, 0 AS haber, p.saldofis AS cant_d, 0 AS cant_h
 	FROM inv_periodo p
 	WHERE p.cod_alm = 2
-	AND p.mes = 1
+	AND p.mes = 4
 	AND p.gestion = 2019
 	AND p.saldofis > 0
 	UNION
@@ -15,7 +15,7 @@ FROM (
 	SELECT d.cod_art, SUM(d.monto) AS debe, 0 AS haber, SUM(d.cantidad) AS cant_d, 0 AS cant_h
 	FROM inv_movdet d
 	LEFT JOIN inv_vales v ON d.no_trans = v.no_trans
-	WHERE v.fecha BETWEEN '2019-01-01' AND '2019-01-31'
+	WHERE v.fecha BETWEEN '2019-01-01' AND '2019-04-30'
 	AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL
 	GROUP BY d.cod_art
 	UNION
@@ -23,7 +23,7 @@ FROM (
 	SELECT d.cod_art, SUM(d.monto) AS debe, 0 AS haber, SUM(d.cantidad) cant_d, 0 AS cant_h
 	FROM inv_vales i
 	JOIN inv_movdet d ON i.no_trans = d.no_trans
-	WHERE i.fecha BETWEEN '2019-01-01' AND '2019-01-31'
+	WHERE i.fecha BETWEEN '2019-01-01' AND '2019-04-30'
 	AND i.cod_alm = 2
 	AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL)
 	GROUP BY d.cod_art
@@ -33,7 +33,7 @@ FROM (
 	FROM inv_movdet d
 	LEFT JOIN inv_vales v ON d.`no_trans` = v.`no_trans`
 	LEFT JOIN sf_tmpdet t ON v.`idtmpenc` = t.`id_tmpenc`
-	WHERE v.`fecha` BETWEEN '2019-01-01' AND '2019-01-31'
+	WHERE v.`fecha` BETWEEN '2019-01-01' AND '2019-04-30'
 	AND v.`oper` IS NOT NULL
 	AND d.`cod_art` = t.`cod_art`
 	GROUP BY d.`cod_art`
@@ -54,7 +54,7 @@ SELECT z.cod_art, SUM(z.monto) / SUM(z.cantidad) FROM (
 	SELECT d.cod_art, d.monto, d.cantidad
 	FROM inv_movdet d
 	LEFT JOIN inv_vales v ON d.no_trans = v.no_trans
-	WHERE v.fecha BETWEEN '2019-01-01' AND '2019-01-31'
+	WHERE v.fecha BETWEEN '2019-01-01' AND '2019-04-30'
 	AND v.cod_alm = 5 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL
 ) z
 GROUP BY z.cod_art
