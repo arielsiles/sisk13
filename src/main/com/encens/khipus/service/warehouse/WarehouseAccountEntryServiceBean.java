@@ -1912,12 +1912,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 "select voucher from WarehouseVoucher voucher " +
                 " where voucher.operation in (:TP, :BA, :DE) " +
                 " and voucher.date between :startDate and :endDate " +
+                " and voucher.state =:state " +
                 " and voucher.voucher is null ")
                 .setParameter("TP", VoucherOperation.TP)
                 .setParameter("BA", VoucherOperation.BA)
                 .setParameter("DE", VoucherOperation.DE)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
                 .getResultList();
 
         return warehouseVoucherList;
