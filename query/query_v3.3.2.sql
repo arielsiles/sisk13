@@ -1,0 +1,5 @@
+/** 17.05.2019 **/
+UPDATE SECUENCIA SET VALOR=(SELECT MAX(E.`idcostosindirectosconf`)+1 FROM costosindirectosconf E) WHERE TABLA='COSTOSINDIRECTOSCONF';
+UPDATE SECUENCIA SET VALOR=(SELECT MAX(z.`idcostosindirectos`)+1 FROM costosindirectos z) WHERE TABLA='COSTOSINDIRECTOS';
+UPDATE SECUENCIA SET VALOR=(SELECT MAX(z.`idperiodocostoindirecto`)+1 FROM periodocostoindirecto z) WHERE TABLA='PERIODOCOSTOINDIRECTO';
+

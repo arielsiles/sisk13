@@ -20,7 +20,7 @@ import java.math.BigDecimal;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "COSTOSINDIRECTOS",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "COSTOSINDIRECTOS")

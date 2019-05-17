@@ -88,4 +88,12 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return  result;
     }
 
+    public double getTotalWeighed(ProductionPlan productionPlan){
+
+        double result = productionPlanService.findTotalWeighed(productionPlan.getDate());
+        return result;
+
+    }
+
+
 }

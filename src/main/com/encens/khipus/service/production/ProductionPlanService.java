@@ -4,6 +4,7 @@ import com.encens.khipus.model.production.ProductionPlan;
 import com.encens.khipus.model.production.ProductionProduct;
 
 import javax.ejb.Local;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,5 +18,6 @@ public interface ProductionPlanService {
 
     void updateProductionPlan(ProductionPlan productionPlan, List<ProductionProduct> productList);
     List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan);
+    double findTotalWeighed(Date date);
 
 }

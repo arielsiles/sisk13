@@ -1,5 +1,6 @@
 package com.encens.khipus.service.production;
 
+import com.encens.khipus.model.production.CollectionForm;
 import com.encens.khipus.model.production.ProductionPlan;
 import com.encens.khipus.model.production.ProductionProduct;
 import org.jboss.seam.annotations.AutoCreate;
@@ -8,7 +9,9 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,4 +54,25 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
 
         return  productionProductList;
     }
+
+    public double findTotalWeighed(Date date){
+
+        double result = 0.0;
+        try {
+            CollectionForm collectionForm = (CollectionForm)em.createQuery(" select collectionForm from CollectionForm collectionForm" +
+                    " where collectionForm.date = :date ")
+                    .setParameter("date",date)
+                    .getSingleResult();
+
+            if (collectionForm != null)
+                result = collectionForm.getTotalWeighed();
+
+        }catch (NoResultException exception){
+            result = 0;
+        }
+
+        return result;
+    }
+
+
 }
