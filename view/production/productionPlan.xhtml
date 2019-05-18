@@ -108,11 +108,12 @@
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 40%, 30%, 10%, 10%">
+                            columnsWidth="10%, 35%, 15%, 20%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column><h:outputText value="#{messages['Production.code']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.tank']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['Production.destinedMilk']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.category']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.state']}" /></rich:column>
                         <rich:column styleClass="center"><h:outputText value="#{messages['Common.action']}" /></rich:column>
@@ -125,6 +126,10 @@
 
                 <rich:column>
                     <h:outputText value="#{productionItem.productionTank.name}" />
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productionPlanAction.getDestinedMilk(productionItem)}" />
                 </rich:column>
 
                 <rich:column>
