@@ -8,5 +8,6 @@ package com.encens.khipus.model.production;
  */
 public enum MeasurementUnit {
     KG,
+    GR,
     LT
 }

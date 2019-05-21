@@ -169,6 +169,22 @@ public class ProductionAction extends GenericAction<Production> {
         }
     }
 
+
+    public BigDecimal getSupplyUnitCost(Supply supplyDetail){
+
+        BigDecimal unitCost = supplyDetail.getProductItem().getUnitCost();
+
+        if (supplyDetail.hasFormula() ){
+            //unitCost = supplyDetail.getProductItem().getUnitCost();
+            if (supplyDetail.getFormulationInput().hasSecondFormula()){
+                unitCost = calculateCost_compoundSupply(supplyDetail);
+            }
+        }
+
+        return unitCost;
+    }
+
+
     public List<ProductionProduct> getProductionProductList(){
         List<ProductionProduct> productionProductList = productionPlanService.getProductionProductList(getInstance().getProductionPlan());
         return  productionProductList;
@@ -266,6 +282,46 @@ public class ProductionAction extends GenericAction<Production> {
             }
             System.out.println("-------> Recalculado: " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
         }
+    }
+
+
+    public BigDecimal calculateCost_compoundSupply(Supply supplyDetail){
+
+        BigDecimal quantity = supplyDetail.getQuantity();
+        System.out.println("=======> Supply: " + supplyDetail.getProductItem().getFullName() + " - Q: " + quantity);
+        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+
+        HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+
+        BigDecimal totalQuantityFormula = BigDecimal.ZERO;
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityVal = formulationInput.getQuantity();
+            if (formulationInput.getProductItem().getUsageMeasureUnit().getMeasureUnitCode().equals("GR")){
+                quantityVal = BigDecimalUtil.divide(quantityVal, BigDecimalUtil.toBigDecimal(1000), 6);
+            }
+            totalQuantityFormula = BigDecimalUtil.sum(totalQuantityFormula, quantityVal, 6);
+            formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
+        }
+
+        System.out.println("=======> Total Quantity Formula: " + totalQuantityFormula);
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityVal = formulationInputMap.get(formulationInput.getProductItemCode());
+            BigDecimal newQuantity = BigDecimalUtil.multiply(quantity, quantityVal, 6);
+                       newQuantity = BigDecimalUtil.divide(newQuantity, totalQuantityFormula, 6);
+
+            if (formulationInput.getProductItem().getUsageMeasureUnit().getMeasureUnitCode().equals("GR")){
+                newQuantity = BigDecimalUtil.divide(newQuantity, BigDecimalUtil.toBigDecimal(1000), 6);
+            }
+
+            BigDecimal cost = BigDecimalUtil.multiply(newQuantity, formulationInput.getProductItem().getUnitCost(), 6);
+            totalCost = BigDecimalUtil.sum(totalCost, cost, 6);
+
+            System.out.println("=======> " + formulationInput.getProductItem().getFullName() + " - " + newQuantity + " - " + cost);
+        }
+        System.out.println("=======> calculateCost_compoundSupply: " + totalCost);
+        return totalCost;
     }
 
     public ProductionTank getProductionTank() {
