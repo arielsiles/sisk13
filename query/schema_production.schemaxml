@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">khipus</database>
+<database charset="utf8" collation="utf8_general_ci">caiscdev</database>
 </source>
 <canvas zoom="100">
 <tables>
-<table name="pr_plan" view="colnames">
-<left>235</left>
-<top>453</top>
-<width>149</width>
-<height>159</height>
-<sql_create_table>CREATE TABLE `pr_plan` (
-  `idplan` bigint(20) NOT NULL,
-  `nombre` varchar(100) DEFAULT NULL,
-  `fecha` date NOT NULL,
-  `VERSION` bigint(20) NOT NULL,
-  `idcompania` bigint(20) NOT NULL,
-  PRIMARY KEY (`idplan`),
-  UNIQUE KEY `fecha` (`fecha`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
-</table>
 <table name="pr_formula" view="colnames">
-<left>790</left>
-<top>524</top>
-<width>145</width>
-<height>206</height>
+<left>992</left>
+<top>576</top>
+<width>143</width>
+<height>214</height>
 <sql_create_table>CREATE TABLE `pr_formula` (
   `idformula` bigint(20) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `capacidad` decimal(16,2) NOT NULL,
+  `estado` varchar(3) DEFAULT NULL,
+  `totaleq` decimal(16,2) NOT NULL,
+  `capacidad` decimal(16,2) DEFAULT NULL,
   `activo` int(1) DEFAULT NULL,
   `idcategoria` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
@@ -39,31 +26,37 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumoformula" view="colnames">
-<left>1081</left>
-<top>481</top>
-<width>141</width>
-<height>175</height>
+<left>1331</left>
+<top>507</top>
+<width>192</width>
+<height>197</height>
 <sql_create_table>CREATE TABLE `pr_insumoformula` (
   `idinsumoformula` bigint(20) NOT NULL,
   `cantidad` decimal(20,6) NOT NULL,
   `cod_art` varchar(6) NOT NULL,
+  `defecto` int(1) DEFAULT NULL,
   `idformula` bigint(20) NOT NULL,
+  `idform` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idinsumoformula`),
   KEY `idformula` (`idformula`),
-  CONSTRAINT `pr_insumoformula_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `pr_formula` (`idformula`)
+  KEY `idform` (`idform`),
+  CONSTRAINT `pr_insumoformula_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `pr_formula` (`idformula`),
+  CONSTRAINT `pr_insumoformula_ibfk_2` FOREIGN KEY (`idform`) REFERENCES `pr_formula` (`idformula`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_produccion" view="colnames">
-<left>570</left>
-<top>220</top>
-<width>152</width>
-<height>229</height>
+<left>342</left>
+<top>353</top>
+<width>185</width>
+<height>250</height>
 <sql_create_table>CREATE TABLE `pr_produccion` (
   `idproduccion` bigint(20) NOT NULL,
   `codigo` int(11) DEFAULT NULL,
   `estado` varchar(5) DEFAULT NULL,
+  `costototal` decimal(16,2) DEFAULT '0.00',
+  `totalmp` decimal(16,2) DEFAULT '0.00',
   `descripcion` varchar(255) DEFAULT NULL,
   `idformula` bigint(20) DEFAULT NULL,
   `idtanque` bigint(20) DEFAULT NULL,
@@ -79,11 +72,77 @@
   CONSTRAINT `pr_produccion_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `pr_plan` (`idplan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
+<table name="pr_insumo" view="colnames">
+<left>980</left>
+<top>79</top>
+<width>151</width>
+<height>248</height>
+<sql_create_table>CREATE TABLE `pr_insumo` (
+  `idinsumo` bigint(20) NOT NULL,
+  `cod_art` varchar(6) DEFAULT NULL,
+  `cantidad` decimal(16,6) NOT NULL DEFAULT '0.000000',
+  `costouni` decimal(16,6) DEFAULT NULL,
+  `tipo` varchar(15) DEFAULT NULL,
+  `idinsumoformula` bigint(20) DEFAULT NULL,
+  `idproduccion` bigint(20) NOT NULL,
+  `idproducto` bigint(20) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idinsumo`),
+  KEY `idproduccion` (`idproduccion`),
+  KEY `idinsumoformula` (`idinsumoformula`),
+  KEY `idproducto` (`idproducto`),
+  CONSTRAINT `pr_insumo_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`),
+  CONSTRAINT `pr_insumo_ibfk_2` FOREIGN KEY (`idinsumoformula`) REFERENCES `pr_insumoformula` (`idinsumoformula`),
+  CONSTRAINT `pr_insumo_ibfk_3` FOREIGN KEY (`idproducto`) REFERENCES `pr_producto` (`idproducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="pr_material" view="colnames">
+<left>1302</left>
+<top>44</top>
+<width>180</width>
+<height>216</height>
+<sql_create_table>CREATE TABLE `pr_material` (
+  `idmaterial` bigint(20) NOT NULL,
+  `cod_art` varchar(6) NOT NULL,
+  `cod_art_mat` varchar(6) NOT NULL,
+  `descri` varchar(100) DEFAULT NULL,
+  `flag_cant` int(1) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idmaterial`),
+  KEY `cod_art` (`cod_art`),
+  KEY `cod_art_mat` (`cod_art_mat`),
+  CONSTRAINT `pr_material_ibfk_1` FOREIGN KEY (`cod_art`) REFERENCES `inv_articulos` (`cod_art`),
+  CONSTRAINT `pr_material_ibfk_2` FOREIGN KEY (`cod_art_mat`) REFERENCES `inv_articulos` (`cod_art`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="pr_producto" view="colnames">
+<left>624</left>
+<top>18</top>
+<width>152</width>
+<height>197</height>
+<sql_create_table>CREATE TABLE `pr_producto` (
+  `idproducto` bigint(20) NOT NULL,
+  `cod_art` varchar(6) DEFAULT NULL,
+  `cantidad` decimal(16,2) DEFAULT NULL,
+  `idproduccion` bigint(20) DEFAULT NULL,
+  `idplan` bigint(20) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idproducto`),
+  KEY `idproduccion` (`idproduccion`),
+  KEY `idplan` (`idplan`),
+  CONSTRAINT `pr_producto_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`),
+  CONSTRAINT `pr_producto_ibfk_2` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`),
+  CONSTRAINT `pr_producto_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `pr_plan` (`idplan`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
 <table name="pr_tanque" view="colnames">
-<left>204</left>
-<top>115</top>
-<width>135</width>
-<height>190</height>
+<left>87</left>
+<top>579</top>
+<width>157</width>
+<height>197</height>
 <sql_create_table>CREATE TABLE `pr_tanque` (
   `idtanque` bigint(20) NOT NULL,
   `nombre` varchar(255) NOT NULL,
@@ -94,22 +153,19 @@
   PRIMARY KEY (`idtanque`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
-<table name="pr_insumo" view="colnames">
-<left>897</left>
-<top>44</top>
-<width>175</width>
-<height>206</height>
-<sql_create_table>CREATE TABLE `pr_insumo` (
-  `idinsumo` bigint(20) NOT NULL,
-  `cod_art` varchar(6) DEFAULT NULL,
-  `cantidad` decimal(16,6) DEFAULT NULL,
-  `costouni` decimal(16,6) DEFAULT NULL,
-  `idproduccion` bigint(20) NOT NULL,
+<table name="pr_plan" view="colnames">
+<left>81</left>
+<top>87</top>
+<width>124</width>
+<height>163</height>
+<sql_create_table>CREATE TABLE `pr_plan` (
+  `idplan` bigint(20) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `fecha` date NOT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
-  PRIMARY KEY (`idinsumo`),
-  KEY `idproduccion` (`idproduccion`),
-  CONSTRAINT `pr_insumo_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`)
+  PRIMARY KEY (`idplan`),
+  UNIQUE KEY `fecha` (`fecha`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 </tables>

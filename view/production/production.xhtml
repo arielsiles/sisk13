@@ -35,7 +35,7 @@
                            ajaxSingle="true"
                            immediate="true"
                            rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
-                           reRender="ingredientPanel">
+                           reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
         <a4j:commandButton id="addMaterialCommandButton"
@@ -172,6 +172,22 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="totalCostField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Production.totalCost']}</ui:define>
+                    <h:outputText value="#{productionAction.calculateTotalCost()}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                    </h:outputText>
+                    <!--<h:outputText value="#{production.totalCost}"/>-->
+                </s:decorate>
+
+                <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Production.totalRawMaterial']}</ui:define>
+                    <h:outputText value="#{productionAction.calculateRawMaterial()}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                    </h:outputText>
+                    <!--<h:outputText value="#{production.totalRawMaterial}"/>-->
+                </s:decorate>
+
             </s:div>
 
             <s:div id="assignProductionProduct">
@@ -244,7 +260,7 @@
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
                                     <!--<a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" action="#{productionAction.recalculateSupplies()}" />-->
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel" />
+                                    <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel, totalCostField, totalRawMaterialField" />
                                 </h:inputText>
                             </td>
 
@@ -276,7 +292,7 @@
                                                  action="#{productionAction.removeSupply(supplyDetail)}"
                                                  ajaxSingle="true"
                                                  rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
-                                                 reRender="ingredientPanel">
+                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
                             </td>
@@ -357,7 +373,7 @@
                                                  immediate="true"
                                                  action="#{productionAction.removeSupply(materialDetail)}"
                                                  rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
-                                                 reRender="materialPanel">
+                                                 reRender="materialPanel, totalCostField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
                             </td>

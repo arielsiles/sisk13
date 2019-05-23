@@ -106,6 +106,7 @@ public class Supply implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
+        setUnitCost(productItem.getUnitCost());
     }
 
     public BigDecimal getQuantity() {

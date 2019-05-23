@@ -6,3 +6,8 @@ UPDATE SECUENCIA SET VALOR=(SELECT MAX(z.`idperiodocostoindirecto`)+1 FROM perio
 /** 21.05.2019 **/
 ALTER TABLE pr_insumoformula ADD COLUMN idform BIGINT(20) NULL AFTER idformula;
 ALTER TABLE pr_insumoformula ADD FOREIGN KEY (idform) REFERENCES pr_formula(idformula);
+ALTER TABLE pr_formula ADD COLUMN totaleq DECIMAL(16,2) NOT NULL AFTER estado;
+
+/** 22.05.2019 **/
+ALTER TABLE pr_produccion ADD COLUMN costototal DECIMAL(16,2) DEFAULT 0 AFTER estado;
+ALTER TABLE pr_produccion ADD COLUMN totalmp DECIMAL(16,2) DEFAULT 0 AFTER costototal;

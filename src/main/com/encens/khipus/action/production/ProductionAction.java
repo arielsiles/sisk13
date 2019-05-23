@@ -30,6 +30,9 @@ public class ProductionAction extends GenericAction<Production> {
     private List<Supply> ingredientSupplyList = new ArrayList<Supply>();
     private List<Supply> materialSupplyList = new ArrayList<Supply>();
 
+    //private BigDecimal totalCost;
+    //private BigDecimal totalRawMaterial;
+
 
     @In
     private ProductionService productionService;
@@ -80,6 +83,10 @@ public class ProductionAction extends GenericAction<Production> {
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
 
+        System.out.println("-------> Update Total cost: " + calculateTotalCost());
+        System.out.println("-------> Update Total mil: " + calculateRawMaterial());
+        production.setTotalCost(calculateTotalCost());
+        production.setTotalRawMaterial(calculateRawMaterial());
         productionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
 
         return Outcome.SUCCESS;
@@ -135,6 +142,7 @@ public class ProductionAction extends GenericAction<Production> {
             supply.setProductItem(formulationInput.getProductItem());
             supply.setQuantity(formulationInput.getQuantity());
             supply.setFormulationInput(formulationInput);
+            //supply.setUnitCost(formulationInput.getProductItem().getUnitCost());
             ingredientSupplyList.add(supply);
         }
     }
@@ -150,6 +158,7 @@ public class ProductionAction extends GenericAction<Production> {
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
             supply.setType(SupplyType.MATERIAL);
+            //supply.setUnitCost(productItem.getUnitCost());
             materialSupplyList.add(supply);
         }
     }
@@ -164,6 +173,7 @@ public class ProductionAction extends GenericAction<Production> {
             Supply supply = new Supply();
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
+            //supply.setUnitCost(productItem.getUnitCost());
             supply.setType(SupplyType.INGREDIENT);
             ingredientSupplyList.add(supply);
         }
@@ -178,6 +188,7 @@ public class ProductionAction extends GenericAction<Production> {
             //unitCost = supplyDetail.getProductItem().getUnitCost();
             if (supplyDetail.getFormulationInput().hasSecondFormula()){
                 unitCost = calculateCost_compoundSupply(supplyDetail);
+                supplyDetail.setUnitCost(unitCost);
             }
         }
 
@@ -277,51 +288,111 @@ public class ProductionAction extends GenericAction<Production> {
                     BigDecimal newQuantity = BigDecimalUtil.multiply(formulationInputMap.get(supplyCode), supplyMap.get(defaultInputCode), 6);
                     newQuantity = BigDecimalUtil.divide(newQuantity, formulationInputMap.get(defaultInputCode), 6);
                     supply.setQuantity(newQuantity);
-                }else
-                    supply.setQuantity(BigDecimal.ZERO);
+                }
             }
             System.out.println("-------> Recalculado: " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
         }
+
+        getInstance().setTotalCost(calculateTotalCost());
+        getInstance().setTotalRawMaterial(calculateRawMaterial());
+
     }
 
 
     public BigDecimal calculateCost_compoundSupply(Supply supplyDetail){
 
-        BigDecimal quantity = supplyDetail.getQuantity();
-        System.out.println("=======> Supply: " + supplyDetail.getProductItem().getFullName() + " - Q: " + quantity);
+        BigDecimal quantityParam = supplyDetail.getQuantity();
+        System.out.println("=======> Supply quantityParam: " + supplyDetail.getProductItem().getFullName() + " - Q: " + quantityParam);
         Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
 
         HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
-
-        BigDecimal totalQuantityFormula = BigDecimal.ZERO;
         for (FormulationInput formulationInput : formulation.getFormulationInputList()){
             BigDecimal quantityVal = formulationInput.getQuantity();
-            if (formulationInput.getProductItem().getUsageMeasureUnit().getMeasureUnitCode().equals("GR")){
-                quantityVal = BigDecimalUtil.divide(quantityVal, BigDecimalUtil.toBigDecimal(1000), 6);
-            }
-            totalQuantityFormula = BigDecimalUtil.sum(totalQuantityFormula, quantityVal, 6);
             formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
         }
 
-        System.out.println("=======> Total Quantity Formula: " + totalQuantityFormula);
-
         BigDecimal totalCost = BigDecimal.ZERO;
         for (FormulationInput formulationInput : formulation.getFormulationInputList()){
-            BigDecimal quantityVal = formulationInputMap.get(formulationInput.getProductItemCode());
-            BigDecimal newQuantity = BigDecimalUtil.multiply(quantity, quantityVal, 6);
-                       newQuantity = BigDecimalUtil.divide(newQuantity, totalQuantityFormula, 6);
-
-            if (formulationInput.getProductItem().getUsageMeasureUnit().getMeasureUnitCode().equals("GR")){
-                newQuantity = BigDecimalUtil.divide(newQuantity, BigDecimalUtil.toBigDecimal(1000), 6);
-            }
+            BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
+            BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
+                       newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
 
             BigDecimal cost = BigDecimalUtil.multiply(newQuantity, formulationInput.getProductItem().getUnitCost(), 6);
             totalCost = BigDecimalUtil.sum(totalCost, cost, 6);
 
             System.out.println("=======> " + formulationInput.getProductItem().getFullName() + " - " + newQuantity + " - " + cost);
         }
-        System.out.println("=======> calculateCost_compoundSupply: " + totalCost);
-        return totalCost;
+        System.out.println("=======> Costo Total: " + totalCost);
+        System.out.println("=======> Costo unit: " + BigDecimalUtil.divide(totalCost, quantityParam, 6));
+
+        return BigDecimalUtil.divide(totalCost, quantityParam, 6);
+    }
+
+    public BigDecimal calculateTotalRawMaterial_compoundSupply(Supply supplyDetail){
+
+        BigDecimal quantityParam = supplyDetail.getQuantity();
+        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+
+        HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityVal = formulationInput.getQuantity();
+            formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
+        }
+
+        BigDecimal totalRawMaterial = BigDecimal.ZERO;
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
+            BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
+            newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
+
+            if (formulationInput.getProductItemCode().equals(Constants.ID_ART_RAW_MILK)){
+                totalRawMaterial = BigDecimalUtil.sum(totalRawMaterial, newQuantity, 6);
+            }
+        }
+
+        return totalRawMaterial;
+    }
+
+    public BigDecimal calculateTotalCost(){
+        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal ingredientCost = BigDecimal.ZERO;
+        BigDecimal materialCost = BigDecimal.ZERO;
+
+        for (Supply supply : ingredientSupplyList){
+            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            ingredientCost = BigDecimalUtil.sum(ingredientCost, cost, 6);
+            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+        }
+
+        for (Supply supply : materialSupplyList){
+            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            materialCost = BigDecimalUtil.sum(materialCost, cost, 6);
+            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+        }
+
+
+        result = BigDecimalUtil.sum(ingredientCost, materialCost, 6);
+        result = BigDecimalUtil.roundBigDecimal(result, 2);
+        System.out.println("===>>> TOTAL COST: " + result);
+
+        return result;
+    }
+
+    public BigDecimal calculateRawMaterial(){
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (Supply supply : ingredientSupplyList){
+            if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
+                result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);
+
+            if (supply.hasFormula()){
+                if (supply.getFormulationInput().hasSecondFormula()){
+                    result = BigDecimalUtil.sum(result, calculateTotalRawMaterial_compoundSupply(supply), 6);
+                }
+            }
+        }
+        result = BigDecimalUtil.roundBigDecimal(result, 2);
+        return result;
     }
 
     public ProductionTank getProductionTank() {
@@ -363,4 +434,22 @@ public class ProductionAction extends GenericAction<Production> {
     public void setMaterialSupplyList(List<Supply> materialSupplyList) {
         this.materialSupplyList = materialSupplyList;
     }
+
+    /*public BigDecimal getTotalCost() {
+        totalCost = calculateTotalCost();
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public BigDecimal getTotalRawMaterial() {
+        this.totalRawMaterial = calculateRawMaterial();
+        return totalRawMaterial;
+    }
+
+    public void setTotalRawMaterial(BigDecimal totalRawMaterial) {
+        this.totalRawMaterial = totalRawMaterial;
+    }*/
 }

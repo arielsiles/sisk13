@@ -6,6 +6,7 @@ import com.encens.khipus.model.admin.Company;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,12 @@ public class Production implements BaseModel {
     @Column(name = "estado", nullable = true)
     @Enumerated(EnumType.STRING)
     private ProductionState state;
+
+    @Column(name = "costototal")
+    private BigDecimal totalCost;
+
+    @Column(name = "totalmp")
+    private BigDecimal totalRawMaterial;
 
     @Column(name = "descripcion")
     private String description;
@@ -157,5 +164,21 @@ public class Production implements BaseModel {
 
     public void setProductionProductList(List<ProductionProduct> productionProductList) {
         this.productionProductList = productionProductList;
+    }
+
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public BigDecimal getTotalRawMaterial() {
+        return totalRawMaterial;
+    }
+
+    public void setTotalRawMaterial(BigDecimal totalRawMaterial) {
+        this.totalRawMaterial = totalRawMaterial;
     }
 }
