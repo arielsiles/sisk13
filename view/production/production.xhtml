@@ -177,15 +177,15 @@
                     <h:outputText value="#{productionAction.calculateTotalCost()}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
-                    <!--<h:outputText value="#{production.totalCost}"/>-->
                 </s:decorate>
 
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Production.totalRawMaterial']}</ui:define>
+                    <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
                     <h:outputText value="#{productionAction.calculateRawMaterial()}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
-                    <!--<h:outputText value="#{production.totalRawMaterial}"/>-->
+                    <span class="spacer"></span>
+                    <h:outputText value="#{messages['MeasureUnit.LT']}" />
                 </s:decorate>
 
             </s:div>

@@ -101,7 +101,18 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
                 result = BigDecimalUtil.sum(result, supply.getQuantity(), 2);
         }
+        return result;
+    }
 
+    public BigDecimal calculateTotalRawMaterial(ProductionPlan productionPlan){
+
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (Production production : productionPlan.getProductionList()){
+            productionAction.setInstance(production);
+            productionAction.setIngredientSupplyList(production.getSupplyList());
+            result = BigDecimalUtil.sum(result, productionAction.calculateRawMaterial(), 2);
+        }
         return result;
 
     }
