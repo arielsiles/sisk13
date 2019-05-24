@@ -70,6 +70,11 @@ public class ProductionServiceBean implements ProductionService {
             }
         }
 
+        for (ProductionProduct product : production.getProductionProductList()){
+            em.merge(product);
+            em.flush();
+        }
+
         em.merge(production);
         em.flush();
 

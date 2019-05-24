@@ -6,7 +6,7 @@
 <canvas zoom="100">
 <tables>
 <table name="pr_formula" view="colnames">
-<left>992</left>
+<left>980</left>
 <top>576</top>
 <width>143</width>
 <height>214</height>
@@ -26,8 +26,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumoformula" view="colnames">
-<left>1331</left>
-<top>507</top>
+<left>1329</left>
+<top>452</top>
 <width>192</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `pr_insumoformula` (
@@ -126,9 +126,10 @@
   `idproducto` bigint(20) NOT NULL,
   `cod_art` varchar(6) DEFAULT NULL,
   `cantidad` decimal(16,2) DEFAULT NULL,
+  `costo` decimal(16,2) DEFAULT '0.00',
   `idproduccion` bigint(20) DEFAULT NULL,
   `idplan` bigint(20) DEFAULT NULL,
-  `VERSION` bigint(20) NOT NULL,
+  `version` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idproducto`),
   KEY `idproduccion` (`idproduccion`),

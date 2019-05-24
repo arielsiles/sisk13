@@ -11,3 +11,9 @@ ALTER TABLE pr_formula ADD COLUMN totaleq DECIMAL(16,2) NOT NULL AFTER estado;
 /** 22.05.2019 **/
 ALTER TABLE pr_produccion ADD COLUMN costototal DECIMAL(16,2) DEFAULT 0 AFTER estado;
 ALTER TABLE pr_produccion ADD COLUMN totalmp DECIMAL(16,2) DEFAULT 0 AFTER costototal;
+
+/** 24.05.2019 **/
+ALTER TABLE pr_producto ADD COLUMN costo DECIMAL(16,2) DEFAULT 0 AFTER cantidad;
+
+ALTER TABLE inv_articulos ADD COLUMN med_pr VARCHAR(6) AFTER cod_med;
+ALTER TABLE inv_articulos ADD COLUMN cant_pr DECIMAL(16, 2) AFTER med_pr;

@@ -47,6 +47,9 @@ public class ProductionProduct implements BaseModel {
     @Column(name = "cantidad")
     private BigDecimal quantity;
 
+    @Column(name = "costo", nullable = true, updatable = true, insertable = true)
+    private BigDecimal cost;
+
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = true, updatable = true, insertable = true)
     private Production production;
@@ -125,5 +128,13 @@ public class ProductionProduct implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 }

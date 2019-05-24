@@ -316,6 +316,31 @@
                      reRender="subGroupField"
                      tabindex="12"/>
 </s:decorate>
+
+    <s:decorate id="basicMeasureField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.basicMeasure']}</ui:define>
+        <h:selectOneMenu id="basicMeasure"
+                         value="#{productItem.basicMeasure}"
+                         styleClass="inputMedium"
+                         tabindex="4">
+            <s:selectItems value="#{MeasurementUnitEnum}"
+                           var="measure"
+                           label="#{messages[measure.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="basicQuantityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.basicQuantity']}</ui:define>
+        <h:inputText id="basicQuantity"
+                     value="#{productItem.basicQuantity}"
+                     styleClass="input"
+                     tabindex="3">
+            <app:realNumberConverter forId="basicQuantity"/>
+        </h:inputText>
+    </s:decorate>
+
 </rich:panel>
 
 <div class="buttons">
