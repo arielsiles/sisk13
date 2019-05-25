@@ -8,7 +8,7 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:define name="pageTitle">#{messages['Reports.kardex.valuedPhysicalInventory.titleReport']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="70%"/>
 
@@ -18,7 +18,7 @@
 
             <rich:panel>
                 <f:facet name="header">
-                    #{messages['Reports.kardex.inventoryReport.titleReport']}
+                    #{messages['Reports.kardex.valuedPhysicalInventory.titleReport']}
                 </f:facet>
 
                 <!--<s:decorate id="warehouseField"
@@ -90,21 +90,20 @@
                     </app:selectPopUp>
                 </s:decorate>
 
+                <div class="buttons">
+                    <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReport}"
+                                     styleClass="button"
+                                     value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                </div>
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{valuedPhysicalInventoryReportAction}" showPageFormat="false"
-                                      tabIndex="3"
-                                      showReportTitle="false"/>
-
-            <div class="buttons">
-                <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReport}"
-                                 styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                    <s:defaultAction/>
-                </h:commandButton>
-
-            </div>
+            <!--<app:reportDefaultOptions reportAction="#{valuedPhysicalInventoryReportAction}" showPageFormat="false"
+                                          tabIndex="3"
+                                      showReportTitle="false"/>-->
 
         </h:form>
 
