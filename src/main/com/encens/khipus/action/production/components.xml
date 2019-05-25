@@ -81,7 +81,11 @@
     <factory name="collectionFormStateEnum"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.CollectionFormState')}"/>
 
+
     <!-- 19.04.2019 -->
+    <factory name="MeasurementUnitEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.MeasurementUnit')}"/>
+
     <factory name="productionTankList" value="#{productionTankQuery}"/>
     <framework:entity-query name="productionTankQuery" ejbql="select p from ProductionTank p"/>
 

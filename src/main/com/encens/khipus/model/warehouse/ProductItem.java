@@ -5,6 +5,7 @@ import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
+import com.encens.khipus.model.production.MeasurementUnit;
 import com.encens.khipus.model.production.OrderMaterial;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Type;
@@ -111,6 +112,13 @@ public class ProductItem implements BaseModel {
     @Column(name = "VENDIBLE", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean saleable;
+
+    @Column(name = "med_pr")
+    @Enumerated(EnumType.STRING)
+    private MeasurementUnit basicMeasure;
+
+    @Column(name = "cant_pr", nullable = true)
+    private BigDecimal basicQuantity;
 
     @Version
     @Column(name = "version")
@@ -442,5 +450,21 @@ public class ProductItem implements BaseModel {
 
     public void setSalePrice(BigDecimal salePrice) {
         this.salePrice = salePrice;
+    }
+
+    public MeasurementUnit getBasicMeasure() {
+        return basicMeasure;
+    }
+
+    public void setBasicMeasure(MeasurementUnit basicMeasure) {
+        this.basicMeasure = basicMeasure;
+    }
+
+    public BigDecimal getBasicQuantity() {
+        return basicQuantity;
+    }
+
+    public void setBasicQuantity(BigDecimal basicQuantity) {
+        this.basicQuantity = basicQuantity;
     }
 }

@@ -5,8 +5,6 @@ import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.production.IndirectCosts;
 import com.encens.khipus.model.production.IndirectCostsConfig;
 import com.encens.khipus.model.production.PeriodIndirectCost;
-
-import com.encens.khipus.model.production.ProductionOrder;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
@@ -87,7 +85,8 @@ public class PeriodIndirectCostServiceBean implements PeriodIndirectCostService 
     @Override
     public List<IndirectCostsConfig> findPredefinedIndirectCost() {
         List<IndirectCostsConfig> indirectCostsConfigs = (List<IndirectCostsConfig>)em.createQuery("select indirectCostsConfig from IndirectCostsConfig indirectCostsConfig " +
-                " where indirectCostsConfig.predefined = true")
+                " where indirectCostsConfig.predefined =:predefined")
+                .setParameter("predefined", Boolean.TRUE)
                 .getResultList();
 
         return  indirectCostsConfigs;

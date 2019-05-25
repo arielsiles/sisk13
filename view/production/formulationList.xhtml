@@ -7,14 +7,14 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
-    <ui:define name="pageTitle">#{messages['ProductionPlan.list']}</ui:define>
+    <ui:define name="pageTitle">#{messages['Formulation.list']}</ui:define>
     <ui:param name="bodyWidth" value="70%"/>
 
     <ui:param name="selectedTab" value="production"/>
     <ui:define name="body">
         <h:form id="productionPlanSearch">
 
-            <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['ProductionPlan.search']}" switchType="client">
+            <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['Formulation.search']}" switchType="client">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Formulation.name']}</ui:define>
                     <h:inputText id="name" value="#{formulationDataModel.criteria.name}"

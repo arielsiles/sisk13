@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Gestion;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 
@@ -24,7 +25,7 @@ import java.util.List;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "PERIODOCOSTOINDIRECTO",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "PERIODOCOSTOINDIRECTO")

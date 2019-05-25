@@ -58,6 +58,10 @@ public class FormulationInput implements BaseModel {
     @JoinColumn(name = "idformula", nullable = false, updatable = false, insertable = true)
     private Formulation formulation;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idform", nullable = true, updatable = true, insertable = true)
+    private Formulation secondFormulation;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -65,6 +69,14 @@ public class FormulationInput implements BaseModel {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
+
+    public boolean hasSecondFormula(){
+        boolean result = false;
+        if (secondFormulation != null)
+            result = true;
+
+        return result;
+    }
 
     public Long getId() {
         return id;
@@ -128,5 +140,13 @@ public class FormulationInput implements BaseModel {
 
     public void setInputDefault(Boolean inputDefault) {
         this.inputDefault = inputDefault;
+    }
+
+    public Formulation getSecondFormulation() {
+        return secondFormulation;
+    }
+
+    public void setSecondFormulation(Formulation secondFormulation) {
+        this.secondFormulation = secondFormulation;
     }
 }

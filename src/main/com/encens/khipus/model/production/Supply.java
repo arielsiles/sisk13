@@ -75,6 +75,15 @@ public class Supply implements BaseModel {
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
+
+    public boolean hasFormula(){
+        boolean result = false;
+        if (formulationInput != null)
+            result = true;
+
+        return result;
+    }
+
     public Long getId() {
         return id;
     }
@@ -97,6 +106,7 @@ public class Supply implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
+        setUnitCost(productItem.getUnitCost());
     }
 
     public BigDecimal getQuantity() {

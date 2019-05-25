@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.Group;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
@@ -11,7 +12,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 /**
  *
@@ -24,7 +24,7 @@ import java.math.BigDecimal;
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "COSTOSINDIRECTOSCONF",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "COSTOSINDIRECTOSCONF")
@@ -55,7 +55,7 @@ public class IndirectCostsConfig implements BaseModel {
     private String description;
 
     @Column(name = "PREDEFINIDO")
-    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    @Type(type = IntegerBooleanUserType.NAME)
     private Boolean predefined;
 
     @Column(name = "CUENTA", insertable = true, updatable = false, nullable = true)

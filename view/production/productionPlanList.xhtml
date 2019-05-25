@@ -65,7 +65,7 @@
 
             <rich:dataTable value="#{productionPlanDataModel}" var="productionPlanItem" id="productionPlanList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="50%, 50%">
+                            width="100%" columnsWidth="40%, 40%, 20%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
@@ -75,6 +75,8 @@
                                 #{messages['ProductionPlan.date']}
                             </app:commandSortHeader>
                         </rich:column>
+
+                        <rich:column>#{messages['ProductionPlan.collection']}</rich:column>
 
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
@@ -86,6 +88,13 @@
                         <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
                     </h:outputText>
                 </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{productionPlanAction.getTotalWeighed(productionPlanItem)}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"

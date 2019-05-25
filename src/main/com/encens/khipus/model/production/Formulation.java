@@ -43,6 +43,9 @@ public class Formulation implements BaseModel {
     @Enumerated(EnumType.STRING)
     private FormulationState state = FormulationState.PEN;
 
+    @Column(name = "totaleq", precision = 16, scale = 2)
+    private BigDecimal totalEquivalent;
+
     @Column(name = "capacidad", precision = 16, scale = 2)
     private BigDecimal capacity;
 
@@ -123,5 +126,13 @@ public class Formulation implements BaseModel {
 
     public void setState(FormulationState state) {
         this.state = state;
+    }
+
+    public BigDecimal getTotalEquivalent() {
+        return totalEquivalent;
+    }
+
+    public void setTotalEquivalent(BigDecimal totalEquivalent) {
+        this.totalEquivalent = totalEquivalent;
     }
 }

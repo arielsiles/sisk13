@@ -30,6 +30,9 @@ public class ProductionAction extends GenericAction<Production> {
     private List<Supply> ingredientSupplyList = new ArrayList<Supply>();
     private List<Supply> materialSupplyList = new ArrayList<Supply>();
 
+    //private BigDecimal totalCost;
+    //private BigDecimal totalRawMaterial;
+
 
     @In
     private ProductionService productionService;
@@ -80,6 +83,10 @@ public class ProductionAction extends GenericAction<Production> {
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
 
+        System.out.println("-------> Update Total cost: " + calculateTotalCost());
+        System.out.println("-------> Update Total mil: " + calculateRawMaterial());
+        production.setTotalCost(calculateTotalCost());
+        production.setTotalRawMaterial(calculateRawMaterial());
         productionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
 
         return Outcome.SUCCESS;
@@ -94,9 +101,68 @@ public class ProductionAction extends GenericAction<Production> {
 
     public void approve(){
 
-        getInstance().setState(ProductionState.APR);
-        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        for (ProductionProduct product : getInstance().getProductionProductList()){
+            BigDecimal productCost = BigDecimal.ZERO;
+            for (Supply ingredient : this.ingredientSupplyList){
+                if (ingredient.getProductionProduct() != null) {
+                    System.out.println("***Yes 1: " + ingredient.getProductionProduct().getProductItemCode());
+                    if (product.getProductItemCode().equals(ingredient.getProductionProduct().getProductItem().getProductItemCode())) {
+                        System.out.println("***Yes 2: " + ingredient.getProductionProduct().getProductItemCode());
+                        //BigDecimal productCost = product.getCost();
+                        BigDecimal ingredientCost = BigDecimalUtil.multiply(ingredient.getQuantity(), ingredient.getUnitCost(), 6);
+                        productCost = BigDecimalUtil.sum(productCost, ingredientCost);
+                        productCost = BigDecimalUtil.roundBigDecimal(productCost, 2);
+                        product.setCost(productCost);
+                    }
+                }/*else{
+                    BigDecimal ingredientCost = BigDecimalUtil.multiply(ingredient.getQuantity(), ingredient.getUnitCost(), 6);
+                    remainingCost = BigDecimalUtil.sum(remainingCost, ingredientCost, 6);
+                    remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
+                }*/
+            }
 
+            for (Supply material : this.materialSupplyList){
+                if (material.getProductionProduct() != null) {
+                    System.out.println("***Yesss 1: " + material.getProductionProduct().getProductItemCode());
+                    if (product.getProductItemCode().equals(material.getProductionProduct().getProductItem().getProductItemCode())) {
+                        System.out.println("***Yesss 2: " + material.getProductionProduct().getProductItemCode());
+                        //BigDecimal productCost = product.getCost();
+                        BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
+                        productCost = BigDecimalUtil.sum(productCost, materialCost);
+                        productCost = BigDecimalUtil.roundBigDecimal(productCost, 2);
+                        product.setCost(productCost);
+                    }
+                }/*else{
+                    BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
+                    remainingCost = BigDecimalUtil.sum(remainingCost, materialCost, 6);
+                    remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
+                }*/
+            }
+            System.out.println("-*-*-*-*-*-*-*---> Costo Producto: " + product.getProductItem().getFullName() + " - " + product.getCost());
+        }
+
+
+        BigDecimal remainingCost = BigDecimal.ZERO;
+        for (Supply ingredient : this.ingredientSupplyList){
+            if (ingredient.getProductionProduct() == null) {
+                BigDecimal ingredientCost = BigDecimalUtil.multiply(ingredient.getQuantity(), ingredient.getUnitCost(), 6);
+                remainingCost = BigDecimalUtil.sum(remainingCost, ingredientCost, 6);
+                remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
+            }
+        }
+
+        for (Supply material : this.materialSupplyList){
+            if (material.getProductionProduct() == null) {
+                BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
+                remainingCost = BigDecimalUtil.sum(remainingCost, materialCost, 6);
+                remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
+            }
+        }
+
+        System.out.println("-*-*-*-*-*-*-*---> Costo restante: " + remainingCost);
+
+        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        getInstance().setState(ProductionState.APR);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
     }
 
@@ -135,6 +201,7 @@ public class ProductionAction extends GenericAction<Production> {
             supply.setProductItem(formulationInput.getProductItem());
             supply.setQuantity(formulationInput.getQuantity());
             supply.setFormulationInput(formulationInput);
+            //supply.setUnitCost(formulationInput.getProductItem().getUnitCost());
             ingredientSupplyList.add(supply);
         }
     }
@@ -150,6 +217,7 @@ public class ProductionAction extends GenericAction<Production> {
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
             supply.setType(SupplyType.MATERIAL);
+            //supply.setUnitCost(productItem.getUnitCost());
             materialSupplyList.add(supply);
         }
     }
@@ -164,10 +232,28 @@ public class ProductionAction extends GenericAction<Production> {
             Supply supply = new Supply();
             supply.setProductItemCode(productItem.getProductItemCode());
             supply.setProductItem(productItem);
+            supply.setQuantity(BigDecimal.ZERO);
             supply.setType(SupplyType.INGREDIENT);
             ingredientSupplyList.add(supply);
         }
     }
+
+
+    public BigDecimal getSupplyUnitCost(Supply supplyDetail){
+
+        BigDecimal unitCost = supplyDetail.getProductItem().getUnitCost();
+
+        if (supplyDetail.hasFormula() ){
+            //unitCost = supplyDetail.getProductItem().getUnitCost();
+            if (supplyDetail.getFormulationInput().hasSecondFormula()){
+                unitCost = calculateCost_compoundSupply(supplyDetail);
+                supplyDetail.setUnitCost(unitCost);
+            }
+        }
+
+        return unitCost;
+    }
+
 
     public List<ProductionProduct> getProductionProductList(){
         List<ProductionProduct> productionProductList = productionPlanService.getProductionProductList(getInstance().getProductionPlan());
@@ -261,11 +347,111 @@ public class ProductionAction extends GenericAction<Production> {
                     BigDecimal newQuantity = BigDecimalUtil.multiply(formulationInputMap.get(supplyCode), supplyMap.get(defaultInputCode), 6);
                     newQuantity = BigDecimalUtil.divide(newQuantity, formulationInputMap.get(defaultInputCode), 6);
                     supply.setQuantity(newQuantity);
-                }else
-                    supply.setQuantity(BigDecimal.ZERO);
+                }
             }
             System.out.println("-------> Recalculado: " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
         }
+
+        getInstance().setTotalCost(calculateTotalCost());
+        getInstance().setTotalRawMaterial(calculateRawMaterial());
+
+    }
+
+
+    public BigDecimal calculateCost_compoundSupply(Supply supplyDetail){
+
+        BigDecimal quantityParam = supplyDetail.getQuantity();
+        System.out.println("=======> Supply quantityParam: " + supplyDetail.getProductItem().getFullName() + " - Q: " + quantityParam);
+        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+
+        HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityVal = formulationInput.getQuantity();
+            formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
+        }
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
+            BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
+                       newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
+
+            BigDecimal cost = BigDecimalUtil.multiply(newQuantity, formulationInput.getProductItem().getUnitCost(), 6);
+            totalCost = BigDecimalUtil.sum(totalCost, cost, 6);
+
+            System.out.println("=======> " + formulationInput.getProductItem().getFullName() + " - " + newQuantity + " - " + cost);
+        }
+        System.out.println("=======> Costo Total: " + totalCost);
+        System.out.println("=======> Costo unit: " + BigDecimalUtil.divide(totalCost, quantityParam, 6));
+
+        return BigDecimalUtil.divide(totalCost, quantityParam, 6);
+    }
+
+    public BigDecimal calculateTotalRawMaterial_compoundSupply(Supply supplyDetail){
+
+        BigDecimal quantityParam = supplyDetail.getQuantity();
+        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+
+        HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityVal = formulationInput.getQuantity();
+            formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
+        }
+
+        BigDecimal totalRawMaterial = BigDecimal.ZERO;
+        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+            BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
+            BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
+            newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
+
+            if (formulationInput.getProductItemCode().equals(Constants.ID_ART_RAW_MILK)){
+                totalRawMaterial = BigDecimalUtil.sum(totalRawMaterial, newQuantity, 6);
+            }
+        }
+
+        return totalRawMaterial;
+    }
+
+    public BigDecimal calculateTotalCost(){
+        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal ingredientCost = BigDecimal.ZERO;
+        BigDecimal materialCost = BigDecimal.ZERO;
+
+        for (Supply supply : ingredientSupplyList){
+            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            ingredientCost = BigDecimalUtil.sum(ingredientCost, cost, 6);
+            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+        }
+
+        for (Supply supply : materialSupplyList){
+            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            materialCost = BigDecimalUtil.sum(materialCost, cost, 6);
+            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+        }
+
+
+        result = BigDecimalUtil.sum(ingredientCost, materialCost, 6);
+        result = BigDecimalUtil.roundBigDecimal(result, 2);
+        System.out.println("===>>> TOTAL COST: " + result);
+
+        return result;
+    }
+
+    public BigDecimal calculateRawMaterial(){
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (Supply supply : ingredientSupplyList){
+            if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
+                result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);
+
+            if (supply.hasFormula()){
+                if (supply.getFormulationInput().hasSecondFormula()){
+                    result = BigDecimalUtil.sum(result, calculateTotalRawMaterial_compoundSupply(supply), 6);
+                }
+            }
+        }
+        result = BigDecimalUtil.roundBigDecimal(result, 2);
+        return result;
     }
 
     public ProductionTank getProductionTank() {
@@ -307,4 +493,22 @@ public class ProductionAction extends GenericAction<Production> {
     public void setMaterialSupplyList(List<Supply> materialSupplyList) {
         this.materialSupplyList = materialSupplyList;
     }
+
+    /*public BigDecimal getTotalCost() {
+        totalCost = calculateTotalCost();
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public BigDecimal getTotalRawMaterial() {
+        this.totalRawMaterial = calculateRawMaterial();
+        return totalRawMaterial;
+    }
+
+    public void setTotalRawMaterial(BigDecimal totalRawMaterial) {
+        this.totalRawMaterial = totalRawMaterial;
+    }*/
 }

@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -21,7 +20,7 @@
 </ui:define>
 
 <ui:param name="bodyAlign" value="center"/>
-<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="bodyWidth" value="70%"/>
 
 <ui:param name="selectedTab" value="products"/>
 <ui:define name="body">
@@ -112,11 +111,12 @@
         <rich:jQuery selector="#name" query="focus()" timing="onload"/>
     </rich:simpleTogglePanel>
 
+    <rich:spacer height="5" />
+
     <rich:dataTable value="#{indirectCostsAction.indirectCostses}"
                     var="item"
                     id="indirectCostsList"
-                    width="100%"
-            >
+                    width="100%">
 
         <f:facet name="header">
             <rich:columnGroup>
@@ -154,48 +154,6 @@
 
     </rich:dataTable>
 
-
-    <div class="buttons">
-
-        <a4j:commandButton action="#{indirectCostsAction.findLastPeriod}"
-                           reRender="indirectCostsList"
-                           styleClass="button"
-                           value="#{messages['Indirectcosts.searchLast']}"
-                           ajaxSingle="true"
-                           immediate="true"
-                           tabindex="1">
-            <s:defaultAction/>
-        </a4j:commandButton>
-
-        <h:commandButton id="createButtonIdDown"
-                         action="#{indirectCostsAction.create}"
-                         value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{!indirectCostsAction.managed and s:hasPermission('INDIRECTCOSTS','CREATE')}">
-            <s:defaultAction/>
-        </h:commandButton>
-
-        <h:commandButton id="updateButtonId"
-                         action="#{indirectCostsAction.update}"
-                         value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{indirectCostsAction.managed and s:hasPermission('INDIRECTCOSTS','UPDATE')}">
-            <s:defaultAction/>
-        </h:commandButton>
-        <h:commandButton value="#{messages['Common.delete']}"
-                         styleClass="button"
-                         rendered="#{indirectCostsAction.managed and s:hasPermission('INDIRECTCOSTS','DELETE')}">
-            <rich:componentControl for="deleteConfirmation"
-                                   event="onclick"
-                                   disableDefault="true"
-                                   operation="show"/>
-        </h:commandButton>
-
-        <h:commandButton action="#{indirectCostsAction.cancel}"
-                         value="#{messages['Common.cancel']}"
-                         styleClass="button"
-                         immediate="true"/>
-    </div>
 </h:form>
 
 <s:decorate template="/include/modalDialog.xhtml"

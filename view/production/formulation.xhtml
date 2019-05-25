@@ -103,6 +103,16 @@
             </h:selectOneMenu>
         </s:decorate>
 
+        <s:decorate id="totalEquivalentIdField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Formulation.totalEquivalent']}</ui:define>
+            <h:inputText id="totalEquivalentId"
+                         value="#{formulation.totalEquivalent}"
+                         styleClass="inputSmall right">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="totalEquivalentId"/>
+            </h:inputText>
+
+        </s:decorate>
+
     </h:panelGrid>
     </rich:panel>
 

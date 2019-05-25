@@ -5,7 +5,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -23,7 +22,7 @@
                              cellspacing="0"
                              border="0"
                              columnClasses="width50percent,width50percent">
-                    <s:div>
+                    <!--<s:div>
                         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['Indirectcosts.name']}</ui:define>
                             <h:inputText id="name"
@@ -33,21 +32,32 @@
                                          styleClass="input">
                             </h:inputText>
                         </s:decorate>
-                    </s:div>
+                    </s:div>-->
                     <s:div>
                         <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
                             <h:selectOneMenu id="gestion"
-                                             value="#{indirectCostsDataModel.privateCriteria.gestion}"
+                                             value="#{indirectCostsDataModel.gestion}"
                                              styleClass="input"
-                                             required="true"
-                                             tabindex="2">
+                                             tabindex="1">
                                 <s:selectItems value="#{gestionList}"
                                                var="gestion"
                                                label="#{gestion.year}"
                                                hideNoSelectionLabel="false"/>
                                 <s:convertEntity/>
                             </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['IndirectCosts.month']}</ui:define>
+                            <h:inputText id="month"
+                                         value="#{indirectCostsDataModel.month}"
+                                         styleClass="inputSmall"
+                                         maxlength="2"
+                                         tabindex="2">
+                                <app:naturalNumberConverter/>
+                            </h:inputText>
+
                             <a4j:commandButton action="#{indirectCostsDataModel.search}"
                                                reRender="indirectCostsList, dataScroller"
                                                styleClass="button"
@@ -56,22 +66,12 @@
                                                tabindex="4">
                                 <s:defaultAction/>
                             </a4j:commandButton>
+
                         </s:decorate>
+
                     </s:div>
                     <s:div>
-                        <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Month.month']}</ui:define>
-                            <h:selectOneMenu id="month"
-                                             value="#{indirectCostsDataModel.privateCriteria.month}"
-                                             styleClass="input"
-                                             required="true"
-                                             tabindex="3">
 
-                                <s:selectItems value="#{monthEnumIndirectCosts}" var="month"
-                                               label="#{messages[month.resourceKey]}"
-                                               hideNoSelectionLabel="false"/>
-                            </h:selectOneMenu>
-                        </s:decorate>
                     </s:div>
                 </h:panelGrid>
                 <rich:jQuery selector="#name" query="focus()" timing="onload"/>

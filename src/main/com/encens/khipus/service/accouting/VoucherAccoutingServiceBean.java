@@ -874,7 +874,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "from ventas v " +
                 "where v.fecha between :startDate and :endDate " +
                 "and v.idusuario <> 5 and v.idtipopedido in (1,5) " +
-                "and v.cod_art not in (192,193,194,195,196,188,493,693) " +
+                "and v.cod_art not in (192,193,194,795,195,196,188,493,693) " + /** MODIFYID **/
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);

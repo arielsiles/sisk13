@@ -7,6 +7,22 @@ package com.encens.khipus.model.production;
  * @version
  */
 public enum MeasurementUnit {
-    KG,
-    LT
+    KG("MeasurementUnit.KG"),
+    GR("MeasurementUnit.GR"),
+    LT("MeasurementUnit.LT"),
+    ML("MeasurementUnit.ML");
+
+    private String resourceKey;
+
+    MeasurementUnit(String resourceKey) {
+        this.resourceKey = resourceKey;
+    }
+
+    public String getResourceKey() {
+        return resourceKey;
+    }
+
+    public void setResourceKey(String resourceKey) {
+        this.resourceKey = resourceKey;
+    }
 }
