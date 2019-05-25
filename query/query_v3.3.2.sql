@@ -1,19 +1,23 @@
 /** 17.05.2019 **/
-UPDATE SECUENCIA SET VALOR=(SELECT MAX(E.`idcostosindirectosconf`)+1 FROM costosindirectosconf E) WHERE TABLA='COSTOSINDIRECTOSCONF';
-UPDATE SECUENCIA SET VALOR=(SELECT MAX(z.`idcostosindirectos`)+1 FROM costosindirectos z) WHERE TABLA='COSTOSINDIRECTOS';
-UPDATE SECUENCIA SET VALOR=(SELECT MAX(z.`idperiodocostoindirecto`)+1 FROM periodocostoindirecto z) WHERE TABLA='PERIODOCOSTOINDIRECTO';
+update SECUENCIA set VALOR=(select MAX(E.`idcostosindirectosconf`)+1 from costosindirectosconf E) where TABLA='COSTOSINDIRECTOSCONF';
+update SECUENCIA set VALOR=(select MAX(z.`idcostosindirectos`)+1 from costosindirectos z) where TABLA='COSTOSINDIRECTOS';
+update SECUENCIA set VALOR=(select MAX(z.`idperiodocostoindirecto`)+1 from periodocostoindirecto z) where TABLA='PERIODOCOSTOINDIRECTO';
 
 /** 21.05.2019 **/
-ALTER TABLE pr_insumoformula ADD COLUMN idform BIGINT(20) NULL AFTER idformula;
-ALTER TABLE pr_insumoformula ADD FOREIGN KEY (idform) REFERENCES pr_formula(idformula);
-ALTER TABLE pr_formula ADD COLUMN totaleq DECIMAL(16,2) NOT NULL AFTER estado;
+alter table pr_insumoformula add column idform bigint(20) null after idformula;
+alter table pr_insumoformula add foreign key (idform) references pr_formula(idformula);
+alter table pr_formula add column totaleq decimal(16,2) not null after estado;
 
 /** 22.05.2019 **/
-ALTER TABLE pr_produccion ADD COLUMN costototal DECIMAL(16,2) DEFAULT 0 AFTER estado;
-ALTER TABLE pr_produccion ADD COLUMN totalmp DECIMAL(16,2) DEFAULT 0 AFTER costototal;
+alter table pr_produccion add column costototal decimal(16,2) default 0 after estado;
+alter table pr_produccion add column totalmp decimal(16,2) default 0 after costototal;
 
 /** 24.05.2019 **/
-ALTER TABLE pr_producto ADD COLUMN costo DECIMAL(16,2) DEFAULT 0 AFTER cantidad;
+alter table pr_producto add column costo decimal(16,2) default 0 after cantidad;
 
-ALTER TABLE inv_articulos ADD COLUMN med_pr VARCHAR(6) AFTER cod_med;
-ALTER TABLE inv_articulos ADD COLUMN cant_pr DECIMAL(16, 2) AFTER med_pr;
+alter table inv_articulos add column med_pr varchar(6) after cod_med;
+alter table inv_articulos add column cant_pr decimal(16, 2) after med_pr;
+
+alter table pr_producto add column costo_a decimal(16, 2) default 0 after costo;
+alter table pr_producto add column costo_b decimal(16, 2) default 0 after costo_a;
+alter table pr_producto add column costo_c decimal(16, 2) default 0 after costo_b;

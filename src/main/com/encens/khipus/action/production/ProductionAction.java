@@ -112,13 +112,9 @@ public class ProductionAction extends GenericAction<Production> {
                         BigDecimal ingredientCost = BigDecimalUtil.multiply(ingredient.getQuantity(), ingredient.getUnitCost(), 6);
                         productCost = BigDecimalUtil.sum(productCost, ingredientCost);
                         productCost = BigDecimalUtil.roundBigDecimal(productCost, 2);
-                        product.setCost(productCost);
+                        product.setCostA(productCost);
                     }
-                }/*else{
-                    BigDecimal ingredientCost = BigDecimalUtil.multiply(ingredient.getQuantity(), ingredient.getUnitCost(), 6);
-                    remainingCost = BigDecimalUtil.sum(remainingCost, ingredientCost, 6);
-                    remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
-                }*/
+                }
             }
 
             for (Supply material : this.materialSupplyList){
@@ -130,18 +126,15 @@ public class ProductionAction extends GenericAction<Production> {
                         BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
                         productCost = BigDecimalUtil.sum(productCost, materialCost);
                         productCost = BigDecimalUtil.roundBigDecimal(productCost, 2);
-                        product.setCost(productCost);
+                        product.setCostA(productCost);
                     }
-                }/*else{
-                    BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
-                    remainingCost = BigDecimalUtil.sum(remainingCost, materialCost, 6);
-                    remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
-                }*/
+                }
             }
             System.out.println("-*-*-*-*-*-*-*---> Costo Producto: " + product.getProductItem().getFullName() + " - " + product.getCost());
+
         }
 
-
+        /** Calculando Costo Restante */
         BigDecimal remainingCost = BigDecimal.ZERO;
         for (Supply ingredient : this.ingredientSupplyList){
             if (ingredient.getProductionProduct() == null) {
@@ -158,12 +151,37 @@ public class ProductionAction extends GenericAction<Production> {
                 remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
             }
         }
+        /** end **/
+
+        /** Calculando volumen total de lo productos */
+        BigDecimal totalVolume = calculateTotalVolume(getInstance());
+
+        for (ProductionProduct product : getInstance().getProductionProductList()){
+            BigDecimal productCost = BigDecimal.ZERO;
+            BigDecimal productVolume     = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
+            BigDecimal productPercentage = BigDecimalUtil.multiply(productVolume, BigDecimalUtil.toBigDecimal(100), 2);
+                       productPercentage = BigDecimalUtil.divide(productPercentage, totalVolume, 2);
+
+            productCost = BigDecimalUtil.multiply(remainingCost, BigDecimalUtil.toBigDecimal(productPercentage.doubleValue()/100), 2);
+            product.setCostB(productCost);
+        }
+
 
         System.out.println("-*-*-*-*-*-*-*---> Costo restante: " + remainingCost);
 
+        //getInstance().setState(ProductionState.APR);
         productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
-        getInstance().setState(ProductionState.APR);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
+    }
+
+    /** Calcula el volumen Total de los productos de una produccion **/
+    public BigDecimal calculateTotalVolume(Production production){
+        BigDecimal totalVolume = BigDecimal.ZERO;
+        for (ProductionProduct product : production.getProductionProductList()){
+            BigDecimal productVolume   = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
+            totalVolume = BigDecimalUtil.sum(totalVolume, productVolume, 2);
+        }
+        return totalVolume;
     }
 
     public boolean isPending(){
