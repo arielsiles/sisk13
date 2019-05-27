@@ -50,6 +50,9 @@ public class ProductionProduct implements BaseModel {
     @Column(name = "costo", nullable = true, updatable = true, insertable = true)
     private BigDecimal cost;
 
+    @Column(name = "costouni", nullable = true, updatable = true, insertable = true)
+    private BigDecimal unitCost;
+
     @Column(name = "costo_a", nullable = true, updatable = true, insertable = true)
     private BigDecimal costA;
 
@@ -169,5 +172,13 @@ public class ProductionProduct implements BaseModel {
 
     public void setCostC(BigDecimal costC) {
         this.costC = costC;
+    }
+
+    public BigDecimal getUnitCost() {
+        return unitCost;
+    }
+
+    public void setUnitCost(BigDecimal unitCost) {
+        this.unitCost = unitCost;
     }
 }

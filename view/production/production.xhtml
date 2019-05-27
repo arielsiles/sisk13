@@ -213,6 +213,7 @@
                                          ajaxSingle="true"
                                          immediate="true"
                                          action="#{productionAction.assignProduct(productionProduct)}"
+                                         rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                                          reRender="assignProductionProduct, ingredientPanel, materialPanel, finalProductList">
                         </a4j:commandLink>
                     </rich:column>
@@ -392,11 +393,13 @@
         <rich:dataTable id="productList"
                         value="#{production.productionProductList}"
                         var="product"
-                        width="100%" columnsWidth="60%, 30%, 10$">
+                        width="100%" columnsWidth="50%, 15%, 15%, 15%, 5%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
                     <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
+                    <rich:column>#{messages['Production.totalCost']}</rich:column>
+                    <rich:column>#{messages['Production.unitCost']}</rich:column>
                     <rich:column>#{messages['Common.action']}</rich:column>
                 </rich:columnGroup>
             </f:facet>
@@ -406,6 +409,17 @@
             </rich:column>
             <rich:column styleClass="right">
                 <h:outputText value="#{product.quantity}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{product.cost}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+
+                <h:outputText value="#{product.unitCost}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                 </h:outputText>
             </rich:column>

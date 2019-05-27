@@ -74,5 +74,14 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         return result;
     }
 
+    public List<ProductionPlan> getProductionPlanList(Date startDate, Date endDate){
+
+        List<ProductionPlan> productionPlanList = (List<ProductionPlan>) em.createQuery("select p from ProductionPlan p " +
+                "where p.date between :startDate and :endDate")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+        return productionPlanList;
+    }
 
 }

@@ -166,15 +166,15 @@ public class ProductionAction extends GenericAction<Production> {
             product.setCostB(productCost);
         }
 
-
         System.out.println("-*-*-*-*-*-*-*---> Costo restante: " + remainingCost);
 
-        //getInstance().setState(ProductionState.APR);
+        updateUnitCostProducts(getInstance());
+        getInstance().setState(ProductionState.APR);
         productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
     }
 
-    /** Calcula el volumen Total de los productos de una produccion **/
+    /** Calcula el VOLUMEN TOTAL de una produccion **/
     public BigDecimal calculateTotalVolume(Production production){
         BigDecimal totalVolume = BigDecimal.ZERO;
         for (ProductionProduct product : production.getProductionProductList()){
@@ -182,6 +182,18 @@ public class ProductionAction extends GenericAction<Production> {
             totalVolume = BigDecimalUtil.sum(totalVolume, productVolume, 2);
         }
         return totalVolume;
+    }
+
+    public void updateUnitCostProducts(Production production){
+
+        for (ProductionProduct product : production.getProductionProductList()){
+            BigDecimal totalCostProcuct = BigDecimal.ZERO;
+            totalCostProcuct = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
+            totalCostProcuct = BigDecimalUtil.sum(totalCostProcuct, product.getCostC(), 2);
+            product.setCost(totalCostProcuct);
+            product.setUnitCost(BigDecimalUtil.divide(totalCostProcuct, product.getQuantity(), 2));
+        }
+
     }
 
     public boolean isPending(){
@@ -455,6 +467,7 @@ public class ProductionAction extends GenericAction<Production> {
         return result;
     }
 
+    /** Calcula la cantidad total de materia prima (leche) de la produccion **/
     public BigDecimal calculateRawMaterial(){
         BigDecimal result = BigDecimal.ZERO;
 

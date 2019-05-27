@@ -1,10 +1,14 @@
 package com.encens.khipus.service.production;
 
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.production.IndirectCosts;
+import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.SubGroup;
 
 import javax.ejb.Local;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -37,4 +41,6 @@ public interface IndirectCostsService extends GenericService {
     public List<IndirectCosts> getIndirectCostGeneral(PeriodIndirectCost indirectCost);
 
     boolean findPeriodIndirectCostUsed(PeriodIndirectCost periodIndirectCost);
+
+    BigDecimal getTotalIndirectCostByPeriod(PeriodIndirectCost periodIndirectCost);
 }

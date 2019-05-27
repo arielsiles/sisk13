@@ -431,4 +431,16 @@ public class IndirectCostsServiceBean extends ExtendedGenericServiceBean impleme
 
         return periodIndirectCost;
     }
+
+    public BigDecimal getTotalIndirectCostByPeriod(PeriodIndirectCost periodIndirectCost){
+        BigDecimal result = BigDecimal.ZERO;
+
+        result = (BigDecimal)em.createQuery("select sum(i.amountBs) from IndirectCosts i " +
+                                               "where i.periodIndirectCost =:periodIndirectCost")
+                .setParameter("periodIndirectCost", periodIndirectCost)
+                .getSingleResult();
+
+        return result;
+    }
+
 }

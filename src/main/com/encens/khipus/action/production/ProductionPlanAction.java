@@ -2,19 +2,22 @@ package com.encens.khipus.action.production;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.production.Production;
-import com.encens.khipus.model.production.ProductionPlan;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.Supply;
+import com.encens.khipus.model.employees.Gestion;
+import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.production.IndirectCostsService;
+import com.encens.khipus.service.production.PeriodIndirectCostService;
 import com.encens.khipus.service.production.ProductionPlanService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -24,11 +27,22 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     @In(create = true)
     private ProductionAction productionAction;
-
     @In
     private ProductionPlanService productionPlanService;
+    @In
+    private PeriodIndirectCostService periodIndirectCostService;
+    @In
+    private IndirectCostsService indirectCostsService;
 
     private List<ProductionProduct> productList = new ArrayList<ProductionProduct>();
+
+    /*private Date startDate;
+    private Date endDate;*/
+    private BigDecimal totalIndirectCost;
+    private BigDecimal totalVolumePeriod;
+
+    private Gestion gestion;
+    private Month month;
 
     @Factory(value = "productionPlan", scope = ScopeType.STATELESS)
     public ProductionPlan initProductionPlan() {
@@ -42,6 +56,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         setProductList(getInstance().getProductionProductList());
 
         return outCome;
+    }
+
+    @Factory(value = "monthsEnum")
+    public Month[] getMonthEnum() {
+        return Month.values();
     }
 
     @Override
@@ -64,6 +83,94 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         productionAction.setProductionPlan(getInstance());
         /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
+    }
+
+
+    public void processIndirectCostDistribution(){
+
+        // 0. Obtener Costos indirectos del periodo
+        PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+        this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
+
+        Date startDate = DateUtils.firstDayOfMonth(this.month.getValue(), this.gestion.getYear());
+        Date endDate = DateUtils.lastDayOfMonth(this.month.getValue(), this.gestion.getYear());
+        System.out.println("ºººººººººº>>> firstDayOfMonth: " + startDate);
+        System.out.println("ºººººººººº>>> lastDayOfMonth: " + endDate);
+
+        // 1. Obtener las producciones del mes
+        // Calcula el Volumen total por Plan de produccion (x dia)
+        // 2. Calcular el volumen Total de las produccion del mes
+        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+        BigDecimal totalVolume = BigDecimal.ZERO;
+        for (ProductionPlan productionPlan : productionPlanList){
+            totalVolume = BigDecimalUtil.sum(totalVolume, calculateTotalVolumePlan(productionPlan), 2);
+        }
+        this.totalVolumePeriod = totalVolume;
+        System.out.println("=-=-=-=---> totalIndirectCost: " + totalIndirectCost);
+        System.out.println("=-=-=-=---> TotalVolumePlan: " + totalVolumePeriod);
+        // 3. Calcular los porcentajes por dia de produccion
+        BigDecimal totalDistribution = BigDecimal.ZERO;
+        for (ProductionPlan productionPlan : productionPlanList){
+
+            BigDecimal volumeDay = calculateTotalVolumePlan(productionPlan);
+            BigDecimal percentageDay = BigDecimalUtil.multiply(volumeDay, BigDecimalUtil.toBigDecimal(100), 2);
+            percentageDay = BigDecimalUtil.divide(percentageDay, totalVolumePeriod, 2);
+            BigDecimal distributionDay = BigDecimalUtil.multiply(totalIndirectCost, (BigDecimalUtil.divide(percentageDay, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+
+            totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionDay, 2);
+
+            System.out.println("=-=-=-=---> Fecha: " + productionPlan.getDate() + " - " + volumeDay + " - " + percentageDay + " = " + distributionDay);
+            distributionCostByDay(productionPlan, distributionDay);
+        }
+        System.out.println("=-=-=-=---> Total Dist: " + totalDistribution);
+
+        // 4. Distribuir costos por dia
+        // 5. Distribuir costos por producto
+
+    }
+
+    public void distributionCostByDay(ProductionPlan productionPlan, BigDecimal distributionDay){
+
+        BigDecimal volumePlan = calculateTotalVolumePlan(productionPlan);
+        BigDecimal totalDistribution = BigDecimal.ZERO;
+        for (Production production : productionPlan.getProductionList()){
+            BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
+            BigDecimal percentage = BigDecimalUtil.multiply(volumeProduction, BigDecimalUtil.toBigDecimal(100), 2);
+                       percentage = BigDecimalUtil.divide(percentage, volumePlan, 2);
+
+            BigDecimal distributionProduction = BigDecimalUtil.multiply(distributionDay, (BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+            totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduction, 2);
+            System.out.println("-------==============> Dist: " + volumeProduction + " - " + percentage + " = " + distributionProduction);
+            distributionCostbyProduction(production, distributionProduction);
+        }
+        System.out.println("-------==============> Total Dist: " + totalDistribution);
+    }
+
+    public void distributionCostbyProduction(Production production, BigDecimal distributionProduction){
+
+        BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
+        BigDecimal totalDistribution = BigDecimal.ZERO;
+        for (ProductionProduct product : production.getProductionProductList()){
+            BigDecimal volumeProduct = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
+            BigDecimal percentage = BigDecimalUtil.multiply(volumeProduct, BigDecimalUtil.toBigDecimal(100), 2);
+                       percentage = BigDecimalUtil.divide(percentage, volumeProduction, 2);
+
+            BigDecimal distributionProduct = BigDecimalUtil.multiply(distributionProduction, (BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+            totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduct, 2);
+            System.out.println("-------==============--------------------> Dist: " + volumeProduct + " - " + percentage + " = " + distributionProduct);
+        }
+        System.out.println("-------==============--------------------> Total Dist: " + totalDistribution);
+    }
+
+
+
+    public BigDecimal calculateTotalVolumePlan(ProductionPlan productionPlan){
+
+        BigDecimal result = BigDecimal.ZERO;
+        for (Production production : productionPlan.getProductionList()){
+            result = BigDecimalUtil.sum(result, productionAction.calculateTotalVolume(production), 2);
+        }
+        return result;
     }
 
     public List<ProductionProduct> getProductList() {
@@ -124,5 +231,35 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     }
 
+    public BigDecimal getTotalIndirectCost() {
+        return totalIndirectCost;
+    }
 
+    public void setTotalIndirectCost(BigDecimal totalIndirectCost) {
+        this.totalIndirectCost = totalIndirectCost;
+    }
+
+    public Gestion getGestion() {
+        return gestion;
+    }
+
+    public void setGestion(Gestion gestion) {
+        this.gestion = gestion;
+    }
+
+    public Month getMonth() {
+        return month;
+    }
+
+    public void setMonth(Month month) {
+        this.month = month;
+    }
+
+    public BigDecimal getTotalVolumePeriod() {
+        return totalVolumePeriod;
+    }
+
+    public void setTotalVolumePeriod(BigDecimal totalVolumePeriod) {
+        this.totalVolumePeriod = totalVolumePeriod;
+    }
 }
