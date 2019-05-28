@@ -33,6 +33,8 @@ public class ProductionAction extends GenericAction<Production> {
     //private BigDecimal totalCost;
     //private BigDecimal totalRawMaterial;
 
+    @In
+    private ProductionPlanAction productionPlanAction;
 
     @In
     private ProductionService productionService;
@@ -170,6 +172,8 @@ public class ProductionAction extends GenericAction<Production> {
 
         updateUnitCostProducts(getInstance());
         getInstance().setState(ProductionState.APR);
+        productionPlanAction.changePlanStatus(getInstance().getProductionPlan());
+
         productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
     }

@@ -37,8 +37,6 @@ import org.jboss.seam.international.StatusMessage;
 import javax.faces.event.ActionEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.encens.khipus.model.production.ProductionPlanningState.*;
@@ -343,7 +341,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
 
     }
 
-    public void setPendingProductionOrder(){
+    /*public void setPendingProductionOrder(){
         productionPlanningService.setProductionOrdersState(start, end, ProductionPlanningState.PENDING);
     }
 
@@ -383,7 +381,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
             setInstance(productionPlanning);
             generateAllAccountingEntries();
         }
-    }
+    }*/
 
     public void generateOnlyAllVoucher(){
 

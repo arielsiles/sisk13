@@ -1165,20 +1165,9 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <s:link view="/production/materialConfigurationList.xhtml"
-                value="#{messages['menu.production.materialConfiguration']}"
-                styleClass="tab-cell"
-                propagation="none"/>
-
-        <s:link view="/production/countingProduction.xhtml"
-                value="Contabilizar"
-                styleClass="tab-cell"
-                propagation="none"/>
-
         <rich:dropDownMenu value="#{messages['menu.production.process']}" >
             <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{s:hasPermission('PRODUCTION','VIEW')}">
+                           styleClass="main-menu-item">
 
                 <s:link view="/production/distributionIndirectCost.xhtml"
                         value="#{messages['menu.production.process.distributionIndirectCost']}"
@@ -1213,8 +1202,29 @@
                         value="#{messages['menu.production.planification.reportProductionBalance']}"
                         propagation="begin"/>
             </rich:menuItem>
+        </rich:dropDownMenu>
 
+        <rich:dropDownMenu value="#{messages['menu.production.configuration']}"
+                           rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item">
 
+                <s:link view="/production/materialConfigurationList.xhtml"
+                        value="#{messages['menu.production.materialConfiguration']}"
+                        propagation="begin"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item">
+                <s:link view="/production/indirectCostConfigList.xhtml"
+                        value="#{messages['menu.production.configuration.indirectCostParameters']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item">
+                <s:link view="/production/indirectCostsList.xhtml"
+                        value="#{messages['menu.production.configuration.indirectCostRegistration']}"
+                        propagation="none"/>
+            </rich:menuItem>
         </rich:dropDownMenu>
 
     </h:panelGrid>
@@ -1332,22 +1342,7 @@
                 value="#{messages['menu.production.configuration.productionMaterial']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
 
-            >
-        <s:link view="/production/indirectCostConfigList.xhtml"
-                value="#{messages['menu.production.configuration.indirectCostconfiguration']}"
-                propagation="none"/>
-    </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
-
-            >
-        <s:link view="/production/indirectCostsList.xhtml"
-                value="#{messages['menu.production.configuration.indirectCosts']}"
-                propagation="none"/>
-    </rich:menuItem>
 </rich:dropDownMenu>
 
 <rich:dropDownMenu value="#{messages['menu.production.rawMaterialCollection']}"

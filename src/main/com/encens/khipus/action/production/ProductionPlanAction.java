@@ -9,11 +9,13 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
 import com.encens.khipus.service.production.ProductionPlanService;
+import com.encens.khipus.service.production.ProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,6 +35,9 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     private PeriodIndirectCostService periodIndirectCostService;
     @In
     private IndirectCostsService indirectCostsService;
+
+    @In
+    private ProductionService productionService;
 
     private List<ProductionProduct> productList = new ArrayList<ProductionProduct>();
 
@@ -85,11 +90,21 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return Outcome.SUCCESS;
     }
 
+    public void calculateTotalInditectCost(){
+        PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+        this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
+    }
 
+    /** Start Proceso Distribucion de costos indirectos (1) **/
     public void processIndirectCostDistribution(){
 
-        // 0. Obtener Costos indirectos del periodo
         PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+
+        if (periodIndirectCost.getDisttributionFlag()){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.distributedIndirectCosts");
+            return;
+        }
+
         this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
 
         Date startDate = DateUtils.firstDayOfMonth(this.month.getValue(), this.gestion.getYear());
@@ -115,7 +130,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             BigDecimal volumeDay = calculateTotalVolumePlan(productionPlan);
             BigDecimal percentageDay = BigDecimalUtil.multiply(volumeDay, BigDecimalUtil.toBigDecimal(100), 2);
             percentageDay = BigDecimalUtil.divide(percentageDay, totalVolumePeriod, 2);
-            BigDecimal distributionDay = BigDecimalUtil.multiply(totalIndirectCost, (BigDecimalUtil.divide(percentageDay, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+            BigDecimal distributionDay = BigDecimalUtil.multiply(totalIndirectCost, (BigDecimalUtil.divide(percentageDay, BigDecimalUtil.toBigDecimal(100), 4)), 2);
 
             totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionDay, 2);
 
@@ -126,9 +141,26 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         // 4. Distribuir costos por dia
         // 5. Distribuir costos por producto
+        // ----------------------------------
+        /** Actualizando el costo unitario de los productos **/
+        List<Supply> emptyList = new ArrayList<Supply>();
+        for (ProductionPlan productionPlan : productionPlanList){
+            for (Production production : productionPlan.getProductionList()){
+                for (ProductionProduct product : production.getProductionProductList()){
+                    BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
+                                productCost = BigDecimalUtil.sum(productCost, product.getCostC(), 2);
 
+                    product.setCost(productCost);
+                    product.setUnitCost(BigDecimalUtil.divide(productCost, product.getQuantity(), 2));
+                }
+                production.setState(ProductionState.FIN);
+
+                productionService.updateProduction(production, emptyList, emptyList);
+            }
+        }
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.indirectCostsCompleted");
     }
-
+    /** Proceso Distribucion de costos indirectos (2) **/
     public void distributionCostByDay(ProductionPlan productionPlan, BigDecimal distributionDay){
 
         BigDecimal volumePlan = calculateTotalVolumePlan(productionPlan);
@@ -138,14 +170,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             BigDecimal percentage = BigDecimalUtil.multiply(volumeProduction, BigDecimalUtil.toBigDecimal(100), 2);
                        percentage = BigDecimalUtil.divide(percentage, volumePlan, 2);
 
-            BigDecimal distributionProduction = BigDecimalUtil.multiply(distributionDay, (BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+            BigDecimal distributionProduction = BigDecimalUtil.multiply(distributionDay, (BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 4)), 2);
             totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduction, 2);
             System.out.println("-------==============> Dist: " + volumeProduction + " - " + percentage + " = " + distributionProduction);
             distributionCostbyProduction(production, distributionProduction);
         }
         System.out.println("-------==============> Total Dist: " + totalDistribution);
     }
-
+    /** Proceso Distribucion de costos indirectos (3) **/
     public void distributionCostbyProduction(Production production, BigDecimal distributionProduction){
 
         BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
@@ -155,13 +187,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             BigDecimal percentage = BigDecimalUtil.multiply(volumeProduct, BigDecimalUtil.toBigDecimal(100), 2);
                        percentage = BigDecimalUtil.divide(percentage, volumeProduction, 2);
 
-            BigDecimal distributionProduct = BigDecimalUtil.multiply(distributionProduction, (BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 2)), 2);
+            BigDecimal distributionProduct = BigDecimalUtil.multiply(distributionProduction, BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 4), 2);
             totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduct, 2);
-            System.out.println("-------==============--------------------> Dist: " + volumeProduct + " - " + percentage + " = " + distributionProduct);
+            System.out.println("-------==============--------------------> Dist: " + product.getProductItem().getFullName() + " - " + volumeProduct + " - " + percentage + " = " + distributionProduct);
+            product.setCostC(distributionProduct);
         }
         System.out.println("-------==============--------------------> Total Dist: " + totalDistribution);
     }
-
+    /** End Proceso Distribucion de costos indirectos **/
 
 
     public BigDecimal calculateTotalVolumePlan(ProductionPlan productionPlan){
@@ -171,6 +204,15 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             result = BigDecimalUtil.sum(result, productionAction.calculateTotalVolume(production), 2);
         }
         return result;
+    }
+
+    public void changePlanStatus(ProductionPlan productionPlan){
+        ProductionPlanState result = ProductionPlanState.APR;
+        for (Production production : productionPlan.getProductionList()){
+            if (!production.getState().equals(ProductionState.APR))
+                result = ProductionPlanState.PEN;
+        }
+        productionPlan.setState(result);
     }
 
     public List<ProductionProduct> getProductList() {

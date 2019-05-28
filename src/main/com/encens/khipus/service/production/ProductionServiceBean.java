@@ -46,6 +46,7 @@ public class ProductionServiceBean implements ProductionService {
 
     public void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList){
 
+        System.out.println("----> Estado Produccion: " + production.getState());
         for (Supply supply : ingredientSupplyList){
             if (supply.getId() == null){
                 supply.setProduction(production);
@@ -78,6 +79,8 @@ public class ProductionServiceBean implements ProductionService {
         em.merge(production);
         em.flush();
 
+        em.merge(production.getProductionPlan());
+        em.flush();
     }
 
     public void assignProduct(Production production, ProductionProduct product){

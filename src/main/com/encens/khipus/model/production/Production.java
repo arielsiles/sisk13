@@ -36,8 +36,7 @@ public class Production implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Production.tableGenerator")
     private Long id;
 
-    @Column(name = "codigo")
-    private Integer code;
+    @Column(name = "codigo") private Integer code;
 
     @Column(name = "estado", nullable = true)
     @Enumerated(EnumType.STRING)

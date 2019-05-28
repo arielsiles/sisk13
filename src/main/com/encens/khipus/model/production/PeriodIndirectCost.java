@@ -4,9 +4,11 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Gestion;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,8 +43,9 @@ public class PeriodIndirectCost implements BaseModel {
     @Column(name = "MES", nullable = true)
     private Integer month;
 
-    @Column(name = "DIA", nullable = true)
-    private Integer day;
+    @Column(name = "dist", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean disttributionFlag = Boolean.FALSE;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},optional = false)
     @JoinColumn(name = "IDGESTION")
@@ -72,14 +75,6 @@ public class PeriodIndirectCost implements BaseModel {
         this.month = month;
     }
 
-    public Integer getDay() {
-        return day;
-    }
-
-    public void setDay(Integer day) {
-        this.day = day;
-    }
-
     public Gestion getGestion() {
         return gestion;
     }
@@ -102,5 +97,13 @@ public class PeriodIndirectCost implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public Boolean getDisttributionFlag() {
+        return disttributionFlag;
+    }
+
+    public void setDisttributionFlag(Boolean disttributionFlag) {
+        this.disttributionFlag = disttributionFlag;
     }
 }

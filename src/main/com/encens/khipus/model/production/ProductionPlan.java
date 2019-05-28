@@ -42,6 +42,10 @@ public class ProductionPlan implements BaseModel {
     @Column(name = "fecha")
     private Date date;
 
+    @Column(name = "estado", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private ProductionPlanState state;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionPlan")
     private List<Production> productionList = new ArrayList<Production>(0);
 
@@ -111,5 +115,13 @@ public class ProductionPlan implements BaseModel {
 
     public void setProductionProductList(List<ProductionProduct> productionProductList) {
         this.productionProductList = productionProductList;
+    }
+
+    public ProductionPlanState getState() {
+        return state;
+    }
+
+    public void setState(ProductionPlanState state) {
+        this.state = state;
     }
 }

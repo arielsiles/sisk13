@@ -10,7 +10,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 /**
  *
@@ -18,7 +17,7 @@ import java.math.BigDecimal;
  * @author Diego Loza
  * @version 1.2.1
  */
-@TableGenerator(name = "IndirectCostsConifg.tableGenerator",
+@TableGenerator(name = "IndirectCostConfig.tableGenerator",
         table = "SECUENCIA",
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
@@ -29,11 +28,11 @@ import java.math.BigDecimal;
 @Table(name = "COSTOSINDIRECTOSCONF")
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-public class IndirectCostsConifg implements BaseModel {
+public class IndirectCostConfig implements BaseModel {
 
     @Id
     @Column(name = "IDCOSTOSINDIRECTOSCONF", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "IndirectCostsConifg.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "IndirectCostConfig.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
