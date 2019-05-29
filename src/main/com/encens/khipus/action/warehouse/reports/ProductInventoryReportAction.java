@@ -94,7 +94,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("reportTitle", "REPORTE DE INVENTARIO");
+        paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO");
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
         paramMap.put("warehouse", warehouse.getFullName());
