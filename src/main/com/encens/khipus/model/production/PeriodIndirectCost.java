@@ -43,9 +43,9 @@ public class PeriodIndirectCost implements BaseModel {
     @Column(name = "MES", nullable = true)
     private Integer month;
 
-    @Column(name = "dist", nullable = false)
+    @Column(name = "procesado", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean disttributionFlag = Boolean.FALSE;
+    private Boolean processed = Boolean.FALSE;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},optional = false)
     @JoinColumn(name = "IDGESTION")
@@ -99,11 +99,11 @@ public class PeriodIndirectCost implements BaseModel {
         this.company = company;
     }
 
-    public Boolean getDisttributionFlag() {
-        return disttributionFlag;
+    public Boolean getProcessed() {
+        return processed;
     }
 
-    public void setDisttributionFlag(Boolean disttributionFlag) {
-        this.disttributionFlag = disttributionFlag;
+    public void setProcessed(Boolean disttributionFlag) {
+        this.processed = disttributionFlag;
     }
 }

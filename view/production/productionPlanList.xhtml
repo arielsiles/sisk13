@@ -83,13 +83,13 @@
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{productionPlanItem.date}" >
                         <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
                     </h:outputText>
                 </rich:column>
 
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{messages[productionPlanItem.state.resourceKey]}"/>
                 </rich:column>
 

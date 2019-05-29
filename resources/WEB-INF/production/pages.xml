@@ -622,4 +622,12 @@
         </navigation>
     </page>
 
+    <page view-id="/production/distributionIndirectCost.xhtml" no-conversation-view-id="/production/productionPlanList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/productionPlanList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

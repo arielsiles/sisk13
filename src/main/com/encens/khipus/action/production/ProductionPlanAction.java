@@ -71,6 +71,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     @Override
     @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String create() {
+        getInstance().setState(ProductionPlanState.PEN);
         String outcome = super.create();
         setOp(OP_UPDATE);
         return outcome;
@@ -100,15 +101,15 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
 
-        if (periodIndirectCost.getDisttributionFlag()){
+        if (periodIndirectCost.getProcessed()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.distributedIndirectCosts");
             return;
         }
 
         this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
+        Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
+        Date endDate = DateUtils.getLastDayOfMonth(startDate);
 
-        Date startDate = DateUtils.firstDayOfMonth(this.month.getValue(), this.gestion.getYear());
-        Date endDate = DateUtils.lastDayOfMonth(this.month.getValue(), this.gestion.getYear());
         System.out.println("ºººººººººº>>> firstDayOfMonth: " + startDate);
         System.out.println("ºººººººººº>>> lastDayOfMonth: " + endDate);
 
@@ -116,10 +117,22 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         // Calcula el Volumen total por Plan de produccion (x dia)
         // 2. Calcular el volumen Total de las produccion del mes
         List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+
         BigDecimal totalVolume = BigDecimal.ZERO;
+        Boolean flagState = Boolean.TRUE;
         for (ProductionPlan productionPlan : productionPlanList){
             totalVolume = BigDecimalUtil.sum(totalVolume, calculateTotalVolumePlan(productionPlan), 2);
+            if (!productionPlan.getState().equals(ProductionPlanState.APR)){
+                flagState = Boolean.FALSE;
+            }
         }
+
+        if (!flagState){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.pendingProductionOrders");
+            return;
+        }
+
+
         this.totalVolumePeriod = totalVolume;
         System.out.println("=-=-=-=---> totalIndirectCost: " + totalIndirectCost);
         System.out.println("=-=-=-=---> TotalVolumePlan: " + totalVolumePeriod);
@@ -145,6 +158,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         /** Actualizando el costo unitario de los productos **/
         List<Supply> emptyList = new ArrayList<Supply>();
         for (ProductionPlan productionPlan : productionPlanList){
+            System.out.println("-.-.-.-.-.-.-.-.-.----> Plan: " + productionPlan.getDate());
             for (Production production : productionPlan.getProductionList()){
                 for (ProductionProduct product : production.getProductionProductList()){
                     BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
@@ -154,10 +168,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                     product.setUnitCost(BigDecimalUtil.divide(productCost, product.getQuantity(), 2));
                 }
                 production.setState(ProductionState.FIN);
-
                 productionService.updateProduction(production, emptyList, emptyList);
             }
+            productionPlan.setState(ProductionPlanState.FIN);
+            productionPlanService.updateProductionPlan(productionPlan, new ArrayList<ProductionProduct>());
         }
+        periodIndirectCost.setProcessed(Boolean.TRUE);
+        periodIndirectCostService.updatePeriodIndirectCost(periodIndirectCost);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.indirectCostsCompleted");
     }
     /** Proceso Distribucion de costos indirectos (2) **/
@@ -240,6 +257,15 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             result = "SI";
 
         return  result;
+    }
+
+    public boolean isPending(){
+        boolean result = false;
+        if (isManaged()) {
+            if (getInstance().getState().equals(ProductionPlanState.PEN))
+                result = true;
+        }
+        return result;
     }
 
     public BigDecimal getDestinedMilk(Production production){

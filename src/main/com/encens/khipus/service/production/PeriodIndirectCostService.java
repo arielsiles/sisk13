@@ -2,7 +2,6 @@ package com.encens.khipus.service.production;
 
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.production.IndirectCosts;
 import com.encens.khipus.model.production.IndirectCostsConfig;
 import com.encens.khipus.model.production.PeriodIndirectCost;
 
@@ -15,14 +14,11 @@ import java.util.List;
 @Local
 public interface PeriodIndirectCostService {
     public PeriodIndirectCost findLastPeriodIndirectCost();
-
     PeriodIndirectCost findPeriodIndirect(Month month, Gestion gestion);
-
     boolean findPeriodIndirect(PeriodIndirectCost periodIndirectCost);
-
     PeriodIndirectCost findLastPeriodIndirectCostUsed();
-
     public List<IndirectCostsConfig> findPredefinedIndirectCost();
-
     boolean findPeriodIndirectCostUsed(PeriodIndirectCost periodIndirectCost);
+    void updatePeriodIndirectCost(PeriodIndirectCost periodIndirectCost);
+
 }

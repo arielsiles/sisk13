@@ -79,8 +79,8 @@ public class ProductionServiceBean implements ProductionService {
         em.merge(production);
         em.flush();
 
-        em.merge(production.getProductionPlan());
-        em.flush();
+        /*em.merge(production.getProductionPlan());
+        em.flush();*/
     }
 
     public void assignProduct(Production production, ProductionProduct product){

@@ -275,6 +275,11 @@ public final class DateUtils {
         return dateTime.toDate();
     }
 
+    public static Date getFirstDayOfMonth(Integer month, Integer year, Integer ms) {
+        DateTime dateTime = new DateTime(year, month, 1, 0, 0, ms, 0);
+        return dateTime.toDate();
+    }
+
     public static Date getLastDayOfMonth(Long timeMillis) {
         DateTime dateTime = new DateTime(timeMillis);
         return dateTime.dayOfMonth().withMaximumValue().toDate();

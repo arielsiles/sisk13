@@ -107,4 +107,12 @@ public class PeriodIndirectCostServiceBean implements PeriodIndirectCostService 
 
         return indirectCosts.size() > 0;
     }
+
+    @Override
+    public void updatePeriodIndirectCost(PeriodIndirectCost periodIndirectCost) {
+        em.merge(periodIndirectCost);
+        em.flush();
+    }
+
+
 }

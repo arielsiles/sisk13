@@ -25,10 +25,10 @@
 <h:form id="productionPlanForm">
 
     <div class="buttons">
-        <!--<h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
+        <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="4">
-        </h:commandButton>-->
+        </h:commandButton>
     </div>
 
     <rich:panel id="formPanel">
@@ -47,30 +47,6 @@
         <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
 
             <s:div>
-                <!--<s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.startDate']}</ui:define>
-                    <rich:calendar value="#{productionPlanAction.startDate}"
-                                   popup="true"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   enableManualInput="true"
-                                   tabindex="9">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>
-
-                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.endDate']}</ui:define>
-                    <rich:calendar value="#{productionPlanAction.endDate}"
-                                   popup="true"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   enableManualInput="true"
-                                   tabindex="9">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>-->
-
                 <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
                     <h:selectOneMenu id="gestion"
@@ -109,21 +85,7 @@
                     </h:outputText>
                 </s:decorate>
 
-                <!--<s:decorate id="totalVolumePlanField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.totalVolumePeriod']}</ui:define>
-                    <h:outputText id="totalVolumePlan"
-                                  value="#{productionPlanAction.totalVolumePeriod}"
-                                  styleClass="input">
-                        <app:realNumberConverter forId="totalVolumePlan" pattern="#{messages['patterns.decimalNumber']}"/>
-                    </h:outputText>
-                </s:decorate>-->
-
-
                 <s:decorate id="amountTransferButtonField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <a4j:commandButton action="#{productionPlanAction.processIndirectCostDistribution()}" reRender="totalIndirectCostField, totalVolumePlanField"
-                                       styleClass="button"
-                                       value="#{messages['CashSale.calculate']}" id="amountTransferButtonId" tabindex="4">
-                    </a4j:commandButton>
 
                     <a4j:commandButton action="#{productionPlanAction.calculateTotalInditectCost()}"
                                        value="#{messages['CashSale.calculate']}"
@@ -139,22 +101,8 @@
                     </a4j:commandButton>
                 </s:decorate>
 
-
-
-                <!--<s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.milkWeighing']}</ui:define>
-                    <h:outputText value="#{productionPlanAction.getTotalWeighed(productionPlan)}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                    </h:outputText>
-                    <span class="spacer"></span>
-                    <h:outputText value="#{messages['MeasureUnit.LT']}" />
-                </s:decorate>-->
-
-
             </s:div>
 
-
-            <s:div></s:div>
         </h:panelGrid>
     </rich:panel>
 
@@ -168,7 +116,6 @@
             <p>
                 <h:outputFormat value="#{messages['ProductionPlan.process.confirmation']}">
                     <!--<f:param value="#{currency.name}"/>-->
-
                 </h:outputFormat>
             </p>
         </ui:define>
@@ -177,7 +124,9 @@
                                value="#{messages['Common.process']}"
                                immediate="true"
                                styleClass="button"
-                               tabindex="1000"/>
+                               tabindex="1000">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </a4j:commandButton>
         </ui:define>
     </s:decorate>
 

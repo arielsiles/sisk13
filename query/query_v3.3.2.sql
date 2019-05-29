@@ -105,9 +105,9 @@ update inv_articulos set med_pr = 	'ML',	 cant_pr = 	0	 where cod_art = 	182	;
 update inv_articulos set med_pr = 	'ML',	 cant_pr = 	0	 where cod_art = 	183	;
 
 /** 28.05.2019 **/
-alter table periodocostoindirecto add column dist int(1) after mes;
+alter table periodocostoindirecto add column procesado int(1) after mes;
 alter table periodocostoindirecto drop column dia;
-update periodocostoindirecto p set p.`dist` = 0;
+update periodocostoindirecto p set p.`procesado` = 0;
 
 alter table pr_plan add column estado varchar(5) after fecha;
 update pr_plan p set p.`estado` = 'PEN';
