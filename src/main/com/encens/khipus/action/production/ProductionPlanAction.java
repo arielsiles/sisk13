@@ -86,6 +86,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String addProduction() {
+        productionAction.clearAction();
         productionAction.setProductionPlan(getInstance());
         /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
