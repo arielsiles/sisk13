@@ -97,6 +97,35 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
     }
 
+    public void accountingProduction(){
+
+        PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+        List<IndirectCosts> indirectCostList = periodIndirectCost.getIndirectCostList();
+
+        System.out.println("------> COSTOS INDIRECTOS <-------");
+        for (IndirectCosts indirectCost : indirectCostList){
+            System.out.println("---> " + indirectCost.getName() + " - " + indirectCost.getAmountBs());
+        }
+
+        Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
+        Date endDate   = DateUtils.getLastDayOfMonth(startDate);
+        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+
+        //System.out.println("------> ... <-------");
+        //System.out.println("------> PRODUCCION <-------");
+        for (ProductionPlan productionPlan : productionPlanList){
+            //System.out.println("===> PLAN FECHA: " + productionPlan.getDate());
+            for (Production production : productionPlan.getProductionList()){
+                //System.out.println("===> ORDEN PRODUCCION: " + production.getCode() + " - " + production.getTotalCost());
+                for (Supply supply : production.getSupplyList()){
+                    //System.out.println("===> INSUMOS : " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
+                }
+            }
+            System.out.println(". . .");
+        }
+
+    }
+
     /** Start Proceso Distribucion de costos indirectos (1) **/
     public void processIndirectCostDistribution(){
 
@@ -121,17 +150,19 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         BigDecimal totalVolume = BigDecimal.ZERO;
         Boolean flagState = Boolean.TRUE;
+        /** Para verificar si las ordenes de produccion estan aprobadas **/
+        /** Calcula el total de volumen **/
         for (ProductionPlan productionPlan : productionPlanList){
             totalVolume = BigDecimalUtil.sum(totalVolume, calculateTotalVolumePlan(productionPlan), 2);
             if (!productionPlan.getState().equals(ProductionPlanState.APR)){
                 flagState = Boolean.FALSE;
             }
         }
-
         if (!flagState){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.pendingProductionOrders");
             return;
         }
+        /** End Para verificar si las ordenes de produccion estan aprobadas **/
 
 
         this.totalVolumePeriod = totalVolume;
@@ -140,10 +171,9 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         // 3. Calcular los porcentajes por dia de produccion
         BigDecimal totalDistribution = BigDecimal.ZERO;
         for (ProductionPlan productionPlan : productionPlanList){
-
             BigDecimal volumeDay = calculateTotalVolumePlan(productionPlan);
             BigDecimal percentageDay = BigDecimalUtil.multiply(volumeDay, BigDecimalUtil.toBigDecimal(100), 2);
-            percentageDay = BigDecimalUtil.divide(percentageDay, totalVolumePeriod, 2);
+                       percentageDay = BigDecimalUtil.divide(percentageDay, totalVolumePeriod, 2);
             BigDecimal distributionDay = BigDecimalUtil.multiply(totalIndirectCost, (BigDecimalUtil.divide(percentageDay, BigDecimalUtil.toBigDecimal(100), 4)), 2);
 
             totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionDay, 2);

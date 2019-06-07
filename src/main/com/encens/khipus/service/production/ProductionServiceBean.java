@@ -132,6 +132,19 @@ public class ProductionServiceBean implements ProductionService {
         }
     }
 
+    @Override
+    public List<Object[]> getAllProductionSuplies(Production production) {
+
+        List<Object[]> result = new ArrayList<Object[]>();
+
+        result = em.createQuery("select supply.productItemCode,  from Supply supply " +
+                            " where supply.production = :production " +
+                            " group by ")
+                .getResultList();
+
+        return null;
+    }
+
     public List<MaterialInput> getMaterialInput(String productItemCode){
 
         List<MaterialInput> materialInputList = new ArrayList<MaterialInput>();

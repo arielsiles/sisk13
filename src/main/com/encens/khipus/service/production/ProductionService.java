@@ -22,4 +22,5 @@ public interface ProductionService {
     public List<MaterialInput> getMaterialInput(String productItemCode);
     void assignMaterial(Production production, Supply supply);
     void removeSupply(Supply supply);
+    List<Object[]> getAllProductionSuplies(Production production);
 }

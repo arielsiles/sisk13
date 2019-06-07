@@ -47,8 +47,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_produccion" view="colnames">
-<left>342</left>
-<top>353</top>
+<left>375</left>
+<top>330</top>
 <width>185</width>
 <height>250</height>
 <sql_create_table>CREATE TABLE `pr_produccion` (
@@ -118,8 +118,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_producto" view="colnames">
-<left>624</left>
-<top>18</top>
+<left>651</left>
+<top>17</top>
 <width>152</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `pr_producto` (
@@ -127,9 +127,13 @@
   `cod_art` varchar(6) DEFAULT NULL,
   `cantidad` decimal(16,2) DEFAULT NULL,
   `costo` decimal(16,2) DEFAULT '0.00',
+  `costouni` decimal(16,2) DEFAULT '0.00',
+  `costo_a` decimal(16,2) DEFAULT '0.00',
+  `costo_b` decimal(16,2) DEFAULT '0.00',
+  `costo_c` decimal(16,2) DEFAULT '0.00',
   `idproduccion` bigint(20) DEFAULT NULL,
   `idplan` bigint(20) DEFAULT NULL,
-  `version` bigint(20) NOT NULL,
+  `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idproducto`),
   KEY `idproduccion` (`idproduccion`),
@@ -163,6 +167,7 @@
   `idplan` bigint(20) NOT NULL,
   `nombre` varchar(100) DEFAULT NULL,
   `fecha` date NOT NULL,
+  `estado` varchar(5) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idplan`),

@@ -53,7 +53,7 @@ public class PeriodIndirectCost implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "periodIndirectCost", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<IndirectCosts> indirectCostses = new ArrayList<IndirectCosts>();
+    private List<IndirectCosts> indirectCostList = new ArrayList<IndirectCosts>();
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
@@ -83,12 +83,12 @@ public class PeriodIndirectCost implements BaseModel {
         this.gestion = gestion;
     }
 
-    public List<IndirectCosts> getIndirectCostses() {
-        return indirectCostses;
+    public List<IndirectCosts> getIndirectCostList() {
+        return indirectCostList;
     }
 
-    public void setIndirectCostses(List<IndirectCosts> indirectCostses) {
-        this.indirectCostses = indirectCostses;
+    public void setIndirectCostList(List<IndirectCosts> indirectCostses) {
+        this.indirectCostList = indirectCostses;
     }
 
     public Company getCompany() {
