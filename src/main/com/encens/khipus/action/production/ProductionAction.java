@@ -101,6 +101,9 @@ public class ProductionAction extends GenericAction<Production> {
         return Outcome.CANCEL;
     }
 
+    /**
+     * Al aprobar la produccion calcula los costos y lo distribuye por cada producto en la produccion
+     */
     public void approve(){
 
         for (ProductionProduct product : getInstance().getProductionProductList()){

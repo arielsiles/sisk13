@@ -100,16 +100,50 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     public void accountingProduction(){
 
         PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
-        List<IndirectCosts> indirectCostList = periodIndirectCost.getIndirectCostList();
+        if (periodIndirectCost == null){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.withoutIndirectCost");
+            return;
+        }
 
         System.out.println("------> COSTOS INDIRECTOS <-------");
-        for (IndirectCosts indirectCost : indirectCostList){
-            System.out.println("---> " + indirectCost.getName() + " - " + indirectCost.getAmountBs());
+        BigDecimal totalIndirectCostValue = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
+
+        List<IndirectAux> indirectAuxList = new ArrayList<IndirectAux>();
+
+        List<IndirectCosts> indirectCostList = periodIndirectCost.getIndirectCostList();
+        /** Calcula Lista de costos indirectos con porcentajes **/
+        for (IndirectCosts param : indirectCostList){
+            BigDecimal aux        = BigDecimalUtil.multiply(param.getAmountBs(), BigDecimalUtil.toBigDecimal(100), 6);
+            BigDecimal percentage = BigDecimalUtil.divide(aux, totalIndirectCostValue, 4);
+            IndirectAux indirect  = new IndirectAux(param.getCostsConifg().getAccount(), param.getAmountBs(), percentage, BigDecimal.ZERO);
+            indirectAuxList.add(indirect);
+
         }
 
         Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
         Date endDate   = DateUtils.getLastDayOfMonth(startDate);
         List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+
+        /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/
+        for (ProductionPlan productionPlan : productionPlanList){
+            for (Production production : productionPlan.getProductionList()){
+                for (ProductionProduct product : production.getProductionProductList()){
+                    for (IndirectAux indirectAux : indirectAuxList){
+                        BigDecimal percentageDec = BigDecimalUtil.divide(indirectAux.getPercentage(), BigDecimalUtil.toBigDecimal(100), 6);
+                        BigDecimal value = BigDecimalUtil.multiply(product.getCostC(), percentageDec, 6);
+                        BigDecimal totalValue = indirectAux.getValue();
+                        totalValue = BigDecimalUtil.sum(totalValue, value, 6);
+                        indirectAux.setValue(totalValue);
+                    }
+                }
+            }
+        }
+
+        System.out.println("------>> LISTA COSTOS INDIRECTOS TOTAL VALOR <<------");
+        for (IndirectAux indirectAux : indirectAuxList){
+            System.out.println("----->> " + indirectAux.getAccountCode() + " - " + indirectAux.getAmount() + " - " + indirectAux.getPercentage() + " - " + indirectAux.getValue() );
+        }
+
 
         //System.out.println("------> ... <-------");
         //System.out.println("------> PRODUCCION <-------");
@@ -121,7 +155,6 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                     //System.out.println("===> INSUMOS : " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
                 }
             }
-            System.out.println(". . .");
         }
 
     }
@@ -257,8 +290,17 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     public void changePlanStatus(ProductionPlan productionPlan){
         ProductionPlanState result = ProductionPlanState.APR;
         for (Production production : productionPlan.getProductionList()){
-            if (!production.getState().equals(ProductionState.APR))
+            if (!production.getState().equals(ProductionState.APR)) {
                 result = ProductionPlanState.PEN;
+                break;
+            }
+        }
+
+        for (ProductionProduct product : productionPlan.getProductionProductList()){
+            if (!hasProduction2(product)){
+                result = ProductionPlanState.PEN;
+                break;
+            }
         }
         productionPlan.setState(result);
     }
@@ -286,6 +328,15 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         String result = "NO";
         if (productionProduct.getProduction() != null)
             result = "SI";
+
+        return  result;
+    }
+
+    public Boolean hasProduction2(ProductionProduct productionProduct){
+
+        Boolean result = Boolean.FALSE;
+        if (productionProduct.getProduction() != null)
+            result = Boolean.TRUE;
 
         return  result;
     }
@@ -361,4 +412,52 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     public void setTotalVolumePeriod(BigDecimal totalVolumePeriod) {
         this.totalVolumePeriod = totalVolumePeriod;
     }
+
+    private class IndirectAux {
+
+        private String accountCode;
+        private BigDecimal amount;
+        private BigDecimal percentage;
+        private BigDecimal value;
+
+        IndirectAux(String accountCode, BigDecimal amount, BigDecimal percentage, BigDecimal value){
+            this.setAccountCode(accountCode);
+            this.setAmount(amount);
+            this.setPercentage(percentage);
+            this.setValue(value);
+        }
+
+        public String getAccountCode() {
+            return accountCode;
+        }
+
+        public void setAccountCode(String accountCode) {
+            this.accountCode = accountCode;
+        }
+
+        public BigDecimal getAmount() {
+            return amount;
+        }
+
+        public void setAmount(BigDecimal amount) {
+            this.amount = amount;
+        }
+
+        public BigDecimal getPercentage() {
+            return percentage;
+        }
+
+        public void setPercentage(BigDecimal percentage) {
+            this.percentage = percentage;
+        }
+
+        public BigDecimal getValue() {
+            return value;
+        }
+
+        public void setValue(BigDecimal value) {
+            this.value = value;
+        }
+    }
+
 }
