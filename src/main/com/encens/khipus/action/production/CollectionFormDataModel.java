@@ -28,6 +28,7 @@ public class CollectionFormDataModel extends QueryDataModel<Long, CollectionForm
     @Create
     public void init() {
         sortProperty = "collectionForm.date";
+        sortAsc = false;
     }
 
     @Override
