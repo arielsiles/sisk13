@@ -15,7 +15,19 @@ import java.math.BigDecimal;
  * @author:
  */
 
-@NamedQueries({})
+@NamedQueries({
+        @NamedQuery(name = "ProductionProduct.findProductionByProductItem",
+                query = "Select productionProduct " +
+                        "from ProductionProduct productionProduct " +
+                        "left join productionProduct.productionPlan productionPlan " +
+                        "where productionPlan.date between :startDate and :endDate " +
+                        "and productionProduct.productItemCode =:productItemCode "),
+        @NamedQuery(name = "ProductionProduct.findProductionByDates",
+                query = "Select productionProduct " +
+                        "from ProductionProduct productionProduct " +
+                        "left join productionProduct.productionPlan productionPlan " +
+                        "where productionPlan.date between :startDate and :endDate ")
+})
 
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionProduct.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,

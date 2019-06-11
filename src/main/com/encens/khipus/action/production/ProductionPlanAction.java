@@ -1,11 +1,16 @@
 package com.encens.khipus.action.production;
 
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.finances.CashAccountService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
 import com.encens.khipus.service.production.ProductionPlanService;
@@ -35,9 +40,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     private PeriodIndirectCostService periodIndirectCostService;
     @In
     private IndirectCostsService indirectCostsService;
-
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
     @In
     private ProductionService productionService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private CashAccountService cashAccountService;
 
     private List<ProductionProduct> productList = new ArrayList<ProductionProduct>();
 
@@ -97,7 +107,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         this.totalIndirectCost = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
     }
 
-    public void accountingProduction(){
+    public void accountingProduction() throws CompanyConfigurationNotFoundException{
 
         PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
         if (periodIndirectCost == null){
@@ -105,11 +115,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             return;
         }
 
+        /** todo: Restriccion, controlar que toda la produccion este aprobada **/
+
         System.out.println("------> COSTOS INDIRECTOS <-------");
         BigDecimal totalIndirectCostValue = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
-
         List<IndirectAux> indirectAuxList = new ArrayList<IndirectAux>();
-
         List<IndirectCosts> indirectCostList = periodIndirectCost.getIndirectCostList();
         /** Calcula Lista de costos indirectos con porcentajes **/
         for (IndirectCosts param : indirectCostList){
@@ -117,13 +127,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             BigDecimal percentage = BigDecimalUtil.divide(aux, totalIndirectCostValue, 4);
             IndirectAux indirect  = new IndirectAux(param.getCostsConifg().getAccount(), param.getAmountBs(), percentage, BigDecimal.ZERO);
             indirectAuxList.add(indirect);
-
         }
 
         Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
         Date endDate   = DateUtils.getLastDayOfMonth(startDate);
         List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
-
         /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/
         for (ProductionPlan productionPlan : productionPlanList){
             for (Production production : productionPlan.getProductionList()){
@@ -139,24 +147,98 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             }
         }
 
-        System.out.println("------>> LISTA COSTOS INDIRECTOS TOTAL VALOR <<------");
+        /*System.out.println("------>> LISTA COSTOS INDIRECTOS TOTAL VALOR <<------");
         for (IndirectAux indirectAux : indirectAuxList){
             System.out.println("----->> " + indirectAux.getAccountCode() + " - " + indirectAux.getAmount() + " - " + indirectAux.getPercentage() + " - " + indirectAux.getValue() );
-        }
+            indirectAux.setValue(BigDecimal.ZERO);
+        }*/
 
+        List<DataVoucherDetail> dataVoucherDetailList = new ArrayList<DataVoucherDetail>();
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
-        //System.out.println("------> ... <-------");
-        //System.out.println("------> PRODUCCION <-------");
         for (ProductionPlan productionPlan : productionPlanList){
-            //System.out.println("===> PLAN FECHA: " + productionPlan.getDate());
             for (Production production : productionPlan.getProductionList()){
-                //System.out.println("===> ORDEN PRODUCCION: " + production.getCode() + " - " + production.getTotalCost());
-                for (Supply supply : production.getSupplyList()){
-                    //System.out.println("===> INSUMOS : " + supply.getProductItem().getFullName() + " - " + supply.getQuantity());
+
+                /** ---- */
+                Voucher voucher = new Voucher();
+                voucher.setDocumentType(Constants.PD_VOUCHER_DOCTYPE);
+                voucher.setGloss("ORDEN DE PRODUCCION NRO: (" + production.getCode() +")");
+                voucher.setDate(production.getProductionPlan().getDate());
+                /** ---- */
+
+                for (ProductionProduct product : production.getProductionProductList()){
+                    BigDecimal productionCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 6);
+                               productionCost = BigDecimalUtil.sum(productionCost, product.getCostC(), 6);
+
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(production.getCode().toString(), companyConfiguration.getCtaAlmPT(), productionCost, BigDecimal.ZERO, product.getProductItemCode());
+                    dataVoucherDetailList.add(dataVoucherDetail);
+
+                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                    voucher.getDetails().add(voucherDetail);
+
                 }
+
+                for (Supply supply : production.getSupplyList()){
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                            production.getCode().toString(),
+                            supply.getProductItem().getCashAccount(),
+                            BigDecimal.ZERO,
+                            BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6), null);
+                    dataVoucherDetailList.add(dataVoucherDetail);
+
+                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                    voucher.getDetails().add(voucherDetail);
+
+                }
+
+                for (IndirectAux indirect : indirectAuxList){
+                    BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.toBigDecimal(100), 6);
+                    BigDecimal amount     = BigDecimal.ZERO;
+                    for (ProductionProduct product : production.getProductionProductList()){
+                        BigDecimal aux = BigDecimalUtil.multiply(product.getCostC(), percentage, 6);
+                        amount = BigDecimalUtil.sum(amount, aux, 6);
+                    }
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(production.getCode().toString(), cashAccountService.findByAccountCode(indirect.getAccountCode()), BigDecimal.ZERO, amount, null);
+                    dataVoucherDetailList.add(dataVoucherDetail);
+
+                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                    voucher.getDetails().add(voucherDetail);
+
+                }
+
+                voucherAccoutingService.saveVoucher(voucher);
+
             }
         }
 
+        //System.out.println("------===> DATA VOUCHER DETAIL <===-------");
+        /*for (DataVoucherDetail data : dataVoucherDetailList){
+            //System.out.println("|" + data.getProductionCode() + "|" + data.getCashAccount().getFullName() + "|" + data.debit + "|" + data.getCredit() + "|");
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setCashAccount(data.getCashAccount());
+            voucherDetail.setAccount(data.getCashAccount().getAccountCode());
+            voucherDetail.setCompanyNumber(Constants.defaultCompanyNumber);
+            voucherDetail.setDebit(data.getDebit());
+            voucherDetail.setCredit(data.getCredit());
+            voucherDetail.setCurrency(FinancesCurrencyType.P);
+            voucherDetail.setDebitMe(BigDecimal.ZERO);
+            voucherDetail.setCreditMe(BigDecimal.ZERO);
+            voucherDetail.setProductItemCode(data.getProductItemCode());
+        }*/
+    }
+
+    private VoucherDetail createVoucherDetail(DataVoucherDetail data){
+        VoucherDetail voucherDetail = new VoucherDetail();
+        voucherDetail.setCashAccount(data.getCashAccount());
+        voucherDetail.setAccount(data.getCashAccount().getAccountCode());
+        voucherDetail.setCompanyNumber(Constants.defaultCompanyNumber);
+        voucherDetail.setDebit(data.getDebit());
+        voucherDetail.setCredit(data.getCredit());
+        voucherDetail.setCurrency(FinancesCurrencyType.P);
+        voucherDetail.setDebitMe(BigDecimal.ZERO);
+        voucherDetail.setCreditMe(BigDecimal.ZERO);
+        voucherDetail.setProductItemCode(data.getProductItemCode());
+        return voucherDetail;
     }
 
     /** Start Proceso Distribucion de costos indirectos (1) **/
@@ -413,6 +495,10 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         this.totalVolumePeriod = totalVolumePeriod;
     }
 
+    /**
+     * Private class
+     */
+
     private class IndirectAux {
 
         private String accountCode;
@@ -459,5 +545,65 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             this.value = value;
         }
     }
+
+    private class DataVoucherDetail{
+
+        private String productionCode;
+        private CashAccount cashAccount;
+        private BigDecimal debit;
+        private BigDecimal credit;
+        private String productItemCode;
+
+        DataVoucherDetail(String productionCode, CashAccount cashAccount, BigDecimal debit, BigDecimal credit, String productItemCode){
+            this.setProductionCode(productionCode);
+            this.setCashAccount(cashAccount);
+            this.setDebit(debit);
+            this.setCredit(credit);
+            this.setProductItemCode(productItemCode);
+        }
+
+
+        public BigDecimal getDebit() {
+            return debit;
+        }
+
+        public void setDebit(BigDecimal debit) {
+            this.debit = debit;
+        }
+
+        public BigDecimal getCredit() {
+            return credit;
+        }
+
+        public void setCredit(BigDecimal credit) {
+            this.credit = credit;
+        }
+
+        public String getProductionCode() {
+            return productionCode;
+        }
+
+        public void setProductionCode(String productionCode) {
+            this.productionCode = productionCode;
+        }
+
+        public CashAccount getCashAccount() {
+            return cashAccount;
+        }
+
+        public void setCashAccount(CashAccount cashAccount) {
+            this.cashAccount = cashAccount;
+        }
+
+        public String getProductItemCode() {
+            return productItemCode;
+        }
+
+        public void setProductItemCode(String productItemCode) {
+            this.productItemCode = productItemCode;
+        }
+    }
+
+    /** **/
 
 }

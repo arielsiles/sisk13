@@ -1,54 +1,63 @@
 -- -----------------------------------------------------------------
 -- VISTAS PARA REPORTE DE PRODUCCIO DE PRODUCTOS
 -- 1.- 
-CREATE OR REPLACE VIEW produccionreproceso AS
-SELECT PL.FECHA, M.CODIGO AS COD_ART, M.NOMBRE, O.CODIGO AS COD_ORD, o.`cantidadproducida` AS CANTIDAD_SC, O.CANTIDADPRODUCIDARESPONSABLE AS CANTIDAD_SP, 0 AS REPROCESO_SC, 0 AS REPROCESO_SP, o.costotoalproduccion AS COSTOTOTALPRODUCCION
-FROM ORDENPRODUCCION O
-LEFT JOIN PLANIFICACIONPRODUCCION PL    ON O.IDPLANIFICACIONPRODUCCION  = PL.IDPLANIFICACIONPRODUCCION
-LEFT JOIN COMPOSICIONPRODUCTO C         ON O.IDCOMPOSICIONPRODUCTO      = C.IDCOMPOSICIONPRODUCTO
-LEFT JOIN PRODUCTOPROCESADO P           ON C.IDPRODUCTOPROCESADO        = P.IDPRODUCTOPROCESADO
-LEFT JOIN METAPRODUCTOPRODUCCION M      ON P.IDPRODUCTOPROCESADO        = M.IDMETAPRODUCTOPRODUCCION
-UNION
-SELECT pp.`FECHA`, mp.codigo AS COD_ART, mp.`NOMBRE`, pb.`CODIGO` AS COD_ORD, 0 AS CANTIDAD_SC, 0 AS CANTIDAD_SP, ps.`cantidad` AS REPROCESO_SC, ps.`cantidadproducidaresponsable` AS REPROCESO_SP, ps.COSTOTOTALPRODUCCION
-FROM productobase pb
-LEFT JOIN planificacionproduccion pp 	ON pb.`idplanificacionproduccion` = pp.`idplanificacionproduccion`
-LEFT JOIN productosimple ps		ON pb.`idproductobase` = ps.`idproductobase`
-LEFT JOIN productosimpleprocesado psp	ON ps.`idproductosimple` = psp.`idproductosimple`
-LEFT JOIN metaproductoproduccion mp 	ON psp.`idmetaproductoproduccion` = mp.`idmetaproductoproduccion`
--- UNION
--- SELECT STR_TO_DATE(CONCAT(i.`gestion`, '-01-01'),'%Y-%m-%d') AS fecha, i.`cod_art`, i.`nombre`, '0000-0000', i.`cantidad`, 0, 0, 0, (i.`cantidad` * i.`costo_uni`) AS COSTOTOTALPRODUCCION
--- FROM inv_inicio i  WHERE i.`alm` = 2 AND i.`cantidad` > 0
+create or replace view produccionreproceso as
+select PL.FECHA, M.CODIGO as COD_ART, M.NOMBRE, O.CODIGO as COD_ORD, o.`cantidadproducida` as CANTIDAD_SC, O.CANTIDADPRODUCIDARESPONSABLE as CANTIDAD_SP, 0 as REPROCESO_SC, 0 as REPROCESO_SP, o.costotoalproduccion as COSTOTOTALPRODUCCION
+from ORDENPRODUCCION O
+left join PLANIFICACIONPRODUCCION PL    on O.IDPLANIFICACIONPRODUCCION  = PL.IDPLANIFICACIONPRODUCCION
+left join COMPOSICIONPRODUCTO C         on O.IDCOMPOSICIONPRODUCTO      = C.IDCOMPOSICIONPRODUCTO
+left join PRODUCTOPROCESADO P           on C.IDPRODUCTOPROCESADO        = P.IDPRODUCTOPROCESADO
+left join METAPRODUCTOPRODUCCION M      on P.IDPRODUCTOPROCESADO        = M.IDMETAPRODUCTOPRODUCCION
+union
+select pp.`FECHA`, mp.codigo as COD_ART, mp.`NOMBRE`, pb.`CODIGO` as COD_ORD, 0 as CANTIDAD_SC, 0 as CANTIDAD_SP, ps.`cantidad` as REPROCESO_SC, ps.`cantidadproducidaresponsable` as REPROCESO_SP, ps.COSTOTOTALPRODUCCION
+from productobase pb
+left join planificacionproduccion pp 	on pb.`idplanificacionproduccion` = pp.`idplanificacionproduccion`
+left join productosimple ps		on pb.`idproductobase` = ps.`idproductobase`
+left join productosimpleprocesado psp	on ps.`idproductosimple` = psp.`idproductosimple`
+left join metaproductoproduccion mp 	on psp.`idmetaproductoproduccion` = mp.`idmetaproductoproduccion`
+union
+select pl.`fecha`, p.`cod_art`, a.`descri` as nombre, '', p.`cantidad` as cantidad_sc, 0, 0, 0, p.`costo`
+from pr_producto p
+left join pr_plan pl 	  on p.`idplan` = pl.`idplan`
+left join inv_articulos a on p.`cod_art` = a.`cod_art`
+;
+
+
+select pl.`fecha`, p.`cod_art`, a.`descri` as nombre, '', p.`cantidad` as cantidad_sc, 0, 0, 0, p.`costo`
+from pr_producto p
+left join pr_plan pl 	  on p.`idplan` = pl.`idplan`
+left join inv_articulos a on p.`cod_art` = a.`cod_art`
 ;
 
 
 -- 2.- 
-CREATE OR REPLACE VIEW producciontotal AS
-SELECT 	1 AS ID, FECHA, COD_ART, NOMBRE,
-	SUM(CANTIDAD_SC) AS CANTIDAD_SC,
-	SUM(CANTIDAD_SP) AS CANTIDAD_SP,
-	SUM(REPROCESO_SC) AS REPROCESO_SC,
-	SUM(REPROCESO_SP) AS REPROCESO_SP,
-	SUM(COSTOTOTALPRODUCCION) AS COSTOTOTALPRODUCCION,
-	SUM(CANTIDAD_SC) + SUM(REPROCESO_SC) AS CANT_TOTAL
-FROM produccionreproceso
-GROUP BY ID, FECHA, COD_ART, NOMBRE
+create or replace view producciontotal as
+select 	1 as ID, FECHA, COD_ART, NOMBRE,
+	SUM(CANTIDAD_SC) as CANTIDAD_SC,
+	SUM(CANTIDAD_SP) as CANTIDAD_SP,
+	SUM(REPROCESO_SC) as REPROCESO_SC,
+	SUM(REPROCESO_SP) as REPROCESO_SP,
+	SUM(COSTOTOTALPRODUCCION) as COSTOTOTALPRODUCCION,
+	SUM(CANTIDAD_SC) + SUM(REPROCESO_SC) as CANT_TOTAL
+from produccionreproceso
+group by ID, FECHA, COD_ART, NOMBRE
 ;
 -- -----------------------------------------------------------------
 -- 3.- Vista para Reporte COSTO DE PRODUCCION
-CREATE OR REPLACE VIEW costoproduccion AS
-SELECT e.`id_tmpenc`, d.`id_tmpdet`, e.`fecha`, e.`tipo_doc`, e.`no_doc`, e.`no_trans`, o.`codigo`, d.`cuenta`, a.`descri`, d.`debe`, d.`haber`
-FROM sf_tmpenc e
-JOIN ordenproduccion o ON e.`id_tmpenc` = o.`id_tmpenc`
-JOIN sf_tmpdet d ON e.`id_tmpenc` = d.`id_tmpenc`
-JOIN arcgms a    ON d.`cuenta` = a.`cuenta`
-WHERE e.estado <> 'ANL'
-UNION
-SELECT e.`id_tmpenc`, d.`id_tmpdet`, e.`fecha`, e.`tipo_doc`, e.`no_doc`, e.`no_trans`, b.`codigo`, d.`cuenta`, a.`descri`, d.`debe`, d.`haber`
-FROM sf_tmpenc e
-JOIN productobase b    ON e.`id_tmpenc` = b.`id_tmpenc`
-JOIN sf_tmpdet d ON e.`id_tmpenc` = d.`id_tmpenc`
-JOIN arcgms a    ON d.`cuenta` = a.`cuenta`
-WHERE e.estado <> 'ANL'
+create or replace view costoproduccion as
+select e.`id_tmpenc`, d.`id_tmpdet`, e.`fecha`, e.`tipo_doc`, e.`no_doc`, e.`no_trans`, o.`codigo`, d.`cuenta`, a.`descri`, d.`debe`, d.`haber`
+from sf_tmpenc e
+join ordenproduccion o on e.`id_tmpenc` = o.`id_tmpenc`
+join sf_tmpdet d on e.`id_tmpenc` = d.`id_tmpenc`
+join arcgms a    on d.`cuenta` = a.`cuenta`
+where e.estado <> 'ANL'
+union
+select e.`id_tmpenc`, d.`id_tmpdet`, e.`fecha`, e.`tipo_doc`, e.`no_doc`, e.`no_trans`, b.`codigo`, d.`cuenta`, a.`descri`, d.`debe`, d.`haber`
+from sf_tmpenc e
+join productobase b    on e.`id_tmpenc` = b.`id_tmpenc`
+join sf_tmpdet d on e.`id_tmpenc` = d.`id_tmpenc`
+join arcgms a    on d.`cuenta` = a.`cuenta`
+where e.estado <> 'ANL'
 ;
 -- -----------------------------------------------------------------
 

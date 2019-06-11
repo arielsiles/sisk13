@@ -1,11 +1,10 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
-import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
@@ -15,7 +14,6 @@ import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.JRException;
@@ -119,6 +117,8 @@ public class KardexProductMovementAction extends GenericReportAction {
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), startDate, endDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
+        List<ProductionProduct> productionProductList = productionOrderService.findProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
+
         for (ProductionOrder po:productionOrderList){
             CollectionData collectionData = new CollectionData(
                     po.getProductionPlanning().getDate(),
@@ -127,6 +127,17 @@ public class KardexProductMovementAction extends GenericReportAction {
                     BigDecimal.ZERO,
                     "E",
                     "ORDEN DE PRODUCCION NRO. " + po.getCode());
+            datas.add(collectionData);
+        }
+
+        for (ProductionProduct product : productionProductList){
+            CollectionData collectionData = new CollectionData(
+                    product.getProductionPlan().getDate(),
+                    product.getProductItemCode() ,
+                    product.getQuantity() ,
+                    BigDecimal.ZERO,
+                    "E",
+                    "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy") );
             datas.add(collectionData);
         }
 
