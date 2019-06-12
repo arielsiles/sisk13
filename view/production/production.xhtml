@@ -137,7 +137,7 @@
                     <h:selectOneMenu id="productionTank"
                                      value="#{productionAction.productionTank}"
                                      styleClass="input"
-                                     required="false"
+                                     required="true"
                                      disabled="#{productionAction.approved}"
                                      tabindex="7">
                         <s:selectItems value="#{productionTankList}"
@@ -154,7 +154,7 @@
                     <h:selectOneMenu id="formulationTank"
                                      value="#{productionAction.formulation}"
                                      styleClass="input"
-                                     required="false"
+                                     required="true"
                                      disabled="#{productionAction.approved}"
                                      tabindex="7">
                         <s:selectItems value="#{formulationList}"

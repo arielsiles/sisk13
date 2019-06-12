@@ -7,7 +7,8 @@ package com.encens.khipus.model.production;
 public enum ProductionPlanState {
     PEN("ProductionPlan.state.PEN"),
     APR("ProductionPlan.state.APR"),
-    FIN("ProductionPlan.state.FIN");
+    FIN("ProductionPlan.state.FIN"),
+    SUS("ProductionPlan.state.SUS");
 
     private String resourceKey;
 

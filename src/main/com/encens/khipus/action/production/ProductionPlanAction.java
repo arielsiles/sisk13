@@ -115,6 +115,16 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             return;
         }
 
+        Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
+        Date endDate   = DateUtils.getLastDayOfMonth(startDate);
+        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+
+        for (ProductionPlan productionPlan : productionPlanList){
+            if (!productionPlan.getState().equals(ProductionPlanState.FIN)){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.unfinishedProduction");
+                return;
+            }
+        }
         /** todo: Restriccion, controlar que toda la produccion este aprobada **/
 
         System.out.println("------> COSTOS INDIRECTOS <-------");
@@ -129,9 +139,6 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             indirectAuxList.add(indirect);
         }
 
-        Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
-        Date endDate   = DateUtils.getLastDayOfMonth(startDate);
-        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
         /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/
         for (ProductionPlan productionPlan : productionPlanList){
             for (Production production : productionPlan.getProductionList()){
@@ -146,12 +153,6 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                 }
             }
         }
-
-        /*System.out.println("------>> LISTA COSTOS INDIRECTOS TOTAL VALOR <<------");
-        for (IndirectAux indirectAux : indirectAuxList){
-            System.out.println("----->> " + indirectAux.getAccountCode() + " - " + indirectAux.getAmount() + " - " + indirectAux.getPercentage() + " - " + indirectAux.getValue() );
-            indirectAux.setValue(BigDecimal.ZERO);
-        }*/
 
         List<DataVoucherDetail> dataVoucherDetailList = new ArrayList<DataVoucherDetail>();
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -207,24 +208,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                 }
 
                 voucherAccoutingService.saveVoucher(voucher);
-
             }
+            productionPlan.setState(ProductionPlanState.SUS);
+            productionPlanService.updateProductionPlan(productionPlan);
         }
 
-        //System.out.println("------===> DATA VOUCHER DETAIL <===-------");
-        /*for (DataVoucherDetail data : dataVoucherDetailList){
-            //System.out.println("|" + data.getProductionCode() + "|" + data.getCashAccount().getFullName() + "|" + data.debit + "|" + data.getCredit() + "|");
-            VoucherDetail voucherDetail = new VoucherDetail();
-            voucherDetail.setCashAccount(data.getCashAccount());
-            voucherDetail.setAccount(data.getCashAccount().getAccountCode());
-            voucherDetail.setCompanyNumber(Constants.defaultCompanyNumber);
-            voucherDetail.setDebit(data.getDebit());
-            voucherDetail.setCredit(data.getCredit());
-            voucherDetail.setCurrency(FinancesCurrencyType.P);
-            voucherDetail.setDebitMe(BigDecimal.ZERO);
-            voucherDetail.setCreditMe(BigDecimal.ZERO);
-            voucherDetail.setProductItemCode(data.getProductItemCode());
-        }*/
     }
 
     private VoucherDetail createVoucherDetail(DataVoucherDetail data){
@@ -271,6 +259,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             totalVolume = BigDecimalUtil.sum(totalVolume, calculateTotalVolumePlan(productionPlan), 2);
             if (!productionPlan.getState().equals(ProductionPlanState.APR)){
                 flagState = Boolean.FALSE;
+                break;
             }
         }
         if (!flagState){

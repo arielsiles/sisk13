@@ -44,6 +44,11 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         em.flush();
     }
 
+    public void updateProductionPlan(ProductionPlan productionPlan){
+        em.merge(productionPlan);
+        em.flush();
+    }
+
     public List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan){
 
         List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>();
