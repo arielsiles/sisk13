@@ -47,6 +47,10 @@ public class PeriodIndirectCost implements BaseModel {
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean processed = Boolean.FALSE;
 
+    @Column(name = "contab")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean accounting = Boolean.FALSE;
+
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},optional = false)
     @JoinColumn(name = "IDGESTION")
     private Gestion gestion;
@@ -105,5 +109,13 @@ public class PeriodIndirectCost implements BaseModel {
 
     public void setProcessed(Boolean disttributionFlag) {
         this.processed = disttributionFlag;
+    }
+
+    public Boolean getAccounting() {
+        return accounting;
+    }
+
+    public void setAccounting(Boolean accounting) {
+        this.accounting = accounting;
     }
 }

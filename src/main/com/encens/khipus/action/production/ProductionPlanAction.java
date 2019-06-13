@@ -207,12 +207,43 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
                 }
 
+                /** Si existe ajusta diferencia de montos del asiento generado **/
+                BigDecimal totalDebit = BigDecimal.ZERO;
+                BigDecimal totalCredit = BigDecimal.ZERO;
+                for (VoucherDetail detail : voucher.getDetails()){
+                    totalDebit  = BigDecimalUtil.sum(totalDebit, detail.getDebit(), 2);
+                    totalCredit = BigDecimalUtil.sum(totalCredit, detail.getCredit(), 2);
+                }
+                BigDecimal difference = BigDecimalUtil.subtract(totalDebit, totalCredit, 2);
+                if (difference.doubleValue() > 0){
+                    BigDecimal debitValue = voucher.getDetails().get(0).getDebit();
+                    debitValue = BigDecimalUtil.subtract(debitValue, difference, 2);
+                    voucher.getDetails().get(0).setDebit(debitValue);
+                }
+                if (difference.doubleValue() < 0){
+                    BigDecimal debitValue = voucher.getDetails().get(0).getDebit();
+                    debitValue = BigDecimalUtil.sum(debitValue, BigDecimalUtil.abs(difference), 2);
+                    voucher.getDetails().get(0).setDebit(debitValue);
+                }
+
+                if (difference.doubleValue() != 0) {
+                    System.out.println("======================> Difference: " + difference + " - " +
+                            DateUtils.format(production.getProductionPlan().getDate(), "dd/MM/yyyy") + " - Code: " +
+                            production.getCode());
+
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                            "Production.message.differenceVoucher",
+                            DateUtils.format(production.getProductionPlan().getDate(), "dd/MM/yyyy"), production.getCode(), difference);
+                }
+                /** End **/
+
                 voucherAccoutingService.saveVoucher(voucher);
             }
             productionPlan.setState(ProductionPlanState.SUS);
             productionPlanService.updateProductionPlan(productionPlan);
         }
-
+        periodIndirectCost.setAccounting(Boolean.TRUE);
+        periodIndirectCostService.updatePeriodIndirectCost(periodIndirectCost);
     }
 
     private VoucherDetail createVoucherDetail(DataVoucherDetail data){
@@ -227,6 +258,24 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         voucherDetail.setCreditMe(BigDecimal.ZERO);
         voucherDetail.setProductItemCode(data.getProductItemCode());
         return voucherDetail;
+    }
+
+    public Boolean indirectCostProcesssed(){
+        Boolean result = Boolean.FALSE;
+        if (this.month != null && this.gestion != null) {
+            PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+            result = periodIndirectCost.getProcessed();
+        }
+        return result;
+    }
+
+    public Boolean indirectCostAccounting(){
+        Boolean result = Boolean.FALSE;
+        if (this.month != null && this.gestion != null) {
+            PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+            result = periodIndirectCost.getAccounting();
+        }
+        return result;
     }
 
     /** Start Proceso Distribucion de costos indirectos (1) **/
@@ -388,6 +437,11 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         for (ProductItem productItem : productItems) {
             ProductionProduct product = new ProductionProduct();
+            product.setUnitCost(BigDecimal.ZERO);
+            product.setCostA(BigDecimal.ZERO);
+            product.setCostB(BigDecimal.ZERO);
+            product.setCostC(BigDecimal.ZERO);
+            product.setCost(BigDecimal.ZERO);
             product.setProductItemCode(productItem.getProductItemCode());
             product.setProductItem(productItem);
             productList.add(product);

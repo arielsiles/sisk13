@@ -89,21 +89,23 @@
 
                     <a4j:commandButton action="#{productionPlanAction.calculateTotalInditectCost()}"
                                        value="#{messages['CashSale.calculate']}"
-                                       reRender="totalIndirectCostField"
+                                       reRender="totalIndirectCostField,amountTransferButtonField"
                                        styleClass="button"
-                                       tabindex="4">
+                                       tabindex="1">
                     </a4j:commandButton>
 
                     <a4j:commandButton value="#{messages['Common.process']}"
                                        styleClass="button"
-                                       tabindex="4">
+                                       disabled="#{productionPlanAction.indirectCostProcesssed()}"
+                                       tabindex="2">
                         <rich:componentControl for="processConfirmation" event="onclick" disableDefault="true" operation="show"/>
                     </a4j:commandButton>
 
-                    <a4j:commandButton action="#{productionPlanAction.accountingProduction()}"
-                                       value="Contabilizar"
+                    <a4j:commandButton value="#{messages['Common.accounting']}"
                                        styleClass="button"
-                                       tabindex="4">
+                                       disabled="#{productionPlanAction.indirectCostAccounting()}"
+                                       tabindex="3">
+                        <rich:componentControl for="accountingConfirmation" event="onclick" disableDefault="true" operation="show"/>
                     </a4j:commandButton>
                 </s:decorate>
 
@@ -120,9 +122,7 @@
         <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
         <ui:define name="dialogContent">
             <p>
-                <h:outputFormat value="#{messages['ProductionPlan.process.confirmation']}">
-                    <!--<f:param value="#{currency.name}"/>-->
-                </h:outputFormat>
+                <h:outputFormat value="#{messages['ProductionPlan.process.indirectCostDistribution.confirmation']}" />
             </p>
         </ui:define>
         <ui:define name="dialogOption">
@@ -130,6 +130,27 @@
                                value="#{messages['Common.process']}"
                                immediate="true"
                                styleClass="button"
+                               reRender="amountTransferButtonField"
+                               tabindex="1000">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </a4j:commandButton>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate template="/include/modalDialog.xhtml" >
+        <ui:param name="dialogId" value="accountingConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductionPlan.process.accounting.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionPlanAction.accountingProduction()}"
+                               value="#{messages['Common.process']}"
+                               immediate="true"
+                               styleClass="button"
+                               reRender="amountTransferButtonField"
                                tabindex="1000">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </a4j:commandButton>

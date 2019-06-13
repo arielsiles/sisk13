@@ -59,19 +59,19 @@ public class ProductionProduct implements BaseModel {
     @Column(name = "cantidad")
     private BigDecimal quantity;
 
-    @Column(name = "costo", nullable = true, updatable = true, insertable = true)
+    @Column(name = "costo", nullable = false, updatable = true, insertable = true)
     private BigDecimal cost;
 
-    @Column(name = "costouni", nullable = true, updatable = true, insertable = true)
+    @Column(name = "costouni", nullable = false, updatable = true, insertable = true)
     private BigDecimal unitCost;
 
-    @Column(name = "costo_a", nullable = true, updatable = true, insertable = true)
+    @Column(name = "costo_a", nullable = false, updatable = true, insertable = true)
     private BigDecimal costA;
 
-    @Column(name = "costo_b", nullable = true, updatable = true, insertable = true)
+    @Column(name = "costo_b", nullable = false, updatable = true, insertable = true)
     private BigDecimal costB;
 
-    @Column(name = "costo_c", nullable = true, updatable = true, insertable = true)
+    @Column(name = "costo_c", nullable = false, updatable = true, insertable = true)
     private BigDecimal costC;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
