@@ -138,7 +138,7 @@
                                      value="#{productionAction.productionTank}"
                                      styleClass="input"
                                      required="true"
-                                     disabled="#{productionAction.approved}"
+                                     disabled="#{productionAction.approved or productionAction.managed}"
                                      tabindex="7">
                         <s:selectItems value="#{productionTankList}"
                                        var="productionTank"
@@ -155,7 +155,7 @@
                                      value="#{productionAction.formulation}"
                                      styleClass="input"
                                      required="true"
-                                     disabled="#{productionAction.approved}"
+                                     disabled="#{productionAction.approved or productionAction.managed}"
                                      tabindex="7">
                         <s:selectItems value="#{formulationList}"
                                        var="formulation"
