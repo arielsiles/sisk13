@@ -588,6 +588,11 @@
                 <redirect view-id="/production/production.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{productionAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule if-outcome="Cancel">
                 <redirect view-id="/production/productionPlan.xhtml"/>

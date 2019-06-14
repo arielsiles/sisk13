@@ -88,6 +88,13 @@
             <s:defaultAction/>
         </h:commandButton>
 
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
         <h:commandButton action="#{productionAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="4">
@@ -476,6 +483,21 @@
         </ui:define>
     </s:decorate>
 
+    <s:decorate template="/include/modalDialog.xhtml">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['Production.message.deleteConfirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               styleClass="button"/>
+        </ui:define>
+    </s:decorate>
 
 </ui:define>
 </ui:composition>

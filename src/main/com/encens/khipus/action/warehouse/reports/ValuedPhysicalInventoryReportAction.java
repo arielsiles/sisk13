@@ -122,6 +122,9 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
             BigDecimal input = (BigDecimal)value[5];
             BigDecimal output = (BigDecimal)value[6];
 
+            System.out.println("=====> $$$$$$$$$$$$$$$$");
+            System.out.println("=====> INPUT: " + input);
+            System.out.println("=====> OUTPUT: " + output);
             BigDecimal physicalBalance = BigDecimalUtil.subtract(input, output, 2);
             BigDecimal valuedBalance   = BigDecimalUtil.subtract(debit, credit, 2);
 

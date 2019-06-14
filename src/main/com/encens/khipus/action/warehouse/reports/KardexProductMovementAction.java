@@ -173,7 +173,7 @@ public class KardexProductMovementAction extends GenericReportAction {
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
                                                                 "S",
-                                                                "Venta al contado "+ao.getVentaDirecta().getCodigo());
+                                                                "Venta al contado "+ao.getVentaDirecta().getCodigo() + " " + ao.getVentaDirecta().getCliente().getFullName());
             datas.add(collectionData);
         }
 
@@ -184,7 +184,7 @@ public class KardexProductMovementAction extends GenericReportAction {
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
                                                                 "S",
-                                                                "Venta a credito " + ao.getCustomerOrder().getCodigo());
+                                                                "Venta a credito " + ao.getCustomerOrder().getCodigo() + " " + ao.getCustomerOrder().getCliente().getFullName());
             datas.add(collectionData);
         }
 

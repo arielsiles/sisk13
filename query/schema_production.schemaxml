@@ -6,8 +6,8 @@
 <canvas zoom="100">
 <tables>
 <table name="pr_formula" view="colnames">
-<left>980</left>
-<top>576</top>
+<left>714</left>
+<top>579</top>
 <width>143</width>
 <height>214</height>
 <sql_create_table>CREATE TABLE `pr_formula` (
@@ -26,8 +26,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumoformula" view="colnames">
-<left>1329</left>
-<top>452</top>
+<left>1059</left>
+<top>422</top>
 <width>192</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `pr_insumoformula` (
@@ -47,8 +47,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_produccion" view="colnames">
-<left>375</left>
-<top>330</top>
+<left>320</left>
+<top>331</top>
 <width>185</width>
 <height>250</height>
 <sql_create_table>CREATE TABLE `pr_produccion` (
@@ -73,8 +73,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumo" view="colnames">
-<left>980</left>
-<top>79</top>
+<left>833</left>
+<top>166</top>
 <width>151</width>
 <height>248</height>
 <sql_create_table>CREATE TABLE `pr_insumo` (
@@ -98,8 +98,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_material" view="colnames">
-<left>1302</left>
-<top>44</top>
+<left>1095</left>
+<top>29</top>
 <width>180</width>
 <height>216</height>
 <sql_create_table>CREATE TABLE `pr_material` (
@@ -118,19 +118,19 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_producto" view="colnames">
-<left>651</left>
-<top>17</top>
+<left>571</left>
+<top>40</top>
 <width>152</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `pr_producto` (
   `idproducto` bigint(20) NOT NULL,
   `cod_art` varchar(6) DEFAULT NULL,
   `cantidad` decimal(16,2) DEFAULT NULL,
-  `costo` decimal(16,2) DEFAULT '0.00',
-  `costouni` decimal(16,2) DEFAULT '0.00',
-  `costo_a` decimal(16,2) DEFAULT '0.00',
-  `costo_b` decimal(16,2) DEFAULT '0.00',
-  `costo_c` decimal(16,2) DEFAULT '0.00',
+  `costo` decimal(16,2) NOT NULL DEFAULT '0.00',
+  `costouni` decimal(16,2) NOT NULL DEFAULT '0.00',
+  `costo_a` decimal(16,2) NOT NULL DEFAULT '0.00',
+  `costo_b` decimal(16,2) NOT NULL DEFAULT '0.00',
+  `costo_c` decimal(16,2) NOT NULL DEFAULT '0.00',
   `idproduccion` bigint(20) DEFAULT NULL,
   `idplan` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,

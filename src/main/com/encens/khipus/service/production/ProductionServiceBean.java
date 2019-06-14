@@ -83,6 +83,24 @@ public class ProductionServiceBean implements ProductionService {
         em.flush();*/
     }
 
+    @Override
+    public void deleteProduction(Production production) {
+
+        for (ProductionProduct product : production.getProductionProductList()){
+            product.setProduction(null);
+            em.merge(product);
+            em.flush();
+        }
+
+        for (Supply supply : production.getSupplyList()){
+            em.remove(supply);
+            em.flush();
+        }
+
+        em.remove(production);
+        em.flush();
+    }
+
     public void assignProduct(Production production, ProductionProduct product){
         product.setProduction(production);
         em.merge(product);

@@ -95,6 +95,13 @@ public class ProductionAction extends GenericAction<Production> {
     }
 
     @Override
+    public String delete() {
+        productionService.deleteProduction(getInstance());
+        addDeletedMessage();
+        return Outcome.SUCCESS;
+    }
+
+    @Override
     @End(beforeRedirect = true)
     public String cancel() {
         clearAction();

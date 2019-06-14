@@ -17,6 +17,7 @@ public interface ProductionService {
     List<Supply> getSupplyList(Production production, SupplyType type);
     void createProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
     void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList);
+    void deleteProduction(Production production);
     void assignProduct(Production production, ProductionProduct product);
     void removeProductionProduct(ProductionProduct product, Production production);
     public List<MaterialInput> getMaterialInput(String productItemCode);
