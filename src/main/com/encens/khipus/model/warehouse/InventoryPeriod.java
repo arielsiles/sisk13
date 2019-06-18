@@ -1,8 +1,6 @@
 package com.encens.khipus.model.warehouse;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.CompanyNumberListener;
-import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
 
@@ -24,7 +22,6 @@ import java.math.BigDecimal;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
 @Table(name = "inv_periodo", schema = Constants.FINANCES_SCHEMA)
 public class InventoryPeriod implements BaseModel {
     @Id
@@ -45,16 +42,15 @@ public class InventoryPeriod implements BaseModel {
     @Column(name = "costouni", precision = 16, scale = 6, nullable = false)
     private BigDecimal unitCost;
 
+    @Column(name = "mes", nullable = false)
+    private Integer month;
+
     @Column(name = "gestion", nullable = false)
     private Integer year;
 
     @Column(name = "cod_alm", length = 6, nullable = false)
     @Length(max = 6)
     private String warehouseCode;
-
-    @Version
-    @Column(name = "version")
-    private long version;
 
 
     public Long getId() {
@@ -114,13 +110,11 @@ public class InventoryPeriod implements BaseModel {
         this.warehouseCode = warehouseCode;
     }
 
-    public long getVersion() {
-        return version;
+    public Integer getMonth() {
+        return month;
     }
 
-    public void setVersion(long version) {
-        this.version = version;
+    public void setMonth(Integer month) {
+        this.month = month;
     }
-
-
 }

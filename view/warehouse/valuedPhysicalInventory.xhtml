@@ -76,10 +76,10 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
                     <app:selectPopUp id="itemAccount"
-                                     required="true"
+                                     required="false"
                                      textValue="#{valuedPhysicalInventoryReportAction.cashAccount.fullName}"
                                      value="#{valuedPhysicalInventoryReportAction.cashAccount}"
                                      clearAction="#{valuedPhysicalInventoryReportAction.clearAccount()}"
@@ -88,9 +88,39 @@
                                      reRender="itemAccountField"
                                      tabindex="3">
                     </app:selectPopUp>
+                </s:decorate>-->
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="#{valuedPhysicalInventoryReportAction.warehouse.warehouseCode}"
+                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="3">
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{valuedPhysicalInventoryReportAction.warehouse.name}"
+                                     required="true"
+                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
+                                     clearAction="#{valuedPhysicalInventoryReportAction.cleanWarehouseField()}"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
                 </s:decorate>
 
                 <div class="buttons">
+
+                    <h:commandButton action="#{valuedPhysicalInventoryReportAction.transferInventoryPeriod}"
+                                     styleClass="button"
+                                     value="#{messages['Common.transfer']}" id="TransferButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </h:commandButton>
+
                     <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReport}"
                                      styleClass="button"
                                      value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">

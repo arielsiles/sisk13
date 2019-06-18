@@ -19,7 +19,10 @@ import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.finances.FinancesUserService;
-import com.encens.khipus.util.*;
+import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.query.QueryUtils;
 import com.encens.khipus.util.warehouse.WarehouseUtil;
 import org.jboss.seam.Component;
@@ -29,10 +32,11 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
@@ -1013,5 +1017,35 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
 
         return warehouseDocumentType;
     }
+
+    @Override
+    public void createTransferInventoryPeriod(List<InventoryPeriod> inventoryPeriodList) {
+
+        for (InventoryPeriod inventoryPeriod : inventoryPeriodList){
+            em.persist(inventoryPeriod);
+            em.flush();
+        }
+    }
+
+    public Boolean wasTransferred(String warehouseCode, Integer year, Integer month){
+
+        Boolean result = Boolean.FALSE;
+
+        Long count = (Long)em.createQuery("select count(*) from InventoryPeriod inventory " +
+                " where inventory.warehouseCode =:warehouseCode " +
+                " and inventory.year =:year " +
+                " and inventory.month =:month ")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("year", year)
+                .setParameter("month", month)
+                .getSingleResult();
+
+        System.out.println("--------------->>>>> count: " + count);
+
+        if (count > 0) result = Boolean.TRUE;
+
+        return result;
+    }
+
 
 }

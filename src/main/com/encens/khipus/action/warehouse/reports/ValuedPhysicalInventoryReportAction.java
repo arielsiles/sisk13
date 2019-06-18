@@ -1,16 +1,12 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
-import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
-import com.encens.khipus.service.customers.ArticleOrderService;
-import com.encens.khipus.service.production.ProductionOrderService;
-import com.encens.khipus.service.warehouse.InitialInventoryService;
-import com.encens.khipus.service.warehouse.MovementDetailService;
-import com.encens.khipus.service.warehouse.ProductInventoryService;
-import com.encens.khipus.service.warehouse.ProductItemService;
+import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -22,6 +18,8 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
@@ -45,23 +43,14 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
     private Warehouse warehouse;
-    private CashAccount cashAccount;
+    //private CashAccount cashAccount;
 
     @In
-    private MovementDetailService movementDetailService;
-    @In
-    private ArticleOrderService articleOrderService;
-    @In
-    private ProductItemService productItemService;
-    @In
-    private ProductInventoryService productInventoryService;
-    @In
-    private ProductionOrderService productionOrderService;
-    @In
-    private InitialInventoryService initialInventoryService;
-
+    private WarehouseService warehouseService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
+    @In
+    protected FacesMessages facesMessages;
 
     @Create
     public void init() {
@@ -73,30 +62,25 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         return "";
     }
 
-    public void clearAccount() {
+    /*public void clearAccount() {
         setCashAccount(null);
-    }
+    }*/
 
     public void generateReport() {
 
         log.debug("generating Product Inventory Report................................................");
-
-
         Collection<CollectionData> beanCollection = calculateValuedInventory();
-
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE DE INVENTARIO FISICO - VALORADO");
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
-        paramMap.put("cashAccount", getCashAccount().getFullName());
-
+        paramMap.put("cashAccount", this.warehouse.getWarehouseCashAccount().getFullName());
         parameters.putAll(paramMap);
 
         for (CollectionData data : beanCollection){
             System.out.println("|"+ data.getCodeArt() +"|"+ data.getName() +"|"+ data.getUnitCost() +"|"+ data.getQuantity() + "|" + data.getAmount());
         }
-
         try{
             File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/valuedPhysicalInventory.jasper"));
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
@@ -109,9 +93,8 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
     public Collection<CollectionData> calculateValuedInventory(){
 
         Collection<CollectionData> beanCollection = new ArrayList();
-
-        List<Object[]> valuedInventory = voucherAccoutingService.getValuedInventory(startDate, endDate, getCashAccount());
-
+        //List<Object[]> valuedInventory = voucherAccoutingService.getValuedInventory(startDate, endDate, getCashAccount());
+        List<Object[]> valuedInventory = voucherAccoutingService.getValuedInventory(startDate, endDate, this.warehouse.getWarehouseCashAccount());
 
         for ( Object[] value : valuedInventory){
             String codArt = (String)value[0];
@@ -150,6 +133,40 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         FacesContext.getCurrentInstance().responseComplete();
     }
 
+    public void transferInventoryPeriod(){
+
+        Collection<CollectionData> collectionData = calculateValuedInventory();
+        Integer year  = DateUtils.getCurrentYear(this.endDate);
+        Integer month = DateUtils.getCurrentMonth(this.endDate);
+
+        if (month == 12){
+            month = 1;
+            year++;
+        }else {
+            month++;
+        }
+
+        if (warehouseService.wasTransferred(this.warehouse.getWarehouseCode(), year, month)){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Warehouse.message.transferredInventoryPeriod");
+            return;
+        }
+
+        List<InventoryPeriod> inventoryPeriodList = new ArrayList<InventoryPeriod>();
+        for (CollectionData data : collectionData){
+            InventoryPeriod inventory = new InventoryPeriod();
+            inventory.setProductItemCode(data.getCodeArt());
+            inventory.setQuantity(data.getQuantity());
+            inventory.setAmount(data.getAmount());
+            inventory.setUnitCost(data.getUnitCost());
+            inventory.setWarehouseCode(this.warehouse.getWarehouseCode());
+            inventory.setYear(year);
+            inventory.setMonth(month);
+            inventoryPeriodList.add(inventory);
+        }
+        warehouseService.createTransferInventoryPeriod(inventoryPeriodList);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Warehouse.message.successfulTransferInventoryPeriod");
+    }
+
 
     public Date getStartDate() {
         return startDate;
@@ -179,13 +196,13 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         warehouse = null;
     }
 
-    public CashAccount getCashAccount() {
+    /*public CashAccount getCashAccount() {
         return cashAccount;
     }
 
     public void setCashAccount(CashAccount cashAccount) {
         this.cashAccount = cashAccount;
-    }
+    }*/
 
 
     /**

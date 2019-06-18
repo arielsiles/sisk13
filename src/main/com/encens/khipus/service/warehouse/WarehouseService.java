@@ -129,4 +129,8 @@ public interface WarehouseService extends GenericService {
     BigDecimal findAmountOrderByCodArt(String codArt,Gestion gestion);
 
     public WarehouseDocumentType findWarehouseDocumentType(WarehouseVoucherType warehouseVoucherType);
+
+    void createTransferInventoryPeriod(List<InventoryPeriod> inventoryPeriodList);
+
+    Boolean wasTransferred(String warehouseCode, Integer year, Integer month);
 }
