@@ -8,10 +8,25 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">#{messages['ProductionPlan.list']}</ui:define>
-    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="bodyWidth" value="100%"/>
 
     <ui:param name="selectedTab" value="production"/>
     <ui:define name="body">
+        <style type="text/css">
+            .special tr[id] {
+                display: none;
+            }
+
+            .top-aligned {
+                vertical-align: top;
+                border: none;
+            }
+
+            .row-borders {
+                border-top: solid #616161 thin;
+                border-bottom: solid #616161 thin;
+            }
+        </style>
         <h:form id="productionPlanSearch">
 
             <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['ProductionPlan.search']}" switchType="client">
@@ -44,14 +59,12 @@
                     </rich:calendar>
 
                     <a4j:commandButton action="#{productionPlanDataModel.search}"
-                                       reRender="productionPlanList, dataScroller"
+                                       reRender="productionPlanList, dataScroller, productionPlanningList, dataScrollerProductionPlan"
                                        styleClass="button"
                                        value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
                         <s:defaultAction/>
                     </a4j:commandButton>
                 </s:decorate>
-
-                <!--<rich:jQuery selector="#year" query="focus()" timing="onload"/>-->
             </rich:simpleTogglePanel>
 
             <div class="buttons">
@@ -63,7 +76,7 @@
                           tabindex="4"/>
             </div>
 
-            <rich:dataTable value="#{productionPlanDataModel}" var="productionPlanItem" id="productionPlanList"
+            <!--<rich:dataTable value="#{productionPlanDataModel}" var="productionPlanItem" id="productionPlanList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%" columnsWidth="35%, 35%, 30%">
                 <f:facet name="header">
@@ -101,7 +114,56 @@
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
-            <app:dataScroller id="dataScroller" for="productionPlanList" dataModel="#{productionPlanDataModel}"/>
+            <app:dataScroller id="dataScroller" for="productionPlanList" dataModel="#{productionPlanDataModel}"/>-->
+
+            <!----><!----><!---->
+
+            <rich:dataGrid id="productionPlanningList" value="#{productionPlanDataModel}" var="productionPlanItem"
+                           width="100%" columns="3" elements="6" border="0" rowClasses="row-borders"
+                           columnClasses="top-aligned" style="border: none;">
+
+                <rich:panel style="position:relative; top:0;">
+                    <f:facet name="header">
+                        <h:outputFormat value="{0, date, dd.MM.yyyy}">
+                            <f:param value="#{productionPlanItem.date}"/>
+                        </h:outputFormat>
+                    </f:facet>
+                    <s:div>
+                        <h:commandLink style="float:left;" value="#{messages['Common.select']}"
+                                       action="#{productionPlanAction.select(productionPlanItem)}"/>
+
+                    </s:div>
+                    <s:div style="float:right;">
+                        <!--#{messages['ProductionPlanning.etiq.totalMilk']} #{productionPlanningItem.totalMilk}-->
+                    </s:div>
+                    <rich:dataTable value="#{productionPlanAction.getProductionProductList(productionPlanItem)}"
+                                    var="productionProductItem"
+                                    id="productionOrderList"
+                                    width="100%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>#{messages['ProductionOrder.processedProduct.name']}</rich:column>
+                                <rich:column>#{messages['ProductionOrder.quantity']}</rich:column>
+                                <rich:column>#{messages['ProductionOrder.estateOrderProduction']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{productionProductItem.productItem.fullName}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{productionProductItem.quantity}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText   value="#{messages[productionPlanItem.state.resourceKey]}"
+                                            style="color: #{productionPlanItem.state=='PEN' ? 'red' : (productionPlanItem.state=='APR' ? 'green' : '')}"
+                            />
+                        </rich:column>
+                    </rich:dataTable>
+
+                </rich:panel>
+            </rich:dataGrid>
+            <app:dataScroller id="dataScrollerProductionPlan" for="productionPlanningList" dataModel="#{productionPlanDataModel}"/>
+            <!----><!----><!---->
 
         </h:form>
     </ui:define>

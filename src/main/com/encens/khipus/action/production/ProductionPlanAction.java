@@ -506,6 +506,19 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     }
 
+    public List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan){
+
+        List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>();
+        System.out.println("=====> Plan: " + productionPlan.getDate());
+        for (ProductionProduct product : productionPlan.getProductionProductList()){
+            System.out.println("---------->>>> Plan Product:" + productionPlan.getDate() + " - " + product.getProductItem().getFullName() + " - " + product.getQuantity());
+            productionProductList.add(product);
+        }
+
+
+        return productionProductList;
+    }
+
     public BigDecimal getTotalIndirectCost() {
         return totalIndirectCost;
     }
