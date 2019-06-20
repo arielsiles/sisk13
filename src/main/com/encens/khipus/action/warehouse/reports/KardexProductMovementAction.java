@@ -158,7 +158,8 @@ public class KardexProductMovementAction extends GenericReportAction {
 
         for (MovementDetail md:movementDetailList){
             CollectionData collectionData = new CollectionData(
-                    md.getMovementDetailDate(),
+                    /*md.getMovementDetailDate(),*/
+                    md.getInventoryMovement().getWarehouseVoucher().getDate(),
                     md.getInventoryMovement().getWarehouseVoucher().getNumber(),
                     md.getMovementType().name().equals("E") ? md.getQuantity() : BigDecimal.ZERO,
                     md.getMovementType().name().equals("S") ? md.getQuantity() : BigDecimal.ZERO,

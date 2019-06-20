@@ -633,4 +633,10 @@ public class WarehouseVoucher implements BaseModel {
     public void setNotransOrigin(String notransOrigin) {
         this.notransOrigin = notransOrigin;
     }
+
+    public String getGloss(){
+        String result = getInventoryMovementList().get(0).getDescription();
+        return result;
+    }
+
 }

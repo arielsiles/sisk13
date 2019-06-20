@@ -227,23 +227,56 @@
                 var="warehouseVoucherItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="10%, 15%, 10%, 10%, 10%, 10%, 15%, 10%, 10%">
+                columnsWidth="5%, 5%, 5%, 8%, 15%, 10%, 5%, 30%, 7%">
     <f:facet name="header">
         <rich:columnGroup>
-            <rich:column>
+            <!--<rich:column>
                 <app:commandSortHeader sortProperty="warehouseVoucher.executorUnit"
                                        dataModel="#{warehouseVoucherDataModel}"
                                        reRender="warehouseVoucherList, dataScroller">
                     #{messages['WarehouseVoucher.executorUnitCode']}
                 </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
+            </rich:column>-->
+            <!--<rich:column>
                 <app:commandSortHeader sortProperty="warehouseVoucher.costCenterCode"
                                        dataModel="#{warehouseVoucherDataModel}"
                                        reRender="warehouseVoucherList, dataScroller">
                     #{messages['WarehouseVoucher.costCenter']}
                 </app:commandSortHeader>
+            </rich:column>-->
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehouseVoucher.date"
+                                       dataModel="#{warehouseVoucherDataModel}"
+                                       reRender="warehouseVoucherList, dataScroller">
+                    #{messages['WarehouseVoucher.date']}
+                </app:commandSortHeader>
             </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehouseVoucher.number"
+                                       dataModel="#{warehouseVoucherDataModel}"
+                                       reRender="warehouseVoucherList, dataScroller">
+                    #{messages['WarehouseVoucher.voucher']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehouseVoucher.documentType.name"
+                                       dataModel="#{warehouseVoucherDataModel}"
+                                       reRender="warehouseVoucherList, dataScroller">
+                    #{messages['WarehouseVoucher.type']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <rich:column>
+                <app:commandSortHeader sortProperty="warehouseVoucher.purchaseOrder.orderNumber"
+                                       dataModel="#{warehouseVoucherDataModel}"
+                                       reRender="warehouseVoucherList, dataScroller">
+                    #{messages['WarehouseVoucher.purchaseOrder.oc']}
+                </app:commandSortHeader>
+            </rich:column>
+
             <rich:column>
                 <app:commandSortHeader sortProperty="warehouseVoucher.purchaseOrder.provider"
                                        dataModel="#{warehouseVoucherDataModel}"
@@ -251,27 +284,7 @@
                     #{messages['WarehousePurchaseOrder.provider']}
                 </app:commandSortHeader>
             </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="warehouseVoucher.documentType.name"
-                                       dataModel="#{warehouseVoucherDataModel}"
-                                       reRender="warehouseVoucherList, dataScroller">
-                    #{messages['WarehouseVoucher.documentType']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="warehouseVoucher.purchaseOrder.orderNumber"
-                                       dataModel="#{warehouseVoucherDataModel}"
-                                       reRender="warehouseVoucherList, dataScroller">
-                    #{messages['WarehouseVoucher.purchaseOrder.orderNumber']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="warehouseVoucher.number"
-                                       dataModel="#{warehouseVoucherDataModel}"
-                                       reRender="warehouseVoucherList, dataScroller">
-                    #{messages['WarehouseVoucher.number']}
-                </app:commandSortHeader>
-            </rich:column>
+
             <rich:column>
                 <app:commandSortHeader sortProperty="warehouseVoucher.warehouse.name"
                                        dataModel="#{warehouseVoucherDataModel}"
@@ -286,19 +299,26 @@
                     #{messages['WarehouseVoucher.state']}
                 </app:commandSortHeader>
             </rich:column>
+            <rich:column>#{messages['WarehouseVoucher.gloss']}</rich:column>
             <rich:column styleClass="center">
                 #{messages['Common.action']}
             </rich:column>
         </rich:columnGroup>
     </f:facet>
-    <rich:column>
+    <!--<rich:column>
         <h:outputText value="#{warehouseVoucherItem.executorUnit.fullName}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{warehouseVoucherItem.costCenter.fullName}"/>
+    </rich:column>-->
+
+    <rich:column>
+        <h:outputText value="#{warehouseVoucherItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+        </h:outputText>
     </rich:column>
     <rich:column>
-        <h:outputText value="#{warehouseVoucherItem.purchaseOrder.provider.fullName}"/>
+        <h:outputText value="#{warehouseVoucherItem.number}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{warehouseVoucherItem.documentType.name}"/>
@@ -307,13 +327,16 @@
         <h:outputText value="#{warehouseVoucherItem.purchaseOrder.orderNumber}"/>
     </rich:column>
     <rich:column>
-        <h:outputText value="#{warehouseVoucherItem.number}"/>
+        <h:outputText value="#{warehouseVoucherItem.purchaseOrder.provider.fullName}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{warehouseVoucherItem.warehouse.name}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{messages[warehouseVoucherItem.state.resourceKey]}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{warehouseVoucherItem.gloss}"/>
     </rich:column>
     <rich:column styleClass="center">
         <h:commandLink value="#{messages['Common.select']}"

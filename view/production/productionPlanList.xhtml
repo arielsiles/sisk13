@@ -150,12 +150,12 @@
                         <rich:column>
                             <h:outputText value="#{productionProductItem.productItem.fullName}"/>
                         </rich:column>
-                        <rich:column>
+                        <rich:column styleClass="right">
                             <h:outputText value="#{productionProductItem.quantity}"/>
                         </rich:column>
-                        <rich:column>
-                            <h:outputText   value="#{messages[productionPlanItem.state.resourceKey]}"
-                                            style="color: #{productionPlanItem.state=='PEN' ? 'red' : (productionPlanItem.state=='APR' ? 'green' : '')}"
+                        <rich:column styleClass="center">
+                            <h:outputText value="#{messages[productionPlanItem.state.resourceKey]}"
+                                          style="color: #{productionPlanItem.state=='PEN' ? 'red' : (productionPlanItem.state=='APR' ? '#1a52bc' : (productionPlanItem.state=='FIN' ? '#35B056' : (productionPlanItem.state=='SUS' ? '#ECB700' : '')))}"
                             />
                         </rich:column>
                     </rich:dataTable>
