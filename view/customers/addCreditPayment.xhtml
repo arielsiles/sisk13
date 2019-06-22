@@ -35,7 +35,6 @@
                              value="#{messages['CreditTransaction.save']}"
                              styleClass="button"
                              rendered="#{!creditTransactionAction.managed}">
-                <s:defaultAction/>
             </h:commandButton>
 
             <h:commandButton value="#{messages['Common.delete']}"
@@ -185,12 +184,49 @@
                 <ui:define name="label">#{messages['CreditTransaction.gloss']}</ui:define>
                 <h:inputTextarea id="gloss"
                                  value="#{creditTransaction.gloss}"
-                                 styleClass="input textarea"
+                                 styleClass="input textarea-medium"
                                  required="false"
                                  tabindex="8">
                     <f:validateLength maximum="255"/>
                 </h:inputTextarea>
             </s:decorate>
+
+            <s:decorate id="transferSavingField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CreditTransaction.transferSaving']}</ui:define>
+                <h:selectBooleanCheckbox id="transferSaving"
+                                         value="#{creditTransactionAction.transferSaving}"
+                                         tabindex="16">
+                    <a4j:support event="onchange"
+                                 reRender="transferSavingField, savingAccountDiv"
+                                 ajaxSingle="true"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+
+            <s:div id="savingAccountDiv">
+            <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{creditTransactionAction.transferSaving}">
+                <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
+                <app:selectPopUp id="accountFieldId"
+                                 required="false"
+                                 textValue="#{creditTransactionAction.partnerAccount.fullAccountName}"
+                                 value="#{creditTransactionAction.partnerAccount}"
+                                 clearAction="#{creditTransactionAction.clearPartnerAccount()}"
+                                 searchModalPanel="accountListModalPanel"
+                                 dataModel="#{accountDataModel}"
+                                 reRender="accountField"
+                                 tabindex="12">
+                </app:selectPopUp>
+
+                <h:inputText id="amountDepositId"
+                             value="#{creditTransactionAction.amountTransfer}"
+                             styleClass="inputNumberTiny"
+                             required="false">
+                    <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="amountDepositId"/>
+                    <a4j:support event="onblur" ajaxSingle="true" reRender="amountDepositId"/>
+                    <h:message for="amountDepositId" styleClass="errors" style="display:block;" rendered="true"/>
+                </h:inputText>
+            </s:decorate>
+            </s:div>
 
         </rich:panel>
     </h:form>

@@ -6,10 +6,7 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.customers.CreditState;
-import com.encens.khipus.model.customers.CreditTransaction;
-import com.encens.khipus.model.customers.CreditTransactionType;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -19,14 +16,11 @@ import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
-import com.google.zxing.NotFoundException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.ws.core.soap.SOAPMessageUnMarshaller;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -59,6 +53,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
+
+    private Boolean transferSaving = Boolean.FALSE;
+    private Account partnerAccount;
+    private BigDecimal amountTransfer;
 
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
@@ -458,6 +456,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     }
 
+    public void clearPartnerAccount(){
+        setPartnerAccount(null);
+    }
+
     public Date getDateTransaction() {
         return dateTransaction;
     }
@@ -496,6 +498,30 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void setCriminalInterestValue(BigDecimal criminalInterestValue) {
         this.criminalInterestValue = criminalInterestValue;
+    }
+
+    public Boolean getTransferSaving() {
+        return transferSaving;
+    }
+
+    public void setTransferSaving(Boolean transferSaving) {
+        this.transferSaving = transferSaving;
+    }
+
+    public Account getPartnerAccount() {
+        return partnerAccount;
+    }
+
+    public void setPartnerAccount(Account partnerAccount) {
+        this.partnerAccount = partnerAccount;
+    }
+
+    public BigDecimal getAmountTransfer() {
+        return amountTransfer;
+    }
+
+    public void setAmountTransfer(BigDecimal amountTransfer) {
+        this.amountTransfer = amountTransfer;
     }
 }
 

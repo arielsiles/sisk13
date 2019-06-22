@@ -25,7 +25,7 @@
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
                     <h:inputText id="firstName" value="#{creditDataModel.firstName}"
-                                 maxlength="80" tabindex="2" styleClass="input">
+                                 maxlength="80" tabindex="1" styleClass="input">
                     </h:inputText>
                 </s:decorate>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
@@ -34,12 +34,18 @@
                                  maxlength="80" tabindex="2" styleClass="input">
                     </h:inputText>
                 </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+                    <h:inputText id="lastName" value="#{creditDataModel.maidenName}"
+                                 maxlength="80" tabindex="3" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
             </s:div>
             <s:div>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
                     <h:inputText id="code" value="#{creditDataModel.criteria.previousCode}"
-                                 maxlength="80" tabindex="3" styleClass="inputMedium">
+                                 maxlength="80" tabindex="4" styleClass="inputMedium">
                     </h:inputText>
                 </s:decorate>
                 <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">

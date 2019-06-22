@@ -1,93 +1,93 @@
 -- 1. 
-DELIMITER $$
-CREATE FUNCTION `getNextSeq`(sSeqName VARCHAR(50)) RETURNS VARCHAR(10) CHARSET utf8
-BEGIN
-    DECLARE nLast_val VARCHAR(10);
+delimiter $$
+create function `getNextSeq`(sSeqName varchar(50)) returns varchar(10) charset utf8
+begin
+    declare nLast_val varchar(10);
  
-    SET nLast_val =  (SELECT seq_val
-                          FROM _sequence
-                          WHERE seq_name = sSeqName);
-    IF nLast_val IS NULL THEN
-        SET nLast_val = 1;
-        INSERT INTO _sequence (seq_name,seq_val)
-        VALUES (sSeqName,nLast_Val);
-    ELSE
-        SET nLast_val = nLast_val + 1;
-        UPDATE _sequence SET seq_val = nLast_val
-        WHERE seq_name = sSeqName;
-    END IF;
+    set nLast_val =  (select seq_val
+                          from _sequence
+                          where seq_name = sSeqName);
+    if nLast_val is null then
+        set nLast_val = 1;
+        insert into _sequence (seq_name,seq_val)
+        values (sSeqName,nLast_Val);
+    else
+        set nLast_val = nLast_val + 1;
+        update _sequence set seq_val = nLast_val
+        where seq_name = sSeqName;
+    end if;
     
-    RETURN nLast_val;
-END$$
-DELIMITER ;
+    return nLast_val;
+end$$
+delimiter ;
 
 -- 2.
-DELIMITER $$
-CREATE FUNCTION `newId_sf_tmpdet`() RETURNS INT(11)
-BEGIN
-    DECLARE nLast_val INT;
-    SET nLast_val =  (SELECT valor
-                          FROM secuencia
-                          WHERE tabla = 'sf_tmpdet');
-        SET nLast_val = nLast_val + 1;
-        UPDATE secuencia SET valor = nLast_val
-        WHERE tabla = 'sf_tmpdet';
-    RETURN nLast_val;
-END$$
-DELIMITER ;
+delimiter $$
+create function `newId_sf_tmpdet`() returns int(11)
+begin
+    declare nLast_val int;
+    set nLast_val =  (select valor
+                          from secuencia
+                          where tabla = 'sf_tmpdet');
+        set nLast_val = nLast_val + 1;
+        update secuencia set valor = nLast_val
+        where tabla = 'sf_tmpdet';
+    return nLast_val;
+end$$
+delimiter ;
 
 -- 3.
-DELIMITER $$
-CREATE FUNCTION `newId_sf_tmpenc`() RETURNS INT(11)
-BEGIN
-    DECLARE nLast_val INT;
-    SET nLast_val =  (SELECT valor
-                          FROM secuencia
-                          WHERE tabla = 'sf_tmpenc');
-        SET nLast_val = nLast_val + 1;
-        UPDATE secuencia SET valor = nLast_val
-        WHERE tabla = 'sf_tmpenc';
-    RETURN nLast_val;
-END$$
-DELIMITER ;
+delimiter $$
+create function `newId_sf_tmpenc`() returns int(11)
+begin
+    declare nLast_val int;
+    set nLast_val =  (select valor
+                          from secuencia
+                          where tabla = 'sf_tmpenc');
+        set nLast_val = nLast_val + 1;
+        update secuencia set valor = nLast_val
+        where tabla = 'sf_tmpenc';
+    return nLast_val;
+end$$
+delimiter ;
 
 -- 4.
-DELIMITER $$
-CREATE FUNCTION `next_tmpenc`() RETURNS VARCHAR(10) CHARSET utf8
-BEGIN
-    DECLARE act_trans VARCHAR(10);
-    SET act_trans = 0;
-    SELECT IFNULL(MAX(no_trans),0) INTO act_trans FROM khipus.sf_tmpenc;
-  RETURN act_trans+1;
-    END
+delimiter $$
+create function `next_tmpenc`() returns varchar(10) charset utf8
+begin
+    declare act_trans varchar(10);
+    set act_trans = 0;
+    select IFNULL(MAX(no_trans),0) into act_trans from khipus.sf_tmpenc;
+  return act_trans+1;
+    end
 $$
-DELIMITER ;
+delimiter ;
 
 
 -- 5.
-DELIMITER $$
-CREATE FUNCTION `sigte_trans`() RETURNS VARCHAR(10) CHARSET utf8
-BEGIN
-    DECLARE act_trans VARCHAR(10);
-    SET act_trans = 0;
-    SELECT IFNULL(MAX(no_trans),0) INTO act_trans FROM khipus.inv_vales;
-  RETURN act_trans+1;
-    END
+delimiter $$
+create function `sigte_trans`() returns varchar(10) charset utf8
+begin
+    declare act_trans varchar(10);
+    set act_trans = 0;
+    select IFNULL(MAX(no_trans),0) into act_trans from khipus.inv_vales;
+  return act_trans+1;
+    end
 $$
-DELIMITER ;
+delimiter ;
 
 -- 6.
-DELIMITER $$
-CREATE FUNCTION `newId_inv_inventario_detalle`() RETURNS INT(11)
-BEGIN
-    DECLARE nLast_val INT;
-    SET nLast_val =  (SELECT valor
-                          FROM secuencia
-                          WHERE tabla = 'inv_inventario_detalle');
-        SET nLast_val = nLast_val + 1;
-        UPDATE secuencia SET valor = nLast_val
-        WHERE tabla = 'inv_inventario_detalle';
-    RETURN nLast_val;
-END $$
-DELIMITER ;
+delimiter $$
+create function `newId_inv_inventario_detalle`() returns int(11)
+begin
+    declare nLast_val int;
+    set nLast_val =  (select valor
+                          from secuencia
+                          where tabla = 'inv_inventario_detalle');
+        set nLast_val = nLast_val + 1;
+        update secuencia set valor = nLast_val
+        where tabla = 'inv_inventario_detalle';
+    return nLast_val;
+end $$
+delimiter ;
 

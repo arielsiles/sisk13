@@ -24,10 +24,12 @@ public class CreditDataModel extends QueryDataModel<Long, Credit> {
 
     private String firstName;
     private String lastName;
+    private String maidenName;
 
     private static final String[] RESTRICTIONS = {
             "lower(credit.partner.firstName) like concat('%', concat(lower(#{creditDataModel.firstName}), '%'))",
             "lower(credit.partner.lastName) like concat('%', concat(lower(#{creditDataModel.lastName}), '%'))",
+            "lower(credit.partner.maidenName) like concat('%', concat(lower(#{creditDataModel.maidenName}), '%'))",
             "lower(credit.previousCode) like concat('%', concat(lower(#{creditDataModel.criteria.previousCode}), '%'))"
     };
 
@@ -62,5 +64,13 @@ public class CreditDataModel extends QueryDataModel<Long, Credit> {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getMaidenName() {
+        return maidenName;
+    }
+
+    public void setMaidenName(String maidenName) {
+        this.maidenName = maidenName;
     }
 }
