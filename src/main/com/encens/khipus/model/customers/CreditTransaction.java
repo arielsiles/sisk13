@@ -4,7 +4,9 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
@@ -77,6 +79,10 @@ public class CreditTransaction implements Serializable, BaseModel {
     @Column(name = "tipo", nullable = true, length = 1)
     @Enumerated(EnumType.STRING)
     private CreditTransactionType creditTransactionType;
+
+    @Column(name = "traspaso", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean transfer = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idcredito", nullable = false)
@@ -236,5 +242,13 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setCriminalInterest(BigDecimal criminalInterest) {
         this.criminalInterest = criminalInterest;
+    }
+
+    public Boolean getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(Boolean transfer) {
+        this.transfer = transfer;
     }
 }
