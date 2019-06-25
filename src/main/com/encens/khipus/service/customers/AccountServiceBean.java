@@ -1,7 +1,8 @@
 package com.encens.khipus.service.customers;
 
-import com.encens.khipus.model.contacts.Entity;
-import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.customers.Account;
+import com.encens.khipus.model.customers.AccountState;
+import com.encens.khipus.model.customers.SavingType;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.VoucherDetail;
 import org.jboss.seam.annotations.AutoCreate;
@@ -11,8 +12,6 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.TemporalType;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +37,7 @@ public class AccountServiceBean implements AccountService {
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
                     " where voucherDetail.partnerAccount = :account " +
+                    " and voucherDetail.voucher.state <> 'ANL' " +
                     " order by voucherDetail.voucher.date asc ")
                     .setParameter("account", account)
                     .getResultList();

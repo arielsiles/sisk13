@@ -2,11 +2,12 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.customers.reports.CreditReportAction;
-import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.accounting.DocType;
-import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.customers.Credit;
+import com.encens.khipus.model.customers.CreditState;
+import com.encens.khipus.model.customers.CreditTransaction;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -21,12 +22,10 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
-import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -108,7 +107,7 @@ public class CreditAction extends GenericAction<Credit> {
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String addPayoutCredit() {
         setOp(OP_UPDATE);
-        return creditTransactionAction.addCreditTransactionPayout();
+        return creditTransactionAction.addCreditTransactionPayout(getInstance());
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)

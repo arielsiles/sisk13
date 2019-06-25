@@ -116,7 +116,7 @@
                                      value="#{creditTransactionAction.interestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, criminalInterestField, amountField, capitalField, transferAmountField"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -126,7 +126,7 @@
                                      value="#{creditTransactionAction.capitalValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField, transferAmountField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -136,7 +136,7 @@
                                      value="#{creditTransactionAction.criminalInterestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="criminalInterest, amountField, transferAmountField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="criminalInterest, amountField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -149,15 +149,20 @@
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField, transferAmountField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
                         </h:inputText>
                         <a4j:commandLink id="adjustCents" ajaxSingle="true" immediate="true"
                                          tabindex="5"
                                          title="#{messages['CreditTransaction.adjustCents']}"
                                          action="#{creditTransactionAction.adjustCents()}"
-                                         reRender="interestField, amountField">
+                                         reRender="interestField, amountField, amountME">
                             <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                         </a4j:commandLink>
+
+                        <h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountME"/>
+                        </h:outputText>
+
                     </s:decorate>
 
                 </c:when>
@@ -180,17 +185,6 @@
                 </c:otherwise>
             </c:choose>
 
-            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['CreditTransaction.gloss']}</ui:define>
-                <h:inputTextarea id="gloss"
-                                 value="#{creditTransaction.gloss}"
-                                 styleClass="input textarea-medium"
-                                 required="false"
-                                 tabindex="8">
-                    <f:validateLength maximum="255"/>
-                </h:inputTextarea>
-            </s:decorate>
-
             <s:decorate id="transferSavingField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CreditTransaction.transferSaving']}</ui:define>
                 <h:selectBooleanCheckbox id="transferSaving"
@@ -204,38 +198,39 @@
             </s:decorate>
 
             <s:div id="savingAccountDiv">
-                <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{creditTransactionAction.transferSaving}">
-                    <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
-                    <app:selectPopUp id="accountFieldId"
-                                     required="true"
-                                     styleClass="inputLarge"
-                                     textValue="#{creditTransactionAction.partnerAccount.fullAccountName}"
-                                     value="#{creditTransactionAction.partnerAccount}"
-                                     clearAction="#{creditTransactionAction.clearPartnerAccount()}"
-                                     searchModalPanel="accountListModalPanel"
-                                     dataModel="#{accountDataModel}"
-                                     reRender="accountField, transferAmountField, savingAccountDiv"
-                                     tabindex="12">
-                    </app:selectPopUp>
-
+                <s:decorate id="partnerAccountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.partnerAccount']}</ui:define>
+                    <h:selectOneMenu id="partnerAccount" value="#{creditTransactionAction.account}" styleClass="inputLarge" required="true" tabindex="2">
+                        <s:selectItems value="#{partnerAccountList.resultList}" var="partnerAccount" label="#{accountAction.getFullAccountBalance(partnerAccount)}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" reRender="transferAmountField" />
+                    </h:selectOneMenu>
                 </s:decorate>
-                <s:decorate id="transferAmountField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{creditTransactionAction.transferSaving}">
+
+                <s:decorate id="transferAmountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CreditTransaction.transferAmount']}</ui:define>
-                    <h:inputText id="transferAmountId"
-                                 value="#{creditTransactionAction.amountTransfer}"
-                                 disabled="true"
-                                 styleClass="inputNumberTiny"
-                                 required="true">
-                        <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="transferAmountId"/>
-                        <!--<a4j:support event="onblur"
-                                     action="#{creditTransactionAction.changeCapital()}"
-                                     ajaxSingle="true" reRender="transferAmountId, savingAccountDiv, amountField, capitalField"/>-->
-                        <h:message for="transferAmountId" styleClass="errors" style="display:block;" rendered="true"/>
+                    <h:inputText id="transferAmount" rendered="#{creditTransactionAction.transferSaving and creditTransactionAction.account!=null}"
+                                 value="#{creditTransactionAction.transferAmount}"
+                                 styleClass="input" required="true" tabindex="2">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="transferAmount"/>
+                        <a4j:support event="onblur" reRender="transferAmount"/>
                     </h:inputText>
                 </s:decorate>
+
+
             </s:div>
+
+            <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CreditTransaction.gloss']}</ui:define>
+                <h:inputTextarea id="gloss"
+                                 value="#{creditTransactionAction.gloss}"
+                                 styleClass="input textarea-medium"
+                                 required="true"
+                                 tabindex="8">
+                    <f:validateLength maximum="255"/>
+                </h:inputTextarea>
+            </s:decorate>
 
         </rich:panel>
     </h:form>
@@ -275,7 +270,7 @@
     </s:decorate>
 
     <!--Set selector Id to enable focus-->
-    <rich:jQuery selector="#amount" query="focus()" timing="onload"/>
+    <!--<rich:jQuery selector="#gloss" query="focus()" timing="onload"/>-->
 
 </ui:define>
 </ui:composition>

@@ -7,7 +7,8 @@ package com.encens.khipus.model.customers;
 public enum CreditState {
     VIG("Partner.state.valid"),
     VEN("Credit.state.expired"),
-    EJE("Credit.state.execution");
+    EJE("Credit.state.execution"),
+    FIN("Credit.state.finalized");
 
     private String resourceKey;
 

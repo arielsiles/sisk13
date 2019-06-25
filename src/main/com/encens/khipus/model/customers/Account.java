@@ -4,13 +4,13 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.util.MessageUtils;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * Entity for accounts
@@ -149,6 +149,10 @@ public class Account implements BaseModel {
 
     public String getFullAccountName(){
         return getAccountNumber() + " - " + partner.getFullName();
+    }
+
+    public String getFullAccount(){
+        return getAccountNumber() + " (" +  MessageUtils.getMessage(getCurrency().getSymbolResourceKey()) + " - " + getAccountType().getName() + ")";
     }
 
 }

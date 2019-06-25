@@ -115,6 +115,43 @@ public class AccountAction extends GenericAction<Account> {
         setTotalBalanceMe(BigDecimalUtil.subtract(getTotalCreditMe(), getTotalDebitMe(), 2));
     }
 
+    public BigDecimal getTotalBalanceAccount(Account account){
+
+        BigDecimal result = BigDecimal.ZERO;
+
+        BigDecimal balanceMN = BigDecimal.ZERO;
+        BigDecimal balanceME = BigDecimal.ZERO;
+
+        BigDecimal totalDebitMN  = BigDecimal.ZERO;
+        BigDecimal totalCreditMN = BigDecimal.ZERO;
+
+        BigDecimal totalDebitME  = BigDecimal.ZERO;
+        BigDecimal totalCreditME = BigDecimal.ZERO;
+
+        List<VoucherDetail> voucherDetails = accountService.getAccountDetailList(account);
+        for (VoucherDetail voucherDetail : voucherDetails){
+            totalCreditMN = BigDecimalUtil.sum(totalCreditMN, voucherDetail.getCredit());
+            totalDebitMN  = BigDecimalUtil.sum(totalDebitMN, voucherDetail.getDebit());
+
+            totalCreditME = BigDecimalUtil.sum(totalCreditME, voucherDetail.getCreditMe());
+            totalDebitME  = BigDecimalUtil.sum(totalDebitME, voucherDetail.getDebitMe());
+        }
+        balanceMN = BigDecimalUtil.subtract(totalCreditMN, totalDebitMN);
+        balanceME = BigDecimalUtil.subtract(totalCreditME, totalDebitME);
+
+        if (account.getCurrency().equals(FinancesCurrencyType.P))
+            result = balanceMN;
+        if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M))
+            result = balanceME;
+
+        return result;
+    }
+
+    public String getFullAccountBalance(Account account){
+        return account.getFullAccount() + " (" + getTotalBalanceAccount(account) + ")";
+    }
+
+
     public void assignPartner(Partner partner){
         getInstance().setPartner(partner);
     }

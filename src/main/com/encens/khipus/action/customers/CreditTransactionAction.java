@@ -60,11 +60,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
+    private BigDecimal transferAmount;
 
     private Boolean transferSaving = Boolean.FALSE;
-    private Account partnerAccount;
-    private BigDecimal amountTransfer;
-
+    private Account account;
+    private String gloss;
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
@@ -130,6 +130,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setCreditTransactionType(CreditTransactionType.ING);
         creditTransaction.setCredit(creditItem);
         creditTransaction.setTransfer(this.transferSaving);
+        creditTransaction.setGloss(this.gloss);
 
         creditItem.setCapitalBalance(capitalBalance);
         creditItem.setLastPayment(dateTransaction);
@@ -138,7 +139,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         /** Uncomment for Production **/
         createIncomeAccountingRecord(creditTransaction);
-
+        cleanValues();
         return  Outcome.SUCCESS;
     }
 
@@ -163,21 +164,21 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 String cashAccountCode = "";
                 voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
 
-                if (partnerAccount.getCurrency().equals(FinancesCurrencyType.P))
-                    cashAccountCode = this.partnerAccount.getAccountType().getCashAccountMn().getAccountCode();
-                if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D))
-                    cashAccountCode = this.partnerAccount.getAccountType().getCashAccountMe().getAccountCode();
-                if (partnerAccount.getCurrency().equals(FinancesCurrencyType.M))
-                    cashAccountCode = this.partnerAccount.getAccountType().getCashAccountMv().getAccountCode();
+                if (account.getCurrency().equals(FinancesCurrencyType.P))
+                    cashAccountCode = this.account.getAccountType().getCashAccountMn().getAccountCode();
+                if (account.getCurrency().equals(FinancesCurrencyType.D))
+                    cashAccountCode = this.account.getAccountType().getCashAccountMe().getAccountCode();
+                if (account.getCurrency().equals(FinancesCurrencyType.M))
+                    cashAccountCode = this.account.getAccountType().getCashAccountMv().getAccountCode();
 
                 voucherDetailBox.setAccount(cashAccountCode);
-                voucherDetailBox.setPartnerAccount(this.partnerAccount);
-                if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)){
+                voucherDetailBox.setPartnerAccount(this.account);
+                if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M)){
                     voucherDetailBox.setDebit(creditTransaction.getAmount());
                     voucherDetailBox.setCredit(BigDecimal.ZERO);
                     voucherDetailBox.setDebitMe(BigDecimalUtil.divide(creditTransaction.getAmount(), exchangeRate));
                     voucherDetailBox.setCreditMe(BigDecimal.ZERO);
-                    voucherDetailBox.setCurrency(partnerAccount.getCurrency());
+                    voucherDetailBox.setCurrency(account.getCurrency());
                 }else {
                     voucherDetailBox.setDebit(creditTransaction.getAmount());
                     voucherDetailBox.setCredit(BigDecimal.ZERO);
@@ -227,10 +228,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
 
-            voucher.setGloss(creditTransaction.getCredit().getPreviousCode() + " " + creditTransaction.getCredit().getPartner().getFullName() + ", " + creditTransaction.getGloss());
+            voucher.setGloss(creditTransaction.getGloss());
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
-            voucher.getDetails().add(voucherDetailInterest);
+            if (creditTransaction.getInterest().doubleValue() > 0)
+                voucher.getDetails().add(voucherDetailInterest);
 
             voucherAccoutingService.saveVoucher(voucher);
 
@@ -252,6 +254,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         setTotalAmountValue(BigDecimal.ZERO);
         setDateTransaction(new Date());
         clearPartnerAccount();
+        setTransferSaving(Boolean.FALSE);
     }
 
     @End(beforeRedirect = true)
@@ -316,7 +319,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return Outcome.SUCCESS;
     }
 
-    public String addCreditTransactionPayout() {
+    public String addCreditTransactionPayout(Credit credit) {
         setOp(OP_CREATE);
         //set a null v in the current instance to force a create the new instance.
         setInstance(null);
@@ -350,6 +353,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;
         this.criminalInterestValue = calculateCriminalInterest();
+
+        if (saldoCapital.doubleValue() < capitalValue.doubleValue()) {
+            capitalValue = saldoCapital;
+            totalPayment = BigDecimalUtil.sum(capitalValue, interest, 6);
+            this.totalAmountValue = totalPayment;
+        }
 
         System.out.println("--------------------------> Capital: " + capitalValue);
         System.out.println("--------------------------> Interes: " + interestValue);
@@ -477,7 +486,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         }
         //getInstance().setAmount(totalAmount);
         setTotalAmountValue(totalAmount);
-        setAmountTransfer(totalAmount);
     }
 
     public void calculateTotalCapital(){
@@ -489,7 +497,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             setCapitalValue(BigDecimalUtil.subtract(totalAmountValue, interestValue, 6));
 
         }
-        setAmountTransfer(getTotalAmountValue());
     }
 
     public void adjustCents(){
@@ -503,13 +510,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     public void clearPartnerAccount(){
-        setPartnerAccount(null);
-        setAmountTransfer(null);
-    }
-
-    public void changeCapital(){
-        setCapitalValue(getAmountTransfer());
-        calculateTotalAmount();
+        setAccount(null);
     }
 
     public Date getDateTransaction() {
@@ -540,6 +541,16 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return totalAmountValue;
     }
 
+    public BigDecimal getTotalAmountValueToMe(){
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
+
+        return BigDecimalUtil.divide(getTotalAmountValue(), exchangeRate);
+    }
+
     public void setTotalAmountValue(BigDecimal totalAmountValue) {
         this.totalAmountValue = totalAmountValue;
     }
@@ -560,22 +571,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.transferSaving = transferSaving;
     }
 
-    public Account getPartnerAccount() {
-        return partnerAccount;
-    }
-
-    public void setPartnerAccount(Account partnerAccount) {
-        this.partnerAccount = partnerAccount;
-    }
-
-    public BigDecimal getAmountTransfer() {
-        return amountTransfer;
-    }
-
-    public void setAmountTransfer(BigDecimal amountTransfer) {
-        this.amountTransfer = amountTransfer;
-    }
-
     private void addFinancesCurrencyNotFoundMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                 "FixedAssets.FinancesCurrencyNotFoundException");
@@ -584,6 +579,36 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private void addFinancesExchangeRateNotFoundExceptionMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "FixedAssets.FinancesExchangeRateNotFoundException");
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public String getGloss() {
+        gloss = creditAction.getInstance().getPartner().getFullName() + " (" + creditAction.getInstance().getPreviousCode() + ") ";
+        return gloss;
+    }
+
+    public void setGloss(String gloss) {
+        this.gloss = gloss;
+    }
+
+    public BigDecimal getTransferAmount() {
+
+        transferAmount = getTotalAmountValue();
+        if (getAccount().getCurrency().equals(FinancesCurrencyType.D) || getAccount().getCurrency().equals(FinancesCurrencyType.M))
+            transferAmount = getTotalAmountValueToMe();
+
+        return transferAmount;
+    }
+
+    public void setTransferAmount(BigDecimal transferAmount) {
+        this.transferAmount = transferAmount;
     }
 }
 

@@ -3,10 +3,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['CashSale.transferCash']}</ui:define>
@@ -61,7 +58,7 @@
 
 </h:form>
 
-<s:decorate template="/include/modalDialog.xhtml">
+<!--<s:decorate template="/include/modalDialog.xhtml">
     <ui:param name="dialogId" value="generateTransferConfirmation"/>
     <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
     <ui:define name="dialogContent">
@@ -76,14 +73,14 @@
                            tabindex="21"
                            styleClass="button"/>
     </ui:define>
-</s:decorate>
+</s:decorate>-->
 
-
+<!--
 <s:fragment rendered="#{!bankAction.managed}">
     <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
 </s:fragment>
 <s:fragment rendered="#{bankAction.managed}">
     <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
-</s:fragment>
+</s:fragment>-->
 </ui:define>
 </ui:composition>

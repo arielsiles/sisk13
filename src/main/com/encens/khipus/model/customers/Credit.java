@@ -3,7 +3,6 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.contacts.Entity;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -21,7 +20,7 @@ import java.util.Date;
 
 @NamedQueries(
         {
-                @NamedQuery(name = "Credit.findAllCredits", query = "select c from Credit c "),
+                @NamedQuery(name = "Credit.findAllCredits", query = "select c from Credit c where c.capitalBalance > 0"),
                 @NamedQuery(name = "Credit.findCreditById", query = "select c from Credit c where c.id=:creditId")
         }
 )
