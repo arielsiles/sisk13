@@ -59,6 +59,9 @@ public class CreditTransaction implements Serializable, BaseModel {
     @Column(name = "importe", precision = 13, scale = 2, nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "diff", precision = 13, scale = 2)
+    private BigDecimal difference;
+
     @Column(name = "glosa", length = 255)
     private String gloss;
 
@@ -250,5 +253,13 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setTransfer(Boolean transfer) {
         this.transfer = transfer;
+    }
+
+    public BigDecimal getDifference() {
+        return difference;
+    }
+
+    public void setDifference(BigDecimal difference) {
+        this.difference = difference;
     }
 }

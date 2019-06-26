@@ -32,16 +32,16 @@ public final class Constants {
     public static final Long currencyIdSus = (long) 2;
 
     //Schema for KHIPUS
-    /*public static final String KHIPUS_SCHEMA    = "khipus";
+    public static final String KHIPUS_SCHEMA    = "khipus";
     public static final String FINANCES_SCHEMA  = "khipus";
     public static final String CASHBOX_SCHEMA   = "khipus";
-    public static final String ACADEMIC_SCHEMA  = "khipus";*/
+    public static final String ACADEMIC_SCHEMA  = "khipus";
 
     //Schema for KHIPUS DEV
-    public static final String KHIPUS_SCHEMA    = "khipusdev";
+    /*public static final String KHIPUS_SCHEMA    = "khipusdev";
     public static final String FINANCES_SCHEMA  = "khipusdev";
     public static final String CASHBOX_SCHEMA   = "khipusdev";
-    public static final String ACADEMIC_SCHEMA  = "khipusdev";
+    public static final String ACADEMIC_SCHEMA  = "khipusdev";*/
 
     //Schema for CAISC - Fondo Lech
     /*public static final String KHIPUS_SCHEMA    = "caisc";
@@ -261,6 +261,7 @@ public final class Constants {
     public static final String ACOUNT_INTEREST_4110210200 = "4110210200";   //Int.Obligaciones Ahorros Socios M.N.
 
     public static final String ACOUNT_RCIVA_2420310100 = "2420310100";   //RC IVA retenido a Clientes
+    public static final String ACCOUNT_DIFFERENCE_AVAILABLE_CHANGE = "5210110000";   //Diferencias de Cambios Disponibilidades
 
 
     public static final String ACOUNT_LOAN_EXECUTION = "";          //

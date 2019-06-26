@@ -204,7 +204,7 @@
                         <s:selectItems value="#{partnerAccountList.resultList}" var="partnerAccount" label="#{accountAction.getFullAccountBalance(partnerAccount)}"
                                        noSelectionLabel="" hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
-                        <a4j:support event="onchange" reRender="transferAmountField" />
+                        <a4j:support event="onchange" reRender="transferAmountField" action="#{creditTransactionAction.setTransferAmountDefault()}" />
                     </h:selectOneMenu>
                 </s:decorate>
 
@@ -214,10 +214,9 @@
                                  value="#{creditTransactionAction.transferAmount}"
                                  styleClass="input" required="true" tabindex="2">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="transferAmount"/>
-                        <a4j:support event="onblur" reRender="transferAmount"/>
+                        <a4j:support event="onchange" reRender="transferAmount" action="#{creditTransactionAction.setDifferenceTransfer()}"/>
                     </h:inputText>
                 </s:decorate>
-
 
             </s:div>
 

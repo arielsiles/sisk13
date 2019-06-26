@@ -55,12 +55,14 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private CreditReportAction creditReportAction;
 
     private Date dateTransaction = new Date();
+    BigDecimal exchangeRate = BigDecimal.ZERO;
 
     private BigDecimal interestValue;
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
     private BigDecimal transferAmount;
+    private BigDecimal differenceAvailable = BigDecimal.ZERO;
 
     private Boolean transferSaving = Boolean.FALSE;
     private Account account;
@@ -68,6 +70,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
         return getInstance();
     }
 
@@ -131,6 +137,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setCredit(creditItem);
         creditTransaction.setTransfer(this.transferSaving);
         creditTransaction.setGloss(this.gloss);
+        creditTransaction.setDifference(differenceAvailable);
 
         creditItem.setCapitalBalance(capitalBalance);
         creditItem.setLastPayment(dateTransaction);
@@ -159,6 +166,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.setDocumentType(Constants.RI_VOUCHER_DOCTYPE);
 
             VoucherDetail voucherDetailBox = new VoucherDetail();
+            VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
             /** Si es traspaso **/
             if (creditTransaction.getTransfer()){
                 String cashAccountCode = "";
@@ -174,16 +182,29 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailBox.setAccount(cashAccountCode);
                 voucherDetailBox.setPartnerAccount(this.account);
                 if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M)){
-                    voucherDetailBox.setDebit(creditTransaction.getAmount());
+                    //voucherDetailBox.setDebit(creditTransaction.getAmount());
+                    voucherDetailBox.setDebit(BigDecimalUtil.sum(creditTransaction.getAmount(), differenceAvailable));
                     voucherDetailBox.setCredit(BigDecimal.ZERO);
-                    voucherDetailBox.setDebitMe(BigDecimalUtil.divide(creditTransaction.getAmount(), exchangeRate));
+                    //voucherDetailBox.setDebitMe(BigDecimalUtil.divide(creditTransaction.getAmount(), exchangeRate));
+                    voucherDetailBox.setDebitMe(getTransferAmount());
                     voucherDetailBox.setCreditMe(BigDecimal.ZERO);
                     voucherDetailBox.setCurrency(account.getCurrency());
                 }else {
-                    voucherDetailBox.setDebit(creditTransaction.getAmount());
+                    //voucherDetailBox.setDebit(creditTransaction.getAmount());
+                    voucherDetailBox.setDebit(getTransferAmount());
                     voucherDetailBox.setCredit(BigDecimal.ZERO);
                     voucherDetailBox.setDebitMe(BigDecimal.ZERO);
                     voucherDetailBox.setCreditMe(BigDecimal.ZERO);
+                }
+
+                /** Si existe diferencia de cambio **/
+                if (differenceAvailable.doubleValue() > 0){
+                    voucherDetailDifferenceChange.setAccount(Constants.ACCOUNT_DIFFERENCE_AVAILABLE_CHANGE);
+                    voucherDetailDifferenceChange.setDebit(BigDecimal.ZERO);
+                    voucherDetailDifferenceChange.setCredit(differenceAvailable);
+                    voucherDetailDifferenceChange.setCurrency(FinancesCurrencyType.P);
+                    voucherDetailDifferenceChange.setDebitMe(BigDecimal.ZERO);
+                    voucherDetailDifferenceChange.setCreditMe(BigDecimal.ZERO);
                 }
 
             }else {
@@ -208,6 +229,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
             voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
+            voucherDetailCurrentLoan.setDebitMe(BigDecimal.ZERO);
+            voucherDetailCurrentLoan.setCreditMe(BigDecimal.ZERO);
 
             VoucherDetail voucherDetailInterest = new VoucherDetail();
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
@@ -224,6 +247,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             voucherDetailInterest.setDebit(BigDecimal.ZERO);
             voucherDetailInterest.setCredit(creditTransaction.getInterest());
+            voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
+            voucherDetailInterest.setCreditMe(BigDecimal.ZERO);
 
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
@@ -233,6 +258,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.getDetails().add(voucherDetailCurrentLoan);
             if (creditTransaction.getInterest().doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailInterest);
+            if (differenceAvailable.doubleValue() > 0)
+                voucher.getDetails().add(voucherDetailDifferenceChange);
 
             voucherAccoutingService.saveVoucher(voucher);
 
@@ -599,17 +626,35 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     public BigDecimal getTransferAmount() {
-
-        transferAmount = getTotalAmountValue();
-        if (getAccount().getCurrency().equals(FinancesCurrencyType.D) || getAccount().getCurrency().equals(FinancesCurrencyType.M))
-            transferAmount = getTotalAmountValueToMe();
-
         return transferAmount;
     }
 
     public void setTransferAmount(BigDecimal transferAmount) {
         this.transferAmount = transferAmount;
     }
+
+    public void setTransferAmountDefault(){
+        BigDecimal amount = getTotalAmountValue();
+        if (getAccount().getCurrency().equals(FinancesCurrencyType.D) || getAccount().getCurrency().equals(FinancesCurrencyType.M)) {
+            amount = getTotalAmountValueToMe();
+        }
+        setTransferAmount(amount);
+    }
+
+    public void setDifferenceTransfer(){
+        BigDecimal amountValue = getTotalAmountValue();
+        BigDecimal transferAmountValue = getTransferAmount();
+
+        differenceAvailable = BigDecimalUtil.subtract(transferAmountValue, amountValue);
+        if (getAccount().getCurrency().equals(FinancesCurrencyType.D) || getAccount().getCurrency().equals(FinancesCurrencyType.M)) {
+            transferAmountValue = BigDecimalUtil.multiply(transferAmountValue, exchangeRate);
+            differenceAvailable = BigDecimalUtil.subtract(transferAmountValue, amountValue);
+        }
+        if (differenceAvailable.doubleValue() < 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"CreditTransaction.message.invalidTransferAmount");
+        }
+    }
+
 }
 
 
