@@ -35,7 +35,7 @@
                                     condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
                         </ui:define>
                     </app:quickSearch>
-                    <app:selectPopUp id="productItem"
+                    <app:selectPopUp id="productItem" styleClass="inputLarge"
                                      textValue="#{kardexProductMovementAction.productItem.name}"
                                      value="#{kardexProductMovementAction.productItem}"
                                      clearAction="kardexProductMovementAction.cleanProductItem()"

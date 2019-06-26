@@ -224,8 +224,15 @@ public class KardexProductMovementAction extends GenericReportAction {
 
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItemCode, firstDate, initDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
+        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(firstDate, initDate);
 
 
+        /** PR_PRODUCCION **/ /*** REVISAR DESDE EL 1 MAYO 2019 ***/
+        for (ProductionProduct product : productionProductList){
+            if (productItemCode.equals(product.getProductItemCode())){
+                initialQuantity = BigDecimalUtil.sum(initialQuantity, product.getQuantity(), 2);
+            }
+        }
         for (ProductionOrder po:productionOrderList){
             initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 2);
         }
