@@ -152,11 +152,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
-        BigDecimal exchangeRate = BigDecimal.ZERO;
-        try {
-            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
-        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
-        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
+        setDifferenceTransfer();
 
         if (    creditTransaction.getCredit().getState().equals(CreditState.VIG) ||
                 creditTransaction.getCredit().getState().equals(CreditState.VEN) ||
@@ -648,8 +644,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         differenceAvailable = BigDecimalUtil.subtract(transferAmountValue, amountValue);
         if (getAccount().getCurrency().equals(FinancesCurrencyType.D) || getAccount().getCurrency().equals(FinancesCurrencyType.M)) {
             transferAmountValue = BigDecimalUtil.multiply(transferAmountValue, exchangeRate);
+            System.out.println("---------> transferAmountValue: " + transferAmountValue);
             differenceAvailable = BigDecimalUtil.subtract(transferAmountValue, amountValue);
         }
+        System.out.println("---------> differenceAvailable: " + differenceAvailable);
         if (differenceAvailable.doubleValue() < 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"CreditTransaction.message.invalidTransferAmount");
         }
