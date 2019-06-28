@@ -152,7 +152,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
-        setDifferenceTransfer();
+        if (creditTransaction.getTransfer()) setDifferenceTransfer();
 
         if (    creditTransaction.getCredit().getState().equals(CreditState.VIG) ||
                 creditTransaction.getCredit().getState().equals(CreditState.VEN) ||
