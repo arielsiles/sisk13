@@ -655,6 +655,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
                     if (isSalaryGenerationType) {
                         if (gestionPayroll.getJobCategory().getPayrollGenerationType().equals(PayrollGenerationType.GENERATION_BY_PERIODSALARY)) {
+                            System.out.println("==============>> GENERATION_BY_PERIODSALARY ");
                             List<Long> employeeIdList = (List<Long>) ListUtil.i.getIdList(employeeList);
                             HashMap<Long, List<JobContract>> employeeJobContractMap = (HashMap<Long, List<JobContract>>) horaryBandContractService.getJobContractWithValidHoraryBandContractByEmployeeBusinessUnitJobCategory(
                                     employeeIdList, gestionPayroll.getBusinessUnit(), gestionPayroll.getJobCategory(), gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
@@ -670,6 +671,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                     employeeIdList,
                                     employeeJobContractMap);
                         } else {
+                            System.out.println("==============>> GENERATION BY SALARY...");
                             payrollGenerationResult = fillManagersPayroll(
                                     generatedPayroll, employeeList, specialDate4BusinessUnit,
                                     specialDateTime4BusinessUnit, specialDate4OrganizationalUnit,
@@ -927,6 +929,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         SeniorityBonus seniorityBonus = taxPayrollUtilService.getActiveSeniorityBonus();
         for (Employee employee : employeeList) {
             index++;
+            System.out.println("==> fillManagersPayroll ===> Processing employee = " + employee.getId() + employee.getFullName() + " index=" + index);
             log.debug("Processing employee = " + employee.getId() + employee.getFullName() + " index=" + index);
             JobContract currentJobContract;
             Double lastIvaResidue = 0.0;
