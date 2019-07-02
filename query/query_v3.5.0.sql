@@ -1,9 +1,7 @@
-/** 24.06.2019 **/
-ALTER TABLE transaccioncredito ADD COLUMN traspaso INT(1) AFTER tipo;
-UPDATE transaccioncredito t SET t.`traspaso` = 0;
+/** 01.07.2019 **/
+ALTER TABLE planillafiscalporcategoria ADD COLUMN afplab_individual DECIMAL(13,2) AFTER retencionafp;
+ALTER TABLE planillafiscalporcategoria ADD COLUMN afplab_riesocomun DECIMAL(13,2) AFTER afplab_individual;
+ALTER TABLE planillafiscalporcategoria ADD COLUMN afplab_solidario DECIMAL(13,2) AFTER afplab_riesocomun;
+ALTER TABLE planillafiscalporcategoria ADD COLUMN afplab_comision DECIMAL(13,2) AFTER afplab_solidario;
 
-UPDATE _sequence s SET s.`seq_val` = 2 WHERE s.`seq_name` = 'CT';
-
-/** 26.26.2019 **/
-ALTER TABLE transaccioncredito ADD COLUMN diff DECIMAL(13,2) AFTER importe;
-UPDATE transaccioncredito t SET t.`diff` = 0 WHERE t.`diff` IS NULL;
+UPDATE planillafiscalporcategoria SET afplab_individual = 0;
