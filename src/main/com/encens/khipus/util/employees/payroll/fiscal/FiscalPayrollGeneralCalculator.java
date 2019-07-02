@@ -70,6 +70,11 @@ public class FiscalPayrollGeneralCalculator extends Calculator<CategoryFiscalPay
         instance.setExtraHour(categoryTributaryPayroll.getExtraHour());
         instance.setSundayBonus(categoryTributaryPayroll.getSundayBonus());
         instance.setProductionBonus(categoryTributaryPayroll.getProductionBonus());
+
+        instance.setNightWorkBonus(categoryTributaryPayroll.getNightWorkBonus());
+        instance.setTransReturnBonus(categoryTributaryPayroll.getTransReturnBonus());
+        instance.setRefreshmentBonus(categoryTributaryPayroll.getRefreshmentBonus());
+
         instance.setOtherBonus(categoryTributaryPayroll.getOtherBonus());
         instance.setOtherIncomes(categoryTributaryPayroll.getOtherIncomes());
     }

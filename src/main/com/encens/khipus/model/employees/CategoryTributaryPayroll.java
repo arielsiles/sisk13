@@ -104,6 +104,15 @@ public class CategoryTributaryPayroll implements BaseModel {
     @Column(name = "BONOPRODUCCION", precision = 13, scale = 2, nullable = false)
     private BigDecimal productionBonus;
 
+    @Column(name = "BONONOCTURNO", precision = 13, scale = 2, nullable = false)
+    private BigDecimal nightWorkBonus;
+
+    @Column(name = "BONOPASAJE", precision = 13, scale = 2, nullable = false)
+    private BigDecimal transReturnBonus;
+
+    @Column(name = "BONOREFRIGERIO", precision = 13, scale = 2, nullable = false)
+    private BigDecimal refreshmentBonus;
+
     @Column(name = "OTROSBONOS", precision = 13, scale = 2, nullable = false)
     private BigDecimal otherBonus;
 
@@ -608,5 +617,29 @@ public class CategoryTributaryPayroll implements BaseModel {
 
     public void setLaborComissionAFP(BigDecimal laborComissionAFP) {
         this.laborComissionAFP = laborComissionAFP;
+    }
+
+    public BigDecimal getNightWorkBonus() {
+        return nightWorkBonus;
+    }
+
+    public void setNightWorkBonus(BigDecimal nightWorkBonus) {
+        this.nightWorkBonus = nightWorkBonus;
+    }
+
+    public BigDecimal getTransReturnBonus() {
+        return transReturnBonus;
+    }
+
+    public void setTransReturnBonus(BigDecimal transReturnBonus) {
+        this.transReturnBonus = transReturnBonus;
+    }
+
+    public BigDecimal getRefreshmentBonus() {
+        return refreshmentBonus;
+    }
+
+    public void setRefreshmentBonus(BigDecimal refreshmentBonus) {
+        this.refreshmentBonus = refreshmentBonus;
     }
 }

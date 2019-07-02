@@ -56,7 +56,14 @@ public class BonusDataModel extends QueryDataModel<Long, Bonus> {
 
     @Factory(value = "bonusType", scope = ScopeType.STATELESS)
     public BonusType[] getBonusType() {
-        return new BonusType[]{BonusType.SENIORITY_BONUS, BonusType.REGULAR_BONUS, BonusType.SUNDAYS_BONUS};
+        return new BonusType[]{
+                BonusType.SENIORITY_BONUS,
+                BonusType.REGULAR_BONUS,
+                BonusType.SUNDAYS_BONUS,
+                BonusType.PRODUCTION_BONUS,
+                BonusType.NIGHTWORK_BONUS,
+                BonusType.TRANSRETURN_BONUS,
+                BonusType.REFRESHMENT_BONUS};
     }
 
     public String getDescription() {

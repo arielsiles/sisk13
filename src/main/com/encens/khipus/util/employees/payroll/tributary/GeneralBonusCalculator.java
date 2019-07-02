@@ -27,6 +27,11 @@ public class GeneralBonusCalculator extends Calculator<CategoryTributaryPayroll>
 
         BigDecimal otherBonus = BigDecimal.ZERO;
         BigDecimal sundayBonus = BigDecimal.ZERO;
+        BigDecimal productionBonus = BigDecimal.ZERO;
+
+        BigDecimal nightWork = BigDecimal.ZERO;
+        BigDecimal transportationReturn = BigDecimal.ZERO;
+        BigDecimal refreshment = BigDecimal.ZERO;
 
         if (null != grantedBonus) {
             for (GrantedBonus element : grantedBonus) {
@@ -39,10 +44,32 @@ public class GeneralBonusCalculator extends Calculator<CategoryTributaryPayroll>
                 if (BonusType.SUNDAYS_BONUS.equals(bonusType)) {
                     sundayBonus = BigDecimalUtil.sum(sundayBonus, element.getAmount());
                 }
+
+                if (BonusType.PRODUCTION_BONUS.equals(bonusType)) {
+                    productionBonus = BigDecimalUtil.sum(productionBonus, element.getAmount());
+                }
+
+                if (BonusType.NIGHTWORK_BONUS.equals(bonusType)) {
+                    nightWork = BigDecimalUtil.sum(nightWork, element.getAmount());
+                }
+
+                if (BonusType.TRANSRETURN_BONUS.equals(bonusType)) {
+                    transportationReturn = BigDecimalUtil.sum(transportationReturn, element.getAmount());
+                }
+
+                if (BonusType.REFRESHMENT_BONUS.equals(bonusType)) {
+                    refreshment = BigDecimalUtil.sum(refreshment, element.getAmount());
+                }
             }
         }
 
         instance.setOtherBonus(otherBonus);
         instance.setSundayBonus(sundayBonus);
+        instance.setProductionBonus(productionBonus);
+
+        instance.setNightWorkBonus(nightWork);
+        instance.setTransReturnBonus(transportationReturn);
+        instance.setRefreshmentBonus(refreshment);
+
     }
 }
