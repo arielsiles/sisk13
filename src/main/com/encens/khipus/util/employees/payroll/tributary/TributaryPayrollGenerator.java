@@ -30,6 +30,12 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
     private AFPRate patronalProffesionalRiskRetentionAFP;
     private AFPRate patronalProHomeRetentionAFP;
     private AFPRate patronalSolidaryRetentionAFP;
+
+    private AFPRate laborIndividualAFP;
+    private AFPRate laborCommonRiskAFP;
+    private AFPRate laborSolidaryContributionAFP;
+    private AFPRate laborComissionAFP;
+
     private CNSRate cnsRate;
     private SMNRate smnRate;
     private IVARate ivaRate;
@@ -64,6 +70,10 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         this.patronalProHomeRetentionAFP = payrollGenerationCycle.getProHousingAfpRate();
         this.patronalSolidaryRetentionAFP = payrollGenerationCycle.getSolidaryAfpRate();
         this.patronalRetentionAFPRate = BigDecimalUtil.sum(this.patronalProffesionalRiskRetentionAFP.getRate(),this.patronalProHomeRetentionAFP.getRate(), this.patronalSolidaryRetentionAFP.getRate());
+        this.laborIndividualAFP = payrollGenerationCycle.getLaborIndividualAfpRate();
+        this.laborCommonRiskAFP = payrollGenerationCycle.getLaborCommonRiskAfpRate();
+        this.laborSolidaryContributionAFP = payrollGenerationCycle.getSolidaryAfpRate();
+        this.laborComissionAFP = payrollGenerationCycle.getLaborComissionAfpRate();
         this.cnsRate = payrollGenerationCycle.getCnsRate();
         this.businessUnit = payrollGenerationCycle.getBusinessUnit();
         this.afpRate = payrollGenerationCycle.getAfpRate();
@@ -89,10 +99,15 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         addColumn(PayrollColumn.getInstance(new OtherIncomesCalculator(otherIncomes)));
         addColumn(PayrollColumn.getInstance(new TotalGrainedCalculator(workedDays)));
         addColumn(PayrollColumn.getInstance(new RetentionAFPCalculator(afpRate, nationalSolidaryAFPDiscountRule, endDate)));
-        addColumn(PayrollColumn.getInstance(new PatronalAFPRetentionCalculator(patronalRetentionAFPRate,
-                patronalProffesionalRiskRetentionAFP,
-                patronalProHomeRetentionAFP,
-                patronalSolidaryRetentionAFP)));
+        addColumn(PayrollColumn.getInstance(new PatronalAFPRetentionCalculator( patronalRetentionAFPRate,
+                                                                                patronalProffesionalRiskRetentionAFP,
+                                                                                patronalProHomeRetentionAFP,
+                                                                                patronalSolidaryRetentionAFP,
+                                                                                laborIndividualAFP,
+                                                                                laborCommonRiskAFP,
+                                                                                laborSolidaryContributionAFP,
+                                                                                laborComissionAFP
+                                                                                                    )));
         addColumn(PayrollColumn.getInstance(new PatronalOtherRetentionCalculator(cnsRate)));
         addColumn(PayrollColumn.getInstance(new NetSalaryCalculator()));
         addColumn(PayrollColumn.getInstance(new SalaryNotTaxableTwoSMNCalculator(smnRate)));

@@ -159,6 +159,26 @@ public class PayrollGenerationCycle implements BaseModel {
     private AFPRate solidaryAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "IDTASAAFPLABINDIVIDUAL")
+    @NotNull
+    private AFPRate laborIndividualAfpRate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "IDTASAAFPLABRIESGOCOMUN")
+    @NotNull
+    private AFPRate laborCommonRiskAfpRate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "IDTASAAFPLABSOLIDARIO")
+    @NotNull
+    private AFPRate laborSolidaryContributionAfpRate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "IDTASAAFPLABCOMISION")
+    @NotNull
+    private AFPRate laborComissionAfpRate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "IDTASACNS")
     @NotNull
     private CNSRate cnsRate;
@@ -449,5 +469,37 @@ public class PayrollGenerationCycle implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public AFPRate getLaborIndividualAfpRate() {
+        return laborIndividualAfpRate;
+    }
+
+    public void setLaborIndividualAfpRate(AFPRate laborIndividualAfpRate) {
+        this.laborIndividualAfpRate = laborIndividualAfpRate;
+    }
+
+    public AFPRate getLaborCommonRiskAfpRate() {
+        return laborCommonRiskAfpRate;
+    }
+
+    public void setLaborCommonRiskAfpRate(AFPRate laborCommonRiskAfpRate) {
+        this.laborCommonRiskAfpRate = laborCommonRiskAfpRate;
+    }
+
+    public AFPRate getLaborSolidaryContributionAfpRate() {
+        return laborSolidaryContributionAfpRate;
+    }
+
+    public void setLaborSolidaryContributionAfpRate(AFPRate laborSolidaryContributionAfpRate) {
+        this.laborSolidaryContributionAfpRate = laborSolidaryContributionAfpRate;
+    }
+
+    public AFPRate getLaborComissionAfpRate() {
+        return laborComissionAfpRate;
+    }
+
+    public void setLaborComissionAfpRate(AFPRate laborComissionAfpRate) {
+        this.laborComissionAfpRate = laborComissionAfpRate;
     }
 }

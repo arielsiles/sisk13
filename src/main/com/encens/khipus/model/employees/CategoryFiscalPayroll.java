@@ -145,6 +145,21 @@ public class CategoryFiscalPayroll implements BaseModel {
     @Column(name = "RETENCIONAFP", precision = 13, scale = 2, nullable = false)
     private BigDecimal retentionAFP;
 
+    @Column(name = "AFPLAB_INDIVIDUAL", precision = 13, scale = 2, nullable = false)
+    private BigDecimal laborIndividualAFP;
+
+    @Column(name = "AFPLAB_RIESGOCOMUN", precision = 13, scale = 2, nullable = false)
+    @NotNull
+    private BigDecimal laborCommonRiskAFP;
+
+    @Column(name = "AFPLAB_SOLIDARIO", precision = 13, scale = 2, nullable = false)
+    @NotNull
+    private BigDecimal laborSolidaryContributionAFP;
+
+    @Column(name = "AFPLAB_COMISION", precision = 13, scale = 2, nullable = false)
+    @NotNull
+    private BigDecimal laborComissionAFP;
+
     @Column(name = "TOTALGANADO", precision = 13, scale = 2, nullable = false)
     private BigDecimal totalGrained;
 
@@ -493,5 +508,37 @@ public class CategoryFiscalPayroll implements BaseModel {
 
     public void setCategoryTributaryPayroll(CategoryTributaryPayroll categoryTributaryPayroll) {
         this.categoryTributaryPayroll = categoryTributaryPayroll;
+    }
+
+    public BigDecimal getLaborIndividualAFP() {
+        return laborIndividualAFP;
+    }
+
+    public void setLaborIndividualAFP(BigDecimal laborIndividualAFP) {
+        this.laborIndividualAFP = laborIndividualAFP;
+    }
+
+    public BigDecimal getLaborCommonRiskAFP() {
+        return laborCommonRiskAFP;
+    }
+
+    public void setLaborCommonRiskAFP(BigDecimal laborCommonRiskAFP) {
+        this.laborCommonRiskAFP = laborCommonRiskAFP;
+    }
+
+    public BigDecimal getLaborSolidaryContributionAFP() {
+        return laborSolidaryContributionAFP;
+    }
+
+    public void setLaborSolidaryContributionAFP(BigDecimal laborSolidaryContributionAFP) {
+        this.laborSolidaryContributionAFP = laborSolidaryContributionAFP;
+    }
+
+    public BigDecimal getLaborComissionAFP() {
+        return laborComissionAFP;
+    }
+
+    public void setLaborComissionAFP(BigDecimal laborComissionAFP) {
+        this.laborComissionAFP = laborComissionAFP;
     }
 }

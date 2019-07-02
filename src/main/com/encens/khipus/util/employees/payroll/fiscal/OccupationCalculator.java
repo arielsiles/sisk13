@@ -17,7 +17,8 @@ public class OccupationCalculator extends Calculator<CategoryFiscalPayroll> {
 
     @Override
     public void execute(CategoryFiscalPayroll instance) {
-        instance.setOccupation(formatOccupation(jobContract));
+        //instance.setOccupation(formatOccupation(jobContract));
+        instance.setOccupation(jobContract.getJob().getCharge().getName());
     }
 
     private String formatOccupation(JobContract jobContract) {

@@ -28,9 +28,16 @@ public class TotalDiscountCalculator extends Calculator<CategoryFiscalPayroll> {
                 instance.getAdvanceDiscount(),
                 instance.getWinDiscount(),
 
-                instance.getRetentionAFP(),
+                //instance.getRetentionAFP(),
+
+                instance.getLaborIndividualAFP(),
+                instance.getLaborCommonRiskAFP(),
+                instance.getLaborSolidaryContributionAFP(),
+                instance.getLaborComissionAFP(),
+
                 instance.getRetentionClearance(),
                 instance.getOtherDiscount());
+
         instance.setTotalDiscount(result);
     }
 }

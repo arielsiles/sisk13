@@ -96,7 +96,11 @@ public class CategoryFiscalPayrollReportAction extends GenericReportAction {
                 "categoryFiscalPayroll.retentionClearance," +
                 "categoryFiscalPayroll.otherDiscount," +
                 "categoryFiscalPayroll.totalDiscount," +
-                "categoryFiscalPayroll.liquidPayment" +
+                "categoryFiscalPayroll.liquidPayment," +
+                "categoryFiscalPayroll.laborIndividualAFP," +
+                "categoryFiscalPayroll.laborCommonRiskAFP," +
+                "categoryFiscalPayroll.laborSolidaryContributionAFP," +
+                "categoryFiscalPayroll.laborComissionAFP" +
                 " FROM CategoryFiscalPayroll categoryFiscalPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.generatedPayroll generatedPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.jobContract jobContract" +
@@ -139,6 +143,12 @@ public class CategoryFiscalPayrollReportAction extends GenericReportAction {
         Map paramMap = new HashMap();
         paramMap.put("retentionAFPColumnParam", MessageUtils.getMessage("FiscalPayroll.retentionAFP", payrollGenerationCycle.getAfpRate().getRate()));
         paramMap.put("retentionIvaColumnParam", MessageUtils.getMessage("FiscalPayroll.retentionClearance", payrollGenerationCycle.getIvaRate().getRate()));
+
+        paramMap.put("laborIndividualAFPParam", MessageUtils.getMessage("FiscalPayroll.laborIndividualAFP", payrollGenerationCycle.getLaborIndividualAfpRate().getRate()));
+        paramMap.put("laborCommonRiskAFPParam", MessageUtils.getMessage("FiscalPayroll.laborCommonRiskAFP", payrollGenerationCycle.getLaborCommonRiskAfpRate().getRate()));
+        paramMap.put("laborSolidaryContributionAFPParam", MessageUtils.getMessage("FiscalPayroll.laborSolidaryContributionAFP", payrollGenerationCycle.getLaborSolidaryContributionAfpRate() .getRate()));
+        paramMap.put("laborComissionAFPParam", MessageUtils.getMessage("FiscalPayroll.laborComissionAFP", payrollGenerationCycle.getLaborComissionAfpRate().getRate()));
+
         return paramMap;
     }
 

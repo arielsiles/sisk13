@@ -19,5 +19,9 @@ public class RetentionAFPCalculator extends Calculator<CategoryFiscalPayroll> {
     @Override
     public void execute(CategoryFiscalPayroll instance) {
         instance.setRetentionAFP(categoryTributaryPayroll.getRetentionAFP());
+        instance.setLaborIndividualAFP(categoryTributaryPayroll.getLaborIndividualAFP());
+        instance.setLaborCommonRiskAFP(categoryTributaryPayroll.getLaborCommonRiskAFP());
+        instance.setLaborSolidaryContributionAFP(categoryTributaryPayroll.getLaborSolidaryContributionAFP());
+        instance.setLaborComissionAFP(categoryTributaryPayroll.getLaborComissionAFP());
     }
 }
