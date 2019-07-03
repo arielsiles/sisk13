@@ -100,7 +100,10 @@ public class CategoryFiscalPayrollReportAction extends GenericReportAction {
                 "categoryFiscalPayroll.laborIndividualAFP," +
                 "categoryFiscalPayroll.laborCommonRiskAFP," +
                 "categoryFiscalPayroll.laborSolidaryContributionAFP," +
-                "categoryFiscalPayroll.laborComissionAFP" +
+                "categoryFiscalPayroll.laborComissionAFP," +
+                "categoryFiscalPayroll.nightWorkBonus," +
+                "categoryFiscalPayroll.transReturnBonus," +
+                "categoryFiscalPayroll.refreshmentBonus" +
                 " FROM CategoryFiscalPayroll categoryFiscalPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.generatedPayroll generatedPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.jobContract jobContract" +
