@@ -34,6 +34,8 @@ public class FiscalPayrollGeneralCalculator extends Calculator<CategoryFiscalPay
     @Override
     public void execute(CategoryFiscalPayroll instance) {
         instance.setPersonalIdentifier(employee.getIdNumber());
+        instance.setExtension(employee.getExtensionSite()== null ? "" : employee.getExtensionSite().getExtension());
+
         //instance.setName(formatName(employee));
         instance.setName(employee.getFirstName() + " " + employee.getLastName() + " " + employee.getMaidenName());
         instance.setNationality("");

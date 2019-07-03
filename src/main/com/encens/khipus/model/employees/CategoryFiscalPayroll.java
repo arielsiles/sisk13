@@ -66,6 +66,9 @@ public class CategoryFiscalPayroll implements BaseModel {
     @Column(name = "CI", nullable = false)
     private String personalIdentifier;
 
+    @Column(name = "EXT", nullable = false)
+    private String extension;
+
     @Column(name = "COSTOHORASEXTRA", precision = 13, scale = 2, nullable = false)
     private BigDecimal extraHourCost;
 
@@ -168,6 +171,10 @@ public class CategoryFiscalPayroll implements BaseModel {
     @Column(name = "AFPLAB_COMISION", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal laborComissionAFP;
+
+    @Column(name = "AFPSOLIDARIO", precision = 13, scale = 2, nullable = false)
+    @NotNull
+    private BigDecimal solidaryAFP;
 
     @Column(name = "TOTALGANADO", precision = 13, scale = 2, nullable = false)
     private BigDecimal totalGrained;
@@ -573,5 +580,21 @@ public class CategoryFiscalPayroll implements BaseModel {
 
     public void setRefreshmentBonus(BigDecimal refreshmentBonus) {
         this.refreshmentBonus = refreshmentBonus;
+    }
+
+    public BigDecimal getSolidaryAFP() {
+        return solidaryAFP;
+    }
+
+    public void setSolidaryAFP(BigDecimal solidaryAFP) {
+        this.solidaryAFP = solidaryAFP;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
     }
 }

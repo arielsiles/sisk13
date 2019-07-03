@@ -34,6 +34,7 @@ public class TotalDiscountCalculator extends Calculator<CategoryFiscalPayroll> {
                 instance.getLaborCommonRiskAFP(),
                 instance.getLaborSolidaryContributionAFP(),
                 instance.getLaborComissionAFP(),
+                instance.getSolidaryAFP(),
 
                 instance.getRetentionClearance(),
                 instance.getOtherDiscount());

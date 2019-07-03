@@ -48,6 +48,14 @@ update planillafiscalporcategoria set bononocturno = 0;
 update planillafiscalporcategoria set bonopasaje = 0;
 update planillafiscalporcategoria set bonorefrigerio = 0;
 
+/** 03.07.2019 **/
+alter table planillafiscalporcategoria add column afpsolidario decimal(13,2) after afplab_comision; 
+update planillafiscalporcategoria set afpsolidario = 0;
 
+alter table planillafiscalporcategoria add column ext varchar(6) after ci;
+update planillafiscalporcategoria set ext = 'CB';
 
+update entidad e set e.idexttipodocumento = 2 where e.idexttipodocumento is null;
+
+-- Bug, actualizar gensecuencia en SECUENCIA
 
