@@ -11,35 +11,36 @@ import java.math.BigDecimal;
  * @author
  * @version 3.4
  */
-public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributaryPayroll> { /** Ojo Patronal and Laboral **/
+public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributaryPayroll> { // /** Ojo Patronal and Laboral **/
     private static final int TWO_DECIMAL_SCALE = 2;
     private BigDecimal patronalAFPRate;
     private AFPRate patronalProffesionalRiskRetentionAFP;
     private AFPRate patronalProHomeRetentionAFP;
     private AFPRate patronalSolidaryRetentionAFP;
 
-    private AFPRate laborIndividualAFP;
+    /*private AFPRate laborIndividualAFP;
     private AFPRate laborCommonRiskAFP;
     private AFPRate laborSolidaryContributionAFP;
-    private AFPRate laborComissionAFP;
+    private AFPRate laborComissionAFP;*/
 
     public PatronalAFPRetentionCalculator(BigDecimal patronalAFPRate,
                                           AFPRate patronalProffesionalRiskRetentionAFP,
                                           AFPRate patronalProHomeRetentionAFP,
-                                          AFPRate patronalSolidaryRetentionAFP,
-                                          AFPRate laborIndividualAFP,
+                                          AFPRate patronalSolidaryRetentionAFP
+                                          /*AFPRate laborIndividualAFP,
                                           AFPRate laborCommonRiskAFP,
                                           AFPRate laborSolidaryContributionAFP,
-                                          AFPRate laborComissionAFP
+                                          AFPRate laborComissionAFP*/
                                                                                         ) {
         this.patronalAFPRate = patronalAFPRate;
         this.patronalProffesionalRiskRetentionAFP = patronalProffesionalRiskRetentionAFP;
         this.patronalProHomeRetentionAFP = patronalProHomeRetentionAFP;
         this.patronalSolidaryRetentionAFP = patronalSolidaryRetentionAFP;
-        this.laborIndividualAFP = laborIndividualAFP;
+
+        /*this.laborIndividualAFP = laborIndividualAFP;
         this.laborCommonRiskAFP = laborCommonRiskAFP;
         this.laborSolidaryContributionAFP = laborSolidaryContributionAFP;
-        this.laborComissionAFP = laborComissionAFP;
+        this.laborComissionAFP = laborComissionAFP;*/
     }
 
     @Override
@@ -53,10 +54,10 @@ public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributary
         instance.setPatronalSolidaryRetentionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(),
                 patronalSolidaryRetentionAFP.getRate(), TWO_DECIMAL_SCALE));
 
-        instance.setLaborIndividualAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborIndividualAFP.getRate(), TWO_DECIMAL_SCALE));
+        /*instance.setLaborIndividualAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborIndividualAFP.getRate(), TWO_DECIMAL_SCALE));
         instance.setLaborCommonRiskAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborCommonRiskAFP.getRate(), TWO_DECIMAL_SCALE));
         instance.setLaborSolidaryContributionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborSolidaryContributionAFP.getRate(), TWO_DECIMAL_SCALE));
-        instance.setLaborComissionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborComissionAFP.getRate(), TWO_DECIMAL_SCALE));
+        instance.setLaborComissionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborComissionAFP.getRate(), TWO_DECIMAL_SCALE));*/
 
     }
 }

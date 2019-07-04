@@ -98,15 +98,23 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         addColumn(PayrollColumn.getInstance(new GeneralBonusCalculator(grantedBonus)));
         addColumn(PayrollColumn.getInstance(new OtherIncomesCalculator(otherIncomes)));
         addColumn(PayrollColumn.getInstance(new TotalGrainedCalculator(workedDays)));
-        addColumn(PayrollColumn.getInstance(new RetentionAFPCalculator(afpRate, nationalSolidaryAFPDiscountRule, endDate)));
+        //addColumn(PayrollColumn.getInstance(new RetentionAFPCalculator(afpRate, nationalSolidaryAFPDiscountRule, endDate)));
+        addColumn(PayrollColumn.getInstance(new RetentionAFPCalculator( afpRate,
+                                                                        laborIndividualAFP,
+                                                                        laborCommonRiskAFP,
+                                                                        laborSolidaryContributionAFP,
+                                                                        laborComissionAFP,
+                                                                        nationalSolidaryAFPDiscountRule, endDate)));
+
+
         addColumn(PayrollColumn.getInstance(new PatronalAFPRetentionCalculator( patronalRetentionAFPRate,
                                                                                 patronalProffesionalRiskRetentionAFP,
                                                                                 patronalProHomeRetentionAFP,
-                                                                                patronalSolidaryRetentionAFP,
-                                                                                laborIndividualAFP,
+                                                                                patronalSolidaryRetentionAFP
+                                                                                /*laborIndividualAFP,
                                                                                 laborCommonRiskAFP,
                                                                                 laborSolidaryContributionAFP,
-                                                                                laborComissionAFP
+                                                                                laborComissionAFP*/
                                                                                                     )));
         addColumn(PayrollColumn.getInstance(new PatronalOtherRetentionCalculator(cnsRate)));
         addColumn(PayrollColumn.getInstance(new NetSalaryCalculator()));

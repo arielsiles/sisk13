@@ -1361,8 +1361,16 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 managersPayroll.setLoanDiscount(BigDecimalUtil.toBigDecimal(totalLoanDiscount));
                 managersPayroll.setAdvanceDiscount(BigDecimalUtil.toBigDecimal(totalAdvanceDiscount));
                 managersPayroll.setOtherDiscounts(BigDecimalUtil.toBigDecimal(totalOtherDiscount));
+
                 managersPayroll.setAfp(null != categoryTributaryPayroll && categoryTributaryPayroll.getRetentionAFP().compareTo(BigDecimal.ZERO) == 1 ?
                         categoryTributaryPayroll.getRetentionAFP() : BigDecimalUtil.toBigDecimal(0));
+                /*managersPayroll.setAfp(null != categoryTributaryPayroll && categoryTributaryPayroll.getRetentionAFP().compareTo(BigDecimal.ZERO) == 1 ?
+                        BigDecimalUtil.sum( categoryTributaryPayroll.getLaborIndividualAFP(),
+                                            categoryTributaryPayroll.getLaborCommonRiskAFP(),
+                                            categoryTributaryPayroll.getLaborSolidaryContributionAFP(),
+                                            categoryTributaryPayroll.getLaborComissionAFP())
+                        : BigDecimalUtil.toBigDecimal(0));*/
+
                 managersPayroll.setRciva(BigDecimalUtil.toBigDecimal(totalRCIvaDiscount));
                 managersPayroll.setUnit(currentJobContract.getJob().getOrganizationalUnit().getName());
                 OrganizationalLevel areaLevel = findOrganizationalLevelByName("AREA");

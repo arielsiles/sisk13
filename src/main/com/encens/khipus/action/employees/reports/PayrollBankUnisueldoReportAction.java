@@ -1,11 +1,6 @@
 package com.encens.khipus.action.employees.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
-import com.encens.khipus.action.reports.PageFormat;
-import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.reports.ReportFormat;
-import com.encens.khipus.action.warehouse.reports.KardexProductMovementAction;
-import com.encens.khipus.action.warehouse.reports.ProductInventoryReportAction;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.employees.GeneratedPayroll;
 import com.encens.khipus.model.employees.ManagersPayroll;
@@ -24,9 +19,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.export.JRTextExporter;
 import net.sf.jasperreports.engine.export.JRTextExporterParameter;
-import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -72,6 +65,7 @@ public class PayrollBankUnisueldoReportAction extends GenericReportAction {
         BigDecimal sumLiquid = managersPayrollSummaryService.sumLiquidByPaymentType(generatedPayroll.getId(), PaymentType.PAYMENT_BANK_ACCOUNT);
 
         String str30 = "..............................";
+               str30 = "                              ";
         String str12 = "000000000000";
         String str05 = "00000";
 

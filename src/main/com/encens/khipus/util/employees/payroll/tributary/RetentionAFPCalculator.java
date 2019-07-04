@@ -19,11 +19,24 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
     private static final Double AGE_COMPLIANT_PERCENTAGE = 1.0;
     private static final Double NOT_AGE_COMPLIANT_PERCENTAGE = 2.71;
     private AFPRate afpRate;
+    private AFPRate laborIndividualAFP;
+    private AFPRate laborCommonRiskAFP;
+    private AFPRate laborSolidaryContributionAFP;
+    private AFPRate laborComissionAFP;
     private Date endDate;
     private DiscountRule nationalSolidaryAFPDiscountRule;
 
-    public RetentionAFPCalculator(AFPRate afpRate, DiscountRule nationalSolidaryAFPDiscountRule, Date endDate) {
+    public RetentionAFPCalculator(AFPRate afpRate,
+                                  AFPRate laborIndividualAFP,
+                                  AFPRate laborCommonRiskAFP,
+                                  AFPRate laborSolidaryContributionAFP,
+                                  AFPRate laborComissionAFP,
+                                  DiscountRule nationalSolidaryAFPDiscountRule, Date endDate) {
         this.afpRate = afpRate;
+        this.laborIndividualAFP = laborIndividualAFP;
+        this.laborCommonRiskAFP = laborCommonRiskAFP;
+        this.laborSolidaryContributionAFP = laborSolidaryContributionAFP;
+        this.laborComissionAFP = laborComissionAFP;
         this.nationalSolidaryAFPDiscountRule = nationalSolidaryAFPDiscountRule;
         this.endDate = endDate;
     }
@@ -55,10 +68,26 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
             solydaryAFPRetention = BigDecimalUtil.sum(solydaryAFPRetention, amount);
         }
 
-        retentionAFP = BigDecimalUtil.getPercentage(totalGrained, afpRatePercentage, TWO_DECIMAL_SCALE);
-        retentionAFP = BigDecimalUtil.sum(retentionAFP, solydaryAFPRetention);
+        //retentionAFP = BigDecimalUtil.getPercentage(totalGrained, afpRatePercentage, TWO_DECIMAL_SCALE);
+        //retentionAFP = BigDecimalUtil.sum(retentionAFP, solydaryAFPRetention);
         instance.setSolidaryAFP(solydaryAFPRetention);
+        //instance.setRetentionAFP(retentionAFP);
+
+        /** revision **/
+
+        instance.setLaborIndividualAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(),  laborIndividualAFP.getRate(), TWO_DECIMAL_SCALE));
+        instance.setLaborCommonRiskAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborCommonRiskAFP.getRate(), TWO_DECIMAL_SCALE));
+        instance.setLaborSolidaryContributionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborSolidaryContributionAFP.getRate(), TWO_DECIMAL_SCALE));
+        instance.setLaborComissionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborComissionAFP.getRate(), TWO_DECIMAL_SCALE));
+
+        retentionAFP = BigDecimalUtil.sum(
+                instance.getLaborIndividualAFP(),
+                instance.getLaborCommonRiskAFP(),
+                instance.getLaborSolidaryContributionAFP(),
+                instance.getLaborComissionAFP(),
+                instance.getSolidaryAFP());
         instance.setRetentionAFP(retentionAFP);
+        /** End revision **/
     }
 
     public List<DiscountRuleRange> findDiscountRuleRangeListInList(BigDecimal amount, DiscountRule discountRule) {
