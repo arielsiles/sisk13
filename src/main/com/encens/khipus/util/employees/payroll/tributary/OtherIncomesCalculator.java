@@ -23,6 +23,18 @@ public class OtherIncomesCalculator extends Calculator<CategoryTributaryPayroll>
         if (!BigDecimalUtil.isZeroOrNull(otherIncomes)) {
             instance.setOtherIncomes(otherIncomes);
         }
-        instance.setTotalOtherIncomes(BigDecimalUtil.sum(instance.getOtherIncomes(), instance.getSeniorityBonus(), instance.getExtraHourCost(), instance.getProductionBonus(), instance.getSundayBonus(), instance.getOtherBonus(), instance.getOtherIncomes()));
+        instance.setTotalOtherIncomes(
+                        BigDecimalUtil.sum(
+                                instance.getOtherIncomes(), //???
+                                instance.getSeniorityBonus(),
+                                instance.getExtraHourCost(),
+                                instance.getProductionBonus(),
+                                instance.getSundayBonus(),
+                                instance.getNightWorkBonus(),
+                                instance.getTransReturnBonus(),
+                                instance.getRefreshmentBonus(),
+                                instance.getOtherBonus(),
+                                instance.getOtherIncomes()
+                        ));
     }
 }

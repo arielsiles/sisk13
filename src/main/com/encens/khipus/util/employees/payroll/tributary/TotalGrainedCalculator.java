@@ -24,9 +24,9 @@ public class TotalGrainedCalculator extends Calculator<CategoryTributaryPayroll>
         //formula TOTAL GANADO= TOTAL GANADO + BONO DE ANTIGÜEDAD+ HORAS EXTRAS + BONOS DE PRODUCCION + BONOS DOMINICALES + OTROS BONOS + OTROS INGRESOS(MOVIMIENTOS A SALARIO)
         value = BigDecimalUtil.sum(value, instance.getTotalOtherIncomes());
 
-        value = BigDecimalUtil.sum(value, instance.getNightWorkBonus());
-        value = BigDecimalUtil.sum(value, instance.getTransReturnBonus());
-        value = BigDecimalUtil.sum(value, instance.getRefreshmentBonus());
+        //value = BigDecimalUtil.sum(value, instance.getNightWorkBonus());
+        //value = BigDecimalUtil.sum(value, instance.getTransReturnBonus());
+        //value = BigDecimalUtil.sum(value, instance.getRefreshmentBonus());
 
         instance.setTotalGrained(value);
     }

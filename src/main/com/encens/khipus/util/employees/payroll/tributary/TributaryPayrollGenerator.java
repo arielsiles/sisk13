@@ -72,7 +72,7 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         this.patronalRetentionAFPRate = BigDecimalUtil.sum(this.patronalProffesionalRiskRetentionAFP.getRate(),this.patronalProHomeRetentionAFP.getRate(), this.patronalSolidaryRetentionAFP.getRate());
         this.laborIndividualAFP = payrollGenerationCycle.getLaborIndividualAfpRate();
         this.laborCommonRiskAFP = payrollGenerationCycle.getLaborCommonRiskAfpRate();
-        this.laborSolidaryContributionAFP = payrollGenerationCycle.getSolidaryAfpRate();
+        this.laborSolidaryContributionAFP = payrollGenerationCycle.getLaborSolidaryContributionAfpRate();
         this.laborComissionAFP = payrollGenerationCycle.getLaborComissionAfpRate();
         this.cnsRate = payrollGenerationCycle.getCnsRate();
         this.businessUnit = payrollGenerationCycle.getBusinessUnit();

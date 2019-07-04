@@ -131,7 +131,7 @@
 	<field name="fiscalPayroll.solidaryAFP" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_42]]></fieldDescription>
 	</field>
-	<field name="fiscalPayroll.extension" class="java.math.BigDecimal">
+	<field name="fiscalPayroll.extension" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_43]]></fieldDescription>
 	</field>
 	<variable name="sumBasicAmountVar" class="java.math.BigDecimal" calculation="Sum">

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  * @author
  * @version 3.4
  */
-public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributaryPayroll> {
+public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributaryPayroll> { /** Ojo Patronal and Laboral **/
     private static final int TWO_DECIMAL_SCALE = 2;
     private BigDecimal patronalAFPRate;
     private AFPRate patronalProffesionalRiskRetentionAFP;
