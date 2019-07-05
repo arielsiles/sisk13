@@ -1155,7 +1155,11 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                         totalWinDiscount += amount;
                     }
 
-
+                    /** Revisar, nuevo provisional hasta corregir modulo Tributario RCIVA **/
+                    if (employeeSalaryMovement.getSalaryMovementType().getMovementType().equals(MovementType.RCIVA)) {
+                        totalRCIvaDiscount = totalRCIvaDiscount + amount;
+                        System.out.println("========> RCIVA mov: " + totalRCIvaDiscount);
+                    }
 
                 }
                 // round to 2 decimal points
@@ -1207,7 +1211,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     categoryTributaryPayroll.setGeneratedPayroll(generatedPayroll);
                     categoryTributaryPayroll.setNumber((long) (index + 1));
                     totalOtherIncomes = categoryTributaryPayroll.getTotalOtherIncomes().doubleValue();
-                    totalRCIvaDiscount = categoryTributaryPayroll.getRetentionClearance().doubleValue();
+                    totalRCIvaDiscount = totalRCIvaDiscount + categoryTributaryPayroll.getRetentionClearance().doubleValue();
                     totalAfpDiscount = categoryTributaryPayroll.getRetentionAFP().doubleValue();
                 } else {
                     if (employee.getRetentionFlag()) {
@@ -1364,13 +1368,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
                 managersPayroll.setAfp(null != categoryTributaryPayroll && categoryTributaryPayroll.getRetentionAFP().compareTo(BigDecimal.ZERO) == 1 ?
                         categoryTributaryPayroll.getRetentionAFP() : BigDecimalUtil.toBigDecimal(0));
-                /*managersPayroll.setAfp(null != categoryTributaryPayroll && categoryTributaryPayroll.getRetentionAFP().compareTo(BigDecimal.ZERO) == 1 ?
-                        BigDecimalUtil.sum( categoryTributaryPayroll.getLaborIndividualAFP(),
-                                            categoryTributaryPayroll.getLaborCommonRiskAFP(),
-                                            categoryTributaryPayroll.getLaborSolidaryContributionAFP(),
-                                            categoryTributaryPayroll.getLaborComissionAFP())
-                        : BigDecimalUtil.toBigDecimal(0));*/
 
+                System.out.println("=======> set totalRCIvaDiscount: " + totalRCIvaDiscount);
                 managersPayroll.setRciva(BigDecimalUtil.toBigDecimal(totalRCIvaDiscount));
                 managersPayroll.setUnit(currentJobContract.getJob().getOrganizationalUnit().getName());
                 OrganizationalLevel areaLevel = findOrganizationalLevelByName("AREA");

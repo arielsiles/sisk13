@@ -65,7 +65,7 @@
                         </c:otherwise>
                     </c:choose>
                 </f:facet>
-                <s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SalaryMovementType.movementType']}</ui:define>
                     <h:selectOneMenu id="salaryMovementType"
                                      value="#{salaryMovementType.movementType}"
@@ -74,6 +74,24 @@
                                      required="true"
                                      tabindex="1">
                         <s:selectItems value="#{movementTypeByAccessRightEnum}"
+                                       var="movementType"
+                                       label="#{messages[movementType.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{messages[salaryMovementType.movementType.resourceKey]}"
+                                  rendered="#{salaryMovementTypeAction.managed}"/>
+                </s:decorate>-->
+                <s:decorate id="salaryMovementTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementType.movementType']}</ui:define>
+                    <h:selectOneMenu id="salaryMovementType"
+                                     value="#{salaryMovementType.movementType}"
+                                     styleClass="input"
+                                     rendered="#{not salaryMovementTypeAction.managed}"
+                                     required="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{movementTypeEnum}"
                                        var="movementType"
                                        label="#{messages[movementType.resourceKey]}"
                                        hideNoSelectionLabel="false"
