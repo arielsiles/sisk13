@@ -8,7 +8,7 @@
 		<pen lineWidth="0.5"/>
 	</style>
 	<style name="headerStyle" isDefault="true" backcolor="#CDCDCD" fontName="Verdana" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true">
-		<pen lineWidth="0.2" lineStyle="Solid" lineColor="#000000"/>
+		<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 	</style>
 	<style name="headerStyleBlank" isDefault="true" fontName="Verdana" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 	<style name="totalStyle" isDefault="true" backcolor="#E0DFDF" fontName="Verdana" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
@@ -16,7 +16,4 @@
 	<style name="tinyHeaderStyle" isDefault="true" backcolor="#C0C0C0" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
 	<style name="tinyHeaderStyleBlank" isDefault="true" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 	<style name="tinyTotalStyle" isDefault="true" backcolor="#E0DFDF" fontName="Verdana" fontSize="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true"/>
-	<style name="headerStyle1" isDefault="true" backcolor="#DCDCDC" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Verdana-Bold" isPdfEmbedded="true">
-		<pen lineWidth="0.2" lineStyle="Dashed" lineColor="#000000"/>
-	</style>
 </jasperTemplate>
