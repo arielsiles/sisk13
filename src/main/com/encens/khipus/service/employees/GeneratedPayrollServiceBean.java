@@ -1206,7 +1206,10 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             generatedPayroll.getPayrollGenerationCycle(),
                             invoicesFormMap.get(employee.getId()),
                             lastMonthBalance,
-                            gestionPayroll);
+                            gestionPayroll,
+                            totalRCIvaDiscount /** De MovimientoSueldo **/
+                            );
+
                     categoryTributaryPayroll = generator.generate();
                     categoryTributaryPayroll.setGeneratedPayroll(generatedPayroll);
                     categoryTributaryPayroll.setNumber((long) (index + 1));
@@ -3962,7 +3965,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             generatedPayroll.getPayrollGenerationCycle(),
                             invoicesFormMap.get(employee.getId()),
                             lastMonthBalance,
-                            gestionPayroll);
+                            gestionPayroll, 0.0);
                     categoryTributaryPayroll = generator.generate();
                     categoryTributaryPayroll.setGeneratedPayroll(generatedPayroll);
 //                    categoryTributaryPayroll.setTotalOtherIncomes(BigDecimalUtil.subtract(categoryTributaryPayroll.getTotalGrained(), categoryTributaryPayroll.getBasicAmount()));

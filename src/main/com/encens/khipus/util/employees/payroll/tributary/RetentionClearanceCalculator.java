@@ -9,8 +9,16 @@ import com.encens.khipus.util.employees.payroll.structure.Calculator;
  * @version 2.26
  */
 public class RetentionClearanceCalculator extends Calculator<CategoryTributaryPayroll> {
+
+    private Double totalRCIvaDiscount;
+
+    public RetentionClearanceCalculator(Double totalRCIvaDiscount) {
+        this.totalRCIvaDiscount = totalRCIvaDiscount;
+    }
+
     @Override
     public void execute(CategoryTributaryPayroll instance) {
         instance.setRetentionClearance(BigDecimalUtil.subtract(instance.getPhysicalBalance(), instance.getUsedBalance()));
+        instance.setRetentionClearance( BigDecimalUtil.toBigDecimal(instance.getRetentionClearance().doubleValue() + this.totalRCIvaDiscount));
     }
 }

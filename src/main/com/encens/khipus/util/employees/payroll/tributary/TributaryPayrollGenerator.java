@@ -45,7 +45,7 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
     private BigDecimal lastMonthBalance;
     private GestionPayroll gestionPayroll;
     private DiscountRule nationalSolidaryAFPDiscountRule;
-
+    private Double totalRCIvaDiscount;
 
     public TributaryPayrollGenerator(Employee employee,
                                      JobContract jobContract,
@@ -57,7 +57,9 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
                                      Date endDate, PayrollGenerationCycle payrollGenerationCycle,
                                      InvoicesForm invoicesForm,
                                      BigDecimal lastMonthBalance,
-                                     GestionPayroll gestionPayroll) {
+                                     GestionPayroll gestionPayroll,
+                                     Double totalRCIvaDiscount /** De MovimientoSueldo **/
+                                     ) {
         this.employee = employee;
         this.jobContract = jobContract;
         this.extraHoursWorked = extraHoursWorked;
@@ -85,6 +87,8 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         this.invoicesForm = invoicesForm;
         this.lastMonthBalance = lastMonthBalance;
         this.gestionPayroll = gestionPayroll;
+
+        this.totalRCIvaDiscount = totalRCIvaDiscount;
     }
 
     @Override
@@ -130,7 +134,7 @@ public class TributaryPayrollGenerator extends PayrollGenerator<CategoryTributar
         addColumn(PayrollColumn.getInstance(new LastBalanceUpdatedCalculator()));
         addColumn(PayrollColumn.getInstance(new DependentTotalBalanceCalculator()));
         addColumn(PayrollColumn.getInstance(new UsedBalanceCalculator()));
-        addColumn(PayrollColumn.getInstance(new RetentionClearanceCalculator()));
+        addColumn(PayrollColumn.getInstance(new RetentionClearanceCalculator(totalRCIvaDiscount)));
         addColumn(PayrollColumn.getInstance(new DependentBalanceToNextMonthCalculator()));
     }
 
