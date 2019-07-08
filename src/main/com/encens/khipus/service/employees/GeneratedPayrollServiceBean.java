@@ -1214,7 +1214,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     categoryTributaryPayroll.setGeneratedPayroll(generatedPayroll);
                     categoryTributaryPayroll.setNumber((long) (index + 1));
                     totalOtherIncomes = categoryTributaryPayroll.getTotalOtherIncomes().doubleValue();
-                    totalRCIvaDiscount = totalRCIvaDiscount + categoryTributaryPayroll.getRetentionClearance().doubleValue();
+                    //totalRCIvaDiscount = totalRCIvaDiscount + categoryTributaryPayroll.getRetentionClearance().doubleValue();
+                    totalRCIvaDiscount = categoryTributaryPayroll.getRetentionClearance().doubleValue();
+                    System.out.println("--------> RCIVA get: " + totalRCIvaDiscount);
                     totalAfpDiscount = categoryTributaryPayroll.getRetentionAFP().doubleValue();
                 } else {
                     if (employee.getRetentionFlag()) {

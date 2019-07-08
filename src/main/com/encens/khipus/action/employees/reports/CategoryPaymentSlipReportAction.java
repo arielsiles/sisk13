@@ -15,6 +15,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
 import org.joda.time.DateTime;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +85,18 @@ public class CategoryPaymentSlipReportAction extends GenericReportAction {
                 "categoryFiscalPayroll.retentionAFP," +
                 "categoryFiscalPayroll.retentionClearance," +
                 "categoryFiscalPayroll.totalDiscount," +
-                "categoryFiscalPayroll.liquidPayment" +
+                "categoryFiscalPayroll.liquidPayment," +
+
+                "categoryFiscalPayroll.nightWorkBonus," +
+                "categoryFiscalPayroll.transReturnBonus," +
+                "categoryFiscalPayroll.refreshmentBonus," +
+
+                "categoryFiscalPayroll.laborIndividualAFP," +
+                "categoryFiscalPayroll.laborCommonRiskAFP," +
+                "categoryFiscalPayroll.laborSolidaryContributionAFP," +
+                "categoryFiscalPayroll.laborComissionAFP," +
+                "categoryFiscalPayroll.solidaryAFP," +
+                "categoryFiscalPayroll.otherDiscount" +
 
                 " FROM CategoryFiscalPayroll categoryFiscalPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.generatedPayroll generatedPayroll" +
@@ -116,7 +128,8 @@ public class CategoryPaymentSlipReportAction extends GenericReportAction {
         DateTime lastDayOfMonthDateTime = dateTime.dayOfMonth().withMaximumValue();
 
         paramMap.put("monthYearParam", monthYear);
-        paramMap.put("lastDayOfMonthParam", lastDayOfMonthDateTime.toDate());
+        //paramMap.put("lastDayOfMonthParam", lastDayOfMonthDateTime.toDate());
+        paramMap.put("lastDayOfMonthParam", new Date());
 
         return paramMap;
     }

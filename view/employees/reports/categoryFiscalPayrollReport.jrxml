@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="2500" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="2470" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
-	<property name="ireport.zoom" value="2.593742460100022"/>
-	<property name="ireport.x" value="122"/>
+	<property name="ireport.zoom" value="4.17724816941569"/>
+	<property name="ireport.x" value="6997"/>
 	<property name="ireport.y" value="0"/>
 	<import value="com.encens.khipus.action.employees.reports.PayrollFiscalReportAction"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
@@ -215,7 +215,7 @@
 	<title>
 		<band height="30">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="" style="titleStyle" positionType="Float" x="0" y="0" width="305" height="15"/>
+				<reportElement key="" style="titleStyle" positionType="Float" x="0" y="0" width="469" height="15"/>
 				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
@@ -229,7 +229,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.categoryFiscalPayroll.title}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="" style="tinyTitleStyle" positionType="Float" x="0" y="15" width="305" height="15"/>
+				<reportElement key="" style="tinyTitleStyle" positionType="Float" x="0" y="15" width="469" height="15"/>
 				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
@@ -417,7 +417,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{retentionIvaColumnParam}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.fiscalPayroll.rciva}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2139" y="12" width="60" height="24"/>
