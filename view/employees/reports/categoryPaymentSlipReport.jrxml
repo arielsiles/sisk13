@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="425" whenNoDataType="AllSectionsNoDetail" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="40" bottomMargin="20">
-	<property name="ireport.zoom" value="1.6105100000000019"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="609" pageHeight="793" whenNoDataType="AllSectionsNoDetail" columnWidth="553" leftMargin="28" rightMargin="28" topMargin="28" bottomMargin="28">
+	<property name="ireport.zoom" value="2.853116706110014"/>
+	<property name="ireport.x" value="34"/>
+	<property name="ireport.y" value="131"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
 	<field name="fiscalPayroll.id" class="java.lang.Long">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
@@ -106,9 +106,9 @@
 	<group name="rowGroup">
 		<groupExpression><![CDATA[$F{fiscalPayroll.id}]]></groupExpression>
 		<groupHeader>
-			<band height="385">
+			<band height="733">
 				<frame>
-					<reportElement positionType="Float" x="0" y="0" width="582" height="89"/>
+					<reportElement positionType="Float" x="0" y="0" width="553" height="89"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -117,7 +117,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement key="" positionType="Float" x="0" y="46" width="582" height="15"/>
+						<reportElement key="" positionType="Float" x="0" y="46" width="553" height="15"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -131,7 +131,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.categoryPaymentSlip.title}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement key="" positionType="Float" x="0" y="61" width="582" height="12"/>
+						<reportElement key="" positionType="Float" x="0" y="61" width="553" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -216,7 +216,7 @@
 					</textField>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="0" y="89" width="246" height="123"/>
+					<reportElement positionType="Float" x="0" y="89" width="238" height="123"/>
 					<box leftPadding="0" rightPadding="0">
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -225,7 +225,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="2" y="0" width="244" height="12"/>
+						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="238" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -237,9 +237,38 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.employee}]]></textFieldExpression>
 					</textField>
 					<frame>
-						<reportElement positionType="Float" x="2" y="20" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="16" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="56" height="12"/>
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="38" height="12"/>
+							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Top"/>
+							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.ci}]]></textFieldExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="37" y="0" width="201" height="12"/>
+							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+							<textElement textAlignment="Left">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscalPayroll.personalIdentifier}]]></textFieldExpression>
+						</textField>
+					</frame>
+					<frame>
+						<reportElement positionType="Float" x="0" y="27" width="238" height="12"/>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="38" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -251,7 +280,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.name}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="56" y="0" width="188" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="37" y="0" width="201" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -259,41 +288,16 @@
 								<bottomPen lineWidth="0.0"/>
 								<rightPen lineWidth="0.0"/>
 							</box>
-							<textElement textAlignment="Left"/>
+							<textElement textAlignment="Left">
+								<font size="8"/>
+							</textElement>
 							<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscalPayroll.name}]]></textFieldExpression>
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="2" y="32" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="38" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="43" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left" verticalAlignment="Top"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.code}]]></textFieldExpression>
-						</textField>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="43" y="0" width="201" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscalPayroll.personalIdentifier}]]></textFieldExpression>
-						</textField>
-					</frame>
-					<frame>
-						<reportElement positionType="Float" x="2" y="44" width="244" height="12"/>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="43" height="12"/>
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="38" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -305,7 +309,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.section}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="43" y="0" width="201" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="37" y="0" width="201" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -313,14 +317,16 @@
 								<bottomPen lineWidth="0.0"/>
 								<rightPen lineWidth="0.0"/>
 							</box>
-							<textElement textAlignment="Left"/>
+							<textElement textAlignment="Left">
+								<font size="8"/>
+							</textElement>
 							<textFieldExpression class="java.lang.String"><![CDATA[$F{organizationalUnit.name}]]></textFieldExpression>
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="2" y="56" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="49" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="43" height="12"/>
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="38" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -328,11 +334,11 @@
 								<bottomPen lineWidth="0.0"/>
 								<rightPen lineWidth="0.0"/>
 							</box>
-							<textElement textAlignment="Left" verticalAlignment="Top"/>
+							<textElement textAlignment="Right" verticalAlignment="Top"/>
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.charge}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="43" y="0" width="201" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="37" y="0" width="201" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -340,12 +346,14 @@
 								<bottomPen lineWidth="0.0"/>
 								<rightPen lineWidth="0.0"/>
 							</box>
-							<textElement textAlignment="Left"/>
+							<textElement textAlignment="Left">
+								<font size="8"/>
+							</textElement>
 							<textFieldExpression class="java.lang.String"><![CDATA[$F{charge.name}]]></textFieldExpression>
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="2" y="68" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="60" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="76" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -370,35 +378,11 @@
 							<textElement textAlignment="Left"/>
 							<textFieldExpression class="java.util.Date"><![CDATA[$F{fiscalPayroll.entranceDate}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="146" y="0" width="25" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left" verticalAlignment="Top"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.ci}]]></textFieldExpression>
-						</textField>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="171" y="0" width="73" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscalPayroll.personalIdentifier}]]></textFieldExpression>
-						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="2" y="80" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="71" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="43" height="12"/>
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="76" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -407,10 +391,10 @@
 								<rightPen lineWidth="0.0"/>
 							</box>
 							<textElement textAlignment="Left" verticalAlignment="Top"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.basic}]]></textFieldExpression>
+							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.basicAmount}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="43" y="0" width="80" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="76" y="0" width="70" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -421,33 +405,9 @@
 							<textElement textAlignment="Left"/>
 							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.basicAmount}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="123" y="0" width="55" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left" verticalAlignment="Top"/>
-							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.seniorityYears}]]></textFieldExpression>
-						</textField>
-						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="178" y="0" width="66" height="12"/>
-							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-								<topPen lineWidth="0.0"/>
-								<leftPen lineWidth="0.0"/>
-								<bottomPen lineWidth="0.0"/>
-								<rightPen lineWidth="0.0"/>
-							</box>
-							<textElement textAlignment="Left"/>
-							<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscalPayroll.seniorityYears}]]></textFieldExpression>
-						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="2" y="92" width="244" height="12"/>
+						<reportElement positionType="Float" x="0" y="82" width="238" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="76" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -461,7 +421,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.workedDays}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="76" y="0" width="168" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="76" y="0" width="70" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -473,9 +433,36 @@
 							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.workedDays}]]></textFieldExpression>
 						</textField>
 					</frame>
+					<frame>
+						<reportElement positionType="Float" x="0" y="93" width="238" height="12"/>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="76" height="12"/>
+							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+							<textElement textAlignment="Left" verticalAlignment="Top"/>
+							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.seniorityYears}]]></textFieldExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="76" y="0" width="70" height="12"/>
+							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<topPen lineWidth="0.0"/>
+								<leftPen lineWidth="0.0"/>
+								<bottomPen lineWidth="0.0"/>
+								<rightPen lineWidth="0.0"/>
+							</box>
+							<textElement textAlignment="Left"/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscalPayroll.seniorityYears}]]></textFieldExpression>
+						</textField>
+					</frame>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="249" y="89" width="165" height="123"/>
+					<reportElement positionType="Float" x="240" y="89" width="150" height="123"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -484,7 +471,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="165" height="12"/>
+						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="150" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -496,7 +483,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.incomes}]]></textFieldExpression>
 					</textField>
 					<frame>
-						<reportElement positionType="Float" x="0" y="20" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="16" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -510,7 +497,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.basicAmount}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -523,7 +510,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="31" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="27" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -537,7 +524,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.seniorityBonus}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -550,7 +537,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="42" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="38" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -564,7 +551,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.extraHourCost}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -577,7 +564,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="64" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="60" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -591,7 +578,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.nightWork}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -604,7 +591,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="53" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="49" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -618,7 +605,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.sundayBonus}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="100" y="0" width="65" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="100" y="0" width="50" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -631,7 +618,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="97" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="93" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -645,7 +632,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.otherBonus}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="89" y="0" width="76" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="89" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -658,7 +645,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="75" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="71" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -672,7 +659,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.transportationReturn}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -685,7 +672,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="86" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="82" width="150" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="89" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -699,7 +686,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.refreshmentBonus}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="77" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="0" width="62" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -713,7 +700,7 @@
 					</frame>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="417" y="89" width="165" height="123"/>
+					<reportElement positionType="Float" x="393" y="89" width="160" height="123"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -722,7 +709,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="165" height="12"/>
+						<reportElement style="tinyHeaderStyleBlank" positionType="Float" mode="Transparent" x="0" y="0" width="160" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -734,7 +721,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.discounts}]]></textFieldExpression>
 					</textField>
 					<frame>
-						<reportElement positionType="Float" x="0" y="82" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="82" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -748,7 +735,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.absenceMinutesDiscount}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -761,7 +748,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="93" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="93" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -775,7 +762,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.tardinessMinutesDiscount}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -788,7 +775,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="38" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="38" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -802,7 +789,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.laborSolidaryContributionAFP}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -815,7 +802,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="49" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="49" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -829,7 +816,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.laborComissionAFP}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -842,7 +829,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="60" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="60" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -856,7 +843,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.solidaryAFP}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -869,7 +856,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="27" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="27" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -883,7 +870,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.laborCommonRiskAFP}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -896,7 +883,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="16" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="16" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -910,7 +897,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.laborIndividualAFP}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -923,7 +910,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="71" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="71" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -937,7 +924,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.retentionClearance}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -950,7 +937,7 @@
 						</textField>
 					</frame>
 					<frame>
-						<reportElement positionType="Float" x="0" y="104" width="165" height="12"/>
+						<reportElement positionType="Float" x="0" y="104" width="160" height="12"/>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement style="tinyDetailStyle" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -964,7 +951,7 @@
 							<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.otherDiscount}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="66" height="12"/>
+							<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="99" y="0" width="61" height="12"/>
 							<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 								<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 								<topPen lineWidth="0.0"/>
@@ -978,7 +965,7 @@
 					</frame>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="249" y="214" width="165" height="12"/>
+					<reportElement positionType="Float" x="240" y="214" width="150" height="12"/>
 					<box>
 						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
 						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
@@ -999,7 +986,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.totalGrained}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="80" y="0" width="85" height="12"/>
+						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="80" y="0" width="70" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -1012,7 +999,7 @@
 					</textField>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="417" y="214" width="165" height="12"/>
+					<reportElement positionType="Float" x="393" y="214" width="160" height="12"/>
 					<box>
 						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
 						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
@@ -1033,7 +1020,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.totalDiscount}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="93" y="0" width="72" height="12"/>
+						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="93" y="0" width="67" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -1046,7 +1033,7 @@
 					</textField>
 				</frame>
 				<frame>
-					<reportElement positionType="Float" x="0" y="228" width="581" height="24"/>
+					<reportElement positionType="Float" x="0" y="228" width="553" height="24"/>
 					<box leftPadding="0" rightPadding="0">
 						<pen lineWidth="0.0"/>
 						<topPen lineWidth="0.0"/>
@@ -1079,7 +1066,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[com.encens.khipus.util.FormatUtils.getLiteralExpression($F{fiscalPayroll.liquidPayment},$P{REPORT_LOCALE})]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="dd MMMMM yyyy" isBlankWhenNull="true">
-						<reportElement style="tinyDetailStyle" positionType="Float" mode="Transparent" x="36" y="12" width="201" height="12"/>
+						<reportElement style="tinyDetailStyle" positionType="Float" mode="Transparent" x="36" y="12" width="401" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -1091,7 +1078,7 @@
 						<textFieldExpression class="java.util.Date"><![CDATA[$P{lastDayOfMonthParam}]]></textFieldExpression>
 					</textField>
 					<textField>
-						<reportElement x="1" y="12" width="36" height="12"/>
+						<reportElement x="0" y="12" width="36" height="12"/>
 						<textElement>
 							<font isBold="false"/>
 						</textElement>
@@ -1099,49 +1086,49 @@
 					</textField>
 				</frame>
 				<textField>
-					<reportElement x="45" y="310" width="100" height="9"/>
+					<reportElement x="45" y="326" width="100" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["Agr. Eliseo Camacho Orellana"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="45" y="319" width="100" height="9"/>
+					<reportElement x="45" y="335" width="100" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["GERENTE GENERAL"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="237" y="310" width="100" height="9"/>
+					<reportElement x="228" y="326" width="100" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["Lic. Juana de Dios Pozo"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="237" y="319" width="100" height="9"/>
+					<reportElement x="228" y="335" width="100" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["JEFE ADM. FINANCIERO"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="405" y="308" width="144" height="9"/>
+					<reportElement x="389" y="324" width="144" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscalPayroll.name}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="405" y="317" width="144" height="9"/>
+					<reportElement x="389" y="333" width="144" height="9"/>
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{charge.name}]]></textFieldExpression>
 				</textField>
 				<frame>
-					<reportElement x="0" y="214" width="246" height="12"/>
+					<reportElement x="0" y="214" width="238" height="12"/>
 					<box>
 						<pen lineWidth="1.0" lineColor="#CCCCCC"/>
 						<topPen lineWidth="1.0" lineColor="#CCCCCC"/>
@@ -1162,7 +1149,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.liquidPayment}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="96" y="0" width="126" height="12"/>
+						<reportElement style="tinyDetailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="96" y="0" width="142" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="2">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>

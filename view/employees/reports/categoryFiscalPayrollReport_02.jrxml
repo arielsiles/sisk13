@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="2135" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="2105" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
-	<property name="ireport.zoom" value="3.7974983358324463"/>
-	<property name="ireport.x" value="0"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="2500" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="2470" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
+	<property name="ireport.zoom" value="4.17724816941569"/>
+	<property name="ireport.x" value="6997"/>
 	<property name="ireport.y" value="0"/>
 	<import value="com.encens.khipus.action.employees.reports.PayrollFiscalReportAction"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
@@ -317,137 +317,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.sundayBonus}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.otherBonus}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="0" width="60" height="36"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.totalGrained}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="1719" y="0" width="240" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.discounts}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.absenceMinutesDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.tardinessMinutesDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.fiscalPayroll.rciva}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.otherDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="0" width="70" height="36"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.totalDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2029" y="0" width="70" height="36"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.liquidPayment}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborIndividualAFPParam}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborCommonRiskAFPParam}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborSolidaryContributionAFPParam}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="12" width="60" height="24"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborComissionAFPParam}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.productionBonus}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1119" y="12" width="60" height="24"/>
@@ -457,7 +327,167 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.nightWork}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.sundayBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.otherBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="0" width="60" height="36"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.totalGrained}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="1779" y="0" width="420" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.discounts}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.absenceMinutesDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.tardinessMinutesDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.loanDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2019" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.advanceDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2079" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.winDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.fiscalPayroll.rciva}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2139" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.otherDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2199" y="0" width="70" height="36"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.totalDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2269" y="0" width="70" height="36"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.liquidPayment}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborIndividualAFPParam}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborCommonRiskAFPParam}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborSolidaryContributionAFPParam}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{laborComissionAFPParam}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1179" y="12" width="60" height="24"/>
@@ -467,10 +497,20 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.transportationReturn}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.nightWork}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1239" y="12" width="60" height="24"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.transportationReturn}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="12" width="60" height="24"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
@@ -490,7 +530,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.extraTime}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="12" width="60" height="24"/>
+				<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="12" width="60" height="24"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
@@ -530,7 +570,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.number}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="1419" y="0" width="300" height="12"/>
+				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="1479" y="0" width="300" height="12"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
@@ -540,7 +580,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$R{FiscalPayroll.pensionSystem}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="919" y="0" width="440" height="12"/>
+				<reportElement style="headerStyle" positionType="Float" mode="Opaque" x="919" y="0" width="500" height="12"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
@@ -671,137 +711,7 @@
 				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.sundayBonus}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.otherBonus}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.totalGrained}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.absenceMinutesDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.tardinessMinutesDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.retentionClearance}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.otherDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="0" width="70" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.totalDiscount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2029" y="0" width="70" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.liquidPayment}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborIndividualAFP}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborCommonRiskAFP}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborSolidaryContributionAFP}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborComissionAFP}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1179" y="0" width="60" height="12"/>
-				<box padding="1">
-					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right">
-					<font fontName="Arial"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.transReturnBonus}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.productionBonus}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1119" y="0" width="60" height="12"/>
@@ -811,7 +721,157 @@
 				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.nightWorkBonus}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.sundayBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.otherBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.totalGrained}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.absenceMinutesDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.tardinessMinutesDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.loanDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2019" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.advanceDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2079" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.winDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.retentionClearance}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2139" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.otherDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2199" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.totalDiscount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2269" y="0" width="70" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.liquidPayment}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborIndividualAFP}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborCommonRiskAFP}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborSolidaryContributionAFP}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.laborComissionAFP}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1239" y="0" width="60" height="12"/>
@@ -821,10 +881,30 @@
 				<textElement textAlignment="Right">
 					<font fontName="Arial"/>
 				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.transReturnBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1179" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.nightWorkBonus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="0" width="60" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscalPayroll.refreshmentBonus}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="0" width="60" height="12"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="0" width="60" height="12"/>
 				<box padding="1">
 					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
@@ -894,7 +974,7 @@
 	<summary>
 		<band height="30">
 			<frame>
-				<reportElement key="" positionType="Float" x="0" y="0" width="2099" height="12"/>
+				<reportElement key="" positionType="Float" x="0" y="0" width="2339" height="12"/>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="849" y="0" width="70" height="12"/>
 					<box padding="1">
@@ -933,127 +1013,7 @@
 					<textElement textAlignment="Right">
 						<font fontName="Arial"/>
 					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumSundayBonusVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumOtherBonusVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTotalGrainedVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAbsenceMinutesDiscountVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTardinessMinutesDiscountVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumRetentionClearanceVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumOtherDiscountVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="0" width="70" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTotalDiscountVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2029" y="0" width="70" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLiquidPaymentVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborIndividualAFPVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborCommonRiskAFPVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborSolidaryContributionAFPVar}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="0" width="60" height="12"/>
-					<box padding="1">
-						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Right">
-						<font fontName="Arial"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborComissionAFPVar}]]></textFieldExpression>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumProductionBonusVar}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1119" y="0" width="60" height="12"/>
@@ -1063,7 +1023,157 @@
 					<textElement textAlignment="Right">
 						<font fontName="Arial"/>
 					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumNightWorkBonusVar}]]></textFieldExpression>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumSundayBonusVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1359" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumOtherBonusVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1419" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTotalGrainedVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1899" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAbsenceMinutesDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1839" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTardinessMinutesDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1959" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLoanDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2019" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAdvanceDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2079" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumWinDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1779" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumRetentionClearanceVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2139" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumOtherDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2199" y="0" width="70" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTotalDiscountVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2269" y="0" width="70" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLiquidPaymentVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1479" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborIndividualAFPVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1539" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborCommonRiskAFPVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1599" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborSolidaryContributionAFPVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumLaborComissionAFPVar}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1179" y="0" width="60" height="12"/>
@@ -1073,7 +1183,7 @@
 					<textElement textAlignment="Right">
 						<font fontName="Arial"/>
 					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTransReturnBonusVar}]]></textFieldExpression>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumNightWorkBonusVar}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1239" y="0" width="60" height="12"/>
@@ -1083,10 +1193,20 @@
 					<textElement textAlignment="Right">
 						<font fontName="Arial"/>
 					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumTransReturnBonusVar}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1299" y="0" width="60" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumRefreshmentBonusVar}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1659" y="0" width="60" height="12"/>
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1719" y="0" width="60" height="12"/>
 					<box padding="1">
 						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					</box>
