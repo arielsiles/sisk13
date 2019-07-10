@@ -720,7 +720,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 credit = (BigDecimal)data[3];
                 accountType = ((CashAccountType)data[4]).toString();
 
-                System.out.println("----------> CashAccountType:" + accountType);
+                //System.out.println("----------> CashAccountType:" + accountType);
 
                 /** For Debit Balance **/
                 if ( debit.doubleValue() > credit.doubleValue() )
