@@ -718,7 +718,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             for(Object[] data: datas){
                 debit  = (BigDecimal)data[2];
                 credit = (BigDecimal)data[3];
-                accountType = (String)data[4];
+                accountType = ((CashAccountType)data[4]).toString();
+
+                System.out.println("----------> CashAccountType:" + accountType);
 
                 /** For Debit Balance **/
                 if ( debit.doubleValue() > credit.doubleValue() )
