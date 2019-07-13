@@ -94,6 +94,20 @@
                                  hotKeySelect="alt+2"/>
             </s:decorate>
 
+            <s:decorate id="supplyTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.type']}</ui:define>
+                <h:selectOneMenu id="supplyType"
+                                 value="#{materialInput.type}"
+                                 styleClass="inputMedium"
+                                 tabindex="4">
+                    <s:selectItems value="#{SupplyTypeEnum}"
+                                   var="supplyType"
+                                   label="#{messages[supplyType.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
             <rich:spacer height="10" />
 
             <s:decorate id="quantityFlagField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -103,6 +117,29 @@
                                          disabled="false"
                                          tabindex="31">
                 </h:selectBooleanCheckbox>
+            </s:decorate>
+
+
+            <rich:spacer height="10" />
+
+            <s:decorate id="volumeOneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.volumeOne']}</ui:define>
+                <h:inputText id="volumeOneId"
+                             value="#{materialInput.volumeOne}"
+                             styleClass="inputSmall right">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="volumeOneId"/>
+                    <a4j:support event="onblur" ajaxSingle="true" reRender="volumeOneId" />
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="weightOneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.weightOne']}</ui:define>
+                <h:inputText id="weightOneId"
+                             value="#{materialInput.weightOne}"
+                             styleClass="inputSmall right">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="weightOneId"/>
+                    <a4j:support event="onblur" ajaxSingle="true" reRender="weightOneId" />
+                </h:inputText>
             </s:decorate>
 
         </h:panelGrid>

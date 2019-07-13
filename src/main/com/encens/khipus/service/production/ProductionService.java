@@ -20,7 +20,10 @@ public interface ProductionService {
     void deleteProduction(Production production);
     void assignProduct(Production production, ProductionProduct product);
     void removeProductionProduct(ProductionProduct product, Production production);
-    public List<MaterialInput> getMaterialInput(String productItemCode);
+
+    List<MaterialInput> getMaterialInput(String productItemCode);
+    List<MaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type);
+
     void assignMaterial(Production production, Supply supply);
     void removeSupply(Supply supply);
     List<Object[]> getAllProductionSuplies(Production production);

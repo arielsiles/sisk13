@@ -319,7 +319,10 @@ public class ProductionAction extends GenericAction<Production> {
 
     private void addMaterialDefault(ProductionProduct product, BigDecimal quantity){
 
-        List<MaterialInput> materialInputList = productionService.getMaterialInput(product.getProductItemCode());
+        //List<MaterialInput> materialInputList = productionService.getMaterialInput(product.getProductItemCode());
+
+        List<MaterialInput> materialInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
+        List<MaterialInput> ingredientInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
 
         for (MaterialInput materialInput : materialInputList){
             Supply supply = new Supply();
@@ -332,8 +335,36 @@ public class ProductionAction extends GenericAction<Production> {
                 supply.setQuantity(BigDecimal.ZERO);
 
             supply.setProductionProduct(product);
+            supply.setType(SupplyType.MATERIAL);
 
             materialSupplyList.add(supply);
+            productionService.assignMaterial(getInstance(), supply);
+        }
+
+        for (MaterialInput ingredientInput : ingredientInputList){
+            Supply supply = new Supply();
+            supply.setProductItemCode(ingredientInput.getProductItemMaterialCode());
+            supply.setProductItem(ingredientInput.getProductItemMaterial());
+
+            BigDecimal weightTwo = BigDecimal.ZERO;
+
+            if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.GR)){
+
+            }
+
+            if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.ML)){
+                BigDecimal basicLitre = BigDecimalUtil.divide(product.getProductItem().getBasicQuantity(), BigDecimalUtil.ONE_THOUSAND);
+                BigDecimal volumeTwo = BigDecimalUtil.multiply(product.getQuantity(), basicLitre); /** Calculado volumen 2 **/
+                weightTwo = BigDecimalUtil.multiply(volumeTwo, ingredientInput.getWeightOne()); /** vol2 * peso1 **/
+                weightTwo = BigDecimalUtil.divide(weightTwo, ingredientInput.getVolumeOne());
+            }
+
+            supply.setQuantity(weightTwo);
+
+            supply.setProductionProduct(product);
+            supply.setType(SupplyType.INGREDIENT);
+
+            ingredientSupplyList.add(supply);
             productionService.assignMaterial(getInstance(), supply);
         }
 

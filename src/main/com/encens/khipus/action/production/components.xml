@@ -86,6 +86,9 @@
     <factory name="MeasurementUnitEnum"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.MeasurementUnit')}"/>
 
+    <factory name="SupplyTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.SupplyType')}"/>
+
     <factory name="productionTankList" value="#{productionTankQuery}"/>
     <framework:entity-query name="productionTankQuery" ejbql="select p from ProductionTank p"/>
 

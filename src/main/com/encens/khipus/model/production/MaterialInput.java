@@ -8,6 +8,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * Entity fo Product
@@ -54,6 +55,19 @@ public class MaterialInput implements BaseModel {
     @Column(name = "flag_cant", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean quantityFlag = Boolean.FALSE;
+
+    @Column(name = "tipo", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private SupplyType type;
+
+    @Column(name = "vol1")
+    private BigDecimal volumeOne;
+
+    @Column(name = "peso1")
+    private BigDecimal weightOne;
+
+    @Column(name = "vol2")
+    private BigDecimal volumeTwo;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -127,5 +141,37 @@ public class MaterialInput implements BaseModel {
 
     public void setQuantityFlag(Boolean quantityFlag) {
         this.quantityFlag = quantityFlag;
+    }
+
+    public SupplyType getType() {
+        return type;
+    }
+
+    public void setType(SupplyType type) {
+        this.type = type;
+    }
+
+    public BigDecimal getVolumeOne() {
+        return volumeOne;
+    }
+
+    public void setVolumeOne(BigDecimal volumeOne) {
+        this.volumeOne = volumeOne;
+    }
+
+    public BigDecimal getWeightOne() {
+        return weightOne;
+    }
+
+    public void setWeightOne(BigDecimal weightOne) {
+        this.weightOne = weightOne;
+    }
+
+    public BigDecimal getVolumeTwo() {
+        return volumeTwo;
+    }
+
+    public void setVolumeTwo(BigDecimal volumeTwo) {
+        this.volumeTwo = volumeTwo;
     }
 }

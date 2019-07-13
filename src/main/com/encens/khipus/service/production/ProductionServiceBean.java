@@ -112,7 +112,7 @@ public class ProductionServiceBean implements ProductionService {
     public void assignMaterial(Production production, Supply supply){
         supply.setProduction(production);
         if (supply.getId() == null){
-            supply.setType(SupplyType.MATERIAL);
+            //supply.setType(SupplyType.MATERIAL);
             em.persist(supply);
             em.flush();
         }else {
@@ -174,5 +174,20 @@ public class ProductionServiceBean implements ProductionService {
                 .getResultList();
 
         return materialInputList;
+    }
+
+    public List<MaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type){
+
+        List<MaterialInput> resultInputList = new ArrayList<MaterialInput>();
+
+        resultInputList = (List<MaterialInput>)em.createQuery(
+                "select m from MaterialInput m " +
+                        "where m.productItemCode =:productItemCode " +
+                        "and m.type =:type")
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("type", type)
+                .getResultList();
+
+        return resultInputList;
     }
 }
