@@ -18,8 +18,12 @@ import java.util.List;
 public class MaterialInputDataModel extends QueryDataModel<Long, MaterialInput> {
 
     private String name;
+    private String productItemCode;
 
-    private static final String[] RESTRICTIONS = {"lower(materialInput.productItem.name) like concat('%', concat(lower(#{materialInputDataModel.name}), '%'))"};
+    private static final String[] RESTRICTIONS = {
+            "lower(materialInput.productItem.name) like concat('%', concat(lower(#{materialInputDataModel.name}), '%'))",
+            "lower(materialInput.productItem.productItemCode) = #{materialInputDataModel.productItemCode}"
+    };
 
     @Create
     public void init() {
@@ -42,5 +46,13 @@ public class MaterialInputDataModel extends QueryDataModel<Long, MaterialInput> 
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProductItemCode() {
+        return productItemCode;
+    }
+
+    public void setProductItemCode(String productItemCode) {
+        this.productItemCode = productItemCode;
     }
 }

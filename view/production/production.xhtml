@@ -71,21 +71,18 @@
                                      productionAction.pending and
                                      s:hasPermission('PRODUCTION','UPDATE')}"
                          tabindex="1">
-            <s:defaultAction/>
         </h:commandButton>
 
         <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
                          rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                          tabindex="1">
-            <s:defaultAction/>
         </h:commandButton>
 
         <h:commandButton action="#{productionAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
                          rendered="#{!productionAction.managed and s:hasPermission('PRODUCTION','CREATE')}"
                          tabindex="1">
-            <s:defaultAction/>
         </h:commandButton>
 
         <h:commandButton value="#{messages['Common.delete']}"

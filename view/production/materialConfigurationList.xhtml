@@ -21,6 +21,14 @@
                                  tabindex="1"
                                  styleClass="input">
                     </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Production.materialConfiguration.code']}</ui:define>
+                    <h:inputText id="productItemCode" value="#{materialInputDataModel.productItemCode}"
+                                 tabindex="1"
+                                 styleClass="input100">
+                    </h:inputText>
                     <a4j:commandButton action="#{materialInputDataModel.search}"
                                        reRender="materialInputListId, dataScroller"
                                        styleClass="button"
