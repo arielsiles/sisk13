@@ -156,7 +156,7 @@ public class CreditAction extends GenericAction<Credit> {
             for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
 
                 if (i == paidQuotas || paidQuotas == 0) {
-                    System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
+                    //System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
                     paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
 
                     Calendar cal = Calendar.getInstance();
@@ -168,14 +168,14 @@ public class CreditAction extends GenericAction<Credit> {
 
                     long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
 
-                    System.out.println("===>>> Diff DAYS: " + diffDays);
+                    //System.out.println("===>>> Diff DAYS: " + diffDays);
 
                     if (diffDays <= 0) {
                         //System.out.println("===> !!!!CREDITO VIGENTE!!!!");
                         if (credit.getState().equals(CreditState.VEN)){
                             addVoucherDetailVig(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VIG);
-                            System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VIG);
+                            //System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VIG);
                             cont++;
                         }
                     }
@@ -185,7 +185,7 @@ public class CreditAction extends GenericAction<Credit> {
                         if (!credit.getState().equals(CreditState.VEN)){
                             addVoucherDetailVen(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VEN);
-                            System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VEN);
+                            //System.out.println("=-=-=-> STATE: " + cont + " - " + CreditState.VEN);
                             cont++;
                         }
 
@@ -236,7 +236,7 @@ public class CreditAction extends GenericAction<Credit> {
         for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
 
             if (i == paidQuotas || paidQuotas == 0) {
-                System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
+                //System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
                 paidDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
 
                 Calendar cal = Calendar.getInstance();
@@ -248,7 +248,7 @@ public class CreditAction extends GenericAction<Credit> {
 
                 Long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
 
-                System.out.println("===>>> Diff DAYS: " + diffDays);
+                //System.out.println("===>>> Diff DAYS: " + diffDays);
 
                 result = diffDays;
 

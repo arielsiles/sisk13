@@ -495,19 +495,19 @@ public class ProductionAction extends GenericAction<Production> {
         for (Supply supply : ingredientSupplyList){
             BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
             ingredientCost = BigDecimalUtil.sum(ingredientCost, cost, 6);
-            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+            //System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
         }
 
         for (Supply supply : materialSupplyList){
             BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
             materialCost = BigDecimalUtil.sum(materialCost, cost, 6);
-            System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
+            //System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
         }
 
 
         result = BigDecimalUtil.sum(ingredientCost, materialCost, 6);
         result = BigDecimalUtil.roundBigDecimal(result, 2);
-        System.out.println("===>>> TOTAL COST: " + result);
+        //System.out.println("===>>> TOTAL COST: " + result);
 
         return result;
     }
