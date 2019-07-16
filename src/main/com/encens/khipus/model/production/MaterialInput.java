@@ -66,8 +66,8 @@ public class MaterialInput implements BaseModel {
     @Column(name = "peso1")
     private BigDecimal weightOne;
 
-    @Column(name = "vol2")
-    private BigDecimal volumeTwo;
+    /*@Column(name = "vol2")
+    private BigDecimal volumeTwo;*/
 
     @Version
     @Column(name = "version", nullable = false)
@@ -167,11 +167,4 @@ public class MaterialInput implements BaseModel {
         this.weightOne = weightOne;
     }
 
-    public BigDecimal getVolumeTwo() {
-        return volumeTwo;
-    }
-
-    public void setVolumeTwo(BigDecimal volumeTwo) {
-        this.volumeTwo = volumeTwo;
-    }
 }
