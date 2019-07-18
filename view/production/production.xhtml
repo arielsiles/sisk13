@@ -19,7 +19,7 @@
         </c:otherwise>
     </c:choose>
 </ui:define>
-<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyWidth" value="90%"/>
 <ui:param name="selectedTab" value="production"/>
 <ui:define name="body">
 
@@ -64,25 +64,25 @@
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
         </a4j:commandButton>
 
+        <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
+                         styleClass="button"
+                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{productionAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!productionAction.managed and s:hasPermission('PRODUCTION','CREATE')}">
+        </h:commandButton>
+
         <!--!productionAction.existProductionProducts() and-->
         <h:commandButton action="#{productionAction.approve}" value="#{messages['Common.approve']}"
                          styleClass="button"
                          rendered="#{productionAction.managed and
                                      productionAction.pending and
                                      s:hasPermission('PRODUCTION','UPDATE')}"
-                         tabindex="1">
-        </h:commandButton>
-
-        <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
-                         styleClass="button"
-                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
-                         tabindex="1">
-        </h:commandButton>
-
-        <h:commandButton action="#{productionAction.create}" value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{!productionAction.managed and s:hasPermission('PRODUCTION','CREATE')}"
-                         tabindex="1">
+                         tabindex="2">
         </h:commandButton>
 
         <h:commandButton value="#{messages['Common.delete']}"
@@ -92,9 +92,14 @@
                                    operation="show"/>
         </h:commandButton>
 
+        <h:commandButton action="#{productionAction.disapprove}" value="#{messages['Common.disapprove']}"
+                         styleClass="button"
+                         rendered="#{productionAction.approved}"
+                         tabindex="2">
+        </h:commandButton>
+
         <h:commandButton action="#{productionAction.cancel}" value="#{messages['Common.cancel']}"
-                         styleClass="button" immediate="true"
-                         tabindex="4">
+                         styleClass="button" immediate="true">
         </h:commandButton>
     </div>
 
@@ -237,11 +242,11 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="45%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="40%">#{messages['Supply.name']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Supply.unity']}</th>
-                        <th class="rich-table-headercell" width="15%">#{messages['Supply.quantity']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Supply.quantity']}</th>
                         <th class="rich-table-headercell" width="10%">#{messages['Supply.netCost']}</th>
-                        <th class="rich-table-headercell" width="20%">#{messages['Supply.affect']}</th>
+                        <th class="rich-table-headercell" width="30%">#{messages['Supply.affect']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
@@ -275,10 +280,10 @@
                                 </h:outputText>
                             </td>
 
-                            <td class="rich-table-cell">
+                            <td class="rich-table-cell center">
                                 <h:selectOneMenu id="#{productInputFieldId}"
                                                  value="#{supplyDetail.productionProduct}"
-                                                 styleClass="input"
+                                                 styleClass="input250"
                                                  rendered="#{!productionAction.hasFormula(supplyDetail)}"
                                                  required="false"
                                                  disabled="#{productionAction.approved}"
@@ -315,11 +320,11 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="45%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="40%">#{messages['Supply.name']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Supply.unity']}</th>
-                        <th class="rich-table-headercell" width="15%">#{messages['Supply.quantity']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Supply.quantity']}</th>
                         <th class="rich-table-headercell" width="10%">#{messages['Supply.netCost']}</th>
-                        <th class="rich-table-headercell" width="20%">#{messages['Supply.affect']}</th>
+                        <th class="rich-table-headercell" width="30%">#{messages['Supply.affect']}</th>
                         <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
@@ -354,10 +359,10 @@
                                 </h:outputText>
                             </td>
 
-                            <td class="rich-table-cell">
+                            <td class="rich-table-cell center">
                                 <h:selectOneMenu id="#{productMaterialInputFieldId}"
                                                  value="#{materialDetail.productionProduct}"
-                                                 styleClass="input"
+                                                 styleClass="input250"
                                                  rendered="#{!productionAction.hasFormula(materialDetail)}"
                                                  required="false"
                                                  disabled="#{productionAction.approved}"

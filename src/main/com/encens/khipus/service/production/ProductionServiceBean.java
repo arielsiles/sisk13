@@ -46,7 +46,7 @@ public class ProductionServiceBean implements ProductionService {
 
     public void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList){
 
-        System.out.println("----> Estado Produccion: " + production.getState());
+        //System.out.println("----> Estado Produccion: " + production.getState());
         for (Supply supply : ingredientSupplyList){
             if (supply.getId() == null){
                 supply.setProduction(production);

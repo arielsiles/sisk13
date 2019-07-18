@@ -85,8 +85,8 @@ public class ProductionAction extends GenericAction<Production> {
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
 
-        System.out.println("-------> Update Total cost: " + calculateTotalCost());
-        System.out.println("-------> Update Total mil: " + calculateRawMaterial());
+        //System.out.println("-------> Update Total cost: " + calculateTotalCost());
+        //System.out.println("-------> Update Total mil: " + calculateRawMaterial());
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
         productionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
@@ -108,6 +108,12 @@ public class ProductionAction extends GenericAction<Production> {
         return Outcome.CANCEL;
     }
 
+    public void disapprove(){
+        getInstance().setState(ProductionState.PEN);
+        productionPlanAction.changePlanStatus(getInstance().getProductionPlan());
+        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.disapproveProduction");
+    }
     /**
      * Al aprobar la produccion calcula los costos y lo distribuye por cada producto en la produccion
      */
@@ -319,8 +325,6 @@ public class ProductionAction extends GenericAction<Production> {
 
     private void addMaterialDefault(ProductionProduct product, BigDecimal quantity){
 
-        //List<MaterialInput> materialInputList = productionService.getMaterialInput(product.getProductItemCode());
-
         List<MaterialInput> materialInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
         List<MaterialInput> ingredientInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
 
@@ -348,15 +352,16 @@ public class ProductionAction extends GenericAction<Production> {
 
             BigDecimal weightTwo = BigDecimal.ZERO;
 
-            if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.GR)){
+            if (ingredientInput.getVolumeOne() != null && ingredientInput.getWeightOne() != null) {
 
-            }
+                if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.GR)) {}
 
-            if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.ML)){
-                BigDecimal basicLitre = BigDecimalUtil.divide(product.getProductItem().getBasicQuantity(), BigDecimalUtil.ONE_THOUSAND);
-                BigDecimal volumeTwo = BigDecimalUtil.multiply(product.getQuantity(), basicLitre); /** Calculado volumen 2 **/
-                weightTwo = BigDecimalUtil.multiply(volumeTwo, ingredientInput.getWeightOne()); /** vol2 * peso1 **/
-                weightTwo = BigDecimalUtil.divide(weightTwo, ingredientInput.getVolumeOne());
+                if (product.getProductItem().getBasicMeasure().equals(MeasurementUnit.ML)) {
+                    BigDecimal basicLitre = BigDecimalUtil.divide(product.getProductItem().getBasicQuantity(), BigDecimalUtil.ONE_THOUSAND);
+                    BigDecimal volumeTwo = BigDecimalUtil.multiply(product.getQuantity(), basicLitre); /** Calculado volumen 2 **/
+                    weightTwo = BigDecimalUtil.multiply(volumeTwo, ingredientInput.getWeightOne()); /** vol2 * peso1 **/
+                    weightTwo = BigDecimalUtil.divide(weightTwo, ingredientInput.getVolumeOne());
+                }
             }
 
             supply.setQuantity(weightTwo);
