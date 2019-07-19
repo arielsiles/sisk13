@@ -3,10 +3,8 @@ package com.encens.khipus.action.employees;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.RHMark;
 import com.encens.khipus.model.employees.RH_Mark;
-import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
@@ -40,6 +38,7 @@ public class RH_MarkAction extends GenericAction<RH_Mark> {
     @Factory(value = "rH_Mark", scope = ScopeType.STATELESS)
     //@Restrict("#{s:hasPermission('RHMARK','VIEW')}")
     public RH_Mark initRHMark() {
+        System.out.println("-----> init RHMARK");
         return getInstance();
     }
 
@@ -48,8 +47,23 @@ public class RH_MarkAction extends GenericAction<RH_Mark> {
         return "marDate";
     }
 
+    //@End(beforeRedirect=true)
+    @End
+    public String entryToWork(){
+        setControl("1");
+        RH_Mark rhMark = getInstance();
+        System.out.println("----> rhmark: " + rhMark.getMarPerId());
+        return create();
+    }
+
+    //@End(beforeRedirect=true)
+    @End
+    public String outToWork(){
+        setControl("3");
+        return create();
+    }
+
     @Override
-    @End(beforeRedirect=true)
     public String create() {
         try {
             RH_Mark rhMark = getInstance();

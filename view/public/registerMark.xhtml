@@ -31,15 +31,16 @@
 
                     <s:div>
                         <s:decorate id="dateMarkField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">Fecha: </ui:define>
-                            <span id="date_server"></span>
+                            <ui:define name="label">FECHA: </ui:define>
+                            <span id="date_server" style="font-size: 15px;"></span>
                         </s:decorate>
 
                         <s:decorate id="marPerIdField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RHMark.marRefCard']}</ui:define>
+                            <ui:define name="label">#{messages['RHMark.code']}</ui:define>
                                 <h:inputText id="marRefCard"
                                          value="#{rH_Mark.marPerId}"
                                          styleClass="input"
+                                         style="font-size: 18px; height: 22px;"
                                          maxlength="200"
                                          required="true"
                                          tabindex="1"
@@ -48,40 +49,52 @@
                             </h:inputText>
                         </s:decorate>
 
-                        <s:decorate id="controlId" template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:decorate id="buttonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <h:commandButton action="#{rH_MarkAction.entryToWork}" value="#{messages['Common.entry']}"
+                                             styleClass="button" style="font-size: 15px; padding: 5px 10px 5px 10px;">
+                            </h:commandButton>
+
+                            <h:commandButton action="#{rH_MarkAction.outToWork}" value="#{messages['Common.output']}"
+                                             styleClass="button" style="font-size: 15px; padding: 5px 10px 5px 10px;">
+                            </h:commandButton>
+                        </s:decorate>
+
+                        <!--<s:decorate id="controlId" template="/include/inputField.xhtml" styleClass="formRow">
                             <h:selectOneRadio value="#{rH_MarkAction.control}" required="true">
                                 <f:selectItem itemValue="1" itemLabel="#{messages['RHMark.input']}" />
                                 <f:selectItem itemValue="3" itemLabel="#{messages['RHMark.output']}" />
                             </h:selectOneRadio>
-                        </s:decorate>
+                        </s:decorate>-->
 
                         <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RegisterMarck.description']}</ui:define>
+                            <ui:define name="label">OBSERVACION:</ui:define>
                             <h:inputTextarea id="description"
                                              value="#{rH_Mark.description}"
-                                             style="margin: 0px; width: 250px; height: 80px;"
+                                             style="margin: 0px; width: 250px; height: 60px;"
                                              styleClass="input textarea"
                                              tabindex="2"
                                     />
                         </s:decorate>
-                        <s:decorate id="createField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <!--<s:decorate id="createField" template="/include/inputField.xhtml" styleClass="formRow">
                             <h:commandButton action="#{rH_MarkAction.create}" value="#{messages['Common.register']}"
                                              styleClass="button" tabindex="3" style="font-size: 16px;">
 
                                 <s:defaultAction/>
                             </h:commandButton>
-                        </s:decorate>
+                        </s:decorate>-->
+
                         <s:decorate id="timeField" template="/include/inputField.xhtml" styleClass="formRow">
                             <span id="time_server" style="font-size: 17px;"></span>
                         </s:decorate>
                     </s:div>
 
-                            <h:inputHidden id="marDate" value="#{rH_Mark.marDate}">
-                                    </h:inputHidden>
-                            <h:inputHidden id="marTime" value="#{rH_Mark.marTime}" >
-                            <s:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}"
-                                               type="time"/>
-                            </h:inputHidden>
+                    <h:inputHidden id="marDate" value="#{rH_Mark.marDate}" >
+                        <!--<s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>-->
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:inputHidden>
+                    <h:inputHidden id="marTime" value="#{rH_Mark.marTime}" >
+                        <f:convertDateTime pattern="#{messages['patterns.time']}" timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputHidden>
 
 
 
