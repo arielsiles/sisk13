@@ -1,5 +1,6 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -9,6 +10,7 @@ import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.AccountService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -40,6 +42,8 @@ public class AccountAction extends GenericAction<Account> {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     private FinancesExchangeRateService financesExchangeRateService;
+    @In
+    private SequenceGeneratorService sequenceGeneratorService;
 
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
 
@@ -85,6 +89,26 @@ public class AccountAction extends GenericAction<Account> {
         calculateTotalAmounts(instance);
         return super.select(instance);
 
+    }
+
+    @End
+    @Override
+    public String create() {
+        try {
+            getInstance().setAccountNumber(generateAccountNumber());
+            getService().create(getInstance());
+            addCreatedMessage();
+            return Outcome.SUCCESS;
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+            return Outcome.REDISPLAY;
+        }
+    }
+
+
+    public String generateAccountNumber(){
+        String result = String.valueOf(sequenceGeneratorService.nextValue(Constants.SAVINGS_ACCOUNT_NUMBER));
+        return result;
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)

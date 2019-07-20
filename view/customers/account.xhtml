@@ -86,16 +86,16 @@
                                          clearAction="#{accountAction.clearPartner()}"
                                          searchModalPanel="partnerListModalPanel"
                                          dataModel="#{partnerDataModel}"
-                                         reRender="partnerField"
+                                         reRender="partnerField" styleClass="input"
                                          tabindex="12">
                         </app:selectPopUp>
                     </s:decorate>
 
 
-                    <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{accountAction.managed}">
                         <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
-                        <h:inputText id="accountNumber" value="#{account.accountNumber}" styleClass="input"
-                                     maxlength="25" tabindex="2" required="true"/>
+                        <h:outputText id="accountNumber" styleClass="input"
+                                     value="#{account.accountNumber}"  />
                     </s:decorate>
 
                     <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">

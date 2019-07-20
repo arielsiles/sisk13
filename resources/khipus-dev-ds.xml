@@ -61,9 +61,12 @@
         </exception-sorter-class-name>
     </local-tx-datasource>-->
 
+    <!-- FOR DEVELOPMENT -->
+
+    <!-- FOR F.LECHERO DEV-->
     <local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
-        <connection-url>jdbc:mysql://localhost:3306/caiscdev</connection-url>
+        <connection-url>jdbc:mysql://localhost:3306/erp_lechdev</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
         <user-name>admin</user-name>
         <password>Cisc.13</password>
@@ -75,9 +78,10 @@
         </exception-sorter-class-name>
     </local-tx-datasource>
 
+    <!-- FOR ILVA DEV-->
     <!--<local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
-        <connection-url>jdbc:mysql://localhost:3306/khipusdev</connection-url>
+        <connection-url>jdbc:mysql://localhost:3306/erp_ilvadev</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
         <user-name>admin</user-name>
         <password>Cisc.13</password>
