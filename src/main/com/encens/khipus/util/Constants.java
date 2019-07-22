@@ -47,10 +47,18 @@ public final class Constants {
     /** For Development **/
 
     //Schema for F. Lechero
-    public static final String KHIPUS_SCHEMA    = "erp_lechdev";
+    /*public static final String KHIPUS_SCHEMA    = "erp_lechdev";
     public static final String FINANCES_SCHEMA  = "erp_lechdev";
     public static final String CASHBOX_SCHEMA   = "erp_lechdev";
-    public static final String ACADEMIC_SCHEMA  = "erp_lechdev";
+    public static final String ACADEMIC_SCHEMA  = "erp_lechdev";*/
+
+    //Schema for ILVA
+    public static final String KHIPUS_SCHEMA    = "erp_ilvadev";
+    public static final String FINANCES_SCHEMA  = "erp_ilvadev";
+    public static final String CASHBOX_SCHEMA   = "erp_ilvadev";
+    public static final String ACADEMIC_SCHEMA  = "erp_ilvadev";
+
+    /** ------ **/
 
     public static final String SEQUENCE_TABLE_NAME = "secuencia";
     public static final String SEQUENCE_TABLE_PK_COLUMN_NAME = "tabla";

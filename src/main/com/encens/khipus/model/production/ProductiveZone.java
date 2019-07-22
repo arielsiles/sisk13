@@ -33,22 +33,24 @@ import java.util.List;
         )
 })
 
-@TableGenerator(name = "ProductiveZone_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PRODUCTIVEZONE",
+@TableGenerator(name = "ProductiveZone.tableGenerator",
+        table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "ZONAPRODUCTIVA",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "ZONAPRODUCTIVA", uniqueConstraints = @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"}))
+@Table( schema = Constants.KHIPUS_SCHEMA,
+        name = "ZONAPRODUCTIVA",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class ProductiveZone implements BaseModel {
 
     @Id
     @Column(name = "IDZONAPRODUCTIVA", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductiveZone_Generator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductiveZone.tableGenerator")
     private Long id;
 
     @Column(name = "NUMERO", nullable = false, length = 20)
