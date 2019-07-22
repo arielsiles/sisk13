@@ -344,14 +344,17 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         for (ProductionPlan productionPlan : productionPlanList){
             System.out.println("-.-.-.-.-.-.-.-.-.----> Plan: " + productionPlan.getDate());
             for (Production production : productionPlan.getProductionList()){
+                BigDecimal productionTotalCost = BigDecimal.ZERO;
                 for (ProductionProduct product : production.getProductionProductList()){
                     BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
                                 productCost = BigDecimalUtil.sum(productCost, product.getCostC(), 2);
 
                     product.setCost(productCost);
                     product.setUnitCost(BigDecimalUtil.divide(productCost, product.getQuantity(), 2));
+                    productionTotalCost = BigDecimalUtil.sum(productionTotalCost, productCost);
                 }
                 production.setState(ProductionState.FIN);
+                production.setTotalCost(productionTotalCost);
                 productionService.updateProduction(production, emptyList, emptyList);
             }
             productionPlan.setState(ProductionPlanState.FIN);
