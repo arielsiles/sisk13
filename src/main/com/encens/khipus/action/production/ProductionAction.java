@@ -121,6 +121,7 @@ public class ProductionAction extends GenericAction<Production> {
 
         for (ProductionProduct product : getInstance().getProductionProductList()){
             BigDecimal productCost = BigDecimal.ZERO;
+            /** Calcula para los insumos asignados a un producto especifico **/
             for (Supply ingredient : this.ingredientSupplyList){
                 if (ingredient.getProductionProduct() != null) {
                     System.out.println("***Yes 1: " + ingredient.getProductionProduct().getProductItemCode());
@@ -135,6 +136,7 @@ public class ProductionAction extends GenericAction<Production> {
                 }
             }
 
+            /** Calcula para los materiales asignados a un producto especifico **/
             for (Supply material : this.materialSupplyList){
                 if (material.getProductionProduct() != null) {
                     System.out.println("***Yesss 1: " + material.getProductionProduct().getProductItemCode());
@@ -162,6 +164,9 @@ public class ProductionAction extends GenericAction<Production> {
             }
         }
 
+        System.out.println("====> TOTAL INGREDIENT: " + remainingCost);
+        System.out.println("====> TOTAL remainingCost: " + remainingCost);
+
         for (Supply material : this.materialSupplyList){
             if (material.getProductionProduct() == null) {
                 BigDecimal materialCost = BigDecimalUtil.multiply(material.getQuantity(), material.getUnitCost(), 6);
@@ -169,10 +174,12 @@ public class ProductionAction extends GenericAction<Production> {
                 remainingCost = BigDecimalUtil.roundBigDecimal(remainingCost, 2);
             }
         }
+        System.out.println("====> TOTAL remainingCost: " + remainingCost);
         /** end **/
 
         /** Calculando volumen total de lo productos */
         BigDecimal totalVolume = calculateTotalVolume(getInstance());
+        System.out.println("====> TOTAL VOLUME: " + totalVolume);
 
         for (ProductionProduct product : getInstance().getProductionProductList()){
             BigDecimal productCost = BigDecimal.ZERO;
@@ -180,7 +187,12 @@ public class ProductionAction extends GenericAction<Production> {
             BigDecimal productPercentage = BigDecimalUtil.multiply(productVolume, BigDecimalUtil.toBigDecimal(100), 2);
                        productPercentage = BigDecimalUtil.divide(productPercentage, totalVolume, 2);
 
-            productCost = BigDecimalUtil.multiply(remainingCost, BigDecimalUtil.toBigDecimal(productPercentage.doubleValue()/100), 2);
+                       productPercentage = BigDecimalUtil.divide(productPercentage, BigDecimalUtil.ONE_HUNDRED, 6);
+
+            productCost = BigDecimalUtil.multiply(remainingCost, productPercentage, 2);
+            System.out.println("====> TOTAL VOLUME producto: " +
+                    product.getProductItem().getFullName() + " : " +
+                    productPercentage + " x " + remainingCost + " = " + productCost);
             product.setCostB(productCost);
         }
 
@@ -207,11 +219,11 @@ public class ProductionAction extends GenericAction<Production> {
     public void updateUnitCostProducts(Production production){
 
         for (ProductionProduct product : production.getProductionProductList()){
-            BigDecimal totalCostProcuct = BigDecimal.ZERO;
-            totalCostProcuct = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
-            totalCostProcuct = BigDecimalUtil.sum(totalCostProcuct, product.getCostC(), 2);
-            product.setCost(totalCostProcuct);
-            product.setUnitCost(BigDecimalUtil.divide(totalCostProcuct, product.getQuantity(), 2));
+            BigDecimal totalCostProduct = BigDecimal.ZERO;
+            totalCostProduct = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
+            totalCostProduct = BigDecimalUtil.sum(totalCostProduct, product.getCostC(), 2);
+            product.setCost(totalCostProduct);
+            product.setUnitCost(BigDecimalUtil.divide(totalCostProduct, product.getQuantity(), 2));
         }
 
     }

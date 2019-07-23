@@ -129,17 +129,22 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         System.out.println("------> COSTOS INDIRECTOS <-------");
         BigDecimal totalIndirectCostValue = indirectCostsService.getTotalIndirectCostByPeriod(periodIndirectCost);
+        System.out.println("Total Costo indirecto: " + totalIndirectCostValue);
         List<IndirectAux> indirectAuxList = new ArrayList<IndirectAux>();
         List<IndirectCosts> indirectCostList = periodIndirectCost.getIndirectCostList();
         /** Calcula Lista de costos indirectos con porcentajes **/
+        Double test = 0.0;
         for (IndirectCosts param : indirectCostList){
+            System.out.println("===> costo indirecto bs: " + param.getAmountBs());
             BigDecimal aux        = BigDecimalUtil.multiply(param.getAmountBs(), BigDecimalUtil.toBigDecimal(100), 6);
             BigDecimal percentage = BigDecimalUtil.divide(aux, totalIndirectCostValue, 4);
+            System.out.println("===> percentage: " + percentage);
             IndirectAux indirect  = new IndirectAux(param.getCostsConifg().getAccount(), param.getAmountBs(), percentage, BigDecimal.ZERO);
             indirectAuxList.add(indirect);
+            test = test + param.getAmountBs().doubleValue();
         }
 
-        /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/
+        /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/ // ??? no es necesario
         for (ProductionPlan productionPlan : productionPlanList){
             for (Production production : productionPlan.getProductionList()){
                 for (ProductionProduct product : production.getProductionProductList()){
@@ -153,6 +158,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                 }
             }
         }
+
+        /** sout **/
+        System.out.println("-------INDIRECT AUX LIST------");
+        for (IndirectAux indirectAux : indirectAuxList){
+            System.out.println("----> " + indirectAux.getAccountCode() + " - " + indirectAux.getAmount() + " - " + indirectAux.getPercentage() + " - " + indirectAux.getValue());
+        }
+
 
         List<DataVoucherDetail> dataVoucherDetailList = new ArrayList<DataVoucherDetail>();
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -171,7 +183,13 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                     BigDecimal productionCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 6);
                                productionCost = BigDecimalUtil.sum(productionCost, product.getCostC(), 6);
 
-                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(production.getCode().toString(), companyConfiguration.getCtaAlmPT(), productionCost, BigDecimal.ZERO, product.getProductItemCode());
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                            production.getCode().toString(),
+                            companyConfiguration.getCtaAlmPT(),
+                            productionCost,
+                            BigDecimal.ZERO,
+                            product.getProductItemCode(),
+                            product.getQuantity());
                     dataVoucherDetailList.add(dataVoucherDetail);
 
                     VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
@@ -184,7 +202,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                             production.getCode().toString(),
                             supply.getProductItem().getCashAccount(),
                             BigDecimal.ZERO,
-                            BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6), null);
+                            BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6), null, null);
                     dataVoucherDetailList.add(dataVoucherDetail);
 
                     VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
@@ -192,19 +210,41 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
                 }
 
-                for (IndirectAux indirect : indirectAuxList){
+                /*for (IndirectAux indirect : indirectAuxList){
                     BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.toBigDecimal(100), 6);
                     BigDecimal amount     = BigDecimal.ZERO;
                     for (ProductionProduct product : production.getProductionProductList()){
                         BigDecimal aux = BigDecimalUtil.multiply(product.getCostC(), percentage, 6);
                         amount = BigDecimalUtil.sum(amount, aux, 6);
                     }
-                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(production.getCode().toString(), cashAccountService.findByAccountCode(indirect.getAccountCode()), BigDecimal.ZERO, amount, null);
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                            production.getCode().toString(),
+                            cashAccountService.findByAccountCode(indirect.getAccountCode()),
+                            BigDecimal.ZERO, amount, null);
                     dataVoucherDetailList.add(dataVoucherDetail);
 
                     VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
                     voucher.getDetails().add(voucherDetail);
 
+                }*/
+
+                for (IndirectAux indirect : indirectAuxList){
+                    BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.ONE_HUNDRED, 6);
+                    BigDecimal totalCostC     = BigDecimal.ZERO;
+                    for (ProductionProduct product : production.getProductionProductList()){
+                        totalCostC = BigDecimalUtil.sum(totalCostC, product.getCostC(), 6);
+                    }
+
+                    BigDecimal amount = BigDecimalUtil.multiply(percentage, totalCostC);
+
+                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                            production.getCode().toString(),
+                            cashAccountService.findByAccountCode(indirect.getAccountCode()),
+                            BigDecimal.ZERO, amount, null, null);
+                    dataVoucherDetailList.add(dataVoucherDetail);
+
+                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                    voucher.getDetails().add(voucherDetail);
                 }
 
                 /** Si existe ajusta diferencia de montos del asiento generado **/
@@ -257,6 +297,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         voucherDetail.setDebitMe(BigDecimal.ZERO);
         voucherDetail.setCreditMe(BigDecimal.ZERO);
         voucherDetail.setProductItemCode(data.getProductItemCode());
+        voucherDetail.setQuantityArt(data.getQuantity());
         return voucherDetail;
     }
 
@@ -316,6 +357,18 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             return;
         }
         /** End Para verificar si las ordenes de produccion estan aprobadas **/
+
+
+
+        /**  test **/
+        for (ProductionPlan productionPlan : productionPlanList){
+            for (Production production : productionPlan.getProductionList()){
+                productionAction.select(production);
+                productionAction.approve();
+                System.out.println("-------> aprobando: " + production.getCode());
+            }
+        }
+
 
 
         this.totalVolumePeriod = totalVolume;
@@ -612,13 +665,15 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         private BigDecimal debit;
         private BigDecimal credit;
         private String productItemCode;
+        private BigDecimal quantity;
 
-        DataVoucherDetail(String productionCode, CashAccount cashAccount, BigDecimal debit, BigDecimal credit, String productItemCode){
+        DataVoucherDetail(String productionCode, CashAccount cashAccount, BigDecimal debit, BigDecimal credit, String productItemCode, BigDecimal quantity){
             this.setProductionCode(productionCode);
             this.setCashAccount(cashAccount);
             this.setDebit(debit);
             this.setCredit(credit);
             this.setProductItemCode(productItemCode);
+            this.setQuantity(quantity);
         }
 
 
@@ -660,6 +715,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
         public void setProductItemCode(String productItemCode) {
             this.productItemCode = productItemCode;
+        }
+
+        public BigDecimal getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(BigDecimal quantity) {
+            this.quantity = quantity;
         }
     }
 
