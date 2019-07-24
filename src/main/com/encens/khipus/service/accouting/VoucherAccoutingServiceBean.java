@@ -1129,6 +1129,15 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 " AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL) " +
                 " GROUP BY d.cod_art " +
                 " UNION " +
+                " " + /** Entradas de produccion 2 **/
+                " SELECT d.cod_art, SUM(d.debe) AS debe, 0 AS haber, SUM(d.cant_art) cant_d, 0 AS cant_h " +
+                " FROM sf_tmpdet d " +
+                " LEFT JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
+                " WHERE e.fecha BETWEEN :startDate AND :endDate " +
+                " AND d.cuenta = '1510110201' " +
+                " AND d.debe > 0 " +
+                " GROUP BY d.cod_art " +
+                " UNION " +
                 " " + /** Transferencias, Bajas, Devoluciones **/
                 " SELECT d. cod_art , SUM(t. debe ) AS debe, SUM(t. haber ) AS haber, SUM(IF(t.debe>0, d.cantidad, 0)) AS cant_d, SUM(IF(t.haber>0, d.cantidad, 0)) AS cant_h " +
                 " FROM inv_movdet d " +
