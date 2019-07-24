@@ -21,30 +21,6 @@
                     #{messages['Reports.kardex.valuedPhysicalInventory.titleReport']}
                 </f:facet>
 
-                <!--<s:decorate id="warehouseField"
-                            template="/include/inputField.xhtml"
-                            styleClass="formRow">
-                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
-                    <app:quickSearch id="quickSearchWarehouse"
-                                     textValue="productInventoryReportAction.warehouse.warehouseCode"
-                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
-                                     searchField="warehouseCode"
-                                     alias="warehouse"
-                                     reRender="warehouseField"
-                                     tabindex="3">
-
-                    </app:quickSearch>
-                    <app:selectPopUp id="warehouse"
-                                     textValue="#{valuedPhysicalInventoryReportAction.warehouse.name}"
-                                     value="#{valuedPhysicalInventoryReportAction.warehouse}"
-                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
-                                     clearAction="valuedPhysicalInventoryReportAction.cleanWarehouseField()"
-                                     searchModalPanel="warehouseModalPanel"
-                                     dataModel="#{warehouseSearchDataModel}"
-                                     reRender="warehouseField"
-                                     hotKeySelect="alt+1"/>
-                </s:decorate>-->
-
                 <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
                     <rich:calendar id="startDate"
@@ -76,20 +52,6 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <!--<s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
-                    <app:selectPopUp id="itemAccount"
-                                     required="false"
-                                     textValue="#{valuedPhysicalInventoryReportAction.cashAccount.fullName}"
-                                     value="#{valuedPhysicalInventoryReportAction.cashAccount}"
-                                     clearAction="#{valuedPhysicalInventoryReportAction.clearAccount()}"
-                                     searchModalPanel="cashAccountListModalPanel"
-                                     dataModel="#{cashAccountDataModel}"
-                                     reRender="itemAccountField"
-                                     tabindex="3">
-                    </app:selectPopUp>
-                </s:decorate>-->
-
                 <s:decorate id="warehouseField"
                             template="/include/inputField.xhtml"
                             styleClass="formRow">
@@ -115,25 +77,19 @@
 
                 <div class="buttons">
 
-                    <h:commandButton action="#{valuedPhysicalInventoryReportAction.transferInventoryPeriod}"
-                                     styleClass="button"
-                                     value="#{messages['Common.transfer']}" id="TransferButtonId" tabindex="4">
-                        <s:defaultAction/>
-                    </h:commandButton>
-
                     <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReport}"
                                      styleClass="button"
-                                     value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                        <s:defaultAction/>
+                                     value="#{messages['Common.generate']}" id="generateButtonId" tabindex="1">
+                    </h:commandButton>
+
+                    <h:commandButton id="TransferButtonId" styleClass="button" rendered="#{s:hasPermission('TRANSFER_INVENTORY','VIEW')}"
+                                     value="#{messages['ProductInventory.transferNextPeriod']}" tabindex="2">
+                        <rich:componentControl for="processConfirmation" event="onclick"  disableDefault="true" operation="show"/>
                     </h:commandButton>
 
                 </div>
 
             </rich:panel>
-
-            <!--<app:reportDefaultOptions reportAction="#{valuedPhysicalInventoryReportAction}" showPageFormat="false"
-                                          tabIndex="3"
-                                      showReportTitle="false"/>-->
 
         </h:form>
 
@@ -151,15 +107,23 @@
             </ui:define>
         </s:decorate>
 
-        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
-        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
-            <ui:param name="dialogId" value="progressModalPanel"/>
-            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
-            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+        <s:decorate template="/include/modalDialog.xhtml" >
+            <ui:param name="dialogId" value="processConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
             <ui:define name="dialogContent">
                 <p>
-                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                    <h:outputFormat value="#{messages['ProductInventory.transferNextPeriodMessage']}" />
                 </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{valuedPhysicalInventoryReportAction.transferInventoryPeriod}"
+                                   value="#{messages['Common.process']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   reRender="productInventoryReportForm"
+                                   tabindex="1000">
+                    <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+                </a4j:commandButton>
             </ui:define>
         </s:decorate>
 

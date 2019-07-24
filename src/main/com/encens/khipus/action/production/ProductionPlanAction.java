@@ -25,6 +25,7 @@ import org.jboss.seam.international.StatusMessage;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -198,35 +199,52 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                 }
 
                 for (Supply supply : production.getSupplyList()){
-                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
-                            production.getCode().toString(),
-                            supply.getProductItem().getCashAccount(),
-                            BigDecimal.ZERO,
-                            BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6), null, null);
-                    dataVoucherDetailList.add(dataVoucherDetail);
 
-                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
-                    voucher.getDetails().add(voucherDetail);
+                    if (supply.hasFormula() && supply.getFormulationInput().hasSecondFormula()){
 
-                }
+                            BigDecimal quantityParam = supply.getQuantity();
+                            Formulation formulation = supply.getFormulationInput().getSecondFormulation();
+                            HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
+                            for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+                                BigDecimal quantityVal = formulationInput.getQuantity();
+                                formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
+                            }
 
-                /*for (IndirectAux indirect : indirectAuxList){
-                    BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.toBigDecimal(100), 6);
-                    BigDecimal amount     = BigDecimal.ZERO;
-                    for (ProductionProduct product : production.getProductionProductList()){
-                        BigDecimal aux = BigDecimalUtil.multiply(product.getCostC(), percentage, 6);
-                        amount = BigDecimalUtil.sum(amount, aux, 6);
+                            for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+                                BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
+                                BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
+                                newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
+
+                                BigDecimal cost = BigDecimalUtil.multiply(newQuantity, formulationInput.getProductItem().getUnitCost(), 6);
+
+                                //totalCost = BigDecimalUtil.sum(totalCost, cost, 6);
+                                //System.out.println("=======> " + formulationInput.getProductItem().getFullName() + " - " + newQuantity + " - " + cost);
+
+                                DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                                        production.getCode().toString(),
+                                        //supply.getProductItem().getCashAccount(),
+                                        formulationInput.getProductItem().getCashAccount(),
+                                        BigDecimal.ZERO,
+                                        //BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6),
+                                        cost,
+                                        null, null);
+                                dataVoucherDetailList.add(dataVoucherDetail);
+
+                                VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                                voucher.getDetails().add(voucherDetail);
+                            }
+                    }else {
+                        DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
+                                production.getCode().toString(),
+                                supply.getProductItem().getCashAccount(),
+                                BigDecimal.ZERO,
+                                BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6), null, null);
+                        dataVoucherDetailList.add(dataVoucherDetail);
+
+                        VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
+                        voucher.getDetails().add(voucherDetail);
                     }
-                    DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
-                            production.getCode().toString(),
-                            cashAccountService.findByAccountCode(indirect.getAccountCode()),
-                            BigDecimal.ZERO, amount, null);
-                    dataVoucherDetailList.add(dataVoucherDetail);
-
-                    VoucherDetail voucherDetail = createVoucherDetail(dataVoucherDetail);
-                    voucher.getDetails().add(voucherDetail);
-
-                }*/
+                }
 
                 for (IndirectAux indirect : indirectAuxList){
                     BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.ONE_HUNDRED, 6);
