@@ -102,6 +102,11 @@
                            required="true">
             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
             </rich:calendar>
+
+            <rich:spacer width="5" />
+
+            <h:inputText id="number" value="#{voucherCreateAction.voucher.number}" styleClass="inputTiny" />
+
         </s:decorate>
 
         <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">

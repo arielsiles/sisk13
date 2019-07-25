@@ -38,6 +38,18 @@
                            reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
+        <a4j:commandButton id="addProductCommandButton"
+                           action="#{productionProductAssignedDataModel.reset()}"
+                           value="Add product"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           reRender="productItemsByAssignmentListModalPanel">
+            <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
+        </a4j:commandButton>
+
         <a4j:commandButton id="addMaterialCommandButton"
                            action="#{productItemByWarehouseDataModel.reset()}"
                            value="#{messages['Production.addMaterial']}"
@@ -452,6 +464,25 @@
     </rich:panel>
 
 </h:form>
+
+    <!-- Test -->
+    <!--<s:decorate id="productItemsByAssignmentListModalPanelContainer"
+                template="/production/productItemsByAssignmentListModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemsByAssignmentListModalPanel"/>
+        <ui:define name="addButton">
+            <a4j:commandButton id="addButton"
+                               immediate="true"
+                               ajaxSingle="true"
+
+                               value="#{messages['Common.add']}"
+                               reRender="materialPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('productItemsByAssignmentListModalPanel');"/>
+        </ui:define>
+    </s:decorate>-->
+    <!-- test -->
+
 
     <s:decorate id="productItemsByWarehouseListModalPanelContainer"
                 template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">

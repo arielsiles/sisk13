@@ -180,6 +180,11 @@ public class Voucher implements BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "voucher")
     private List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>(0);
 
+
+    @Column(name = "ndoc", length = 20)
+    @Length(max = 20)
+    private String number;
+
     @Transient
     private List<VoucherDetail> details = new ArrayList<VoucherDetail>(0);
 
@@ -516,6 +521,14 @@ public class Voucher implements BaseModel{
 
     public String getFullDocument(){
         return getDocumentType() + " " + getDocumentNumber();
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     /*@Override
