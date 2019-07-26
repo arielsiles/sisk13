@@ -400,6 +400,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public String approveVoucher(){
         voucher.setState(VoucherState.APR.toString());
+
+        if (voucher.getNumber() != null)
+            voucher.setDocumentNumber(voucher.getNumber());
+
         voucherAccoutingService.approveVoucher(voucher);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.approveAccountingEntry");
         return APPROVED_OUTCOME;
