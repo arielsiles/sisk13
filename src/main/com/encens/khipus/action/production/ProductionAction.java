@@ -33,6 +33,8 @@ public class ProductionAction extends GenericAction<Production> {
     //private BigDecimal totalCost;
     //private BigDecimal totalRawMaterial;
 
+    private Supply supplyAssign;
+
     @In
     private ProductionPlanAction productionPlanAction;
 
@@ -335,6 +337,16 @@ public class ProductionAction extends GenericAction<Production> {
         addMaterialDefault(product, product.getQuantity());
     }
 
+    public void assignSupply(Supply supply){
+        setSupplyAssign(supply);
+    }
+
+    public void assignProductAffect(){
+
+        System.out.println("============> Afecta: " + supplyAssign.getProductItem().getFullName());
+
+    }
+
     private void addMaterialDefault(ProductionProduct product, BigDecimal quantity){
 
         List<MaterialInput> materialInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
@@ -585,6 +597,14 @@ public class ProductionAction extends GenericAction<Production> {
 
     public void setMaterialSupplyList(List<Supply> materialSupplyList) {
         this.materialSupplyList = materialSupplyList;
+    }
+
+    public Supply getSupplyAssign() {
+        return supplyAssign;
+    }
+
+    public void setSupplyAssign(Supply supplyAssign) {
+        this.supplyAssign = supplyAssign;
     }
 
     /*public BigDecimal getTotalCost() {

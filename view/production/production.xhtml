@@ -38,7 +38,7 @@
                            reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
-        <a4j:commandButton id="addProductCommandButton"
+        <!--<a4j:commandButton id="addProductCommandButton"
                            action="#{productionProductAssignedDataModel.reset()}"
                            value="Add product"
                            styleClass="button"
@@ -48,7 +48,7 @@
                            rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="productItemsByAssignmentListModalPanel">
             <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
-        </a4j:commandButton>
+        </a4j:commandButton>-->
 
         <a4j:commandButton id="addMaterialCommandButton"
                            action="#{productItemByWarehouseDataModel.reset()}"
@@ -265,6 +265,8 @@
                     <c:forEach var="supplyDetail" items="#{productionAction.ingredientSupplyList}" varStatus="row">
                         <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
                         <c:set var="productInputFieldId" value="productInputField_#{row.index}"/>
+                        <c:set var="productItemsByAssignmentListModalPanelContainerFieldId" value="productItemsByAssignmentListModalPanelContainerField_#{row.index}"/>
+                        <c:set var="addButtonFieldId" value="addButtonField_#{row.index}"/>
 
                         <tr class="rich-table-row" style="#{productionAction.hasFormula(supplyDetail)?'background-color: lightyellow':'' }">
                             <td class="rich-table-cell">
@@ -307,6 +309,33 @@
                                                    hideNoSelectionLabel="false"/>
                                     <s:convertEntity/>
                                 </h:selectOneMenu>
+
+                                <a4j:commandButton
+                                        action="#{productionAction.assignSupply(supplyDetail)}"
+                                        value="Add product"
+                                        styleClass="button"
+                                        immediate="true"
+                                        oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
+                                        actionListener="#{selectPopUpAction.select}"
+                                        reRender="productItemsByAssignmentListModalPanel">
+                                    <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
+                                </a4j:commandButton>
+
+                                <!--<s:decorate id="#{productItemsByAssignmentListModalPanelContainerFieldId}" template="/production/productItemsByAssignmentListModalPanel.xhtml">
+                                    <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
+                                    <ui:param name="dialogId" value="productItemsByAssignmentListModalPanel"/>
+                                    <ui:define name="addButton">
+                                        <a4j:commandButton id="addButton"
+                                                           immediate="true"
+                                                           ajaxSingle="true"
+                                                           action="#{productionAction.assignProductAffect(supplyDetail)}"
+                                                           value="#{messages['Common.add']}"
+                                                           reRender="materialPanel"
+                                                           styleClass="button"
+                                                           oncomplete="Richfaces.hideModalPanel('productItemsByAssignmentListModalPanel');"/>
+                                    </ui:define>
+                                </s:decorate>-->
+
                             </td>
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
@@ -385,7 +414,7 @@
                                                noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
                                                hideNoSelectionLabel="false"/>
                                 <s:convertEntity/>
-                            </h:selectOneMenu>
+                                </h:selectOneMenu>
                             </td>
                             <td class="rich-table-cell center">
                                 <!-- todo -->
@@ -466,7 +495,7 @@
 </h:form>
 
     <!-- Test -->
-    <!--<s:decorate id="productItemsByAssignmentListModalPanelContainer"
+    <s:decorate id="productItemsByAssignmentListModalPanelContainer"
                 template="/production/productItemsByAssignmentListModalPanel.xhtml">
         <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
         <ui:param name="dialogId" value="productItemsByAssignmentListModalPanel"/>
@@ -474,13 +503,13 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-
+                               action="#{productionAction.assignProductAffect()}"
                                value="#{messages['Common.add']}"
                                reRender="materialPanel"
                                styleClass="button"
                                oncomplete="Richfaces.hideModalPanel('productItemsByAssignmentListModalPanel');"/>
         </ui:define>
-    </s:decorate>-->
+    </s:decorate>
     <!-- test -->
 
 

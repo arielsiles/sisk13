@@ -1,23 +1,23 @@
 /** 25.07.2019 **/
-CREATE TABLE pr_prodafectado(
-	idprodafectado BIGINT(20) NOT NULL,
-	idinsumo BIGINT(20) NOT NULL,
-	idproducto BIGINT(20) NOT NULL,
-	VERSION BIGINT(20) NOT NULL,
-	idcompania BIGINT(20) NOT NULL,
-	PRIMARY KEY(idprodafectado)	
+create table pr_prodafectado(
+	idprodafectado bigint(20) not null,
+	idinsumo bigint(20) not null,
+	idproducto bigint(20) not null,
+	VERSION bigint(20) not null,
+	idcompania bigint(20) not null,
+	primary key(idprodafectado)	
 );
 
-ALTER TABLE pr_prodafectado ADD FOREIGN KEY (idinsumo) REFERENCES pr_insumo (idinsumo);
-ALTER TABLE pr_prodafectado ADD FOREIGN KEY (idproducto) REFERENCES pr_producto (idproducto);
-ALTER TABLE pr_prodafectado ADD FOREIGN KEY (idcompania) REFERENCES compania (idcompania);
+alter table pr_prodafectado add foreign key (idinsumo) references pr_insumo (idinsumo);
+alter table pr_prodafectado add foreign key (idproducto) references pr_producto (idproducto);
+alter table pr_prodafectado add foreign key (idcompania) references compania (idcompania);
 
-ALTER TABLE sf_tmpenc ADD COLUMN ndoc VARCHAR(20) NULL;
+alter table sf_tmpenc add column ndoc varchar(20) null;
 
 --
 
-UPDATE socio s SET s.`nombres` = TRIM(s.`nombres`), s.`apellidopaterno` = TRIM(s.`apellidopaterno`), s.`apellidomaterno` = TRIM(s.`apellidomaterno`)
-UPDATE credito c SET c.`codigoant` = TRIM(c.`codigoant`)
+update socio s set s.`nombres` = TRIM(s.`nombres`), s.`apellidopaterno` = TRIM(s.`apellidopaterno`), s.`apellidomaterno` = TRIM(s.`apellidomaterno`);
+update credito c set c.`codigoant` = TRIM(c.`codigoant`);
 
 /* Solo para F. LECHERO
 update credito set codigoant = 	'51-025-03'	 where idcredito = 	76	;
@@ -43,16 +43,16 @@ update credito set codigoant = 	'04-099-07'	 where idcredito = 	283	;
 
 --
 -- Actualizando Glosa de desmbolso credito
-UPDATE sf_tmpenc e
-JOIN sf_tmpdet d ON e.`id_tmpenc` = d.`id_tmpenc`
-JOIN credito c ON d.`idcredito` = c.`idcredito`
-JOIN socio s ON c.`idsocio` = s.`idsocio`
-SET e.`glosa` = CONCAT(s.`nombres`,' ', s.`apellidopaterno`, ' ', s.`apellidomaterno`, ' ', c.`codigoant`, ', ', e.`glosa`)
-WHERE e.`tipo_doc` = 'CE'
+update sf_tmpenc e
+join sf_tmpdet d on e.`id_tmpenc` = d.`id_tmpenc`
+join credito c on d.`idcredito` = c.`idcredito`
+join socio s on c.`idsocio` = s.`idsocio`
+set e.`glosa` = CONCAT(s.`nombres`,' ', s.`apellidopaterno`, ' ', s.`apellidomaterno`, ' ', c.`codigoant`, ', ', e.`glosa`)
+where e.`tipo_doc` = 'CE'
 ;
 -- Actualizando fecha de asientos , transaccion credito
-UPDATE sf_tmpenc e 
-JOIN transaccioncredito t ON e.`id_tmpenc` = t.`id_tmpenc`
-SET e.`fecha` = t.`fechatransaccion`
+update sf_tmpenc e 
+join transaccioncredito t on e.`id_tmpenc` = t.`id_tmpenc`
+set e.`fecha` = t.`fechatransaccion`
 ;
 
