@@ -1585,7 +1585,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "WHERE d.cuenta = :cashAccount " +
                 "AND e.fecha BETWEEN :startDate AND :endDate " +
                 "AND e.estado <> 'ANL' " +
-                "GROUP BY d.cod_art, a.descri, a.cod_med ")
+                "GROUP BY d.cod_art, a.descri, a.cod_med order by a.descri")
         .setParameter("cashAccount", cashAccount.getAccountCode())
         .setParameter("startDate", startDate)
         .setParameter("endDate", endDate).getResultList();
