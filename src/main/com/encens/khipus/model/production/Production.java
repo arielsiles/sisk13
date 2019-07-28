@@ -3,6 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.finances.Voucher;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -68,6 +69,10 @@ public class Production implements BaseModel {
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>(0);
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tmpenc")
+    private Voucher voucher;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -179,5 +184,13 @@ public class Production implements BaseModel {
 
     public void setTotalRawMaterial(BigDecimal totalRawMaterial) {
         this.totalRawMaterial = totalRawMaterial;
+    }
+
+    public Voucher getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
     }
 }
