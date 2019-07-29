@@ -107,7 +107,7 @@ public class VoucherReportAction extends GenericReportAction {
             e.printStackTrace();
         }
 
-        String title = companyConfiguration.getTitle();
+        String companyTitle = companyConfiguration.getTitle();
         String subTitle = companyConfiguration.getSubTitle();
 
         BigDecimal totalD = voucherCreateAction.getTotalsDebit();
@@ -121,7 +121,7 @@ public class VoucherReportAction extends GenericReportAction {
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
-        reportParameters.put("title", title);
+        reportParameters.put("companyTitle", companyTitle);
         reportParameters.put("subTitle", subTitle);
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
