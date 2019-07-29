@@ -96,11 +96,16 @@ public class VoucherReportAction extends GenericReportAction {
 
     }
 
-    public void generateReport(Voucher voucher) throws CompanyConfigurationNotFoundException {
+    public void generateReport(Voucher voucher) {
         voucherId = voucher.getId();
         this.voucher = voucher;
 
-        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            e.printStackTrace();
+        }
 
         String title = companyConfiguration.getTitle();
         String subTitle = companyConfiguration.getSubTitle();
