@@ -38,6 +38,12 @@ public class CompanyConfiguration {
     @Column(name = "NO_CIA", nullable = false, updatable = false)
     private String companyNumber;
 
+    @Column(name = "TITULO")
+    private String title;
+
+    @Column(name = "SUBTITULO")
+    private String subTitle;
+
     @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1209,5 +1215,21 @@ public class CompanyConfiguration {
 
     public void setGeneralCashAccountNational(CashAccount generalCashAccountNational) {
         this.generalCashAccountNational = generalCashAccountNational;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 }

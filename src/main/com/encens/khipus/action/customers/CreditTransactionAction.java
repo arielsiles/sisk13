@@ -159,7 +159,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 creditTransaction.getCredit().getState().equals(CreditState.EJE)    ){
 
             Voucher voucher = new Voucher();
-            voucher.setDocumentType(Constants.RI_VOUCHER_DOCTYPE);
+            voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
 
             VoucherDetail voucherDetailBox = new VoucherDetail();
             VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
@@ -204,7 +204,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 }
 
             }else {
-                voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+                voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH); /** todo **/
                 voucherDetailBox.setDebit(creditTransaction.getAmount());
                 voucherDetailBox.setCredit(BigDecimal.ZERO);
             }

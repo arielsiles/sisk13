@@ -7,7 +7,7 @@
 
     <factory name="voucherDocumentTypeList" value="#{voucherDocumentTypeQuery}"/>
     <framework:entity-query name="voucherDocumentTypeQuery"
-                            ejbql="select docType from DocType docType">
+                            ejbql="select docType from DocType docType order by docType.name asc">
     </framework:entity-query>
 
     <!--Enumerations-->

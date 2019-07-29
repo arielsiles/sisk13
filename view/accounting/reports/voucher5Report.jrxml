@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voucherReport" pageWidth="611" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="561" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.VoucherReportScriptlet">
-	<property name="ireport.zoom" value="1.9487171000000025"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="5.559917313492245"/>
+	<property name="ireport.x" value="123"/>
+	<property name="ireport.y" value="112"/>
 	<parameter name="totalD" class="java.math.BigDecimal"/>
 	<parameter name="totalC" class="java.math.BigDecimal"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="literalAmount" class="java.lang.String"/>
+	<parameter name="title" class="java.lang.String"/>
+	<parameter name="subTitle" class="java.lang.String"/>
 	<field name="voucher" class="com.encens.khipus.model.finances.Voucher">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -193,20 +195,20 @@
 			</frame>
 			<frame>
 				<reportElement x="0" y="0" width="561" height="20"/>
-				<staticText>
-					<reportElement x="0" y="0" width="213" height="10"/>
-					<textElement>
+				<textField>
+					<reportElement x="0" y="0" width="215" height="10"/>
+					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[COOPERATIVA INTEGRAL DE SERVICIOS CBBA.LTDA.]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="9" width="161" height="10"/>
-					<textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{title}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="9" width="215" height="10"/>
+					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
-				</staticText>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{subTitle}]]></textFieldExpression>
+				</textField>
 			</frame>
 		</band>
 	</title>

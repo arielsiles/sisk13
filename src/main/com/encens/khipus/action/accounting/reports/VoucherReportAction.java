@@ -6,8 +6,11 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.action.reports.ReportFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.MoneyUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -45,6 +48,8 @@ public class VoucherReportAction extends GenericReportAction {
     VoucherCreateAction voucherCreateAction;
     @In
     private VoucherService voucherService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @Create
     public void init() {
@@ -91,13 +96,15 @@ public class VoucherReportAction extends GenericReportAction {
 
     }
 
-    public void generateReport(Voucher voucher) {
+    public void generateReport(Voucher voucher) throws CompanyConfigurationNotFoundException {
         voucherId = voucher.getId();
         this.voucher = voucher;
 
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
-        /*BigDecimal totalD = voucherUpdateAction.getTotalsDebit();
-        BigDecimal totalC = voucherUpdateAction.getTotalsCredit();*/
+        String title = companyConfiguration.getTitle();
+        String subTitle = companyConfiguration.getSubTitle();
+
         BigDecimal totalD = voucherCreateAction.getTotalsDebit();
         BigDecimal totalC = voucherCreateAction.getTotalsCredit();
 
@@ -109,6 +116,8 @@ public class VoucherReportAction extends GenericReportAction {
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+        reportParameters.put("title", title);
+        reportParameters.put("subTitle", subTitle);
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
         reportParameters.put("totalD", totalD);

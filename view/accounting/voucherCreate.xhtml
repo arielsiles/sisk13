@@ -73,11 +73,11 @@
             <ui:define name="label">#{messages['Voucher.type']}</ui:define>
             <h:selectOneMenu id="documentType"
                              value="#{voucherCreateAction.docType}"
-                             styleClass="inputTiny" disabled="#{voucherCreateAction.managed}"
+                             styleClass="input" disabled="#{voucherCreateAction.managed}"
                              required="true">
                 <s:selectItems value="#{selectList}"
                                var="element"
-                               label="#{element.name}"
+                               label="#{element.fullName}"
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <a4j:support event="onchange"
