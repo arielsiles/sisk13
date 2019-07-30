@@ -326,6 +326,13 @@
                                immediate="true"
                                reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId,partnerFieldId,contributionId">
             </a4j:commandButton>
+            <a4j:commandButton id="withdrawalPartnerId"
+                               action="#{voucherCreateAction.withdrawalPartnerVoucherDetail()}"
+                               value=" - "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="movementDetailListPanel,itemAccountField,clientField,providerField,accountField,amountDepositId,partnerFieldId,contributionId">
+            </a4j:commandButton>
             <h:outputText value="#{messages['Partner.contribution']}"/>
         </s:decorate>
 

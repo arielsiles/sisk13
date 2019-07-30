@@ -573,7 +573,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignProductItemVoucherDetail(){
 
         try {
-            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
             CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.ACOUNT_OTHER_OPERATING_INCOME);
 
             VoucherDetail voucherCaja = new VoucherDetail();
@@ -644,7 +644,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMe().getFullName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getCashAccountMn().getFullName());
 
-            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
             CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
 
             /** Cuenta CAJA | Billetes Ext **/
@@ -788,7 +788,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
 
             /** **/
-            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount ctaCajaMn = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
             CashAccount ctaCajaMe = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_ME); /** todo **/
             VoucherDetail voucherCaja = new VoucherDetail();
             if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
@@ -842,7 +842,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         try {
             System.out.println("---> Partner: " + partner.getFullName());
 
-            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
             CashAccount contributionAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_CONTRIBUTION);
 
             VoucherDetail voucherBox = new VoucherDetail();
@@ -869,6 +869,46 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             voucherDetails.add(voucherBox);
             voucherDetails.add(voucherContribution);
+
+            clearPartner();
+            setContribution(null);
+
+            clearAccount();
+            clearClient();
+            clearProvider();
+            clearPartnerAccount();
+            setDebit(BigDecimal.ZERO);
+            setCredit(BigDecimal.ZERO);
+        }catch (NullPointerException e){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
+        }
+
+    }
+    public void withdrawalPartnerVoucherDetail(){
+        try {
+            System.out.println("---> Partner: " + partner.getFullName());
+
+            CashAccount boxAccount          = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
+            CashAccount contributionAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_CONTRIBUTION);
+
+            VoucherDetail voucherBox = new VoucherDetail();
+            voucherBox.setCashAccount(boxAccount);
+            voucherBox.setAccount(boxAccount.getAccountCode());
+            voucherBox.setDebit(BigDecimal.ZERO);
+            voucherBox.setCredit(getContribution());
+
+
+            VoucherDetail voucherContribution = new VoucherDetail();
+
+            voucherContribution.setCashAccount(contributionAccount);
+            voucherContribution.setAccount(contributionAccount.getAccountCode());
+            voucherContribution.setPartner(this.partner);
+
+            voucherContribution.setDebit(getContribution());
+            voucherContribution.setCredit(BigDecimal.ZERO);
+
+            voucherDetails.add(voucherContribution);
+            voucherDetails.add(voucherBox);
 
             clearPartner();
             setContribution(null);

@@ -304,7 +304,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         voucherDetailDebit.setCreditPartner(credit);
 
         VoucherDetail voucherDetailCredit = new VoucherDetail();
-        voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH_CISC); /** todo **/
+        voucherDetailCredit.setAccount(Constants.ACCOUNT_GENERALCASH); /** todo **/
         voucherDetailCredit.setDebit(BigDecimal.ZERO);
         voucherDetailCredit.setCredit(getInstance().getAmount());
 
