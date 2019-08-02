@@ -202,19 +202,19 @@ public class AccountAction extends GenericAction<Account> {
 
     public void capitaliationOfInterests(){
         if (this.savingType.equals(SavingType.SOC)){
-
+            capitaliationOfInterestsCAJ(SavingType.SOC);
         }
 
         if (this.savingType.equals(SavingType.CAJ)){
-            capitaliationOfInterestsCAJ();
+            capitaliationOfInterestsCAJ(SavingType.CAJ);
         }
 
-        if (this.savingType.equals(SavingType.DPF)){
+        /*if (this.savingType.equals(SavingType.DPF)){
 
-        }
+        }*/
     }
 
-    public void capitaliationOfInterestsCAJ(){
+    public void capitaliationOfInterestsCAJ(SavingType savingType){
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {   exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
@@ -233,7 +233,7 @@ public class AccountAction extends GenericAction<Account> {
 
         /** For MN **/
         //List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ, FinancesCurrencyType.P); /** MN **/
-        List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ); /** MN **/
+        List<Account> accountsMnList = accountService.getSavingsAccounts(savingType); /** MN **/
         BigDecimal totalInterestMN = BigDecimal.ZERO;
         BigDecimal totalIvaTax = BigDecimal.ZERO;
 
@@ -245,11 +245,13 @@ public class AccountAction extends GenericAction<Account> {
             /** change for conditions: with credit, without credit **/
             BigDecimal percentage = account.getAccountType().getInta();
 
-            System.out.println(kardexList.get(0).getDate() + " - " + kardexList.get(0).getDebit() + " - " + kardexList.get(0).getCredit() + " - Diff: 0 - " + kardexList.get(0).getInterest());
+            System.out.println(kardexList.get(0).getDate() + " - " + kardexList.get(0).getDebit() + " - " + kardexList.get(0).getCredit() + " - Dias: 0 - " + kardexList.get(0).getInterest());
             for (int i=1 ; i < kardexList.size() ; i++){
+
                 AccountKardex previous = kardexList.get(i-1);
                 AccountKardex current = kardexList.get(i);
                 Long days = DateUtils.daysBetween(previous.getDate(), current.getDate()) - 1;
+
                 current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance, percentage));
                 accountInterest = BigDecimalUtil.sum(accountInterest, current.getInterest(), 6);
 

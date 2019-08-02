@@ -38,10 +38,10 @@ public final class Constants {
     public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
     //Schema for CAISC - Fondo Lech
-    public static final String KHIPUS_SCHEMA    = "caisc";
+    /*public static final String KHIPUS_SCHEMA    = "caisc";
     public static final String FINANCES_SCHEMA  = "caisc";
     public static final String CASHBOX_SCHEMA   = "caisc";
-    public static final String ACADEMIC_SCHEMA  = "caisc";
+    public static final String ACADEMIC_SCHEMA  = "caisc";*/
 
 
     /** For Development **/
@@ -52,11 +52,16 @@ public final class Constants {
     public static final String CASHBOX_SCHEMA   = "erp_lechdev";
     public static final String ACADEMIC_SCHEMA  = "erp_lechdev";*/
 
+    /*public static final String KHIPUS_SCHEMA    = "erp_ciscdev";
+    public static final String FINANCES_SCHEMA  = "erp_ciscdev";
+    public static final String CASHBOX_SCHEMA   = "erp_ciscdev";
+    public static final String ACADEMIC_SCHEMA  = "erp_ciscdev";*/
+
     //Schema for ILVA
-    /*public static final String KHIPUS_SCHEMA    = "erp_ilvadev";
+    public static final String KHIPUS_SCHEMA    = "erp_ilvadev";
     public static final String FINANCES_SCHEMA  = "erp_ilvadev";
     public static final String CASHBOX_SCHEMA   = "erp_ilvadev";
-    public static final String ACADEMIC_SCHEMA  = "erp_ilvadev";*/
+    public static final String ACADEMIC_SCHEMA  = "erp_ilvadev";
 
     /** ------ **/
 

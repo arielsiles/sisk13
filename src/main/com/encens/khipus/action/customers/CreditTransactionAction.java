@@ -364,7 +364,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
-        //BigDecimal fullPayment = BigDecimalUtil.sum(credit.getQuota(), interest, 6);
 
         getInstance().setInterest(interest);
         BigDecimal currentCapital = calculateCapital(credit);
@@ -482,7 +481,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     public Integer calculatePaidQuotas(Credit credit){
-
+        System.out.println("===================> REV calculatePaidQuotas: " + credit.getPreviousCode());
         BigDecimal totalPaid = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2);
         Integer quota = BigDecimalUtil.divide(totalPaid, credit.getQuota(), 2).intValue();
 

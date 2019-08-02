@@ -4,9 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['Account.capitalizeInterest.title']}</ui:define>
@@ -22,7 +20,7 @@
 
 
     <rich:panel id="formPanel">
-        <f:facet name="header">#{messages['CashSale.transferCash']}</f:facet>
+        <f:facet name="header">#{messages['Account.capitalizeInterest.title']}</f:facet>
 
 
         <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
