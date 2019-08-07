@@ -1,10 +1,7 @@
 package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.contacts.Entity;
-import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.customers.CreditState;
-import com.encens.khipus.model.customers.CreditTransaction;
-import com.encens.khipus.model.customers.CreditTransactionType;
+import com.encens.khipus.model.customers.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -82,6 +79,13 @@ public class CreditServiceBean implements CreditService {
         em.merge(credit);
         em.flush();
 
+    }
+
+    public List<Credit> getCreditList(Partner partner){
+        List<Credit> creditList = em.createQuery("select c from Credit c where c.partner =:partner")
+                .setParameter("partner", partner)
+                .getResultList();
+        return  creditList;
     }
 
 }

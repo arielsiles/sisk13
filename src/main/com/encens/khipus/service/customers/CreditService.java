@@ -3,6 +3,7 @@ package com.encens.khipus.service.customers;
 import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
+import com.encens.khipus.model.customers.Partner;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -23,4 +24,5 @@ public interface CreditService {
     BigDecimal getTotalPaidCapital(Credit credit);
     List<Credit> getAllCredits();
     void changeCreditState(Credit credit, CreditState state);
+    List<Credit> getCreditList(Partner partner);
 }

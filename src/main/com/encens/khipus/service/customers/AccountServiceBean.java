@@ -55,12 +55,13 @@ public class AccountServiceBean implements AccountService {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
                     " where voucherDetail.partnerAccount = :account " +
                     " and voucherDetail.voucher.date between :startDate and :endDate " +
+                    " and voucherDetail.voucher.state <> :state " +
                     " order by voucherDetail.voucher.date asc ")
                     .setParameter("account", account)
                     .setParameter("startDate", startDate)
                     .setParameter("endDate", endDate)
+                    .setParameter("state", "ANL")
                     .getResultList();
-
         }catch (NoResultException e){
             return null;
         }
