@@ -250,15 +250,17 @@ public class AccountAction extends GenericAction<Account> {
         voucher.setDate(this.endDate);
         voucher.setGloss("CAPITALIZACION DE INTERESES SOBRE " + MessageUtils.getMessage(savingType.getResourceKey()).toUpperCase() + " AL " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
+        BigDecimal totalInterestMN = BigDecimal.ZERO;
         BigDecimal totalInterestME = BigDecimal.ZERO;
         BigDecimal totalInterestMV = BigDecimal.ZERO;
 
+        BigDecimal totalIvaTaxMN = BigDecimal.ZERO;
+        BigDecimal totalIvaTaxME = BigDecimal.ZERO;
+        BigDecimal totalIvaTaxMV = BigDecimal.ZERO;
 
         /** For MN **/
         //List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ, FinancesCurrencyType.P); /** MN **/
         List<Account> accountsMnList = accountService.getSavingsAccounts(savingType); /** MN **/
-        BigDecimal totalInterestMN = BigDecimal.ZERO;
-        BigDecimal totalIvaTax = BigDecimal.ZERO;
 
         for (Account account : accountsMnList){
             BigDecimal accountInterest = BigDecimal.ZERO;
@@ -270,7 +272,6 @@ public class AccountAction extends GenericAction<Account> {
             if (hasCredit(account.getPartner()))
                 percentage = account.getAccountType().getIntb(); /** With credit **/
 
-            //BigDecimal ivaTax = BigDecimalUtil.multiply(accountInterest, Constants.VAT, 6);
             BigDecimal ivaTax = BigDecimal.ZERO;
             /** Para 1 transaccion en el periodo **/
             if (kardexList.size() == 1){
@@ -302,46 +303,92 @@ public class AccountAction extends GenericAction<Account> {
                     }
                 }
             }
+
             ivaTax = BigDecimalUtil.multiply(accountInterest, Constants.VAT, 2);
 
-
             String cashAccountCode = "";
-            if (account.getCurrency().equals(FinancesCurrencyType.P))
+            if (account.getCurrency().equals(FinancesCurrencyType.P)){
                 cashAccountCode = account.getAccountType().getCashAccountMn().getAccountCode();
-            if (account.getCurrency().equals(FinancesCurrencyType.D))
+                totalInterestMN = BigDecimalUtil.sum(totalInterestMN, accountInterest, 6);
+                totalIvaTaxMN     = BigDecimalUtil.sum(totalIvaTaxMN,ivaTax, 6);
+            }
+            if (account.getCurrency().equals(FinancesCurrencyType.D)) {
                 cashAccountCode = account.getAccountType().getCashAccountMe().getAccountCode();
-            if (account.getCurrency().equals(FinancesCurrencyType.M))
+                totalInterestME = BigDecimalUtil.sum(totalInterestME, accountInterest, 6);
+                totalIvaTaxME   = BigDecimalUtil.sum(totalIvaTaxME,ivaTax, 6);
+            }
+            if (account.getCurrency().equals(FinancesCurrencyType.M)) {
                 cashAccountCode = account.getAccountType().getCashAccountMv().getAccountCode();
+                totalInterestMV = BigDecimalUtil.sum(totalInterestMV, accountInterest, 6);
+                totalIvaTaxMV   = BigDecimalUtil.sum(totalIvaTaxMV, ivaTax, 6);
+            }
 
-            VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, accountInterest, "CREDIT", account.getCurrency());
-            detailInterest.setPartnerAccount(account);
+            accountInterest = BigDecimalUtil.roundBigDecimal(accountInterest, 2);
+            if (accountInterest.doubleValue()>0){
+                VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, accountInterest, "CREDIT", account.getCurrency(), Boolean.TRUE);
+                detailInterest.setPartnerAccount(account);
+                voucher.getDetails().add(detailInterest);
+            }
 
-            VoucherDetail detailIvaTax   = buildAccountEntryDetail(cashAccountCode, ivaTax, "DEBIT", account.getCurrency());
-            detailIvaTax.setPartnerAccount(account);
+            ivaTax = BigDecimalUtil.roundBigDecimal(ivaTax, 2);
+            if (ivaTax.doubleValue()>0){
+                VoucherDetail detailIvaTax   = buildAccountEntryDetail(cashAccountCode, ivaTax, "DEBIT", account.getCurrency(), Boolean.TRUE);
+                detailIvaTax.setPartnerAccount(account);
+                voucher.getDetails().add(detailIvaTax);
+            }
 
-            voucher.getDetails().add(detailInterest);
-            voucher.getDetails().add(detailIvaTax);
-
-            totalInterestMN = BigDecimalUtil.sum(totalInterestMN, accountInterest, 6);
-            totalIvaTax     = BigDecimalUtil.sum(totalIvaTax,ivaTax, 6);
-
-            //System.out.println("====> TOTAL INTERES: " + accountInterest);
         }
 
-        //System.out.println("==> Interes: " + totalInterestMN);
-        //System.out.println("==> Total IVA: " + totalIvaTax);
+        /** Reemplaza totales calculados anteriormente, si correcto no calcular arriba **/
+        totalInterestMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MN_2120110200, Boolean.TRUE);
+        totalInterestME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.TRUE);
+        totalInterestMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.TRUE);
 
-        VoucherDetail detailTotalInterest = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210100, totalInterestMN, "DEBIT", FinancesCurrencyType.P);
-        VoucherDetail detailTotalIvaTax   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax, "CREDIT", FinancesCurrencyType.P);
+        BigDecimal totalInterestCajAhoMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_MN_2120110100, Boolean.TRUE);
+        BigDecimal totalInterestCajAhoME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_ME_2120120100, Boolean.TRUE);
 
-        voucher.getDetails().add(detailTotalInterest);
-        voucher.getDetails().add(detailTotalIvaTax);
+        VoucherDetail detailTotalInterestMN = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterestMN, "DEBIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalInterestMV = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110230200_AHO_SOC_MV, totalInterestMV, "DEBIT", FinancesCurrencyType.M, Boolean.FALSE);
+
+        VoucherDetail detailTotalInterestME = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterestME, "DEBIT", FinancesCurrencyType.D, Boolean.FALSE);
+
+        /** Reemplaza totales calculados anteriormente, si correcto no calcular arriba **/
+        totalIvaTaxMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MN_2120110200, Boolean.FALSE);
+        totalIvaTaxME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.FALSE);
+        totalIvaTaxMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.FALSE);
+
+        VoucherDetail detailTotalIvaTaxMN   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxMN, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalIvaTaxME   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxME, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalIvaTaxMV   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxMV, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+
+
+        if (detailTotalInterestMN.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestMN);
+        if (detailTotalInterestME.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestME);
+        if (detailTotalInterestMV.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestMV);
+
+        if (detailTotalIvaTaxMN.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxMN);
+        if (detailTotalIvaTaxME.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxME);
+        if (detailTotalIvaTaxMV.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxMV);
 
         voucherAccoutingService.saveVoucher(voucher);
 
     }
 
-    public VoucherDetail buildAccountEntryDetail(String cashAccountCode, BigDecimal amount, String flag, FinancesCurrencyType currencyType){
+    public BigDecimal calculateTotalInterestSum(List<VoucherDetail> voucherDetailList, String account, Boolean interest){
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (VoucherDetail detail : voucherDetailList){
+            if (detail.getAccount().equals(account))
+                if (interest)
+                    result = BigDecimalUtil.sum(result, detail.getCredit(), 2);
+                else
+                    result = BigDecimalUtil.sum(result, detail.getDebit(), 2);
+        }
+
+        return result;
+    }
+
+    public VoucherDetail buildAccountEntryDetail(String cashAccountCode, BigDecimal amount, String flag, FinancesCurrencyType currencyType, Boolean change){
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {
@@ -377,23 +424,64 @@ public class AccountAction extends GenericAction<Account> {
         }
 
         if (currencyType.equals(FinancesCurrencyType.D) || currencyType.equals(FinancesCurrencyType.M)){
-            if (flag.equals("DEBIT")){
-                detail.setDebitMe(amount);
-                detail.setCreditMe(BigDecimal.ZERO);
-                detail.setAccount(cashAccountCode);
+            if (change) {
+                if (flag.equals("DEBIT")) {
+                    detail.setDebitMe(amount);
+                    detail.setCreditMe(BigDecimal.ZERO);
+                    detail.setAccount(cashAccountCode);
 
-                detail.setExchangeAmount(exchangeRate);
-                detail.setDebit(BigDecimalUtil.multiply(detail.getDebitMe(), exchangeRate, 2));
-                detail.setCredit(BigDecimal.ZERO);
+                    detail.setExchangeAmount(exchangeRate);
+                    detail.setDebit(BigDecimalUtil.multiply(detail.getDebitMe(), exchangeRate, 2));
+                    detail.setCredit(BigDecimal.ZERO);
+                }
+                if (flag.equals("CREDIT")) {
+                    detail.setDebitMe(BigDecimal.ZERO);
+                    detail.setCreditMe(amount);
+                    detail.setAccount(cashAccountCode);
+
+                    detail.setExchangeAmount(exchangeRate);
+                    detail.setDebit(BigDecimal.ZERO);
+                    detail.setCredit(BigDecimalUtil.multiply(detail.getCreditMe(), exchangeRate, 2));
+                }
             }
-            if (flag.equals("CREDIT")){
-                detail.setDebitMe(BigDecimal.ZERO);
-                detail.setCreditMe(amount);
-                detail.setAccount(cashAccountCode);
 
-                detail.setExchangeAmount(exchangeRate);
-                detail.setDebit(BigDecimal.ZERO);
-                detail.setCredit(BigDecimalUtil.multiply(detail.getCreditMe(), exchangeRate, 2));
+            if (!change) {
+                if (flag.equals("DEBIT")) {
+                    detail.setAccount(cashAccountCode);
+                    detail.setExchangeAmount(exchangeRate);
+
+                    detail.setDebit(amount);
+                    detail.setCredit(BigDecimal.ZERO);
+
+                    detail.setDebitMe(BigDecimalUtil.divide(amount, exchangeRate, 2));
+                    detail.setCreditMe(BigDecimal.ZERO);
+
+                    //detail.setDebitMe(amount);
+                    //detail.setCreditMe(BigDecimal.ZERO);
+                    //detail.setAccount(cashAccountCode);
+
+                    //detail.setExchangeAmount(exchangeRate);
+                    //detail.setDebit(BigDecimalUtil.multiply(detail.getDebitMe(), exchangeRate, 2));
+                    //detail.setCredit(BigDecimal.ZERO);
+                }
+                if (flag.equals("CREDIT")) {
+                    detail.setAccount(cashAccountCode);
+                    detail.setExchangeAmount(exchangeRate);
+
+                    detail.setDebit(BigDecimal.ZERO);
+                    detail.setCredit(amount);
+
+                    detail.setDebitMe(BigDecimal.ZERO);
+                    detail.setCreditMe(BigDecimalUtil.divide(amount, exchangeRate, 2));
+
+                    /*detail.setDebitMe(BigDecimal.ZERO);
+                    detail.setCreditMe(amount);
+                    detail.setAccount(cashAccountCode);
+
+                    detail.setExchangeAmount(exchangeRate);
+                    detail.setDebit(BigDecimal.ZERO);
+                    detail.setCredit(BigDecimalUtil.multiply(detail.getCreditMe(), exchangeRate, 2));*/
+                }
             }
 
         }
