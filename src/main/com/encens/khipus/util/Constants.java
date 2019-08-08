@@ -271,16 +271,16 @@ public final class Constants {
     public static final String CTA_AHO_SOC_MN_2120110200 = "2120110200";   //Cuenta Ahorros Socios MN
     public static final String CTA_AHO_SOC_MV_2120130200 = "2120130200";   //Cuenta Ahorros Socios MV
 
-    public static final String CTA_AHO_SOC_ME_2120120100 = "2120120100";   //Cuenta Ahorros Socios ME
+    public static final String DEP_CAJ_AHO_MN_2120110100 = "2120110100";   //Depositos en Caja de ahorros MN
+    public static final String DEP_CAJ_AHO_ME_2120120100 = "2120120100";   //Depositos en Caja de Ahorros ME
+
+    //public static final String CTA_AHO_SOC_ME_2120120100 = "2120120100";   //Cuenta Ahorros Socios ME
 
     public static final String ACOUNT_INTEREST_4110210200_AHO_SOC_MN = "4110210200";   //Int.Obligaciones Ahorros Socios M.N.
     public static final String ACOUNT_INTEREST_4110230200_AHO_SOC_MV = "4110230200";   //Int.Obligaciones Ahorros Socios M.V.
 
-    public static final String CTA_CAJ_AHO_MN_2120110100 = "2120110100";   //Depositos en Caja de ahorros MN
-    public static final String CTA_CAJ_AHO_ME_2120120100 = "2120120100";   //Depositos en Caja de Ahorros ME
-
-    public static final String CTA_CAJ_AHO_MN_INTEREST_4110210100 = "4110210100";   //Int.Obligaciones Cajas de Ahorros M.N.
-    public static final String ACOUNT_INTEREST_4110220100_CAJ_AHO_ME = "4110220100";   //Int.Obligaciones Cajas de Ahorros ME
+    public static final String ACOUNT_INTEREST_4110210100_DEP_CAJ_AHO_MN = "4110210100";   //Int.Obligaciones Cajas de Ahorros M.N.
+    public static final String ACOUNT_INTEREST_4110220100_DEP_CAJ_AHO_ME = "4110220100";   //Int.Obligaciones Cajas de Ahorros ME
 
 
 

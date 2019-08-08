@@ -250,20 +250,20 @@ public class AccountAction extends GenericAction<Account> {
         voucher.setDate(this.endDate);
         voucher.setGloss("CAPITALIZACION DE INTERESES SOBRE " + MessageUtils.getMessage(savingType.getResourceKey()).toUpperCase() + " AL " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
-        BigDecimal totalInterestMN = BigDecimal.ZERO;
-        BigDecimal totalInterestME = BigDecimal.ZERO;
-        BigDecimal totalInterestMV = BigDecimal.ZERO;
+        //BigDecimal totalInterestMN = BigDecimal.ZERO;
+        //BigDecimal totalInterestME = BigDecimal.ZERO;
+        //BigDecimal totalInterestMV = BigDecimal.ZERO;
 
-        BigDecimal totalIvaTaxMN = BigDecimal.ZERO;
-        BigDecimal totalIvaTaxME = BigDecimal.ZERO;
-        BigDecimal totalIvaTaxMV = BigDecimal.ZERO;
+        //BigDecimal totalIvaTaxMN = BigDecimal.ZERO;
+        //BigDecimal totalIvaTaxME = BigDecimal.ZERO;
+        //BigDecimal totalIvaTaxMV = BigDecimal.ZERO;
 
         /** For MN **/
         //List<Account> accountsMnList = accountService.getSavingsAccounts(SavingType.CAJ, FinancesCurrencyType.P); /** MN **/
         List<Account> accountsMnList = accountService.getSavingsAccounts(savingType); /** MN **/
 
         for (Account account : accountsMnList){
-            BigDecimal accountInterest = BigDecimal.ZERO;
+            BigDecimal interest = BigDecimal.ZERO;
             List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
             List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency());
 
@@ -278,9 +278,9 @@ public class AccountAction extends GenericAction<Account> {
                 AccountKardex previous = kardexList.get(0);
                 Long days = DateUtils.daysBetween(previous.getDate(), endDate);
                 previous.setInterest(calculateInterest(previous.getDate(), endDate, previous.balance, percentage));
-                accountInterest = BigDecimalUtil.sum(accountInterest, previous.getInterest(), 2);
-                ivaTax = BigDecimalUtil.multiply(accountInterest, Constants.VAT, 2);
-                System.out.println(this.endDate + " * " + previous.getDebit() + " * " + previous.getCredit() + " * Diff: " + days + " - " + accountInterest);
+                interest = BigDecimalUtil.sum(interest, previous.getInterest(), 2);
+                ivaTax = BigDecimalUtil.multiply(interest, Constants.VAT, 2);
+                System.out.println(this.endDate + " * " + previous.getDebit() + " * " + previous.getCredit() + " * Diff: " + days + " - " + interest);
             }
 
             //System.out.println(kardexList.get(0).getDate() + " - " + kardexList.get(0).getDebit() + " - " + kardexList.get(0).getCredit() + " - Dias: 0 - " + kardexList.get(0).getInterest());
@@ -290,7 +290,7 @@ public class AccountAction extends GenericAction<Account> {
                 AccountKardex current = kardexList.get(i);
                 //Long days = DateUtils.daysBetween(previous.getDate(), current.getDate()) - 1;
                 current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance, percentage));
-                accountInterest = BigDecimalUtil.sum(accountInterest, current.getInterest(), 2);
+                interest = BigDecimalUtil.sum(interest, current.getInterest(), 2);
                 //System.out.println(current.getDate() + " - " + current.getDebit() + " - " + current.getCredit() + " - Diff: " + days + " - " + current.getInterest());
 
                 /** Si ultima transaccion es menor al 31/mm/aaaaa **/
@@ -298,34 +298,34 @@ public class AccountAction extends GenericAction<Account> {
                     if (kardexList.get(i).getDate().compareTo(this.endDate) < 0){
                         Long daysZ = DateUtils.daysBetween(kardexList.get(i).getDate(), this.endDate);
                         BigDecimal endInterest = calculateInterest(kardexList.get(i).getDate(), this.endDate, current.getBalance(), percentage);
-                        accountInterest = BigDecimalUtil.sum(accountInterest, endInterest, 6);
+                        interest = BigDecimalUtil.sum(interest, endInterest, 6);
                         System.out.println(this.endDate + " - " + current.getDebit() + " - " + current.getCredit() + " - Diff: " + daysZ + " - " + endInterest);
                     }
                 }
             }
 
-            ivaTax = BigDecimalUtil.multiply(accountInterest, Constants.VAT, 2);
+            ivaTax = BigDecimalUtil.multiply(interest, Constants.VAT, 2);
 
             String cashAccountCode = "";
             if (account.getCurrency().equals(FinancesCurrencyType.P)){
                 cashAccountCode = account.getAccountType().getCashAccountMn().getAccountCode();
-                totalInterestMN = BigDecimalUtil.sum(totalInterestMN, accountInterest, 6);
-                totalIvaTaxMN     = BigDecimalUtil.sum(totalIvaTaxMN,ivaTax, 6);
+                //totalInterestMN = BigDecimalUtil.sum(totalInterestMN, accountInterest, 6);
+                //totalIvaTaxMN     = BigDecimalUtil.sum(totalIvaTaxMN,ivaTax, 6);
             }
             if (account.getCurrency().equals(FinancesCurrencyType.D)) {
                 cashAccountCode = account.getAccountType().getCashAccountMe().getAccountCode();
-                totalInterestME = BigDecimalUtil.sum(totalInterestME, accountInterest, 6);
-                totalIvaTaxME   = BigDecimalUtil.sum(totalIvaTaxME,ivaTax, 6);
+                //totalInterestME = BigDecimalUtil.sum(totalInterestME, accountInterest, 6);
+                //totalIvaTaxME   = BigDecimalUtil.sum(totalIvaTaxME,ivaTax, 6);
             }
             if (account.getCurrency().equals(FinancesCurrencyType.M)) {
                 cashAccountCode = account.getAccountType().getCashAccountMv().getAccountCode();
-                totalInterestMV = BigDecimalUtil.sum(totalInterestMV, accountInterest, 6);
-                totalIvaTaxMV   = BigDecimalUtil.sum(totalIvaTaxMV, ivaTax, 6);
+                //totalInterestMV = BigDecimalUtil.sum(totalInterestMV, accountInterest, 6);
+                //totalIvaTaxMV   = BigDecimalUtil.sum(totalIvaTaxMV, ivaTax, 6);
             }
 
-            accountInterest = BigDecimalUtil.roundBigDecimal(accountInterest, 2);
-            if (accountInterest.doubleValue()>0){
-                VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, accountInterest, "CREDIT", account.getCurrency(), Boolean.TRUE);
+            interest = BigDecimalUtil.roundBigDecimal(interest, 2);
+            if (interest.doubleValue()>0){
+                VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, interest, "CREDIT", account.getCurrency(), Boolean.TRUE);
                 detailInterest.setPartnerAccount(account);
                 voucher.getDetails().add(detailInterest);
             }
@@ -340,35 +340,51 @@ public class AccountAction extends GenericAction<Account> {
         }
 
         /** Reemplaza totales calculados anteriormente, si correcto no calcular arriba **/
-        totalInterestMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MN_2120110200, Boolean.TRUE);
-        totalInterestME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.TRUE);
-        totalInterestMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.TRUE);
+        BigDecimal totalInterest_AHO_SOC_MN     = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MN_2120110200, Boolean.TRUE);
+        BigDecimal totalInterest_DEP_CAJ_AHO_MN = calculateTotalInterestSum(voucher.getDetails(), Constants.DEP_CAJ_AHO_MN_2120110100, Boolean.TRUE);
 
-        BigDecimal totalInterestCajAhoMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_MN_2120110100, Boolean.TRUE);
-        BigDecimal totalInterestCajAhoME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_ME_2120120100, Boolean.TRUE);
+        BigDecimal totalInterest_AHO_SOC_MV     = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.TRUE);
+        BigDecimal totalInterest_DEP_CAJ_AHO_ME = calculateTotalInterestSum(voucher.getDetails(), Constants.DEP_CAJ_AHO_ME_2120120100, Boolean.TRUE);
 
-        VoucherDetail detailTotalInterestMN = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterestMN, "DEBIT", FinancesCurrencyType.P, Boolean.TRUE);
-        VoucherDetail detailTotalInterestMV = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110230200_AHO_SOC_MV, totalInterestMV, "DEBIT", FinancesCurrencyType.M, Boolean.FALSE);
+        //totalInterestME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.TRUE);
+        //totalInterestMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.TRUE);
+        //BigDecimal totalInterestCajAhoMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_MN_2120110100, Boolean.TRUE);
+        //BigDecimal totalInterestCajAhoME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_CAJ_AHO_ME_2120120100, Boolean.TRUE);
 
-        VoucherDetail detailTotalInterestME = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterestME, "DEBIT", FinancesCurrencyType.D, Boolean.FALSE);
+
+        VoucherDetail detailTotalInterest_AHO_SOC_MN     = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterest_AHO_SOC_MN, "DEBIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalInterest_DEP_CAJ_AHO_MN = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210100_DEP_CAJ_AHO_MN, totalInterest_DEP_CAJ_AHO_MN, "DEBIT", FinancesCurrencyType.P, Boolean.TRUE);
+
+        VoucherDetail detailTotalInterest_AHO_SOC_MV     = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110230200_AHO_SOC_MV, totalInterest_AHO_SOC_MV, "DEBIT", FinancesCurrencyType.M, Boolean.FALSE);
+        VoucherDetail detailTotalInterest_DEP_CAJ_AHO_ME = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110220100_DEP_CAJ_AHO_ME, totalInterest_DEP_CAJ_AHO_ME, "DEBIT", FinancesCurrencyType.D, Boolean.FALSE);
+
+        //VoucherDetail detailTotalInterestMV = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110230200_AHO_SOC_MV, totalInterestMV, "DEBIT", FinancesCurrencyType.M, Boolean.FALSE);
+        //VoucherDetail detailTotalInterestME = buildAccountEntryDetail(Constants.ACOUNT_INTEREST_4110210200_AHO_SOC_MN, totalInterestME, "DEBIT", FinancesCurrencyType.D, Boolean.FALSE);
 
         /** Reemplaza totales calculados anteriormente, si correcto no calcular arriba **/
-        totalIvaTaxMN = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MN_2120110200, Boolean.FALSE);
-        totalIvaTaxME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.FALSE);
-        totalIvaTaxMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.FALSE);
+        BigDecimal totalIvaTax_AHO_SOC_MN = calculateTotalInterestSum(voucher.getDetails(),     Constants.CTA_AHO_SOC_MN_2120110200, Boolean.FALSE);
+        BigDecimal totalIvaTax_DEP_CAJ_AHO_MN = calculateTotalInterestSum(voucher.getDetails(), Constants.DEP_CAJ_AHO_MN_2120110100, Boolean.FALSE);
+        BigDecimal totalIvaTax_AHO_SOC_MV = calculateTotalInterestSum(voucher.getDetails(),     Constants.CTA_AHO_SOC_MV_2120130200, Boolean.FALSE);
+        BigDecimal totalIvaTax_DEP_CAJ_AHO_ME = calculateTotalInterestSum(voucher.getDetails(), Constants.DEP_CAJ_AHO_ME_2120120100, Boolean.FALSE);
 
-        VoucherDetail detailTotalIvaTaxMN   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxMN, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
-        VoucherDetail detailTotalIvaTaxME   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxME, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
-        VoucherDetail detailTotalIvaTaxMV   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTaxMV, "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        //totalIvaTaxME = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_ME_2120120100, Boolean.FALSE);
+        //totalIvaTaxMV = calculateTotalInterestSum(voucher.getDetails(), Constants.CTA_AHO_SOC_MV_2120130200, Boolean.FALSE);
+
+        VoucherDetail detailTotalIvaTax_AHO_SOC_MN   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax_AHO_SOC_MN,    "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalIvaTax_DEP_CAJ_AHO_MN   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax_DEP_CAJ_AHO_MN,"CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalIvaTax_AHO_SOC_MV   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax_AHO_SOC_MV,    "CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
+        VoucherDetail detailTotalIvaTax_DEP_CAJ_AHO_ME   = buildAccountEntryDetail(Constants.ACOUNT_RCIVA_2420310100, totalIvaTax_DEP_CAJ_AHO_ME,"CREDIT", FinancesCurrencyType.P, Boolean.TRUE);
 
 
-        if (detailTotalInterestMN.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestMN);
-        if (detailTotalInterestME.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestME);
-        if (detailTotalInterestMV.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterestMV);
+        if (detailTotalInterest_AHO_SOC_MN.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterest_AHO_SOC_MN);
+        if (detailTotalInterest_DEP_CAJ_AHO_MN.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterest_DEP_CAJ_AHO_MN);
+        if (detailTotalInterest_AHO_SOC_MV.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterest_AHO_SOC_MV);
+        if (detailTotalInterest_DEP_CAJ_AHO_ME.getDebit().doubleValue()>0) voucher.getDetails().add(detailTotalInterest_DEP_CAJ_AHO_ME);
 
-        if (detailTotalIvaTaxMN.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxMN);
-        if (detailTotalIvaTaxME.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxME);
-        if (detailTotalIvaTaxMV.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTaxMV);
+        if (detailTotalIvaTax_AHO_SOC_MN.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTax_AHO_SOC_MN);
+        if (detailTotalIvaTax_DEP_CAJ_AHO_MN.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTax_DEP_CAJ_AHO_MN);
+        if (detailTotalIvaTax_AHO_SOC_MV.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTax_AHO_SOC_MV);
+        if (detailTotalIvaTax_DEP_CAJ_AHO_ME.getCredit().doubleValue()>0) voucher.getDetails().add(detailTotalIvaTax_DEP_CAJ_AHO_ME);
 
         voucherAccoutingService.saveVoucher(voucher);
 
