@@ -27,5 +27,10 @@ where c.`idcuenta` in (
 alter table tipocuenta modify column ctap_me varchar(20) null;
 update tipocuenta t set t.`ctap_me` = null where t.`idtipocuenta` = 1;
 
+update sf_tmpdet d  set d.`haber` = 27966.95
+where d.`id_tmpdet` = 3129;
+
+-- update sf_tmpdet d set d.`haber` = ''
+
 --
  
