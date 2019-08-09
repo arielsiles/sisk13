@@ -77,6 +77,20 @@
 
                 <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
                 <s:div id="leftSidePanel">
+
+                    <s:decorate id="openDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.openingDate']}</ui:define>
+                        <rich:calendar value="#{account.openingDate}"
+                                       popup="true"
+                                       required="true"
+                                       datePattern="#{messages['patterns.date']}"
+                                       styleClass="input"
+                                       enableManualInput="true"
+                                       tabindex="6">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+
                     <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
                         <app:selectPopUp id="partnerFieldId"
@@ -133,6 +147,13 @@
                                            hideNoSelectionLabel="false"/>
                             <s:convertEnum/>
                         </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.retention']}</ui:define>
+                        <h:selectBooleanCheckbox id="retentionFlag"
+                                                 value="#{account.retentionFlag}"
+                                                 tabindex="17"/>
                     </s:decorate>
                 </s:div>
 

@@ -83,7 +83,7 @@ public class AccountServiceBean implements AccountService {
         accountList = (List<Account>) em.createQuery("select account from Account account " +
                 " where account.accountState =:state" +
                 " and account.accountType.savingType =:savingType"
-                /*" and account.id in (63, 29, 908) "*/ )
+                /*+ " and account.id in (2061) "*/ )
                 .setParameter("state", AccountState.ACTIVE)
                 .setParameter("savingType", savingType)
                 .getResultList();

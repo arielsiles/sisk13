@@ -76,9 +76,9 @@ public class Credit implements BaseModel {
     @Temporal(TemporalType.DATE)
     private Date grantDate;
 
-    @Column(name = "fechapago", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date firstPayment;
+        @Column(name = "fechapago", nullable = false)
+        @Temporal(TemporalType.DATE)
+        private Date firstPayment;
 
     @Column(name = "cuota", precision = 13, scale = 2, nullable = false)
     private BigDecimal quota;

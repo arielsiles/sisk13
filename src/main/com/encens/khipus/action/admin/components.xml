@@ -46,8 +46,7 @@
     <factory name="personDocumentTypeList" value="#{personDocumentTypeQuery}"/>
     <framework:entity-query name="personDocumentTypeQuery" ejbql="select pdt from DocumentType pdt">
         <framework:restrictions>
-            <value>pdt.entityType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.contacts.EntityType', 'PERSON')}
-            </value>
+            <value>pdt.entityType=#{enumerationUtil.getEnumValue('com.encens.khipus.model.contacts.EntityType', 'PERSON')}</value>
         </framework:restrictions>
     </framework:entity-query>
 

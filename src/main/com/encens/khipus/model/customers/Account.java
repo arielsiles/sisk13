@@ -6,11 +6,13 @@ import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.util.MessageUtils;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Entity for accounts
@@ -41,6 +43,10 @@ public class Account implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Account.tableGenerator")
     private Long id;
 
+    @Column(name = "fechaapertura", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date openingDate;
+
     @Column(name = "nocuenta", nullable = false, length = 20)
     @Length(max = 20)
     private String accountNumber;
@@ -55,6 +61,10 @@ public class Account implements BaseModel {
 
     @Column(name = "saldo", precision = 13, scale = 2, nullable = false)
     private BigDecimal balance = new BigDecimal(0);
+
+    @Column(name = "ret", nullable = true)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean retentionFlag = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsocio", nullable = false)
@@ -155,4 +165,19 @@ public class Account implements BaseModel {
         return getAccountNumber() + " (" +  MessageUtils.getMessage(getCurrency().getSymbolResourceKey()) + " - " + getAccountType().getName() + ")";
     }
 
+    public Date getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(Date openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public Boolean getRetentionFlag() {
+        return retentionFlag;
+    }
+
+    public void setRetentionFlag(Boolean retentionFlag) {
+        this.retentionFlag = retentionFlag;
+    }
 }

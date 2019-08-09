@@ -27,10 +27,22 @@ where c.`idcuenta` in (
 alter table tipocuenta modify column ctap_me varchar(20) null;
 update tipocuenta t set t.`ctap_me` = null where t.`idtipocuenta` = 1;
 
-update sf_tmpdet d  set d.`haber` = 27966.95
-where d.`id_tmpdet` = 3129;
+update sf_tmpdet d  set d.`haber` = 27966.95 where d.`id_tmpdet` = 3129; -- Apertura cuenta #6 ILVA
 
--- update sf_tmpdet d set d.`haber` = ''
+/** 09.08.2019 **/
+-- Para F.Cisc
+update tipocuenta t set t.`inta` = 1, t.`intb` = 1 where t.`idtipocuenta` = 2;
+
+-- 
+alter table socio add column nit varchar(100) null after noidentificacion;
+update socio set nit = 0;
+
+
+alter table cuenta add column fechaapertura date after idcuenta;
+alter table cuenta add column ret int(1) after saldo;
+update cuenta c set c.`ret` = 1;
 
 --
+ 
+ 
  
