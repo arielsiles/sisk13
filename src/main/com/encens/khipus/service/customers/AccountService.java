@@ -1,9 +1,6 @@
 package com.encens.khipus.service.customers;
 
-import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.Account;
-import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.SavingType;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -23,6 +20,7 @@ import java.util.List;
 public interface AccountService {
 
     List<VoucherDetail> getAccountDetailList(Account account);
+    BigDecimal calculateAccountBalance(Account account, Date startDate, Date endDate);
     List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate);
     List<Account> getAccountList();
     List<Account> getSavingsAccounts(SavingType savingType);

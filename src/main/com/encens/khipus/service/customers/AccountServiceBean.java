@@ -12,6 +12,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +47,48 @@ public class AccountServiceBean implements AccountService {
             return null;
         }
         return voucherDetails;
+    }
+
+    public BigDecimal calculateAccountBalance(Account account, Date startDate, Date endDate){
+        BigDecimal result = BigDecimal.ZERO;
+        String cashAccount = account.getAccountType().getCashAccountMn().getAccountCode();
+
+        if (account.getCurrency().equals(FinancesCurrencyType.D))
+            cashAccount = account.getAccountType().getCashAccountMe().getAccountCode();
+        if (account.getCurrency().equals(FinancesCurrencyType.M))
+            cashAccount = account.getAccountType().getCashAccountMv().getAccountCode();
+
+        if (account.getCurrency().equals(FinancesCurrencyType.P)) {
+            result = (BigDecimal) em.createQuery("select sum(voucherDetail.credit) - sum(voucherDetail.debit) from VoucherDetail voucherDetail " +
+                    " where voucherDetail.partnerAccount =:account " +
+                    " and voucherDetail.voucher.date between :startDate and :endDate " +
+                    " and voucherDetail.account =:cashAccount " +
+                    " and voucherDetail.voucher.state <> :state")
+                    .setParameter("account", account)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("cashAccount", cashAccount)
+                    .setParameter("state", "ANL")
+                    .getSingleResult();
+        }
+
+        if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M)){
+            result = (BigDecimal) em.createQuery("select sum(voucherDetail.creditMe) - sum(voucherDetail.debitMe) from VoucherDetail voucherDetail " +
+                    " where voucherDetail.partnerAccount =:account " +
+                    " and voucherDetail.voucher.date between :startDate and :endDate " +
+                    " and voucherDetail.account =:cashAccount " +
+                    " and voucherDetail.voucher.state <> :state")
+                    .setParameter("account", account)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("cashAccount", cashAccount)
+                    .setParameter("state", "ANL")
+                    .getSingleResult();
+        }
+
+        if (result == null) result = BigDecimal.ZERO;
+
+        return result;
     }
 
     public List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate){

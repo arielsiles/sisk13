@@ -41,6 +41,7 @@ update socio set nit = 0;
 alter table cuenta add column fechaapertura date after idcuenta;
 alter table cuenta add column ret int(1) after saldo;
 update cuenta c set c.`ret` = 1;
+update cuenta c set c.`ret` = 0 where c.`idcuenta` = 2065;
 
 --
  
