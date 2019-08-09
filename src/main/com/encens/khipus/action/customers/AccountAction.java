@@ -254,7 +254,7 @@ public class AccountAction extends GenericAction<Account> {
             BigDecimal ivaTax = BigDecimal.ZERO;
 
             List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
-            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency());
+            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency(), startDate,accountService.calculateAccountBalance(account, start, end));
 
             /** change for conditions: with credit, without credit **/
             BigDecimal percentage = account.getAccountType().getInta(); /** Without credit **/
@@ -471,11 +471,14 @@ public class AccountAction extends GenericAction<Account> {
         return detail;
     }
 
-    public List<AccountKardex> calculateAccountKardex(List<VoucherDetail> accountMovements, FinancesCurrencyType currencyType){
+    public List<AccountKardex> calculateAccountKardex(List<VoucherDetail> accountMovements, FinancesCurrencyType currencyType, Date start, BigDecimal accountBalance){
 
         List<AccountKardex> dataList = new ArrayList<AccountKardex>();
         BigDecimal balance = BigDecimal.ZERO;
         /** For M.N. **/
+
+        AccountKardex initAccountKardex = new AccountKardex(start, BigDecimal.ZERO, accountBalance, accountBalance);
+        dataList.add(initAccountKardex);
 
         if (currencyType.equals(FinancesCurrencyType.P)){
             System.out.println("------- KARDEX MN -------");
@@ -485,22 +488,27 @@ public class AccountAction extends GenericAction<Account> {
 
                 AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebit(),detail.getCredit(),balance);
                 dataList.add(data);
-                System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
+                //System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
             }
         }
 
         /** For M.E. **/
         if (currencyType.equals(FinancesCurrencyType.D) || currencyType.equals(FinancesCurrencyType.M)){
-            System.out.println("------- KARDEX MEV -------");
+            //System.out.println("------- KARDEX MEV -------");
             for (VoucherDetail detail : accountMovements){
                 balance = BigDecimalUtil.subtract(balance, detail.getDebitMe(), 6);
                 balance = BigDecimalUtil.sum(balance, detail.getCreditMe(), 6);
 
                 AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebitMe(), detail.getCreditMe(), balance);
                 dataList.add(data);
-                System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
+                //System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
             }
         }
+        System.out.println("--------------------ACCOUNT KARDEX----------------------");
+        for (AccountKardex data : dataList){
+            System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + data.getBalance());
+        }
+
         return dataList;
     }
 
