@@ -66,6 +66,10 @@ public class Account implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean retentionFlag = Boolean.TRUE;
 
+    @Column(name = "emp", nullable = true)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean companyAccountFlag = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
@@ -179,5 +183,13 @@ public class Account implements BaseModel {
 
     public void setRetentionFlag(Boolean retentionFlag) {
         this.retentionFlag = retentionFlag;
+    }
+
+    public Boolean getCompanyAccountFlag() {
+        return companyAccountFlag;
+    }
+
+    public void setCompanyAccountFlag(Boolean companyAccountFlag) {
+        this.companyAccountFlag = companyAccountFlag;
     }
 }

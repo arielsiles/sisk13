@@ -43,6 +43,10 @@ alter table cuenta add column ret int(1) after saldo;
 update cuenta c set c.`ret` = 1;
 update cuenta c set c.`ret` = 0 where c.`idcuenta` = 2065;
 
+/** 10.08.2019 **/
+alter table cuenta add column emp int(1) after ret;
+update cuenta c set c.`emp` = 0;
+update cuenta c set c.`emp` = 1 where c.`idcuenta` = 2065;
 --
  
  

@@ -254,7 +254,7 @@ public class AccountAction extends GenericAction<Account> {
             BigDecimal ivaTax = BigDecimal.ZERO;
 
             List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
-            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency(), startDate,accountService.calculateAccountBalance(account, start, end));
+            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency(), startDate, accountService.calculateAccountBalance(account, start, end));
 
             /** change for conditions: with credit, without credit **/
             BigDecimal percentage = account.getAccountType().getInta(); /** Without credit **/
@@ -304,7 +304,7 @@ public class AccountAction extends GenericAction<Account> {
             /** Adicionar cuentas contables **/
             if (BigDecimalUtil.roundBigDecimal(interest, 2).doubleValue() > 0){ // Para no crear con valores 0.00
 
-                if (!account.getRetentionFlag()) interest = BigDecimalUtil.subtract(interest, ivaTax, 6);
+                if (!account.getRetentionFlag() && account.getCompanyAccountFlag()) interest = BigDecimalUtil.subtract(interest, ivaTax, 6);
 
                 VoucherDetail detailInterest = buildAccountEntryDetail(cashAccountCode, interest, "CREDIT", account.getCurrency(), Boolean.TRUE);
                 detailInterest.setPartnerAccount(account);
@@ -477,7 +477,8 @@ public class AccountAction extends GenericAction<Account> {
         BigDecimal balance = BigDecimal.ZERO;
         /** For M.N. **/
 
-        AccountKardex initAccountKardex = new AccountKardex(start, BigDecimal.ZERO, accountBalance, accountBalance);
+        balance = accountBalance;
+        AccountKardex initAccountKardex = new AccountKardex(start, BigDecimal.ZERO, accountBalance, balance);
         dataList.add(initAccountKardex);
 
         if (currencyType.equals(FinancesCurrencyType.P)){
@@ -486,7 +487,7 @@ public class AccountAction extends GenericAction<Account> {
                 balance = BigDecimalUtil.subtract(balance, detail.getDebit(), 6);
                 balance = BigDecimalUtil.sum(balance, detail.getCredit(), 6);
 
-                AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebit(),detail.getCredit(),balance);
+                AccountKardex data = new AccountKardex(detail.getVoucher().getDate(), detail.getDebit(),detail.getCredit(), balance);
                 dataList.add(data);
                 //System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
             }
