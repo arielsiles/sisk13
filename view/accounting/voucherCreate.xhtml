@@ -155,9 +155,16 @@
                              reRender="itemAccountField, debitField, creditField"
                              tabindex="11">
             </app:selectPopUp>
-
-            <a4j:commandButton id="newRegisterId"
+            <!--<a4j:commandButton id="newRegisterId"
                                action="#{voucherCreateAction.assignCashAccountVoucherDetail()}"
+                               rendered="#{voucherCreateAction.pending}"
+                               value=" + "
+                               styleClass="button"
+                               immediate="true"
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
+            </a4j:commandButton>-->
+            <a4j:commandButton id="newRegisterId"
+                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
                                rendered="#{voucherCreateAction.pending}"
                                value=" + "
                                styleClass="button"
@@ -377,10 +384,11 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{debitFieldId}">
+                                <!--readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"-->
                                 <h:inputText id="#{debitInputFieldId}"
                                              value="#{voucherDetail.debit}"
                                              styleClass="inputSmall right"
-                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
+
                                              required="true"
                                              rendered="true">
                                     <app:realNumberConverter minimum="0"
@@ -396,16 +404,16 @@
 
                         <td class="rich-table-cell center">
                             <s:div id="#{creditFieldId}">
+                                <!--readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"-->
                                 <h:inputText id="#{creditInputFieldId}"
                                              value="#{voucherDetail.credit}"
                                              styleClass="inputSmall right"
-                                             readonly="#{voucherCreateAction.isFiscalCredit(voucherDetail)}"
+
                                              required="true"
                                              rendered="true">
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{creditInputFieldId}"/>
-                                    <!--<a4j:support event="onblur" ajaxSingle="true" reRender="#{creditFieldId}, totalCredit" actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>-->
                                     <a4j:support event="onblur" ajaxSingle="true"
                                                  reRender="movementDetailListPanel"
                                                  actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>

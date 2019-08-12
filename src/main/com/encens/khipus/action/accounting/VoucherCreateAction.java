@@ -138,7 +138,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         //voucher.setPurchaseDocumentList(purchaseDocumentList);
 
-        Boolean hasFiscalCredit = false;
+        //Boolean hasFiscalCredit = false;
 
         BigDecimal totalD = BigDecimal.ZERO;
         BigDecimal totalC = BigDecimal.ZERO;
@@ -153,7 +153,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 totalC = totalC.add(voucherDetail.getCredit());
 
                 if (isFiscalCredit(voucherDetail)){
-                    hasFiscalCredit = true;
+                    //hasFiscalCredit = true;
                     totalFiscalCredit = BigDecimalUtil.sum(totalFiscalCredit, voucherDetail.getDebit(), 2);
                 }
 
@@ -186,8 +186,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             }*/
 
             if (totalFiscalCredit.compareTo(totalIVA) != 0){
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectFiscalCredit");
-                return Outcome.REDISPLAY;
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incorrectFiscalCredit");
+                //return Outcome.REDISPLAY;
             }
 
             /** For Create Invoice **/
