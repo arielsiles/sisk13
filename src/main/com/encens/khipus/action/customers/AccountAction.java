@@ -235,7 +235,8 @@ public class AccountAction extends GenericAction<Account> {
         voucher.setDate(this.endDate);
         voucher.setGloss("CAPITALIZACION DE INTERESES SOBRE " + MessageUtils.getMessage(savingType.getResourceKey()).toUpperCase() + " AL " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
-        List<Account> accountsMnList = accountService.getSavingsAccounts(savingType);
+        List<Account> accountList = accountService.getSavingsAccounts(savingType);
+        accountList = removeZeroBalance(accountList, this.startDate, this.endDate);
 
         /** Para calcular el saldo a inicio del periodo a capitalizar, resta un dia a fecha inicio **/
         Calendar calendar = Calendar.getInstance();
@@ -244,12 +245,12 @@ public class AccountAction extends GenericAction<Account> {
         Date start = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate));
         Date end   = calendar.getTime();
         System.out.println("=====> FECHAS: " + start + " - " + end);
-        for (Account account : accountsMnList){
+        for (Account account : accountList){
             BigDecimal balance = accountService.calculateAccountBalance(account, start, end);
             System.out.println("=====> SALDO CUENTA: " + account.getPartner().getFullName() + " : " + balance);
         }
 
-        for (Account account : accountsMnList){
+        for (Account account : accountList){
             BigDecimal interest = BigDecimal.ZERO;
             BigDecimal ivaTax = BigDecimal.ZERO;
 
@@ -369,6 +370,17 @@ public class AccountAction extends GenericAction<Account> {
 
         voucherAccoutingService.saveVoucher(voucher);
 
+    }
+
+    private List<Account> removeZeroBalance(List<Account> accountList, Date start, Date end){
+
+        List<Account> result = new ArrayList<Account>();
+        for (Account account: accountList){
+            BigDecimal balance = accountService.calculateAccountBalance(account, start, end);
+            if (balance.doubleValue() > 0)
+                result.add(account);
+        }
+        return result;
     }
 
     public BigDecimal calculateTotalInterestSum(List<VoucherDetail> voucherDetailList, String account, Boolean interest){
