@@ -198,7 +198,7 @@
             </s:decorate>
 
             <s:div id="savingAccountDiv">
-                <s:decorate id="partnerAccountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<s:decorate id="partnerAccountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Partner.partnerAccount']}</ui:define>
                     <h:selectOneMenu id="partnerAccount" value="#{creditTransactionAction.account}" styleClass="inputLarge" required="true" tabindex="2">
                         <s:selectItems value="#{partnerAccountList.resultList}" var="partnerAccount" label="#{accountAction.getFullAccountBalance(partnerAccount)}"
@@ -216,7 +216,29 @@
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="transferAmount"/>
                         <a4j:support event="onchange" reRender="transferAmount" action="#{creditTransactionAction.setDifferenceTransfer()}"/>
                     </h:inputText>
+                </s:decorate>-->
+
+                <s:decorate id="transferAmountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditTransaction.accounts']}</ui:define>
+                    <rich:dataTable id="creditTransactionListId"
+                                    value="#{creditTransactionAction.getAccountList(credit.partner)}"
+                                    var="partnerAccount"
+                                    rows="#{sessionUser.rowsPerPage}"
+                                    rendered="#{creditTransactionAction.transferSaving}"
+                                    >
+
+                        <rich:column styleClass="left">
+                            <h:outputText value="#{accountAction.getFullAccountBalance(partnerAccount)}" />
+                        </rich:column>
+
+                        <rich:column>
+                            <h:inputText value="#{partnerAccount.transfer}"  styleClass="inputNumberSmall" />
+                        </rich:column>
+                    </rich:dataTable>
                 </s:decorate>
+
+
+
 
             </s:div>
 

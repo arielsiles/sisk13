@@ -1,6 +1,7 @@
 package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.customers.Account;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.customers.SavingType;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -25,5 +26,6 @@ public interface AccountService {
     List<Account> getAccountList();
     List<Account> getSavingsAccounts(SavingType savingType);
     List<Account> getSavingsAccounts(SavingType savingType, FinancesCurrencyType currencyType);
+    List<Account> getAccountList(Partner partner);
 
 }

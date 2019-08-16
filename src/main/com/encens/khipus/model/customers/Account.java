@@ -87,6 +87,8 @@ public class Account implements BaseModel {
     @NotNull
     private Company company;
 
+    @Transient
+    private BigDecimal transfer = BigDecimal.ZERO;
 
     @Override
     public Long getId() {
@@ -191,5 +193,13 @@ public class Account implements BaseModel {
 
     public void setCompanyAccountFlag(Boolean companyAccountFlag) {
         this.companyAccountFlag = companyAccountFlag;
+    }
+
+    public BigDecimal getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(BigDecimal transfer) {
+        this.transfer = transfer;
     }
 }

@@ -2,6 +2,7 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.customers.Account;
 import com.encens.khipus.model.customers.AccountState;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.customers.SavingType;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -144,6 +145,18 @@ public class AccountServiceBean implements AccountService {
                 .setParameter("currency", currencyType)
                 .setParameter("savingType", savingType)
                 .getResultList();
+        return accountList;
+    }
+
+    @Override
+    public List<Account> getAccountList(Partner partner) {
+        List<Account> accountList = new ArrayList<Account>();
+
+        accountList = (List<Account>) em.createQuery("select account from Account account" +
+                " where account.partner =:partner ")
+                .setParameter("partner", partner)
+                .getResultList();
+
         return accountList;
     }
 

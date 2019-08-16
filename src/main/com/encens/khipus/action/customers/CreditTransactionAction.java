@@ -13,6 +13,7 @@ import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.customers.AccountService;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.service.finances.CashAccountService;
@@ -27,6 +28,7 @@ import org.jboss.seam.international.StatusMessage;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Actions for Credit
@@ -48,6 +50,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private CashAccountService cashAccountService;
     @In
     private FinancesExchangeRateService financesExchangeRateService;
+    @In
+    private AccountService accountService;
 
     @In(create = true)
     private CreditAction creditAction;
@@ -67,6 +71,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private Boolean transferSaving = Boolean.FALSE;
     private Account account;
     private String gloss;
+
+    private List<Account> accountList;
 
     @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
     public CreditTransaction initCredit() {
@@ -650,6 +656,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (differenceAvailable.doubleValue() < 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"CreditTransaction.message.invalidTransferAmount");
         }
+    }
+
+    public List<Account> getAccountList(Partner partner){
+
+        this.accountList = accountService.getAccountList(partner);
+        return accountList;
     }
 
 }
