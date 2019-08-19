@@ -218,6 +218,15 @@
                     </h:inputText>
                 </s:decorate>-->
 
+                <s:decorate id="totalTransferField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditTransaction.totalTransferAmount']}</ui:define>
+                    <h:outputText id="totalTransfer"
+                                  value="#{creditTransactionAction.getTotalTransferAmount()}"
+                                  styleClass="input">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="totalTransfer"/>
+                    </h:outputText>
+                </s:decorate>
+
                 <s:decorate id="transferAmountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CreditTransaction.accounts']}</ui:define>
                     <rich:dataTable id="creditTransactionListId"
@@ -232,13 +241,13 @@
                         </rich:column>
 
                         <rich:column>
-                            <h:inputText value="#{partnerAccount.transfer}"  styleClass="inputNumberSmall" />
+                            <h:inputText value="#{partnerAccount.transferAmount}" styleClass="inputNumberSmall" >
+                                <a4j:support event="onblur" action="#{creditTransactionAction.getTotalTransferAmount()}" reRender="totalTransferField"/>
+                                <!--<app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />-->
+                            </h:inputText>
                         </rich:column>
                     </rich:dataTable>
                 </s:decorate>
-
-
-
 
             </s:div>
 

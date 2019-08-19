@@ -74,10 +74,12 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     private List<Account> accountList;
 
-    @Factory(value = "creditTransaction", scope = ScopeType.STATELESS)
+    @Factory(value = "creditTransaction")
     public CreditTransaction initCredit() {
         try {
+
             exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+            System.out.println("----> Obteniendo tipo de cambio... " + exchangeRate);
         }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
         }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
         return getInstance();
@@ -662,6 +664,26 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         this.accountList = accountService.getAccountList(partner);
         return accountList;
+    }
+
+    public BigDecimal getTotalTransferAmount(){
+        BigDecimal result = BigDecimal.ZERO;
+        /*BigDecimal exchange = BigDecimal.ZERO;
+        try {
+            exchange = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}*/
+
+        for (Account account : this.accountList){
+            System.out.println("----> Transf amount: " + account.getTransferAmount());
+            if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M)){
+                result = BigDecimalUtil.sum(result, BigDecimalUtil.multiply(account.getTransferAmount(), Constants.EXCHANGE_RATE));
+            }
+
+            if (account.getCurrency().equals(FinancesCurrencyType.P))
+                result = BigDecimalUtil.sum(result, account.getTransferAmount());
+        }
+        return result;
     }
 
 }
