@@ -236,15 +236,18 @@ public class AccountAction extends GenericAction<Account> {
         voucher.setGloss("CAPITALIZACION DE INTERESES SOBRE " + MessageUtils.getMessage(savingType.getResourceKey()).toUpperCase() + " AL " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
         List<Account> accountList = accountService.getSavingsAccounts(savingType);
-        accountList = removeZeroBalance(accountList, this.startDate, this.endDate);
 
         /** Para calcular el saldo a inicio del periodo a capitalizar, resta un dia a fecha inicio **/
+        /** todo: corregir segundos en fecha inicio toma los segundos del sistema **/
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date start = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate));
         Date end   = calendar.getTime();
         System.out.println("=====> FECHAS: " + start + " - " + end);
+
+        accountList = removeZeroBalance(accountList, start, end); // revisar
+
         for (Account account : accountList){
             BigDecimal balance = accountService.calculateAccountBalance(account, start, end);
             System.out.println("=====> SALDO CUENTA: " + account.getPartner().getFullName() + " : " + balance);
@@ -268,7 +271,7 @@ public class AccountAction extends GenericAction<Account> {
                 previous.setInterest(calculateInterest(previous.getDate(), endDate, previous.balance, percentage));
                 interest = BigDecimalUtil.sum(interest, previous.getInterest(), 6);
                 ivaTax = BigDecimalUtil.multiply(interest, Constants.VAT, 6);
-                System.out.println(DateUtils.format(this.endDate, "dd/MM/yyyy") + " ===> D:" + previous.getDebit() + " H:" + previous.getCredit() + " Int: " + interest);
+                //System.out.println(DateUtils.format(this.endDate, "dd/MM/yyyy") + " ===> D:" + previous.getDebit() + " H:" + previous.getCredit() + " Int: " + interest);
             }
 
             /** Para 2 o mas transacciones en el periodo **/
@@ -277,14 +280,14 @@ public class AccountAction extends GenericAction<Account> {
                 AccountKardex current = kardexList.get(i);
                 current.setInterest(calculateInterest(previous.getDate(), current.getDate(), previous.balance, percentage));
                 interest = BigDecimalUtil.sum(interest, current.getInterest(), 6);
-                System.out.println(DateUtils.format(current.getDate(), "dd/MM/yyyy") + " ++-> D:" + current.getDebit() + " H:" + current.getCredit() + " Int: " + current.getInterest());
+                //System.out.println(DateUtils.format(current.getDate(), "dd/MM/yyyy") + " ++-> D:" + current.getDebit() + " H:" + current.getCredit() + " Int: " + current.getInterest());
 
                 /** Si ultima transaccion es menor al 31/mm/aaaaa **/
                 if (i == kardexList.size()-1){
                     if (kardexList.get(i).getDate().compareTo(this.endDate) < 0){
                         BigDecimal endInterest = calculateInterest(kardexList.get(i).getDate(), this.endDate, current.getBalance(), percentage);
                         interest = BigDecimalUtil.sum(interest, endInterest, 6);
-                        System.out.println(DateUtils.format(this.endDate, "dd/MM/yyyy") + " ---> D:" + current.getDebit() + " H:" + current.getCredit() + " Int: " + endInterest);
+                        //System.out.println(DateUtils.format(this.endDate, "dd/MM/yyyy") + " ---> D:" + current.getDebit() + " H:" + current.getCredit() + " Int: " + endInterest);
                     }
                 }
             }
@@ -494,7 +497,7 @@ public class AccountAction extends GenericAction<Account> {
         dataList.add(initAccountKardex);
 
         if (currencyType.equals(FinancesCurrencyType.P)){
-            System.out.println("------- KARDEX MN -------");
+            //System.out.println("------- KARDEX MN -------");
             for (VoucherDetail detail : accountMovements){
                 balance = BigDecimalUtil.subtract(balance, detail.getDebit(), 6);
                 balance = BigDecimalUtil.sum(balance, detail.getCredit(), 6);
@@ -517,10 +520,10 @@ public class AccountAction extends GenericAction<Account> {
                 //System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + balance);
             }
         }
-        System.out.println("--------------------ACCOUNT KARDEX----------------------");
+        /*System.out.println("--------------------ACCOUNT KARDEX----------------------");
         for (AccountKardex data : dataList){
             System.out.println("---> " + data.getDate() + " - " + data.getDebit() + " - " + data.getCredit() + " - " + data.getBalance());
-        }
+        }*/
 
         return dataList;
     }
@@ -537,7 +540,7 @@ public class AccountAction extends GenericAction<Account> {
         if (previousDate.equals(startDate))
             days = days+1;
 
-        System.out.println("--> D:" + days);
+        //System.out.println("--> D:" + days);
 
         BigDecimal var_interest = BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 6);
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);

@@ -100,7 +100,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 
-            System.out.println("CUENTA: " + voucherDetail.getAccount() + " NOTRANS:" + voucherDetail.getTransactionNumber() + " D:" + voucherDetail.getDebit() + " H:" + voucherDetail.getCredit());
+            //System.out.println("CUENTA: " + voucherDetail.getAccount() + " NOTRANS:" + voucherDetail.getTransactionNumber() + " D:" + voucherDetail.getDebit() + " H:" + voucherDetail.getCredit());
 
             em.persist(voucherDetail);
             em.flush();

@@ -21,7 +21,7 @@ import java.util.List;
 public interface AccountService {
 
     List<VoucherDetail> getAccountDetailList(Account account);
-    BigDecimal calculateAccountBalance(Account account, Date startDate, Date endDate);
+    BigDecimal  calculateAccountBalance(Account account, Date startDate, Date endDate);
     List<VoucherDetail> getMovementAccountBetweenDates(Account account, Date startDate, Date endDate);
     List<Account> getAccountList();
     List<Account> getSavingsAccounts(SavingType savingType);

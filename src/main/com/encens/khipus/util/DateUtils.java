@@ -292,6 +292,7 @@ public final class DateUtils {
         d.setYear(year - 1900);
         d.setHours(0);
         d.setMinutes(0);
+        d.setSeconds(0);
         return d;
     }
 
