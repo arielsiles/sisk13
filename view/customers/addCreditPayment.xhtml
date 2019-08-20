@@ -218,15 +218,6 @@
                     </h:inputText>
                 </s:decorate>-->
 
-                <s:decorate id="totalTransferField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CreditTransaction.totalTransferAmount']}</ui:define>
-                    <h:outputText id="totalTransfer"
-                                  value="#{creditTransactionAction.getTotalTransferAmount()}"
-                                  styleClass="input">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="totalTransfer"/>
-                    </h:outputText>
-                </s:decorate>
-
                 <s:decorate id="transferAmountField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CreditTransaction.accounts']}</ui:define>
                     <rich:dataTable id="creditTransactionListId"
@@ -247,6 +238,15 @@
                             </h:inputText>
                         </rich:column>
                     </rich:dataTable>
+                </s:decorate>
+
+                <s:decorate id="totalTransferField" rendered="#{creditTransactionAction.transferSaving}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditTransaction.totalTransferAmount']}</ui:define>
+                    <h:outputText id="totalTransfer"
+                                  value="#{creditTransactionAction.getTotalTransferAmount()}"
+                                  styleClass="input">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="totalTransfer"/>
+                    </h:outputText>
                 </s:decorate>
 
             </s:div>
