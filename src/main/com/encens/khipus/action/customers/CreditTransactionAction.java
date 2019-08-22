@@ -259,6 +259,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.getDetails().add(voucherDetailDifferenceChange);
         }
 
+        /** Si tiene monto de interes penal **/
+        addVoucherDetailCriminalInterest(voucher, creditTransaction);
+
         voucherAccoutingService.saveVoucher(voucher);
         creditTransactionService.updateTransaction(creditTransaction, voucher);
 
@@ -278,51 +281,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             VoucherDetail voucherDetailBox = new VoucherDetail();
             VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
-            /** Si es traspaso **/
-            /*if (creditTransaction.getTransfer()){
-                String cashAccountCode = "";
-                voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
-
-                if (account.getCurrency().equals(FinancesCurrencyType.P))
-                    cashAccountCode = this.account.getAccountType().getCashAccountMn().getAccountCode();
-                if (account.getCurrency().equals(FinancesCurrencyType.D))
-                    cashAccountCode = this.account.getAccountType().getCashAccountMe().getAccountCode();
-                if (account.getCurrency().equals(FinancesCurrencyType.M))
-                    cashAccountCode = this.account.getAccountType().getCashAccountMv().getAccountCode();
-
-                voucherDetailBox.setAccount(cashAccountCode);
-                voucherDetailBox.setPartnerAccount(this.account);
-                if (account.getCurrency().equals(FinancesCurrencyType.D) || account.getCurrency().equals(FinancesCurrencyType.M)){
-                    //voucherDetailBox.setDebit(creditTransaction.getAmount());
-                    voucherDetailBox.setDebit(BigDecimalUtil.sum(creditTransaction.getAmount(), differenceAvailable));
-                    voucherDetailBox.setCredit(BigDecimal.ZERO);
-                    //voucherDetailBox.setDebitMe(BigDecimalUtil.divide(creditTransaction.getAmount(), exchangeRate));
-                    voucherDetailBox.setDebitMe(getTransferAmount());
-                    voucherDetailBox.setCreditMe(BigDecimal.ZERO);
-                    voucherDetailBox.setCurrency(account.getCurrency());
-                }else {
-                    //voucherDetailBox.setDebit(creditTransaction.getAmount());
-                    voucherDetailBox.setDebit(getTransferAmount());
-                    voucherDetailBox.setCredit(BigDecimal.ZERO);
-                    voucherDetailBox.setDebitMe(BigDecimal.ZERO);
-                    voucherDetailBox.setCreditMe(BigDecimal.ZERO);
-                }
-
-                *//** Si existe diferencia de cambio **//*
-                if (differenceAvailable.doubleValue() > 0){
-                    voucherDetailDifferenceChange.setAccount(Constants.ACCOUNT_DIFFERENCE_AVAILABLE_CHANGE);
-                    voucherDetailDifferenceChange.setDebit(BigDecimal.ZERO);
-                    voucherDetailDifferenceChange.setCredit(differenceAvailable);
-                    voucherDetailDifferenceChange.setCurrency(FinancesCurrencyType.P);
-                    voucherDetailDifferenceChange.setDebitMe(BigDecimal.ZERO);
-                    voucherDetailDifferenceChange.setCreditMe(BigDecimal.ZERO);
-                }
-
-            }else {
-                voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH); *//** todo **//*
-                voucherDetailBox.setDebit(creditTransaction.getAmount());
-                voucherDetailBox.setCredit(BigDecimal.ZERO);
-            }*/
 
             voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH); /** todo **/
             voucherDetailBox.setDebit(creditTransaction.getAmount());
@@ -371,17 +329,41 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.setGloss(creditTransaction.getGloss());
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
+
             if (creditTransaction.getInterest().doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailInterest);
             if (differenceAvailable.doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailDifferenceChange);
 
+            /** Si tiene monto de interes penal **/
+            addVoucherDetailCriminalInterest(voucher, creditTransaction);
+            /*if (creditTransaction.getCriminalInterest().doubleValue() > 0){
+                VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
+                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+                voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
+                voucher.getDetails().add(voucherDetailCriminalInterest);
+            }*/
+
             voucherAccoutingService.saveVoucher(voucher);
 
             creditTransactionService.updateTransaction(creditTransaction, voucher);
-
         }
+    }
 
+    private void addVoucherDetailCriminalInterest(Voucher voucher, CreditTransaction creditTransaction){
+        /** Si tiene monto de interes penal **/
+        if (creditTransaction.getCriminalInterest().doubleValue() > 0){
+            VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
+            voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+            voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
+            voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+            voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
+            voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
+            voucher.getDetails().add(voucherDetailCriminalInterest);
+        }
     }
 
     @Override

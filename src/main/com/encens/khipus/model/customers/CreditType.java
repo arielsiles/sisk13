@@ -55,6 +55,9 @@ public class CreditType implements BaseModel {
     @Column(name = "ictaeje")
     private String executedInterestAccountCode;
 
+    @Column(name = "ipctaeje")
+    private String criminalInterestAccountCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctavig", insertable = false, updatable = false, referencedColumnName = "cuenta")
     private CashAccount currentAccount;
@@ -78,6 +81,10 @@ public class CreditType implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ictaeje", insertable = false, updatable = false, referencedColumnName = "cuenta")
     private CashAccount executedInterestAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ipctaeje", insertable = false, updatable = false, referencedColumnName = "cuenta")
+    private CashAccount criminalInterestAccount;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -224,5 +231,21 @@ public class CreditType implements BaseModel {
     public void setExecutedInterestAccount(CashAccount executedInterestAccount) {
         this.executedInterestAccount = executedInterestAccount;
         setExecutedInterestAccountCode(this.executedInterestAccount != null ? this.executedInterestAccount.getAccountCode() : null);
+    }
+
+    public String getCriminalInterestAccountCode() {
+        return criminalInterestAccountCode;
+    }
+
+    public void setCriminalInterestAccountCode(String criminalInterestAccountCode) {
+        this.criminalInterestAccountCode = criminalInterestAccountCode;
+    }
+
+    public CashAccount getCriminalInterestAccount() {
+        return criminalInterestAccount;
+    }
+
+    public void setCriminalInterestAccount(CashAccount criminalInterestAccount) {
+        this.criminalInterestAccount = criminalInterestAccount;
     }
 }

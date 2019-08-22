@@ -186,6 +186,20 @@
                                      hotKeySelect="alt+1"/>
                 </s:decorate>
 
+                <s:decorate id="criminalInterestAccountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.criminalInterestAccount']}</ui:define>
+                    <app:selectPopUp id="criminalInterestAccount"
+                                     required="true"
+                                     textValue="#{creditType.criminalInterestAccount.fullName}"
+                                     value="#{creditType.criminalInterestAccount}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearCriminalInterestAccount()}"
+                                     searchModalPanel="criminalInterestAccountListModalPanel"
+                                     reRender="criminalInterestAccountField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
             </rich:panel>
 
         </h:form>
@@ -281,6 +295,19 @@
                                    styleClass="select-image-middle"
                                    reRender="executedInterestAccountField"
                                    oncomplete="Richfaces.hideModalPanel('executedInterestAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="criminalInterestAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="criminalInterestAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="criminalInterestAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignCriminalInterestAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="criminalInterestAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('criminalInterestAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

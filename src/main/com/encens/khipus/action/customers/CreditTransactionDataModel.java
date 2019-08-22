@@ -24,7 +24,7 @@ public class CreditTransactionDataModel extends QueryDataModel<Long, CreditTrans
             {"creditTransaction.credit = #{credit}"};
     @Create
     public void init() {
-        sortProperty = "creditTransaction.date";
+        sortProperty = "creditTransaction.id";
         sortAsc = false;
     }
 
