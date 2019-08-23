@@ -466,6 +466,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
 
+        /** For criminal interest **/
+        BigDecimal var_criminalInterest = BigDecimalUtil.divide(credit.getCriminalInterest(), BigDecimalUtil.ONE_HUNDRED, 6);
+        /** todo **/
+
+        /** --- **/
+
+
         getInstance().setInterest(interest);
         BigDecimal currentCapital = calculateCapital(credit);
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
@@ -476,6 +483,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;
         this.criminalInterestValue = calculateCriminalInterest();
+
+
+
 
         if (saldoCapital.doubleValue() < capitalValue.doubleValue()) {
             capitalValue = saldoCapital;

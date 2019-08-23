@@ -2,7 +2,6 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.customers.Account;
-import com.encens.khipus.model.customers.Credit;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -24,10 +23,12 @@ public class AccountDataModel extends QueryDataModel<Long, Account> {
 
     private String firstName;
     private String lastName;
+    private String maidenName;
 
     private static final String[] RESTRICTIONS = {
             "lower(account.partner.firstName) like concat('%', concat(lower(#{accountDataModel.firstName}), '%'))",
             "lower(account.partner.lastName) like concat('%', concat(lower(#{accountDataModel.lastName}), '%'))",
+            "lower(account.partner.maidenName) like concat('%', concat(lower(#{accountDataModel.maidenName}), '%'))",
             "lower(account.accountNumber) like concat('%', concat(lower(#{accountDataModel.criteria.accountNumber}), '%'))"
     };
 
@@ -56,5 +57,14 @@ public class AccountDataModel extends QueryDataModel<Long, Account> {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+
+    public String getMaidenName() {
+        return maidenName;
+    }
+
+    public void setMaidenName(String maidenName) {
+        this.maidenName = maidenName;
     }
 }

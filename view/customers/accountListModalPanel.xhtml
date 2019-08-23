@@ -23,49 +23,59 @@
     </f:facet>
     <h:form id="accountListForm#{dialogId}">
         <rich:simpleTogglePanel label="#{messages['Account.search']}" switchType="account">
-            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
-                         columnClasses="width50percent,width50percent">
-                <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.name']}</ui:define>
-                    <h:inputText id="firstName" value="#{dataModel.firstName}" maxlength="20"
-                                 styleClass="input"
-                                 tabindex="2001"/>
-                </s:decorate>
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
 
-                <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
-                    <h:inputText id="lastName" value="#{dataModel.lastName}" maxlength="100"
-                                 styleClass="input"
-                                 tabindex="2002"/>
-                </s:decorate>
+                <s:div>
+                    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+                        <h:inputText id="firstName" value="#{dataModel.firstName}" maxlength="20"
+                                     styleClass="input"
+                                     tabindex="2001"/>
+                    </s:decorate>
 
-                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.account']}</ui:define>
-                    <h:inputText id="accountNumber" value="#{dataModel.criteria.accountNumber}" maxlength="100"
-                                 styleClass="input"
-                                 tabindex="2002"/>
-                </s:decorate>
+                    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+                        <h:inputText id="lastName" value="#{dataModel.lastName}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="2002"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+                        <h:inputText id="maidenName" value="#{dataModel.maidenName}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="2003"/>
+                    </s:decorate>
 
-                <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <a4j:commandButton action="#{dataModel.search}"
-                                       reRender="accountList, dataScroller"
-                                       styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
-                                       tabindex="2004">
-                        <s:defaultAction/>
-                    </a4j:commandButton>
-                </s:decorate>
+                    <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.account']}</ui:define>
+                        <h:inputText id="accountNumber" value="#{dataModel.criteria.accountNumber}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="2004"/>
+
+                        <a4j:commandButton action="#{dataModel.search}"
+                                           reRender="accountList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                           tabindex="2004">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
             </h:panelGrid>
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="accountItem" id="accountList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="25%, 25%, 10%, 25%, 10%, 5%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="15%, 15%, 15%, 10%, 20%, 5%, 10%, 5%">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column>#{messages['Partner.name']}</rich:column>
+                    <rich:column>#{messages['Partner.firstName']}</rich:column>
                     <rich:column>#{messages['Partner.lastName']}</rich:column>
+                    <rich:column>#{messages['Partner.maidenName']}</rich:column>
                     <rich:column>#{messages['Partner.account']}</rich:column>
                     <rich:column>#{messages['Account.accountType']}</rich:column>
                     <rich:column>#{messages['Account.currency']}</rich:column>
+                    <rich:column>#{messages['Account.balance']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
                     </rich:column>
@@ -78,6 +88,9 @@
                 <h:outputText value="#{accountItem.partner.lastName}"/>
             </rich:column>
             <rich:column>
+                <h:outputText value="#{accountItem.partner.maidenName}"/>
+            </rich:column>
+            <rich:column>
                 <h:outputText value="#{accountItem.accountNumber}"/>
             </rich:column>
             <rich:column>
@@ -85,6 +98,11 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{messages[accountItem.currency.symbolResourceKey]}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{accountAction.getTotalBalanceAccount(accountItem)}" >
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
             </rich:column>
             <rich:column styleClass="center">
                 <ui:insert name="assignButton"/>
