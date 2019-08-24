@@ -476,6 +476,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setInterest(interest);
         BigDecimal currentCapital = calculateCapital(credit);
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
+        totalPayment = BigDecimalUtil.sum(totalPayment, criminalInterest, 6);
+
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
 
@@ -490,11 +492,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (saldoCapital.doubleValue() < capitalValue.doubleValue()) {
             capitalValue = saldoCapital;
             totalPayment = BigDecimalUtil.sum(capitalValue, interest, 6);
+            totalPayment = BigDecimalUtil.sum(totalPayment, criminalInterest, 6);
             this.totalAmountValue = totalPayment;
         }
 
         System.out.println("--------------------------> Capital: " + capitalValue);
         System.out.println("--------------------------> Interes: " + interestValue);
+        System.out.println("--------------------------> Interes Penal: " + criminalInterestValue);
         System.out.println("--------------------------> Total  : " + totalAmountValue);
 
         return interest;
@@ -619,12 +623,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void calculateTotalCapital(){
 
-        //BigDecimal totalCapital = null;
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
-            //totalCapital = BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6);
-            //getInstance().setCapital(BigDecimalUtil.subtract(getInstance().getAmount(), getInstance().getInterest(), 6));
-            setCapitalValue(BigDecimalUtil.subtract(totalAmountValue, interestValue, 6));
-
+            BigDecimal totalCapital = BigDecimalUtil.subtract(totalAmountValue, interestValue, 6);
+            totalCapital = BigDecimalUtil.subtract(totalCapital, criminalInterestValue, 6);
+            setCapitalValue(totalCapital);
         }
     }
 
