@@ -212,9 +212,9 @@
                         </rich:column>
 
                         <rich:column>
-                            <h:inputText value="#{partnerAccount.transferAmount}" styleClass="inputNumberSmall" >
-                                <a4j:support event="onblur" action="#{creditTransactionAction.getTotalTransferAmount()}" reRender="totalTransferField"/>
-                                <!--<app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />-->
+                            <h:inputText id="amount#{partnerAccount.id}" value="#{partnerAccount.transferAmount}" styleClass="inputNumberSmall" >
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount#{partnerAccount.id}" />
+                                <a4j:support event="onblur" action="#{creditTransactionAction.getTotalTransferAmount()}" reRender="totalTransferField, creditTransactionListId"/>
                             </h:inputText>
                         </rich:column>
                     </rich:dataTable>

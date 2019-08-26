@@ -1,7 +1,12 @@
 /** 22.08.2019 **/
-ALTER TABLE tipocredito ADD COLUMN ipctaeje VARCHAR(20) AFTER ictaeje;
+alter table tipocredito add column ipctaeje varchar(20) after ictaeje;
 
 -- FCISC
-UPDATE tipocredito t SET t.ipctaeje = '5159910100' WHERE t.`idtipocredito` = 1; -- Intereses Penales Cartera Ejec.CIS M.N
+update tipocredito t set t.ipctaeje = '5159910100' where t.`idtipocredito` = 1; -- Intereses Penales Cartera Ejec.CIS M.N
 -- verifivar ????
-UPDATE tipocredito t SET t.ipctaeje = '5159930100' WHERE t.`idtipocredito` = 1; -- Intereses Penales Cartera en ejec.MV
+update tipocredito t set t.ipctaeje = '5159930100' where t.`idtipocredito` = 1; -- Intereses Penales Cartera en ejec.MV
+
+
+-- 
+-- Añadir restriccion de integridad en:
+-- sf_tmpdet (idsocio, idcuenta, idcredito)

@@ -9,6 +9,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -141,7 +142,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         CreditTransaction creditTransaction = getInstance();
         BigDecimal capitalBalance = creditItem.getCapitalBalance();
-        capitalBalance = BigDecimalUtil.subtract(capitalBalance, capitalValue, 6);
+        capitalBalance = BigDecimalUtil.subtract(capitalBalance, capitalValue, 2);
         creditTransaction.setDate(dateTransaction);
         creditTransaction.setDays(0);
         creditTransaction.setCapitalBalance(capitalBalance);
@@ -354,15 +355,36 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     private void addVoucherDetailCriminalInterest(Voucher voucher, CreditTransaction creditTransaction){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
+
+
         /** Si tiene monto de interes penal **/
         if (creditTransaction.getCriminalInterest().doubleValue() > 0){
+
+            CashAccount cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+
             VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
-            voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
-            voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
-            voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
-            voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
-            voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
-            voucher.getDetails().add(voucherDetailCriminalInterest);
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+                voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
+                voucher.getDetails().add(voucherDetailCriminalInterest);
+            }
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)) {
+                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+                voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCreditMe(BigDecimalUtil.divide(creditTransaction.getCriminalInterest(), exchangeRate, 2));
+                voucher.getDetails().add(voucherDetailCriminalInterest);
+            }
         }
     }
 
