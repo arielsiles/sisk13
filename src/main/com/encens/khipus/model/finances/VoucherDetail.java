@@ -361,10 +361,10 @@ public class VoucherDetail implements BaseModel {
 
 
 
-        System.out.println("=======> getDebit(): " + getDebit());
-        System.out.println("=======> getCredit(): " + getCredit());
-        System.out.println("=======> getDebitMe(): " + getDebitMe());
-        System.out.println("=======> getCreditMe(): " + getCreditMe());
+        //System.out.println("=======> getDebit(): " + getDebit());
+        //System.out.println("=======> getCredit(): " + getCredit());
+        //System.out.println("=======> getDebitMe(): " + getDebitMe());
+        //System.out.println("=======> getCreditMe(): " + getCreditMe());
 
 
         if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)){

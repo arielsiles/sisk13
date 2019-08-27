@@ -43,8 +43,8 @@ public class VoucherReportScriptlet extends JRDefaultScriptlet {
         //BigDecimal totalCredits = voucherUpdateAction.getTotalsCredit();
         BigDecimal totalCredits = voucherCreateAction.getTotalsCredit();
 
-        System.out.println("===========> T. Debits: " + totalDebits);
-        System.out.println("===========> T. Credits: " + totalCredits);
+        //System.out.println("===========> T. Debits: " + totalDebits);
+        //System.out.println("===========> T. Credits: " + totalCredits);
 
         this.setVariableValue("totalDebits", totalDebits);
         this.setVariableValue("totalCredits", totalCredits);

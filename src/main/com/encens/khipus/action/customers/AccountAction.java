@@ -246,12 +246,12 @@ public class AccountAction extends GenericAction<Account> {
         Date end   = calendar.getTime();
         System.out.println("=====> FECHAS: " + start + " - " + end);
 
-        accountList = removeZeroBalance(accountList, start, end); // revisar
+        //accountList = removeZeroBalance(accountList, start, end); // revisar
 
-        for (Account account : accountList){
+        /*for (Account account : accountList){
             BigDecimal balance = accountService.calculateAccountBalance(account, start, end);
             System.out.println("=====> SALDO CUENTA: " + account.getPartner().getFullName() + " : " + balance);
-        }
+        }*/
 
         for (Account account : accountList){
             BigDecimal interest = BigDecimal.ZERO;

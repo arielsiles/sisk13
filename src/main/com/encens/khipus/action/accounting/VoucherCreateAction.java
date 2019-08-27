@@ -1014,7 +1014,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if(voucherDetail.getDebit() != null)
                 total = total.add(voucherDetail.getDebit());
         }
-        System.out.println("....getTotalsDebit:::: " + total);
+        //System.out.println("....getTotalsDebit:::: " + total);
         return total;
     }
 
@@ -1034,7 +1034,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if(voucherDetail.getCredit() != null)
                 total = total.add(voucherDetail.getCredit());
         }
-        System.out.println("....getTotalsCredit:::: " + total);
+        //System.out.println("....getTotalsCredit:::: " + total);
         return total;
     }
 
