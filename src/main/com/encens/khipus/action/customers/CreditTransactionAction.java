@@ -475,6 +475,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public BigDecimal calculateInterest(){
 
         Credit credit = creditAction.getInstance();
+
         BigDecimal saldoCapital = credit.getCapitalBalance();
 
         Date currentPaymentDate = dateTransaction;
@@ -491,9 +492,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         /** For criminal interest **/ /** todo **/
         BigDecimal criminalInterest = BigDecimal.ZERO;
         if (credit.getState().equals(CreditState.EJE)) {
+            Date payment_date = creditAction.findDateOfNextPayment(credit);
+            Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
+            BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
+
             BigDecimal var_criminalInterest = BigDecimalUtil.divide(credit.getCriminalInterest(), BigDecimalUtil.ONE_HUNDRED, 6);
             criminalInterest = BigDecimalUtil.multiply(saldoCapital, var_criminalInterest, 6);
-            criminalInterest = BigDecimalUtil.multiply(criminalInterest, var_time, 6);
+            criminalInterest = BigDecimalUtil.multiply(criminalInterest, var_time_criminal, 6);
         }
         /** --- **/
 
@@ -509,8 +514,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.interestValue = interest;
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;
-        //this.criminalInterestValue = criminalInterest;
-        this.criminalInterestValue = BigDecimal.ZERO;
+        this.criminalInterestValue = criminalInterest;
+        //this.criminalInterestValue = BigDecimal.ZERO;
 
 
 
@@ -624,7 +629,21 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         System.out.println("----> QUOTAS PAGADAS: " + quota);
         return quota;
+    }
 
+    /**  **/
+    public Integer calculateQuotasForCriminal(Credit credit){
+
+        BigDecimal totalPaid = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2); // Capital pagado
+        Integer quota = BigDecimalUtil.divide(totalPaid, credit.getQuota(), 2).intValue();
+        BigDecimal totalPlanQuota = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quota), 2);
+
+        if (totalPaid.doubleValue() > totalPlanQuota.doubleValue()){
+            quota++;
+        }
+
+        System.out.println("----> CAPITAL HASTA QUOTA: " + quota);
+        return quota;
     }
 
     public Integer calculatePendingFees(Credit credit){

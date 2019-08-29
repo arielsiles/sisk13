@@ -23,9 +23,7 @@ import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -125,6 +123,46 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setPartner(null);
     }
 
+    //public void findDateOfNextPayment(Credit credit, Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas) {
+    public Date findDateOfNextPayment(Credit credit) {
+
+        Date result = null;
+
+        //int paidQuotas = creditTransactionAction.calculatePaidQuotas(credit);
+        int paidQuotas = creditTransactionAction.calculateQuotasForCriminal(credit);
+
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+
+        int i=1;
+
+        List<CreditReportAction.PaymentPlanData> listPaymentPlan = new ArrayList<CreditReportAction.PaymentPlanData>();
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas) listPaymentPlan.add(paymentPlanData);
+
+        for (int j = 0; j<listPaymentPlan.size(); j++){
+            if (i == paidQuotas || paidQuotas == 0) {
+                result = DateUtils.parse(listPaymentPlan.get(j).getPaymentDate(), "dd/MM/yyyy");
+                System.out.println("=====>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate());
+            }
+            i++;
+        }
+
+        /*for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+            if (i == paidQuotas || paidQuotas == 0) {
+                System.out.println("=====>>>> POSIBLE FECHA SIGUIENTE: " + paymentPlanData.getPaymentDate());
+                result = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+            }
+            i++;
+        }*/
+
+        System.out.println("-----------------------------");
+        System.out.println("====> CAPITAL PAGADO: " + BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2));
+        System.out.println("====> CAPITAL HASTA QUOTA: " + paidQuotas);
+        System.out.println("====> FECHA ENCONTRADA: " + DateUtils.format(result, "dd/MM/yyyy"));
+        System.out.println("-----------------------------");
+
+        return result;
+    }
+
     @End
     public String generateTransferCredit(){
 
@@ -145,6 +183,10 @@ public class CreditAction extends GenericAction<Credit> {
             System.out.println("----> Coutas Pagadas: " + paidQuotas);
 
             Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+
+            /** **/
+            //findDateOfNextPayment(credit, paymentPlanDatas);
+            /** **/
 
             Integer i=1;
             Date paidDate = null;
