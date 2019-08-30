@@ -80,14 +80,20 @@
 
             <c:choose>
                 <c:when test="#{!creditTransactionAction.managed}">
+
+                    <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.name']}</ui:define>
+                        <h:outputText>#{credit.partner.fullName}</h:outputText>
+                    </s:decorate>
+
                     <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.credit']}</ui:define>
                         <h:outputText>#{credit.previousCode}</h:outputText>
                     </s:decorate>
 
-                    <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Credit.name']}</ui:define>
-                        <h:outputText>#{credit.partner.fullName}</h:outputText>
+                    <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
+                        <h:outputText>#{credit.creditType.fullName}</h:outputText>
                     </s:decorate>
 
                     <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -159,9 +165,9 @@
                             <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                         </a4j:commandLink>
 
-                        <h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
+                        <!--<h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountME"/>
-                        </h:outputText>
+                        </h:outputText>-->
 
                     </s:decorate>
 

@@ -56,7 +56,10 @@ public class CreditType implements BaseModel {
     private String executedInterestAccountCode;
 
     @Column(name = "ipctaeje")
-    private String criminalInterestAccountCode;
+    private String criminalInterestAccountCode_EJE;
+
+    @Column(name = "ipctaven")
+    private String criminalInterestAccountCode_VEN;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctavig", insertable = false, updatable = false, referencedColumnName = "cuenta")
@@ -83,8 +86,12 @@ public class CreditType implements BaseModel {
     private CashAccount executedInterestAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ipctaven", insertable = false, updatable = false, referencedColumnName = "cuenta")
+    private CashAccount criminalInterestAccountVEN;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ipctaeje", insertable = false, updatable = false, referencedColumnName = "cuenta")
-    private CashAccount criminalInterestAccount;
+    private CashAccount criminalInterestAccountEJE;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -233,19 +240,35 @@ public class CreditType implements BaseModel {
         setExecutedInterestAccountCode(this.executedInterestAccount != null ? this.executedInterestAccount.getAccountCode() : null);
     }
 
-    public String getCriminalInterestAccountCode() {
-        return criminalInterestAccountCode;
+    public String getCriminalInterestAccountCode_EJE() {
+        return criminalInterestAccountCode_EJE;
     }
 
-    public void setCriminalInterestAccountCode(String criminalInterestAccountCode) {
-        this.criminalInterestAccountCode = criminalInterestAccountCode;
+    public void setCriminalInterestAccountCode_EJE(String criminalInterestAccountCode_EJE) {
+        this.criminalInterestAccountCode_EJE = criminalInterestAccountCode_EJE;
     }
 
-    public CashAccount getCriminalInterestAccount() {
-        return criminalInterestAccount;
+    public String getCriminalInterestAccountCode_VEN() {
+        return criminalInterestAccountCode_VEN;
     }
 
-    public void setCriminalInterestAccount(CashAccount criminalInterestAccount) {
-        this.criminalInterestAccount = criminalInterestAccount;
+    public void setCriminalInterestAccountCode_VEN(String criminalInterestAccountCode_VEN) {
+        this.criminalInterestAccountCode_VEN = criminalInterestAccountCode_VEN;
+    }
+
+    public CashAccount getCriminalInterestAccountVEN() {
+        return criminalInterestAccountVEN;
+    }
+
+    public void setCriminalInterestAccountVEN(CashAccount criminalInterestAccountVEN) {
+        this.criminalInterestAccountVEN = criminalInterestAccountVEN;
+    }
+
+    public CashAccount getCriminalInterestAccountEJE() {
+        return criminalInterestAccountEJE;
+    }
+
+    public void setCriminalInterestAccountEJE(CashAccount criminalInterestAccountEJE) {
+        this.criminalInterestAccountEJE = criminalInterestAccountEJE;
     }
 }

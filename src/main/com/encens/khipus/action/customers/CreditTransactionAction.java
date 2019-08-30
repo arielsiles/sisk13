@@ -67,6 +67,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
+
     private BigDecimal transferAmount;
     private BigDecimal differenceAvailable = BigDecimal.ZERO;
 
@@ -272,6 +273,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     public void createIncomeAccountingRecord(CreditTransaction creditTransaction){
 
         //if (creditTransaction.getTransfer()) setDifferenceTransfer();
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
 
         if (    creditTransaction.getCredit().getState().equals(CreditState.VIG) ||
                 creditTransaction.getCredit().getState().equals(CreditState.VEN) ||
@@ -284,8 +290,22 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
 
             voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH); /** todo **/
-            voucherDetailBox.setDebit(creditTransaction.getAmount());
-            voucherDetailBox.setCredit(BigDecimal.ZERO);
+            //CashAccount boxCashAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
+            if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS")){
+                voucherDetailBox.setDebit(creditTransaction.getAmount());
+                voucherDetailBox.setCredit(BigDecimal.ZERO);
+                voucherDetailBox.setDebitMe(BigDecimal.ZERO);
+                voucherDetailBox.setCreditMe(BigDecimal.ZERO);
+            }
+
+            /** continuar aqui, Creditos en dolares, bolivianizar sus transacciones **/
+
+            if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("USD")){
+                voucherDetailBox.setDebit(BigDecimalUtil.multiply(creditTransaction.getAmount(), exchangeRate, 2));
+                voucherDetailBox.setCredit(BigDecimal.ZERO);
+                voucherDetailBox.setDebitMe(creditTransaction.getAmount());
+                voucherDetailBox.setCreditMe(BigDecimal.ZERO);
+            }
 
             VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
 
@@ -300,6 +320,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             if (creditTransaction.getCredit().getState().equals(CreditState.EJE)){
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getExecutedAccountCode());
             }
+
 
             voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
             voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
@@ -331,6 +352,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.getDetails().add(voucherDetailBox);
             voucher.getDetails().add(voucherDetailCurrentLoan);
 
+
             if (creditTransaction.getInterest().doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailInterest);
             if (differenceAvailable.doubleValue() > 0)
@@ -338,15 +360,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             /** Si tiene monto de interes penal **/
             addVoucherDetailCriminalInterest(voucher, creditTransaction);
-            /*if (creditTransaction.getCriminalInterest().doubleValue() > 0){
-                VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
-                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
-                voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
-                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
-                voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
-                voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
-                voucher.getDetails().add(voucherDetailCriminalInterest);
-            }*/
 
             voucherAccoutingService.saveVoucher(voucher);
 
@@ -366,11 +379,21 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         /** Si tiene monto de interes penal **/
         if (creditTransaction.getCriminalInterest().doubleValue() > 0){
 
-            CashAccount cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+            CashAccount cashAccount = null;
+            String criminalInterestAccountCode = null;
+
+            if (creditTransaction.getCredit().getState().equals(CreditState.VEN)) {
+                cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VEN());
+                criminalInterestAccountCode = creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VEN();
+            }
+            if (creditTransaction.getCredit().getState().equals(CreditState.EJE)) {
+                cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_EJE());
+                criminalInterestAccountCode = creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_EJE();
+            }
 
             VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.P)) {
-                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+                voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
                 voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
@@ -378,7 +401,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)) {
-                voucherDetailCriminalInterest.setAccount(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode());
+                voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
                 voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
@@ -483,6 +506,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Date lastPaymentDate    = creditTransactionService.findLastPaymentForInterest(credit);
 
         Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
+        System.out.println("-----> DIAS DESDE EL ULTIMO PAGO = " + days);
 
         BigDecimal var_interest = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(credit.getAnnualRate()), BigDecimalUtil.toBigDecimal(100), 6);
         BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
@@ -491,16 +515,21 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         /** For criminal interest **/ /** todo **/
         BigDecimal criminalInterest = BigDecimal.ZERO;
-        if (credit.getState().equals(CreditState.EJE)) {
-            Date payment_date = creditAction.findDateOfNextPayment(credit);
-            Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
-            BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
+        Date payment_date = creditAction.findDateOfNextPayment(credit);
+        Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
+        BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
+
+        //if (credit.getState().equals(CreditState.EJE)) {
+        if (DateUtils.daysBetween(payment_date, currentPaymentDate) > 90) {
+            //Date payment_date = creditAction.findDateOfNextPayment(credit);
+            //Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
+            //BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
 
             BigDecimal var_criminalInterest = BigDecimalUtil.divide(credit.getCriminalInterest(), BigDecimalUtil.ONE_HUNDRED, 6);
             criminalInterest = BigDecimalUtil.multiply(saldoCapital, var_criminalInterest, 6);
             criminalInterest = BigDecimalUtil.multiply(criminalInterest, var_time_criminal, 6);
         }
-        /** --- **/
+        /** End **/
 
 
         getInstance().setInterest(interest);
