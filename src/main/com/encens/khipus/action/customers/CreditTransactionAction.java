@@ -286,20 +286,17 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             Voucher voucher = new Voucher();
             voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
 
-            VoucherDetail voucherDetailBox = new VoucherDetail();
             VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
 
+            /** For Box **/
+            VoucherDetail voucherDetailBox = new VoucherDetail();
             voucherDetailBox.setAccount(Constants.ACCOUNT_GENERALCASH); /** todo **/
-            //CashAccount boxCashAccount = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH);
             if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS")){
                 voucherDetailBox.setDebit(creditTransaction.getAmount());
                 voucherDetailBox.setCredit(BigDecimal.ZERO);
                 voucherDetailBox.setDebitMe(BigDecimal.ZERO);
                 voucherDetailBox.setCreditMe(BigDecimal.ZERO);
             }
-
-            /** continuar aqui, Creditos en dolares, bolivianizar sus transacciones **/
-
             if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("USD")){
                 voucherDetailBox.setDebit(BigDecimalUtil.multiply(creditTransaction.getAmount(), exchangeRate, 2));
                 voucherDetailBox.setCredit(BigDecimal.ZERO);
@@ -307,43 +304,61 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailBox.setCreditMe(BigDecimal.ZERO);
             }
 
-            VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
+            /** End For Box **/
 
+            /** For Capital **/
+            VoucherDetail voucherDetailCurrentLoan = new VoucherDetail();
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getCurrentAccountCode());
             }
-
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getExpiredAccountCode());
             }
-
             if (creditTransaction.getCredit().getState().equals(CreditState.EJE)){
                 voucherDetailCurrentLoan.setAccount(creditTransaction.getCredit().getCreditType().getExecutedAccountCode());
             }
 
+            CashAccount currentLoanCashAccount = cashAccountService.findByAccountCode(voucherDetailCurrentLoan.getAccount());
+            if (currentLoanCashAccount.getCurrency().equals(FinancesCurrencyType.P)){
+                voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
+                voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
+                voucherDetailCurrentLoan.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCurrentLoan.setCreditMe(BigDecimal.ZERO);
+            }
+            if (currentLoanCashAccount.getCurrency().equals(FinancesCurrencyType.D)){
+                voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
+                voucherDetailCurrentLoan.setCredit(BigDecimalUtil.multiply(creditTransaction.getCapital(), exchangeRate, 2));
+                voucherDetailCurrentLoan.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCurrentLoan.setCreditMe(creditTransaction.getCapital());
+            }
+            /** End For Capital **/
 
-            voucherDetailCurrentLoan.setDebit(BigDecimal.ZERO);
-            voucherDetailCurrentLoan.setCredit(creditTransaction.getCapital());
-            voucherDetailCurrentLoan.setDebitMe(BigDecimal.ZERO);
-            voucherDetailCurrentLoan.setCreditMe(BigDecimal.ZERO);
-
+            /** For Interest **/
             VoucherDetail voucherDetailInterest = new VoucherDetail();
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getCurrentInterestAccountCode());
             }
-
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)){
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getExpiredInterestAccountCode());
             }
-
             if (creditTransaction.getCredit().getState().equals(CreditState.EJE)){
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getExecutedInterestAccountCode());
             }
+            CashAccount interestCashAccount = cashAccountService.findByAccountCode(voucherDetailInterest.getAccount());
+            if (interestCashAccount.getCurrency().equals(FinancesCurrencyType.P)){
+                voucherDetailInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailInterest.setCredit(creditTransaction.getInterest());
+                voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailInterest.setCreditMe(BigDecimal.ZERO);
+            }
+            if (interestCashAccount.getCurrency().equals(FinancesCurrencyType.D)){
+                voucherDetailInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailInterest.setCredit(BigDecimalUtil.multiply(creditTransaction.getInterest(), exchangeRate, 2));
+                voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailInterest.setCreditMe(creditTransaction.getInterest());
+            }
 
-            voucherDetailInterest.setDebit(BigDecimal.ZERO);
-            voucherDetailInterest.setCredit(creditTransaction.getInterest());
-            voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
-            voucherDetailInterest.setCreditMe(BigDecimal.ZERO);
+            /** End For Interest **/
 
             voucherDetailCurrentLoan.setCreditPartner(creditTransaction.getCredit());
             voucherDetailInterest.setCreditPartner(creditTransaction.getCredit());
@@ -403,9 +418,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)) {
                 voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
                 voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
-                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setCredit(BigDecimalUtil.multiply(creditTransaction.getCriminalInterest(), exchangeRate, 2));
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
-                voucherDetailCriminalInterest.setCreditMe(BigDecimalUtil.divide(creditTransaction.getCriminalInterest(), exchangeRate, 2));
+                voucherDetailCriminalInterest.setCreditMe(creditTransaction.getCriminalInterest());
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
         }
