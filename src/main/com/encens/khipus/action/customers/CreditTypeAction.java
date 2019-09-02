@@ -58,10 +58,13 @@ public class CreditTypeAction extends GenericAction<CreditType> {
         getInstance().setExecutedInterestAccount(null);
     }
 
-    public void clearCriminalInterestAccount() {
-        getInstance().setCriminalInterestAccount(null);
+    public void clearCriminalInterestAccountVEN() {
+        getInstance().setCriminalInterestAccountVEN(null);
     }
 
+    public void clearCriminalInterestAccountEJE() {
+        getInstance().setCriminalInterestAccountEJE(null);
+    }
 
     public void assignCurrentAccount(CashAccount cashAccount) {
         getInstance().setCurrentAccount(cashAccount);
@@ -87,8 +90,12 @@ public class CreditTypeAction extends GenericAction<CreditType> {
             getInstance().setExecutedInterestAccount(cashAccount);
     }
 
-    public void assignCriminalInterestAccount(CashAccount cashAccount) {
-        getInstance().setCriminalInterestAccount(cashAccount);
+    public void assignCriminalInterestAccountVEN(CashAccount cashAccount) {
+        getInstance().setCriminalInterestAccountVEN(cashAccount);
+    }
+
+    public void assignCriminalInterestAccountEJE(CashAccount cashAccount) {
+        getInstance().setCriminalInterestAccountEJE(cashAccount);
     }
 
 }

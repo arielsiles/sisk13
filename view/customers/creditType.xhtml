@@ -186,16 +186,30 @@
                                      hotKeySelect="alt+1"/>
                 </s:decorate>
 
-                <s:decorate id="criminalInterestAccountField" template="/include/viewField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CreditType.criminalInterestAccount']}</ui:define>
-                    <app:selectPopUp id="criminalInterestAccount"
+                <s:decorate id="criminalInterestAccountExpiredField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.criminalInterestAccountExpired']}</ui:define>
+                    <app:selectPopUp id="criminalInterestAccountExpired"
                                      required="true"
-                                     textValue="#{creditType.criminalInterestAccount.fullName}"
-                                     value="#{creditType.criminalInterestAccount}"
+                                     textValue="#{creditType.criminalInterestAccountVEN.fullName}"
+                                     value="#{creditType.criminalInterestAccountVEN}"
                                      dataModel="#{cashAccountDataModel}"
-                                     clearAction="#{creditTypeAction.clearCriminalInterestAccount()}"
-                                     searchModalPanel="criminalInterestAccountListModalPanel"
-                                     reRender="criminalInterestAccountField"
+                                     clearAction="#{creditTypeAction.clearCriminalInterestAccountVEN()}"
+                                     searchModalPanel="criminalInterestAccountExpiredListModalPanel"
+                                     reRender="criminalInterestAccountExpiredField"
+                                     tabindex="4"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="criminalInterestAccountExecutedField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.criminalInterestAccountExecuted']}</ui:define>
+                    <app:selectPopUp id="criminalInterestAccountExecuted"
+                                     required="true"
+                                     textValue="#{creditType.criminalInterestAccountEJE.fullName}"
+                                     value="#{creditType.criminalInterestAccountEJE}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{creditTypeAction.clearCriminalInterestAccountEJE()}"
+                                     searchModalPanel="criminalInterestAccountExecutedListModalPanel"
+                                     reRender="criminalInterestAccountExecutedField"
                                      tabindex="4"
                                      hotKeySelect="alt+1"/>
                 </s:decorate>
@@ -298,16 +312,29 @@
             </ui:define>
         </s:decorate>
 
-        <s:decorate id="criminalInterestAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-            <ui:param name="containerId" value="criminalInterestAccountListModalPanelContainer"/>
-            <ui:param name="dialogId" value="criminalInterestAccountListModalPanel"/>
+        <s:decorate id="criminalInterestAccountExpiredListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="criminalInterestAccountExpiredListModalPanelContainer"/>
+            <ui:param name="dialogId" value="criminalInterestAccountExpiredListModalPanel"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
-                                   action="#{creditTypeAction.assignCriminalInterestAccount(cashAccountItem)}"
+                                   action="#{creditTypeAction.assignCriminalInterestAccountVEN(cashAccountItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="criminalInterestAccountField"
-                                   oncomplete="Richfaces.hideModalPanel('criminalInterestAccountListModalPanel');"/>
+                                   reRender="criminalInterestAccountExpiredField"
+                                   oncomplete="Richfaces.hideModalPanel('criminalInterestAccountExpiredListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="criminalInterestAccountExecutedListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="criminalInterestAccountExecutedListModalPanelContainer"/>
+            <ui:param name="dialogId" value="criminalInterestAccountExecutedListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditTypeAction.assignCriminalInterestAccountEJE(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="criminalInterestAccountExecutedField"
+                                   oncomplete="Richfaces.hideModalPanel('criminalInterestAccountExecutedListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

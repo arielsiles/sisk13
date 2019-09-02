@@ -67,6 +67,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
+    private BigDecimal totalAmountConvertedValue;
 
     private BigDecimal transferAmount;
     private BigDecimal differenceAvailable = BigDecimal.ZERO;
@@ -712,11 +713,18 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void calculateTotalCapital(){
 
+        Credit credit = creditAction.getInstance();
+
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             BigDecimal totalCapital = BigDecimalUtil.subtract(totalAmountValue, interestValue, 6);
             totalCapital = BigDecimalUtil.subtract(totalCapital, criminalInterestValue, 6);
             setCapitalValue(totalCapital);
+
+            if (credit.getCreditType().getCurrency().equals("USD")){
+                totalAmountConvertedValue = BigDecimalUtil.multiply(totalCapital, exchangeRate, 2);
+            }
         }
+
     }
 
     public void adjustCents(){
@@ -881,6 +889,14 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void setAccountTransferList(List<Account> accountTransferList) {
         this.accountTransferList = accountTransferList;
+    }
+
+    public BigDecimal getTotalAmountConvertedValue() {
+        return totalAmountConvertedValue;
+    }
+
+    public void setTotalAmountConvertedValue(BigDecimal totalAmountConvertedValue) {
+        this.totalAmountConvertedValue = totalAmountConvertedValue;
     }
 }
 

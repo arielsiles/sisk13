@@ -71,10 +71,10 @@
                                  immediate="true"
                                  title="#{messages['Common.calculate']}"
                                  action="#{creditTransactionAction.calculateInterest()}"
-                                 reRender="interestField, capitalField, amountField, criminalInterestField"
+                                 reRender="interestField, capitalField, amountField, criminalInterestField, amountConverted"
                                  tabindex="6">
                     <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
-                    <a4j:support event="onclick" reRender="interestField, capitalField, amountField"/>
+                    <a4j:support event="onclick" reRender="interestField, capitalField, amountField, amountConverted"/>
                 </a4j:commandLink>
             </s:decorate>
 
@@ -155,15 +155,25 @@
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField, amountConverted"/>
                         </h:inputText>
                         <a4j:commandLink id="adjustCents" ajaxSingle="true" immediate="true"
                                          tabindex="5"
                                          title="#{messages['CreditTransaction.adjustCents']}"
                                          action="#{creditTransactionAction.adjustCents()}"
-                                         reRender="interestField, amountField, amountME">
+                                         reRender="interestField, amountField">
                             <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                         </a4j:commandLink>
+
+                        <h:inputText id="amountConverted"
+                                     value="#{creditTransactionAction.totalAmountConvertedValue}"
+                                     styleClass="input"
+                                     readonly="false"
+                                     required="true"
+                                     tabindex="2">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountConverted"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField, amountConverted"/>
+                        </h:inputText>
 
                         <!--<h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountME"/>
