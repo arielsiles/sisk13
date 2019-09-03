@@ -371,11 +371,34 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             if (creditTransaction.getInterest().doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailInterest);
+
+            /** revisar ??? nada **/
             if (differenceAvailable.doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailDifferenceChange);
 
             /** Si tiene monto de interes penal **/
             addVoucherDetailCriminalInterest(voucher, creditTransaction);
+
+            /** DIFERENCIAS DE CAMBIO **/
+            BigDecimal diff = BigDecimal.ZERO;
+            if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("USD"))
+                diff = BigDecimalUtil.subtract(totalAmountConvertedValue, BigDecimalUtil.multiply(totalAmountValue, exchangeRate, 2));
+            if (creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS"))
+                diff = BigDecimalUtil.subtract(totalAmountConvertedValue, totalAmountValue, 2);
+
+            if (diff.doubleValue() > 0){
+                voucherDetailDifferenceChange.setAccount(Constants.ACCOUNT_DIFFERENCE_AVAILABLE_CHANGE);
+                voucherDetailDifferenceChange.setDebit(BigDecimal.ZERO);
+                voucherDetailDifferenceChange.setCredit(diff);
+                voucherDetailDifferenceChange.setDebitMe(BigDecimal.ZERO);
+                voucherDetailDifferenceChange.setCreditMe(BigDecimal.ZERO);
+                voucher.getDetails().add(voucherDetailDifferenceChange);
+
+                /** Sumando diferencias a caja general **/
+                voucherDetailBox.setDebit(BigDecimalUtil.sum(voucherDetailBox.getDebit(), diff));
+            }
+
+            /** FIN DIFERENCIAS DE CAMBIO **/
 
             voucherAccoutingService.saveVoucher(voucher);
 
@@ -408,7 +431,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             }
 
             VoucherDetail voucherDetailCriminalInterest = new VoucherDetail();
-            if (cashAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.P) && creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS")) {
                 voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
                 voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
@@ -416,12 +439,20 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
-            if (cashAccount.getCurrency().equals(FinancesCurrencyType.D)) {
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) && creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("USD")) {
                 voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
                 voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCredit(BigDecimalUtil.multiply(creditTransaction.getCriminalInterest(), exchangeRate, 2));
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCreditMe(creditTransaction.getCriminalInterest());
+                voucher.getDetails().add(voucherDetailCriminalInterest);
+            }
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) && creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS")) {
+                voucherDetailCriminalInterest.setAccount(criminalInterestAccountCode);
+                voucherDetailCriminalInterest.setDebit(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCreditMe(BigDecimalUtil.divide(creditTransaction.getCriminalInterest(), exchangeRate, 2));
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
         }
@@ -722,6 +753,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             totalAmountConvertedValue = BigDecimalUtil.multiply(totalAmount, exchangeRate, 2);
             System.out.println("---->>>>>> Total converted 1: " + totalAmountConvertedValue);
         }
+        if (credit.getCreditType().getCurrency().getSymbol().equals("BS")){
+            totalAmountConvertedValue = getTotalAmountValue();
+            System.out.println("---->>>>>> Total no converted 1: " + totalAmountConvertedValue);
+        }
     }
 
     public void calculateTotalCapital(){
@@ -731,6 +766,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             totalCapital = BigDecimalUtil.subtract(totalCapital, criminalInterestValue, 6);
             setCapitalValue(totalCapital);
         }
+        calculateTotalAmount();
     }
 
     public void adjustCents(){

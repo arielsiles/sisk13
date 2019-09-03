@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voucherReport" pageWidth="611" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="561" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.VoucherReportScriptlet">
-	<property name="ireport.zoom" value="5.559917313492245"/>
-	<property name="ireport.x" value="123"/>
-	<property name="ireport.y" value="112"/>
+	<property name="ireport.zoom" value="2.593742460100005"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="totalD" class="java.math.BigDecimal"/>
 	<parameter name="totalC" class="java.math.BigDecimal"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
@@ -196,14 +196,14 @@
 			<frame>
 				<reportElement x="0" y="0" width="561" height="20"/>
 				<textField>
-					<reportElement x="0" y="0" width="215" height="10"/>
+					<reportElement x="0" y="0" width="400" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyTitle}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="0" y="9" width="215" height="10"/>
+					<reportElement x="0" y="9" width="400" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>

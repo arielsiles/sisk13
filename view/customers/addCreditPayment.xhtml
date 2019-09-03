@@ -122,7 +122,7 @@
                                      value="#{creditTransactionAction.interestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, criminalInterestField, amountField, capitalField"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="interestField, criminalInterestField, amountField, capitalField, amountConvertedField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -132,7 +132,7 @@
                                      value="#{creditTransactionAction.capitalValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField, amountConvertedField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -142,7 +142,7 @@
                                      value="#{creditTransactionAction.criminalInterestValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="criminalInterest, amountField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="criminalInterest, amountField, amountConvertedField"/>
                         </h:inputText>
                     </s:decorate>
 
@@ -180,7 +180,7 @@
                                      required="true"
                                      tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountConverted"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField, amountConverted"/>
+                            <a4j:support event="onblur" reRender="interestField, criminalInterestField, amountField, capitalField, amountConverted"/>
                         </h:inputText>
                     </s:decorate>
 
