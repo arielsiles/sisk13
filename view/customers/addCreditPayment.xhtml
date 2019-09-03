@@ -161,10 +161,18 @@
                                          tabindex="5"
                                          title="#{messages['CreditTransaction.adjustCents']}"
                                          action="#{creditTransactionAction.adjustCents()}"
-                                         reRender="interestField, amountField">
+                                         reRender="interestField, amountField, amountConvertedField">
                             <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                         </a4j:commandLink>
 
+                        <!--<h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountME"/>
+                        </h:outputText>-->
+
+                    </s:decorate>
+
+                    <s:decorate id="amountConvertedField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">Total BS:</ui:define>
                         <h:inputText id="amountConverted"
                                      value="#{creditTransactionAction.totalAmountConvertedValue}"
                                      styleClass="input"
@@ -174,11 +182,6 @@
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountConverted"/>
                             <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalCapital()}" reRender="interestField, criminalInterestField, amountField, capitalField, amountConverted"/>
                         </h:inputText>
-
-                        <!--<h:outputText id="amountME" value="#{creditTransactionAction.getTotalAmountValueToMe()}" >
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amountME"/>
-                        </h:outputText>-->
-
                     </s:decorate>
 
                 </c:when>

@@ -67,7 +67,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
-    private BigDecimal totalAmountConvertedValue;
+    private BigDecimal totalAmountConvertedValue = BigDecimal.ZERO;
 
     private BigDecimal transferAmount;
     private BigDecimal differenceAvailable = BigDecimal.ZERO;
@@ -572,6 +572,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             this.totalAmountValue = totalPayment;
         }
 
+        /** Convierte a BS **/
+        /*if (credit.getCreditType().getCurrency().getSymbol().equals("USD")){
+            totalAmountConvertedValue = BigDecimalUtil.multiply(totalAmountValue, exchangeRate, 2);
+            System.out.println("---->>>>>> Total converted: " + totalAmountConvertedValue);
+        }*/
+        calculateTotalAmount();
+
         System.out.println("--------------------------> Capital: " + capitalValue);
         System.out.println("--------------------------> Interes: " + interestValue);
         System.out.println("--------------------------> Interes Penal: " + criminalInterestValue);
@@ -702,29 +709,28 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void calculateTotalAmount() {
         BigDecimal totalAmount = null;
+        Credit credit = creditAction.getInstance();
         //if (null != getInstance().getCapital() && null != getInstance().getInterest() && null != getInstance().getCriminalInterest()) {
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             totalAmount = BigDecimalUtil.sum(capitalValue, interestValue, 6);
             totalAmount = BigDecimalUtil.sum(totalAmount, criminalInterestValue, 6);
         }
-        //getInstance().setAmount(totalAmount);
+
         setTotalAmountValue(totalAmount);
+
+        if (credit.getCreditType().getCurrency().getSymbol().equals("USD")){
+            totalAmountConvertedValue = BigDecimalUtil.multiply(totalAmount, exchangeRate, 2);
+            System.out.println("---->>>>>> Total converted 1: " + totalAmountConvertedValue);
+        }
     }
 
     public void calculateTotalCapital(){
-
-        Credit credit = creditAction.getInstance();
 
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             BigDecimal totalCapital = BigDecimalUtil.subtract(totalAmountValue, interestValue, 6);
             totalCapital = BigDecimalUtil.subtract(totalCapital, criminalInterestValue, 6);
             setCapitalValue(totalCapital);
-
-            if (credit.getCreditType().getCurrency().equals("USD")){
-                totalAmountConvertedValue = BigDecimalUtil.multiply(totalCapital, exchangeRate, 2);
-            }
         }
-
     }
 
     public void adjustCents(){
@@ -735,6 +741,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         interestValue    = BigDecimalUtil.sum(interestValue, diff, 6);
         totalAmountValue = totalAmountRound;
 
+        calculateTotalAmount();
     }
 
     public void clearPartnerAccount(){
