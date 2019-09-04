@@ -96,7 +96,7 @@ public class CategoryPaymentSlipReportAction extends GenericReportAction {
                 "categoryFiscalPayroll.laborSolidaryContributionAFP," +
                 "categoryFiscalPayroll.laborComissionAFP," +
                 "categoryFiscalPayroll.solidaryAFP," +
-                "categoryFiscalPayroll.otherDiscount" +
+                "categoryFiscalPayroll.otherDiscount as otherDiscount" +
 
                 " FROM CategoryFiscalPayroll categoryFiscalPayroll" +
                 " LEFT JOIN categoryFiscalPayroll.generatedPayroll generatedPayroll" +

@@ -310,16 +310,19 @@
                                     <s:convertEntity/>
                                 </h:selectOneMenu>
 
-                                <a4j:commandButton
-                                        action="#{productionAction.assignSupply(supplyDetail)}"
-                                        value="Add product"
-                                        styleClass="button"
-                                        immediate="true"
-                                        oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
-                                        actionListener="#{selectPopUpAction.select}"
-                                        reRender="productItemsByAssignmentListModalPanel">
-                                    <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
-                                </a4j:commandButton>
+                                <c:if test="#{productionAction.managed}">
+                                    <!-- TEST -->
+                                    <!--<a4j:commandButton
+                                            action="#{productionAction.assignSupply(supplyDetail)}"
+                                            value="Add product"
+                                            styleClass="button"
+                                            immediate="true"
+                                            oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
+                                            actionListener="#{selectPopUpAction.select}"
+                                            reRender="productItemsByAssignmentListModalPanel">
+                                        <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
+                                    </a4j:commandButton>-->
+                                </c:if>
 
                                 <!--<s:decorate id="#{productItemsByAssignmentListModalPanelContainerFieldId}" template="/production/productItemsByAssignmentListModalPanel.xhtml">
                                     <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
@@ -495,6 +498,7 @@
 </h:form>
 
     <!-- Test -->
+    <c:if test="#{productionAction.managed}">
     <s:decorate id="productItemsByAssignmentListModalPanelContainer"
                 template="/production/productItemsByAssignmentListModalPanel.xhtml">
         <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
@@ -510,6 +514,7 @@
                                oncomplete="Richfaces.hideModalPanel('productItemsByAssignmentListModalPanel');"/>
         </ui:define>
     </s:decorate>
+    </c:if>
     <!-- test -->
 
 
