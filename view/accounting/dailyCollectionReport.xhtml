@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Accounting.dailyCollection.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="productItemReportForm">
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['Accounting.dailyCollection.report']}
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent">
+
+                <s:decorate id="dateFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateFrom']}</ui:define>
+                    <rich:calendar id="dateFrom"
+                                   value="#{dailyCollectionReportAction.startDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="dateToField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateTo']}</ui:define>
+                    <rich:calendar id="dateTo"
+                                   value="#{dailyCollectionReportAction.endDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="documTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                    <h:selectOneMenu id="documType"
+                                     value="#{dailyCollectionReportAction.documentType}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{voucherDocumentTypeList}"
+                                       var="element"
+                                       label="#{element.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </h:panelGrid>
+        </rich:panel>
+
+        <app:reportDefaultOptions reportAction="#{dailyCollectionReportAction}" showPageFormat="false"
+                                  tabIndex="11"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{dailyCollectionReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+</ui:define>
+</ui:composition>
