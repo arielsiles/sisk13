@@ -6,6 +6,7 @@ import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.model.accounting.DocType;
+import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import org.jboss.seam.ScopeType;
@@ -38,6 +39,8 @@ public class DailyCollectionReportAction extends GenericReportAction {
     private Date endDate;
     private DocType documentType;
 
+    @In
+    User currentUser;
     @In
     private FinancesExchangeRateService financesExchangeRateService;
     @In
@@ -80,12 +83,14 @@ public class DailyCollectionReportAction extends GenericReportAction {
         }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
 
         log.debug("Generating products produced report...................");
+
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
 
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("startDate", startDate);
         reportParameters.put("endDate", endDate);
         reportParameters.put("exchangeRate", exchangeRate);
+        reportParameters.put("userLoginParam", currentUser.getEmployee().getFullName());
 
         super.generateReport(
                 "dailyCollectionReport",
