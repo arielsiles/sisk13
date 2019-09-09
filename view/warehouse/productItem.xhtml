@@ -341,6 +341,18 @@
         </h:inputText>
     </s:decorate>
 
+    <s:decorate id="salePriceField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.salePrice']}</ui:define>
+        <h:inputText id="salePrice"
+                     value="#{productItem.salePrice}"
+                     styleClass="input80"
+                     tabindex="3">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="salePrice"/>
+            <a4j:support event="onblur" reRender="salePriceField"/>
+
+        </h:inputText>
+    </s:decorate>
+
 </rich:panel>
 
 <div class="buttons">

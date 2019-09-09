@@ -524,6 +524,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setAccount(this.account.getAccountCode());
                 voucherDetail.setClient(this.client);
                 voucherDetail.setProvider(this.provider);
+                voucherDetail.setPartner(this.partner);
 
                 if (this.provider != null) voucherDetail.setProviderCode(this.provider.getProviderCode());
 
@@ -568,11 +569,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         clearAccount();
         clearClient();
         clearProvider();
+        clearPartner();
+        clearProductItem();
+        clearPartnerAccount();
     }
 
     public void assignProductItemVoucherDetail(){
 
-        try {
+        /*try {*/
             CashAccount ctaCaja     = cashAccountService.findByAccountCode(Constants.ACCOUNT_GENERALCASH); /** todo **/
             CashAccount ctaIngreso  = cashAccountService.findByAccountCode(Constants.ACOUNT_OTHER_OPERATING_INCOME);
 
@@ -618,9 +622,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             setDebit(BigDecimal.ZERO);
             setCredit(BigDecimal.ZERO);
 
-        }catch (NullPointerException e){
+        /*}catch (NullPointerException e){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Voucher.message.incomplete");
-        }
+        }*/
 
     }
 

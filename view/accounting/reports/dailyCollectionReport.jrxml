@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dailyCollectionReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
-	<property name="ireport.zoom" value="3.7974983358324375"/>
-	<property name="ireport.x" value="44"/>
-	<property name="ireport.y" value="83"/>
+	<property name="ireport.zoom" value="3.452271214393126"/>
+	<property name="ireport.x" value="897"/>
+	<property name="ireport.y" value="69"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="exchangeRate" class="java.math.BigDecimal"/>
+	<parameter name="userLoginParam" class="java.lang.String"/>
 	<field name="accountCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -142,28 +143,28 @@
 			<band height="24" splitType="Stretch">
 				<frame>
 					<reportElement x="0" y="7" width="561" height="16"/>
-					<textField pattern="###0.00;(###0.00)">
+					<textField pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
 						<reportElement x="410" y="0" width="60" height="16"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="8" isBold="true"/>
 						</textElement>
 						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{varTotalDebit}]]></textFieldExpression>
 					</textField>
-					<textField pattern="###0.00;(###0.00)">
+					<textField pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
 						<reportElement x="470" y="0" width="60" height="16"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="8" isBold="true"/>
 						</textElement>
 						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{varTotalCredit}]]></textFieldExpression>
 					</textField>
-					<textField pattern="###0.00;(###0.00)">
+					<textField pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
 						<reportElement x="291" y="0" width="59" height="16"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="8" isBold="true"/>
 						</textElement>
 						<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalDebitMe}]]></textFieldExpression>
 					</textField>
-					<textField pattern="###0.00;(###0.00)">
+					<textField pattern="#,##0.00;(-#,##0.00)" isBlankWhenNull="true">
 						<reportElement x="350" y="0" width="60" height="16"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="8" isBold="true"/>
@@ -194,20 +195,20 @@
 			</frame>
 			<frame>
 				<reportElement x="0" y="0" width="561" height="20"/>
-				<staticText>
-					<reportElement x="0" y="0" width="161" height="10"/>
-					<textElement>
+				<textField>
+					<reportElement x="0" y="9" width="400" height="10"/>
+					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="9" width="161" height="10"/>
-					<textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{subTitle}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="400" height="10"/>
+					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[SISTEMA INTEGRADO CONTABLE]]></text>
-				</staticText>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyTitle}]]></textFieldExpression>
+				</textField>
 			</frame>
 		</band>
 	</title>
@@ -240,14 +241,14 @@
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;(###0.00)">
+			<textField pattern="#,##0.00;(-#,##0.00)">
 				<reportElement x="290" y="0" width="60" height="11"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{varDebitMe}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;(###0.00)">
+			<textField pattern="#,##0.00;(-#,##0.00)">
 				<reportElement x="350" y="0" width="60" height="11"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
@@ -260,17 +261,23 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="14" splitType="Stretch">
-			<textField pattern="">
-				<reportElement x="40" y="2" width="83" height="12"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{userLoginParam]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="14" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
-		<band height="88" splitType="Stretch"/>
+		<band height="88" splitType="Stretch">
+			<textField pattern="">
+				<reportElement x="391" y="30" width="139" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Caja: "+$P{userLoginParam}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="391" y="30" width="139" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
 	</summary>
 </jasperReport>

@@ -92,7 +92,7 @@ public class ProductItem implements BaseModel {
     private BigDecimal unitCost;
 
     @Column(name = "PRECIO_VENTA", precision = 10, scale = 2, nullable = true)
-    private BigDecimal salePrice;
+    private BigDecimal  salePrice;
 
     @Column(name = "CU", precision = 16, scale = 6, nullable = true)
     private BigDecimal cu;

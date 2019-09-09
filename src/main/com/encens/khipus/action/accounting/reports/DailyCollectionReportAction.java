@@ -3,12 +3,15 @@ package com.encens.khipus.action.accounting.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -44,6 +47,8 @@ public class DailyCollectionReportAction extends GenericReportAction {
     @In
     private FinancesExchangeRateService financesExchangeRateService;
     @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
     protected FacesMessages facesMessages;
 
     @Create
@@ -75,6 +80,15 @@ public class DailyCollectionReportAction extends GenericReportAction {
     public void generateReport() {
 
         String documentTitle = "RECAUDACION DIARIA";
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String companyTitle = companyConfiguration.getTitle();
+        String subTitle = companyConfiguration.getSubTitle();
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {
@@ -91,6 +105,8 @@ public class DailyCollectionReportAction extends GenericReportAction {
         reportParameters.put("endDate", endDate);
         reportParameters.put("exchangeRate", exchangeRate);
         reportParameters.put("userLoginParam", currentUser.getEmployee().getFullName());
+        reportParameters.put("companyTitle", companyTitle);
+        reportParameters.put("subTitle", subTitle);
 
         super.generateReport(
                 "dailyCollectionReport",
