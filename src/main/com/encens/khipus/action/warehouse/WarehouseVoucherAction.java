@@ -123,8 +123,10 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
-            //System.out.println("------> VOUCHER DEV: " + movementDetail.getProductItem().getFullName());
+            System.out.println("------> VOUCHER DEV: " + movementDetail.getProductItem().getFullName());
             BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+            System.out.println("------> unitCost: " + unitCost);
+            System.out.println("------> Quantity: " + movementDetail.getQuantity());
             BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
