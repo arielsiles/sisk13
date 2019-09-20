@@ -1157,7 +1157,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal unitCost = (BigDecimal) product[1];
             result.put(codArt, unitCost);
             /** Uncomment for test **/
-            //System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
+            System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
         }
         System.out.println("---------------END------------");
 
@@ -1178,6 +1178,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         if (result.get("705") == null) //705-YOG BEBIBLE FAMILIAR coco 1L
             result.put("705", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L*/
+
+        if (result.get("668") == null) //668-YOGURT BEBIBLE 1L DURAZNO
+            result.put("668", result.get("704")); //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
 
         result.put("188", BigDecimal.ZERO);
         result.put("193", BigDecimal.ZERO);
