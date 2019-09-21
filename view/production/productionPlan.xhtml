@@ -183,6 +183,7 @@
                         <th class="rich-table-headercell">#{messages['ProductionPlan.product.name']}</th>
                         <th class="rich-table-headercell">#{messages['ProductionPlan.product.quantity']}</th>
                         <th class="rich-table-headercell">#{messages['ProductionPlan.product.production']}</th>
+                        <th class="rich-table-headercell">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
                     <c:forEach var="productItem" items="#{productionPlanAction.productList}" varStatus="row">
@@ -196,17 +197,33 @@
                                 <h:outputText value="#{productItem.productItem.name}"/>
                             </td>
                             <td class="rich-table-cell" align="center">
+                                <c:if test="#{!productionPlanAction.hasProduction2(productItem)}">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{productItem.quantity}"
                                              styleClass="inputSmall right">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{quantityInputFieldId}"/>
+                                    <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="productsPanel" />
                                 </h:inputText>
+                                </c:if>
+                                <c:if test="#{productionPlanAction.hasProduction2(productItem)}">
+                                    <h:outputText value="#{productItem.quantity}"
+                                                  styleClass="inputSmall right" >
+                                        <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="#{quantityInputFieldId}"/>
+                                    </h:outputText>
+                                </c:if>
                             </td>
                             <td class="rich-table-cell" align="center">
                                 <h:outputText value="#{productionPlanAction.hasProduction(productItem)}"/>
+                            </td>
+                            <td class="rich-table-cell center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{productionPlanAction.removeProduct(productItem)}"
+                                                 ajaxSingle="true"
+                                                 rendered="#{!productionPlanAction.hasProduction2(productItem)}"
+                                                 reRender="productsPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
                             </td>
                         </tr>
                     </c:forEach>

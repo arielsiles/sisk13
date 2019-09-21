@@ -524,6 +524,12 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         }
     }
 
+    public void removeProduct(ProductionProduct product){
+        productList.remove(product);
+        productionPlanService.removeProduct(product);
+
+    }
+
     public String hasProduction(ProductionProduct productionProduct){
 
         String result = "NO";
