@@ -1,7 +1,9 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.exception.EntryDuplicatedException;
+import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.contacts.Country;
 import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.contacts.Extension;
@@ -15,7 +17,6 @@ import com.encens.khipus.service.customers.PartnerService;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import com.encens.khipus.framework.action.Outcome;
 
 import java.util.List;
 
@@ -43,8 +44,9 @@ public class PartnerAction extends GenericAction<Partner> {
 
     private Country country;
     private Department department;
+    private Person person;
 
-    @Factory(value = "partner", scope = ScopeType.STATELESS)
+    @Factory(value = "partner")
     public Partner initPartner() {
         return getInstance();
     }
@@ -86,6 +88,42 @@ public class PartnerAction extends GenericAction<Partner> {
         }
     }
 
+    public void updateShowExtensionPerson() {
+        extensionList = extensionService.findExtensionsByDocumentType(getPerson().getDocumentType());
+        showExtension = extensionList != null && !extensionList.isEmpty();
+        if (!showExtension) {
+            getPerson().setExtensionSite(null);
+        }
+    }
+
+    public void assignPerson(Person person) {
+        if (person != null) {
+            try {
+                person = getService().findById(Person.class, person.getId());
+            } catch (EntryNotFoundException e) {
+                entryNotFoundLog();
+            }
+        }
+
+        setPerson(person);
+        updateShowExtensionPerson();
+        getInstance().setFirstName(person.getFirstName());
+        getInstance().setLastName(person.getLastName());
+        getInstance().setMaidenName(person.getMaidenName());
+        getInstance().setGender(person.getGender());
+        getInstance().setSalutation(person.getSalutation());
+        getInstance().setProfession(person.getProfession());
+        getInstance().setMaritalStatus(person.getMaritalStatus());
+
+        getInstance().setIdNumber(person.getIdNumber());
+        getInstance().setDocumentType(person.getDocumentType());
+        getInstance().setExtensionSite(person.getExtensionSite());
+
+        System.out.println("DocumentType: " + getPerson().getDocumentType().getName());
+        System.out.println("Extension: " + getPerson().getExtensionSite().getExtension());
+
+    }
+
     public void selectProductiveZone(ProductiveZone productiveZone) {
         getInstance().setProductiveZone(productiveZone);
     }
@@ -104,5 +142,13 @@ public class PartnerAction extends GenericAction<Partner> {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

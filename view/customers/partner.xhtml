@@ -63,293 +63,287 @@
     </c:choose>
 </f:facet>
 
-<app:fieldset id="contractFieldset" title="#{messages['Partner.partnerDetails']}">
-<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
-<s:div>
+    <app:fieldset id="personInformationFieldset" title="#{messages['Partner.person']}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
+                    <app:selectPopUp id="person"
+                                     textValue="#{partnerAction.person.fullName}"
+                                     value="#{partnerAction.person}"
+                                     clearAction="pollCopyDataModel.clearPerson()"
+                                     searchModalPanel="personListModalPanel"
+                                     dataModel="#{personDataModel}"
+                                     reRender="personInformationFieldset, contractFieldset"
+                                     hotKeySelect="alt+2"
+                                     tabindex="11"/>
+                </s:decorate>
+            </s:div>
 
-    <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.number']}</ui:define>
-        <h:outputText value="#{partner.number}"/>
-    </s:decorate>
+            <s:div id="documentDiv" rendered="#{not empty partnerAction.person}">
+                <s:decorate id="idNumberField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.idNumber']}</ui:define>
+                    <h:inputText id="idNumber"
+                                 value="#{partnerAction.person.idNumber}"
+                                 required="true"
+                                 maxlength="100"
+                                 styleClass="input"
+                                 tabindex="2">
+                        <app:naturalNumberConverter forId="idNumber"/>
+                    </h:inputText>
+                </s:decorate>
 
-    <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
-        <h:inputText id="productiveZone" styleClass="input" value="#{partner.productiveZone.fullName}"
-                     readonly="true" required="true" tabindex="1">
-        </h:inputText>
-        <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
-                         title="#{messages['RawMaterialProducer.selectProductiveZone']}"
-                         onclick="Richfaces.showModalPanel('productiveZoneModalPanel');">
-            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
-        </a4j:commandLink>
-    </s:decorate>
+                <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Employee.documentType']}</ui:define>
+                    <h:selectOneMenu id="documentType"
+                                     value="#{partnerAction.person.documentType}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="8">
+                        <s:selectItems value="#{personDocumentTypeList}"
+                                       var="documentType"
+                                       label="#{documentType.name}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange"
+                                     action="#{partnerAction.updateShowExtension()}"
+                                     reRender="documentDiv"
+                                     ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate id="extensionField" template="/include/inputField.xhtml"
+                            rendered="#{partnerAction.showExtension}"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                    <h:selectOneMenu id="extension"
+                                     value="#{partnerAction.person.extensionSite}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="4">
+                        <s:selectItems value="#{extensionList}"
+                                       var="extension"
+                                       label="#{extension.extension}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+            <s:div>
 
-    <s:decorate id="idNumberField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.idNumber']}</ui:define>
-        <h:inputText id="idNumber"
-                     value="#{partner.idNumber}"
-                     required="true"
-                     maxlength="100"
-                     styleClass="input"
-                     tabindex="2">
-            <app:naturalNumberConverter forId="idNumber"/>
-        </h:inputText>
-    </s:decorate>
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
 
-    <s:div id="documentDiv">
-        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Partner.documentType']}</ui:define>
-            <h:selectOneMenu id="documentType"
-                             value="#{partner.documentType}"
+    <app:fieldset id="contractFieldset" title="#{messages['Partner.partnerDetails']}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+    <s:div>
+
+        <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.number']}</ui:define>
+            <h:outputText value="#{partner.number}"/>
+        </s:decorate>
+
+        <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+            <h:inputText id="productiveZone" styleClass="input" value="#{partner.productiveZone.fullName}"
+                         readonly="true" required="true" tabindex="1">
+            </h:inputText>
+            <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
+                             title="#{messages['RawMaterialProducer.selectProductiveZone']}"
+                             onclick="Richfaces.showModalPanel('productiveZoneModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
+        <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['City.department']}</ui:define>
+            <h:selectOneMenu id="department" value="#{partner.department}" styleClass="input" required="true"
+                             tabindex="6">
+                <s:selectItems value="#{departmentList.resultList}" var="department" label="#{department.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.birthDay']}</ui:define>
+            <rich:calendar value="#{partner.birthDay}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="7">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.phone']}</ui:define>
+            <h:inputText id="phone" value="#{partner.phone}" maxlength="20" tabindex="8" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="cellphoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.cellphone']}</ui:define>
+            <h:inputText id="cellphone" value="#{partner.cellphone}" maxlength="20" tabindex="9" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="homeAddressField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.homeAddress']}</ui:define>
+            <h:inputTextarea id="homeAddress"
+                             value="#{partner.homeAddress}"
+                             styleClass="textarea"
+                             tabindex="10"
+                             style="width:200px;height:40px;"/>
+        </s:decorate>
+
+    </s:div>
+
+    <s:div>
+
+        <!--<s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
+            <app:selectPopUp id="person"
+                             textValue="#{partnerAction.person.fullName}"
+                             value="#{partnerAction.person}"
+                             clearAction="pollCopyDataModel.clearPerson()"
+                             searchModalPanel="personListModalPanel"
+                             dataModel="#{personDataModel}"
+                             reRender="personField, firstNameField, firstName"
+                             hotKeySelect="alt+2"
+                             tabindex="11"/>
+        </s:decorate>-->
+
+        <s:decorate id="nPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.nPartner']}</ui:define>
+            <h:inputText id="nPartner" value="#{partner.nPartner}" required="true"
+                         maxlength="200" tabindex="11" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+            <h:inputText id="firstName" value="#{partner.firstName}" required="true"
+                         maxlength="200" tabindex="12" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+            <h:inputText id="lastName" value="#{partner.lastName}" required="true"
+                         maxlength="80" tabindex="13" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+            <h:inputText id="maidenName" value="#{partner.maidenName}" required="true"
+                         maxlength="200" tabindex="14" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.gender']}</ui:define>
+            <h:selectOneMenu id="genderType"
+                             value="#{partner.gender}"
                              styleClass="input"
                              required="true"
-                             tabindex="3">
-                <s:selectItems value="#{documentTypeList}" var="documentType"
-                               label="#{documentType.name}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-                <a4j:support event="onchange"
-                             action="#{partnerAction.updateShowExtension()}"
-                             reRender="documentDiv"
-                             ajaxSingle="true"/>
+                             tabindex="15">
+                <s:selectItems value="#{genderEnum}"
+                               var="gender"
+                               label="#{messages[gender.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
             </h:selectOneMenu>
         </s:decorate>
-        <s:decorate id="extensionField" template="/include/inputField.xhtml"
-                    rendered="#{partnerAction.showExtension}"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['Entity.extension']}</ui:define>
-            <h:selectOneMenu id="extension"
-                             value="#{partner.extensionSite}"
+
+        <s:decorate id="maritalStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.maritalStatus']}</ui:define>
+            <h:selectOneMenu id="maritalStatus"
+                             value="#{partner.maritalStatus}"
                              styleClass="input"
-                             required="false"
-                             tabindex="4">
-                <s:selectItems value="#{extensionList}"
-                               var="extension"
-                               label="#{extension.extension}"
+                             required="true"
+                             tabindex="16">
+                <s:selectItems value="#{maritalStatusList.resultList}" var="maritalStatus"
+                               label="#{maritalStatus.name}"
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
             </h:selectOneMenu>
         </s:decorate>
-    </s:div>
 
-    <!--<s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.nationality']}</ui:define>
-        <h:selectOneMenu id="country"
-                         value="#{partner.country}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="9">
-            <s:selectItems value="#{countryList}"
-                           var="country"
-                           label="#{country.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>-->
-
-
-    <!--<s:decorate id="countryField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['City.country']}</ui:define>
-        <h:selectOneMenu id="country" value="#{partner.country}" styleClass="input" tabindex="5">
-            <s:selectItems value="#{countryList.resultList}" var="country" label="#{country.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <a4j:support event="onchange" reRender="department" ajaxSingle="true"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>-->
-
-    <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['City.department']}</ui:define>
-        <h:selectOneMenu id="department" value="#{partner.department}" styleClass="input" required="true"
-                         tabindex="6">
-            <s:selectItems value="#{departmentList.resultList}" var="department" label="#{department.name}"
-                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.birthDay']}</ui:define>
-        <rich:calendar value="#{partner.birthDay}"
-                       popup="true"
-                       datePattern="#{messages['patterns.date']}"
-                       styleClass="input"
-                       enableManualInput="true"
-                       tabindex="7">
-            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
-                               type="date"/>
-        </rich:calendar>
-    </s:decorate>
-
-    <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.phone']}</ui:define>
-        <h:inputText id="phone" value="#{partner.phone}" maxlength="20" tabindex="8" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="cellphoneField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.cellphone']}</ui:define>
-        <h:inputText id="cellphone" value="#{partner.cellphone}" maxlength="20" tabindex="9" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="homeAddressField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.homeAddress']}</ui:define>
-        <h:inputTextarea id="homeAddress"
-                         value="#{partner.homeAddress}"
-                         styleClass="textarea"
-                         tabindex="10"
-                         style="width:200px;height:40px;"/>
-    </s:decorate>
-
-</s:div>
-
-<s:div>
-
-    <!--<s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
-        <app:selectPopUp id="person"
-                         textValue="#{partnerAction.person.fullName}"
-                         value="#{partnerAction.person}"
-                         clearAction="pollCopyDataModel.clearPerson()"
-                         searchModalPanel="personListModalPanel"
-                         dataModel="#{personDataModel}"
-                         reRender="personField, firstNameField, firstName"
-                         hotKeySelect="alt+2"
-                         tabindex="11"/>
-    </s:decorate>-->
-
-    <s:decorate id="nPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.nPartner']}</ui:define>
-        <h:inputText id="nPartner" value="#{partner.nPartner}" required="true"
-                     maxlength="200" tabindex="11" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
-        <h:inputText id="firstName" value="#{partner.firstName}" required="true"
-                     maxlength="200" tabindex="12" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
-        <h:inputText id="lastName" value="#{partner.lastName}" required="true"
-                     maxlength="80" tabindex="13" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-    <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
-        <h:inputText id="maidenName" value="#{partner.maidenName}" required="true"
-                     maxlength="200" tabindex="14" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-    <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.gender']}</ui:define>
-        <h:selectOneMenu id="genderType"
-                         value="#{partner.gender}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="15">
-            <s:selectItems value="#{genderEnum}"
-                           var="gender"
-                           label="#{messages[gender.resourceKey]}"
-                           hideNoSelectionLabel="false"
-                           noSelectionLabel=""/>
-            <s:convertEnum/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="maritalStatusField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.maritalStatus']}</ui:define>
-        <h:selectOneMenu id="maritalStatus"
-                         value="#{partner.maritalStatus}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="16">
-            <s:selectItems value="#{maritalStatusList.resultList}" var="maritalStatus"
-                           label="#{maritalStatus.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.profession']}</ui:define>
-        <h:inputText id="maidenName" value="#{partner.profession}"
-                     maxlength="200" tabindex="17" styleClass="input">
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.salutation']}</ui:define>
-        <h:selectOneMenu id="salutation" value="#{partner.salutation}" styleClass="input"
-                         required="true" tabindex="18">
-            <s:selectItems value="#{salutationList.resultList}" var="salutation"
-                           label="#{salutation.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="numberChildrenField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.numberOfChildren']}</ui:define>
-        <h:inputText id="numberChildren"
-                     value="#{partner.numberChildren}"
-                     required="true"
-                     styleClass="inputNumberSmall"
-                     tabindex="19">
-            <app:naturalNumberConverter forId="numberChildren"/>
-        </h:inputText>
-    </s:decorate>
-    <s:decorate id="numberCreditsField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Partner.numberOfCredits']}</ui:define>
-        <h:inputText id="numberCredits"
-                     value="#{partner.numberCredit}"
-                     required="true"
-                     styleClass="inputNumberSmall"
-                     tabindex="20">
-            <app:naturalNumberConverter forId="numberCredits"/>
-        </h:inputText>
-    </s:decorate>
-
-</s:div>
-</h:panelGrid>
-</app:fieldset>
-
-<app:fieldset id="contactInformationFieldset" title="#{messages['Partner.contactInformation']}">
-<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
-    <s:div>
-        <s:decorate id="spouseField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Partner.spouse']}</ui:define>
-            <h:inputText id="spouse" value="#{partner.spouse}" maxlength="100" tabindex="21" styleClass="input">
+        <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.profession']}</ui:define>
+            <h:inputText id="maidenName" value="#{partner.profession}"
+                         maxlength="200" tabindex="17" styleClass="input">
             </h:inputText>
         </s:decorate>
 
-        <s:decorate id="contactPersonField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Partner.contactPerson']}</ui:define>
-            <h:inputText id="contactPerson" value="#{partner.contactPerson}" maxlength="100" tabindex="22" styleClass="input">
+        <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.salutation']}</ui:define>
+            <h:selectOneMenu id="salutation" value="#{partner.salutation}" styleClass="input"
+                             required="true" tabindex="18">
+                <s:selectItems value="#{salutationList.resultList}" var="salutation"
+                               label="#{salutation.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="numberChildrenField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.numberOfChildren']}</ui:define>
+            <h:inputText id="numberChildren"
+                         value="#{partner.numberChildren}"
+                         required="true"
+                         styleClass="inputNumberSmall"
+                         tabindex="19">
+                <app:naturalNumberConverter forId="numberChildren"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="numberCreditsField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.numberOfCredits']}</ui:define>
+            <h:inputText id="numberCredits"
+                         value="#{partner.numberCredit}"
+                         required="true"
+                         styleClass="inputNumberSmall"
+                         tabindex="20">
+                <app:naturalNumberConverter forId="numberCredits"/>
             </h:inputText>
         </s:decorate>
 
-        <s:decorate id="phoneContactField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Partner.phoneContact']}</ui:define>
-            <h:inputText id="phoneContact" value="#{partner.phoneContact}" maxlength="20" tabindex="23" styleClass="input">
-            </h:inputText>
-        </s:decorate>
     </s:div>
-    <s:div>
+    </h:panelGrid>
+    </app:fieldset>
 
-    </s:div>
-</h:panelGrid>
-</app:fieldset>
+    <app:fieldset id="contactInformationFieldset" title="#{messages['Partner.contactInformation']}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="spouseField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.spouse']}</ui:define>
+                    <h:inputText id="spouse" value="#{partner.spouse}" maxlength="100" tabindex="21" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="contactPersonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.contactPerson']}</ui:define>
+                    <h:inputText id="contactPerson" value="#{partner.contactPerson}" maxlength="100" tabindex="22" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="phoneContactField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.phoneContact']}</ui:define>
+                    <h:inputText id="phoneContact" value="#{partner.phoneContact}" maxlength="20" tabindex="23" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
 </rich:panel>
 
     <div class="buttons">
@@ -394,6 +388,20 @@
                                oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
                                style="width:0.8em"/>
 
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="personListModalPanelContainer" template="/employees/personListModalPanel.xhtml">
+        <ui:param name="dialogId" value="personListModalPanel"/>
+        <ui:param name="container" value="personListModalPanelContainer"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{partnerAction.assignPerson(personItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               ajaxSingle="true"
+                               reRender="personInformationFieldset, contractFieldset"
+                               oncomplete="Richfaces.hideModalPanel('personListModalPanel');"/>
         </ui:define>
     </s:decorate>
 
