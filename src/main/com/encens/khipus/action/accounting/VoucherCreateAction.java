@@ -880,8 +880,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherDetails.add(voucherContribution);
 
             clearPartner();
-            setContribution(null);
-
             clearAccount();
             clearClient();
             clearProvider();
@@ -920,7 +918,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherDetails.add(voucherBox);
 
             clearPartner();
-            setContribution(null);
 
             clearAccount();
             clearClient();
@@ -1228,6 +1225,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearPartner() {
         setPartner(null);
+        setContribution(null);
     }
 
     public void clearClient(){
@@ -1240,7 +1238,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void clearPartnerAccount(){
         setPartnerAccount(null);
-        setAmountDeposit(BigDecimal.ZERO);
+        setAmountDeposit(null);
     }
 
     public void clearProvider(){

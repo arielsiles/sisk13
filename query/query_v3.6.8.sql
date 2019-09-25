@@ -1,3 +1,3 @@
 /** 20.09.2019 **/
-ALTER TABLE articulos_pedido ADD COLUMN costo_uni DECIMAL(16,6) AFTER importe;
-UPDATE articulos_pedido  SET costo_uni = 0;
+alter table articulos_pedido add column costo_uni decimal(16,6) after importe;
+update articulos_pedido  set costo_uni = 0;
