@@ -8,5 +8,7 @@ alter table sf_tmpdet add foreign key (idsocio) references socio (idsocio);
 alter table sf_tmpdet add foreign key (idcuenta) references cuenta (idcuenta);
 alter table sf_tmpdet add foreign key (idcredito) references credito (idcredito);
 
-
 alter table socio add column idpersona bigint(20) after idsocio;
+
+/** 26.09.2019 **/
+alter table socio add foreign key (idpersona) references persona (idpersona);
