@@ -51,10 +51,25 @@ public class PartnerAction extends GenericAction<Partner> {
         return getInstance();
     }
 
+
+    @Override
+    @Begin(ifOutcome = com.encens.khipus.framework.action.Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(Partner instance) {
+        String outCome = super.select(instance);
+
+        //setPerson(getInstance().getPerson());
+        assignPerson(instance.getPerson());
+
+        updateShowExtension();
+        updateShowExtensionPerson();
+        return outCome;
+    }
+
     @Override
     @End
     public String create() {
         try {
+            getInstance().setPerson(this.person);
             partnerService.createPartner(getInstance());
             addCreatedMessage();
             return Outcome.SUCCESS;
@@ -62,6 +77,15 @@ public class PartnerAction extends GenericAction<Partner> {
             addDuplicatedMessage();
             return Outcome.REDISPLAY;
         }
+    }
+
+    @Override
+    @End
+    public String update() {
+
+        getInstance().setPerson(this.person);
+        return super.update();
+
     }
 
     @Create

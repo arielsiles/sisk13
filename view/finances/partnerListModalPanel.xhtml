@@ -58,12 +58,13 @@
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="partnerItem" id="partnerList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 30%, 30%,10%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="25%, 25%, 25%, 10%, 10%">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column>#{messages['Partner.name']}</rich:column>
+                    <rich:column>#{messages['Partner.firstName']}</rich:column>
                     <rich:column>#{messages['Partner.lastName']}</rich:column>
                     <rich:column>#{messages['Partner.maidenName']}</rich:column>
+                    <rich:column>#{messages['Partner.code']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
                     </rich:column>
@@ -77,6 +78,9 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{partnerItem.maidenName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{partnerItem.nPartner}"/>
             </rich:column>
             <rich:column styleClass="center">
                 <ui:insert name="assignButton"/>

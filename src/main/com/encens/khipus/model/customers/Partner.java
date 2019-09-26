@@ -73,6 +73,10 @@ public class Partner implements BaseModel {
     @Column(name = "profesion", length = 100)
     private String profession;
 
+    @ManyToOne
+    @JoinColumn(name = "idpersona", nullable = true)
+    private Person person;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsaludo")
     private Salutation salutation;
@@ -353,5 +357,13 @@ public class Partner implements BaseModel {
 
     public String getFirstAndMaidenName() {
         return (firstName != null ? firstName + " " : "") + (lastName != null ? lastName : "");
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

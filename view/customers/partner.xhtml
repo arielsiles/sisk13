@@ -157,6 +157,59 @@
                 <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
             </a4j:commandLink>
         </s:decorate>
+        <!---->
+        <s:decorate id="idNumberField1"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.idNumber']}</ui:define>
+            <h:inputText id="idNumber1"
+                         value="#{partner.idNumber}"
+                         required="true"
+                         maxlength="100"
+                         styleClass="input"
+                         tabindex="2">
+                <app:naturalNumberConverter forId="idNumber1"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:div id="documentDiv1">
+            <s:decorate id="documentTypeField1" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Partner.documentType']}</ui:define>
+                <h:selectOneMenu id="documentType1"
+                                 value="#{partner.documentType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="3">
+                    <s:selectItems value="#{documentTypeList}" var="documentType"
+                                   label="#{documentType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange"
+                                 action="#{partnerAction.updateShowExtension()}"
+                                 reRender="documentDiv1"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="extensionField1" template="/include/inputField.xhtml"
+                        rendered="#{partnerAction.showExtension}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                <h:selectOneMenu id="extension1"
+                                 value="#{partner.extensionSite}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="4">
+                    <s:selectItems value="#{extensionList}"
+                                   var="extension"
+                                   label="#{extension.extension}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+        <!---->
 
         <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['City.department']}</ui:define>
