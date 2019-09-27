@@ -95,7 +95,7 @@
                             </app:commandSortHeader>
                         </rich:column>
 
-                        <rich:column>#{messages['Partner.numberOfCredits']}</rich:column>
+                        <rich:column>#{messages['Partner.state']}</rich:column>
 
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
@@ -115,8 +115,8 @@
                     <h:outputText value="#{partnerItem.idNumber}"/>
                 </rich:column>
 
-                <rich:column styleClass="right">
-                    <h:outputText value="#{partnerItem.numberCredit}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[partnerItem.state.resourceKey]}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">

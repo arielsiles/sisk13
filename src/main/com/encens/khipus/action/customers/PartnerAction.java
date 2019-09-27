@@ -84,6 +84,10 @@ public class PartnerAction extends GenericAction<Partner> {
     public String update() {
 
         getInstance().setPerson(this.person);
+        this.person.setGender(getInstance().getGender());
+        this.person.setMaritalStatus(getInstance().getMaritalStatus());
+        this.person.setSalutation(getInstance().getSalutation());
+        this.person.setIdNumber(getInstance().getIdNumber());
         return super.update();
 
     }
@@ -94,6 +98,11 @@ public class PartnerAction extends GenericAction<Partner> {
             getInstance().setState(PartnerState.VIG);
             assignCode();
         }
+    }
+
+    @Factory(value = "partnerStates", scope = ScopeType.STATELESS)
+    public PartnerState[] getProductItemStates() {
+        return PartnerState.values();
     }
 
     private void assignCode() {

@@ -91,7 +91,7 @@
                                  maxlength="100"
                                  styleClass="input"
                                  tabindex="2">
-                        <app:naturalNumberConverter forId="idNumber"/>
+                        <!--<app:naturalNumberConverter forId="idNumber"/>-->
                     </h:inputText>
                 </s:decorate>
 
@@ -141,10 +141,10 @@
     <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
     <s:div>
 
-        <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <!--<s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Partner.number']}</ui:define>
             <h:outputText value="#{partner.number}"/>
-        </s:decorate>
+        </s:decorate>-->
 
         <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
@@ -168,7 +168,7 @@
                          maxlength="100"
                          styleClass="input"
                          tabindex="2">
-                <app:naturalNumberConverter forId="idNumber1"/>
+                <!--<app:naturalNumberConverter forId="idNumber1"/>-->
             </h:inputText>
         </s:decorate>
 
@@ -259,21 +259,24 @@
 
     <s:div>
 
-        <!--<s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
-            <app:selectPopUp id="person"
-                             textValue="#{partnerAction.person.fullName}"
-                             value="#{partnerAction.person}"
-                             clearAction="pollCopyDataModel.clearPerson()"
-                             searchModalPanel="personListModalPanel"
-                             dataModel="#{personDataModel}"
-                             reRender="personField, firstNameField, firstName"
-                             hotKeySelect="alt+2"
-                             tabindex="11"/>
-        </s:decorate>-->
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductItem.state']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{partner.state}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{partnerStates}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
 
         <s:decorate id="nPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Partner.nPartner']}</ui:define>
+            <ui:define name="label">#{messages['Partner.code']}</ui:define>
             <h:inputText id="nPartner" value="#{partner.nPartner}" required="true"
                          maxlength="200" tabindex="11" styleClass="input">
             </h:inputText>
