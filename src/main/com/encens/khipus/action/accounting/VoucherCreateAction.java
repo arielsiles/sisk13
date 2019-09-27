@@ -654,12 +654,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             /** Cuenta CAJA | Billetes Ext **/
             VoucherDetail voucherCaja = new VoucherDetail();
 
-            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D)){
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"No existe una configuracion para en TIPOCUENTA para esta cuenta en Dolares ME $us");
+            /* revisar correctamente FCisc, FLech
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.M)){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"No existe una configuracion en TIPOCUENTA para esta cuenta en Dolares MV");
                 return;
-            }
+            }*/
 
-            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D)) {
 
                 voucherCaja.setCashAccount(ctaCajaMe);
                 voucherCaja.setAccount(ctaCajaMe.getAccountCode());
