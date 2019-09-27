@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+>
+
+<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent"
+             rendered="#{not empty personEntity.entity}">
+    <s:div id="leftSidePanel">
+
+        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:param name="required" value="true"/>
+            <ui:define name="label">
+                <h:outputText value="#{messages['Person.idNumber']}"/>
+            </ui:define>
+            <h:inputText id="idNumber"
+                         value="#{person.idNumber}"
+                         styleClass="input"
+                         required="true"
+                         immediate="true"
+                         maxlength="100"/>
+        </s:decorate>
+
+        <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">
+                <h:outputText value="#{messages['Person.firstName']}"/>
+            </ui:define>
+            <h:inputText id="firstName"
+                         value="#{person.firstName}"
+                         styleClass="input"
+                         immediate="true"
+                         required="true"
+                         maxlength="20"/>
+
+        </s:decorate>
+
+
+
+        <!--
+        <s:decorate id="classField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FinanceProvider.class']}</ui:define>
+            <h:selectOneMenu id="class"
+                             value="#{providerEntity.providerClass}"
+                             required="true"
+                             immediate="true"
+                             styleClass="input">
+                <s:selectItems value="#{providerClassList}"
+                               var="providerClass"
+                               label="#{providerClass.fullName}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+        <s:decorate id="stateField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FinanceProvider.entity.state']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{providerEntity.entity.state}"
+                             required="true"
+                             immediate="true"
+                             styleClass="input">
+                <s:selectItems value="#{financesEntityStateEnumList}"
+                               var="financesEntityState"
+                               label="#{messages[financesEntityState.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>-->
+    </s:div>
+    <s:div id="rigthSidePanel">
+    </s:div>
+</h:panelGrid>
+
+</ui:composition>

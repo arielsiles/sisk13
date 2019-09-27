@@ -67,7 +67,7 @@
         <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
             <s:div>
                 <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['PollCopy.person']}</ui:define>
+                    <ui:define name="label">#{messages['Partner.person']}</ui:define>
                     <app:selectPopUp id="person"
                                      textValue="#{partnerAction.person.fullName}"
                                      value="#{partnerAction.person}"
@@ -75,6 +75,9 @@
                                      searchModalPanel="personListModalPanel"
                                      dataModel="#{personDataModel}"
                                      reRender="personInformationFieldset, contractFieldset"
+
+                                     newModalPanel="personPartnerModalPanel"
+                                     renderedNewLink="true"
                                      hotKeySelect="alt+2"
                                      tabindex="11"/>
                 </s:decorate>
@@ -429,6 +432,15 @@
     </div>
 
 </h:form>
+
+    <s:decorate id="personPartnerModalPanelContainer" template="/contacts/personPartnerModalPanel.xhtml">
+        <ui:param name="containerId" value="personPartnerModalPanelContainer"/>
+        <ui:param name="dialogId" value="personPartnerModalPanel"/>
+        <ui:param name="reRender" value="idNumberField, firstNameField"/>
+
+        <!--<ui:param name="postCreateAction" value="#{voucherCreateAction.assignProviderAndFinancesEntity(financeProviderAction.instance)}"/>-->
+
+    </s:decorate>
 
     <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
         <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
