@@ -83,7 +83,7 @@
                             <app:commandSortHeader sortProperty="partner.number"
                                                    dataModel="#{partnerDataModel}"
                                                    reRender="partnerList, dataScroller">
-                                #{messages['Partner.number']}
+                                #{messages['Partner.code']}
                             </app:commandSortHeader>
                         </rich:column>
 
@@ -108,7 +108,7 @@
                 </rich:column>
 
                 <rich:column styleClass="right">
-                    <h:outputText value="#{partnerItem.number}"/>
+                    <h:outputText value="#{partnerItem.nPartner}"/>
                 </rich:column>
 
                 <rich:column styleClass="right">

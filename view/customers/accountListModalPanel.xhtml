@@ -66,15 +66,16 @@
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="accountItem" id="accountList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="15%, 15%, 15%, 10%, 20%, 5%, 10%, 5%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="15%, 15%, 15%, 30%, 10%, 10%, 5%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>#{messages['Partner.firstName']}</rich:column>
                     <rich:column>#{messages['Partner.lastName']}</rich:column>
                     <rich:column>#{messages['Partner.maidenName']}</rich:column>
                     <rich:column>#{messages['Partner.account']}</rich:column>
-                    <rich:column>#{messages['Account.accountType']}</rich:column>
-                    <rich:column>#{messages['Account.currency']}</rich:column>
+                    <rich:column>#{messages['Partner.code']}</rich:column>
+                    <!--<rich:column>#{messages['Account.accountType']}</rich:column>
+                    <rich:column>#{messages['Account.currency']}</rich:column>-->
                     <rich:column>#{messages['Account.balance']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
@@ -91,14 +92,17 @@
                 <h:outputText value="#{accountItem.partner.maidenName}"/>
             </rich:column>
             <rich:column>
-                <h:outputText value="#{accountItem.accountNumber}"/>
+                <h:outputText value="#{accountItem.fullAccount}"/>
             </rich:column>
             <rich:column>
+                <h:outputText value="#{accountItem.code}"/>
+            </rich:column>
+            <!--<rich:column>
                 <h:outputText value="#{accountItem.accountType.name}"/>
-            </rich:column>
-            <rich:column>
+            </rich:column>-->
+            <!--<rich:column>
                 <h:outputText value="#{messages[accountItem.currency.symbolResourceKey]}"/>
-            </rich:column>
+            </rich:column>-->
             <rich:column styleClass="right">
                 <h:outputText value="#{accountAction.getTotalBalanceAccount(accountItem)}" >
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />

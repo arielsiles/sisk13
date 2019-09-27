@@ -51,6 +51,10 @@ public class Account implements BaseModel {
     @Length(max = 20)
     private String accountNumber;
 
+    @Column(name = "codigo", nullable = false, length = 20)
+    @Length(max = 20)
+    private String code;
+
     @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
@@ -201,5 +205,13 @@ public class Account implements BaseModel {
 
     public void setTransferAmount(BigDecimal transferAmount) {
         this.transferAmount = transferAmount;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

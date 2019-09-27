@@ -112,9 +112,14 @@
                                      value="#{account.accountNumber}"  />
                     </s:decorate>
 
+                    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.code']}</ui:define>
+                        <h:inputText id="code" value="#{account.code}" styleClass="input" />
+                    </s:decorate>
+
                     <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.currency']}</ui:define>
-                        <h:selectOneMenu id="currency" value="#{account.currency}" styleClass="input"
+                        <h:selectOneMenu id="currency" value="#{account.currency}" styleClass="input" disabled="#{accountAction.managed}"
                                          tabindex="3" required="true">
                             <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
                                            noSelectionLabel=""
@@ -127,7 +132,7 @@
                         <ui:define name="label">#{messages['Account.accountType']}</ui:define>
                         <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
                                          styleClass="input"
-                                         required="true"
+                                         required="true" disabled="#{accountAction.managed}"
                                          tabindex="1">
                             <s:selectItems value="#{accountTypeList.resultList}"
                                            var="accountType"

@@ -641,7 +641,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         try {
 
-
             System.out.println("---> Exchange Rate: " + exchangeRate);
             System.out.println("---> Partner Account: " + partnerAccount.getFullAccountName());
             System.out.println("---> Account Type: " + partnerAccount.getAccountType().getName());
@@ -660,7 +659,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 return;
             }*/
 
-            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D)) {
+            if (partnerAccount.getCurrency().equals(FinancesCurrencyType.D) || partnerAccount.getCurrency().equals(FinancesCurrencyType.M)){
 
                 voucherCaja.setCashAccount(ctaCajaMe);
                 voucherCaja.setAccount(ctaCajaMe.getAccountCode());
