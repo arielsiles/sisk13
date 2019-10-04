@@ -443,6 +443,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             CashAccount cashAccount = null;
             String criminalInterestAccountCode = null;
 
+            if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
+                cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VIG());
+                criminalInterestAccountCode = creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VIG();
+            }
             if (creditTransaction.getCredit().getState().equals(CreditState.VEN)) {
                 cashAccount = cashAccountService.findByAccountCode(creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VEN());
                 criminalInterestAccountCode = creditTransaction.getCredit().getCreditType().getCriminalInterestAccountCode_VEN();
@@ -459,6 +463,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCreditMe(BigDecimal.ZERO);
+                voucherDetailCriminalInterest.setCreditPartner(creditTransaction.getCredit());
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) && creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("USD")) {
@@ -467,6 +472,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailCriminalInterest.setCredit(BigDecimalUtil.multiply(creditTransaction.getCriminalInterest(), exchangeRate, 2));
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCreditMe(creditTransaction.getCriminalInterest());
+                voucherDetailCriminalInterest.setCreditPartner(creditTransaction.getCredit());
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) && creditTransaction.getCredit().getCreditType().getCurrency().getSymbol().equals("BS")) {
@@ -475,8 +481,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 voucherDetailCriminalInterest.setCredit(creditTransaction.getCriminalInterest());
                 voucherDetailCriminalInterest.setDebitMe(BigDecimal.ZERO);
                 voucherDetailCriminalInterest.setCreditMe(BigDecimalUtil.divide(creditTransaction.getCriminalInterest(), exchangeRate, 2));
+                voucherDetailCriminalInterest.setCreditPartner(creditTransaction.getCredit());
                 voucher.getDetails().add(voucherDetailCriminalInterest);
             }
+
         }
     }
 

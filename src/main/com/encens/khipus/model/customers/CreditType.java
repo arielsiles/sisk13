@@ -55,6 +55,9 @@ public class CreditType implements BaseModel {
     @Column(name = "ictaeje")
     private String executedInterestAccountCode;
 
+    @Column(name = "ipctavig")
+    private String criminalInterestAccountCode_VIG;
+
     @Column(name = "ipctaeje")
     private String criminalInterestAccountCode_EJE;
 
@@ -270,5 +273,13 @@ public class CreditType implements BaseModel {
 
     public void setCriminalInterestAccountEJE(CashAccount criminalInterestAccountEJE) {
         this.criminalInterestAccountEJE = criminalInterestAccountEJE;
+    }
+
+    public String getCriminalInterestAccountCode_VIG() {
+        return criminalInterestAccountCode_VIG;
+    }
+
+    public void setCriminalInterestAccountCode_VIG(String criminalInterestAccountCode_VIG) {
+        this.criminalInterestAccountCode_VIG = criminalInterestAccountCode_VIG;
     }
 }
