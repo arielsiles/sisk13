@@ -117,7 +117,7 @@ public class Person extends Entity {
     }
 
     public String getFullName() {
-        return (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName + " " : "") + (firstName != null ? firstName : "");
+        return (firstName != null ? firstName + " " : "") + (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName : "");
     }
 
     public String getSingleFullName() {
@@ -125,7 +125,7 @@ public class Person extends Entity {
     }
 
     public String getIdNumberAndFullName() {
-        return getIdNumber() + " - " + (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName + " " : "") + (firstName != null ? firstName : "");
+        return getIdNumber() + " - " + (firstName != null ? firstName + " " : "") + (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName : "");
     }
 
     public String getName() {

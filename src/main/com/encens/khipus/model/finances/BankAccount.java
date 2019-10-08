@@ -7,6 +7,7 @@ import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.BankEntity;
 import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.production.RawMaterialProducer;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -46,8 +47,12 @@ public class BankAccount implements BaseModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = false)
+    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = true)
     private Employee employee;
+
+    @ManyToOne
+    @JoinColumn(name = "idproductor", referencedColumnName = "idproductormateriaprima", nullable = true)
+    private RawMaterialProducer producer;
 
     @ManyToOne
     @JoinColumn(name = "identidadbancaria", referencedColumnName = "identidadbancaria", nullable = false)
@@ -148,5 +153,13 @@ public class BankAccount implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public RawMaterialProducer getProducer() {
+        return producer;
+    }
+
+    public void setProducer(RawMaterialProducer producer) {
+        this.producer = producer;
     }
 }

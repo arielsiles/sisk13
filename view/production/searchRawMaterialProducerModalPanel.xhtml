@@ -19,18 +19,6 @@
     <h:form id="rawMaterialProducerListForm">
         <rich:simpleTogglePanel label="#{searchPanelTitle}" switchType="client">
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
-                <h:inputText value="#{rawMaterialProducerDataModel.criteria.lastName}" maxlength="100"
-                             styleClass="input"
-                             tabindex="1" />
-            </s:decorate>
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
-                <h:inputText value="#{rawMaterialProducerDataModel.criteria.maidenName}" maxlength="100"
-                             styleClass="input"
-                             tabindex="1" />
-            </s:decorate>
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Person.firstName']}</ui:define>
                 <h:inputText value="#{rawMaterialProducerDataModel.criteria.firstName}" maxlength="100"
                              styleClass="input"
@@ -42,6 +30,18 @@
                     <s:defaultAction/>
                 </a4j:commandButton>
             </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                <h:inputText value="#{rawMaterialProducerDataModel.criteria.lastName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+            </s:decorate>
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                <h:inputText value="#{rawMaterialProducerDataModel.criteria.maidenName}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+            </s:decorate>
         </rich:simpleTogglePanel>
 
         <rich:spacer height="10" width="10" />
@@ -50,6 +50,14 @@
                         rows="#{sessionUser.rowsPerPage}" width="100%" >
             <f:facet name="header">
                 <rich:columnGroup>
+                    <rich:column>#{messages['Person.ci']}</rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialProducer.firstName"
+                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
+                                               reRender="rawMaterialProducerList, dataScroller">
+                            #{messages['Person.firstName']}
+                        </app:commandSortHeader>
+                    </rich:column>
                     <rich:column>
                         <app:commandSortHeader sortProperty="rawMaterialProducer.lastName"
                                                rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
@@ -62,13 +70,6 @@
                                                rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
                                                reRender="rawMaterialProducerList, dataScroller">
                             #{messages['Person.maidenName']}
-                        </app:commandSortHeader>
-                    </rich:column>
-                    <rich:column>
-                        <app:commandSortHeader sortProperty="rawMaterialProducer.firstName"
-                                               rawMaterialProducerDataModel="#{rawMaterialProducerDataModel}"
-                                               reRender="rawMaterialProducerList, dataScroller">
-                            #{messages['Person.firstName']}
                         </app:commandSortHeader>
                     </rich:column>
 
@@ -86,13 +87,16 @@
                 </rich:columnGroup>
             </f:facet>
             <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.idNumber}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialProducerItem.firstName}"/>
+            </rich:column>
+            <rich:column>
                 <h:outputText value="#{rawMaterialProducerItem.lastName}"/>
             </rich:column>
             <rich:column>
                 <h:outputText value="#{rawMaterialProducerItem.maidenName}"/>
-            </rich:column>
-            <rich:column>
-                <h:outputText value="#{rawMaterialProducerItem.firstName}"/>
             </rich:column>
             <rich:column>
                 <h:outputText value="#{rawMaterialProducerItem.productiveZone.fullName}"/>
