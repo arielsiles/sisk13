@@ -38,7 +38,7 @@ import javax.persistence.*;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "cuentabancaria", uniqueConstraints = @UniqueConstraint(columnNames = {"identidadbancaria", "idempleado", "numerocuenta"}))
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "cuentabancaria")
 public class BankAccount implements BaseModel {
 
     @Id
@@ -162,4 +162,15 @@ public class BankAccount implements BaseModel {
     public void setProducer(RawMaterialProducer producer) {
         this.producer = producer;
     }
+
+    public String getAccountOwner(){
+        String result = "";
+        if (getProducer() != null)
+            result = result + getProducer().getIdNumberAndFullName();
+        if (getEmployee() != null)
+            result = result + getEmployee().getIdNumberAndFullName();
+
+        return result;
+    }
+
 }

@@ -67,12 +67,12 @@ public class BankAccountAction extends GenericAction<BankAccount> {
     @Restrict("#{s:hasPermission('BANKACCOUNT','UPDATE')}")
     public String update() {
 
-        if (getInstance().getEmployee() == null) {
+        if (getInstance().getEmployee() == null && getInstance().getProducer() == null) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "BankAccount.error.employeeRequired");
             return com.encens.khipus.framework.action.Outcome.REDISPLAY;
         }
 
-        if (getInstance().getDefaultAccount() && bankAccountService.hasDefaultAccount(getInstance().getEmployee(), getInstance())) {
+        if (getInstance().getDefaultAccount() && bankAccountService.hasDefaultAccount(getInstance().getEmployee(), getInstance()) && getEmployee()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "BankAccount.error.defaultAccountDuplicated");
             return com.encens.khipus.framework.action.Outcome.REDISPLAY;
         }

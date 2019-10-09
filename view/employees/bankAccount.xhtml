@@ -63,21 +63,26 @@
                     </c:choose>
                 </f:facet>
 
-                <s:div id="selectDiv" rendered="#{!bankAccountAction.managed}">
-                    <s:decorate id="isEmployeeField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['BankAccount.isEmployee']}</ui:define>
+                <h:panelGrid id="selectDiv" rendered="#{!bankAccountAction.managed}"
+                             columns="11" border="0" cellpadding="0" cellspacing="0" width="100%" styleClass="entry"
+                             columnClasses="validateLabel right, ,left, , validateLabel right, ,left">
+
+                    <h:outputLabel value="#{messages['BankAccount.isEmployee']}"/>
+                    <rich:spacer width="20"/>
+                    <s:decorate id="isEmployeeField" template="/include/validateField.xhtml">
                         <h:selectBooleanCheckbox id="isEmployeeId" value="#{bankAccountAction.employee}" tabindex="12">
                             <a4j:support event="onchange" reRender="employeeField, personDiv, selectDiv" ajaxSingle="true"/>
                         </h:selectBooleanCheckbox>
                     </s:decorate>
-
-                    <s:decorate id="isProducerField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['BankAccount.isProducer']}</ui:define>
+                    <rich:spacer width="30"/>
+                    <h:outputLabel value="#{messages['BankAccount.isProducer']}"/>
+                    <rich:spacer width="20"/>
+                    <s:decorate id="isProducerField" template="/include/validateField.xhtml">
                         <h:selectBooleanCheckbox id="isProducerId" value="#{bankAccountAction.producer}" tabindex="12">
                             <a4j:support event="onchange" reRender="rawMaterialProducerField, personDiv, selectDiv" ajaxSingle="true"/>
                         </h:selectBooleanCheckbox>
                     </s:decorate>
-                </s:div>
+                </h:panelGrid>
 
                 <s:decorate id="employeeNameField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{bankAccountAction.isEmployeeAccount()}">
                     <ui:define name="label">#{messages['BankAccount.employee']}</ui:define>
