@@ -34,33 +34,19 @@
                             </h:inputText>
                         </s:decorate>
 
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['BankAccount.clientCod']}</ui:define>
-                            <h:inputText id="clientCod" value="#{bankAccountDataModel.criteria.clientCod}"
-                                         styleClass="input" maxlength="150" tabindex="4"/>
-                        </s:decorate>
-
                     </s:div>
                     <s:div>
-                        <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['Employee.idNumber']}</ui:define>
                             <h:inputText id="idNumber" value="#{bankAccountDataModel.idNumber}"
                                          maxlength="150" tabindex="3" styleClass="input">
                                 <app:naturalNumberConverter forId="idNumber"/>
                             </h:inputText>
-                        </s:decorate>-->
-                        <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['BankAccount.clientCod']}</ui:define>
                             <h:inputText id="clientCod" value="#{bankAccountDataModel.criteria.clientCod}"
                                          styleClass="input" maxlength="150" tabindex="4"/>
-                            <a4j:commandButton action="#{bankAccountDataModel.search}"
-                                               reRender="searchPanel,bankAccountList, dataScroller"
-                                               styleClass="button"
-                                               value="#{messages['Common.search']}" id="searchButtonId" tabindex="5">
-                                <s:defaultAction/>
-                            </a4j:commandButton>
-                        </s:decorate>-->
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <a4j:commandButton action="#{bankAccountDataModel.search}"
                                                reRender="searchPanel,bankAccountList, dataScroller"
                                                styleClass="button"
@@ -74,12 +60,19 @@
                 <rich:jQuery selector="#bankEntity" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/bankAccount.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('BANKACCOUNT','CREATE')}"
+                          tabindex="5"/>
+            </div>
+
             <rich:dataTable value="#{bankAccountDataModel}" var="bankAccountItem" id="bankAccountList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="20%, 20%, 10%, 15%, 10%, 8%, 7%">
+                            width="100%" columnsWidth="10%, 20%, 20%, 10%, 15%, 10%, 8%, 7%">
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <!--<rich:column>
+                        <rich:column>
                             <app:commandSortHeader sortProperty="bankAccount.employee.idNumber"
                                                    dataModel="#{bankAccountDataModel}"
                                                    reRender="bankAccountList, dataScroller">
@@ -93,8 +86,7 @@
                                     reRender="bankAccountList, dataScroller">
                                 #{messages['BankAccount.owner']}
                             </app:commandSortHeader>
-                        </rich:column>-->
-                        <rich:column>#{messages['BankAccount.owner']}</rich:column>
+                        </rich:column>
                         <rich:column>
                             <app:commandSortHeader sortProperty="bankAccount.bankEntity.name"
                                                    dataModel="#{bankAccountDataModel}"
@@ -136,14 +128,11 @@
                     </rich:columnGroup>
                 </f:facet>
 
-                <!--<rich:column>
+                <rich:column>
                     <h:outputText value="#{bankAccountItem.employee.idNumber}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{bankAccountItem.employee.fullName}"/>
-                </rich:column>-->
-                <rich:column>
-                    <h:outputText value="#{bankAccountItem.getAccountOwner()}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{bankAccountItem.bankEntity.name}"/>

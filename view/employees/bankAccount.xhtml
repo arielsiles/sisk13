@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">
         <c:choose>
@@ -63,69 +62,23 @@
                     </c:choose>
                 </f:facet>
 
-                <h:panelGrid id="selectDiv" rendered="#{!bankAccountAction.managed}"
-                             columns="11" border="0" cellpadding="0" cellspacing="0" width="100%" styleClass="entry"
-                             columnClasses="validateLabel right, ,left, , validateLabel right, ,left">
-
-                    <h:outputLabel value="#{messages['BankAccount.isEmployee']}"/>
-                    <rich:spacer width="20"/>
-                    <s:decorate id="isEmployeeField" template="/include/validateField.xhtml">
-                        <h:selectBooleanCheckbox id="isEmployeeId" value="#{bankAccountAction.employee}" tabindex="12">
-                            <a4j:support event="onchange" reRender="employeeField, personDiv, selectDiv" ajaxSingle="true"/>
-                        </h:selectBooleanCheckbox>
-                    </s:decorate>
-                    <rich:spacer width="30"/>
-                    <h:outputLabel value="#{messages['BankAccount.isProducer']}"/>
-                    <rich:spacer width="20"/>
-                    <s:decorate id="isProducerField" template="/include/validateField.xhtml">
-                        <h:selectBooleanCheckbox id="isProducerId" value="#{bankAccountAction.producer}" tabindex="12">
-                            <a4j:support event="onchange" reRender="rawMaterialProducerField, personDiv, selectDiv" ajaxSingle="true"/>
-                        </h:selectBooleanCheckbox>
-                    </s:decorate>
-                </h:panelGrid>
-
-                <s:decorate id="employeeNameField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{bankAccountAction.isEmployeeAccount()}">
-                    <ui:define name="label">#{messages['BankAccount.employee']}</ui:define>
-                    <h:outputText value="#{bankAccountAction.employeeFullName}"  />
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['BankAccount.owner']}</ui:define>
+                    <h:inputText id="owner" required="true" styleClass="input" readonly="true"
+                                 value="#{bankAccountAction.employeeFullName}" tabindex="5"/>
+                    <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="6"
+                                     title="#{messages['BankAccount.selectOwner']}"
+                                     onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true" tabindex="7"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{bankAccountAction.clearEmployee}"
+                                     reRender="employeeField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
                 </s:decorate>
 
-                <s:decorate id="producerNameField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{bankAccountAction.isProducerAccount()}">
-                    <ui:define name="label">#{messages['BankAccount.producer']}</ui:define>
-                    <h:outputText value="#{bankAccountAction.producerFullName}"  />
-                </s:decorate>
-
-                <s:div id="personDiv">
-                    <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{bankAccountAction.employee}">
-                        <ui:define name="label">#{messages['BankAccount.employee']}</ui:define>
-                        <h:inputText id="owner" required="false" styleClass="input" readonly="true"
-                                     value="#{bankAccountAction.employeeFullName}" tabindex="5"/>
-                        <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true" tabindex="6"
-                                         title="#{messages['BankAccount.selectOwner']}"
-                                         onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
-                            <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
-                        </a4j:commandLink>
-                        <a4j:commandLink id="clearButton" ajaxSingle="true" immediate="true" tabindex="7"
-                                         title="#{messages['Common.clear']}"
-                                         action="#{bankAccountAction.clearEmployee()}"
-                                         reRender="employeeField">
-                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                        </a4j:commandLink>
-                    </s:decorate>
-
-                    <s:decorate id="rawMaterialProducerField" template="/include/viewField.xhtml" styleClass="formRow" rendered="#{bankAccountAction.producer}">
-                        <ui:define name="label">#{messages['BankAccount.producer']}</ui:define>
-                        <app:selectPopUp id="rawMaterialProducer"
-                                         required="false"
-                                         textValue="#{bankAccount.producer.fullName}"
-                                         value="#{bankAccount.producer}"
-                                         dataModel="#{rawMaterialProducerDataModel}"
-                                         clearAction="#{bankAccountAction.clearProducer()}"
-                                         searchModalPanel="rawMaterialProducerListModalPanel"
-                                         reRender="rawMaterialProducerField"
-                                         readOnly="#{bankAccountAction.managed}"
-                                         hotKeySelect="alt+2"/>
-                    </s:decorate>
-                </s:div>
                 <s:decorate id="bankEntityField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['BankAccount.bankEntity']}</ui:define>
                     <h:selectOneMenu id="bankEntity" value="#{bankAccount.bankEntity}" styleClass="input" tabindex="8"
@@ -215,27 +168,14 @@
             </ui:define>
         </s:decorate>
 
-        <s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
             <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
             <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton" action="#{bankAccountAction.assignEmployee(employeeItem)}"
                                    image="/img/active.gif" style="border:0" ajaxSingle="true" reRender="employeeField"
                                    oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
-            </ui:define>
-        </s:decorate>
-
-        <s:decorate id="rawMaterialProdecerModalPanelContainer" template="/production/searchRawMaterialProducerModalPanel.xhtml">
-            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
-            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
-            <ui:define name="assignButton">
-                <a4j:commandButton id="assignButton"
-                                   action="#{bankAccountAction.assignProducer(rawMaterialProducerItem)}"
-                                   image="/img/active.gif"
-                                   styleClass="select-image-middle"
-                                   ajaxSingle="true"
-                                   reRender="rawMaterialProducerField"
-                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

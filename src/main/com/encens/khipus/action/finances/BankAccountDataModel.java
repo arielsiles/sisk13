@@ -24,7 +24,8 @@ public class BankAccountDataModel extends QueryDataModel<Long, BankAccount> {
     private static final String[] RESTRICTIONS = {
             "bankAccount.accountNumber like concat(#{bankAccountDataModel.criteria.accountNumber}, '%')",
             "bankAccount.clientCod like concat(#{bankAccountDataModel.criteria.clientCod}, '%')",
-            "bankAccount.bankEntity = #{bankAccountDataModel.criteria.bankEntity}"};
+            "bankAccount.bankEntity = #{bankAccountDataModel.criteria.bankEntity}",
+            "bankAccount.employee.idNumber like concat(#{bankAccountDataModel.idNumber}, '%')"};
 
     private String idNumber;
 
@@ -38,7 +39,7 @@ public class BankAccountDataModel extends QueryDataModel<Long, BankAccount> {
 
     @Create
     public void init() {
-        //sortProperty = "bankAccount.employee.firstName,bankAccount.employee.maidenName,bankAccount.employee.firstName";
+        sortProperty = "bankAccount.employee.firstName,bankAccount.employee.maidenName,bankAccount.employee.firstName";
     }
 
     @Override

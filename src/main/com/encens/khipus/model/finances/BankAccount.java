@@ -7,7 +7,6 @@ import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.BankEntity;
 import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.production.RawMaterialProducer;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -38,7 +37,7 @@ import javax.persistence.*;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "cuentabancaria")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "cuentabancaria", uniqueConstraints = @UniqueConstraint(columnNames = {"identidadbancaria", "idempleado", "numerocuenta"}))
 public class BankAccount implements BaseModel {
 
     @Id
@@ -47,12 +46,8 @@ public class BankAccount implements BaseModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = true)
+    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = false)
     private Employee employee;
-
-    @ManyToOne
-    @JoinColumn(name = "idproductor", referencedColumnName = "idproductormateriaprima", nullable = true)
-    private RawMaterialProducer producer;
 
     @ManyToOne
     @JoinColumn(name = "identidadbancaria", referencedColumnName = "identidadbancaria", nullable = false)
@@ -154,23 +149,4 @@ public class BankAccount implements BaseModel {
     public void setVersion(long version) {
         this.version = version;
     }
-
-    public RawMaterialProducer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(RawMaterialProducer producer) {
-        this.producer = producer;
-    }
-
-    public String getAccountOwner(){
-        String result = "";
-        if (getProducer() != null)
-            result = result + getProducer().getIdNumberAndFullName();
-        if (getEmployee() != null)
-            result = result + getEmployee().getIdNumberAndFullName();
-
-        return result;
-    }
-
 }
