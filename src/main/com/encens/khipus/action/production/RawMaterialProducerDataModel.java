@@ -27,8 +27,8 @@ public class RawMaterialProducerDataModel extends QueryDataModel<Long, RawMateri
             "upper(rawMaterialProducer.lastName) like concat(upper(#{rawMaterialProducerDataModel.criteria.lastName}), '%')",
             "upper(rawMaterialProducer.maidenName) like concat(upper(#{rawMaterialProducerDataModel.criteria.maidenName}), '%')",
             "upper(rawMaterialProducer.productiveZone.name) like concat('%', concat(upper(#{rawMaterialProducerDataModel.criteria.productiveZone.name}), '%'))",
-            "upper(rawMaterialProducer.productiveZone.number) like concat('%',#{rawMaterialProducerDataModel.criteria.productiveZone.number}, '%')",
-            "upper(rawMaterialProducer.productiveZone.group) like concat(#{rawMaterialProducerDataModel.criteria.productiveZone.group}, '%')"
+            "rawMaterialProducer.productiveZone.number = #{rawMaterialProducerDataModel.criteria.productiveZone.number}"
+            /*"upper(rawMaterialProducer.productiveZone.group) like concat(#{rawMaterialProducerDataModel.criteria.productiveZone.group}, '%')"*/
     };
 
     @Create

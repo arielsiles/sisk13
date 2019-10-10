@@ -66,6 +66,8 @@ public class Person extends Entity {
     @Length(max = 500)
     protected String homeAddress;
 
+    @Column(name = "telcelular", length = 20)
+    private String cellphone;
 
     public Company getCompany() {
         return company;
@@ -170,5 +172,13 @@ public class Person extends Entity {
 
     public void setHomeAddress(String homeAddress) {
         this.homeAddress = homeAddress;
+    }
+
+    public String getCellphone() {
+        return cellphone;
+    }
+
+    public void setCellphone(String cellphone) {
+        this.cellphone = cellphone;
     }
 }

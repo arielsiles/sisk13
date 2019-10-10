@@ -1257,6 +1257,26 @@
 
 <rich:dropDownMenu value="#{messages['menu.products.configuration']}"
                    rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/productiveZoneList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.productiveZone']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/rawMaterialProducerList.xhtml"
+                value="#{messages['menu.production.rawMaterialCollection.rawMaterialProducer']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/gestionTaxList.xhtml"
+                value="#{messages['GestionTax.CreateGestionTax']}"
+                propagation="none"/>
+    </rich:menuItem>
+
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item">
         <s:link view="/products/productTypeList.xhtml"
@@ -1279,22 +1299,7 @@
                 value="#{messages['menu.products.configuration.productDiscountRule']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
 
-            >
-        <s:link view="/production/productiveZoneList.xhtml"
-                value="#{messages['menu.production.rawMaterialCollection.productiveZone']}"
-                propagation="none"/>
-    </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
-
-            >
-        <s:link view="/production/gestionTaxList.xhtml"
-                value="#{messages['GestionTax.CreateGestionTax']}"
-                propagation="none"/>
-    </rich:menuItem>
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item"
 
@@ -1303,14 +1308,7 @@
                 value="#{messages['menu.production.rawMaterialCollection.reservProducerMilk']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
 
-            >
-        <s:link view="/production/rawMaterialProducerList.xhtml"
-                value="#{messages['menu.production.rawMaterialCollection.rawMaterialProducer']}"
-                propagation="none"/>
-    </rich:menuItem>
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item"
 

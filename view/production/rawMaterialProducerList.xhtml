@@ -23,13 +23,13 @@
                                          maxlength="100" tabindex="1" styleClass="input">
                             </h:inputText>
                         </s:decorate>
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
                             <h:inputText id="group"
                                          value="#{rawMaterialProducerDataModel.criteria.productiveZone.group}"
                                          maxlength="100" tabindex="1" styleClass="input">
                             </h:inputText>
-                        </s:decorate>
+                        </s:decorate>-->
                         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
                             <h:inputText id="name" value="#{rawMaterialProducerDataModel.criteria.productiveZone.name}"
@@ -79,7 +79,7 @@
             <rich:dataTable value="#{rawMaterialProducerDataModel}" var="rawMaterialProducerItem"
                             id="rawMaterialProducerList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="15%,15%,15%,15%,15%,15%,10%">
+                            width="100%" columnsWidth="10%,15%,15%,15%,15%,15%,10%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -88,6 +88,13 @@
                                                    dataModel="#{rawMaterialProducerDataModel}"
                                                    reRender="rawMaterialProducerList, dataScroller">
                                 #{messages['RawMaterialProducer.identificationNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="rawMaterialProducer.firstName"
+                                                   dataModel="#{rawMaterialProducerDataModel}"
+                                                   reRender="rawMaterialProducerList, dataScroller">
+                                #{messages['RawMaterialProducer.firstName']}
                             </app:commandSortHeader>
                         </rich:column>
                         <rich:column>
@@ -104,20 +111,7 @@
                                 #{messages['RawMaterialProducer.maidenName']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="rawMaterialProducer.firstName"
-                                                   dataModel="#{rawMaterialProducerDataModel}"
-                                                   reRender="rawMaterialProducerList, dataScroller">
-                                #{messages['RawMaterialProducer.firstName']}
-                            </app:commandSortHeader>
-                        </rich:column>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="rawMaterialProducer.productiveZone.number"
-                                                   dataModel="#{rawMaterialProducerDataModel}"
-                                                   reRender="rawMaterialProducerList, dataScroller">
-                                #{messages['ProductiveZone.number']}
-                            </app:commandSortHeader>
-                        </rich:column>
+
                         <rich:column>
                             <app:commandSortHeader sortProperty="rawMaterialProducer.productiveZone.name"
                                                    dataModel="#{rawMaterialProducerDataModel}"
@@ -125,6 +119,9 @@
                                 #{messages['ProductiveZone.name']}
                             </app:commandSortHeader>
                         </rich:column>
+
+                        <rich:column>#{messages['RawMaterialProducer.accountNumber']}</rich:column>
+
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
@@ -135,19 +132,19 @@
                     <h:outputText value="#{rawMaterialProducerItem.idNumber}"/>
                 </rich:column>
                 <rich:column>
+                    <h:outputText value="#{rawMaterialProducerItem.firstName}"/>
+                </rich:column>
+                <rich:column>
                     <h:outputText value="#{rawMaterialProducerItem.lastName}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{rawMaterialProducerItem.maidenName}"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{rawMaterialProducerItem.firstName}"/>
+                    <h:outputText value="#{rawMaterialProducerItem.productiveZone.fullName}"/>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{rawMaterialProducerItem.productiveZone.number}"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{rawMaterialProducerItem.productiveZone.name}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{rawMaterialProducerItem.accountNumber}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"

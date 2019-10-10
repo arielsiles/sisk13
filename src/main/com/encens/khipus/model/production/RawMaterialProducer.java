@@ -1,10 +1,10 @@
 package com.encens.khipus.model.production;
 
-import com.encens.khipus.model.contacts.*;
+import com.encens.khipus.model.contacts.Person;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.Length;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +50,10 @@ public class RawMaterialProducer extends Person {
     @Column(name = "ESRESPONSABLE", nullable = false)
     @Type(type = "IntegerBoolean")
     private Boolean responsible;
+
+    @Column(name = "numerocuenta", length = 50, nullable = true)
+    @Length(max = 50)
+    private String accountNumber;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = true, updatable = true, insertable = true)
@@ -171,6 +175,14 @@ public class RawMaterialProducer extends Person {
 
     public void setProducerTaxes(List<ProducerTax> producerTaxes) {
         this.producerTaxes = producerTaxes;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }
 
