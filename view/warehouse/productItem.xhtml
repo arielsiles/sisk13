@@ -248,6 +248,21 @@
 
 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['ProductItem.state']}</ui:define>
+    <!-- Sin restriccion -->
+    <h:selectOneMenu id="state"
+                     value="#{productItem.state}"
+                     styleClass="input"
+                     required="true"
+                     tabindex="8">
+        <s:selectItems value="#{productItemStates}"
+                       var="element"
+                       label="#{messages[element.resourceKey]}"
+                       noSelectionLabel=""
+                       hideNoSelectionLabel="false"/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+
+    <!-- Restriccion para productos en uso
     <c:choose>
         <c:when test="#{isProductItemInUse}">
             <h:outputText value="#{messages[productItem.state.resourceKey]}"/>
@@ -266,7 +281,7 @@
                 <s:convertEnum/>
             </h:selectOneMenu>
         </c:otherwise>
-    </c:choose>
+    </c:choose>-->
 </s:decorate>
 <s:decorate id="controlValuedField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['ProductItem.controlValued']}</ui:define>
