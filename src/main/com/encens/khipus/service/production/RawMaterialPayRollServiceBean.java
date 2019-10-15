@@ -379,6 +379,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             boletaPagoProductor.setLiquidoPagable((Double)dato[17]);
             boletaPagoProductor.setCi((String)dato[20]);
             boletaPagoProductor.setDescuentoGA((Double)dato[21]);
+            boletaPagoProductor.setNumerocuenta((String)dato[22]);
 
             boletaPagoProductors.add(boletaPagoProductor);
         }
@@ -472,7 +473,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " productiveZone.name, " +
                 " rawMaterialPayRecord.discountReserve, " +
                 " rawMaterialProducer.idNumber, " +
-                " rawMaterialPayRecord.discountGA " +
+                " rawMaterialPayRecord.discountGA, " +
+                " rawMaterialProducer.accountNumber " +
                 " FROM RawMaterialPayRoll rawMaterialPayRoll " +
                 " inner join RawMaterialPayRoll.rawMaterialPayRecordList rawMaterialPayRecord " +
                 " inner join rawMaterialPayRecord.rawMaterialProducerDiscount rawMaterialProducerDiscount " +
