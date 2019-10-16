@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voucherReport" pageWidth="611" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="561" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.VoucherReportScriptlet">
 	<property name="ireport.zoom" value="2.3579476910000046"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="71"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="totalD" class="java.math.BigDecimal"/>
 	<parameter name="totalC" class="java.math.BigDecimal"/>
@@ -9,6 +9,7 @@
 	<parameter name="literalAmount" class="java.lang.String"/>
 	<parameter name="companyTitle" class="java.lang.String"/>
 	<parameter name="subTitle" class="java.lang.String"/>
+	<parameter name="description" class="java.lang.String"/>
 	<field name="voucher" class="com.encens.khipus.model.finances.Voucher">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -126,7 +127,7 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="30" splitType="Stretch">
+			<band height="42" splitType="Stretch">
 				<frame>
 					<reportElement x="0" y="1" width="561" height="16"/>
 					<textField pattern="#,##0.00">
@@ -162,8 +163,15 @@
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="7"/>
 					</textElement>
-					<text><![CDATA[Son: ]]></text>
+					<text><![CDATA[SON: ]]></text>
 				</staticText>
+				<textField>
+					<reportElement x="11" y="29" width="385" height="13"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{description}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -247,7 +255,7 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="14" splitType="Stretch"/>
+		<band height="7" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
 		<band height="103" splitType="Stretch">

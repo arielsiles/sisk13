@@ -1,6 +1,7 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.accounting.VoucherCreateAction;
+import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.customers.reports.CreditReportAction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
@@ -17,6 +18,7 @@ import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
@@ -51,6 +53,8 @@ public class CreditAction extends GenericAction<Credit> {
     private CreditTransactionAction creditTransactionAction;
     @In(create = true)
     private VoucherCreateAction voucherCreateAction;
+    @In(create = true)
+    private VoucherReportAction voucherReportAction;
     @In(create = true)
     private CreditReportAction creditReportAction;
 
@@ -409,6 +413,14 @@ public class CreditAction extends GenericAction<Credit> {
 
         if (credit.getNumberQuota() != 0)
             quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2);
+
+    }
+
+    public void generateTransactionReport(CreditTransaction creditTransaction){
+
+        voucherReportAction.setDescription(MessageUtils.getMessage("Voucher.message.descriptionCredit") + creditTransaction.getCapitalBalance());
+        voucherCreateAction.generateReport(creditTransaction.getVoucher());
+        //voucherReportAction.generateReport(creditTransaction.getVoucher());
 
     }
 

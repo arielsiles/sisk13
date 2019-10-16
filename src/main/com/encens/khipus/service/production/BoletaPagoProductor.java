@@ -4,6 +4,7 @@ package com.encens.khipus.service.production;
  * Created by Diego on 13/06/2015.
  */
 public class BoletaPagoProductor {
+    private String numerocuenta;
     private String nombrecompletoProductor;
     private String nombreGAB;
     private String ci;
@@ -183,5 +184,13 @@ public class BoletaPagoProductor {
 
     public void setDescuentoGA(Double descuentoGA) {
         this.descuentoGA = descuentoGA;
+    }
+
+    public String getNumerocuenta() {
+        return numerocuenta;
+    }
+
+    public void setNumerocuenta(String numerocuenta) {
+        this.numerocuenta = numerocuenta;
     }
 }

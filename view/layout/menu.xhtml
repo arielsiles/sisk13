@@ -1417,14 +1417,18 @@
                     value="#{messages['menu.production.supplierPayments.reports.payRoll']}"
                     propagation="begin"/>
         </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                >
-
+        <rich:menuItem submitMode="none" styleClass="main-menu-item">
             <s:link view="/production/reports/voletasDePagoReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.voletasPago']}"
+                    value="#{messages['menu.production.supplierPayments.reports.boletasPago']}"
                     propagation="begin"/>
         </rich:menuItem>
+
+        <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <s:link view="/production/reports/generateUnisueldoFile.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.generateUnisueldoFile']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
         <!--Todo: el reporte de acopio solo-->
         <!--<rich:menuItem submitMode="none"
                        styleClass="main-menu-item"

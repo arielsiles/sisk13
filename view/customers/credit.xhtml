@@ -332,8 +332,9 @@
                                            action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
                                            rendered="#{s:hasPermission('CREDIT','VIEW')}" />
                             &#160;-->
-                            <h:commandLink action="#{voucherCreateAction.generateReport(creditTransactionItem.voucher)}"
-                                           immediate="true">
+                            <!--<h:commandLink action="#{voucherCreateAction.generateReport(creditTransactionItem.voucher)}" immediate="true">-->
+                            <h:commandLink action="#{creditAction.generateTransactionReport(creditTransactionItem)}" immediate="true">
+
                                 <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
                                                 title="#{messages['Voucher.report.generateReport']}"/>
                             </h:commandLink>

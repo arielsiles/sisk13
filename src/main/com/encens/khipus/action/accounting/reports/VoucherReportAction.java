@@ -42,6 +42,9 @@ public class VoucherReportAction extends GenericReportAction {
     private Date startDate = new Date();
     private Date endDate = new Date();
 
+    private String description = "";
+
+
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In(create = true)
@@ -67,23 +70,6 @@ public class VoucherReportAction extends GenericReportAction {
         String end = df.format(endDate);*/
         String start = "2015-09-01";
         String end = "2015-09-30";
-
-        /*return  " SELECT distinct productionOrder.productComposition.processedProduct.productItem.productItemCode as productItemCode " +
-                " ,productionOrder.productComposition.processedProduct.productItem.name as name" +
-                " FROM  ProductionPlanning productionPlanning " +
-                " inner join productionPlanning.productionOrderList productionOrder " +
-                " where productionPlanning.date between '"+start+"' and '"+end+"'";*/
-
-        /*return  " SELECT distinct productionOrder.productComposition.processedProduct.productItem.productItemCode as productItemCode, " +
-                "        productionOrder.productComposition.processedProduct.productItem.name as name" +
-                " FROM  ProductionPlanning productionPlanning " +
-                " inner join productionPlanning.productionOrderList productionOrder ";*/
-
-
-        /*return " SELECT productItem.productItemCode as productItemCode," +
-               " productItem.name as name " +
-               " FROM   ProductItem productItem " +
-               " WHERE  productItem.productItemAccount = '4460114500'";*/
 
         return " SELECT voucher, " +
                "        voucherDetail.account as account, " +
@@ -129,6 +115,7 @@ public class VoucherReportAction extends GenericReportAction {
         reportParameters.put("totalC", totalC);
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("literalAmount", literalAmount);
+        reportParameters.put("description", this.description);
 
         String fileReport = "/accounting/reports/voucherReport.jrxml";
 
@@ -175,5 +162,13 @@ public class VoucherReportAction extends GenericReportAction {
 
     public void setVoucher(Voucher voucher) {
         this.voucher = voucher;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

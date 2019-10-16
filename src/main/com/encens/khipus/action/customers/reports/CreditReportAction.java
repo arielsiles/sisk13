@@ -56,7 +56,7 @@ public class CreditReportAction extends GenericReportAction {
         Collection<PaymentPlanData> beanCollection = calculatePaymentPlan(credit);
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
         String partnerName = credit.getPartner().getFullName();
-        String partnerCode = credit.getPartner().getNumber();
+        String partnerCode = credit.getPreviousCode();
         String term = credit.getTerm().toString() + " MESES";
         String amortiza = "C/ " + credit.getAmortization().toString() + " DIAS";
 
@@ -75,6 +75,7 @@ public class CreditReportAction extends GenericReportAction {
         paramMap.put("amount", amount);
         paramMap.put("interest", interest);
         paramMap.put("grantDate", grantDate);
+        paramMap.put("accountingAccount", credit.getCreditType().getCurrentAccount().getAccountCode());
         parameters.putAll(paramMap);
 
         try{
