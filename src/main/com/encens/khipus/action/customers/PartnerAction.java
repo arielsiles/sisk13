@@ -69,9 +69,40 @@ public class PartnerAction extends GenericAction<Partner> {
     @End
     public String create() {
         try {
-            getInstance().setPerson(this.person);
-            partnerService.createPartner(getInstance());
-            addCreatedMessage();
+
+            if (this.person == null){
+
+                Person person = new Person();
+                person.setFirstName(getInstance().getFirstName());
+                person.setLastName(getInstance().getLastName());
+                person.setMaidenName(getInstance().getMaidenName());
+
+                person.setDocumentType(getInstance().getDocumentType());
+                person.setIdNumber(getInstance().getIdNumber());
+                person.setExtensionSite(getInstance().getExtensionSite());
+
+                person.setBirthDay(getInstance().getBirthDay());
+                person.setSalutation(getInstance().getSalutation());
+                person.setCellphone(getInstance().getCellphone());
+                person.setHomeAddress(getInstance().getHomeAddress());
+                person.setProfession(getInstance().getProfession());
+                person.setMaritalStatus(getInstance().getMaritalStatus());
+                person.setGender(getInstance().getGender());
+
+                getService().create(person);
+                getInstance().setPerson(person);
+                partnerService.createPartner(getInstance());
+                addCreatedMessage();
+            }
+
+            if (this.person != null) {
+                getInstance().setPerson(this.person);
+                partnerService.createPartner(getInstance());
+                addCreatedMessage();
+            }
+
+
+
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();

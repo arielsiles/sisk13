@@ -67,7 +67,7 @@
             <rich:dataTable value="#{partnerDataModel}" var="partnerItem" id="partnerList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="50%, 15%, 15%, 10%, 10%">
+                            columnsWidth="40%, 10%, 10%, 20%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -95,6 +95,8 @@
                             </app:commandSortHeader>
                         </rich:column>
 
+                        <rich:column>#{messages['Partner.gab']}</rich:column>
+
                         <rich:column>#{messages['Partner.state']}</rich:column>
 
                         <rich:column styleClass="center">
@@ -113,6 +115,10 @@
 
                 <rich:column styleClass="right">
                     <h:outputText value="#{partnerItem.idNumber}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{partnerItem.productiveZone.fullName}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
