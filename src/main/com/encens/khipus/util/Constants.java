@@ -38,10 +38,10 @@ public final class Constants {
     public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
     //Schema for CAISC - Fondo Lech
-    public static final String KHIPUS_SCHEMA    = "caisc";
+    /*public static final String KHIPUS_SCHEMA    = "caisc";
     public static final String FINANCES_SCHEMA  = "caisc";
     public static final String CASHBOX_SCHEMA   = "caisc";
-    public static final String ACADEMIC_SCHEMA  = "caisc";
+    public static final String ACADEMIC_SCHEMA  = "caisc";*/
 
 
     /** For Development **/

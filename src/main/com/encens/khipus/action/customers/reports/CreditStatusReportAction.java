@@ -3,41 +3,15 @@ package com.encens.khipus.action.customers.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.warehouse.reports.KardexProductMovementAction;
-import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditType;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.SingleProduct;
-import com.encens.khipus.model.warehouse.*;
-import com.encens.khipus.service.customers.ArticleOrderService;
-import com.encens.khipus.service.production.ProductionOrderService;
-import com.encens.khipus.service.warehouse.InitialInventoryService;
-import com.encens.khipus.service.warehouse.MovementDetailService;
-import com.encens.khipus.service.warehouse.ProductInventoryService;
-import com.encens.khipus.service.warehouse.ProductItemService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.DateUtils;
-import com.encens.khipus.util.JSFUtil;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
-import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Encens S.R.L.
@@ -50,8 +24,7 @@ import java.util.*;
 @Scope(ScopeType.PAGE)
 public class CreditStatusReportAction extends GenericReportAction {
 
-    private Date startDate = new Date();
-    private Date endDate = new Date();
+    private Date endPeriodDate;
 
     private CreditState creditState;
     private CreditType creditType;
@@ -154,6 +127,33 @@ public class CreditStatusReportAction extends GenericReportAction {
 
         }
 
+        if (creditState != null && creditType != null && endPeriodDate != null){
+
+            ejbql = " SELECT " +
+                    " credit.state || ' - ' || creditType.name AS status," +
+                    " credit.state," +
+                    " creditType.name as creditTypeName," +
+                    " productiveZone.name AS gabName," +
+                    " partner.firstName," +
+                    " partner.lastName," +
+                    " partner.maidenName," +
+                    " credit.grantDate," +
+                    " credit.amount," +
+                    " credit.capitalBalance," +
+                    " MAX(creditTransaction.date) as lastPayment" +
+                    " FROM CreditTransaction creditTransaction" +
+                    " LEFT JOIN creditTransaction.credit " +
+                    " LEFT JOIN credit.creditType creditType" +
+                    " LEFT JOIN credit.partner partner" +
+                    " LEFT JOIN partner.productiveZone productiveZone " +
+                    " LEFT JOIN " +
+                    " WHERE credit.state = '" + creditState.toString() +"'" +
+                    " AND credit.creditType = " + creditType.getId() +
+                    " GROUP BY credit.state, creditType.name, productiveZone.name, productiveZone.name, partner.firstName, " +
+                    " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
+
+        }
+
 
         return ejbql;
     }
@@ -165,8 +165,7 @@ public class CreditStatusReportAction extends GenericReportAction {
         log.debug("Generating credit status report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("documentTitle", documentTitle);
-        //reportParameters.put("startDate", startDate);
-        //reportParameters.put("endDate", endDate);
+
 
         super.generateReport(
                 "summaryProviderKardexReport",
@@ -176,23 +175,6 @@ public class CreditStatusReportAction extends GenericReportAction {
                 messages.get("Reports.credit.creditStatus.title"),
                 reportParameters);
 
-    }
-
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
 
@@ -210,5 +192,13 @@ public class CreditStatusReportAction extends GenericReportAction {
 
     public void setCreditType(CreditType creditType) {
         this.creditType = creditType;
+    }
+
+    public Date getEndPeriodDate() {
+        return endPeriodDate;
+    }
+
+    public void setEndPeriodDate(Date endPeriodDate) {
+        this.endPeriodDate = endPeriodDate;
     }
 }

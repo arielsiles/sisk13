@@ -3,7 +3,6 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
@@ -48,6 +47,20 @@
                                        hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="endPeriodDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.date']}</ui:define>
+                    <rich:calendar id="endPeriodDate"
+                                   value="#{creditStatusReportAction.endPeriodDate}"
+                                   popup="true"
+                                   required="false"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
                 </s:decorate>
 
             </rich:panel>
