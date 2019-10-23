@@ -5,6 +5,7 @@ import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditType;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -39,7 +40,7 @@ public class CreditStatusReportAction extends GenericReportAction {
 
         String ejbql = "";
 
-        ejbql = " SELECT " +
+        /*ejbql = " SELECT " +
                 " credit.state || ' - ' || creditType.name AS status," +
                 " credit.state," +
                 " creditType.name as creditTypeName," +
@@ -125,9 +126,11 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " AND credit.creditType = " + creditType.getId() +
                     " ORDER BY credit.state, creditType.name";
 
-        }
+        }*/
 
         if (creditState != null && creditType != null && endPeriodDate != null){
+
+            String dateParam = DateUtils.format(this.endPeriodDate, "yyyy-MM-dd");
 
             ejbql = " SELECT " +
                     " credit.state || ' - ' || creditType.name AS status," +
@@ -139,17 +142,20 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " partner.maidenName," +
                     " credit.grantDate," +
                     " credit.amount," +
-                    " credit.capitalBalance," +
+                    " credit.id as creditId," +
+
+                    " credit.amount - SUM(creditTransaction.capital) AS capitalBalance," +
                     " MAX(creditTransaction.date) as lastPayment" +
+
                     " FROM CreditTransaction creditTransaction" +
-                    " LEFT JOIN creditTransaction.credit " +
+                    " LEFT JOIN creditTransaction.credit credit" +
                     " LEFT JOIN credit.creditType creditType" +
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone " +
-                    " LEFT JOIN " +
-                    " WHERE credit.state = '" + creditState.toString() +"'" +
-                    " AND credit.creditType = " + creditType.getId() +
-                    " GROUP BY credit.state, creditType.name, productiveZone.name, productiveZone.name, partner.firstName, " +
+                    " WHERE credit.state = '" + creditState.toString() + "'" +
+                    " AND credit.creditType = " + creditType.getId() + "" +
+                    " AND creditTransaction.date <= '" + dateParam + "'" +
+                    " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
                     " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
 
         }
@@ -165,6 +171,7 @@ public class CreditStatusReportAction extends GenericReportAction {
         log.debug("Generating credit status report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("documentTitle", documentTitle);
+        reportParameters.put("endPeriodDate", endPeriodDate);
 
 
         super.generateReport(

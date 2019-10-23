@@ -572,6 +572,18 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return Outcome.SUCCESS;
     }
 
+    public BigDecimal calculateInterest(BigDecimal capitalBalance, Date lastPaymentDate, Date currentPaymentDate, Integer annualRate){
+        //BigDecimal interest = BigDecimal.ZERO;
+        Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate) - 1;
+
+        BigDecimal var_interest = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(annualRate), BigDecimalUtil.toBigDecimal(100), 6);
+        BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
+        BigDecimal interest = BigDecimalUtil.multiply(capitalBalance, var_interest, 6);
+        interest = BigDecimalUtil.multiply(interest, var_time, 6);
+
+        return interest;
+    }
+
     public BigDecimal calculateInterest(){
 
         Credit credit = creditAction.getInstance();

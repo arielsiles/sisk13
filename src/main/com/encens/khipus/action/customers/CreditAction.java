@@ -160,8 +160,8 @@ public class CreditAction extends GenericAction<Credit> {
 
         System.out.println("-----------------------------");
         System.out.println("====> CAPITAL PAGADO: " + BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2));
-        System.out.println("====> CAPITAL HASTA QUOTA: " + paidQuotas);
-        System.out.println("====> FECHA ENCONTRADA: " + DateUtils.format(result, "dd/MM/yyyy"));
+        //System.out.println("====> CAPITAL HASTA QUOTA: " + paidQuotas);
+        //System.out.println("====> FECHA ENCONTRADA: " + DateUtils.format(result, "dd/MM/yyyy"));
         System.out.println("-----------------------------");
 
         return result;
