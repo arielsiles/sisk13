@@ -47,8 +47,8 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         Long creditId = (Long) getFieldValue("creditId");
         Credit credit = creditService.findCreditById(creditId);
 
-        if (credit.getExpirationDate() == null)
-            creditReportAction.calculatePaymentPlan(credit);
+        //if (credit.getExpirationDate() == null)
+        creditReportAction.calculatePaymentPlan(credit);
 
         BigDecimal capitalBalance = (BigDecimal) getFieldValue("capitalBalance");
         Date lastPaymentDate = (Date) getFieldValue("lastPayment");

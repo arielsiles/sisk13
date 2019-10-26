@@ -145,7 +145,6 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " credit.amount," +
                     " credit.id as creditId," +
                     " credit.expirationDate," +
-                    " credit.expirationDate," +
                     " credit.previousCode," +
 
                     " credit.amount - SUM(creditTransaction.capital) AS capitalBalance," +
