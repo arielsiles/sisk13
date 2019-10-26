@@ -23,6 +23,7 @@ import java.util.Date;
 @NamedQueries(
         {
                 @NamedQuery(name = "CreditTransaction.transactions", query = "select ct from CreditTransaction ct where ct.credit=:credit"),
+                @NamedQuery(name = "CreditTransaction.transactionsBefore", query = "select ct from CreditTransaction ct where ct.credit=:credit and ct.date <=:date"),
                 @NamedQuery(name = "CreditTransaction.findIncomePayments", query = "select ct from CreditTransaction ct where ct.credit=:credit and ct.creditTransactionType=:creditTransactionType"),
                 @NamedQuery(name = "CreditTransaction.findLastTransaction", query = "select max(ct.date) " +
                                                                                     "from CreditTransaction ct " +

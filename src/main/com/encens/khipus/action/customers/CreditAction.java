@@ -65,6 +65,8 @@ public class CreditAction extends GenericAction<Credit> {
     private Date transferDate;
     private String gloss = "TRASPASO DE CARTERA POR MOROSIDAD AL ";
 
+    private CreditState creditStateFIN = CreditState.FIN;
+
     @Factory(value = "credit", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('CREDIT','VIEW')}")
     public Credit initCredit() {
@@ -163,6 +165,32 @@ public class CreditAction extends GenericAction<Credit> {
         //System.out.println("====> CAPITAL HASTA QUOTA: " + paidQuotas);
         //System.out.println("====> FECHA ENCONTRADA: " + DateUtils.format(result, "dd/MM/yyyy"));
         System.out.println("-----------------------------");
+
+        return result;
+    }
+
+    public Date findDateOfNextPayment(Credit credit, Date endPeriod) {
+
+        Date result = null;
+        int paidQuotas = creditTransactionAction.calculateQuotasForCriminal2(credit, endPeriod);
+        System.out.println("-a-a-a-a-a-a--> cuotas2: " + paidQuotas);
+        if (paidQuotas <= 0)
+            result = endPeriod;
+
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+
+        int i=1;
+
+        List<CreditReportAction.PaymentPlanData> listPaymentPlan = new ArrayList<CreditReportAction.PaymentPlanData>();
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas) listPaymentPlan.add(paymentPlanData);
+
+        for (int j = 0; j<listPaymentPlan.size(); j++){
+            if (i == paidQuotas || paidQuotas == 0) {
+                result = DateUtils.parse(listPaymentPlan.get(j).getPaymentDate(), "dd/MM/yyyy");
+                System.out.println("-------=>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate());
+            }
+            i++;
+        }
 
         return result;
     }
@@ -462,5 +490,13 @@ public class CreditAction extends GenericAction<Credit> {
 
     public void setGloss(String gloss) {
         this.gloss = gloss;
+    }
+
+    public CreditState getCreditStateFIN() {
+        return creditStateFIN;
+    }
+
+    public void setCreditStateFIN(CreditState creditStateFIN) {
+        this.creditStateFIN = creditStateFIN;
     }
 }

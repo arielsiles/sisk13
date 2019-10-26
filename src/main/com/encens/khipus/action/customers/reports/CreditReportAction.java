@@ -90,20 +90,22 @@ public class CreditReportAction extends GenericReportAction {
     public Collection<PaymentPlanData> calculatePaymentPlan(Credit credit){
 
         Collection<PaymentPlanData> beanCollection = new ArrayList();
+        Date expirationDate = null;
+
         BigDecimal quotas       =  BigDecimalUtil.divide(credit.getAmount(), credit.getQuota(), 0);
 
         System.out.println(".....Numero de cuotas: " + quotas);
         System.out.println(".....Amortizacion: " + credit.getAmortization());
 
-        Date fechaUltimoPago    = credit.getGrantDate(); // Fecha concesion
-        Date fechaPago          = credit.getFirstPayment();
+        Date lastPaymentDate    = credit.getGrantDate(); // Comienza con Fecha concesion
+        Date paymentDate          = credit.getFirstPayment();
         BigDecimal saldoCapital = credit.getAmount();
         BigDecimal paymentQuota = credit.getQuota();
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
 
         for(int q=1; q<=quotas.intValue(); q++){
-            String fecha = sdf.format(fechaPago);
-            Long dias = DateUtils.daysBetween(fechaUltimoPago, fechaPago) - 1;
+            String fecha = sdf.format(paymentDate);
+            Long dias = DateUtils.daysBetween(lastPaymentDate, paymentDate) - 1;
             BigDecimal var_interes = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(credit.getAnnualRate()), BigDecimalUtil.toBigDecimal(100), 6);
             BigDecimal var_tiempo = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(dias.toString()), BigDecimalUtil.toBigDecimal(360), 6);
             BigDecimal interes = BigDecimalUtil.multiply(saldoCapital, var_interes, 6);
@@ -116,7 +118,7 @@ public class CreditReportAction extends GenericReportAction {
                 }
             }
             BigDecimal totalCuota = BigDecimalUtil.sum(paymentQuota, interes, 6);
-            System.out.println(q + "\t\t" + sdf.format(fechaUltimoPago) + "\t\t" + fecha + "\t\t" + dias + "\t\t" + paymentQuota + "\t\t" + interes + "\t\t" + totalCuota + "\t\t" + saldoCapital);
+            System.out.println(q + "\t\t" + sdf.format(lastPaymentDate) + "\t\t" + fecha + "\t\t" + dias + "\t\t" + paymentQuota + "\t\t" + interes + "\t\t" + totalCuota + "\t\t" + saldoCapital);
 
 
             BigDecimal totalCuotaValue = BigDecimalUtil.toBigDecimal(Math.round(totalCuota.doubleValue()));
@@ -126,15 +128,22 @@ public class CreditReportAction extends GenericReportAction {
 
             PaymentPlanData paymentPlanData = new PaymentPlanData(q, saldoCapital, paymentQuota, interes, totalCuota, fecha);
             beanCollection.add(paymentPlanData);
+            expirationDate = paymentDate;
 
             saldoCapital = BigDecimalUtil.subtract(saldoCapital, paymentQuota, 6);
-            fechaUltimoPago = fechaPago;
+            lastPaymentDate = paymentDate;
 
             Calendar cal = Calendar.getInstance();
-            cal.setTime(fechaPago);
+            cal.setTime(paymentDate);
             cal.add(Calendar.MONTH, credit.getAmortization()/30);
-            fechaPago = cal.getTime();
+            paymentDate = cal.getTime();
         }
+
+        /** Actualiza la fecha de vencimiento del credito **/
+        credit.setExpirationDate(expirationDate);
+        getEntityManager().merge(credit);
+
+        System.out.println("------------------> FECHA VENCIMIENTO DEL CREDITO: " + DateUtils.format(expirationDate, "dd/MM/yyyy"));
         return beanCollection;
     }
 

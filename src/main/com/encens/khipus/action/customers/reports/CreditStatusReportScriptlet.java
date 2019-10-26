@@ -27,6 +27,8 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
     private CreditTransactionAction creditTransactionAction = (CreditTransactionAction) Component.getInstance("creditTransactionAction");
     private CreditAction creditAction = (CreditAction) Component.getInstance("creditAction");
 
+    private CreditReportAction creditReportAction = (CreditReportAction) Component.getInstance("creditReportAction");
+
     @Override
     public void afterGroupInit(String s) throws JRScriptletException {
         super.beforeGroupInit(s);
@@ -45,34 +47,44 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         Long creditId = (Long) getFieldValue("creditId");
         Credit credit = creditService.findCreditById(creditId);
 
-        BigDecimal capitalBalance = (BigDecimal) getFieldValue("capitalBalance");
-        Date lastPayment = (Date) getFieldValue("lastPayment");
+        if (credit.getExpirationDate() == null)
+            creditReportAction.calculatePaymentPlan(credit);
 
+        BigDecimal capitalBalance = (BigDecimal) getFieldValue("capitalBalance");
+        Date lastPaymentDate = (Date) getFieldValue("lastPayment");
+        Date expirationDate = (Date) getFieldValue("expirationDate");
+
+        System.out.println("====> " + credit.getPartner().getFullName() + " <====");
 
         creditAction.setInstance(credit);
         creditTransactionAction.setDateTransaction(endPeriodDate);
 
+        Long days = DateUtils.differenceBetween(lastPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
+
         BigDecimal interestToDate = BigDecimal.ZERO;
-        if (capitalBalance.doubleValue() > 0)
-            interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPayment, endPeriodDate, credit.getAnnualRate());
+        Date nextPaymentDate = endPeriodDate;
+        Long expiredDays = new Long(0);
+        if (capitalBalance.doubleValue() > 0) {
+            interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
+            nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
 
+            if (expirationDate.compareTo(endPeriodDate) < 0)
+                expiredDays = DateUtils.differenceBetween(expirationDate, endPeriodDate, TimeUnit.DAYS) - 1;
+            if (expirationDate.compareTo(endPeriodDate) > 0)
+                expiredDays = DateUtils.differenceBetween(nextPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
 
+            if (expiredDays <= 0)
+                expiredDays = BigDecimal.ZERO.longValue();
 
-
-        /*Calendar cal = Calendar.getInstance();
-        cal.setTime(credit.getFirstPayment());
-        cal.add(Calendar.MONTH, credit.getTerm()-1);
-        Date expirationDate = cal.getTime();*/
-
-        //Long expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
-        Long days = DateUtils.differenceBetween(lastPayment, endPeriodDate, TimeUnit.DAYS) - 1;
-
-        System.out.println("--------------------------> " + credit.getPartner().getFullName() + " - " + interestToDate + " - Days: " + days);
+        }
+        System.out.println("===> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy") + " <===");
+        System.out.println("--------------------------> " + credit.getPartner().getFullName() + " - " + interestToDate + " - Days: " + days + " - ExpiredDays: " + expiredDays);
         //System.out.println("------------------> expiration Date: " + expirationDate);
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);
         this.setVariableValue("days", days);
+        this.setVariableValue("expiredDays", expiredDays);
         //this.setVariableValue("expiredDaysVar", expiredDays);
 
     }

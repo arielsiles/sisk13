@@ -771,6 +771,21 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return quota;
     }
 
+    public Integer calculateQuotasForCriminal2(Credit credit, Date endPeriod){
+
+        BigDecimal totalPaid = creditService.calculateTotalPaidCapital(credit, endPeriod); // Capital pagado
+        System.out.println("-.-.-.-.-.-.---> Total Pagado 2::: " + totalPaid);
+        Integer quota = BigDecimalUtil.divide(totalPaid, credit.getQuota(), 2).intValue();
+        BigDecimal totalPlanQuota = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quota), 2);
+
+        if (totalPaid.doubleValue() >= totalPlanQuota.doubleValue()){
+            quota++;
+        }
+
+        System.out.println("----> CAPITAL HASTA QUOTA2222: " + quota);
+        return quota;
+    }
+
     public Integer calculatePendingFees(Credit credit){
 
         BigDecimal quota = BigDecimalUtil.divide(credit.getCapitalBalance(), credit.getQuota(), 2);

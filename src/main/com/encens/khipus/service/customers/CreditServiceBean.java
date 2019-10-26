@@ -2,6 +2,8 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -10,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,6 +67,26 @@ public class CreditServiceBean implements CreditService {
             totalPaidCapital = totalPaidCapital.add(transaction.getCapital());
         }
         return totalPaidCapital;
+    }
+
+    @Override
+    public BigDecimal calculateTotalPaidCapital(Credit credit, Date date) {
+
+        System.out.println("............-----> calculando capital pagado al .... : " + DateUtils.format(date, "dd/MM/yyyy"));
+        BigDecimal result = BigDecimal.ZERO;
+
+        List<CreditTransaction> transactions = em.createNamedQuery("CreditTransaction.transactionsBefore")
+                .setParameter("credit", credit)
+                .setParameter("date", date)
+                .getResultList();
+
+        for (CreditTransaction ct : transactions){
+            result = BigDecimalUtil.sum(result, ct.getCapital());
+        }
+
+        System.out.println("--------....----> PAGADO: " + result);
+
+        return result;
     }
 
     public List<Credit> getAllCredits(){

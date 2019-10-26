@@ -4,6 +4,7 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.model.customers.CreditState;
+import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.customers.CreditType;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
@@ -143,6 +144,9 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " credit.grantDate," +
                     " credit.amount," +
                     " credit.id as creditId," +
+                    " credit.expirationDate," +
+                    " credit.expirationDate," +
+                    " credit.previousCode," +
 
                     " credit.amount - SUM(creditTransaction.capital) AS capitalBalance," +
                     " MAX(creditTransaction.date) as lastPayment" +
@@ -155,6 +159,8 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " WHERE credit.state = '" + creditState.toString() + "'" +
                     " AND credit.creditType = " + creditType.getId() + "" +
                     " AND creditTransaction.date <= '" + dateParam + "'" +
+                    " AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +
+                    " AND credit.state <> #{creditAction.creditStateFIN} "+
                     " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
                     " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
 

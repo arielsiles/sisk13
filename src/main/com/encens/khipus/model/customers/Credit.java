@@ -94,6 +94,10 @@ public class Credit implements BaseModel {
     @Temporal(TemporalType.DATE)
     private Date lastPayment;
 
+    @Column(name = "fechavence", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date expirationDate;
+
     @Column(name = "entregado", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean delivered = Boolean.FALSE;
@@ -293,5 +297,13 @@ public class Credit implements BaseModel {
 
     public void setCriminalInterest(BigDecimal criminalInterest) {
         this.criminalInterest = criminalInterest;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

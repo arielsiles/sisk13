@@ -7,6 +7,7 @@ import com.encens.khipus.model.customers.Partner;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public interface CreditService {
     Credit findCreditById(Long creditId);
     BigDecimal getActualCreditBalance(Credit credit);
     BigDecimal getTotalPaidCapital(Credit credit);
+    BigDecimal calculateTotalPaidCapital(Credit credit, Date date);
     List<Credit> getAllCredits();
     void changeCreditState(Credit credit, CreditState state);
     List<Credit> getCreditList(Partner partner);
