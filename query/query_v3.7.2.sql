@@ -10,4 +10,4 @@ alter table credito add column fechavence date after ultimopago;
 insert into funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania) values(256, 'CUSTOMERPROCESS', 1, 1, 'Functionality.customers.process', 1);
 
 alter table configuracion add column i_pf_mn varchar(20);
-update configuracion c set c.`i_pf_mn` = '1380110000';
+update configuracion c set c.`i_pf_mn` = '5130410100';
