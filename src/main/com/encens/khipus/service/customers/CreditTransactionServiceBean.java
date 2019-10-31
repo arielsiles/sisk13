@@ -86,6 +86,25 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         return result;
     }
 
+    @Override
+    public Date findLastPaymentEndPeriod(Credit credit, Date endPeriod) {
+        Date result;
+        try {
+            result =  (Date) em.createNamedQuery("CreditTransaction.findLastTransactionEndPeriod")
+                    .setParameter("credit", credit)
+                    .setParameter("transactionType", CreditTransactionType.ING)
+                    .setParameter("endPeriod", endPeriod)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+        if (result == null)
+            result = credit.getGrantDate();
+
+        return result;
+    }
+
     public void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction){
 
         //String gloss = creditTransaction.getGloss() + " " + credit.getCode();

@@ -31,12 +31,13 @@
                 <rich:jQuery selector="#code" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 
+            <!-- Atencion al cliente > procesos
             <div class="buttons">
                 <s:button value="#{messages['CashSale.transferVeterinarySales']}"
                           view="/customers/transferCashSale.xhtml" styleClass="button"
                           propagation="begin" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}" />
 
-            </div>
+            </div>-->
 
             <rich:dataTable value="#{cashSaleDataModel}" var="cashSaleItem" id="cashSaleList"
                             rows="#{sessionUser.rowsPerPage}"

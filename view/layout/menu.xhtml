@@ -34,7 +34,7 @@
             s:hasPermission('CUSTOMERCATEGORY','VIEW') or
             s:hasPermission('PRINTINVOICE','VIEW') or
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
-    <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="10" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
@@ -115,6 +115,34 @@
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditStatusZoneReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatusByGab']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+        </rich:dropDownMenu>
+
+        <rich:dropDownMenu value="#{messages['menu.customers.process']}" rendered="#{s:hasPermission('CUSTOMERPROCESS','VIEW')}">
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/transferCashSale.xhtml" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}"
+                        value="#{messages['CashSale.transferVeterinarySales']}"
+                        propagation="begin"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/transferCredit.xhtml" rendered="#{s:hasPermission('CREDITTRANSFER','VIEW')}"
+                        value="#{messages['Credit.transfer']}"
+                        propagation="begin"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/capitalizeInterest.xhtml" rendered="#{s:hasPermission('CREDITTRANSFER','VIEW')}"
+                        value="#{messages['Account.capitalizeInterest']}"
+                        propagation="begin"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/provisionInterestReceivable.xhtml"
+                        value="#{messages['menu.customers.process.provisionInterestReceivable']}"
                         propagation="none"/>
             </rich:menuItem>
 

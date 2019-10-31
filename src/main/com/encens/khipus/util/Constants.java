@@ -78,6 +78,7 @@ public final class Constants {
     public static final String CP_VOUCHER_DOCTYPE = "CP";
     public static final String IA_VOUCHER_DOCTYPE = "IA";
     public static final String CV_VOUCHER_DOCTYPE = "CV";
+    public static final String CD_VOUCHER_DOCTYPE = "CD";
     public static final String CT_VOUCHER_DOCTYPE = "CT";
     public static final String CE_VOUCHER_DOCTYPE = "CE";
     public static final String CI_VOUCHER_DOCTYPE = "CI";

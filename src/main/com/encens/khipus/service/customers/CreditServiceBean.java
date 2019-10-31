@@ -96,6 +96,17 @@ public class CreditServiceBean implements CreditService {
         return creditList;
     }
 
+    public List<Credit> getCredits(CreditState creditState, CreditType creditType){
+
+        List<Credit> creditList = em.createNamedQuery("Credit.findCreditsByStateAndType")
+                .setParameter("creditState", creditState)
+                .setParameter("creditType", creditType)
+                .getResultList();
+
+        return creditList;
+    }
+
+
     public void changeCreditState(Credit credit, CreditState state){
         System.out.println("------> Cambiando Estado de Credito a: " + state.getResourceKey());
         credit.setState(state);

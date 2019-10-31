@@ -17,6 +17,7 @@ public interface CreditTransactionService {
     void create(Credit credit, Invoice invoice) throws EntryDuplicatedException;
     Date findLastPayment(Credit credit);
     Date findLastPaymentForInterest(Credit credit);
+    Date findLastPaymentEndPeriod(Credit credit, Date endPeriod);
     void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction);
     void createCreditTransactionPayFee(Credit credit, CreditTransaction creditTransaction);
     public void updateTransaction(CreditTransaction creditTransaction, Voucher voucher);

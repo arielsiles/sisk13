@@ -979,6 +979,27 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return result;
     }
 
+    /**
+     * Calcula interes devengado a fin de periodo
+     * @param credit
+     * @param endPeriodDate Normalmente fin de periodo
+     */
+    public BigDecimal calculateAccruedInterest(Credit credit, Date endPeriodDate)  {
+
+        BigDecimal capitalBalance = BigDecimalUtil.subtract(credit.getAmount(), creditService.calculateTotalPaidCapital(credit, endPeriodDate));
+        Date lastPaymentDate = creditTransactionService.findLastPaymentEndPeriod(credit, endPeriodDate);
+
+        creditAction.setInstance(credit);
+        setDateTransaction(endPeriodDate);
+        BigDecimal interestToDate = BigDecimal.ZERO;
+
+        if (capitalBalance.doubleValue() > 0) {
+            interestToDate = calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
+        }
+
+        return interestToDate;
+    }
+
     public void setTotalTransferAmount(BigDecimal totalTransferAmount) {
         this.totalTransferAmount = totalTransferAmount;
     }

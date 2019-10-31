@@ -6,9 +6,11 @@ import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.customers.CreditType;
+import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
@@ -30,6 +32,9 @@ public class CreditStatusReportAction extends GenericReportAction {
 
     private CreditState creditState;
     private CreditType creditType;
+
+    @In
+    private CreditTransactionService creditTransactionService;
 
     @Create
     public void init() {
