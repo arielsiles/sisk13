@@ -11,3 +11,6 @@ insert into funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecu
 
 alter table configuracion add column i_pf_mn varchar(20);
 update configuracion c set c.`i_pf_mn` = '5130410100';
+
+/** 01/11/2019 **/
+alter table cuenta add column fechavence date after fechaapertura;

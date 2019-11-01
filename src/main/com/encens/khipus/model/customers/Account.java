@@ -47,6 +47,10 @@ public class Account implements BaseModel {
     @Temporal(TemporalType.DATE)
     private Date openingDate;
 
+    @Column(name = "fechavence", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date expirationDate;
+
     @Column(name = "nocuenta", nullable = false, length = 20)
     @Length(max = 20)
     private String accountNumber;
@@ -213,5 +217,13 @@ public class Account implements BaseModel {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

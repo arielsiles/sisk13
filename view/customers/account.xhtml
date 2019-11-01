@@ -154,6 +154,19 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <s:decorate id="exprirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
+                        <rich:calendar value="#{account.expirationDate}"
+                                       popup="true"
+                                       required="false"
+                                       datePattern="#{messages['patterns.date']}"
+                                       styleClass="input"
+                                       enableManualInput="true"
+                                       tabindex="6">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+
                     <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.retention']}</ui:define>
                         <h:selectBooleanCheckbox id="retentionFlag"
