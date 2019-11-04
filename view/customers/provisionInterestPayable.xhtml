@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Customers.process.provisionInterestPayableDPF']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="provisionInterestReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Customers.process.provisionInterestPayableDPF']}
+                </f:facet>
+
+                <!--<s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                    <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
+                                     styleClass="input"
+                                     required="true" disabled="#{accountAction.managed}"
+                                     tabindex="1">
+                        <s:selectItems value="#{accountTypeList.resultList}"
+                                       var="accountType"
+                                       label="#{accountType.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>-->
+
+                <s:decorate id="savingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.savingType']}</ui:define>
+                    <h:selectOneMenu id="savingType" value="#{provisionInterestPayableAction.savingType}" styleClass="input"
+                                     tabindex="3" required="true">
+                        <s:selectItems value="#{savingTypeEnum}" var="savingType" label="#{messages[savingType.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{provisionInterestPayableAction.currencyType}" styleClass="input"
+                                     tabindex="3" required="true">
+                        <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                     required="false"
+                                     textValue="#{provisionInterestPayableAction.cashAccount.fullName}"
+                                     value="#{provisionInterestPayableAction.cashAccount}"
+                                     clearAction="kardexProviderReportAction.clearAccount()"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="itemAccountField"
+                                     tabindex="4"
+                                     styleClass="inputLarge">
+                        <ui:define name="criteriaValues">
+                            <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                        </ui:define>
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <s:decorate id="endPeriodDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.date']}</ui:define>
+                    <rich:calendar id="endPeriodDate"
+                                   value="#{provisionInterestPayableAction.endPeriodDate}"
+                                   popup="true"
+                                   required="false"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{provisionInterestPayableAction.generateProvisionInterest}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{provisionInterestPayableAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

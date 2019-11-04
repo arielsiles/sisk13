@@ -146,6 +146,12 @@
                         propagation="none"/>
             </rich:menuItem>
 
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/provisionInterestPayable.xhtml"
+                        value="#{messages['menu.customers.process.provisionInterestPayableDPF']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.configuration']}" rendered="#{

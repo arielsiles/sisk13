@@ -139,8 +139,7 @@ public class AccountServiceBean implements AccountService {
         accountList = (List<Account>) em.createQuery("select account from Account account " +
                 " where account.accountState =:state" +
                 " and account.currency =:currency" +
-                " and account.accountType.savingType =:savingType" +
-                " and account.id in (2065, 2069) ")
+                " and account.accountType.savingType =:savingType" /*+" and account.id in (2065, 2069) "*/)
                 .setParameter("state", AccountState.ACTIVE)
                 .setParameter("currency", currencyType)
                 .setParameter("savingType", savingType)

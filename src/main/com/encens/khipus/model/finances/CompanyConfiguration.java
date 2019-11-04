@@ -496,7 +496,7 @@ public class CompanyConfiguration {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "I_PF_MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "I_PVIG_PF_MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedTermInterestNationalCurrency;
 
