@@ -4,7 +4,6 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -63,18 +62,22 @@ public class AccountType implements BaseModel {
     private long version;
 
     /*@ManyToOne(fetch = FetchType.LAZY)*/
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumns({
-            /*@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),*/
             @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA", updatable = false, insertable = false)
     })
+    private CashAccount cashAccountMn;*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA", insertable = false, updatable = false)
     private CashAccount cashAccountMn;
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumns({
-            /*@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),*/
             @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
     })
+    private CashAccount cashAccountMe;*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
     private CashAccount cashAccountMe;
 
     @ManyToOne

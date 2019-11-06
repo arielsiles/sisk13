@@ -82,8 +82,9 @@ public class Account implements BaseModel {
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
 
-    @ManyToOne
-    @JoinColumn(name = "idtipocuenta", nullable = false)
+    /*@ManyToOne*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipocuenta", referencedColumnName = "idtipocuenta", nullable = false)
     private AccountType accountType;
 
     @Version

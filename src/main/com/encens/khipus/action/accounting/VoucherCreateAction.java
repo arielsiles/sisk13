@@ -525,6 +525,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setClient(this.client);
                 voucherDetail.setProvider(this.provider);
                 voucherDetail.setPartner(this.partner);
+                voucherDetail.setPartnerAccount(this.partnerAccount);
 
                 if (this.provider != null) voucherDetail.setProviderCode(this.provider.getProviderCode());
 
@@ -826,18 +827,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherCaja.setExchangeAmount(BigDecimal.ONE);
             }
 
-            //voucherCaja.setCashAccount(ctaCaja);
-            //voucherCaja.setAccount(ctaCaja.getAccountCode());
-            //voucherCaja.setDebit(BigDecimal.ZERO);
-            //voucherCaja.setCredit(getAmountDeposit());
-
             /** **/
             voucherDetails.add(voucherSaving);
             voucherDetails.add(voucherCaja);
 
-            //clearAccount();
-            //clearClient();
-            //clearProvider();
             clearPartnerAccount();
             setDebit(BigDecimal.ZERO);
             setCredit(BigDecimal.ZERO);
