@@ -25,12 +25,12 @@ left join inv_articulos a on p.`cod_art` = a.`cod_art`
 -- 2.- 
 create or replace view producciontotal as
 select 	1 as ID, FECHA, COD_ART, NOMBRE,
-	SUM(CANTIDAD_SC) as CANTIDAD_SC,
-	SUM(CANTIDAD_SP) as CANTIDAD_SP,
-	SUM(REPROCESO_SC) as REPROCESO_SC,
-	SUM(REPROCESO_SP) as REPROCESO_SP,
-	SUM(COSTOTOTALPRODUCCION) as COSTOTOTALPRODUCCION,
-	SUM(CANTIDAD_SC) + SUM(REPROCESO_SC) as CANT_TOTAL
+	sum(CANTIDAD_SC) as CANTIDAD_SC,
+	sum(CANTIDAD_SP) as CANTIDAD_SP,
+	sum(REPROCESO_SC) as REPROCESO_SC,
+	sum(REPROCESO_SP) as REPROCESO_SP,
+	sum(COSTOTOTALPRODUCCION) as COSTOTOTALPRODUCCION,
+	sum(CANTIDAD_SC) + sum(REPROCESO_SC) as CANT_TOTAL
 from produccionreproceso
 group by ID, FECHA, COD_ART, NOMBRE
 ;
@@ -59,11 +59,13 @@ create or replace view ventas as
 	from articulos_pedido ap
 	join pedidos p 	 on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
 	and p.estado <> 'ANULADO'
+	and ap.cod_art not in (480, 481) -- LAM
 	union
 	select v.`FECHA_PEDIDO` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	from articulos_pedido ap
 	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
 	and v.estado <> 'ANULADO'
+	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835)
 ;
 
 -- ----------------------------------------------------------------------
