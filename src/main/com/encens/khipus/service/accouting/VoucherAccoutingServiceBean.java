@@ -901,7 +901,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<Object[]> sales = em.createNativeQuery("" +
                 "select z.cod_art, sum(z.cantidad) " +
                 "from ( " +
-                "       SELECT a.cod_art, SUM(a.REPOSICION) + SUM(a.PROMOCION) AS cantidad " +
+                "       select a.cod_art, SUM(a.REPOSICION) + SUM(a.PROMOCION) AS cantidad " +
                 "       from articulos_pedido a " +
                 "       left join pedidos p on a.idpedidos = p.idpedidos " +
                 "       where p.fecha_entrega between :startDate and :endDate " +
@@ -914,6 +914,13 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "       where p.fecha_entrega between :startDate and :endDate " +
                 "       and p.idtipopedido = 4 and p.estado <> 'ANULADO' " +
                 "       group by a.cod_art " +
+                "       union " +
+                "       select a.cod_art, sum(a.reposicion) + sum(a.promocion) as cantidad " +
+                "       from articulos_pedido a " +
+                "       left join ventadirecta v on a.idventadirecta = v.idventadirecta " +
+                "       where v.fecha_pedido between :startDate and :endDate " +
+                "       and v.estado <> 'ANULADO'" +
+                "       group by a.cod_art" +
                 ") z " +
                 "group by z.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
@@ -1181,6 +1188,10 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         if (result.get("668") == null) //668-YOGURT BEBIBLE 1L DURAZNO
             result.put("668", result.get("704")); //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
+        if (result.get("669") == null) //669-YOGURT BEBIBLE 1L COCO
+            result.put("669", result.get("705")); //705-YOG BEBIBLE FAMILIAR COCO 1L
+        if (result.get("642") == null) //642-YOGURT BEBIBLE 1L FRUTILLA
+            result.put("642", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
 
         result.put("188", BigDecimal.ZERO);
         result.put("193", BigDecimal.ZERO);

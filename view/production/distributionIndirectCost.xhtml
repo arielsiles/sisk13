@@ -3,21 +3,11 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
 
-<ui:define name="pageTitle">
-    <c:choose>
-        <c:when test="#{productionPlanAction.managed}">
-            #{messages['ProductionPlan.edit']}
-        </c:when>
-        <c:otherwise>
-            #{messages['ProductionPlan.new']}
-        </c:otherwise>
-    </c:choose>
-</ui:define>
+<ui:define name="pageTitle">#{messages['ProductionPlan.indirectCostDistribution']}</ui:define>
 <ui:param name="bodyWidth" value="50%"/>
 <ui:param name="selectedTab" value="production"/>
 <ui:define name="body">
@@ -33,16 +23,7 @@
 
     <rich:panel id="formPanel">
 
-        <f:facet name="header">
-            <c:choose>
-                <c:when test="#{productionPlanAction.managed}">
-                    #{messages['ProductionPlan.edit']}
-                </c:when>
-                <c:otherwise>
-                    #{messages['ProductionPlan.new']}
-                </c:otherwise>
-            </c:choose>
-        </f:facet>
+        <f:facet name="header">#{messages['ProductionPlan.indirectCostDistribution']}</f:facet>
 
         <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
 
