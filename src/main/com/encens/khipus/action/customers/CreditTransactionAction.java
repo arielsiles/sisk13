@@ -608,6 +608,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
         BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
 
+        System.out.println("===> DATE DIFF: " + DateUtils.format(payment_date, "dd/MM/yyyy") + " - " + DateUtils.format(currentPaymentDate, "dd/MM/yyyy") + " : " + DateUtils.daysBetween(payment_date, currentPaymentDate));
+
         //if (credit.getState().equals(CreditState.EJE)) {
         if (DateUtils.daysBetween(payment_date, currentPaymentDate) > 90) {
             //Date payment_date = creditAction.findDateOfNextPayment(credit);
