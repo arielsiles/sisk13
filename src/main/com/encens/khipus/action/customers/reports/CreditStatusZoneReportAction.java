@@ -3,10 +3,10 @@ package com.encens.khipus.action.customers.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.model.customers.CreditState;
-import com.encens.khipus.model.customers.CreditType;
+import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -36,11 +36,44 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
     }
 
 
+    /** EN DESARROLLO **/
     protected String getEjbql() {
 
         String ejbql = "";
 
+        String dateParam = DateUtils.format(this.dateTransaction, "yyyy-MM-dd");
+
         ejbql = " SELECT " +
+                " credit.state || ' - ' || creditType.name AS status," +
+                " credit.state," +
+                " creditType.name as creditTypeName," +
+                " productiveZone.name AS gabName," +
+                " partner.firstName," +
+                " partner.lastName," +
+                " partner.maidenName," +
+                " credit.grantDate," +
+                " credit.amount," +
+                " credit.id as creditId," +
+                " credit.expirationDate," +
+                " credit.previousCode," +
+
+                " credit.amount - SUM(creditTransaction.capital) AS capitalBalance," +
+                " MAX(creditTransaction.date) as lastPayment" +
+
+                " FROM CreditTransaction creditTransaction" +
+                " LEFT JOIN creditTransaction.credit credit" +
+                " LEFT JOIN credit.creditType creditType" +
+                " LEFT JOIN credit.partner partner" +
+                " LEFT JOIN partner.productiveZone productiveZone " +
+                /*" WHERE credit.state = '" + creditState.toString() + "'" +*/
+                /*" AND credit.creditType = " + creditType.getId() + "" +*/
+                " AND creditTransaction.date <= '" + dateParam + "'" +
+                " AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +
+                " AND credit.state <> #{creditAction.creditStateFIN} "+
+                " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
+                " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
+
+        /*ejbql = " SELECT " +
                 " productiveZone.number || '-' || productiveZone.name as gabName, " +
                 " credit.previousCode as code," +
                 " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as partnerName," +
@@ -54,8 +87,6 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " credit.id as creditId" +
                 " FROM Credit credit" +
                 " LEFT JOIN credit.partner partner" +
-                /*" LEFT JOIN credit.creditType creditType" +
-                " LEFT JOIN creditType.currency currency" +*/
                 " LEFT JOIN partner.productiveZone productiveZone" +
                 " WHERE credit.capitalBalance > 0" +
                 " AND credit.creditType.currency.id = " + currency.getId() +
@@ -82,7 +113,7 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                     " AND credit.creditType.currency.id = " + currency.getId() +
                     " AND productiveZone.id = " + productiveZone.getId() +
                     " ORDER BY credit.previousCode ";
-        }
+        }*/
 
         return ejbql;
     }

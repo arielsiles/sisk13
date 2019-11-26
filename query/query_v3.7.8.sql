@@ -132,5 +132,18 @@ update sf_tmpdet set haber = 	4694.04	 where id_tmpdet = 	6540	;
 update sf_tmpdet set haber = 	143236.89	 where id_tmpdet = 	6541	;
 update sf_tmpdet set haber = 	507803.87	 where id_tmpdet = 	6542	;
 
+--
+-- Para F.Lech
+select * from credito c where c.`saldo` > 0 and c.`saldo` < 1;
+-- hecho
+-- update credito c set c.`estado` = 'FIN' where c.`saldo` > 0 and c.`saldo` < 1;
+
+select * from credito c where c.`saldo` = 0 ;
+-- hecho
+-- update credito c set c.`estado` = 'FIN' where c.`saldo` = 0;
+
+--
+
+
 
 

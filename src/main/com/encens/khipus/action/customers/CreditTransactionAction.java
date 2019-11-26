@@ -610,21 +610,25 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         System.out.println("===> DATE DIFF: " + DateUtils.format(payment_date, "dd/MM/yyyy") + " - " + DateUtils.format(currentPaymentDate, "dd/MM/yyyy") + " : " + DateUtils.daysBetween(payment_date, currentPaymentDate));
 
-        //if (credit.getState().equals(CreditState.EJE)) {
         if (DateUtils.daysBetween(payment_date, currentPaymentDate) > 90) {
-            //Date payment_date = creditAction.findDateOfNextPayment(credit);
-            //Long days_criminal = DateUtils.daysBetween(payment_date, currentPaymentDate) - 1 - 90; /** todo 90 dias espera para ejecucion **/
-            //BigDecimal var_time_criminal = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days_criminal.toString()), BigDecimalUtil.toBigDecimal(360), 6);
-
             BigDecimal var_criminalInterest = BigDecimalUtil.divide(credit.getCriminalInterest(), BigDecimalUtil.ONE_HUNDRED, 6);
             criminalInterest = BigDecimalUtil.multiply(saldoCapital, var_criminalInterest, 6);
             criminalInterest = BigDecimalUtil.multiply(criminalInterest, var_time_criminal, 6);
         }
         /** End **/
 
-
         getInstance().setInterest(interest);
-        BigDecimal currentCapital = calculateCapital(credit);
+
+        BigDecimal currentCapital = BigDecimal.ZERO;
+        /** Si el Plan de Pagos esta vencido, calcula el saldo capital total **/
+        if (currentPaymentDate.compareTo(credit.getExpirationDate()) > 0)
+            currentCapital = credit.getCapitalBalance();
+        else
+            currentCapital = calculateCapital(credit);
+
+        //BigDecimal currentCapital = calculateCapital(credit);
+
+
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
         totalPayment = BigDecimalUtil.sum(totalPayment, criminalInterest, 6);
 

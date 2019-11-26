@@ -42,12 +42,10 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
     public void beforeDetailEval() throws JRScriptletException {
         super.beforeDetailEval();
 
-        //Date dateTransaction = (Date) getParameterValue("dateTransaction", false);
         Date endPeriodDate = (Date) getParameterValue("endPeriodDate", false);
         Long creditId = (Long) getFieldValue("creditId");
         Credit credit = creditService.findCreditById(creditId);
 
-        //if (credit.getExpirationDate() == null)
         creditReportAction.calculatePaymentPlan(credit);
 
         BigDecimal capitalBalance = (BigDecimal) getFieldValue("capitalBalance");
