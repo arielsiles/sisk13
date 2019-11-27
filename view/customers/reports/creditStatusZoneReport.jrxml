@@ -1,42 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditStatusZoneReportScriptlet">
-	<property name="ireport.zoom" value="1.771561000000014"/>
-	<property name="ireport.x" value="45"/>
+	<property name="ireport.zoom" value="2.143588810000017"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="dateTransaction" class="java.util.Date"/>
 	<field name="gabName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
-	<field name="code" class="java.lang.String">
+	<field name="state" class="com.encens.khipus.model.customers.CreditState">
 		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
 	</field>
-	<field name="partnerName" class="java.lang.String">
+	<field name="creditTypeName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
 	</field>
-	<field name="grantDate" class="java.util.Date">
+	<field name="firstName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
 	</field>
-	<field name="annualRate" class="java.lang.Integer">
+	<field name="lastName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
 	</field>
-	<field name="amount" class="java.math.BigDecimal">
+	<field name="maidenName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
 	</field>
-	<field name="lastPayment" class="java.util.Date">
+	<field name="grantDate" class="java.util.Date">
 		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
 	</field>
-	<field name="capitalBalance" class="java.math.BigDecimal">
+	<field name="amount" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
 	</field>
-	<field name="quota" class="java.math.BigDecimal">
+	<field name="creditId" class="java.lang.Long">
 		<fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
 	</field>
-	<field name="state" class="com.encens.khipus.model.customers.CreditState">
+	<field name="expirationDate" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
 	</field>
-	<field name="creditId" class="java.lang.Long">
+	<field name="code" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+	</field>
+	<field name="annualRate" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+	</field>
+	<field name="quota" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+	</field>
+	<field name="capitalBalance" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+	</field>
+	<field name="lastPayment" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
 	</field>
 	<variable name="paidCapital" class="java.lang.Double">
 		<variableExpression><![CDATA[$F{amount}.doubleValue() - $F{capitalBalance}.doubleValue()]]></variableExpression>
@@ -303,7 +315,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{partnerName}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{firstName}+" "+$F{lastName}+" "+$F{maidenName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="280" y="0" width="35" height="11"/>

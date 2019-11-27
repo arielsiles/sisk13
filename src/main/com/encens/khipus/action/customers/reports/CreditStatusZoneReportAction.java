@@ -44,10 +44,9 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
         String dateParam = DateUtils.format(this.dateTransaction, "yyyy-MM-dd");
 
         ejbql = " SELECT " +
-                " credit.state || ' - ' || creditType.name AS status," +
+                " productiveZone.number || '-' || productiveZone.name as gabName, " +
                 " credit.state," +
                 " creditType.name as creditTypeName," +
-                " productiveZone.name AS gabName," +
                 " partner.firstName," +
                 " partner.lastName," +
                 " partner.maidenName," +
@@ -55,7 +54,9 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " credit.amount," +
                 " credit.id as creditId," +
                 " credit.expirationDate," +
-                " credit.previousCode," +
+                " credit.previousCode as code," +
+                " credit.annualRate, " +
+                " credit.quota, " +
 
                 " credit.amount - SUM(creditTransaction.capital) AS capitalBalance," +
                 " MAX(creditTransaction.date) as lastPayment" +
@@ -65,13 +66,15 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " LEFT JOIN credit.creditType creditType" +
                 " LEFT JOIN credit.partner partner" +
                 " LEFT JOIN partner.productiveZone productiveZone " +
-                /*" WHERE credit.state = '" + creditState.toString() + "'" +*/
-                /*" AND credit.creditType = " + creditType.getId() + "" +*/
+                " WHERE productiveZone.id = " + productiveZone.getId() +
+                /*" WHERE partner.productiveZone = " + this.productiveZone +*/
                 " AND creditTransaction.date <= '" + dateParam + "'" +
                 " AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +
                 " AND credit.state <> #{creditAction.creditStateFIN} "+
-                " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
-                " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
+                " AND credit.creditType.currency.id = " + currency.getId() +
+                " GROUP BY productiveZone.number, productiveZone.name, credit.state, creditType.name, " +
+                " partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.id, " +
+                " credit.expirationDate, credit.previousCode, credit.annualRate, credit.quota ";
 
         /*ejbql = " SELECT " +
                 " productiveZone.number || '-' || productiveZone.name as gabName, " +
