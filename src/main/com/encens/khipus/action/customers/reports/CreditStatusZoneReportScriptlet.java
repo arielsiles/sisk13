@@ -3,19 +3,12 @@ package com.encens.khipus.action.customers.reports;
 import com.encens.khipus.action.customers.CreditAction;
 import com.encens.khipus.action.customers.CreditTransactionAction;
 import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.service.customers.CreditService;
-import com.encens.khipus.service.warehouse.MovementDetailService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.Constants;
-import com.encens.khipus.util.DateUtils;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 import org.jboss.seam.Component;
-import org.jboss.seam.annotations.In;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -53,18 +46,18 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         creditTransactionAction.setDateTransaction(dateTransaction);
         BigDecimal interestToDate = creditTransactionAction.calculateInterest();
 
-        Calendar cal = Calendar.getInstance();
+        /*Calendar cal = Calendar.getInstance();
         cal.setTime(credit.getFirstPayment());
         cal.add(Calendar.MONTH, credit.getTerm()-1);
-        Date expirationDate = cal.getTime();
+        Date expirationDate = cal.getTime();*/
 
         Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);
 
-        System.out.println("------------------> expiration Date: " + expirationDate);
+        //System.out.println("------------------> expiration Date: " + expirationDate);
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);
-        this.setVariableValue("expirationDateVar", expirationDate);
+        //this.setVariableValue("expirationDateVar", expirationDate);
         this.setVariableValue("expiredDaysVar", expiredDays);
 
     }

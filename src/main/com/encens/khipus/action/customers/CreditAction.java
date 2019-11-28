@@ -307,7 +307,7 @@ public class CreditAction extends GenericAction<Credit> {
         Date paidDate = null;
         Date currentDate = dateTransaction;
 
-        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+        /*for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
 
             if (i == paidQuotas || paidQuotas == 0) {
                 //System.out.println("=====>>>> FECHA PAID: " + paymentPlanData.getPaymentDate());
@@ -321,33 +321,23 @@ public class CreditAction extends GenericAction<Credit> {
                 Date nextPaidDate = cal.getTime();
 
                 Long diffDays = DateUtils.differenceBetween(nextPaidDate, currentDate, TimeUnit.DAYS);
+                System.out.println("*******000==> CALCULATE EXPIRED DAYS: " +
+                        DateUtils.format(nextPaidDate, "dd/MM/yyyy") + " - " +
+                        DateUtils.format(currentDate, "dd/MM/yyyy") + " - DIFF: " + diffDays);
 
-                //System.out.println("===>>> Diff DAYS: " + diffDays);
 
                 result = diffDays;
-
-                if (diffDays <= 0) {
-                    //System.out.println("===> !!!!CREDITO VIGENTE!!!!");
-                    if (credit.getState().equals(CreditState.VEN)){
-                        //creditService.changeCreditState(credit, CreditState.VIG);
-                    }
-                }
-                if (diffDays >= 1 &&  diffDays <= 90) {
-
-                    //System.out.println("===> CREDITO VENCIDO...");
-                    if (!credit.getState().equals(CreditState.VEN)){
-                        //creditService.changeCreditState(credit, CreditState.VEN);
-                    }
-                }
-                if (diffDays >= 91) {
-                    //System.out.println("===> CREDITO EJECUCION...");
-                    if (!credit.getState().equals(CreditState.EJE)) {
-                        //creditService.changeCreditState(credit, CreditState.EJE);
-                    }
-                }
             }
             i++;
-        }
+        }*/
+
+        Date nextPayment = findDateOfNextPayment(credit);
+        // Long diffDays = DateUtils.differenceBetween(nextPayment, currentDate, TimeUnit.DAYS);
+        Long dias     = DateUtils.daysBetween(nextPayment, currentDate) - 1;
+
+        System.out.println("++++++++=====> CALCULATE EXPIRED DAYS: " +
+                DateUtils.format(nextPayment, "dd/MM/yyyy") + " - " +
+                DateUtils.format(currentDate, "dd/MM/yyyy") + " - DIFF: " + dias);
 
         return  result;
 

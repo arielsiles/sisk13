@@ -3,7 +3,6 @@ package com.encens.khipus.action.customers.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.util.DateUtils;
@@ -67,9 +66,8 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " LEFT JOIN credit.partner partner" +
                 " LEFT JOIN partner.productiveZone productiveZone " +
                 " WHERE productiveZone.id = " + productiveZone.getId() +
-                /*" WHERE partner.productiveZone = " + this.productiveZone +*/
                 " AND creditTransaction.date <= '" + dateParam + "'" +
-                " AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +
+                /*" AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +*/
                 " AND credit.state <> #{creditAction.creditStateFIN} "+
                 " AND credit.creditType.currency.id = " + currency.getId() +
                 " GROUP BY productiveZone.number, productiveZone.name, credit.state, creditType.name, " +
