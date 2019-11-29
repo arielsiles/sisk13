@@ -147,6 +147,19 @@ public class CreditReportAction extends GenericReportAction {
         return beanCollection;
     }
 
+    /**
+     * Metodo provisional actualiza FECHAVENCE en creditos
+     */
+    public void actualizarFechaVencimiento(){
+
+        List<Credit> creditList = getEntityManager().createNamedQuery("Credit.findAllCreditsAll").getResultList();
+
+        for (Credit credit : creditList){
+            System.out.println("------> Actualizando vencimiento..... : " + credit.getPreviousCode());
+            calculatePaymentPlan(credit);
+        }
+    }
+
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();

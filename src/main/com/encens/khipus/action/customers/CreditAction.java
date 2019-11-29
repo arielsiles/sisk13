@@ -187,7 +187,7 @@ public class CreditAction extends GenericAction<Credit> {
         for (int j = 0; j<listPaymentPlan.size(); j++){
             if (i == paidQuotas || paidQuotas == 0) {
                 result = DateUtils.parse(listPaymentPlan.get(j).getPaymentDate(), "dd/MM/yyyy");
-                System.out.println("-------=>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate());
+                System.out.println("-------=>>>> POSIBLE FECHA ok SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate());
             }
             i++;
         }
@@ -331,10 +331,10 @@ public class CreditAction extends GenericAction<Credit> {
             i++;
         }*/
 
-        Date nextPayment = findDateOfNextPayment(credit);
+        Date nextPayment = findDateOfNextPayment(credit, currentDate);
         // Long diffDays = DateUtils.differenceBetween(nextPayment, currentDate, TimeUnit.DAYS);
         Long dias     = DateUtils.daysBetween(nextPayment, currentDate) - 1;
-
+        result = dias;
         System.out.println("++++++++=====> CALCULATE EXPIRED DAYS: " +
                 DateUtils.format(nextPayment, "dd/MM/yyyy") + " - " +
                 DateUtils.format(currentDate, "dd/MM/yyyy") + " - DIFF: " + dias);

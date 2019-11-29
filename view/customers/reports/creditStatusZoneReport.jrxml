@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditStatusZoneReportScriptlet">
 	<property name="ireport.zoom" value="2.8531167061100238"/>
-	<property name="ireport.x" value="1082"/>
+	<property name="ireport.x" value="1331"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="dateTransaction" class="java.util.Date"/>
@@ -66,7 +66,7 @@
 	</variable>
 	<variable name="expiredDaysVar" class="java.lang.Long" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="days" class="java.lang.String">
-		<variableExpression><![CDATA[$V{expiredDaysVar}.intValue() > 0 && ($F{state}.toString().equals("VEN") || $F{state}.toString().equals("EJE")) ? $V{expiredDaysVar}.toString() : ""]]></variableExpression>
+		<variableExpression><![CDATA[$V{expiredDaysVar}.intValue() > 0 ? $V{expiredDaysVar}.toString() : ""]]></variableExpression>
 	</variable>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[$F{gabName}]]></groupExpression>
