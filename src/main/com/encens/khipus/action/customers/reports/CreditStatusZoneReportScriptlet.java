@@ -52,13 +52,20 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         Date expirationDate = cal.getTime();*/
 
         Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);
-
         //System.out.println("------------------> expiration Date: " + expirationDate);
+
+        BigDecimal quota = credit.getQuota();
+
+        if (credit.getNumberQuota() == 1)
+            quota = BigDecimal.ZERO;
+        if (quota.compareTo(credit.getCapitalBalance()) > 0)
+            quota = credit.getCapitalBalance();
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);
         //this.setVariableValue("expirationDateVar", expirationDate);
         this.setVariableValue("expiredDaysVar", expiredDays);
+        this.setVariableValue("quotaVar", quota);
 
     }
 

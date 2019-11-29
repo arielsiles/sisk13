@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditStatusZoneReportScriptlet">
-	<property name="ireport.zoom" value="2.8531167061100238"/>
-	<property name="ireport.x" value="1331"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="6.727499949325662"/>
+	<property name="ireport.x" value="2591"/>
+	<property name="ireport.y" value="414"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="dateTransaction" class="java.util.Date"/>
 	<field name="gabName" class="java.lang.String">
@@ -55,10 +55,10 @@
 	</variable>
 	<variable name="interestToDateVar" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="totalPay" class="java.lang.Double">
-		<variableExpression><![CDATA[$F{quota}.doubleValue() + $V{interestToDateVar}.doubleValue()]]></variableExpression>
+		<variableExpression><![CDATA[$V{quotaVar}.doubleValue() + $V{interestToDateVar}.doubleValue()]]></variableExpression>
 	</variable>
 	<variable name="penBalance" class="java.lang.Double">
-		<variableExpression><![CDATA[$F{capitalBalance}.doubleValue() - $F{quota}.doubleValue()]]></variableExpression>
+		<variableExpression><![CDATA[$F{capitalBalance}.doubleValue() - $V{quotaVar}.doubleValue()]]></variableExpression>
 	</variable>
 	<variable name="expirationDateVar" class="java.util.Date" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="totalLiquid" class="java.lang.Double">
@@ -67,6 +67,31 @@
 	<variable name="expiredDaysVar" class="java.lang.Long" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="days" class="java.lang.String">
 		<variableExpression><![CDATA[$V{expiredDaysVar}.intValue() > 0 ? $V{expiredDaysVar}.toString() : ""]]></variableExpression>
+	</variable>
+	<variable name="totalAmount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="totalPaid" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{paidCapital}]]></variableExpression>
+	</variable>
+	<variable name="quotaVar" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="totalCapitalBalance" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{capitalBalance}]]></variableExpression>
+	</variable>
+	<variable name="totalInterestToDate" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{interestToDateVar}]]></variableExpression>
+	</variable>
+	<variable name="totalTotalPay" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{totalPay}]]></variableExpression>
+	</variable>
+	<variable name="totalPenBalance" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{penBalance}]]></variableExpression>
+	</variable>
+	<variable name="totalTotalLiquid" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{totalLiquid}]]></variableExpression>
+	</variable>
+	<variable name="totalQuotaVar" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{quotaVar}]]></variableExpression>
 	</variable>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[$F{gabName}]]></groupExpression>
@@ -219,13 +244,69 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="9" splitType="Stretch">
+			<band height="11" splitType="Stretch">
 				<line>
-					<reportElement x="0" y="2" width="735" height="1"/>
+					<reportElement x="0" y="0" width="735" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 					</graphicElement>
 				</line>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="240" y="0" width="40" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalAmount}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="315" y="0" width="40" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalPaid}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="355" y="0" width="40" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalCapitalBalance}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="431" y="0" width="34" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalInterestToDate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="467" y="0" width="35" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalTotalPay}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="503" y="0" width="40" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalPenBalance}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="584" y="0" width="40" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{totalTotalLiquid}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="395" y="0" width="35" height="11"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalQuotaVar}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -338,13 +419,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{paidCapital}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;(-#,##0.00)">
-				<reportElement x="395" y="0" width="35" height="11"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="6"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{quota}]]></textFieldExpression>
-			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="431" y="0" width="34" height="11"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -393,6 +467,13 @@
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{days}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="395" y="0" width="35" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{quotaVar}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
