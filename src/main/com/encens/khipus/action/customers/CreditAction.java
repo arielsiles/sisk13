@@ -129,36 +129,31 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setPartner(null);
     }
 
-    //public void findDateOfNextPayment(Credit credit, Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas) {
+    /**
+     *
+     * @param credit
+     * @return La fecha siguiente posterior o igual al total pagado segun el plan de pagos del credito.
+     */
     public Date findDateOfNextPayment(Credit credit) {
-
         Date result = null;
-
         //int paidQuotas = creditTransactionAction.calculatePaidQuotas(credit);
-        int paidQuotas = creditTransactionAction.calculateQuotasForCriminal(credit);
+        int paidQuotas = creditTransactionAction.calculateQuotasForCriminal(credit); // Cuotas pagadas
 
         Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
 
         int i=1;
 
         List<CreditReportAction.PaymentPlanData> listPaymentPlan = new ArrayList<CreditReportAction.PaymentPlanData>();
-        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas) listPaymentPlan.add(paymentPlanData);
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas)
+            listPaymentPlan.add(paymentPlanData);
 
         for (int j = 0; j<listPaymentPlan.size(); j++){
             if (i == paidQuotas || paidQuotas == 0) {
                 result = DateUtils.parse(listPaymentPlan.get(j).getPaymentDate(), "dd/MM/yyyy");
-                System.out.println("=====>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate());
+                System.out.println("=======>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate() + " --> (Fecha sig. al total pagado)");
             }
             i++;
         }
-
-        /*for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
-            if (i == paidQuotas || paidQuotas == 0) {
-                System.out.println("=====>>>> POSIBLE FECHA SIGUIENTE: " + paymentPlanData.getPaymentDate());
-                result = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
-            }
-            i++;
-        }*/
 
         System.out.println("-----------------------------");
         System.out.println("====> CAPITAL PAGADO: " + BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2));

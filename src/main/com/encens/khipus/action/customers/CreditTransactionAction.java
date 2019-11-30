@@ -81,9 +81,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     @Factory(value = "creditTransaction")
     public CreditTransaction initCredit() {
         try {
-
             exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
-            System.out.println("----> Obteniendo tipo de cambio... " + exchangeRate);
         }catch (FinancesExchangeRateNotFoundException e){addFinancesExchangeRateNotFoundExceptionMessage();
         }catch (FinancesCurrencyNotFoundException e){addFinancesCurrencyNotFoundMessage();}
         return getInstance();
@@ -602,6 +600,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
 
+        System.out.println("***start*****************");
+        System.out.println("-+-+-+-+--++++++++++>>>> TEST next date: " + DateUtils.format(creditAction.findDateOfNextPayment(credit, currentPaymentDate), "dd/MM/yyyy"));
+        System.out.println("***end*****************");
+
         /** For criminal interest **/ /** todo **/
         BigDecimal criminalInterest = BigDecimal.ZERO;
         Date payment_date = creditAction.findDateOfNextPayment(credit);
@@ -773,7 +775,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quota++;
         }
 
-        System.out.println("----> CAPITAL HASTA QUOTA: " + quota);
+        System.out.println("----> CAPITAL HASTA QUOTA (only criminal): " + quota);
         return quota;
     }
 
@@ -788,7 +790,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quota++;
         }
 
-        System.out.println("----> CAPITAL HASTA QUOTA2222: " + quota);
+        System.out.println("----> CAPITAL HASTA QUOTA2222: " + quota + "(Sgte cuota de pago, posterior al total pagado)");
         return quota;
     }
 
