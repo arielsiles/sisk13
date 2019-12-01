@@ -600,10 +600,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
 
-        System.out.println("***start*****************");
-        System.out.println("-+-+-+-+--++++++++++>>>> TEST next date: " + DateUtils.format(creditAction.findDateOfNextPayment(credit, currentPaymentDate), "dd/MM/yyyy"));
-        System.out.println("***end*****************");
-
         /** For criminal interest **/ /** todo **/
         BigDecimal criminalInterest = BigDecimal.ZERO;
         Date payment_date = creditAction.findDateOfNextPayment(credit);
@@ -621,15 +617,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         getInstance().setInterest(interest);
 
+        System.out.println("***start*****************");
+        System.out.println("-+-+-+-+--++++++++++>>>> TEST next date: " + DateUtils.format(creditAction.findDateOfNextPayment(credit, currentPaymentDate), "dd/MM/yyyy"));
+        System.out.println("***end*****************");
         BigDecimal currentCapital = BigDecimal.ZERO;
         /** Si el Plan de Pagos esta vencido, calcula el saldo capital total **/
         if (currentPaymentDate.compareTo(credit.getExpirationDate()) > 0)
             currentCapital = credit.getCapitalBalance();
         else
             currentCapital = calculateCapital(credit);
-
-        //BigDecimal currentCapital = calculateCapital(credit);
-
 
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
         totalPayment = BigDecimalUtil.sum(totalPayment, criminalInterest, 6);
@@ -641,10 +637,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;
         this.criminalInterestValue = criminalInterest;
-        //this.criminalInterestValue = BigDecimal.ZERO;
-
-
-
 
         if (saldoCapital.doubleValue() < capitalValue.doubleValue()) {
             capitalValue = saldoCapital;
@@ -679,16 +671,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         int quotas = 0;
 
         Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-
         System.out.println("--------> LASTPAYMENT: " + lastPaymentDate);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastPaymentDate);
         lastPaymentDate = cal.getTime();
 
-        //Date currentPaymentDate = getInstance().getDate();
         Date currentPaymentDate = this.dateTransaction;
-
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
         CreditState state = credit.getState();
@@ -699,7 +688,6 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         }else {
             if (state.equals(CreditState.VEN) || state.equals(CreditState.EJE)) {
                 quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
-                //quotas = 1;
             }
         }
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
@@ -718,8 +706,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         int quotas = 1;
 
-        System.out.println("---> currentDate: " + currentDate);
-        System.out.println("---> lastPaymentDate: " + lastPaymentDate);
+        System.out.println("---> currentDate: " + DateUtils.format(currentDate, "dd/MM/yyyy"));
+        System.out.println("---> lastPaymentDate: " + DateUtils.format(lastPaymentDate, "dd/MM/yyyy"));
+        System.out.println("---> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
         System.out.println("---> nextPaymentDate: " + nextPaymentDate);
         System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
         System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
@@ -729,11 +718,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             if (lastPaymentDate.before(nextPaymentDate)){
                 System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
-
             }else{
-
                 System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
-
                 if (quotas < totalQuotas-calculatePaidQuotas(credit)){
                     quotas++;
                     System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
