@@ -29,7 +29,9 @@ public class PayrollGenerationCycleDataModel extends QueryDataModel<Long, Payrol
 
     @Create
     public void init() {
-        sortProperty = "payrollGenerationCycle.gestion, payrollGenerationCycle.month";
+        /*sortProperty = "payrollGenerationCycle.gestion, payrollGenerationCycle.month";*/
+        sortProperty = "payrollGenerationCycle.generationInitDate";
+        sortAsc = false;
     }
 
     @Override

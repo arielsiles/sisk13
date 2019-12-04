@@ -670,7 +670,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
         int quotas = 0;
 
-        Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
+        Date lastPaymentDate = creditTransactionService.findLastPayment(credit); //Ultimo pago realizado
         System.out.println("--------> LASTPAYMENT: " + lastPaymentDate);
 
         Calendar cal = Calendar.getInstance();
@@ -684,7 +684,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         int amortize = credit.getAmortization();
 
         if (state.equals(CreditState.VIG)) {
-            quotas = 1; //calculateQuotaVig(lastPaymentDate, currentPaymentDate, amortize/30);
+            quotas = 1;
         }else {
             if (state.equals(CreditState.VEN) || state.equals(CreditState.EJE)) {
                 quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
@@ -693,8 +693,56 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
     }
 
-    /** ? **/
+    /** ? con error.... **/
     public int calculateQuotasVen(Credit credit, Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
+
+        Calendar calendarLast = Calendar.getInstance();
+        calendarLast.setTime(lastPaymentDate);
+
+        Calendar calendarNext = Calendar.getInstance();
+        calendarNext.setTime(lastPaymentDate);
+        calendarNext.add(Calendar.MONTH, amortize);
+        Date nextPaymentDate = calendarNext.getTime();
+
+        int quotas = 1;
+
+        System.out.println("---> currentDate: " + DateUtils.format(currentDate, "dd/MM/yyyy"));
+        System.out.println("---> lastPaymentDate: " + DateUtils.format(lastPaymentDate, "dd/MM/yyyy"));
+        System.out.println("---> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
+        System.out.println("---> nextPaymentDate: " + nextPaymentDate);
+        System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
+        System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
+        System.out.println("--------------------");
+
+        while (lastPaymentDate.before(currentDate)){
+
+            if (lastPaymentDate.before(nextPaymentDate)){
+                System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
+            }else{
+                System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
+                if (quotas < totalQuotas-calculatePaidQuotas(credit)){
+                    quotas++;
+                    System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+                    calendarNext.add(Calendar.MONTH, amortize);
+                    nextPaymentDate = calendarNext.getTime();
+                }
+            }
+
+            calendarLast.add(Calendar.DAY_OF_YEAR, 1);
+            lastPaymentDate = calendarLast.getTime();
+
+        }
+
+        System.out.println("--------------------");
+        System.out.println("Last Payment   : " + lastPaymentDate);
+        System.out.println("Current Payment: " + currentDate);
+        System.out.println("nextPaymentDate: " + nextPaymentDate);
+
+        return quotas;
+    }
+
+    /** ? MODIFICANDO... OPTIMIZANDO **/
+    public int calculateQuotas(Credit credit, Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
 
         Calendar calendarLast = Calendar.getInstance();
         calendarLast.setTime(lastPaymentDate);
