@@ -164,10 +164,16 @@ public class CreditAction extends GenericAction<Credit> {
         return result;
     }
 
+    /**
+     * Calcula
+     * @param credit
+     * @param endPeriod
+     * @return
+     */
     public Date findDateOfNextPayment(Credit credit, Date endPeriod) {
 
         Date result = null;
-        int paidQuotas = creditTransactionAction.calculateQuotasForCriminal2(credit, endPeriod);
+        int paidQuotas = creditTransactionAction.getNextQuotaAfterPaid(credit, endPeriod);
         System.out.println("-a-a-a-a-a-a--> cuotas2: " + paidQuotas);
         if (paidQuotas <= 0)
             result = endPeriod;
@@ -189,6 +195,22 @@ public class CreditAction extends GenericAction<Credit> {
 
         return result;
     }
+
+
+    public Integer findNextQuotaOfPaymentPlan(Credit credit, Date date){
+
+        Integer result = 0;
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+            Date planDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+            if (planDate.compareTo(date) >= 0 ){
+                result = paymentPlanData.getNro();
+                break;
+            }
+        }
+        return result;
+    }
+
 
     @End
     public String generateTransferCredit(){

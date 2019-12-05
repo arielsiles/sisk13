@@ -168,11 +168,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             System.out.println("-----> Total IVA Asiento: " + totalFiscalCredit);
             System.out.println("-----> Total IVA FActura: " + totalIVA);
 
-            //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SalaryMovementProducer.message.insufficientBalance",fullName,totalCollected);
-            if(totalD.doubleValue() == 0.00 || totalC.doubleValue() == 0.00){
+            /*if(totalD.doubleValue() == 0.00 || totalC.doubleValue() == 0.00){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectAccountingEntry");
                 return Outcome.REDISPLAY;
-            }
+            }*/
 
             if(totalD.doubleValue() != totalC.doubleValue()){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Voucher.message.incorrectAccountingEntry");

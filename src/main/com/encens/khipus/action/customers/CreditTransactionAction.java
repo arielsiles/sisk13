@@ -616,16 +616,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         /** End **/
 
         getInstance().setInterest(interest);
-
-        System.out.println("***start*****************");
-        System.out.println("-+-+-+-+--++++++++++>>>> TEST next date: " + DateUtils.format(creditAction.findDateOfNextPayment(credit, currentPaymentDate), "dd/MM/yyyy"));
-        System.out.println("***end*****************");
         BigDecimal currentCapital = BigDecimal.ZERO;
         /** Si el Plan de Pagos esta vencido, calcula el saldo capital total **/
         if (currentPaymentDate.compareTo(credit.getExpirationDate()) > 0)
             currentCapital = credit.getCapitalBalance();
         else
-            currentCapital = calculateCapital(credit);
+            currentCapital = calculateCapitalBaseCapital(credit);
+            //currentCapital = calculateCapital(credit);
 
         BigDecimal totalPayment = BigDecimalUtil.sum(currentCapital, interest, 6);
         totalPayment = BigDecimalUtil.sum(totalPayment, criminalInterest, 6);
@@ -665,20 +662,22 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
 
-    /** ? **/
+    /** ? Basado en cuotas **/
     public BigDecimal calculateCapital(Credit credit){
 
         int quotas = 0;
+        Date currentPaymentDate = this.dateTransaction;
+        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
-        Date lastPaymentDate = creditTransactionService.findLastPayment(credit); //Ultimo pago realizado
+        //Date lastPaymentDate = creditTransactionService.findLastPayment(credit); //Ultimo pago realizado
+        Date lastPaymentDate = creditTransactionService.findLastPaymentEndPeriod(credit, currentPaymentDate); //Ultimo pago realizado antes de la fecha
+
         System.out.println("--------> LASTPAYMENT: " + lastPaymentDate);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastPaymentDate);
         lastPaymentDate = cal.getTime();
 
-        Date currentPaymentDate = this.dateTransaction;
-        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
         CreditState state = credit.getState();
         int amortize = credit.getAmortization();
@@ -687,10 +686,84 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             quotas = 1;
         }else {
             if (state.equals(CreditState.VEN) || state.equals(CreditState.EJE)) {
-                quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
+                //quotas = calculateQuotasVen(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
+                quotas = calculateQuotas(credit, lastPaymentDate, currentPaymentDate, amortize/30, credit.getNumberQuota()); //revisar error
             }
         }
         return BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(quotas), 6);
+    }
+
+    /** Basado en el capital pagado y por pagar **/
+    public BigDecimal calculateCapitalBaseCapital(Credit credit){
+
+        Date currentPaymentDate = this.dateTransaction;
+        currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
+
+        Date lastPaymentDate = creditTransactionService.findLastPaymentEndPeriod(credit, currentPaymentDate); //Ultimo pago realizado antes de la fecha
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(lastPaymentDate);
+        lastPaymentDate = cal.getTime();
+
+        Integer nextQuota = creditAction.findNextQuotaOfPaymentPlan(credit, currentPaymentDate);
+        BigDecimal totalToPay = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(nextQuota));
+        if (nextQuota.compareTo(credit.getNumberQuota()) == 0) totalToPay = credit.getAmount(); // Si es la ultima cuota. En algunos creditos la ultima cuota varia
+
+        BigDecimal totalPaid  = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance());
+        BigDecimal capital    = BigDecimalUtil.subtract(totalToPay, totalPaid);
+
+        System.out.println("====> NEXT QUOTA: " + nextQuota + " - Total Pagar: " + totalToPay + " - Total Pagado: " + totalPaid);
+        System.out.println("====> CAPITAL: " + capital);
+
+        return capital;
+    }
+
+    /** ? MODIFICANDO... OPTIMIZAR **/
+    public int calculateQuotas(Credit credit, Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
+
+        Calendar calendarLast = Calendar.getInstance();
+        calendarLast.setTime(lastPaymentDate);
+
+        /*Calendar calendarNext = Calendar.getInstance();
+        calendarNext.setTime(lastPaymentDate);
+        calendarNext.add(Calendar.MONTH, amortize);
+        Date nextPaymentDate = calendarNext.getTime();*/
+        Date nextPaymentDate = creditAction.findDateOfNextPayment(credit, currentDate);
+        Calendar calendarNextPayment = DateUtils.toCalendar(nextPaymentDate);
+
+        int quotas = 1;
+
+        System.out.println("---> currentDate: " + DateUtils.format(currentDate, "dd/MM/yyyy"));
+        System.out.println("---> lastPaymentDate: " + DateUtils.format(lastPaymentDate, "dd/MM/yyyy"));
+        System.out.println("---> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
+        System.out.println("---> nextPaymentDate: " + nextPaymentDate);
+        System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
+        System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
+
+        while (lastPaymentDate.before(currentDate)){
+
+            if (lastPaymentDate.before(nextPaymentDate)){
+                System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
+            }else{
+                System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
+                if (quotas < totalQuotas-calculatePaidQuotas(credit)){
+                    quotas++;
+                    System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
+                    calendarNextPayment.add(Calendar.MONTH, amortize);
+                    nextPaymentDate = calendarNextPayment.getTime();
+                }
+            }
+
+            calendarLast.add(Calendar.DAY_OF_YEAR, 1);
+            lastPaymentDate = calendarLast.getTime();
+
+        }
+
+        System.out.println("--------------------");
+        System.out.println("Last Payment   : " + lastPaymentDate);
+        System.out.println("Current Payment: " + currentDate);
+        System.out.println("nextPaymentDate: " + nextPaymentDate);
+
+        return quotas;
     }
 
     /** ? con error.... **/
@@ -741,53 +814,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return quotas;
     }
 
-    /** ? MODIFICANDO... OPTIMIZANDO **/
-    public int calculateQuotas(Credit credit, Date lastPaymentDate, Date currentDate, int amortize, int totalQuotas){
 
-        Calendar calendarLast = Calendar.getInstance();
-        calendarLast.setTime(lastPaymentDate);
-
-        Calendar calendarNext = Calendar.getInstance();
-        calendarNext.setTime(lastPaymentDate);
-        calendarNext.add(Calendar.MONTH, amortize);
-        Date nextPaymentDate = calendarNext.getTime();
-
-        int quotas = 1;
-
-        System.out.println("---> currentDate: " + DateUtils.format(currentDate, "dd/MM/yyyy"));
-        System.out.println("---> lastPaymentDate: " + DateUtils.format(lastPaymentDate, "dd/MM/yyyy"));
-        System.out.println("---> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
-        System.out.println("---> nextPaymentDate: " + nextPaymentDate);
-        System.out.println("---> lastPaymentDate.before(currentDate): " + lastPaymentDate.before(currentDate));
-        System.out.println("---> lastPaymentDate.equals(currentDate): " + lastPaymentDate.equals(currentDate));
-        System.out.println("--------------------");
-
-        while (lastPaymentDate.before(currentDate)){
-
-            if (lastPaymentDate.before(nextPaymentDate)){
-                System.out.println("Last datee: " + lastPaymentDate + " quotas: " + quotas);
-            }else{
-                System.out.println("====> QUOTAS: " + quotas + " - TOTAL QUOTAS: " + totalQuotas);
-                if (quotas < totalQuotas-calculatePaidQuotas(credit)){
-                    quotas++;
-                    System.out.println("Last date: " + lastPaymentDate + " quotas: " + quotas);
-                    calendarNext.add(Calendar.MONTH, amortize);
-                    nextPaymentDate = calendarNext.getTime();
-                }
-            }
-
-            calendarLast.add(Calendar.DAY_OF_YEAR, 1);
-            lastPaymentDate = calendarLast.getTime();
-
-        }
-
-        System.out.println("--------------------");
-        System.out.println("Last Payment   : " + lastPaymentDate);
-        System.out.println("Current Payment: " + currentDate);
-        System.out.println("nextPaymentDate: " + nextPaymentDate);
-
-        return quotas;
-    }
 
     public Integer calculatePaidQuotas(Credit credit){
         System.out.println("===================> REV calculatePaidQuotas: " + credit.getPreviousCode());
@@ -813,7 +840,17 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         return quota;
     }
 
-    public Integer calculateQuotasForCriminal2(Credit credit, Date endPeriod){
+    /**
+     * OBTENER SIGUIENTE CUOTA, DESPUES DE LAS CUOTAS PAGADAS
+     * Obtiene todos los pagos (cuotas) hasta la fecha dada, y obtiene la siguiente cuota segun el Plan de Pagos (P.P.)
+     * Fecha actual endPeriod: 18/12/2019 - Ej. Ultimo pago: 19/10/2019 (cuota 6 pagada), nextQuota: 7 del 11/11/2019
+     * La sgte cuota no siempre sera posterior a la fecha dada (endPeriod)
+     * @param credit
+     * @param endPeriod Fecha de fin de periodo, o fecha hasta donde considera el total pagado del credito
+     * @return Numero de cuota calculada
+     *
+     */
+    public Integer getNextQuotaAfterPaid(Credit credit, Date endPeriod){
 
         BigDecimal totalPaid = creditService.calculateTotalPaidCapital(credit, endPeriod); // Capital pagado
         System.out.println("-.-.-.-.-.-.---> Total Pagado 2::: " + totalPaid);
