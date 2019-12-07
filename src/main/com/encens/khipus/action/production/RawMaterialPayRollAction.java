@@ -311,7 +311,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
             List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
             for (ProductiveZone productiveZone : productiveZones) {
 
-                if (productiveZone.getGroup().equals("ILVA")) { /** MODIFYID **/
+                if (productiveZone.getGroup().equals("ILVA")) { /** MODIFYID Zonas productivas ILVA **/
                     RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
                     payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
                     payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
