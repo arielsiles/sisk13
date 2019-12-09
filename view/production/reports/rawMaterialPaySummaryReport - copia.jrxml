@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
-	<property name="ireport.zoom" value="2.143588810000003"/>
-	<property name="ireport.x" value="46"/>
-	<property name="ireport.y" value="26"/>
+	<property name="ireport.zoom" value="1.7715610000000022"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
 	<field name="total_collected" class="java.lang.Double"/>
 	<field name="price_unit" class="java.lang.Double"/>
@@ -61,9 +61,9 @@
 	<group name="resumen_principal">
 		<groupExpression><![CDATA[$V{PAGE_NUMBER}]]></groupExpression>
 		<groupHeader>
-			<band height="297">
+			<band height="284">
 				<frame>
-					<reportElement positionType="Float" x="105" y="1" width="362" height="296" forecolor="#FFFFFF"/>
+					<reportElement positionType="Float" x="105" y="1" width="362" height="280" forecolor="#FFFFFF"/>
 					<box leftPadding="0" rightPadding="0">
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -72,7 +72,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textField>
-						<reportElement x="240" y="279" width="76" height="12"/>
+						<reportElement x="240" y="267" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
@@ -183,33 +183,33 @@
 						<text><![CDATA[Tachos Bs.]]></text>
 					</staticText>
 					<line>
-						<reportElement x="240" y="258" width="87" height="1"/>
+						<reportElement x="240" y="246" width="87" height="1"/>
 						<graphicElement>
 							<pen lineWidth="0.5"/>
 						</graphicElement>
 					</line>
 					<textField>
-						<reportElement x="240" y="261" width="76" height="12"/>
+						<reportElement x="240" y="249" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{total_differences}]]></textFieldExpression>
 					</textField>
 					<staticText>
-						<reportElement x="54" y="261" width="157" height="12"/>
+						<reportElement x="54" y="249" width="157" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<text><![CDATA[Total Descuentos ]]></text>
 					</staticText>
 					<line>
-						<reportElement x="240" y="276" width="86" height="1"/>
+						<reportElement x="240" y="264" width="86" height="1"/>
 						<graphicElement>
 							<pen lineWidth="0.5"/>
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement x="54" y="279" width="156" height="12"/>
+						<reportElement x="54" y="267" width="156" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
@@ -300,14 +300,14 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{otrosDescuentos}]]></textFieldExpression>
 					</textField>
 					<textField>
-						<reportElement x="240" y="203" width="76" height="12"/>
+						<reportElement x="240" y="191" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{it}]]></textFieldExpression>
 					</textField>
 					<staticText>
-						<reportElement x="125" y="203" width="100" height="12"/>
+						<reportElement x="125" y="191" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
@@ -396,66 +396,52 @@
 						</graphicElement>
 					</line>
 					<textField>
-						<reportElement x="240" y="217" width="76" height="12"/>
+						<reportElement x="240" y="205" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{iue}]]></textFieldExpression>
 					</textField>
 					<staticText>
-						<reportElement x="125" y="217" width="100" height="12"/>
+						<reportElement x="125" y="205" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<text><![CDATA[I.U.E.]]></text>
 					</staticText>
 					<textField>
-						<reportElement x="240" y="231" width="76" height="12"/>
+						<reportElement x="240" y="219" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{reserva_productores}]]></textFieldExpression>
 					</textField>
 					<staticText>
-						<reportElement x="125" y="231" width="100" height="12"/>
+						<reportElement x="125" y="219" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<text><![CDATA[Reserva Productores]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="125" y="245" width="100" height="12"/>
+						<reportElement x="125" y="233" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<text><![CDATA[G A]]></text>
 					</staticText>
 					<textField>
-						<reportElement x="240" y="245" width="76" height="12"/>
+						<reportElement x="240" y="233" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{reserveGA}]]></textFieldExpression>
 					</textField>
-					<staticText>
-						<reportElement x="125" y="190" width="100" height="12"/>
-						<textElement verticalAlignment="Middle">
-							<font fontName="Arial" size="9" isBold="false"/>
-						</textElement>
-						<text><![CDATA[Comisión Banco]]></text>
-					</staticText>
 				</frame>
-				<textField>
-					<reportElement x="345" y="191" width="76" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isBold="false"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{comision}]]></textFieldExpression>
-				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="34"/>
+			<band height="50"/>
 		</groupFooter>
 	</group>
 	<pageHeader>

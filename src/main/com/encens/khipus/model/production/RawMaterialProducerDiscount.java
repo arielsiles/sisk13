@@ -72,6 +72,9 @@ public class RawMaterialProducerDiscount implements com.encens.khipus.model.Base
     @Column(name = "CONCENTRADOS", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double concentrated = 0.0;
 
+    @Column(name = "COMISION", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    private double commission = 0.0;
+
     @OneToOne(mappedBy = "rawMaterialProducerDiscount", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private com.encens.khipus.model.production.RawMaterialPayRecord rawMaterialPayRecord;
 
@@ -201,5 +204,13 @@ public class RawMaterialProducerDiscount implements com.encens.khipus.model.Base
 
     public void setOtherIncoming(double otherIncoming) {
         this.otherIncoming = otherIncoming;
+    }
+
+    public double getCommission() {
+        return commission;
+    }
+
+    public void setCommission(double commission) {
+        this.commission = commission;
     }
 }

@@ -16,6 +16,7 @@ public class BoletaPagoProductor {
     private Double reserva;
     private Double alcohol;
     private Double concentrados;
+    private Double comision;
     private Double credito;
     private Double veterinario;
     private Double yogurt;
@@ -192,5 +193,13 @@ public class BoletaPagoProductor {
 
     public void setNumerocuenta(String numerocuenta) {
         this.numerocuenta = numerocuenta;
+    }
+
+    public Double getComision() {
+        return comision;
+    }
+
+    public void setComision(Double comision) {
+        this.comision = comision;
     }
 }

@@ -14,7 +14,6 @@ import javax.ejb.Stateless;
 import javax.persistence.NoResultException;
 import javax.persistence.TemporalType;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +36,7 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
 
         rawMaterialProducerDiscount.setRawMaterialProducer(rawMaterialProducer);
         rawMaterialProducerDiscount.setConcentrated(0.0);
+        rawMaterialProducerDiscount.setCommission(0.0);
         rawMaterialProducerDiscount.setYogurt(0.0);
         rawMaterialProducerDiscount.setVeterinary(0.0);
         rawMaterialProducerDiscount.setCredit(0.0);
@@ -45,6 +45,7 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         rawMaterialProducerDiscount.setOtherIncoming(0.0);
 
         Double concentrated = 0.0;
+        Double commission = 0.0;
         Double yogurt = 0.0;
         Double veterinary = 0.0;
         Double credit = 0.0;
@@ -67,6 +68,10 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
                        if(typeDiscount.compareTo("CONCENTRADOS")==0)
                        {
                            concentrated += valor;
+                       }
+                       if(typeDiscount.compareTo("COMISION BANCO")==0)
+                       {
+                            commission += valor;
                        }
                        if(typeDiscount.compareTo("YOGURT")==0)
                        {
@@ -96,6 +101,7 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         }
 
         rawMaterialProducerDiscount.setConcentrated(RoundUtil.getRoundValue(concentrated,2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialProducerDiscount.setCommission(RoundUtil.getRoundValue(commission,2, RoundUtil.RoundMode.SYMMETRIC));
         rawMaterialProducerDiscount.setYogurt(RoundUtil.getRoundValue(yogurt,2, RoundUtil.RoundMode.SYMMETRIC));
         rawMaterialProducerDiscount.setVeterinary(RoundUtil.getRoundValue(veterinary,2,RoundUtil.RoundMode.SYMMETRIC));
         rawMaterialProducerDiscount.setCredit(RoundUtil.getRoundValue(credit,2,RoundUtil.RoundMode.SYMMETRIC));

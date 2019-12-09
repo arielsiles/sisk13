@@ -106,7 +106,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
                 reportParameters);
     }
 
-    private void addSummaryTotal(HashMap<String, Object> params) throws ParseException {
+    private void    addSummaryTotal(HashMap<String, Object> params) throws ParseException {
         //discounts = rawMaterialPayRollService.getDiscounts(dateIni.getTime(),dateEnd.getTime(),null,null);
         DecimalFormat df = new DecimalFormat("#,##0.00");
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -139,7 +139,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         //discounts
         Double totalDiscount = discounts.alcohol + discounts.concentrated + discounts.yogurt
                 + discounts.veterinary + discounts.credit + discounts.recip + discounts.retention
-                + discounts.otherDiscount+reservProducer + reserveGA;
+                + discounts.otherDiscount + reservProducer + reserveGA + discounts.commission;
         //Double liquidPay = totalMoney - totalDifferences;
         params.put("alcohol", df.format(discounts.alcohol));
         params.put("concentrated", df.format(discounts.concentrated));
@@ -149,6 +149,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         params.put("recip", df.format(discounts.recip));
         params.put("retention", df.format(discounts.retention));
         params.put("otrosDescuentos", df.format(discounts.otherDiscount));
+        params.put("comision", df.format(discounts.commission));
         params.put("otrosIngresos", df.format(discounts.otherIncome));
         Double iue, it,porcentageIUE;
         RawMaterialPayRoll rawMaterialPayRoll =  rawMaterialPayRollService.getTotalsRawMaterialPayRoll(startDate,endDate,null,null);

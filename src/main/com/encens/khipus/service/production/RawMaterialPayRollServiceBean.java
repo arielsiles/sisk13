@@ -181,6 +181,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         Double totalRetention = 0.0;
         Double totalAlcohol = 0.0;
         Double totalConcentrated = 0.0;
+        Double totalCommission = 0.0;
         Double totalCredit = 0.0;
         Double totalVeterinary = 0.0;
         Double totalYogurt = 0.0;
@@ -240,6 +241,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             totalCredit += discount.getCredit();
             totalAlcohol += discount.getAlcohol();
             totalConcentrated += discount.getConcentrated();
+            totalCommission += discount.getCommission();
             totalVeterinary += discount.getVeterinary();
             totalYogurt += discount.getYogurt();
             totalCans += discount.getCans();
@@ -264,6 +266,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         totalCredit = RoundUtil.getRoundValue(totalCredit, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalAlcohol = RoundUtil.getRoundValue(totalAlcohol, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalConcentrated = RoundUtil.getRoundValue(totalConcentrated, 2, RoundUtil.RoundMode.SYMMETRIC);
+        totalCommission = RoundUtil.getRoundValue(totalCommission, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalVeterinary = RoundUtil.getRoundValue(totalVeterinary, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalYogurt = RoundUtil.getRoundValue(totalYogurt, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalCans = RoundUtil.getRoundValue(totalCans, 2, RoundUtil.RoundMode.SYMMETRIC);
@@ -292,6 +295,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         rawMaterialPayRoll.setTotalAdjustmentByGAB(totalAdjustment);
         rawMaterialPayRoll.setTotalOtherIncomeByGAB(totalIncome);
         rawMaterialPayRoll.setTotalGA(totalGA);
+        rawMaterialPayRoll.setTotalCommission(totalCommission);
         return rawMaterialPayRoll;
     }
 
@@ -380,6 +384,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             boletaPagoProductor.setCi((String)dato[20]);
             boletaPagoProductor.setDescuentoGA((Double)dato[21]);
             boletaPagoProductor.setNumerocuenta((String)dato[22]);
+            boletaPagoProductor.setComision((Double)dato[23]);
 
             boletaPagoProductors.add(boletaPagoProductor);
         }
@@ -474,7 +479,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " rawMaterialPayRecord.discountReserve, " +
                 " rawMaterialProducer.idNumber, " +
                 " rawMaterialPayRecord.discountGA, " +
-                " rawMaterialProducer.accountNumber " +
+                " rawMaterialProducer.accountNumber, " +
+                " rawMaterialProducerDiscount.commission " +
                 " FROM RawMaterialPayRoll rawMaterialPayRoll " +
                 " inner join RawMaterialPayRoll.rawMaterialPayRecordList rawMaterialPayRecord " +
                 " inner join rawMaterialPayRecord.rawMaterialProducerDiscount rawMaterialProducerDiscount " +
@@ -648,7 +654,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discounts.otherDiscount = ((Double) datas.get(0)[11] != null) ? ((Double) datas.get(0)[11]).doubleValue() : 0.0;
             discounts.otherIncome = ((Double) datas.get(0)[12] != null) ? ((Double) datas.get(0)[12]).doubleValue() : 0.0;
             discounts.adjustment = ((Double) datas.get(0)[13] != null) ? ((Double) datas.get(0)[13]).doubleValue() : 0.0;
-            discounts.unitPrice = ((Double) datas.get(0)[14] != null) ? ((Double) datas.get(0)[14]).doubleValue() : 0.0;
+            discounts.commission = ((Double) datas.get(0)[14] != null) ? ((Double) datas.get(0)[14]).doubleValue() : 0.0;
+            discounts.unitPrice = ((Double) datas.get(0)[15] != null) ? ((Double) datas.get(0)[15]).doubleValue() : 0.0;
         } else {
             discounts.mount = 0.0;
             discounts.collected = 0.0;
@@ -665,6 +672,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discounts.otherIncome = 0.0;
             discounts.adjustment = 0.0;
             discounts.unitPrice = 0.0;
+            discounts.commission = 0.0;
         }
 
         return discounts;
@@ -1215,6 +1223,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         public Double liquid;
         public Double retention;
         public Double otherDiscount;
+        public Double commission;
         public Double otherIncome;
         public Double adjustment;
     }
@@ -1261,6 +1270,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             totalDiscount += discount.getVeterinary();
             totalDiscount += discount.getYogurt();
             totalDiscount += discount.getOtherDiscount();
+            totalDiscount += discount.getCommission();
             double liquidPayable = record.getEarnedMoney() - totalDiscount + discount.getOtherIncoming() - record.getDiscountGA();
             totalLiquidPay += liquidPayable;
             record.setLiquidPayable(RoundUtil.getRoundValue(liquidPayable, 2, RoundUtil.RoundMode.SYMMETRIC));
@@ -1309,6 +1319,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             rawMaterialPayRoll.setIt((Double) (datas.get(0)[17]));
             rawMaterialPayRoll.setTaxRate((Double) (datas.get(0)[18]));
             rawMaterialPayRoll.setTotalGA((Double) (datas.get(0)[19]));
+            rawMaterialPayRoll.setTotalCommission((Double) (datas.get(0)[20]));
         } catch (Exception e) {
             log.debug("Not found totals RawMaterialPayRoll...." + e);
         }
@@ -1340,7 +1351,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " rawMaterialPayRoll.iue, " +
                 " rawMaterialPayRoll.it, " +
                 " rawMaterialPayRoll.taxRate, " +
-                " sum(rawMaterialPayRoll.totalGA) " +
+                " sum(rawMaterialPayRoll.totalGA), " +
+                " sum(rawMaterialPayRoll.totalCommission) " +
                 "from RawMaterialPayRoll rawMaterialPayRoll " +
                 "where rawMaterialPayRoll.startDate = :startDate " +
                 "and rawMaterialPayRoll.endDate <=  :endDate"

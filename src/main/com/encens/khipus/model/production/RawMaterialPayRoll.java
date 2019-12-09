@@ -135,6 +135,7 @@ import java.util.List;
                         " sum(rawMaterialPayRoll.totalOtherDiscountByGAB) as totalOtherDiscount, " +
                         " sum(rawMaterialPayRoll.totalOtherIncomeByGAB) as totalOtherIncome, " +
                         " sum(rawMaterialPayRoll.totalAdjustmentByGAB) as totalAdjustment, " +
+                        " sum(rawMaterialPayRoll.totalCommission) as totalCommission, " +
                         " rawMaterialPayRoll.unitPrice as unitPrice " +
                         "from RawMaterialPayRoll rawMaterialPayRoll " +
                         "where rawMaterialPayRoll.startDate = :startDate " +
@@ -303,6 +304,9 @@ public class RawMaterialPayRoll implements BaseModel {
 
     @Column(name = "TOTALDESCUENTORESERVA", columnDefinition = "DECIMAL(16,2)", nullable = true)
     private double totalReserveDicount = 0.0;
+
+    @Column(name = "TOTALCOMISION", columnDefinition = "DECIMAL(16,2)", nullable = true)
+    private double totalCommission = 0.0;
 
     @Column(name = "TOTALGA", columnDefinition = "DECIMAL(16,2)", nullable = true)
     private double totalGA = 0.0;
@@ -556,5 +560,13 @@ public class RawMaterialPayRoll implements BaseModel {
 
     public void setTotalGA(double totalGA) {
         this.totalGA = totalGA;
+    }
+
+    public double getTotalCommission() {
+        return totalCommission;
+    }
+
+    public void setTotalCommission(double totalCommission) {
+        this.totalCommission = totalCommission;
     }
 }
