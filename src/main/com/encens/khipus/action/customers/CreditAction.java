@@ -197,6 +197,12 @@ public class CreditAction extends GenericAction<Credit> {
     }
 
 
+    /**
+     * Calcula la cuota siguiente a la fecha dada, segun su plan de pagos
+     * @param credit
+     * @param date
+     * @return
+     */
     public Integer findNextQuotaOfPaymentPlan(Credit credit, Date date){
 
         Integer result = 0;

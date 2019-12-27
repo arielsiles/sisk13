@@ -704,15 +704,23 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         cal.setTime(lastPaymentDate);
         lastPaymentDate = cal.getTime();
 
-        Integer nextQuota = creditAction.findNextQuotaOfPaymentPlan(credit, currentPaymentDate);
-        BigDecimal totalToPay = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(nextQuota));
+        Integer nextQuota = creditAction.findNextQuotaOfPaymentPlan(credit, currentPaymentDate); // Calcula la cuota siguiente a la fecha dada, segun su plan de pagos
+        Integer prevQuota = nextQuota-1;
+
+        BigDecimal totalToPay     = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(nextQuota));
+        BigDecimal totalToPayPrev = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(prevQuota));
+
         if (nextQuota.compareTo(credit.getNumberQuota()) == 0) totalToPay = credit.getAmount(); // Si es la ultima cuota. En algunos creditos la ultima cuota varia
 
-        BigDecimal totalPaid  = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance());
-        BigDecimal capital    = BigDecimalUtil.subtract(totalToPay, totalPaid);
+        BigDecimal totalPaid   = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance()); // Total pagado
+        BigDecimal capital     = BigDecimalUtil.subtract(totalToPay, totalPaid);
+        BigDecimal capitalPrev = BigDecimalUtil.subtract(totalToPayPrev, totalPaid);
 
         System.out.println("====> NEXT QUOTA: " + nextQuota + " - Total Pagar: " + totalToPay + " - Total Pagado: " + totalPaid);
         System.out.println("====> CAPITAL: " + capital);
+
+        if (capitalPrev.compareTo(BigDecimal.ZERO) > 0) // si la cuota previa no esta pagada
+            capital = capitalPrev;
 
         return capital;
     }
