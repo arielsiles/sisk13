@@ -699,6 +699,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Date currentPaymentDate = this.dateTransaction;
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
+        Date nextPaymentDate = creditAction.findNextDateOfPaymentPlan(credit, currentPaymentDate);
+        System.out.println("====> NEXT DATE AT DATE: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
+
         Date lastPaymentDate = creditTransactionService.findLastPaymentEndPeriod(credit, currentPaymentDate); //Ultimo pago realizado antes de la fecha
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastPaymentDate);
@@ -719,7 +722,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         System.out.println("====> NEXT QUOTA: " + nextQuota + " - Total Pagar: " + totalToPay + " - Total Pagado: " + totalPaid);
         System.out.println("====> CAPITAL: " + capital);
 
-        if (capitalPrev.compareTo(BigDecimal.ZERO) > 0) // si la cuota previa no esta pagada
+        if (capitalPrev.compareTo(BigDecimal.ZERO) > 0 && currentPaymentDate.compareTo(nextPaymentDate) < 0) // si la cuota previa no esta pagada
             capital = capitalPrev;
 
         return capital;

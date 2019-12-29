@@ -165,7 +165,7 @@ public class CreditAction extends GenericAction<Credit> {
     }
 
     /**
-     * Calcula
+     * Calcula la fecha siguiente de pago, posterior a las cuotas pagadas (revision ???)
      * @param credit
      * @param endPeriod
      * @return
@@ -211,6 +211,26 @@ public class CreditAction extends GenericAction<Credit> {
             Date planDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
             if (planDate.compareTo(date) >= 0 ){
                 result = paymentPlanData.getNro();
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Calcula la fecha de la cuota siguiente a la fecha dada, segun su plan de pagos
+     * @param credit
+     * @param date
+     * @return
+     */
+    public Date findNextDateOfPaymentPlan(Credit credit, Date date){
+
+        Date result = date;
+        Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
+        for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas){
+            Date planDate = DateUtils.parse(paymentPlanData.getPaymentDate(), "dd/MM/yyyy");
+            if (planDate.compareTo(date) >= 0 ){
+                result = planDate;
                 break;
             }
         }
