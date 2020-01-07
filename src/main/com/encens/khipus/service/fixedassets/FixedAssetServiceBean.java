@@ -323,6 +323,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             }
 
             for (FixedAsset fixedAsset : actualFixedAssetList) {
+                System.out.println(" ---> AF: " + fixedAsset.getFullName());
                 /*Adjust of the original value*/
                 adjust(fixedAsset.getFixedAssetSubGroup().getOriginalValueCashAccount(), fixedAsset.getUfvOriginalValue(),
                         lastDayOfMonthUfvExchangeRate, fixedAsset.getLastBsUfvRate(),
@@ -330,6 +331,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         adjustmentForInflationCashAccount, true, businessUnitAdjustVoucherMappings);
                 /*Adjust of the accumulatedDepreciation if exists*/
                 if (fixedAsset.getAcumulatedDepreciation() != null && fixedAsset.getAcumulatedDepreciation().compareTo(BigDecimal.ZERO) > 0) {
+                    System.out.println(" ---> AF: " + fixedAsset.getFullName());
                     adjust(fixedAsset.getFixedAssetSubGroup().getAccumulatedDepreciationCashAccount(), fixedAsset.getAcumulatedDepreciation(),
                             lastDayOfMonthUfvExchangeRate, fixedAsset.getLastBsUfvRate(),
                             fixedAsset.getCostCenter(), fixedAsset.getBusinessUnit(),
