@@ -276,11 +276,12 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
         /*check current date, do not depreciate if current is less than module date*/
         // check if current date is after depreciation month of the module
         boolean isDateAfterFixedAssetProcessMonthDate = fixedAssetMonthProcessService.isDateAfterFixedAssetMothProcess(new Date());
+        /* Comment only for test
         if (!isDateAfterFixedAssetProcessMonthDate) {
-            /*shows a message with a message like the depreciation is not yet applicable because you are still in an earlier date*/
+            *//*shows a message with a message like the depreciation is not yet applicable because you are still in an earlier date*//*
             throw new OutOfDateException(
                     "The Actual date should be after the last day of the month in process");
-        }
+        }*/
 
         /* adjust all the fixedAssets in TDP state whose adjustDate is different to firstDayOfCurrentProcessMonth*/
         List<FixedAsset> totallyDepreciatedFixedAssetList = findTdpFixedAssetsToAdjust(FixedAssetState.TDP, firstDayOfCurrentProcessMonth);
@@ -324,6 +325,10 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
 
             for (FixedAsset fixedAsset : actualFixedAssetList) {
                 System.out.println(" ---> AF: " + fixedAsset.getFullName());
+                System.out.println("-------------> lastDayOfMonthUfvExchangeRate: " + lastDayOfMonthUfvExchangeRate);
+                System.out.println("-------------> fixedAsset.getLastBsUfvRate(): " + fixedAsset.getLastBsUfvRate());
+                System.out.println("");
+
                 /*Adjust of the original value*/
                 adjust(fixedAsset.getFixedAssetSubGroup().getOriginalValueCashAccount(), fixedAsset.getUfvOriginalValue(),
                         lastDayOfMonthUfvExchangeRate, fixedAsset.getLastBsUfvRate(),
@@ -331,12 +336,13 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         adjustmentForInflationCashAccount, true, businessUnitAdjustVoucherMappings);
                 /*Adjust of the accumulatedDepreciation if exists*/
                 if (fixedAsset.getAcumulatedDepreciation() != null && fixedAsset.getAcumulatedDepreciation().compareTo(BigDecimal.ZERO) > 0) {
-                    System.out.println(" ---> AF: " + fixedAsset.getFullName());
+
                     adjust(fixedAsset.getFixedAssetSubGroup().getAccumulatedDepreciationCashAccount(), fixedAsset.getAcumulatedDepreciation(),
                             lastDayOfMonthUfvExchangeRate, fixedAsset.getLastBsUfvRate(),
                             fixedAsset.getCostCenter(), fixedAsset.getBusinessUnit(),
                             adjustmentForInflationCashAccount, false, businessUnitAdjustVoucherMappings);
                 }
+
                 fixedAsset.setLastBsUfvRate(lastDayOfMonthUfvExchangeRate);
                 fixedAsset.setLastBsSusRate(lastDayOfMonthSusExchangeRate);
 
