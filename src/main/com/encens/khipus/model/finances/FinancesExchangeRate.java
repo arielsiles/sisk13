@@ -19,6 +19,8 @@ import java.math.BigDecimal;
                 @NamedQuery(name = "FinancesExchangeRate.countFinancesExchangeRate", query = "select count(o.id) from FinancesExchangeRate o "),
                 @NamedQuery(name = "FinancesExchangeRate.findExchangeRateByDateByCurrency", query = "select o from FinancesExchangeRate o " +
                         "where o.exchangeKind=:exchangeKind and o.id.date=:date"),
+                @NamedQuery(name = "FinancesExchangeRate.findExchangeRateByDateByCurrencyByID", query = "select o from FinancesExchangeRate o " +
+                        "where o.exchangeKind=:exchangeKind and o.id.date=:date"),
                 @NamedQuery(name = "FinancesExchangeRate.findLastDateByFinancesCurrency", query = "select max(o.id.date) from FinancesExchangeRate o " +
                         "where o.exchangeKind=:exchangeKind "),
                 @NamedQuery(name = "FinancesExchangeRate.findLastFinancesExchangeRateDate4SusBs",

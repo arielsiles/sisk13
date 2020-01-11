@@ -381,7 +381,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         fixedAsset.getCostCenter(),
                         fixedAsset.getFixedAssetSubGroup().getExpenseCashAccount(),
                         VoucherDetailType.DEBIT,
-                        BigDecimalUtil.multiply(depreciate, lastDayOfMonthUfvExchangeRate));
+                        //BigDecimalUtil.multiply(depreciate, lastDayOfMonthUfvExchangeRate)
+                        depreciate);
 
                 // accumulates into the corresponding mapping entry the voucher detail amount
                 putInBusinessUnitVoucherMappings(businessUnitDepreciationVoucherMappings,
@@ -389,20 +390,23 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         fixedAsset.getCostCenter(),
                         fixedAsset.getFixedAssetSubGroup().getAccumulatedDepreciationCashAccount(),
                         VoucherDetailType.CREDIT,
-                        BigDecimalUtil.multiply(depreciate, lastDayOfMonthUfvExchangeRate));
+                        //BigDecimalUtil.multiply(depreciate, lastDayOfMonthUfvExchangeRate)
+                        depreciate);
             }
 
             // create the vouchers for depreciation
             if (businessUnitDepreciationVoucherMappings.size() > 0) {
-                Voucher depreciationVoucher = createVoucherByDetailMappings(businessUnitDepreciationVoucherMappings, gloss);
+                Voucher depreciationVoucher = createVoucherByDetailMappings(businessUnitDepreciationVoucherMappings, gloss + " al " + DateUtils.format(lastDayOfCurrentProcessMonth, "dd/MM/yyyy"));
                 //voucherService.create(depreciationVoucher);
                 voucherAccoutingService.saveVoucher(depreciationVoucher);
             }
+
+            /* UNCOMMENT ASIENTO AJUSTE POR INFLACION DE TENENCIA
             if (businessUnitAdjustVoucherMappings.size() > 0) {
                 Voucher adjustVoucher = createVoucherByDetailMappings(businessUnitAdjustVoucherMappings, messages.get("FixedAsset.adjustGloss"));
                 //voucherService.create(adjustVoucher);
                 voucherAccoutingService.saveVoucher(adjustVoucher);
-            }
+            }*/
 
             /*set depreciated size*/
             result.set(0, actualFixedAssetList.size());
@@ -1125,10 +1129,21 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     }
 
     private BigDecimal depreciationCandidate(FixedAsset fixedAsset) {
-        return BigDecimalUtil.divide(
+        /*return BigDecimalUtil.divide(
                 BigDecimalUtil.multiply(
                         BigDecimalUtil.sum(
                                 fixedAsset.getUfvOriginalValue(),
+                                fixedAsset.getImprovement()
+                        ),
+                        fixedAsset.getDepreciationRate()
+                ),
+                BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER)
+        );*/
+
+        return BigDecimalUtil.divide(
+                BigDecimalUtil.multiply(
+                        BigDecimalUtil.sum(
+                                fixedAsset.getBsOriginalValue(),
                                 fixedAsset.getImprovement()
                         ),
                         fixedAsset.getDepreciationRate()
@@ -1140,10 +1155,20 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
 
     private BigDecimal residualCandidate(FixedAsset fixedAsset) {
         /*(VO+MEJ)-DEP_ACUM-DESHECHO*/
-        return BigDecimalUtil.subtract(
+        /*return BigDecimalUtil.subtract(
                 BigDecimalUtil.subtract(
                         BigDecimalUtil.sum(
                                 fixedAsset.getUfvOriginalValue(),
+                                fixedAsset.getImprovement()
+                        ),
+                        fixedAsset.getAcumulatedDepreciation()
+                ),
+                fixedAsset.getRubbish()
+        );*/
+        return BigDecimalUtil.subtract(
+                BigDecimalUtil.subtract(
+                        BigDecimalUtil.sum(
+                                fixedAsset.getBsOriginalValue(),
                                 fixedAsset.getImprovement()
                         ),
                         fixedAsset.getAcumulatedDepreciation()
@@ -1188,7 +1213,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     }
 
     public void fillFixedAssetDefaultValues(FixedAsset fixedAsset) {
-        fixedAsset.setCurrencyType(FinancesCurrencyType.U);
+        //fixedAsset.setCurrencyType(FinancesCurrencyType.U);
+        fixedAsset.setCurrencyType(FinancesCurrencyType.P);
         fixedAsset.setAcumulatedDepreciation(BigDecimal.ZERO);
         fixedAsset.setImprovement(BigDecimal.ZERO);
         fixedAsset.setDepreciation(BigDecimal.ZERO);
@@ -1218,7 +1244,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
         fixedAssetMovement.setMovementDate(new Date());
         fixedAssetMovement.setCreationDate(new Date());
         fixedAssetMovement.setState(FixedAssetMovementState.APR);
-        fixedAssetMovement.setCurrency(FinancesCurrencyType.U);
+        //fixedAssetMovement.setCurrency(FinancesCurrencyType.U);
+        fixedAssetMovement.setCurrency(FinancesCurrencyType.P);
         fixedAssetMovement.setUserNumber(financesUserService.getFinancesUserCode());
         fixedAssetMovement.setFixedAsset(fixedAsset);
     }

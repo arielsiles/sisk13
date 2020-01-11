@@ -699,25 +699,34 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         Date currentPaymentDate = this.dateTransaction;
         currentPaymentDate = DateUtils.removeTime(currentPaymentDate);
 
-        Date nextPaymentDate = creditAction.findNextDateOfPaymentPlan(credit, currentPaymentDate);
-        System.out.println("====> NEXT DATE AT DATE: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
+        Date nextPaymentDate = creditAction.findNextDateOfPaymentPlan(credit, currentPaymentDate); //Fecha de la cuota siguiente a la fecha dada, segun su plan de pagos
+        System.out.println("====> NEXT DATE AT CURRENT DATE: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy"));
 
         Date lastPaymentDate = creditTransactionService.findLastPaymentEndPeriod(credit, currentPaymentDate); //Ultimo pago realizado antes de la fecha
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastPaymentDate);
         lastPaymentDate = cal.getTime();
 
-        Integer nextQuota = creditAction.findNextQuotaOfPaymentPlan(credit, currentPaymentDate); // Calcula la cuota siguiente a la fecha dada, segun su plan de pagos
+        Integer nextQuota = creditAction.findNextQuotaOfPaymentPlan(credit, currentPaymentDate); //Cuota siguiente a la fecha dada, segun su plan de pagos
         Integer prevQuota = nextQuota-1;
 
         BigDecimal totalToPay     = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(nextQuota));
         BigDecimal totalToPayPrev = BigDecimalUtil.multiply(credit.getQuota(), BigDecimalUtil.toBigDecimal(prevQuota));
 
-        if (nextQuota.compareTo(credit.getNumberQuota()) == 0) totalToPay = credit.getAmount(); // Si es la ultima cuota. En algunos creditos la ultima cuota varia
+        if (nextQuota.compareTo(credit.getNumberQuota()) == 0) totalToPay = credit.getAmount(); // Si es la ultima cuota. En algunos creditos la ultima cuota varia (revisar para ultimas cuotas ¿?)
 
         BigDecimal totalPaid   = BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance()); // Total pagado
         BigDecimal capital     = BigDecimalUtil.subtract(totalToPay, totalPaid);
         BigDecimal capitalPrev = BigDecimalUtil.subtract(totalToPayPrev, totalPaid);
+
+        /** Casos: Si total pagado es mayor al total a pagar **/
+        if (totalPaid.compareTo(totalToPay) >= 0){
+            if (credit.getCapitalBalance().compareTo(credit.getQuota()) >= 0) // Si el saldo capital es mayor a la cuota
+                capital = credit.getQuota();
+            else
+                capital = credit.getCapitalBalance();
+        }
+
 
         System.out.println("====> NEXT QUOTA: " + nextQuota + " - Total Pagar: " + totalToPay + " - Total Pagado: " + totalPaid);
         System.out.println("====> CAPITAL: " + capital);
