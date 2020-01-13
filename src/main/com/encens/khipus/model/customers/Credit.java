@@ -48,6 +48,10 @@ public class Credit implements BaseModel {
     @Enumerated(EnumType.STRING)
     private CreditState state;
 
+    @Column(name = "ue", nullable = true, length = 3)
+    @Enumerated(EnumType.STRING)
+    private CreditState lastState;
+
     @Column(name = "codigo", nullable = false, length = 25)
     @Length(max = 25)
     private String code;
@@ -307,5 +311,13 @@ public class Credit implements BaseModel {
 
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public CreditState getLastState() {
+        return lastState;
+    }
+
+    public void setLastState(CreditState lastState) {
+        this.lastState = lastState;
     }
 }

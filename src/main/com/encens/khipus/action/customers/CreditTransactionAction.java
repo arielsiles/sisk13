@@ -159,6 +159,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditItem.setCapitalBalance(capitalBalance);
         creditItem.setLastPayment(dateTransaction);
 
+        if (capitalBalance.compareTo(BigDecimal.ZERO) == 0) {
+            creditItem.setLastState(creditItem.getState());
+            creditItem.setState(CreditState.FIN);
+        }
+
         creditTransactionService.createCreditTransactionPayFee(creditItem, creditTransaction);
 
         if (getTransferSaving())
