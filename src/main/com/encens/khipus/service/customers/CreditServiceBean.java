@@ -122,4 +122,10 @@ public class CreditServiceBean implements CreditService {
         return  creditList;
     }
 
+    @Override
+    public void updateCredit(Credit credit) {
+        em.merge(credit);
+        em.flush();
+    }
+
 }

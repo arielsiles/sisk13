@@ -29,4 +29,5 @@ public interface CreditService {
     List<Credit> getCredits(CreditState creditState, CreditType creditType);
     void changeCreditState(Credit credit, CreditState state);
     List<Credit> getCreditList(Partner partner);
+    void updateCredit(Credit credit);
 }
