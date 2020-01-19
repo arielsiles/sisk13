@@ -93,6 +93,8 @@ public class FinancesExchangeRateServiceBean extends GenericServiceBean implemen
     public FinancesExchangeRate findFinancesExchangeRateByFinancesCurrencyByDate(ExchangeKind exchangeKind, Date date) throws FinancesExchangeRateNotFoundException {
         try {
             Query query = getEntityManager().createNamedQuery("FinancesExchangeRate.findExchangeRateByDateByCurrency");
+            System.out.println("---------------------> exchangeKind: " + exchangeKind.getId());
+            System.out.println("---------------------> date: " + date);
             query.setParameter("exchangeKind", exchangeKind);
             query.setParameter("date", date);
             return (FinancesExchangeRate) query.getSingleResult();

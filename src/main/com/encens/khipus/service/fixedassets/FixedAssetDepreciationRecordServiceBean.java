@@ -34,30 +34,24 @@ public class FixedAssetDepreciationRecordServiceBean extends GenericServiceBean 
         Calendar currentDate = Calendar.getInstance();
         FixedAssetDepreciationRecord fixedAssetDepreciationRecord = new FixedAssetDepreciationRecord();
         fixedAssetDepreciationRecord.setFixedAsset(fixedAsset);
-        fixedAssetDepreciationRecord.setCurrency(FinancesCurrencyType.U);
+        fixedAssetDepreciationRecord.setCurrency(FinancesCurrencyType.P);
         fixedAssetDepreciationRecord.setAcumulatedDepreciation(fixedAsset.getAcumulatedDepreciation());
         fixedAssetDepreciationRecord.setBsAccumulatedDepreciation(
-                BigDecimalUtil.multiply(
-                        fixedAsset.getAcumulatedDepreciation(),
-                        lastDayOfMonthUfvExchangeRate
-                )
+                //BigDecimalUtil.multiply(fixedAsset.getAcumulatedDepreciation(), lastDayOfMonthUfvExchangeRate)
+                fixedAsset.getAcumulatedDepreciation()
         );
         fixedAssetDepreciationRecord.setCostCenterCode(fixedAsset.getCostCenterCode());
         fixedAssetDepreciationRecord.setCustodian(fixedAsset.getCustodianJobContract().getContract().getEmployee());
         fixedAssetDepreciationRecord.setDepreciation(fixedAsset.getDepreciation());
         fixedAssetDepreciationRecord.setBsDepreciation(
-                BigDecimalUtil.multiply(
-                        fixedAsset.getDepreciation(),
-                        lastDayOfMonthUfvExchangeRate
-                )
+                //BigDecimalUtil.multiply(fixedAsset.getDepreciation(), lastDayOfMonthUfvExchangeRate)
+                fixedAsset.getDepreciation()
         );
         fixedAssetDepreciationRecord.setDepreciationRate(fixedAsset.getDepreciationRate());
         fixedAssetDepreciationRecord.setBusinessUnit(fixedAsset.getBusinessUnit());
         fixedAssetDepreciationRecord.setTotalValue(
-                BigDecimalUtil.sum(
-                        fixedAsset.getUfvOriginalValue(),
-                        fixedAsset.getImprovement()
-                )
+                //BigDecimalUtil.sum(fixedAsset.getUfvOriginalValue(), fixedAsset.getImprovement())
+                BigDecimalUtil.sum(fixedAsset.getBsOriginalValue(), fixedAsset.getImprovement())
         );
         Calendar lastDay = DateUtils.toDateCalendar(lastDayOfCurrentProcessMonth);
         fixedAssetDepreciationRecord.setProcessDate(lastDay.getTime());

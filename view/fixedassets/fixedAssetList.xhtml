@@ -348,7 +348,7 @@
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
-                <app:commandSortHeader sortProperty="fixedAsset.ufvOriginalValue"
+                <app:commandSortHeader sortProperty="fixedAsset.bsOriginalValue"
                                        dataModel="#{fixedAssetDataModel}"
                                        reRender="fixedAssetList, dataScroller">
                     #{messages['FixedAsset.originalValue']}
@@ -401,10 +401,10 @@
         </h:outputText>
     </rich:column>
     <rich:column styleClass="right">
-        <h:outputText value="#{fixedAssetItem.ufvOriginalValue}">
+        <h:outputText value="#{fixedAssetItem.bsOriginalValue}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
-        <h:outputText value=" #{messages[fixedAssetItem.currencyType.resourceKey]}"/>
+        <h:outputText value=" #{messages[fixedAssetItem.currencyType.symbolResourceKey]}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{messages[fixedAssetItem.state.resourceKey]}"/>
