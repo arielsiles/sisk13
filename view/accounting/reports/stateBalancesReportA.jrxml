@@ -26,7 +26,7 @@
 	<field name="totalCredit" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
 	</field>
-	<field name="type" class="java.lang.String">
+	<field name="type" class="com.encens.khipus.model.finances.CashAccountType">
 		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
 	</field>
 	<variable name="totalCredit" class="java.math.BigDecimal" calculation="Sum">
@@ -51,16 +51,16 @@
 		<variableExpression><![CDATA[$V{creditBalance}]]></variableExpression>
 	</variable>
 	<variable name="activeB" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[($V{debitBalance}.doubleValue() > $V{creditBalance}.doubleValue()) && ( $F{type}.equals("A") || $F{type}.equals("P") || $F{type}.equals("C") ) ? $V{debitBalance} : (new BigDecimal("0.00"))]]></variableExpression>
+		<variableExpression><![CDATA[($V{debitBalance}.doubleValue() > $V{creditBalance}.doubleValue()) && ( $F{type}.toString().equals("A") || $F{type}.toString().equals("P") || $F{type}.toString().equals("C") ) ? $V{debitBalance} : (new BigDecimal("0.00"))]]></variableExpression>
 	</variable>
 	<variable name="passiveB" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[($V{creditBalance}.doubleValue() > $V{debitBalance}.doubleValue()) && ( $F{type}.equals("A") || $F{type}.equals("P") || $F{type}.equals("C") ) ? $V{creditBalance} : (new BigDecimal("0.00"))]]></variableExpression>
+		<variableExpression><![CDATA[($V{creditBalance}.doubleValue() > $V{debitBalance}.doubleValue()) && ( $F{type}.toString().equals("A") || $F{type}.toString().equals("P") || $F{type}.toString().equals("C") ) ? $V{creditBalance} : (new BigDecimal("0.00"))]]></variableExpression>
 	</variable>
 	<variable name="egressB" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[($V{debitBalance}.doubleValue() > $V{creditBalance}.doubleValue()) && ( $F{type}.equals("E") || $F{type}.equals("I") ) ? $V{debitBalance} : (new BigDecimal("0.00"))]]></variableExpression>
+		<variableExpression><![CDATA[($V{debitBalance}.doubleValue() > $V{creditBalance}.doubleValue()) && ( $F{type}.toString().equals("E") || $F{type}.toString().equals("I") ) ? $V{debitBalance} : (new BigDecimal("0.00"))]]></variableExpression>
 	</variable>
 	<variable name="incomeB" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[($V{creditBalance}.doubleValue() > $V{debitBalance}.doubleValue()) && ( $F{type}.equals("I") || $F{type}.equals("E") ) ? $V{creditBalance} : (new BigDecimal("0.00"))]]></variableExpression>
+		<variableExpression><![CDATA[($V{creditBalance}.doubleValue() > $V{debitBalance}.doubleValue()) && ( $F{type}.toString().equals("I") || $F{type}.toString().equals("E") ) ? $V{creditBalance} : (new BigDecimal("0.00"))]]></variableExpression>
 	</variable>
 	<variable name="totalActiveB" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{activeB}]]></variableExpression>

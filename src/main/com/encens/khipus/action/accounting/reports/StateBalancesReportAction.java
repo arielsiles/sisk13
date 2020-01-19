@@ -4,9 +4,11 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.reports.ReportFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -43,7 +45,8 @@ public class StateBalancesReportAction extends GenericReportAction {
     private VoucherService voucherService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
-
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @Create
     public void init() {
@@ -77,6 +80,14 @@ public class StateBalancesReportAction extends GenericReportAction {
     }
 
     public void generateReport() {
+
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {e.printStackTrace();}
+
+        String companyTitle = companyConfiguration.getTitle();
+        String subTitle = companyConfiguration.getSubTitle();
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String start = df.format(startDate);
