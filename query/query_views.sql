@@ -55,17 +55,17 @@ where e.estado <> 'ANL'
 
 -- 4. VISTA VENTAS union al contado y a credito (lacteos U veterinarios)
 create or replace view ventas as
-	select p.`FECHA_ENTREGA` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
+	select p.`FECHA_ENTREGA` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
 	from articulos_pedido ap
 	join pedidos p 	 on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
 	and p.estado <> 'ANULADO'
 	and ap.cod_art not in (480, 481) -- LAM
 	union
-	select v.`FECHA_PEDIDO` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
+	select v.`FECHA_PEDIDO` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	from articulos_pedido ap
 	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
 	and v.estado <> 'ANULADO'
-	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835)
+	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521)
 ;
 
 -- ----------------------------------------------------------------------
@@ -111,13 +111,13 @@ create or replace view `vmarcado` as
 select  `r`.`idrhmarcado` as `idrhmarcado`,
 	`r`.`marfecha` as `marfecha`,
 	`r`.`marperid` as `marperid`,
-	CONCAT(`r`.`marperid`,'') as `marreftarjeta`,
+	concat(`r`.`marperid`,'') as `marreftarjeta`,
 	`r`.`marhora` as `marhora`,
 	`r`.`control` as `control`,
 	`r`.`marippc` as `marippc`,
 	`r`.`descripcion` as `descripcion`,
 	'1' as `sede`,
-	CONCAT(`p`.`nombres`,' ',`p`.`apellidopaterno`,' ',`p`.`apellidomaterno`) as `nombre`
+	concat(`p`.`nombres`,' ',`p`.`apellidopaterno`,' ',`p`.`apellidomaterno`) as `nombre`
 from ((`rh_marcado` `r`  left join `empleado` `em`  on ((`r`.`marperid` = `em`.`codigomarcacion`)))
 left join `persona` `p`  on ((`em`.`idempleado` = `p`.`idpersona`)))
 where (`r`.`marfecha` >= '2018-08-01')
