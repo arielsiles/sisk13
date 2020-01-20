@@ -86,8 +86,9 @@ public class StateBalancesReportAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {e.printStackTrace();}
 
-        String companyTitle = companyConfiguration.getTitle();
-        String subTitle = companyConfiguration.getSubTitle();
+        String companyName = companyConfiguration.getCompanyName();
+        String systemName = companyConfiguration.getSystemName();
+        String locationName = companyConfiguration.getLocationName();
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String start = df.format(startDate);
@@ -101,6 +102,9 @@ public class StateBalancesReportAction extends GenericReportAction {
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
 
+        reportParameters.put("companyName", companyName);
+        reportParameters.put("systemName", systemName);
+        reportParameters.put("locationName", locationName);
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);

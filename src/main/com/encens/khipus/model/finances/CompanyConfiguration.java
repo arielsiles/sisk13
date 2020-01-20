@@ -44,6 +44,15 @@ public class CompanyConfiguration {
     @Column(name = "SUBTITULO")
     private String subTitle;
 
+    @Column(name = "COMPANIA")
+    private String companyName;
+
+    @Column(name = "SISTEMA")
+    private String systemName;
+
+    @Column(name = "lugar")
+    private String locationName;
+
     @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1246,5 +1255,29 @@ public class CompanyConfiguration {
 
     public void setFixedTermInterestNationalCurrency(CashAccount fixedTermInterestNationalCurrency) {
         this.fixedTermInterestNationalCurrency = fixedTermInterestNationalCurrency;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getSystemName() {
+        return systemName;
+    }
+
+    public void setSystemName(String systemName) {
+        this.systemName = systemName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }

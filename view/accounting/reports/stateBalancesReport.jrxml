@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="stateBalancesReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
-	<property name="ireport.zoom" value="3.797498335832444"/>
-	<property name="ireport.x" value="1107"/>
+	<property name="ireport.zoom" value="2.593742460100023"/>
+	<property name="ireport.x" value="482"/>
 	<property name="ireport.y" value="0"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
@@ -245,31 +248,38 @@
 	<title>
 		<band height="36" splitType="Stretch">
 			<frame>
-				<reportElement x="0" y="21" width="561" height="15"/>
+				<reportElement x="0" y="26" width="561" height="10"/>
 				<textField>
-					<reportElement x="178" y="0" width="215" height="15"/>
+					<reportElement x="178" y="0" width="215" height="10"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="10" isBold="true"/>
+						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>
-				<reportElement x="0" y="0" width="561" height="20"/>
-				<staticText>
-					<reportElement x="0" y="0" width="161" height="10"/>
-					<textElement>
-						<font fontName="Arial" size="8"/>
+				<reportElement x="0" y="0" width="561" height="27"/>
+				<textField>
+					<reportElement x="1" y="0" width="270" height="9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
 					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="9" width="161" height="10"/>
-					<textElement>
-						<font fontName="Arial" size="8"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="8" width="270" height="9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
 					</textElement>
-					<text><![CDATA[SISTEMA INTEGRADO CONTABLE]]></text>
-				</staticText>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="16" width="270" height="9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+				</textField>
 			</frame>
 		</band>
 	</title>
