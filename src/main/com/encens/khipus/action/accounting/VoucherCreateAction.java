@@ -231,6 +231,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void generateClosingResults(){
 
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
         this.voucher.setDate(endDate);
         this.voucher.setDocumentType(this.docType.getName());
         String number = voucherAccoutingService.getNextMaxNumberByDocType(this.docType.getName(), startDate, endDate).toString();
@@ -264,6 +273,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setDebit(creditBalance);
                 voucherDetail.setCredit(debitBalance);
                 voucherDetail.setAccount((String)data[0]);
+
+                CashAccount cashAccount = cashAccountService.findByAccountCode(voucherDetail.getAccount());
+                if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
+                    voucherDetail.setDebitMe(BigDecimalUtil.divide(voucherDetail.getDebit(), exchangeRate, 2));
+                    voucherDetail.setCreditMe(BigDecimalUtil.divide(voucherDetail.getCredit(), exchangeRate, 2));
+                    voucherDetail.setExchangeAmount(exchangeRate);
+                    voucherDetail.setCurrency(cashAccount.getCurrency());
+                }
+
                 voucher.getDetails().add(voucherDetail);
             }
 
@@ -285,8 +303,12 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherDetail.setAccount("3530100000"); /** MODIFYID **/
             voucher.getDetails().add(voucherDetail);
         }
-        if (totalCredit.compareTo(totalDebit) > 0){ /** Ganancia **/
-            /* todo */
+        if (totalCredit.compareTo(totalDebit) > 0){ /** Utilidades **/
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setDebit(BigDecimal.ZERO);
+            voucherDetail.setCredit(BigDecimalUtil.subtract(totalCredit, totalDebit, 2));
+            voucherDetail.setAccount("3510100000"); /** MODIFYID **/
+            voucher.getDetails().add(voucherDetail);
         }
 
         voucherAccoutingService.saveVoucher(voucher);
@@ -294,6 +316,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public void generateBalanceClosure(){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
 
         this.voucher.setDate(endDate);
         this.voucher.setDocumentType(this.docType.getName());
@@ -326,6 +357,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherDetail.setDebit(creditBalance);
                 voucherDetail.setCredit(debitBalance);
                 voucherDetail.setAccount((String)data[0]);
+
+                CashAccount cashAccount = cashAccountService.findByAccountCode(voucherDetail.getAccount());
+                if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
+                    voucherDetail.setDebitMe(BigDecimalUtil.divide(voucherDetail.getDebit(), exchangeRate, 2));
+                    voucherDetail.setCreditMe(BigDecimalUtil.divide(voucherDetail.getCredit(), exchangeRate, 2));
+                    voucherDetail.setExchangeAmount(exchangeRate);
+                    voucherDetail.setCurrency(cashAccount.getCurrency());
+                }
+
                 voucher.getDetails().add(voucherDetail);
             }
 
@@ -339,16 +379,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("===> TOTAL DEBE: " + totalDebit);
         System.out.println("===> TOTAL HABER: " + totalCredit);
         System.out.println("===> TOTAL DIFF: " + BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
-        /*if (totalDebit.compareTo(totalCredit) > 0){ // Perdida
-            VoucherDetail voucherDetail = new VoucherDetail();
-            voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
-            voucherDetail.setCredit(BigDecimal.ZERO);
-            voucherDetail.setAccount("3530100000");
-            voucher.getDetails().add(voucherDetail);
-        }
-        if (totalCredit.compareTo(totalDebit) > 0){ // Ganancia
-
-        }*/
 
         voucherAccoutingService.saveVoucher(voucher);
 
@@ -370,6 +400,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             newVoucherDetail.setAccount(voucherDetail.getAccount());
             newVoucherDetail.setDebit(voucherDetail.getCredit());
             newVoucherDetail.setCredit(voucherDetail.getDebit());
+
+            CashAccount cashAccount = cashAccountService.findByAccountCode(newVoucherDetail.getAccount());
+            if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
+                newVoucherDetail.setDebitMe(BigDecimalUtil.divide(newVoucherDetail.getDebit(), voucherDetail.getExchangeAmount(), 2));
+                newVoucherDetail.setCreditMe(BigDecimalUtil.divide(newVoucherDetail.getCredit(), voucherDetail.getExchangeAmount(), 2));
+                newVoucherDetail.setExchangeAmount(voucherDetail.getExchangeAmount());
+                newVoucherDetail.setCurrency(cashAccount.getCurrency());
+            }
+
+
             newVoucher.getDetails().add(newVoucherDetail);
         }
         voucherAccoutingService.saveVoucher(newVoucher);
