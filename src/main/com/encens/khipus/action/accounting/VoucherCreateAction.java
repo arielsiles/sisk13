@@ -400,16 +400,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             newVoucherDetail.setAccount(voucherDetail.getAccount());
             newVoucherDetail.setDebit(voucherDetail.getCredit());
             newVoucherDetail.setCredit(voucherDetail.getDebit());
-
+            BigDecimal exchangeRate = voucherDetail.getExchangeAmount();
             CashAccount cashAccount = cashAccountService.findByAccountCode(newVoucherDetail.getAccount());
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
-                newVoucherDetail.setDebitMe(BigDecimalUtil.divide(newVoucherDetail.getDebit(), voucherDetail.getExchangeAmount(), 2));
-                newVoucherDetail.setCreditMe(BigDecimalUtil.divide(newVoucherDetail.getCredit(), voucherDetail.getExchangeAmount(), 2));
-                newVoucherDetail.setExchangeAmount(voucherDetail.getExchangeAmount());
+                newVoucherDetail.setDebitMe(BigDecimalUtil.divide(newVoucherDetail.getDebit(), exchangeRate, 2));
+                newVoucherDetail.setCreditMe(BigDecimalUtil.divide(newVoucherDetail.getCredit(), exchangeRate, 2));
+                newVoucherDetail.setExchangeAmount(exchangeRate);
                 newVoucherDetail.setCurrency(cashAccount.getCurrency());
             }
-
-
             newVoucher.getDetails().add(newVoucherDetail);
         }
         voucherAccoutingService.saveVoucher(newVoucher);
