@@ -20,20 +20,6 @@
                     #{messages['Credit.report.creditStatus.title']}
                 </f:facet>
 
-                <s:decorate id="creditStateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.state']}</ui:define>
-                    <h:selectOneMenu id="creditState"
-                                     value="#{creditStatusReportAction.creditState}"
-                                     styleClass="input"
-                                     required="false"
-                                     tabindex="4">
-                        <s:selectItems value="#{creditStateEnum}" var="creditState" label="#{messages[creditState.resourceKey]}"
-                                       hideNoSelectionLabel="false"
-                                       noSelectionLabel=""/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>
-                </s:decorate>
-
                 <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
                     <h:selectOneMenu id="creditTypeId" value="#{creditStatusReportAction.creditType}"
@@ -49,16 +35,30 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="creditStateTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.state']}</ui:define>
+                    <h:selectOneMenu id="creditState"
+                                     value="#{creditStatusReportAction.creditState}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="4">
+                        <s:selectItems value="#{creditStateEnum}" var="creditState" label="#{messages[creditState.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="endPeriodDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.date']}</ui:define>
                     <rich:calendar id="endPeriodDate"
                                    value="#{creditStatusReportAction.endPeriodDate}"
                                    popup="true"
-                                   required="false"
+                                   required="true"
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
                                    enableManualInput="true"
-                                   tabindex="1">
+                                   tabindex="1" reRender="endPeriodDateField">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </rich:calendar>
                 </s:decorate>

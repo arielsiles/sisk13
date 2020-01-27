@@ -63,9 +63,13 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         Date nextPaymentDate = endPeriodDate;
         Long expiredDays = new Long(0);
         if (capitalBalance.doubleValue() > 0) {
-            interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
+
+            //if (credit.getState().equals(CreditState.VIG))
+                interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
+
             nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
 
+            /*
             if (expirationDate.compareTo(endPeriodDate) < 0)
                 expiredDays = DateUtils.differenceBetween(expirationDate, endPeriodDate, TimeUnit.DAYS) - 1;
             if (expirationDate.compareTo(endPeriodDate) > 0)
@@ -73,6 +77,8 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
 
             if (expiredDays <= 0)
                 expiredDays = BigDecimal.ZERO.longValue();
+            */
+            expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
 
         }
         System.out.println("===> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy") + " <===");

@@ -4,7 +4,6 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.model.customers.CreditState;
-import com.encens.khipus.model.customers.CreditTransactionType;
 import com.encens.khipus.model.customers.CreditType;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.DateUtils;
@@ -45,99 +44,16 @@ public class CreditStatusReportAction extends GenericReportAction {
     protected String getEjbql() {
 
         String ejbql = "";
+        String restrictions = "";
 
-        /*ejbql = " SELECT " +
-                " credit.state || ' - ' || creditType.name AS status," +
-                " credit.state," +
-                " creditType.name as creditTypeName," +
-                " productiveZone.name AS gabName," +
-                " partner.firstName," +
-                " partner.lastName," +
-                " partner.maidenName," +
-                " credit.grantDate," +
-                " credit.amount," +
-                " credit.capitalBalance," +
-                " credit.lastPayment" +
-                " FROM Credit credit" +
-                " LEFT JOIN credit.creditType creditType" +
-                " LEFT JOIN credit.partner partner" +
-                " LEFT JOIN partner.productiveZone productiveZone" +
-                " ORDER BY credit.state, creditType.name";
+        if (creditState != null)
+            restrictions += " AND credit.state = '" + creditState.toString() + "'";
+        if (creditType != null)
+            restrictions += " AND credit.creditType = " + creditType.getId();
 
-        if (creditState != null){
-
-            ejbql = " SELECT " +
-                    " credit.state || ' - ' || creditType.name AS status," +
-                    " credit.state," +
-                    " creditType.name as creditTypeName," +
-                    " productiveZone.name AS gabName," +
-                    " partner.firstName," +
-                    " partner.lastName," +
-                    " partner.maidenName," +
-                    " credit.grantDate," +
-                    " credit.amount," +
-                    " credit.capitalBalance," +
-                    " credit.lastPayment" +
-                    " FROM Credit credit" +
-                    " LEFT JOIN credit.creditType creditType" +
-                    " LEFT JOIN credit.partner partner" +
-                    " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE credit.state = '" + creditState.toString() +"'" +
-                    " ORDER BY credit.state, creditType.name";
-
-        }
-
-        if (creditType != null){
-
-            ejbql = " SELECT " +
-                    " credit.state || ' - ' || creditType.name AS status," +
-                    " credit.state," +
-                    " creditType.name as creditTypeName," +
-                    " productiveZone.name AS gabName," +
-                    " partner.firstName," +
-                    " partner.lastName," +
-                    " partner.maidenName," +
-                    " credit.grantDate," +
-                    " credit.amount," +
-                    " credit.capitalBalance," +
-                    " credit.lastPayment" +
-                    " FROM Credit credit" +
-                    " LEFT JOIN credit.creditType creditType" +
-                    " LEFT JOIN credit.partner partner" +
-                    " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE credit.creditType = " + creditType.getId() +
-                    " ORDER BY credit.state, creditType.name";
-
-        }
-
-        if (creditState != null && creditType != null){
-
-            ejbql = " SELECT " +
-                    " credit.state || ' - ' || creditType.name AS status," +
-                    " credit.state," +
-                    " creditType.name as creditTypeName," +
-                    " productiveZone.name AS gabName," +
-                    " partner.firstName," +
-                    " partner.lastName," +
-                    " partner.maidenName," +
-                    " credit.grantDate," +
-                    " credit.amount," +
-                    " credit.capitalBalance," +
-                    " credit.lastPayment" +
-                    " FROM Credit credit" +
-                    " LEFT JOIN credit.creditType creditType" +
-                    " LEFT JOIN credit.partner partner" +
-                    " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE credit.state = '" + creditState.toString() +"'" +
-                    " AND credit.creditType = " + creditType.getId() +
-                    " ORDER BY credit.state, creditType.name";
-
-        }*/
-
-        if (creditState != null && creditType != null && endPeriodDate != null){
-
+        //if (creditState != null && creditType != null && endPeriodDate != null){
+        if (endPeriodDate != null){
             String dateParam = DateUtils.format(this.endPeriodDate, "yyyy-MM-dd");
-
             ejbql = " SELECT " +
                     " credit.state || ' - ' || creditType.name AS status," +
                     " credit.state," +
@@ -160,16 +76,15 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " LEFT JOIN credit.creditType creditType" +
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone " +
-                    " WHERE credit.state = '" + creditState.toString() + "'" +
-                    " AND credit.creditType = " + creditType.getId() + "" +
-                    " AND creditTransaction.date <= '" + dateParam + "'" +
-                    " AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +
+                    " WHERE creditTransaction.date <= '" + dateParam + "'" +
+                    /*" WHERE credit.state = '" + creditState.toString() + "'" +*/
+                    /*" AND credit.creditType = " + creditType.getId() + "" +*/
+                    restrictions +
+                    /*" AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +*/
                     " AND credit.state <> #{creditAction.creditStateFIN} "+
                     " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
                     " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
-
         }
-
 
         return ejbql;
     }
