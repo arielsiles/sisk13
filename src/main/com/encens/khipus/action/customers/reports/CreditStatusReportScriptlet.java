@@ -74,11 +74,10 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
                 expiredDays = DateUtils.differenceBetween(expirationDate, endPeriodDate, TimeUnit.DAYS) - 1;
             if (expirationDate.compareTo(endPeriodDate) > 0)
                 expiredDays = DateUtils.differenceBetween(nextPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
-
-            if (expiredDays <= 0)
-                expiredDays = BigDecimal.ZERO.longValue();
             */
             expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
+            if (expiredDays <= 0)
+                expiredDays = BigDecimal.ZERO.longValue();
 
         }
         System.out.println("===> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy") + " <===");
