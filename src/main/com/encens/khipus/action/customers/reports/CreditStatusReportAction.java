@@ -49,12 +49,44 @@ public class CreditStatusReportAction extends GenericReportAction {
         if (creditState != null)
             restrictions += " AND credit.state = '" + creditState.toString() + "'";
         if (creditType != null)
-            restrictions += " AND credit.creditType = " + creditType.getId();
+            restrictions += " AND voucherDetail.account IN (" + creditType.getCurrentAccountCode() + "," + creditType.getExpiredAccountCode() + "," +creditType.getExecutedAccountCode() + ")";
+
+        /*if (creditType != null)
+            restrictions += " ";*/
 
         //if (creditState != null && creditType != null && endPeriodDate != null){
         if (endPeriodDate != null){
             String dateParam = DateUtils.format(this.endPeriodDate, "yyyy-MM-dd");
+
             ejbql = " SELECT " +
+                    " credit.state || ' - ' || creditType.name AS status," +
+                    " credit.state," +
+                    " creditType.name as creditTypeName," +
+                    " 'ooo' AS gabName," +
+                    " partner.firstName," +
+                    " partner.lastName," +
+                    " partner.maidenName," +
+                    " credit.grantDate," +
+                    " credit.amount," +
+                    " credit.id as creditId," +
+                    " credit.expirationDate," +
+                    " credit.previousCode," +
+                    " SUM(voucherDetail.debit) - SUM(voucherDetail.credit) AS capitalBalance," +
+                    " MAX(voucher.date) as lastPayment" +
+                    " FROM VoucherDetail voucherDetail" +
+                    " JOIN voucherDetail.voucher voucher" +
+                    " JOIN voucherDetail.creditPartner credit" +
+                    " JOIN credit.creditType creditType" +
+                    " JOIN credit.partner partner" +
+                    " WHERE voucher.date <= '" + dateParam + "'" +
+                    " AND voucher.state <> 'ANL'" +
+                    " AND voucherDetail.account = '1310510600'" +
+                    restrictions +
+                    " AND voucherDetail.credit is not null" +
+                    " GROUP BY credit.state, creditType.name, partner.firstName, " +
+                    " partner.lastName, partner.maidenName, credit.grantDate, credit.amount ";
+
+            /*ejbql = " SELECT " +
                     " credit.state || ' - ' || creditType.name AS status," +
                     " credit.state," +
                     " creditType.name as creditTypeName," +
@@ -77,13 +109,13 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " LEFT JOIN credit.partner partner" +
                     " LEFT JOIN partner.productiveZone productiveZone " +
                     " WHERE creditTransaction.date <= '" + dateParam + "'" +
-                    /*" WHERE credit.state = '" + creditState.toString() + "'" +*/
-                    /*" AND credit.creditType = " + creditType.getId() + "" +*/
+                    *//*" WHERE credit.state = '" + creditState.toString() + "'" +*//*
+                    *//*" AND credit.creditType = " + creditType.getId() + "" +*//*
                     restrictions +
-                    /*" AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +*/
+                    *//*" AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +*//*
                     " AND credit.state <> #{creditAction.creditStateFIN} "+
                     " GROUP BY credit.state, creditType.name, productiveZone.name, partner.firstName, " +
-                    " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";
+                    " partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.capitalBalance ";*/
         }
 
         return ejbql;

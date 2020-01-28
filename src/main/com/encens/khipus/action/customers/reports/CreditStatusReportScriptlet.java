@@ -3,6 +3,7 @@ package com.encens.khipus.action.customers.reports;
 import com.encens.khipus.action.customers.CreditAction;
 import com.encens.khipus.action.customers.CreditTransactionAction;
 import com.encens.khipus.model.customers.Credit;
+import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.util.DateUtils;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
@@ -64,7 +65,7 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         Long expiredDays = new Long(0);
         if (capitalBalance.doubleValue() > 0) {
 
-            //if (credit.getState().equals(CreditState.VIG))
+            if (credit.getState().equals(CreditState.VIG))
                 interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
 
             nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
