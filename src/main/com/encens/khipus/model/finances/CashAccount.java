@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.FormatUtils;
 import org.hibernate.annotations.Type;
@@ -49,6 +50,10 @@ public class CashAccount implements BaseModel {
 
     @Column(name = "CTA_NIV3", nullable = false, updatable = false, insertable = false)
     private String accountLevel3Code;
+
+    @Column(name = "EST", nullable = true, length = 3)
+    @Enumerated(EnumType.STRING)
+    private CreditState state;
 
     /*@Column(name = "TIPO", length = 2, updatable = false)
     @Length(max = 2)
@@ -484,6 +489,14 @@ public class CashAccount implements BaseModel {
 
     public void setAccountType(CashAccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public CreditState getState() {
+        return state;
+    }
+
+    public void setState(CreditState state) {
+        this.state = state;
     }
 
     /*public String getAccountType() {

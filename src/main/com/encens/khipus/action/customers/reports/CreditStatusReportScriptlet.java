@@ -45,6 +45,7 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
 
         Date endPeriodDate = (Date) getParameterValue("endPeriodDate", false);
         Long creditId = (Long) getFieldValue("creditId");
+        CreditState state = (CreditState) getFieldValue("state");
         Credit credit = creditService.findCreditById(creditId);
 
         creditReportAction.calculatePaymentPlan(credit);
@@ -58,25 +59,20 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         creditAction.setInstance(credit);
         creditTransactionAction.setDateTransaction(endPeriodDate);
 
-        Long days = DateUtils.differenceBetween(lastPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
+        Long days = new Long(0);
+        if (state.equals(CreditState.VIG))
+            days = DateUtils.differenceBetween(lastPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
 
         BigDecimal interestToDate = BigDecimal.ZERO;
         Date nextPaymentDate = endPeriodDate;
         Long expiredDays = new Long(0);
         if (capitalBalance.doubleValue() > 0) {
-
-            if (credit.getState().equals(CreditState.VIG))
+            if (state.equals(CreditState.VIG))
                 interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
 
             nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
-
-            /*
-            if (expirationDate.compareTo(endPeriodDate) < 0)
-                expiredDays = DateUtils.differenceBetween(expirationDate, endPeriodDate, TimeUnit.DAYS) - 1;
-            if (expirationDate.compareTo(endPeriodDate) > 0)
-                expiredDays = DateUtils.differenceBetween(nextPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
-            */
             expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
+
             if (expiredDays <= 0)
                 expiredDays = BigDecimal.ZERO.longValue();
 

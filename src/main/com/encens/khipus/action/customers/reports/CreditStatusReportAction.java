@@ -54,11 +54,10 @@ public class CreditStatusReportAction extends GenericReportAction {
             String dateParam = DateUtils.format(this.endPeriodDate, "yyyy-MM-dd");
 
             ejbql = " SELECT " +
-                    /*" credit.state || ' - ' || creditType.name AS status," +*/
                     " voucherDetail.cashAccount.accountCode || ' - ' || voucherDetail.cashAccount.description AS status," +
-                    " credit.state," +
+                    " voucherDetail.cashAccount.state, " +
                     " creditType.name as creditTypeName," +
-                    " 'ooo' AS gabName," +
+                    " '' AS gabName," +
                     " partner.firstName," +
                     " partner.lastName," +
                     " partner.maidenName," +
@@ -78,7 +77,7 @@ public class CreditStatusReportAction extends GenericReportAction {
                     restrictions +
                     " AND voucher.state <> 'ANL'" +
                     " AND voucherDetail.credit is not null" +
-                    " GROUP BY voucherDetail.cashAccount.accountCode, voucherDetail.cashAccount.description, credit.state, creditType.name, partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount " +
+                    " GROUP BY voucherDetail.cashAccount.accountCode, voucherDetail.cashAccount.description, voucherDetail.cashAccount.state, creditType.name, partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount " +
                     " HAVING (SUM(voucherDetail.debit) - SUM(voucherDetail.credit)) > 0";
 
             /*ejbql = " SELECT " +
