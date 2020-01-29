@@ -249,7 +249,8 @@ public class CreditAction extends GenericAction<Credit> {
         voucher.setGloss(this.gloss);
 
         System.out.println("-------------APERTURA DE CREDITOS-------------");
-        for (Credit credit : creditService.getAllCredits()){
+
+        for (Credit credit : creditService.getUnfinishedCredits()){
 
             System.out.println(credit.getAmount() + " - " + credit.getCapitalBalance() + " - " + credit.getPartner().getFullName());
             //Date lastPaymentDate = creditTransactionService.findLastPayment(credit);

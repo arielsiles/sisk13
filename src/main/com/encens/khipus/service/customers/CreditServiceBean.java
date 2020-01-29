@@ -96,6 +96,14 @@ public class CreditServiceBean implements CreditService {
         return creditList;
     }
 
+    public List<Credit> getUnfinishedCredits(){
+
+        List<Credit> creditList = em.createNamedQuery("Credit.findUnfinishedCredits")
+                .setParameter("creditStateFIN", CreditState.FIN)
+                .getResultList();
+        return creditList;
+    }
+
     public List<Credit> getCredits(CreditState creditState, CreditType creditType){
 
         List<Credit> creditList = em.createNamedQuery("Credit.findCreditsByStateAndType")

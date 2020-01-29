@@ -26,6 +26,7 @@ public interface CreditService {
     BigDecimal getTotalPaidCapital(Credit credit);
     BigDecimal calculateTotalPaidCapital(Credit credit, Date date);
     List<Credit> getAllCredits();
+    List<Credit> getUnfinishedCredits();
     List<Credit> getCredits(CreditState creditState, CreditType creditType);
     void changeCreditState(Credit credit, CreditState state);
     List<Credit> getCreditList(Partner partner);

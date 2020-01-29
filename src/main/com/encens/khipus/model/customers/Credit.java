@@ -21,6 +21,7 @@ import java.util.Date;
 @NamedQueries(
         {
                 @NamedQuery(name = "Credit.findAllCredits", query = "select c from Credit c where c.capitalBalance > 0"),
+                @NamedQuery(name = "Credit.findUnfinishedCredits", query = "select c from Credit c where c.state <> :creditStateFIN"),
                 @NamedQuery(name = "Credit.findAllCreditsAll", query = "select c from Credit c"),
                 @NamedQuery(name = "Credit.findCreditsByStateAndType", query = "select c from Credit c where c.state =:creditState and c.creditType =:creditType"),
                 @NamedQuery(name = "Credit.findCreditById", query = "select c from Credit c where c.id=:creditId")
