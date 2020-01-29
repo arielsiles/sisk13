@@ -46,20 +46,16 @@ public class CreditStatusReportAction extends GenericReportAction {
         String ejbql = "";
         String restrictions = "";
 
-        if (creditState != null)
-            restrictions += " AND credit.state = '" + creditState.toString() + "'";
         if (creditType != null)
             restrictions += " AND voucherDetail.account IN (" + creditType.getCurrentAccountCode() + "," + creditType.getExpiredAccountCode() + "," +creditType.getExecutedAccountCode() + ")";
-
-        /*if (creditType != null)
-            restrictions += " ";*/
 
         //if (creditState != null && creditType != null && endPeriodDate != null){
         if (endPeriodDate != null){
             String dateParam = DateUtils.format(this.endPeriodDate, "yyyy-MM-dd");
 
             ejbql = " SELECT " +
-                    " credit.state || ' - ' || creditType.name AS status," +
+                    /*" credit.state || ' - ' || creditType.name AS status," +*/
+                    " voucherDetail.cashAccount.accountCode || ' - ' || voucherDetail.cashAccount.description AS status," +
                     " credit.state," +
                     " creditType.name as creditTypeName," +
                     " 'ooo' AS gabName," +
@@ -79,12 +75,11 @@ public class CreditStatusReportAction extends GenericReportAction {
                     " JOIN credit.creditType creditType" +
                     " JOIN credit.partner partner" +
                     " WHERE voucher.date <= '" + dateParam + "'" +
-                    " AND voucher.state <> 'ANL'" +
-                    " AND voucherDetail.account = '1310510600'" +
                     restrictions +
+                    " AND voucher.state <> 'ANL'" +
                     " AND voucherDetail.credit is not null" +
-                    " GROUP BY credit.state, creditType.name, partner.firstName, " +
-                    " partner.lastName, partner.maidenName, credit.grantDate, credit.amount ";
+                    " GROUP BY voucherDetail.cashAccount.accountCode, voucherDetail.cashAccount.description, credit.state, creditType.name, partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount " +
+                    " HAVING (SUM(voucherDetail.debit) - SUM(voucherDetail.credit)) > 0";
 
             /*ejbql = " SELECT " +
                     " credit.state || ' - ' || creditType.name AS status," +

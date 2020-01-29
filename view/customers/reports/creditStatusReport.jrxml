@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditStatusReportScriptlet">
 	<property name="ireport.zoom" value="3.1384283767210235"/>
-	<property name="ireport.x" value="1000"/>
+	<property name="ireport.x" value="52"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="endPeriodDate" class="java.util.Date"/>
@@ -51,12 +51,12 @@
 	<variable name="totalInterest" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="Sum">
 		<variableExpression><![CDATA[$V{interestToDateVar}]]></variableExpression>
 	</variable>
-	<variable name="totalCapitalBalance" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="totalCapitalBalance" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="Sum">
 		<variableExpression><![CDATA[$F{capitalBalance}]]></variableExpression>
 	</variable>
 	<variable name="days" class="java.lang.Long" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="expiredDays" class="java.lang.Long" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
-	<group name="purchaseOrderGroup">
+	<group name="purchaseOrderGroup" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{status}]]></groupExpression>
 		<groupHeader>
 			<band height="29">
