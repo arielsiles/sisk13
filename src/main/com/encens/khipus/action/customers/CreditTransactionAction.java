@@ -1086,7 +1086,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     /**
-     * Calcula interes devengado a fin de periodo
+     * Calcula interes devengado, desde el ultimo pago a fin de periodo
      * @param credit
      * @param endPeriodDate Normalmente fin de periodo
      */

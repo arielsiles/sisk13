@@ -57,7 +57,7 @@ public class ProvisionInterestReceivableAction extends GenericAction {
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         List<Credit> creditList = creditService.getCredits(this.creditState, this.creditType);
 
-        BigDecimal totalAccruedInterest = BigDecimal.ZERO;
+        BigDecimal totalAccruedInterest = BigDecimal.ZERO; //Interes acumulado
         for (Credit credit : creditList){
 
             BigDecimal value = creditTransactionAction.calculateAccruedInterest(credit, this.endPeriodDate);
