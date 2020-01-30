@@ -1,5 +1,4 @@
 /** 29.01.2020 **/
-alter table arcgms add column est varchar(3) null after cta_niv3;
 
 -- FLech
 -- Prestamos Amortizables CIS M.N.

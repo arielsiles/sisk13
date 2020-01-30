@@ -3,6 +3,7 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -321,4 +322,14 @@ public class Credit implements BaseModel {
     public void setLastState(CreditState lastState) {
         this.lastState = lastState;
     }
+
+    public FinancesCurrencyType getFinancesCurrencyType(){
+        FinancesCurrencyType result = FinancesCurrencyType.P;
+        if (getCreditType().getCurrency().getSymbol().equals("USD"))
+            result = FinancesCurrencyType.D;
+
+        return result;
+    }
+
+
 }

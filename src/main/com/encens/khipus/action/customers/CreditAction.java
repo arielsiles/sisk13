@@ -3,12 +3,16 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.customers.reports.CreditReportAction;
+import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
+import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.model.customers.CreditTransaction;
 import com.encens.khipus.model.customers.Partner;
+import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -16,9 +20,11 @@ import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.CreditService;
 import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.service.finances.CashAccountService;
+import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
+import com.encens.khipus.util.finances.CashAccountUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
@@ -48,6 +54,8 @@ public class CreditAction extends GenericAction<Credit> {
     private CashAccountService cashAccountService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private FinancesExchangeRateService financesExchangeRateService;
 
     @In(create = true)
     private CreditTransactionAction creditTransactionAction;
@@ -242,6 +250,7 @@ public class CreditAction extends GenericAction<Credit> {
     public String generateTransferCredit(){
 
         String outcome = Outcome.FAIL;
+        BigDecimal exchangeRate = getExchangeRate();
 
         Voucher voucher = new Voucher();
         voucher.setDocumentType("CD");
@@ -253,20 +262,13 @@ public class CreditAction extends GenericAction<Credit> {
         for (Credit credit : creditService.getUnfinishedCredits()){
 
             System.out.println(credit.getAmount() + " - " + credit.getCapitalBalance() + " - " + credit.getPartner().getFullName());
-            //Date lastPaymentDate = creditTransactionService.findLastPayment(credit);
-
             int paidQuotas = creditTransactionAction.calculatePaidQuotas(credit);
             System.out.println("----> Coutas Pagadas: " + paidQuotas);
 
             Collection<CreditReportAction.PaymentPlanData> paymentPlanDatas = creditReportAction.calculatePaymentPlan(credit);
 
-            /** **/
-            //findDateOfNextPayment(credit, paymentPlanDatas);
-            /** **/
-
             Integer i=1;
             Date paidDate = null;
-            //Date currentDate = new Date();
             Date currentDate = this.transferDate;
 
             int cont = 1;
@@ -289,7 +291,7 @@ public class CreditAction extends GenericAction<Credit> {
                     //System.out.println("===>>> Diff DAYS: " + diffDays);
 
                     if (diffDays <= 0) {
-                        //System.out.println("===> !!!!CREDITO VIGENTE!!!!");
+                        System.out.println("===> !!!!CREDITO VIGENTE!!!!");
                         if (credit.getState().equals(CreditState.VEN)){
                             addVoucherDetailVig(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VIG);
@@ -299,7 +301,7 @@ public class CreditAction extends GenericAction<Credit> {
                     }
                     if (diffDays >= 1 &&  diffDays <= 90) {
 
-                        //System.out.println("===> CREDITO VENCIDO...");
+                        System.out.println("===> CREDITO VENCIDO...");
                         if (!credit.getState().equals(CreditState.VEN)){
                             addVoucherDetailVen(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.VEN);
@@ -309,7 +311,7 @@ public class CreditAction extends GenericAction<Credit> {
 
                     }
                     if (diffDays >= 91) {
-                        //System.out.println("===> CREDITO EJECUCION...");
+                        System.out.println("===> CREDITO EJECUCION...");
                         if (!credit.getState().equals(CreditState.EJE)) {
                             addVoucherDetailEje(credit, voucher);
                             creditService.changeCreditState(credit, CreditState.EJE);
@@ -391,24 +393,31 @@ public class CreditAction extends GenericAction<Credit> {
     //private void addVoucherDetailVigVen(Credit credit, Voucher voucher){
     private void addVoucherDetailVen(Credit credit, Voucher voucher){
 
-        VoucherDetail detailExpiredAccount = new VoucherDetail();
+        /*VoucherDetail detailExpiredAccount = new VoucherDetail();
         detailExpiredAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
         detailExpiredAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
         detailExpiredAccount.setDebit(credit.getCapitalBalance());
-        detailExpiredAccount.setCredit(BigDecimal.ZERO);
+        detailExpiredAccount.setCredit(BigDecimal.ZERO);*/
+        VoucherDetail detailExpiredAccount = CashAccountUtil.createVoucherDetail(   credit.getCreditType().getExpiredAccount(),
+                                                                                    credit.getCapitalBalance(),
+                                                                                    credit.getFinancesCurrencyType(), true, false, getExchangeRate());
         detailExpiredAccount.setCreditPartner(credit);
 
         VoucherDetail detailAccount = new VoucherDetail();
+        CashAccount cashAccount = null;
         if (credit.getState().equals(CreditState.VIG)){
-            detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+            /*detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());*/
+            cashAccount = credit.getCreditType().getCurrentAccount();
         }
         if (credit.getState().equals(CreditState.EJE)){
-            detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+            /*detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
+            detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());*/
+            cashAccount = credit.getCreditType().getExecutedAccount();
         }
-        detailAccount.setDebit(BigDecimal.ZERO);
-        detailAccount.setCredit(credit.getCapitalBalance());
+        /*detailAccount.setDebit(BigDecimal.ZERO);
+        detailAccount.setCredit(credit.getCapitalBalance());*/
+        detailAccount = CashAccountUtil.createVoucherDetail(cashAccount, credit.getCapitalBalance(), credit.getFinancesCurrencyType(), false, true, getExchangeRate());
         detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailExpiredAccount);
@@ -418,24 +427,33 @@ public class CreditAction extends GenericAction<Credit> {
     //private void addVoucherDetailVenEje(Credit credit, Voucher voucher){
     private void addVoucherDetailEje(Credit credit, Voucher voucher){
 
-        VoucherDetail detailExecutedAccount = new VoucherDetail();
+        /*VoucherDetail detailExecutedAccount = new VoucherDetail();
         detailExecutedAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
         detailExecutedAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
         detailExecutedAccount.setDebit(credit.getCapitalBalance());
-        detailExecutedAccount.setCredit(BigDecimal.ZERO);
+        detailExecutedAccount.setCredit(BigDecimal.ZERO);*/
+        VoucherDetail detailExecutedAccount = CashAccountUtil.createVoucherDetail(  credit.getCreditType().getExecutedAccount(),
+                                                                                    credit.getCapitalBalance(),
+                                                                                    credit.getFinancesCurrencyType(), true, false, getExchangeRate());
+
         detailExecutedAccount.setCreditPartner(credit);
 
         VoucherDetail detailAccount = new VoucherDetail();
+        CashAccount cashAccount = null;
         if (credit.getState().equals(CreditState.VIG)){
-            detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+            //detailAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+            //detailAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+            cashAccount = credit.getCreditType().getCurrentAccount();
         }
         if (credit.getState().equals(CreditState.VEN)){
-            detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+            //detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+            //detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+            cashAccount = credit.getCreditType().getExpiredAccount();
         }
-        detailAccount.setDebit(BigDecimal.ZERO);
-        detailAccount.setCredit(credit.getCapitalBalance());
+        /*detailAccount.setDebit(BigDecimal.ZERO);
+        detailAccount.setCredit(credit.getCapitalBalance());*/
+
+        detailAccount = CashAccountUtil.createVoucherDetail(cashAccount, credit.getCapitalBalance(), credit.getFinancesCurrencyType(), false, true, getExchangeRate());
         detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailExecutedAccount);
@@ -445,24 +463,33 @@ public class CreditAction extends GenericAction<Credit> {
     //private void addVoucherDetailVenVig(Credit credit, Voucher voucher){
     private void addVoucherDetailVig(Credit credit, Voucher voucher){
 
-        VoucherDetail detailCurrentAccount = new VoucherDetail();
-        detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
-        detailCurrentAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
-        detailCurrentAccount.setDebit(credit.getCapitalBalance());
-        detailCurrentAccount.setCredit(BigDecimal.ZERO);
+        VoucherDetail detailCurrentAccount = CashAccountUtil.createVoucherDetail(credit.getCreditType().getCurrentAccount(),
+                                                                                credit.getCapitalBalance(),
+                                                                                credit.getFinancesCurrencyType(), true, false, getExchangeRate());
+        //VoucherDetail detailCurrentAccount = new VoucherDetail();
+        //detailCurrentAccount.setAccount(credit.getCreditType().getCurrentAccountCode());
+        //detailCurrentAccount.setCashAccount(credit.getCreditType().getCurrentAccount());
+        //detailCurrentAccount.setDebit(credit.getCapitalBalance());
+        //detailCurrentAccount.setCredit(BigDecimal.ZERO);
         detailCurrentAccount.setCreditPartner(credit);
 
         VoucherDetail detailAccount = new VoucherDetail();
+        CashAccount cashAccount = null;
         if (credit.getState().equals(CreditState.VEN)){
-            detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+            //detailAccount.setAccount(credit.getCreditType().getExpiredAccountCode());
+            //detailAccount.setCashAccount(credit.getCreditType().getExpiredAccount());
+            cashAccount = credit.getCreditType().getExpiredAccount();
         }
         if (credit.getState().equals(CreditState.EJE)){
-            detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
-            detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+            //detailAccount.setAccount(credit.getCreditType().getExecutedAccountCode());
+            //detailAccount.setCashAccount(credit.getCreditType().getExecutedAccount());
+            cashAccount = credit.getCreditType().getExecutedAccount();
         }
-        detailAccount.setDebit(BigDecimal.ZERO);
-        detailAccount.setCredit(credit.getCapitalBalance());
+
+        //detailAccount.setDebit(BigDecimal.ZERO);
+        //detailAccount.setCredit(credit.getCapitalBalance());
+
+        detailAccount = CashAccountUtil.createVoucherDetail(cashAccount, credit.getCapitalBalance(), credit.getFinancesCurrencyType(), false, true, getExchangeRate());
         detailAccount.setCreditPartner(credit);
 
         voucher.getDetails().add(detailCurrentAccount);
@@ -533,4 +560,28 @@ public class CreditAction extends GenericAction<Credit> {
     public void setCreditStateFIN(CreditState creditStateFIN) {
         this.creditStateFIN = creditStateFIN;
     }
+
+    private void addFinancesCurrencyNotFoundMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "FixedAssets.FinancesCurrencyNotFoundException");
+    }
+
+    private void addFinancesExchangeRateNotFoundExceptionMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "FixedAssets.FinancesExchangeRateNotFoundException");
+    }
+
+    public BigDecimal getExchangeRate(){
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
+        return exchangeRate;
+    }
+
 }
