@@ -105,6 +105,23 @@ public class CreditTransactionServiceBean implements CreditTransactionService {
         return result;
     }
 
+    public Date findLastPaymentBeforeDate(Credit credit, Date date) {
+        Date result;
+        try {
+            result =  (Date) em.createNamedQuery("CreditTransaction.findLastTransactionBeforeDate")
+                    .setParameter("credit", credit)
+                    .setParameter("date", date)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+        if (result == null)
+            result = credit.getGrantDate();
+
+        return result;
+    }
+
     public void createCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction){
 
         //String gloss = creditTransaction.getGloss() + " " + credit.getCode();

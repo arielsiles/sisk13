@@ -33,7 +33,11 @@ import java.util.Date;
                                                                                                 "from CreditTransaction ct " +
                                                                                                 "where ct.credit=:credit " +
                                                                                                 "and ct.creditTransactionType=:transactionType " +
-                                                                                                "and ct.date <=:endPeriod ")
+                                                                                                "and ct.date <=:endPeriod "),
+                @NamedQuery(name = "CreditTransaction.findLastTransactionBeforeDate", query =    "select max(ct.date) " +
+                                                                                                "from CreditTransaction ct " +
+                                                                                                "where ct.credit=:credit " +
+                                                                                                "and ct.date <=:date ")
         }
 )
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "CreditTransaction.tableGenerator",

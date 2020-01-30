@@ -5,6 +5,7 @@ import com.encens.khipus.action.customers.CreditTransactionAction;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.service.customers.CreditService;
+import com.encens.khipus.service.customers.CreditTransactionService;
 import com.encens.khipus.util.DateUtils;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
 
     private CreditService creditService = (CreditService) Component.getInstance("creditService");
+    private CreditTransactionService creditTransactionService = (CreditTransactionService) Component.getInstance("creditTransactionService");
 
     private CreditTransactionAction creditTransactionAction = (CreditTransactionAction) Component.getInstance("creditTransactionAction");
     private CreditAction creditAction = (CreditAction) Component.getInstance("creditAction");
@@ -47,6 +49,7 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         Long creditId = (Long) getFieldValue("creditId");
         CreditState state = (CreditState) getFieldValue("state");
         Credit credit = creditService.findCreditById(creditId);
+        Date lastPaymentBefore = creditTransactionService.findLastPaymentBeforeDate(credit, endPeriodDate);
 
         creditReportAction.calculatePaymentPlan(credit);
 
@@ -85,6 +88,7 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         this.setVariableValue("interestToDateVar", interestToDate);
         this.setVariableValue("days", days);
         this.setVariableValue("expiredDays", expiredDays);
+        this.setVariableValue("lastPaymentBefore", lastPaymentBefore);
         //this.setVariableValue("expiredDaysVar", expiredDays);
 
     }
