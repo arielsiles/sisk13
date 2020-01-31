@@ -1,5 +1,5 @@
 /** 29.01.2020 **/
-
+alter table arcgms add column est varchar(3) null after cta_niv3;
 -- FLech
 -- Prestamos Amortizables CIS M.N.
 update arcgms a set a.`est` = 'VIG' where a.`cuenta` = '1310510600';

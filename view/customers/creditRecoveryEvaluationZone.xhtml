@@ -3,7 +3,6 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
@@ -83,23 +82,6 @@
             </div>
 
         </h:form>
-
-        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
-            <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
-            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
-            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
-            <ui:define name="assignButton">
-                <a4j:commandButton id="assignButton"
-                                   title="#{messages['Common.choose']}"
-                                   action="#{creditRecoveryEvaluationZoneReportAction.assignProductiveZone(productiveZoneItem)}"
-                                   image="/img/active.gif" styleClass="select-image-middle"
-                                   ajaxSingle="true"
-                                   reRender="productiveZoneField"
-                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
-                                   style="width:0.8em"/>
-
-            </ui:define>
-        </s:decorate>
 
         <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
         <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
