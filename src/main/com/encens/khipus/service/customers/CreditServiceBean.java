@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -134,6 +135,28 @@ public class CreditServiceBean implements CreditService {
     public void updateCredit(Credit credit) {
         em.merge(credit);
         em.flush();
+    }
+
+    public List<Object[]> getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate){
+
+        List<Object[]> result = new ArrayList<Object[]>();
+        result = em.createQuery(
+                " SELECT " +
+                        " productiveZone.id," +
+                        " count(credit.id)," +
+                        " sum(credit.amount)" +
+                        " FROM Credit credit " +
+                        " LEFT JOIN credit.partner partner " +
+                        " LEFT JOIN partner.productiveZone productiveZone" +
+                        " WHERE credit.grantDate between :startDate and :endDate " +
+                        " AND productiveZone.id = :productiveZoneId " +
+                        " GROUP BY productiveZone.id ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productiveZoneId", productiveZoneId)
+                .getResultList();
+
+        return result;
     }
 
 }

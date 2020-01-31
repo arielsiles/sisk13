@@ -91,7 +91,7 @@ public class CreditRecoveryEvaluationZoneReportAction extends GenericReportActio
                 "summaryProviderKardexReport",
                 "/customers/reports/creditRecoveryEvaluationZoneReport.jrxml",
                 PageFormat.LETTER,
-                PageOrientation.LANDSCAPE,
+                PageOrientation.PORTRAIT,
                 messages.get("Reports.credit.recoveryEvaluationZone.titleFile"),
                 reportParameters);
 

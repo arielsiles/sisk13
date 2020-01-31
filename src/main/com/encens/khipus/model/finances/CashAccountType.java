@@ -13,7 +13,8 @@ public enum CashAccountType {
     E("CashAccountType.E"),
     I("CashAccountType.I"),
     OD("CashAccountType.OD"),
-    OA("CashAccountType.OA");
+    OA("CashAccountType.OA"),
+    Z("CashAccountType.OA");
     private String resourceKey;
 
     CashAccountType(String resourceKey) {

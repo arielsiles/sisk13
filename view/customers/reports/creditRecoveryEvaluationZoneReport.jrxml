@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet">
-	<property name="ireport.zoom" value="2.593742460100023"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditRecoveryEvaluationZoneReportScriptlet">
+	<property name="ireport.zoom" value="3.1384283767210297"/>
+	<property name="ireport.x" value="2"/>
+	<property name="ireport.y" value="38"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -18,36 +18,45 @@
 	<field name="name" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
 	</field>
+	<variable name="newCredits" class="java.lang.Integer" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="amountNewCredits" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<group name="purchaseOrderGroup">
 		<groupHeader>
 			<band height="30">
 				<frame>
-					<reportElement positionType="Float" mode="Opaque" x="1" y="12" width="741" height="17" forecolor="#000000"/>
+					<reportElement positionType="Float" mode="Opaque" x="1" y="12" width="500" height="17" forecolor="#000000"/>
 					<line>
-						<reportElement x="0" y="0" width="735" height="1"/>
+						<reportElement x="0" y="0" width="500" height="1"/>
 						<graphicElement>
 							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 						</graphicElement>
 					</line>
 					<line>
-						<reportElement x="1" y="16" width="735" height="1"/>
+						<reportElement x="0" y="16" width="500" height="1"/>
 						<graphicElement>
 							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement x="0" y="1" width="37" height="15"/>
+						<reportElement x="0" y="1" width="15" height="15"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[Num]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="37" y="1" width="140" height="15"/>
+						<reportElement x="15" y="1" width="100" height="15"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[GAB]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="115" y="1" width="68" height="15"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="6"/>
+						</textElement>
+						<text><![CDATA[Nuevos]]></text>
 					</staticText>
 				</frame>
 			</band>
@@ -55,7 +64,7 @@
 		<groupFooter>
 			<band height="11" splitType="Stretch">
 				<line>
-					<reportElement x="0" y="0" width="735" height="1"/>
+					<reportElement x="0" y="0" width="500" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 					</graphicElement>
@@ -104,18 +113,32 @@
 	<detail>
 		<band height="11" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="38" height="11"/>
+				<reportElement x="0" y="0" width="15" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="38" y="0" width="140" height="11"/>
+				<reportElement x="16" y="0" width="100" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="116" y="0" width="20" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{newCredits}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="136" y="0" width="48" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{amountNewCredits}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
