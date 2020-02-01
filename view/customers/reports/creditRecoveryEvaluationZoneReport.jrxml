@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditRecoveryEvaluationZoneReportScriptlet">
-	<property name="ireport.zoom" value="3.1384283767210297"/>
-	<property name="ireport.x" value="2"/>
-	<property name="ireport.y" value="38"/>
+	<property name="ireport.zoom" value="2.14358881000002"/>
+	<property name="ireport.x" value="11"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -75,28 +75,28 @@
 	<title>
 		<band height="38" splitType="Stretch">
 			<textField>
-				<reportElement x="2" y="16" width="270" height="9"/>
+				<reportElement x="2" y="16" width="200" height="9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="2" y="8" width="270" height="9"/>
+				<reportElement x="2" y="8" width="200" height="9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="2" y="0" width="270" height="9"/>
+				<reportElement x="2" y="0" width="200" height="9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="272" y="25" width="215" height="10"/>
+				<reportElement x="174" y="25" width="215" height="10"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>

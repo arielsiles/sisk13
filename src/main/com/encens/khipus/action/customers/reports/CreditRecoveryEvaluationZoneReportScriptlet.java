@@ -1,6 +1,7 @@
 package com.encens.khipus.action.customers.reports;
 
 import com.encens.khipus.service.customers.CreditService;
+import com.encens.khipus.util.BigDecimalUtil;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 import org.jboss.seam.Component;
@@ -35,18 +36,12 @@ public class CreditRecoveryEvaluationZoneReportScriptlet extends JRDefaultScript
         Date startDate = (Date) getParameterValue("startDate", false);
         Date endDate   = (Date) getParameterValue("endDate", false);
 
-        //List<Object[]> newCredits = creditService.getAmountNewCredits(productiveZoneId, startDate, endDate); // (Cant, Monto)
-        //Object[] obj = newCredits.get(0);
+        Object[] newCredits = creditService.getAmountNewCredits(productiveZoneId, startDate, endDate); // (Cant, Monto)
 
-        //System.out.println("-----> Cant: " + obj[1] + " - Monto: " + obj[2]);
-        System.out.println("-----> productiveZoneId: " + productiveZoneId);
+        //System.out.println("=====>> []: " + newCredits[0] + " - " + newCredits[1]);
 
-        /*this.setVariableValue("newCredits", Integer.getInteger(obj[1].toString()));
-        this.setVariableValue("amountNewCredits", BigDecimalUtil.toBigDecimal(obj[2]));*/
-
-        this.setVariableValue("newCredits", productiveZoneId.intValue());
-        this.setVariableValue("amountNewCredits", BigDecimal.ONE);
-
+        this.setVariableValue("newCredits", new Integer(newCredits[0].toString()));
+        this.setVariableValue("amountNewCredits", BigDecimalUtil.toBigDecimal(newCredits[1]));
     }
 
 

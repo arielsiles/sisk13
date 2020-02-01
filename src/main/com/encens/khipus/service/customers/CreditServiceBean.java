@@ -137,10 +137,12 @@ public class CreditServiceBean implements CreditService {
         em.flush();
     }
 
-    public List<Object[]> getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate){
+    public Object[] getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate){
 
-        List<Object[]> result = new ArrayList<Object[]>();
-        result = em.createQuery(
+        List<Object[]> resultList = new ArrayList<Object[]>();
+        Object[] result = {0, BigDecimal.ZERO}; //Por defecto, si no existe creditos para el GAB
+
+        resultList = em.createQuery(
                 " SELECT " +
                         " productiveZone.id," +
                         " count(credit.id)," +
@@ -150,11 +152,19 @@ public class CreditServiceBean implements CreditService {
                         " LEFT JOIN partner.productiveZone productiveZone" +
                         " WHERE credit.grantDate between :startDate and :endDate " +
                         " AND productiveZone.id = :productiveZoneId " +
-                        " GROUP BY productiveZone.id ")
+                        " GROUP BY productiveZone.id, productiveZone.name ")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("productiveZoneId", productiveZoneId)
                 .getResultList();
+
+        //System.out.println("-------====> result: " + resultList + " - " + resultList.size());
+        if (resultList.size() > 0){
+            for (Object[] objects : resultList) {
+                result[0] = objects[1];
+                result[1] = objects[2];
+            }
+        }
 
         return result;
     }
