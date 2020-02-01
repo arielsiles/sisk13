@@ -78,6 +78,7 @@
         </exception-sorter-class-name>
     </local-tx-datasource>
 
+    <!-- FOR F.CISC -->
     <!--<local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
         <connection-url>jdbc:mysql://localhost:3306/erp_ciscdev</connection-url>

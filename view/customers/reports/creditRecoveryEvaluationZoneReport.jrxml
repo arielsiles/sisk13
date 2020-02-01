@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditRecoveryEvaluationZoneReportScriptlet">
-	<property name="ireport.zoom" value="2.14358881000002"/>
-	<property name="ireport.x" value="11"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="5.559917313492288"/>
+	<property name="ireport.x" value="223"/>
+	<property name="ireport.y" value="339"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -20,6 +20,12 @@
 	</field>
 	<variable name="newCredits" class="java.lang.Integer" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
 	<variable name="amountNewCredits" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="sumNewCredits" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$V{newCredits}]]></variableExpression>
+	</variable>
+	<variable name="sumAmountNewCredits" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{amountNewCredits}]]></variableExpression>
+	</variable>
 	<group name="purchaseOrderGroup">
 		<groupHeader>
 			<band height="30">
@@ -69,6 +75,20 @@
 						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 					</graphicElement>
 				</line>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="136" y="1" width="48" height="10"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAmountNewCredits}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="116" y="0" width="20" height="11"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{sumNewCredits}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -135,7 +155,7 @@
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="136" y="0" width="48" height="11"/>
-				<textElement verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{amountNewCredits}]]></textFieldExpression>
