@@ -12,7 +12,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -139,10 +138,8 @@ public class CreditServiceBean implements CreditService {
 
     public Object[] getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate){
 
-        List<Object[]> resultList = new ArrayList<Object[]>();
-        Object[] result = {0, BigDecimal.ZERO}; //Por defecto, si no existe creditos para el GAB
-
-        resultList = em.createQuery(
+        Object[] result = {0, BigDecimal.ZERO}; //Por defecto, si no existe creditos para el GAB. [Cant, Monto]
+        List<Object[]> resultList = em.createQuery(
                 " SELECT " +
                         " productiveZone.id," +
                         " count(credit.id)," +
@@ -158,14 +155,41 @@ public class CreditServiceBean implements CreditService {
                 .setParameter("productiveZoneId", productiveZoneId)
                 .getResultList();
 
-        //System.out.println("-------====> result: " + resultList + " - " + resultList.size());
         if (resultList.size() > 0){
             for (Object[] objects : resultList) {
                 result[0] = objects[1];
                 result[1] = objects[2];
             }
         }
+        return result;
+    }
+    public Object[] getCreditRecovery(Long productiveZoneId, Date startDate, Date endDate){
+        Object[] result = {0, BigDecimal.ZERO, BigDecimal.ZERO}; //Por defecto. [Cant, Capital, Interes]
+        List<Object[]> resultList = em.createQuery(
+                " SELECT " +
+                        " productiveZone.id," +
+                        " count(credit.id), " +
+                        " sum(creditTransaction.capital), " +
+                        " sum(creditTransaction.interest)" +
+                        " FROM Credit credit " +
+                        " LEFT JOIN credit.creditTransactionList creditTransaction " +
+                        " LEFT JOIN credit.partner partner " +
+                        " LEFT JOIN partner.productiveZone productiveZone " +
+                        " WHERE creditTransaction.date between :startDate and :endDate " +
+                        " AND productiveZone.id = :productiveZoneId " +
+                        " GROUP BY productiveZone.id, productiveZone.name ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productiveZoneId", productiveZoneId)
+                .getResultList();
 
+        if (resultList.size() > 0){
+            for (Object[] objects : resultList) {
+                result[0] = objects[1];
+                result[1] = objects[2];
+                result[2] = objects[3];
+            }
+        }
         return result;
     }
 

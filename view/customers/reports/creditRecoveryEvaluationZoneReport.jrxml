@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.CreditRecoveryEvaluationZoneReportScriptlet">
-	<property name="ireport.zoom" value="5.559917313492288"/>
-	<property name="ireport.x" value="223"/>
-	<property name="ireport.y" value="339"/>
+	<property name="ireport.zoom" value="3.4522712143931367"/>
+	<property name="ireport.x" value="801"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -26,69 +26,212 @@
 	<variable name="sumAmountNewCredits" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{amountNewCredits}]]></variableExpression>
 	</variable>
+	<variable name="quantityRecov" class="java.lang.Integer" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="capitalRecov" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="interestRecov" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="sumQuantityRecov" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$V{quantityRecov}]]></variableExpression>
+	</variable>
+	<variable name="sumCapitalRecov" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{capitalRecov}]]></variableExpression>
+	</variable>
+	<variable name="sumInterestRecov" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{interestRecov}]]></variableExpression>
+	</variable>
 	<group name="purchaseOrderGroup">
 		<groupHeader>
 			<band height="30">
 				<frame>
-					<reportElement positionType="Float" mode="Opaque" x="1" y="12" width="500" height="17" forecolor="#000000"/>
+					<reportElement positionType="Float" mode="Opaque" x="1" y="12" width="561" height="17" forecolor="#000000"/>
 					<line>
-						<reportElement x="0" y="0" width="500" height="1"/>
+						<reportElement x="0" y="0" width="560" height="1"/>
 						<graphicElement>
-							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
+							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
 						</graphicElement>
 					</line>
 					<line>
-						<reportElement x="0" y="16" width="500" height="1"/>
+						<reportElement x="0" y="16" width="560" height="1"/>
 						<graphicElement>
-							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
+							<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
 						</graphicElement>
 					</line>
 					<staticText>
 						<reportElement x="0" y="1" width="15" height="15"/>
 						<textElement verticalAlignment="Middle">
-							<font fontName="Arial" size="6"/>
+							<font fontName="Arial" size="7"/>
 						</textElement>
-						<text><![CDATA[Num]]></text>
+						<text><![CDATA[No]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="15" y="1" width="100" height="15"/>
+						<reportElement x="15" y="1" width="121" height="15"/>
+						<box>
+							<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+						</box>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[GAB]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="115" y="1" width="68" height="15"/>
-						<textElement verticalAlignment="Middle">
+						<reportElement x="136" y="1" width="130" height="15"/>
+						<box>
+							<pen lineStyle="Dashed"/>
+							<topPen lineStyle="Dashed"/>
+							<leftPen lineStyle="Dashed"/>
+							<bottomPen lineStyle="Dashed"/>
+							<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="7"/>
+						</textElement>
+						<text><![CDATA[Nuevos Creditos]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="266" y="1" width="130" height="15"/>
+						<box>
+							<pen lineStyle="Dashed"/>
+							<topPen lineStyle="Dashed"/>
+							<leftPen lineStyle="Dashed"/>
+							<bottomPen lineStyle="Dashed"/>
+							<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="7"/>
+						</textElement>
+						<text><![CDATA[Recuperaciones]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="396" y="1" width="130" height="15"/>
+						<box>
+							<pen lineStyle="Dashed"/>
+							<topPen lineStyle="Dashed"/>
+							<leftPen lineStyle="Dashed"/>
+							<bottomPen lineStyle="Dashed"/>
+							<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
-						<text><![CDATA[Nuevos]]></text>
+						<text><![CDATA[Intereses]]></text>
 					</staticText>
 				</frame>
+				<staticText>
+					<reportElement x="449" y="0" width="27" height="12"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<text><![CDATA[Periodo: ]]></text>
+				</staticText>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="476" y="0" width="40" height="12"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="521" y="0" width="40" height="12"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="516" y="0" width="5" height="12"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<text><![CDATA[- ]]></text>
+				</staticText>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="11" splitType="Stretch">
+			<band height="16" splitType="Stretch">
 				<line>
-					<reportElement x="0" y="0" width="500" height="1"/>
+					<reportElement x="0" y="0" width="560" height="1"/>
 					<graphicElement>
-						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
 					</graphicElement>
 				</line>
 				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="136" y="1" width="48" height="10"/>
+					<reportElement x="157" y="1" width="110" height="15"/>
+					<box rightPadding="10">
+						<pen lineStyle="Dashed"/>
+						<topPen lineStyle="Dashed"/>
+						<leftPen lineStyle="Dashed"/>
+						<bottomPen lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="6"/>
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAmountNewCredits}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="116" y="0" width="20" height="11"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="6"/>
+					<reportElement x="137" y="1" width="20" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{sumNewCredits}]]></textFieldExpression>
 				</textField>
+				<textField>
+					<reportElement x="267" y="1" width="20" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{sumQuantityRecov}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="397" y="1" width="20" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{sumQuantityRecov}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="287" y="1" width="110" height="15"/>
+					<box rightPadding="10">
+						<pen lineStyle="Dashed"/>
+						<topPen lineStyle="Dashed"/>
+						<leftPen lineStyle="Dashed"/>
+						<bottomPen lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumCapitalRecov}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="false">
+					<reportElement x="417" y="1" width="110" height="15"/>
+					<box rightPadding="10">
+						<pen lineStyle="Dashed"/>
+						<topPen lineStyle="Dashed"/>
+						<leftPen lineStyle="Dashed"/>
+						<bottomPen lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumInterestRecov}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="16" y="1" width="121" height="15"/>
+					<box>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<text><![CDATA[TOTAL: ]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="15" width="560" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
+					</graphicElement>
+				</line>
 			</band>
 		</groupFooter>
 	</group>
@@ -116,7 +259,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="174" y="25" width="215" height="10"/>
+				<reportElement x="108" y="25" width="350" height="10"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
@@ -135,30 +278,82 @@
 			<textField>
 				<reportElement x="0" y="0" width="15" height="11"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="6"/>
+					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="16" y="0" width="100" height="11"/>
+				<reportElement x="16" y="0" width="121" height="11"/>
+				<box>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="116" y="0" width="20" height="11"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="6"/>
+				<reportElement x="137" y="0" width="20" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{newCredits}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="136" y="0" width="48" height="11"/>
+				<reportElement x="157" y="0" width="110" height="11"/>
+				<box rightPadding="10">
+					<pen lineStyle="Dashed"/>
+					<topPen lineStyle="Dashed"/>
+					<leftPen lineStyle="Dashed"/>
+					<bottomPen lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="6"/>
+					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{amountNewCredits}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="267" y="0" width="20" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{quantityRecov}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="287" y="0" width="110" height="11"/>
+				<box rightPadding="10">
+					<pen lineStyle="Dashed"/>
+					<topPen lineStyle="Dashed"/>
+					<leftPen lineStyle="Dashed"/>
+					<bottomPen lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{capitalRecov}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="397" y="0" width="20" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{quantityRecov}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="417" y="0" width="110" height="11"/>
+				<box rightPadding="10">
+					<pen lineStyle="Dashed"/>
+					<topPen lineStyle="Dashed"/>
+					<leftPen lineStyle="Dashed"/>
+					<bottomPen lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{interestRecov}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

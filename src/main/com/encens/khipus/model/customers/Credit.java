@@ -11,7 +11,9 @@ import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Entity for credits
@@ -113,6 +115,9 @@ public class Credit implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipocredito", referencedColumnName = "idtipocredito", nullable = true)
     private CreditType creditType;
+
+    @OneToMany(mappedBy = "credit", fetch = FetchType.LAZY)
+    private List<CreditTransaction> creditTransactionList = new ArrayList<CreditTransaction>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -332,4 +337,11 @@ public class Credit implements BaseModel {
     }
 
 
+    public List<CreditTransaction> getCreditTransactionList() {
+        return creditTransactionList;
+    }
+
+    public void setCreditTransactionList(List<CreditTransaction> creditTransactionList) {
+        this.creditTransactionList = creditTransactionList;
+    }
 }

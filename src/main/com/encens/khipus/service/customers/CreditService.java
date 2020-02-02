@@ -32,4 +32,5 @@ public interface CreditService {
     List<Credit> getCreditList(Partner partner);
     void updateCredit(Credit credit);
     Object[] getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate);
+    Object[] getCreditRecovery(Long productiveZoneId, Date startDate, Date endDate);
 }

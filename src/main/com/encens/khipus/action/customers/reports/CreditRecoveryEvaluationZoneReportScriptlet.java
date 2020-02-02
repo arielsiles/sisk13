@@ -36,12 +36,15 @@ public class CreditRecoveryEvaluationZoneReportScriptlet extends JRDefaultScript
         Date startDate = (Date) getParameterValue("startDate", false);
         Date endDate   = (Date) getParameterValue("endDate", false);
 
-        Object[] newCredits = creditService.getAmountNewCredits(productiveZoneId, startDate, endDate); // (Cant, Monto)
-
-        //System.out.println("=====>> []: " + newCredits[0] + " - " + newCredits[1]);
-
+        Object[] newCredits = creditService.getAmountNewCredits(productiveZoneId, startDate, endDate); // [Cant, Monto]
         this.setVariableValue("newCredits", new Integer(newCredits[0].toString()));
         this.setVariableValue("amountNewCredits", BigDecimalUtil.toBigDecimal(newCredits[1]));
+
+        Object[] recoveryCredit = creditService.getCreditRecovery(productiveZoneId, startDate, endDate); // [Cant, Capital, Interes]
+        this.setVariableValue("quantityRecov", new Integer(recoveryCredit[0].toString()));
+        this.setVariableValue("capitalRecov", BigDecimalUtil.toBigDecimal(recoveryCredit[1]));
+        this.setVariableValue("interestRecov", BigDecimalUtil.toBigDecimal(recoveryCredit[2]));
+
     }
 
 
