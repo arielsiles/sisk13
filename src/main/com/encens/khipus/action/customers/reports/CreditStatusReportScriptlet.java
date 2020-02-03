@@ -67,22 +67,22 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
             days = DateUtils.differenceBetween(lastPaymentDate, endPeriodDate, TimeUnit.DAYS) - 1;
 
         BigDecimal interestToDate = BigDecimal.ZERO;
-        Date nextPaymentDate = endPeriodDate;
+        //  Date nextPaymentDate = endPeriodDate;
         Long expiredDays = new Long(0);
+
         if (capitalBalance.doubleValue() > 0) {
             if (state.equals(CreditState.VIG))
                 interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
 
-            nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
+            //nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
             expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
 
             if (expiredDays <= 0)
                 expiredDays = BigDecimal.ZERO.longValue();
 
         }
-        System.out.println("===> nextPaymentDate: " + DateUtils.format(nextPaymentDate, "dd/MM/yyyy") + " <===");
-        System.out.println("--------------------------> " + credit.getPartner().getFullName() + " - " + interestToDate + " - Days: " + days + " - ExpiredDays: " + expiredDays);
-        //System.out.println("------------------> expiration Date: " + expirationDate);
+
+        System.out.println("=========> " + credit.getPartner().getFullName() + " - " + interestToDate + " - Days: " + days + " - ExpiredDays: " + expiredDays);
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);

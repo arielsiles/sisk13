@@ -25,3 +25,8 @@ update arcgms a set a.`est` = 'EJE' where a.`cuenta` = '1330520100';
 update arcgms a set a.`est` = 'VIG' where a.`cuenta` = '1310520400';
 update arcgms a set a.`est` = 'VEN' where a.`cuenta` = '1320520400';
 update arcgms a set a.`est` = 'EJE' where a.`cuenta` = '1330520400';
+
+-- Prestamos a Plazo Fijo Agric M.N
+update arcgms a set a.`est` = 'VIG' where a.`cuenta` = '1310410200';
+update arcgms a set a.`est` = 'VEN' where a.`cuenta` = '1320410200';
+update arcgms a set a.`est` = 'EJE' where a.`cuenta` = '1330410200';
