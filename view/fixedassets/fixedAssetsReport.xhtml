@@ -63,7 +63,7 @@
     </h:selectOneMenu>
 </s:decorate>
 
-<s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
+<!--<s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['FixedAsset.costCenter']}</ui:define>
     <app:quickSearch id="quickSearchCostCenterField"
                      textValue="fixedAssetsReportAction.costCenter.code"
@@ -79,7 +79,7 @@
                      dataModel="#{costCenterDataModel}"
                      reRender="costCenterField"
                      hotKeySelect="alt+1"/>
-</s:decorate>
+</s:decorate>-->
 
 <s:decorate id="fixedAssetLocationField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">
@@ -144,7 +144,7 @@
 
     </s:decorate>
 </s:div>
-<s:decorate id="fixedAssetCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+<!--<s:decorate id="fixedAssetCodeField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['Fixedassets.report.fixedAssetCode']}</ui:define>
     <h:outputText>#{messages['Common.from']}</h:outputText>
     &#160;
@@ -164,8 +164,8 @@
                  tabindex="11">
         <f:convertNumber/>
     </h:inputText>
-</s:decorate>
-<s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+</s:decorate>-->
+<!--<s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['Fixedassets.report.barCode']}</ui:define>
     <app:inputBarcode id="barCode"
                       value="#{fixedAssetsReportAction.barCode}"
@@ -173,7 +173,7 @@
                       label="#{messages['Fixedassets.report.barCode']}"
                       styleClass="input"
                       tabindex="12"/>
-</s:decorate>
+</s:decorate>-->
 <s:decorate id="initRevisionDateField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['Fixedassets.report.registrationDate']}</ui:define>
     <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
@@ -204,7 +204,7 @@
     </rich:calendar>
 </s:decorate>
 
-<s:decorate id="originalValueField" template="/include/inputField.xhtml" styleClass="formRow">
+<!--<s:decorate id="originalValueField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['Fixedassets.report.originalValue']}</ui:define>
     <h:outputText>#{messages['Fixedassets.report.registrationDate.from']}</h:outputText>
     &#160;
@@ -223,7 +223,7 @@
                  tabindex="16">
         <app:realNumberConverter forId="endOriginalValue"/>
     </h:inputText>
-</s:decorate>
+</s:decorate>-->
 </rich:panel>
 
 <app:reportDefaultOptions reportAction="#{fixedAssetsReportAction}"

@@ -3,16 +3,22 @@ package com.encens.khipus.action.fixedassets;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.fixedassets.FixedAssetGroup;
 import com.encens.khipus.model.fixedassets.FixedAssetLocation;
 import com.encens.khipus.model.fixedassets.FixedAssetSubGroup;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -43,6 +49,11 @@ public class FixedAssetsReportAction extends GenericReportAction {
 
     private BigDecimal initOriginalValue;
     private BigDecimal endOriginalValue;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
     @Create
     public void init() {
@@ -92,7 +103,9 @@ public class FixedAssetsReportAction extends GenericReportAction {
                 "      fixedAssetGroup.id, " +
                 "      fixedAssetSubGroup.id, " +
                 "      fixedAssetGroup.description, " +
-                "      fixedAssetSubGroup.description " +
+                "      fixedAssetSubGroup.description, " +
+                "      fixedAsset.acumulatedDepreciation, " +
+                "      (fixedAsset.bsOriginalValue - fixedAsset.acumulatedDepreciation) as balance " +
                 "FROM  FixedAsset as fixedAsset" +
                 "      LEFT JOIN fixedAsset.businessUnit businessUnit" +
                 "      LEFT JOIN fixedAsset.costCenter costCenter" +
@@ -107,8 +120,18 @@ public class FixedAssetsReportAction extends GenericReportAction {
 
     public void generateReport() {
         log.debug("generating fixedAssetsReport......................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
+        reportParameters.put("endDate", endRegistrationDate);
+
         super.generateReport(
                 "fixedAssetReport",
                 "/fixedassets/reports/fixedAssetsReport.jrxml",

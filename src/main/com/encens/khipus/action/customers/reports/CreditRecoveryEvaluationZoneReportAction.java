@@ -74,15 +74,11 @@ public class CreditRecoveryEvaluationZoneReportAction extends GenericReportActio
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        String companyName = companyConfiguration.getCompanyName();
-        String systemName = companyConfiguration.getSystemName();
-        String locationName = companyConfiguration.getLocationName();
-
         String documentTitle = messages.get("Reports.credit.recoveryEvaluationZone.titleReport");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
-        reportParameters.put("companyName", companyName);
-        reportParameters.put("systemName", systemName);
-        reportParameters.put("locationName", locationName);
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("startDate", startDate);
         reportParameters.put("endDate", endDate);
