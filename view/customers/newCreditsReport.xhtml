@@ -25,7 +25,7 @@
                 <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.startDate']}</ui:define>
                     <rich:calendar id="paymentDate"
-                                   value="#{creditRecoveryEvaluationZoneReportAction.startDate}"
+                                   value="#{newCreditsReportAction.startDate}"
                                    popup="true"
                                    required="true"
                                    datePattern="#{messages['patterns.date']}"
@@ -40,7 +40,7 @@
                 <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Credit.endDate']}</ui:define>
                     <rich:calendar id="paymentDate"
-                                   value="#{creditRecoveryEvaluationZoneReportAction.endDate}"
+                                   value="#{newCreditsReportAction.endDate}"
                                    popup="true"
                                    required="true"
                                    datePattern="#{messages['patterns.date']}"
@@ -54,7 +54,7 @@
 
                 <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CreditType.currency']}</ui:define>
-                    <h:selectOneMenu id="currency" value="#{creditStatusZoneReportAction.currency}" styleClass="input" required="true"
+                    <h:selectOneMenu id="currency" value="#{newCreditsReportAction.currency}" styleClass="input" required="true"
                                      tabindex="6">
                         <s:selectItems value="#{currencyList.resultList}" var="currency" label="#{currency.fullName}"
                                        noSelectionLabel="" hideNoSelectionLabel="false"/>
@@ -64,12 +64,12 @@
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{creditStatusZoneReportAction}" showPageFormat="false"
+            <app:reportDefaultOptions reportAction="#{newCreditsReportAction}" showPageFormat="false"
                                       tabIndex="3"
                                       showReportTitle="false"/>
 
             <div class="buttons">
-                <h:commandButton action="#{creditStatusZoneReportAction.generateReport}"
+                <h:commandButton action="#{newCreditsReportAction.generateReport}"
                                  styleClass="button"
                                  value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
                     <s:defaultAction/>
