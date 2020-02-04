@@ -119,6 +119,12 @@
             </rich:menuItem>
 
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/newCreditsReport.xhtml"
+                        value="#{messages['menu.customers.report.newCredits']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditRecoveryEvaluationZone.xhtml"
                         value="#{messages['menu.customers.report.recoveryEvaluationZone']}"
                         propagation="none"/>

@@ -74,48 +74,6 @@ public class CreditStatusZoneReportAction extends GenericReportAction {
                 " partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.id, " +
                 " credit.expirationDate, credit.previousCode, credit.annualRate, credit.quota ";
 
-        /*ejbql = " SELECT " +
-                " productiveZone.number || '-' || productiveZone.name as gabName, " +
-                " credit.previousCode as code," +
-                " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as partnerName," +
-                " credit.grantDate," +
-                " credit.annualRate," +
-                " credit.amount," +
-                " credit.lastPayment," +
-                " credit.capitalBalance," +
-                " credit.quota," +
-                " credit.state, " +
-                " credit.id as creditId" +
-                " FROM Credit credit" +
-                " LEFT JOIN credit.partner partner" +
-                " LEFT JOIN partner.productiveZone productiveZone" +
-                " WHERE credit.capitalBalance > 0" +
-                " AND credit.creditType.currency.id = " + currency.getId() +
-                " ORDER BY credit.previousCode ";
-
-        if (productiveZone != null){
-
-            ejbql = " SELECT " +
-                    " productiveZone.number || '-' || productiveZone.name as gabName, " +
-                    " credit.previousCode as code," +
-                    " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as partnerName," +
-                    " credit.grantDate," +
-                    " credit.annualRate," +
-                    " credit.amount," +
-                    " credit.lastPayment," +
-                    " credit.capitalBalance," +
-                    " credit.quota," +
-                    " credit.state, " +
-                    " credit.id as creditId" +
-                    " FROM Credit credit" +
-                    " LEFT JOIN credit.partner partner" +
-                    " LEFT JOIN partner.productiveZone productiveZone" +
-                    " WHERE credit.capitalBalance > 0" +
-                    " AND credit.creditType.currency.id = " + currency.getId() +
-                    " AND productiveZone.id = " + productiveZone.getId() +
-                    " ORDER BY credit.previousCode ";
-        }*/
-
         return ejbql;
     }
 
