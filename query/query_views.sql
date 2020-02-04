@@ -120,7 +120,7 @@ select  `r`.`idrhmarcado` as `idrhmarcado`,
 	concat(`p`.`nombres`,' ',`p`.`apellidopaterno`,' ',`p`.`apellidomaterno`) as `nombre`
 from ((`rh_marcado` `r`  left join `empleado` `em`  on ((`r`.`marperid` = `em`.`codigomarcacion`)))
 left join `persona` `p`  on ((`em`.`idempleado` = `p`.`idpersona`)))
-where (`r`.`marfecha` >= '2018-08-01')
+where (`r`.`marfecha` >= '2020-01-01')
 ;
 
 
