@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summaryProviderKardexReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.accounting.reports.SummaryProviderReportScriptlet">
-	<property name="ireport.zoom" value="1.771561000000013"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="3.452271214393128"/>
+	<property name="ireport.x" value="120"/>
+	<property name="ireport.y" value="28"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="cashAccount" class="java.lang.String"/>
 	<parameter name="cashAccountCode" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
 	<field name="providerCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -187,33 +190,34 @@
 	</group>
 	<title>
 		<band height="36" splitType="Stretch">
-			<frame>
-				<reportElement x="0" y="21" width="561" height="15"/>
-				<textField>
-					<reportElement x="195" y="0" width="175" height="15"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement x="0" y="0" width="561" height="20"/>
-				<staticText>
-					<reportElement x="0" y="0" width="210" height="10"/>
-					<textElement>
-						<font fontName="Arial" size="8"/>
-					</textElement>
-					<text><![CDATA[COOPERATIVA INTEGRAL DE SERVICIOS CBBA LTDA]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="10" width="210" height="10"/>
-					<textElement>
-						<font fontName="Arial" size="8"/>
-					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
-				</staticText>
-			</frame>
+			<textField>
+				<reportElement x="194" y="21" width="175" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="9" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

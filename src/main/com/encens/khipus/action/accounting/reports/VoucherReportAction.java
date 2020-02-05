@@ -107,8 +107,10 @@ public class VoucherReportAction extends GenericReportAction {
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
-        reportParameters.put("companyTitle", companyTitle);
-        reportParameters.put("subTitle", subTitle);
+
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
         reportParameters.put("totalD", totalD);

@@ -7,8 +7,8 @@
 	<parameter name="totalC" class="java.math.BigDecimal"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="literalAmount" class="java.lang.String"/>
-	<parameter name="companyTitle" class="java.lang.String"/>
-	<parameter name="subTitle" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
 	<field name="voucher" class="com.encens.khipus.model.finances.Voucher">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -193,23 +193,20 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
 				</textField>
 			</frame>
-			<frame>
-				<reportElement x="0" y="0" width="561" height="20"/>
-				<textField>
-					<reportElement x="0" y="0" width="400" height="10"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyTitle}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="0" y="9" width="400" height="10"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{subTitle}]]></textFieldExpression>
-				</textField>
-			</frame>
+			<textField>
+				<reportElement x="0" y="0" width="200" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="9" width="200" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

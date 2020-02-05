@@ -4,20 +4,22 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.reports.ReportFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.finances.VoucherServiceBean;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.DateUtils;
-import org.apache.poi.hssf.record.formula.functions.If;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.testng.annotations.IFactoryAnnotation;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,13 +47,16 @@ public class MajorAccountingReportAction extends GenericReportAction {
 
     private CashAccount cashAccount;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
     private VoucherService voucherService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
-
     @In
     private CashAccountService cashAccountService;
 
@@ -89,15 +94,21 @@ public class MajorAccountingReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-        String documentTitle = "MAYOR CONTABLE";
-        String cashAccountName = this.cashAccount.getFullName();
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
+        String cashAccountName = this.cashAccount.getFullName();
         Double balance = voucherAccoutingService.getBalance(startDate, cashAccount.getAccountCode());
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
 
-        reportParameters.put("documentTitle", documentTitle);
+        reportParameters.put("documentTitle", messages.get("MajorAccounting.report.title"));
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
         reportParameters.put("cashAccount",cashAccountName);

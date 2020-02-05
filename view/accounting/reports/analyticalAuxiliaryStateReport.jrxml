@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="551" leftMargin="42" rightMargin="19" topMargin="28" bottomMargin="28" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet">
-	<property name="ireport.zoom" value="1.9487171000000019"/>
+	<property name="ireport.zoom" value="2.5937424601000028"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="documentTitle" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
 	<field name="accountCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -104,34 +108,6 @@
 	</group>
 	<title>
 		<band height="42">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="" positionType="Float" x="201" y="15" width="180" height="13"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.accounting.analyticalAuxiliaryState.title}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="1" y="0" width="199" height="10"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{App.company.office1}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="1" y="9" width="199" height="10"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{App.company.office2}]]></textFieldExpression>
-			</textField>
 			<textField pattern="dd/MM/yyyy">
 				<reportElement x="502" y="29" width="48" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -152,6 +128,34 @@
 					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
 				</graphicElement>
 			</line>
+			<textField>
+				<reportElement x="160" y="28" width="208" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="9" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="195" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

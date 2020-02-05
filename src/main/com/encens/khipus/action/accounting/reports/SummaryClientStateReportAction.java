@@ -4,10 +4,13 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -37,6 +40,8 @@ public class SummaryClientStateReportAction extends GenericReportAction {
     private CashAccount cashAccount;
     private Provider provider;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
@@ -62,22 +67,6 @@ public class SummaryClientStateReportAction extends GenericReportAction {
 
         String ejbql = "";
 
-            /*ejbql = " SELECT " +
-                    "        client.id, " +
-                    "        client.nit, " +
-                    "        client.name, " +
-                    "        client.ap, " +
-                    "        client.am, " +
-                    "        SUM(voucherDetail.debit) as debit, " +
-                    "        SUM(voucherDetail.credit) as credit " +
-                    "  FROM  Voucher voucher " +
-                    "  JOIN voucher.voucherDetailList voucherDetail " +
-                    "  JOIN voucherDetail.client client " +
-                    "  WHERE voucher.date between '" + start + "' and '" + end + "' " +
-                    "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
-                    "  AND   voucher.state <> 'ANL' " +
-                    "  group by client.id, client.nit, client.name, client.ap, client.am " +
-                    "  order by client.name";*/
         ejbql = " SELECT " +
                 "        client.territoriotrabajo.nombre as group, " +
                 "        client.id, " +
@@ -101,26 +90,31 @@ public class SummaryClientStateReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-            String documentTitle = "RESUMEN ESTADO DE CLIENTES";
-            String cashAccountName = this.cashAccount.getFullName();
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {e.printStackTrace();}
 
-            log.debug("Generating summary client state report...................");
+        String cashAccountName = this.cashAccount.getFullName();
 
-            HashMap<String, Object> reportParameters = new HashMap<String, Object>();
-            reportParameters.put("documentTitle", documentTitle);
-            reportParameters.put("startDate", startDate);
-            reportParameters.put("endDate", endDate);
-            reportParameters.put("cashAccount", cashAccountName);
-            reportParameters.put("cashAccountCode", cashAccount.getAccountCode());
+        HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+        reportParameters.put("documentTitle", messages.get("SummaryClientState.report.title"));
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
+        reportParameters.put("startDate", startDate);
+        reportParameters.put("endDate", endDate);
+        reportParameters.put("cashAccount", cashAccountName);
+        reportParameters.put("cashAccountCode", cashAccount.getAccountCode());
 
-            /*setReportFormat(ReportFormat.PDF);*/
-            super.generateReport(
-                    "summaryClientStateReport",
-                    "/accounting/reports/summaryClientStateReport.jrxml",
-                    PageFormat.LETTER,
-                    PageOrientation.PORTRAIT,
-                    messages.get("menu.finances.accounting.summaryClientState"),
-                    reportParameters);
+        super.generateReport(
+                "summaryClientStateReport",
+                "/accounting/reports/summaryClientStateReport.jrxml",
+                PageFormat.LETTER,
+                PageOrientation.PORTRAIT,
+                messages.get("menu.finances.accounting.summaryClientState"),
+                reportParameters);
+
 
     }
 

@@ -4,14 +4,18 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.reports.ReportFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,8 +37,10 @@ public class CheckSumsBalancesReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
 
-    //private CashAccount cashAccount;
-
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
@@ -45,10 +51,7 @@ public class CheckSumsBalancesReportAction extends GenericReportAction {
 
     @Create
     public void init() {
-        restrictions = new String[]{
-                //"voucherDetail.account=#{majorAccountingReportAction.cashAccount.accountCode}"
-        };
-        //sortProperty = "date";
+        restrictions = new String[]{};
     }
 
     @Override
@@ -74,21 +77,21 @@ public class CheckSumsBalancesReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-        String documentTitle = "COMPROBACIÓN DE SUMAS Y SALDOS";
-        //String cashAccountName = this.cashAccount.getFullName();
-
-        //Double balance = voucherAccoutingService.getBalance(startDate, cashAccount.getAccountCode());
-
         log.debug("Generating products produced report...................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
 
-        reportParameters.put("documentTitle", documentTitle);
+        reportParameters.put("documentTitle", messages.get("checkSumsAndBalances.report.title"));
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
-        //reportParameters.put("cashAccount",cashAccountName);
-        //reportParameters.put("balance",balance);
 
-        /*setReportFormat(ReportFormat.PDF);*/
         super.generateReport(
                 "majorAccountingReport",
                 "/accounting/reports/checkSumsBalancesReport.jrxml",
@@ -97,10 +100,6 @@ public class CheckSumsBalancesReportAction extends GenericReportAction {
                 messages.get("accounting.checkSumsBalance.TitleReport"),
                 reportParameters);
     }
-
-    /*public void clearAccount() {
-        setCashAccount(null);
-    }*/
 
     public Date getStartDate() {
         return startDate;

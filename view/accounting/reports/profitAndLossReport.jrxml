@@ -12,6 +12,9 @@
 	<parameter name="totalProfits" class="java.lang.Double"/>
 	<parameter name="totalLosses" class="java.lang.Double"/>
 	<parameter name="totalResults" class="java.lang.Double"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
 	<field name="account" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -69,64 +72,68 @@
 	<title>
 		<band height="77" splitType="Stretch">
 			<textField>
-				<reportElement x="126" y="26" width="289" height="15"/>
+				<reportElement x="126" y="28" width="289" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
 			</textField>
-			<frame>
-				<reportElement x="0" y="0" width="531" height="23"/>
-				<staticText>
-					<reportElement x="0" y="0" width="210" height="11"/>
-					<textElement>
-						<font fontName="Arial" size="9"/>
-					</textElement>
-					<text><![CDATA[COOPERATIVA INTEGRAL DE SERVICIOS CBBA LTDA]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="11" width="210" height="11"/>
-					<textElement>
-						<font fontName="Arial" size="9"/>
-					</textElement>
-					<text><![CDATA[INDUSTRIAS LACTEAS DEL VALLE ALTO]]></text>
-				</staticText>
-			</frame>
 			<staticText>
-				<reportElement x="179" y="41" width="175" height="13"/>
+				<reportElement x="179" y="43" width="175" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[(Expresado en Bolivianos)]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="219" y="54" width="50" height="12"/>
+				<reportElement x="219" y="56" width="50" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="282" y="54" width="50" height="12"/>
+				<reportElement x="282" y="56" width="50" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="203" y="54" width="15" height="12"/>
+				<reportElement x="203" y="56" width="15" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Del]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="269" y="54" width="12" height="12"/>
+				<reportElement x="269" y="56" width="12" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="9"/>
 				</textElement>
 				<text><![CDATA[Al]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="200" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="200" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="9" width="200" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

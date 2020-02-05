@@ -3,10 +3,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
-                xmlns:c="http://java.sun.com/jstl/core"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['checkSumsAndBalances.report']}</ui:define>
@@ -52,24 +50,6 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <!--<s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
-                    <app:selectPopUp id="itemAccount"
-                                             required="true"
-                                             textValue="#{majorAccountingReportAction.cashAccount.fullName}"
-                                             value="#{majorAccountingReportAction.cashAccount}"
-                                             clearAction="majorAccountingReportAction.clearAccount()"
-                                             searchModalPanel="cashAccountListModalPanel"
-                                             dataModel="#{cashAccountDataModel}"
-                                             reRender="itemAccountField"
-                                             tabindex="3">
-                                <ui:define name="criteriaValues">
-                                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
-                                </ui:define>
-                    </app:selectPopUp>
-                </s:decorate>-->
-                <!--<s:decorate><h:outputText value="#{majorAccountingReportAction.cashAccount.fullName}"/></s:decorate>-->
-
             </h:panelGrid>
         </rich:panel>
 
@@ -86,20 +66,6 @@
         </div>
 
     </h:form>
-
-    <!--<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-        <ui:param name="hasWarehousePermission" value="true"/>
-        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
-        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
-        <ui:define name="assignButton">
-            <a4j:commandButton id="assignButton"
-                               action="#{majorAccountingReportAction.setCashAccount(cashAccountItem)}"
-                               image="/img/active.gif"
-                               styleClass="select-image-middle"
-                               reRender="itemAccountField"
-                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
-        </ui:define>
-    </s:decorate>-->
 
 </ui:define>
 </ui:composition>

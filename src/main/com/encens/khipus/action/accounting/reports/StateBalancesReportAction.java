@@ -50,10 +50,7 @@ public class StateBalancesReportAction extends GenericReportAction {
 
     @Create
     public void init() {
-        restrictions = new String[]{
-                //"voucherDetail.account=#{majorAccountingReportAction.cashAccount.accountCode}"
-        };
-        //sortProperty = "date";
+        restrictions = new String[]{};
     }
 
     @Override
@@ -86,30 +83,19 @@ public class StateBalancesReportAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {e.printStackTrace();}
 
-        String companyName = companyConfiguration.getCompanyName();
-        String systemName = companyConfiguration.getSystemName();
-        String locationName = companyConfiguration.getLocationName();
-
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String start = df.format(startDate);
         String end   = df.format(endDate);
 
-        String documentTitle = "ESTADO DE SALDOS Y RESULTADOS";
-        //String cashAccountName = this.cashAccount.getFullName();
-
-        //Double balance = voucherAccoutingService.getBalance(startDate, cashAccount.getAccountCode());
-
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
 
-        reportParameters.put("companyName", companyName);
-        reportParameters.put("systemName", systemName);
-        reportParameters.put("locationName", locationName);
-        reportParameters.put("documentTitle", documentTitle);
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
+        reportParameters.put("documentTitle", messages.get("stateBalances.report.title"));
         reportParameters.put("startDate",startDate);
         reportParameters.put("endDate",endDate);
-        //reportParameters.put("cashAccount",cashAccountName);
-        //reportParameters.put("balance",balance);
 
         /** Estado de Ganancias y Perdidas **/
         Double totalProfits = voucherAccoutingService.getTotalProfits(start, end);
@@ -158,10 +144,6 @@ public class StateBalancesReportAction extends GenericReportAction {
                 reportParameters);
     }
 
-    /*public void clearAccount() {
-        setCashAccount(null);
-    }*/
-
     public Date getStartDate() {
         return startDate;
     }
@@ -178,11 +160,4 @@ public class StateBalancesReportAction extends GenericReportAction {
         this.endDate = endDate;
     }
 
-    /*public CashAccount getCashAccount() {
-        return cashAccount;
-    }*/
-
-    /*public void setCashAccount(CashAccount cashAccount) {
-        this.cashAccount = cashAccount;
-    }*/
 }

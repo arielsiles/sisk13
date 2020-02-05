@@ -87,7 +87,7 @@ public class NewCreditsReportAction extends GenericReportAction {
                 "newCreditsReport",
                 "/customers/reports/newCreditsReport.jrxml",
                 PageFormat.LETTER,
-                PageOrientation.LANDSCAPE,
+                PageOrientation.PORTRAIT,
                 messages.get("Credit.report.newCreditsReport.title"),
                 reportParameters);
 

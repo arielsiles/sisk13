@@ -4,12 +4,13 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
-import com.encens.khipus.action.reports.ReportFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
-import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -39,6 +40,8 @@ public class KardexProviderReportAction extends GenericReportAction {
     private CashAccount cashAccount;
     private Provider provider;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
@@ -120,6 +123,11 @@ public class KardexProviderReportAction extends GenericReportAction {
 
     public void generateReport() {
 
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {e.printStackTrace();}
+
         if(provider != null) {
             String documentTitle = "KARDEX - PROVEEDORES";
             String cashAccountName = this.cashAccount.getFullName();
@@ -131,6 +139,9 @@ public class KardexProviderReportAction extends GenericReportAction {
 
             HashMap<String, Object> reportParameters = new HashMap<String, Object>();
             reportParameters.put("documentTitle", documentTitle);
+            reportParameters.put("companyName", companyConfiguration.getCompanyName());
+            reportParameters.put("systemName", companyConfiguration.getSystemName());
+            reportParameters.put("locationName", companyConfiguration.getLocationName());
             reportParameters.put("startDate", startDate);
             reportParameters.put("endDate", endDate);
             reportParameters.put("cashAccount", cashAccountName);
@@ -154,6 +165,9 @@ public class KardexProviderReportAction extends GenericReportAction {
 
                 HashMap<String, Object> reportParameters = new HashMap<String, Object>();
                 reportParameters.put("documentTitle", documentTitle);
+                reportParameters.put("companyName", companyConfiguration.getCompanyName());
+                reportParameters.put("systemName", companyConfiguration.getSystemName());
+                reportParameters.put("locationName", companyConfiguration.getLocationName());
                 reportParameters.put("startDate", startDate);
                 reportParameters.put("endDate", endDate);
                 reportParameters.put("cashAccount", cashAccountName);
@@ -171,6 +185,11 @@ public class KardexProviderReportAction extends GenericReportAction {
 
                 log.debug("Generating analytical auxiliary state report...................");
                 HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+
+                reportParameters.put("documentTitle", messages.get("Reports.accounting.analyticalAuxiliaryState.title"));
+                reportParameters.put("companyName", companyConfiguration.getCompanyName());
+                reportParameters.put("systemName", companyConfiguration.getSystemName());
+                reportParameters.put("locationName", companyConfiguration.getLocationName());
                 reportParameters.put("startDate", startDate);
                 reportParameters.put("endDate", endDate);
 

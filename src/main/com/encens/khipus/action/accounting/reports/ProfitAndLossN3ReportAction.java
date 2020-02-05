@@ -4,14 +4,19 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.jatun.titus.reportgenerator.util.TypedReportData;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,6 +40,10 @@ public class ProfitAndLossN3ReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
@@ -45,10 +54,7 @@ public class ProfitAndLossN3ReportAction extends GenericReportAction {
 
     @Create
     public void init() {
-        restrictions = new String[]{
-                //"voucherDetail.account=#{majorAccountingReportAction.cashAccount.accountCode}"
-        };
-        //sortProperty = "date";
+        restrictions = new String[]{};
     }
 
     @Override
@@ -65,11 +71,14 @@ public class ProfitAndLossN3ReportAction extends GenericReportAction {
 
     public void generateReport() {
 
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String start = df.format(startDate);
         String end   = df.format(endDate);
-
-        String documentTitle = "ESTADO  DE  GANANCIAS  Y  PERDIDAS";
 
         Double totalProfits = voucherAccoutingService.getTotalProfits(start, end);
         Double totalLosses  = voucherAccoutingService.getTotalLosses(start, end);
@@ -78,7 +87,11 @@ public class ProfitAndLossN3ReportAction extends GenericReportAction {
         log.debug("Generating balance sheet report...................");
 
         HashMap<String, Object> params = new HashMap<String, Object>();
-        params.put("documentTitle", documentTitle);
+        params.put("documentTitle", messages.get("ProfitAndLoss.report.title"));
+        params.put("companyName", companyConfiguration.getCompanyName());
+        params.put("systemName", companyConfiguration.getSystemName());
+        params.put("locationName", companyConfiguration.getLocationName());
+
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("totalProfits", totalProfits);
@@ -117,12 +130,6 @@ public class ProfitAndLossN3ReportAction extends GenericReportAction {
         params.put("account445", account445);
         params.put("account446", account446);
         params.put("account447", account447);
-
-
-        /*System.out.println("---> 4420000000 COSTO DE BIENES REALIZABLES: " + account442);
-        System.out.println("---> 4430000000 COSTO DE BIENES ADQUIRIDOS: " + account443);
-        System.out.println("---> 4460000000 COSTOS DE PRODUCCION (TRANSITORIO): " + account446);
-        System.out.println("---> 4470000000 GASTOS DE COMERCIALIZACION: " + account447);*/
 
         /*setReportFormat(ReportFormat.PDF);*/
         super.generateReport("profitAndLossReport",

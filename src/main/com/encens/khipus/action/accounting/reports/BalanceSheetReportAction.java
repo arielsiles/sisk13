@@ -4,18 +4,20 @@ import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
-import com.encens.khipus.service.employees.PollFormService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.jatun.titus.reportgenerator.util.TypedReportData;
-import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -38,6 +40,10 @@ public class BalanceSheetReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
     @In(create = true)
     VoucherUpdateAction voucherUpdateAction;
     @In
@@ -68,12 +74,14 @@ public class BalanceSheetReportAction extends GenericReportAction {
 
     public void generateReport() {
 
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String start  = df.format(startDate);
         String end    = df.format(endDate);
-
-        String documentTitle = "ESTADO DE SITUACION PATRIMONIAL";
-        log.debug("Generating balance sheet report...................");
 
         /** Estado de Ganancias y Perdidas **/
         Double totalProfits = voucherAccoutingService.getTotalProfits(start, end);
@@ -88,7 +96,10 @@ public class BalanceSheetReportAction extends GenericReportAction {
         Double totalLiabilitiesCapital    = totalLiabilities + totalCapital;
 
         HashMap<String, Object> params = new HashMap<String, Object>();
-        params.put("documentTitle", documentTitle);
+        params.put("documentTitle", messages.get("BalanceSheet.report.title"));
+        params.put("companyName", companyConfiguration.getCompanyName());
+        params.put("systemName", companyConfiguration.getSystemName());
+        params.put("locationName", companyConfiguration.getLocationName());
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("totalAssets", totalAssets);
