@@ -217,6 +217,11 @@ public class PayrollGenerationCycleAction extends GenericAction<PayrollGeneratio
 
     private void putDefaultRates() {
         getInstance().setAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.LABOR_CONTRIBUTION));
+        getInstance().setLaborIndividualAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.LABOR_INDIVIDUAL));
+        getInstance().setLaborCommonRiskAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.LABOR_COMMON_RISK));
+        getInstance().setLaborSolidaryContributionAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.LABOR_SOLIDARY_CONTRIBUTION));
+        getInstance().setLaborComissionAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.LABOR_LABOR_COMISSION));
+
         getInstance().setNationalSolidaryAfpDiscountRule(taxPayrollUtilService.findActiveNationalSolidaryAfpDiscountRule());
         getInstance().setProfessionalRiskAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.PATRONAL_CONTRIBUTION_PROFESSIONAL_RISKS));
         getInstance().setProHousingAfpRate(taxPayrollUtilService.getActiveAfpRate(AFPRateType.PATRONAL_CONTRIBUTION_PRO_HOUSING));

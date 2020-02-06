@@ -176,6 +176,25 @@ public class AccountAction extends GenericAction<Account> {
         return result;
     }
 
+
+    /** Aportes **/
+    public BigDecimal getTotalBalancePartner(Partner partner){
+        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal totalDebitMN  = BigDecimal.ZERO;
+        BigDecimal totalCreditMN = BigDecimal.ZERO;
+
+        List<VoucherDetail> voucherDetails = accountService.getPartnerDetailList(partner);
+        for (VoucherDetail voucherDetail : voucherDetails){
+            totalCreditMN = BigDecimalUtil.sum(totalCreditMN, voucherDetail.getCredit());
+            totalDebitMN  = BigDecimalUtil.sum(totalDebitMN, voucherDetail.getDebit());
+        }
+        result = BigDecimalUtil.subtract(totalCreditMN, totalDebitMN);
+        return result;
+    }
+
+
+
+
     public String getFullAccountBalance(Account account){
         return account.getFullAccount() + " (" + getTotalBalanceAccount(account) + ")";
     }

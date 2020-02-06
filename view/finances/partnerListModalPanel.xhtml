@@ -64,7 +64,7 @@
                     <rich:column>#{messages['Partner.firstName']}</rich:column>
                     <rich:column>#{messages['Partner.lastName']}</rich:column>
                     <rich:column>#{messages['Partner.maidenName']}</rich:column>
-                    <rich:column>#{messages['Partner.code']}</rich:column>
+                    <rich:column>#{messages['Partner.contributions']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
                     </rich:column>
@@ -79,8 +79,11 @@
             <rich:column>
                 <h:outputText value="#{partnerItem.maidenName}"/>
             </rich:column>
-            <rich:column>
-                <h:outputText value="#{partnerItem.nPartner}"/>
+
+            <rich:column styleClass="right">
+                <h:outputText value="#{accountAction.getTotalBalancePartner(partnerItem)}" >
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
             </rich:column>
             <rich:column styleClass="center">
                 <ui:insert name="assignButton"/>

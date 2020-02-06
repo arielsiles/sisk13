@@ -42,11 +42,11 @@ alter table planillafiscalporcategoria add foreign key (idplanillatributariaporc
 
 
 -- eliminando planillas generadas
-delete from reportecontrol 		 	where idplanillagenerada in ();
-delete from `planillafiscalporcategoria` 	where idplanillagenerada in ();
-delete from `planillatributariaporcategoria` 	where idplanillagenerada in ();
-delete from `planillaadministrativos` 		where idplanillagenerada in ();
-delete from `planillagenerada` 			where idplanillagenerada in ();
+delete from reportecontrol 		 	where idplanillagenerada in (320);
+delete from `planillafiscalporcategoria` 	where idplanillagenerada in (320);
+delete from `planillatributariaporcategoria` 	where idplanillagenerada in (320);
+delete from `planillaadministrativos` 		where idplanillagenerada in (320);
+delete from `planillagenerada` 			where idplanillagenerada in (320);
 
 -- 
 

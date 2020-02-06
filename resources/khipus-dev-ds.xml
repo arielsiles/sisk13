@@ -79,7 +79,7 @@
     </local-tx-datasource>-->
 
     <!-- FOR F.CISC -->
-    <!--<local-tx-datasource>
+    <local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
         <connection-url>jdbc:mysql://localhost:3306/erp_ciscdev</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
@@ -91,10 +91,10 @@
         <idle-timeout-minutes>30</idle-timeout-minutes>
         <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
         </exception-sorter-class-name>
-    </local-tx-datasource>-->
+    </local-tx-datasource>
 
     <!-- FOR ILVA -->
-    <local-tx-datasource>
+    <!--<local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
         <connection-url>jdbc:mysql://localhost:3306/erp_ilvadev</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
@@ -106,6 +106,6 @@
         <idle-timeout-minutes>30</idle-timeout-minutes>
         <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
         </exception-sorter-class-name>
-    </local-tx-datasource>
+    </local-tx-datasource>-->
 
 </datasources>

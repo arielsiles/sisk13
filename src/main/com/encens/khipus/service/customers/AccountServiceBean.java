@@ -50,6 +50,25 @@ public class AccountServiceBean implements AccountService {
         return voucherDetails;
     }
 
+    public List<VoucherDetail> getPartnerDetailList(Partner partner){
+
+        List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
+        try {
+            voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+                    " where voucherDetail.partner =:partner " +
+                    " and voucherDetail.account =:cashAccountCode " +
+                    " and voucherDetail.voucher.state <> 'ANL' " +
+                    " order by voucherDetail.voucher.date asc ")
+                    .setParameter("partner", partner)
+                    .setParameter("cashAccountCode", "3110100000")
+                    .getResultList();
+
+        }catch (NoResultException e){
+            return null;
+        }
+        return voucherDetails;
+    }
+
     public BigDecimal calculateAccountBalance(Account account, Date startDate, Date endDate){
         BigDecimal result = BigDecimal.ZERO;
         String cashAccount = account.getAccountType().getCashAccountMn().getAccountCode();

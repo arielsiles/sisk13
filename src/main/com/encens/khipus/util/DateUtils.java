@@ -447,4 +447,11 @@ public final class DateUtils {
                     return false;
         return true;
     }
+
+    public static Date addDay(Date date, int num){
+        Calendar calendar = toCalendar(date);
+        calendar.add(Calendar.DAY_OF_YEAR, num);
+        return calendar.getTime();
+    }
+
 }

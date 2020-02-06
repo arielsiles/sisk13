@@ -31,6 +31,7 @@ public class SeniorityYearsCalculator extends Calculator<CategoryTributaryPayrol
 
 
     private Integer calculateSeniorityYears(Date hireDate) {
+        hireDate = DateUtils.addDay(hireDate, -1);
         Long seniorityDays = DateUtils.daysBetween(hireDate, gestionPayroll.getEndDate());
         Integer counter = 0;
         while (seniorityDays >= DAYS_OF_YEAR) {
