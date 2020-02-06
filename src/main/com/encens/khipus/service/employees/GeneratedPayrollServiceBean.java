@@ -1123,7 +1123,13 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 log.debug(">>> WORKED DAYS: " + workedDays);
                 log.debug(">>> day Absences: " + dayAbsences);
                 //mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
-                mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences*2);
+
+                dayAbsences = dayAbsences * 2;
+                System.out.println("====> > > Absences: " + employee.getFullName() + " - " + dayAbsences);
+                List<Date> specialDateUnpaidList = specialDateService.getSpecialDateRangeUnpaid(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
+                System.out.println("====> > > SpecialDate Unpaid: " + (specialDateUnpaidList.size()));
+                dayAbsences = dayAbsences - BigDecimalUtil.toBigDecimal(specialDateUnpaidList.size()).doubleValue();
+                mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
 
                 //System.out.println("======> mensualTotalSalary: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + mensualTotalSalary);
 
@@ -1265,7 +1271,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 //System.out.println("====> absenceDiscount: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
                 //absenceDiscount = dayAbsences * totalIncome.doubleValue() / 30;
                 //System.out.println("====> absenceDiscount: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
-                absenceDiscount = absenceDiscount * 2;
+                //absenceDiscount = absenceDiscount * 2;
                 //System.out.println("====> absenceDiscount*2: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + absenceDiscount);
 
                 //Todo this code part must be confirmed by customer

@@ -68,6 +68,22 @@ public class SpecialDateServiceBean implements SpecialDateService {
         return new ArrayList<Date>();
     }
 
+    public List<Date> getSpecialDateRangeUnpaid(Employee employee, Date initDate, Date endDate) {
+        try {
+            return getDateRangeList(em.createNamedQuery("SpecialDate.findSpecialDateRangeByEmployee")
+                    .setParameter("specialDateTarget", SpecialDateTarget.EMPLOYEE)
+                    .setParameter("employee", employee)
+                    .setParameter("initDate", initDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("credit", SpecialDateType.UNPAID)
+                    .setParameter("allDay", true)
+                    .getResultList(), initDate, endDate);
+        } catch (Exception e) {
+
+        }
+        return new ArrayList<Date>();
+    }
+
     public Map<Date, List<TimeInterval>> getSpecialDateTimeRange(Employee employee, Date initDate, Date endDate) {
         try {
             return getDateTimeIntervalRangeList(em.createNamedQuery("SpecialDate.findSpecialDateTimeRangeByEmployee")

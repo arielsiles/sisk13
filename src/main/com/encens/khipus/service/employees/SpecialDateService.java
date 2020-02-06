@@ -37,6 +37,8 @@ public interface SpecialDateService {
      */
     List<Date> getSpecialDateRange(Employee employee, Date initDate, Date endDate);
 
+    List<Date> getSpecialDateRangeUnpaid(Employee employee, Date initDate, Date endDate);
+
     List<Date> getSpecialDateRange(OrganizationalUnit organizationalUnit, Date initDate, Date endDate);
 
     List<Date> getSpecialDateRange(BusinessUnit businessUnit, Date initDate, Date endDate);
