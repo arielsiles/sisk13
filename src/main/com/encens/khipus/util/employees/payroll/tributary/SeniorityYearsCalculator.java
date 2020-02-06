@@ -31,10 +31,13 @@ public class SeniorityYearsCalculator extends Calculator<CategoryTributaryPayrol
 
 
     private Integer calculateSeniorityYears(Date hireDate) {
-        hireDate = DateUtils.addDay(hireDate, -1);
-        Long seniorityDays = DateUtils.daysBetween(hireDate, gestionPayroll.getEndDate());
+        hireDate = DateUtils.addDay(hireDate, 1); //Se incrementa un dia a su fecha de contrato, para que la antiguedad se considere en el sgte mes
+        //Long seniorityDays = DateUtils.daysBetween(hireDate, gestionPayroll.getEndDate());
+        Long seniorityDays = DateUtils.daysBetween(hireDate, gestionPayroll.getEndDate(), false);
+
         Integer counter = 0;
-        while (seniorityDays >= DAYS_OF_YEAR) {
+        //while (seniorityDays >= DAYS_OF_YEAR) {
+        while (seniorityDays > DAYS_OF_YEAR) {
             counter++;
             seniorityDays = seniorityDays - DAYS_OF_YEAR;
         }
