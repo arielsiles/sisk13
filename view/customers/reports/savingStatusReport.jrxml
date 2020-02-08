@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="savingStatusReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="534" leftMargin="53" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet">
 	<property name="ireport.zoom" value="3.1384283767210333"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="769"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
@@ -32,12 +32,15 @@
 	<field name="balanceME" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
 	</field>
-	<variable name="nro" class="java.lang.Integer">
-		<variableExpression><![CDATA[$V{REPORT_COUNT}.intValue()]]></variableExpression>
+	<variable name="nro" class="java.lang.Integer" resetType="Group" resetGroup="purchaseOrderGroup" calculation="Count">
+		<variableExpression><![CDATA[new java.lang.Integer(1)]]></variableExpression>
+		<initialValueExpression><![CDATA[new java.lang.Integer(0)]]></initialValueExpression>
 	</variable>
 	<variable name="balanceVar" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$F{currency}.equals(com.encens.khipus.model.finances.FinancesCurrencyType.P) ? $F{balanceMN} : $F{balanceME}
-]]></variableExpression>
+		<variableExpression><![CDATA[$F{currency}.equals(com.encens.khipus.model.finances.FinancesCurrencyType.P) ? $F{balanceMN} : $F{balanceME}]]></variableExpression>
+	</variable>
+	<variable name="totalBalanceVar" class="java.math.BigDecimal" resetType="Group" resetGroup="purchaseOrderGroup" calculation="Sum">
+		<variableExpression><![CDATA[$V{balanceVar}]]></variableExpression>
 	</variable>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[$F{accountTypeName} + " - " + str($F{currency}.getSymbolResourceKey())]]></groupExpression>
@@ -65,7 +68,7 @@
 						<text><![CDATA[Código]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="141" y="1" width="250" height="10"/>
+						<reportElement x="141" y="1" width="220" height="10"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="7"/>
 						</textElement>
@@ -73,36 +76,50 @@
 					</staticText>
 					<staticText>
 						<reportElement x="38" y="1" width="50" height="10"/>
-						<textElement verticalAlignment="Middle">
+						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[Num Cuenta]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="391" y="1" width="74" height="10"/>
+						<reportElement x="361" y="1" width="74" height="10"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[Saldo Cuenta]]></text>
 					</staticText>
+					<staticText>
+						<reportElement x="435" y="1" width="64" height="10"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="7"/>
+						</textElement>
+						<text><![CDATA[Moneda]]></text>
+					</staticText>
 				</frame>
 				<textField>
-					<reportElement x="0" y="0" width="264" height="11"/>
+					<reportElement x="0" y="0" width="315" height="11"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{accountTypeName} + " - " + str($F{currency}.getSymbolResourceKey())]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="15" splitType="Stretch">
+			<band height="10" splitType="Stretch">
 				<line>
 					<reportElement x="0" y="0" width="534" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 					</graphicElement>
 				</line>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="361" y="1" width="74" height="9"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalBalanceVar}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -161,7 +178,7 @@
 	<detail>
 		<band height="9" splitType="Stretch">
 			<textField>
-				<reportElement x="141" y="0" width="250" height="9"/>
+				<reportElement x="141" y="0" width="220" height="9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
@@ -176,13 +193,13 @@
 			</textField>
 			<textField>
 				<reportElement x="38" y="0" width="50" height="9"/>
-				<textElement verticalAlignment="Middle">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{accountNumber}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="391" y="0" width="74" height="9"/>
+				<reportElement x="361" y="0" width="74" height="9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
@@ -194,6 +211,13 @@
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{nro}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="435" y="0" width="64" height="9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[str($F{currency}.getSymbolResourceKey())]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
