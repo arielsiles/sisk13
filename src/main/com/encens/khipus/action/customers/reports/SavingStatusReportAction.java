@@ -47,23 +47,23 @@ public class SavingStatusReportAction extends GenericReportAction {
         String ejbql = "";
 
         ejbql = " SELECT " +
+                " partnerAccount.accountType.name AS accountTypeName, " +
+                " partnerAccount.currency, " +
                 " partnerAccount.accountNumber, " +
                 " partnerAccount.code, " +
-                " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName as name, " +
-                " partnerAccount.currency, " +
-                " SUM(voucherDetail.credit) - SUM(voucherDetail.debit) -  AS balanceMN, " +
-                " SUM(voucherDetail.creditMe) - SUM(voucherDetail.debitME) -  AS balanceME " +
+                " partnerAccount.accountType.name || ' - ' || partnerAccount.currency AS accountTypeCurrency, " +
+                " partner.firstName || ' ' || partner.lastName || ' ' || partner.maidenName AS partnerName, " +
+                " (SUM(voucherDetail.credit) - SUM(voucherDetail.debit)) AS balanceMN, " +
+                " (SUM(voucherDetail.creditMe) - SUM(voucherDetail.debitMe)) AS balanceME " +
                 " FROM VoucherDetail voucherDetail" +
                 " JOIN voucherDetail.voucher voucher" +
                 " JOIN voucherDetail.partnerAccount partnerAccount" +
                 " JOIN partnerAccount.partner partner" +
-                " JOIN partnerAccount.accountType accountType" +
                 " WHERE voucher.state <> 'ANL'" +
                 " AND voucherDetail.partnerAccount is not null" +
                 " AND voucher.date <= #{savingStatusReportAction.endDate} " +
-                " AND savingType.savingType <> #{savingStatusReportAction.savingTypeDPF}" +
-                " GROUP BY partnerAccount.accountNumber, partnerAccount.code, partner.firstName, partner.lastName, partner.maidenName, partnerAccount.currency";
-
+                " AND partnerAccount.accountType.savingType <> #{savingStatusReportAction.savingTypeDPF}" +
+                " GROUP BY partnerAccount.accountType.name, partnerAccount.currency, partnerAccount.accountNumber, partnerAccount.code, partner.firstName, partner.lastName, partner.maidenName";
 
         return ejbql;
     }
@@ -76,7 +76,7 @@ public class SavingStatusReportAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        String documentTitle = messages.get("Reports.credit.newCredits.title");
+        String documentTitle = messages.get("Reports.account.savingStatus.title");
         log.debug("Generating credit status report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("companyName", companyConfiguration.getCompanyName());
@@ -86,7 +86,7 @@ public class SavingStatusReportAction extends GenericReportAction {
         reportParameters.put("endDate", endDate);
 
         super.generateReport(
-                "newCreditsReport",
+                "savingStatusReport",
                 "/customers/reports/savingStatusReport.jrxml",
                 PageFormat.LETTER,
                 PageOrientation.PORTRAIT,
