@@ -9,10 +9,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.*;
-import com.encens.khipus.model.purchases.PurchaseOrder;
-import com.encens.khipus.model.purchases.PurchaseOrderPayment;
-import com.encens.khipus.model.purchases.PurchaseOrderPaymentState;
-import com.encens.khipus.model.purchases.PurchaseOrderPaymentType;
+import com.encens.khipus.model.purchases.*;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
@@ -495,15 +492,22 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         if (CollectionDocumentType.INVOICE.equals(purchaseOrder.getDocumentType())) {
             if(purchaseOrder.getWithBill().compareTo(Constants.WITH_BILL) == 0){
 
-                BigDecimal amountVAT = BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT);
-                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
-                        executorUnitCode,
-                        costCenterCode,
-                        companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
-                        amountVAT,
-                        FinancesCurrencyType.P,
-                        BigDecimal.ONE));
+                //BigDecimal amountVAT = BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT);
+                BigDecimal amountVAT = BigDecimal.ZERO;
 
+                for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()){
+                    amountVAT = BigDecimalUtil.sum(amountVAT, purchaseDocument.getIva());
+                    VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
+                            executorUnitCode,
+                            costCenterCode,
+                            companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                            purchaseDocument.getIva(),
+                            FinancesCurrencyType.P,
+                            BigDecimal.ONE);
+
+                    voucherDetail.setPurchaseDocument(purchaseDocument);
+                    voucher.addVoucherDetail(voucherDetail);
+                }
                 totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, amountVAT);
             }
         }

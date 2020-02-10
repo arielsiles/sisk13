@@ -202,6 +202,9 @@ public class PurchaseOrder implements BaseModel {
     @JoinColumn(name = "idmotivoordenc", referencedColumnName = "idmotivoordenc")
     private PurchaseOrderCause purchaseOrderCause;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);
+
     public Long getId() {
         return id;
     }
@@ -534,5 +537,13 @@ public class PurchaseOrder implements BaseModel {
 
     public void setWithBill(String withBill) {
         this.withBill = withBill;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentList() {
+        return purchaseDocumentList;
+    }
+
+    public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
+        this.purchaseDocumentList = purchaseDocumentList;
     }
 }
