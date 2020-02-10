@@ -164,7 +164,7 @@ public class CreditAction extends GenericAction<Credit> {
         }
 
         System.out.println("-----------------------------");
-        System.out.println("====> CAPITAL PAGADO: " + BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2));
+        System.out.println("====> CAPITAL PAGADO: " + credit.getPreviousCode() + " " + BigDecimalUtil.subtract(credit.getAmount(), credit.getCapitalBalance(), 2));
         //System.out.println("====> CAPITAL HASTA QUOTA: " + paidQuotas);
         //System.out.println("====> FECHA ENCONTRADA: " + DateUtils.format(result, "dd/MM/yyyy"));
         System.out.println("-----------------------------");
@@ -381,7 +381,8 @@ public class CreditAction extends GenericAction<Credit> {
         // Long diffDays = DateUtils.differenceBetween(nextPayment, currentDate, TimeUnit.DAYS);
         Long dias     = DateUtils.daysBetween(nextPayment, currentDate) - 1;
         result = dias;
-        System.out.println("++++++++=====> CALCULATE EXPIRED DAYS: " +
+        System.out.println();
+        System.out.println("++++++++=====> CALCULATE EXPIRED DAYS: " + credit.getPreviousCode() + " " +
                 DateUtils.format(nextPayment, "dd/MM/yyyy") + " - " +
                 DateUtils.format(currentDate, "dd/MM/yyyy") + " - DIFF: " + dias);
 

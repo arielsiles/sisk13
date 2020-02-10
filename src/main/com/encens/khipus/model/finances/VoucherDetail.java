@@ -151,6 +151,10 @@ public class VoucherDetail implements BaseModel {
     @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
     private PurchaseDocument purchaseDocument;
 
+    @ManyToOne
+    @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
+    private MovementInvoice movement;
+
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
         this.businessUnitCode = businessUnitCode;
@@ -356,6 +360,8 @@ public class VoucherDetail implements BaseModel {
         }
         if (purchaseDocument != null)
             fullCashAccount = fullCashAccount + " (F." + purchaseDocument.getNumber() + ")";
+        if (movement != null)
+            fullCashAccount = fullCashAccount + " (F." + movement.getInvoiceNumber() + ")";
         if (creditPartner != null)
             fullCashAccount = fullCashAccount + " (" + creditPartner.getPartner().getFullName() + ")";
         if (partner != null) {
@@ -481,5 +487,13 @@ public class VoucherDetail implements BaseModel {
 
     public void setQuantityArt(BigDecimal quantityArt) {
         this.quantityArt = quantityArt;
+    }
+
+    public MovementInvoice getMovement() {
+        return movement;
+    }
+
+    public void setMovement(MovementInvoice movement) {
+        this.movement = movement;
     }
 }

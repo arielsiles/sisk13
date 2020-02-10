@@ -8,7 +8,7 @@ alter table `com_encoc` add primary key (id_com_encoc);
 alter table `com_detoc` add foreign key (id_com_encoc) references com_encoc (id_com_encoc);
 
 alter table `inv_vales` add foreign key (id_com_encoc) references com_encoc (id_com_encoc);
-update inv_vales i set i.`idtmpenc` = null where i.`no_trans` in (18295, 18293, 18291, 18258, 18308)
+update inv_vales i set i.`idtmpenc` = null where i.`no_trans` in (18295, 18293, 18291, 18258, 18308); -- Para ILVA
 alter table `inv_vales` add foreign key (idtmpenc) references sf_tmpenc (id_tmpenc);
 -- alter table inv_mov add foreign key (no_trans) references inv_vales (no_trans); -- err
 alter table `inv_movdet` add primary key (id_inv_movdet);
@@ -18,7 +18,7 @@ alter table `documentocompra` add foreign key (idtmpenc) references sf_tmpenc (i
 alter table `documentocompra` add foreign key (idordencompra) references com_encoc (id_com_encoc);
 
 alter table `documentocontable` add primary key (iddocumentocontable);
-update documentocompra d set d.`iddocumentocompra` = 1318 where d.`iddocumentocompra` = 5781;
+update documentocompra d set d.`iddocumentocompra` = 1318 where d.`iddocumentocompra` = 5781; -- para ilva
 
 alter table documentocompra add foreign key (iddocumentocompra) references documentocontable (iddocumentocontable);
 
