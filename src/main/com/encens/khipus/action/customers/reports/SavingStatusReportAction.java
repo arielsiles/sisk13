@@ -64,7 +64,7 @@ public class SavingStatusReportAction extends GenericReportAction {
                 " AND voucher.date <= #{savingStatusReportAction.endDate} " +
                 " AND partnerAccount.accountType.savingType <> #{savingStatusReportAction.savingTypeDPF}" +
                 " GROUP BY partnerAccount.accountType.name, partnerAccount.currency, partnerAccount.accountNumber, partnerAccount.code, partner.firstName, partner.lastName, partner.maidenName" +
-                " ORDER BY partner.firstName, partner.lastName, partner.maidenName";
+                " ORDER BY partnerAccount.accountType.name, partnerAccount.currency, partner.firstName, partner.lastName, partner.maidenName";
 
         return ejbql;
     }

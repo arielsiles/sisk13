@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8" collation="utf8_general_ci">erp_ilvadev</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="sf_tmpenc" view="colnames">
+<left>52</left>
+<top>25</top>
+<width>164</width>
+<height>311</height>
+<sql_create_table>CREATE TABLE `sf_tmpenc` (
+  `id_tmpenc` bigint(20) NOT NULL,
+  `no_trans` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `agregar_cta_prov` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `monto` decimal(16,2) DEFAULT NULL,
+  `cta_bco` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cuenta` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `sede_pago_chq` varchar(8) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_cia` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `moneda` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `idmovimiento` bigint(24) DEFAULT NULL,
+  `fac` int(11) DEFAULT NULL,
+  `descri` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_doc` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tipo_doc` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `beneficiario` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tc` decimal(10,6) DEFAULT NULL,
+  `fecha_ven` date DEFAULT NULL,
+  `formulario` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `glosa` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `observacion` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `pendiente_registro` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_prov` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `entregado_a` varchar(660) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_trans_rel` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `procedencia` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_usr` varchar(4) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_enti` bigint(20) DEFAULT NULL,
+  `NOMBRECLIENTE` varchar(100) DEFAULT NULL,
+  `DEBE` double DEFAULT NULL,
+  `HABER` double DEFAULT NULL,
+  `IDPERSONACLIENTE` bigint(20) DEFAULT NULL,
+  `idusuario` bigint(20) DEFAULT NULL,
+  `ndoc` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id_tmpenc`),
+  UNIQUE KEY `id_tmpenc_UNIQUE` (`id_tmpenc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="sf_tmpdet" view="colnames">
+<left>590</left>
+<top>4</top>
+<width>224</width>
+<height>135</height>
+<sql_create_table>CREATE TABLE `sf_tmpdet` (
+  `id_tmpdet` bigint(20) NOT NULL,
+  `timemillis` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cuenta` varchar(31) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_uni` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_cia` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_cc` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `debe` decimal(16,2) DEFAULT NULL,
+  `haber` decimal(16,2) DEFAULT NULL,
+  `debeme` decimal(16,2) DEFAULT NULL,
+  `haberme` decimal(16,2) DEFAULT NULL,
+  `moneda` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tc` decimal(10,6) DEFAULT NULL,
+  `no_trans` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `id_tmpenc` bigint(20) NOT NULL,
+  `idmovimiento` bigint(24) DEFAULT NULL,
+  `glosa` varchar(1000) DEFAULT NULL,
+  `idpersonacliente` bigint(20) DEFAULT NULL,
+  `cod_prov` varchar(6) DEFAULT NULL,
+  `cod_art` varchar(6) DEFAULT NULL,
+  `cant_art` decimal(16,2) DEFAULT NULL,
+  `idsocio` bigint(20) DEFAULT NULL,
+  `idcuenta` bigint(20) DEFAULT NULL,
+  `idcredito` bigint(20) DEFAULT NULL,
+  `iddocumentocompra` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id_tmpdet`),
+  KEY `FK_TMPENC` (`id_tmpenc`),
+  KEY `idpersonacliente` (`idpersonacliente`),
+  KEY `idsocio` (`idsocio`),
+  KEY `idcuenta` (`idcuenta`),
+  KEY `idcredito` (`idcredito`),
+  KEY `idmovimiento` (`idmovimiento`),
+  KEY `iddocumentocompra` (`iddocumentocompra`),
+  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`),
+  CONSTRAINT `FK_TMPENC` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `sf_tmpdet_ibfk_1` FOREIGN KEY (`idpersonacliente`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
+  CONSTRAINT `sf_tmpdet_ibfk_2` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
+  CONSTRAINT `sf_tmpdet_ibfk_3` FOREIGN KEY (`idcuenta`) REFERENCES `cuenta` (`idcuenta`),
+  CONSTRAINT `sf_tmpdet_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
+  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="ventadirecta" view="colnames">
+<left>445</left>
+<top>489</top>
+<width>214</width>
+<height>159</height>
+<sql_create_table>CREATE TABLE `ventadirecta` (
+  `IDVENTADIRECTA` bigint(20) NOT NULL,
+  `DESCRIPCION` varchar(255) DEFAULT NULL,
+  `FECHA_PEDIDO` date DEFAULT NULL,
+  `OBSERVACION` varchar(255) DEFAULT NULL,
+  `TOTAL` double DEFAULT NULL,
+  `IDCLIENTE` bigint(20) DEFAULT NULL,
+  `ESTADO` varchar(15) DEFAULT NULL,
+  `TOTALIMPORTE` double NOT NULL,
+  `IMPUESTO` double NOT NULL,
+  `IDUSUARIO` bigint(20) DEFAULT NULL,
+  `CODIGO` bigint(20) DEFAULT NULL,
+  `IDMOVIMIENTO` bigint(24) DEFAULT NULL,
+  `PAGO` double NOT NULL,
+  `CAMBIO` double NOT NULL,
+  `documento` longblob,
+  `id_tmpenc` bigint(20) DEFAULT NULL,
+  `IDSUCURSAL` bigint(20) DEFAULT NULL,
+  `flagstock` int(11) DEFAULT '0',
+  `id_tmpenc_cv` bigint(20) DEFAULT NULL,
+  `CV` int(11) NOT NULL DEFAULT '0',
+  `flagct` int(11) DEFAULT '0',
+  PRIMARY KEY (`IDVENTADIRECTA`),
+  KEY `fk_ventdir_movimiento` (`IDMOVIMIENTO`),
+  KEY `fk_ventdir_usuario` (`IDUSUARIO`),
+  KEY `fk_ventdir_cliente` (`IDCLIENTE`),
+  KEY `id_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `ventadirecta_ibfk_1` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `fk_ventdir_cliente` FOREIGN KEY (`IDCLIENTE`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
+  CONSTRAINT `fk_ventdir_movimiento` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
+  CONSTRAINT `fk_ventdir_usuario` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="pedidos" view="colnames">
+<left>458</left>
+<top>235</top>
+<width>204</width>
+<height>177</height>
+<sql_create_table>CREATE TABLE `pedidos` (
+  `IDPEDIDOS` bigint(20) NOT NULL,
+  `DESCRIPCION` varchar(255) DEFAULT NULL,
+  `FACTURA` varchar(255) DEFAULT NULL,
+  `FECHA_A_PAGAR` date DEFAULT NULL,
+  `FECHA_ENTREGA` date DEFAULT NULL,
+  `FECHA_PEDIDO` date DEFAULT NULL,
+  `IDDIRECCION` bigint(20) DEFAULT NULL,
+  `OBSERVACION` varchar(255) DEFAULT NULL,
+  `PORCENTAJECOMISION` double DEFAULT NULL,
+  `PORCENTAJEGARANTIA` double DEFAULT NULL,
+  `SUPERVISOR` bigint(20) DEFAULT NULL,
+  `TOTAL` double DEFAULT NULL,
+  `ESTADO_PEDIDO` bigint(20) DEFAULT NULL,
+  `IDCLIENTE` bigint(20) DEFAULT NULL,
+  `IDTIPOPEDIDO` bigint(20) DEFAULT NULL,
+  `ESTADO` varchar(15) DEFAULT NULL,
+  `TOTALIMPORTE` double NOT NULL,
+  `IDUSUARIO` bigint(20) DEFAULT NULL,
+  `VALORCOMISION` double DEFAULT '0',
+  `VALORGARANTIA` double DEFAULT NULL,
+  `CODIGO` bigint(20) DEFAULT NULL,
+  `CON_REPOSICION` int(1) DEFAULT NULL,
+  `IDMOVIMIENTO` bigint(24) DEFAULT NULL,
+  `PEDIDOSREPOSICION` bigint(20) DEFAULT NULL,
+  `IMPUESTO` double DEFAULT NULL,
+  `TIENEFACTURA` tinyint(1) DEFAULT NULL,
+  `id_tmpenc` bigint(20) DEFAULT NULL,
+  `CONTABILIZADO` tinyint(1) DEFAULT NULL,
+  `IDSUCURSAL` bigint(20) DEFAULT NULL,
+  `flagstock` int(11) DEFAULT '0',
+  `id_tmpenc_cv` bigint(20) DEFAULT NULL,
+  `CV` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`IDPEDIDOS`),
+  KEY `pedidos_sf_tmpenc_FK` (`id_tmpenc`),
+  KEY `IDCLIENTE` (`IDCLIENTE`),
+  KEY `IDTIPOPEDIDO` (`IDTIPOPEDIDO`),
+  KEY `IDUSUARIO` (`IDUSUARIO`),
+  KEY `IDMOVIMIENTO` (`IDMOVIMIENTO`),
+  CONSTRAINT `pedidos_ibfk_5` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`IDCLIENTE`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
+  CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`IDTIPOPEDIDO`) REFERENCES `tipopedido` (`IDTIPOPEDIDO`),
+  CONSTRAINT `pedidos_ibfk_3` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`),
+  CONSTRAINT `pedidos_ibfk_4` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="movimiento" view="colnames">
+<left>879</left>
+<top>437</top>
+<width>237</width>
+<height>311</height>
+<sql_create_table>CREATE TABLE `movimiento` (
+  `IDMOVIMIENTO` bigint(24) NOT NULL,
+  `FECHA_FACTURA` date DEFAULT NULL,
+  `GLOSA` varchar(300) DEFAULT NULL,
+  `ESTADO` varchar(15) DEFAULT NULL,
+  `NROFACTURA` int(11) DEFAULT NULL,
+  `NIT_CLIENTE` varchar(50) DEFAULT NULL,
+  `RAZON_SOCIAL` varchar(200) DEFAULT NULL,
+  `IMPORTE_TOTAL` decimal(10,2) DEFAULT NULL,
+  `IMPORTE_ICE_IEHD_TASAS` decimal(10,2) DEFAULT NULL,
+  `EXPORT_EXENTAS` decimal(10,2) DEFAULT NULL,
+  `VENTAS_GRAB_TASACERO` decimal(10,2) DEFAULT NULL,
+  `SUBTOTAL` decimal(10,2) DEFAULT NULL,
+  `DESCUENTOS` decimal(10,2) DEFAULT NULL,
+  `IMPORTE_PARA_DEBITO_FISCAL` decimal(10,2) DEFAULT NULL,
+  `DEBITO_FISCAL` decimal(10,2) DEFAULT NULL,
+  `CODIGOCONTROL` varchar(30) DEFAULT NULL,
+  `TIPOPAGO` varchar(10) DEFAULT NULL,
+  `TIPOCAMBIO` double DEFAULT NULL,
+  `FECHAREGISTRO` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `CODIGO_QR` varchar(150) NOT NULL,
+  `NRO_AUTORIZACION` varchar(15) NOT NULL,
+  `IDPEDIDOS` bigint(20) DEFAULT NULL,
+  `IDVENTADIRECTA` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`IDMOVIMIENTO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>
