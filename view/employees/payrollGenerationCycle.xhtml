@@ -24,6 +24,7 @@
              columnClasses="left, right">
     <s:div>
         <h:panelGrid columns="2" cellpadding="2" cellspacing="0" border="0">
+            <!-- Menu Flotante
             <rich:dropDownMenu style="color: #{a4jSkin.generalLinkColor};"
                                styleClass="tiny-menu-cell-border"
                                rendered="#{payrollGenerationCycleAction.managed and payrollGenerationCycleAction.hasTributaryPayroll() and s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}"
@@ -86,6 +87,7 @@
                                immediate="true"
                                action="#{workContributionByCostCenterReportAction.generateReport(payrollGenerationCycleAction.instance)}"/>
             </rich:dropDownMenu>
+            End Menu Flotante-->
         </h:panelGrid>
     </s:div>
     <s:div styleClass="buttons">

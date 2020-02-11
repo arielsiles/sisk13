@@ -264,17 +264,15 @@ public class AccountAction extends GenericAction<Account> {
         voucher.setGloss("CAPITALIZACION DE INTERESES SOBRE " + MessageUtils.getMessage(savingType.getResourceKey()).toUpperCase() + " AL " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
         List<Account> accountList = accountService.getSavingsAccounts(savingType);
-
-        for (Account account :accountList){
-            System.out.println("-----> CUENTA AHORRO: " + account.getFullAccountName());
-        }
+        // for (Account account :accountList) System.out.println("-----> CUENTA AHORRO: " + account.getFullAccountName());
 
         /** Para calcular el saldo a inicio del periodo a capitalizar, resta un dia a fecha inicio **/
         /** todo: corregir segundos en fecha inicio toma los segundos del sistema **/
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
         calendar.add(Calendar.DAY_OF_YEAR, -1);
-        Date start = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate));
+        //Date start = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(startDate));
+        Date start = DateUtils.getDate(Constants.YEAR, Constants.MONTH, Constants.DAY);
         Date end   = calendar.getTime();
         System.out.println("=====> FECHAS: " + start + " - " + end);
 
@@ -289,8 +287,11 @@ public class AccountAction extends GenericAction<Account> {
             BigDecimal interest = BigDecimal.ZERO;
             BigDecimal ivaTax = BigDecimal.ZERO;
 
+            BigDecimal accountBalance = accountService.calculateAccountBalance(account, start, end);
+            if (accountBalance.compareTo(BigDecimal.ZERO) == 0) continue;
+
             List<VoucherDetail> accountMovements = accountService.getMovementAccountBetweenDates(account, startDate, endDate);
-            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency(), startDate, accountService.calculateAccountBalance(account, start, end));
+            List<AccountKardex> kardexList       = calculateAccountKardex(accountMovements, account.getCurrency(), startDate, accountBalance);
 
             /** change for conditions: with credit, without credit **/
             BigDecimal percentage = account.getAccountType().getInta(); /** Without credit **/

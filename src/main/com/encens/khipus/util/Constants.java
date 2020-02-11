@@ -287,8 +287,11 @@ public final class Constants {
 
 
     public static final String ACOUNT_LOAN_EXECUTION = "";          //
-
     public static final BigDecimal EXCHANGE_RATE = new BigDecimal(6.96);
+
+    public static final Integer YEAR = 2019;
+    public static final Integer MONTH = 1;
+    public static final Integer DAY = 1;
 
     private Constants() {
     }
