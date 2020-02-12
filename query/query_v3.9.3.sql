@@ -19,14 +19,20 @@ alter table `documentocompra` add foreign key (idordencompra) references com_enc
 
 alter table `documentocontable` add primary key (iddocumentocontable);
 update documentocompra d set d.`iddocumentocompra` = 1318 where d.`iddocumentocompra` = 5781; -- para ilva
-
 alter table documentocompra add foreign key (iddocumentocompra) references documentocontable (iddocumentocontable);
-
 alter table sf_tmpdet add foreign key (iddocumentocompra) references documentocompra (iddocumentocompra);
 
 
 
 -- 
+
+-- update sf_tmpdet d set d.`iddocumentocompra` = null where d.`id_tmpdet` = 742759;
+
+select s.`id_tmpdet`, s.`iddocumentocompra`, d.`iddocumentocompra`
+from sf_tmpdet s
+left join documentocompra d on s.`iddocumentocompra` = d.`iddocumentocompra`
+where s.`iddocumentocompra` is not null
+;
 
 
 select d.`iddocumentocompra`, do.`iddocumentocontable`

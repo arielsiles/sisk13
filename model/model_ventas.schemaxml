@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">erp_ilvadev</database>
+<database charset="utf8" collation="utf8_general_ci">khipus</database>
 </source>
 <canvas zoom="100">
 <tables>
@@ -51,8 +51,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="sf_tmpdet" view="colnames">
-<left>590</left>
-<top>4</top>
+<left>565</left>
+<top>165</top>
 <width>224</width>
 <height>135</height>
 <sql_create_table>CREATE TABLE `sf_tmpdet` (
@@ -88,18 +88,18 @@
   KEY `idcredito` (`idcredito`),
   KEY `idmovimiento` (`idmovimiento`),
   KEY `iddocumentocompra` (`iddocumentocompra`),
-  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`),
   CONSTRAINT `FK_TMPENC` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
   CONSTRAINT `sf_tmpdet_ibfk_1` FOREIGN KEY (`idpersonacliente`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
   CONSTRAINT `sf_tmpdet_ibfk_2` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
   CONSTRAINT `sf_tmpdet_ibfk_3` FOREIGN KEY (`idcuenta`) REFERENCES `cuenta` (`idcuenta`),
   CONSTRAINT `sf_tmpdet_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
-  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
+  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
+  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="ventadirecta" view="colnames">
-<left>445</left>
-<top>489</top>
+<left>303</left>
+<top>556</top>
 <width>214</width>
 <height>159</height>
 <sql_create_table>CREATE TABLE `ventadirecta` (
@@ -129,15 +129,15 @@
   KEY `fk_ventdir_usuario` (`IDUSUARIO`),
   KEY `fk_ventdir_cliente` (`IDCLIENTE`),
   KEY `id_tmpenc` (`id_tmpenc`),
-  CONSTRAINT `ventadirecta_ibfk_1` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
   CONSTRAINT `fk_ventdir_cliente` FOREIGN KEY (`IDCLIENTE`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
   CONSTRAINT `fk_ventdir_movimiento` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
-  CONSTRAINT `fk_ventdir_usuario` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`)
+  CONSTRAINT `fk_ventdir_usuario` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`),
+  CONSTRAINT `ventadirecta_ibfk_1` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pedidos" view="colnames">
-<left>458</left>
-<top>235</top>
+<left>296</left>
+<top>340</top>
 <width>204</width>
 <height>177</height>
 <sql_create_table>CREATE TABLE `pedidos` (
@@ -179,16 +179,16 @@
   KEY `IDTIPOPEDIDO` (`IDTIPOPEDIDO`),
   KEY `IDUSUARIO` (`IDUSUARIO`),
   KEY `IDMOVIMIENTO` (`IDMOVIMIENTO`),
-  CONSTRAINT `pedidos_ibfk_5` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`IDCLIENTE`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`IDTIPOPEDIDO`) REFERENCES `tipopedido` (`IDTIPOPEDIDO`),
   CONSTRAINT `pedidos_ibfk_3` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`),
-  CONSTRAINT `pedidos_ibfk_4` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
+  CONSTRAINT `pedidos_ibfk_4` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
+  CONSTRAINT `pedidos_ibfk_5` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="movimiento" view="colnames">
-<left>879</left>
-<top>437</top>
+<left>960</left>
+<top>178</top>
 <width>237</width>
 <height>311</height>
 <sql_create_table>CREATE TABLE `movimiento` (
@@ -213,9 +213,16 @@
   `FECHAREGISTRO` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `CODIGO_QR` varchar(150) NOT NULL,
   `NRO_AUTORIZACION` varchar(15) NOT NULL,
+  `id_tmpdet` bigint(20) DEFAULT NULL,
   `IDPEDIDOS` bigint(20) DEFAULT NULL,
   `IDVENTADIRECTA` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`IDMOVIMIENTO`)
+  PRIMARY KEY (`IDMOVIMIENTO`),
+  KEY `IDPEDIDOS` (`IDPEDIDOS`),
+  KEY `IDVENTADIRECTA` (`IDVENTADIRECTA`),
+  KEY `id_tmpdet` (`id_tmpdet`),
+  CONSTRAINT `movimiento_ibfk_3` FOREIGN KEY (`id_tmpdet`) REFERENCES `sf_tmpdet` (`id_tmpdet`),
+  CONSTRAINT `movimiento_ibfk_1` FOREIGN KEY (`IDPEDIDOS`) REFERENCES `pedidos` (`IDPEDIDOS`),
+  CONSTRAINT `movimiento_ibfk_2` FOREIGN KEY (`IDVENTADIRECTA`) REFERENCES `ventadirecta` (`IDVENTADIRECTA`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 </tables>

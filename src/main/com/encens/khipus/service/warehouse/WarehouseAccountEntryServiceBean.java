@@ -16,6 +16,7 @@ import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.finances.*;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.purchases.GlossGeneratorService;
+import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.*;
 import com.encens.khipus.util.warehouse.WarehouseUtil;
 import org.jboss.seam.annotations.AutoCreate;
@@ -45,6 +46,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
+
+    @In
+    private PurchaseDocumentService purchaseDocumentService;
 
     @In
     private SequenceGeneratorService sequenceGeneratorService;
@@ -507,6 +511,10 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
                     voucherDetail.setPurchaseDocument(purchaseDocument);
                     voucher.addVoucherDetail(voucherDetail);
+
+                    //purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
+                    //purchaseDocument.setVoucher(voucher);
+
                 }
                 totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, amountVAT);
             }
@@ -569,6 +577,15 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         warehouseVoucher.setVoucher(voucher);
         voucherAccoutingService.saveVoucher(voucher);
+
+        /** Actualiza DocumentoCompra y la relacion con sf_tmpdet **/
+        /*for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()){
+            try {
+                purchaseDocumentService.updateDocument(purchaseDocument);
+            }catch (Exception e){e.printStackTrace();}
+
+        }*/
+
         return voucher;
     }
     /* when a fixedAsset or warehouse purchases order has been liquidated whith only check

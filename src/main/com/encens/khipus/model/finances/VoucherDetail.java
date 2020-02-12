@@ -147,7 +147,7 @@ public class VoucherDetail implements BaseModel {
     private Credit creditPartner;
 
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
     private PurchaseDocument purchaseDocument;
 

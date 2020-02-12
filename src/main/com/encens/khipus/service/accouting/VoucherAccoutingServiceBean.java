@@ -55,6 +55,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     private PurchaseDocumentService purchaseDocumentService;
     @In
     private ProductionOrderService productionOrderService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     public void savePurchaseDocument(){
 
@@ -101,6 +103,22 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucherDetail.setVoucher(voucher);
             em.persist(voucherDetail);
             em.flush();
+        }
+
+    }
+
+    public void updatePurchaseDocumentIfExist(Voucher voucher){
+
+        for (VoucherDetail voucherDetail : voucher.getDetails()) {
+            if (voucherDetail.getPurchaseDocument() != null){
+                System.out.println("-------------------------> debito fiscal: " + voucherDetail.getFullCashAccount());
+                PurchaseDocument purchaseDocument = voucherDetail.getPurchaseDocument();
+                purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
+                purchaseDocument.setVoucher(voucher);
+
+                em.merge(purchaseDocument);
+                em.flush();
+            }
         }
 
     }

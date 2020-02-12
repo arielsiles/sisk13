@@ -86,6 +86,10 @@ public class PurchaseDocument extends AccountingDocument {
     @JoinColumn(name = "IDENTIDAD", referencedColumnName = "COD_ENTI", nullable = true, insertable = true, updatable = true)
     private FinancesEntity financesEntity;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "ID_TMPDET", nullable = true, insertable = true, updatable = true)
+    private VoucherDetail voucherDetailFiscalCredit;
+
     @Column(name = "NO_CIA", length = 2)
     @Length(max = 2)
     private String companyNumber;
@@ -239,5 +243,13 @@ public class PurchaseDocument extends AccountingDocument {
 
     public String getFullName(){
         return getNit() + " " + getName();
+    }
+
+    public VoucherDetail getVoucherDetailFiscalCredit() {
+        return voucherDetailFiscalCredit;
+    }
+
+    public void setVoucherDetailFiscalCredit(VoucherDetail voucherDetailFiscalCredit) {
+        this.voucherDetailFiscalCredit = voucherDetailFiscalCredit;
     }
 }

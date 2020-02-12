@@ -12,6 +12,7 @@ import com.encens.khipus.interceptor.BusinessUnitRestriction;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
@@ -53,6 +54,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
 
     @In(value = "warehousePurchaseOrderService")
     private WarehousePurchaseOrderService warehousePurchaseOrderService;
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     @In(create = true)
     private PurchaseOrderValidator purchaseOrderValidator;
@@ -151,6 +155,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
                 //System.out.println("=======> O.C. con Factura ");
                 //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/ // Before testing
                 voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
+
+                voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
+
                 approvalWarehouseVoucherService.approveWarehouseVoucherForPurchaseOrder(warehouseVoucher.getId(), getGlossMessage(),
                                                                                         movementDetailUnderMinimalStockMap,
                                                                                         movementDetailOverMaximumStockMap,

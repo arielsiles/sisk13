@@ -10,8 +10,8 @@ update pedidos p set p.`IDMOVIMIENTO` = null where p.`IDPEDIDOS` in (
 14165	,14200	,14233	,14389	,14390	,14419	,14456	,14543	,14587	,14588	,14626	,14702	,14768	,14858	);
 
 alter table pedidos add foreign key (idmovimiento) references movimiento(idmovimiento);
-alter table pedidos add foreign key (id_tmpenc) references sf_tmpenc(id_tmpenc);
 
+alter table pedidos add foreign key (id_tmpenc) references sf_tmpenc(id_tmpenc);
 alter table ventadirecta add foreign key (id_tmpenc) references sf_tmpenc(id_tmpenc);
 
 
