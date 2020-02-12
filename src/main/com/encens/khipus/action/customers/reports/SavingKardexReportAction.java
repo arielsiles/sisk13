@@ -62,7 +62,7 @@ public class SavingKardexReportAction extends GenericReportAction {
                 " voucher.date, " +
                 condition +
                 " voucher.gloss, " +
-                " voucher.documentType || '-' || voucher.documentNumber as doc, " +
+                " voucher.documentType || '-' || voucher.documentNumber as doc " +
                 " FROM VoucherDetail voucherDetail" +
                 " JOIN voucherDetail.voucher voucher" +
                 " WHERE voucherDetail.partnerAccount = #{savingKardexReportAction.savingAccount}" +

@@ -53,9 +53,9 @@
                 </s:decorate>
 
                 <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label"><h:outputText value="#{messages['Partner.savings']}"/></ui:define>
+                    <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
                     <app:selectPopUp id="accountFieldId"
-                                     required="false"
+                                     required="true"
                                      textValue="#{savingKardexReportAction.savingAccount.fullAccountName}"
                                      value="#{savingKardexReportAction.savingAccount}"
                                      clearAction="#{savingKardexReportAction.clearSavingAccount()}"
