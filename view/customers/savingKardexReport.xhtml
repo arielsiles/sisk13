@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Account.report.savingKardexReport.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+
+                <f:facet name="header">
+                    #{messages['Account.report.savingKardexReport.title']}
+                </f:facet>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{savingKardexReportAction.startDate}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   disabled="false"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{savingKardexReportAction.endDate}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   disabled="false"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label"><h:outputText value="#{messages['Partner.savings']}"/></ui:define>
+                    <app:selectPopUp id="accountFieldId"
+                                     required="false"
+                                     textValue="#{savingKardexReportAction.savingAccount.fullAccountName}"
+                                     value="#{savingKardexReportAction.savingAccount}"
+                                     clearAction="#{savingKardexReportAction.clearSavingAccount()}"
+                                     searchModalPanel="accountListModalPanel"
+                                     dataModel="#{accountDataModel}"
+                                     reRender="accountField"
+                                     tabindex="12">
+                    </app:selectPopUp>
+                </s:decorate>
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{savingKardexReportAction}" showPageFormat="false" tabIndex="3" showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{savingKardexReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+
+            </div>
+
+        </h:form>
+
+        <s:decorate id="accountListModalPanelContainer" template="/customers/accountListModalPanel.xhtml">
+            <ui:param name="containerId" value="accountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="accountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{savingKardexReportAction.setSavingAccount(accountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="accountField"
+                                   oncomplete="Richfaces.hideModalPanel('accountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

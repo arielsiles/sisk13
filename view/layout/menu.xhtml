@@ -136,6 +136,12 @@
                         propagation="none"/>
             </rich:menuItem>
 
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/savingKardexReport.xhtml"
+                        value="#{messages['menu.customers.report.savingKardex']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.process']}" rendered="#{s:hasPermission('CUSTOMERPROCESS','VIEW')}">
