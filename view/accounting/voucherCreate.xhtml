@@ -472,6 +472,7 @@
                                              title="#{messages['Common.remove']}"
                                              action="#{voucherCreateAction.removeVoucherDetail(voucherDetail)}"
                                              ajaxSingle="true"
+                                             rendered="#{voucherCreateAction.pending}"
                                              reRender="movementDetailListPanel, invoiceDetailListPanel">
                                 <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                             </a4j:commandLink>

@@ -120,14 +120,18 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 em.flush();
             }
         }
-
     }
 
-    @Override
+    public void removeVoucherDetail(VoucherDetail voucherDetail){
+        em.remove(voucherDetail);
+        em.flush();
+    }
+
+    /*@Override
     @TransactionAttribute(REQUIRES_NEW)
     public void updateVoucher(Voucher voucher) {
 
-        /** For VoucherDetail **/
+        *//** For VoucherDetail **//*
         List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
         for (VoucherDetail voucherDetail : voucherDetailsDB) {
             em.merge(voucherDetail);
@@ -136,6 +140,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }
 
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
+            if(voucherDetail.getTransactionNumber() == null){
+                voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+                voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
+                voucherDetail.setVoucher(voucher);
+
+                em.persist(voucherDetail);
+                em.merge(voucher);
+                em.flush();
+
+            }else{
+                em.merge(voucherDetail);
+                em.merge(voucher);
+                em.flush();
+            }
+        }
+
+        em.merge(voucher);
+        em.flush();
+    }*/
+
+    @Override
+    @TransactionAttribute(REQUIRES_NEW)
+    public void updateVoucher(Voucher voucher) {
+
+        /** For VoucherDetail **/
+        List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
+
+        /*for (VoucherDetail voucherDetail : voucherDetailsDB) {
+            em.merge(voucherDetail);
+            em.remove(voucherDetail);
+            em.flush();
+        }*/
+
+        for (VoucherDetail voucherDetail : voucher.getDetails()) {
+
             if(voucherDetail.getTransactionNumber() == null){
                 voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
                 voucherDetail.setTransactionNumber(voucher.getTransactionNumber());

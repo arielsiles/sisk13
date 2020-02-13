@@ -6,8 +6,8 @@
 <canvas zoom="100">
 <tables>
 <table name="com_encoc" view="colnames">
-<left>64</left>
-<top>56</top>
+<left>121</left>
+<top>194</top>
 <width>245</width>
 <height>137</height>
 <sql_create_table>CREATE TABLE `com_encoc` (
@@ -44,8 +44,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="com_detoc" view="colnames">
-<left>664</left>
-<top>65</top>
+<left>449</left>
+<top>15</top>
 <width>186</width>
 <height>128</height>
 <sql_create_table>CREATE TABLE `com_detoc` (
@@ -67,8 +67,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="documentocompra" view="colnames">
-<left>482</left>
-<top>392</top>
+<left>959</left>
+<top>148</top>
 <width>261</width>
 <height>181</height>
 <sql_create_table>CREATE TABLE `documentocompra` (
@@ -83,17 +83,19 @@
   `idcompania` bigint(20) DEFAULT NULL,
   `identidad` bigint(20) DEFAULT NULL,
   `idtmpenc` bigint(20) DEFAULT NULL,
+  `id_tmpdet` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`iddocumentocompra`),
-  KEY `idtmpenc` (`idtmpenc`),
   KEY `idordencompra` (`idordencompra`),
-  CONSTRAINT `documentocompra_ibfk_3` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocontable` (`iddocumentocontable`),
-  CONSTRAINT `documentocompra_ibfk_1` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
-  CONSTRAINT `documentocompra_ibfk_2` FOREIGN KEY (`idordencompra`) REFERENCES `com_encoc` (`id_com_encoc`)
+  KEY `idtmpenc` (`idtmpenc`),
+  KEY `id_tmpdet` (`id_tmpdet`),
+  CONSTRAINT `documentocompra_ibfk_1` FOREIGN KEY (`idordencompra`) REFERENCES `com_encoc` (`id_com_encoc`),
+  CONSTRAINT `documentocompra_ibfk_2` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `documentocompra_ibfk_3` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocontable` (`iddocumentocontable`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="documentocontable" view="colnames">
-<left>150</left>
-<top>512</top>
+<left>1317</left>
+<top>79</top>
 <width>172</width>
 <height>160</height>
 <sql_create_table>CREATE TABLE `documentocontable` (
@@ -118,8 +120,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="sf_tmpdet" view="colnames">
-<left>1298</left>
-<top>205</top>
+<left>1368</left>
+<top>378</top>
 <width>162</width>
 <height>306</height>
 <sql_create_table>CREATE TABLE `sf_tmpdet` (
@@ -155,18 +157,18 @@
   KEY `idcredito` (`idcredito`),
   KEY `idmovimiento` (`idmovimiento`),
   KEY `iddocumentocompra` (`iddocumentocompra`),
-  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`),
   CONSTRAINT `FK_TMPENC` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
   CONSTRAINT `sf_tmpdet_ibfk_1` FOREIGN KEY (`idpersonacliente`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
   CONSTRAINT `sf_tmpdet_ibfk_2` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
   CONSTRAINT `sf_tmpdet_ibfk_3` FOREIGN KEY (`idcuenta`) REFERENCES `cuenta` (`idcuenta`),
   CONSTRAINT `sf_tmpdet_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
-  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
+  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
+  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="sf_tmpenc" view="colnames">
-<left>956</left>
-<top>129</top>
+<left>700</left>
+<top>484</top>
 <width>164</width>
 <height>306</height>
 <sql_create_table>CREATE TABLE `sf_tmpenc` (

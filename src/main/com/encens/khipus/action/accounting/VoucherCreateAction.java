@@ -974,6 +974,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
         }
 
+        voucherAccoutingService.removeVoucherDetail(voucherDetail);
+
         /*if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.CASHACCOUNT_FISCAL_CREDIT)){
 
             for (int i=0 ; i<purchaseDocumentList.size() ; i++){

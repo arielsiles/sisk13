@@ -40,6 +40,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     void updatePurchaseDocumentIfExist(Voucher voucher);
 
+    void removeVoucherDetail(VoucherDetail voucherDetail);
+
     void updateVoucherModify(Voucher voucher, List<VoucherDetail> voucherDetailList);
 
     void updateVoucher(Voucher voucher, PurchaseDocument purchaseDocument);
