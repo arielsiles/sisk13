@@ -111,7 +111,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
             if (voucherDetail.getPurchaseDocument() != null){
-                System.out.println("-------------------------> debito fiscal: " + voucherDetail.getFullCashAccount());
+                //System.out.println("-------------------------> debito fiscal: " + voucherDetail.getId());
                 PurchaseDocument purchaseDocument = voucherDetail.getPurchaseDocument();
                 purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
                 purchaseDocument.setVoucher(voucher);
@@ -176,6 +176,10 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
             em.persist(voucherDetail);
             em.merge(voucher);
+            //em.flush();
+
+            purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
+            em.merge(purchaseDocument);
             em.flush();
 
         }catch (Exception e){

@@ -205,6 +205,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
             }
 
+            voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
+
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;
 

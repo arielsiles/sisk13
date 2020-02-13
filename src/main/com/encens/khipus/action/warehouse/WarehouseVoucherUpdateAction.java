@@ -156,6 +156,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
                 //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/ // Before testing
                 voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
 
+                System.out.println("=====================> VOUCHER ID: " + voucher.getId());
+                System.out.println("=====================> VOUCHER ID: " + voucher.getDetails().size());
+
                 voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
 
                 approvalWarehouseVoucherService.approveWarehouseVoucherForPurchaseOrder(warehouseVoucher.getId(), getGlossMessage(),
