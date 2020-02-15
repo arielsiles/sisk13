@@ -6,8 +6,8 @@
 <canvas zoom="100">
 <tables>
 <table name="com_encoc" view="colnames">
-<left>121</left>
-<top>194</top>
+<left>106</left>
+<top>196</top>
 <width>245</width>
 <height>137</height>
 <sql_create_table>CREATE TABLE `com_encoc` (
@@ -67,8 +67,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="documentocompra" view="colnames">
-<left>959</left>
-<top>148</top>
+<left>899</left>
+<top>139</top>
 <width>261</width>
 <height>181</height>
 <sql_create_table>CREATE TABLE `documentocompra` (
@@ -167,8 +167,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="sf_tmpenc" view="colnames">
-<left>700</left>
-<top>484</top>
+<left>622</left>
+<top>486</top>
 <width>164</width>
 <height>306</height>
 <sql_create_table>CREATE TABLE `sf_tmpenc` (

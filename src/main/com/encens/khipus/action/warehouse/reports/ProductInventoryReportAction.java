@@ -81,10 +81,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
     public void startInventoryAnnual(){
 
-        Collection<CollectionData> beanCollection = calculateCollectionData();
+        Collection<CollectionData> beanCollection = calculateCollectionData2();
+
+        for (CollectionData data : beanCollection){
+            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getInitialAmount() +"|"+ data.getUnitCost() +"|"+ data.getBalance());
+        }
 
         initialInventoryService.createInitialInventory(beanCollection, warehouse.getWarehouseCode(), startDate);
-
     }
 
     public void generateReport() {

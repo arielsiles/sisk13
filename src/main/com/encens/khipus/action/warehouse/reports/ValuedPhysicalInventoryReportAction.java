@@ -136,6 +136,10 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
     public void transferInventoryPeriod(){
 
         Collection<CollectionData> collectionData = calculateValuedInventory();
+
+        System.out.println("----> start: " + startDate);
+        System.out.println("----> end: " + endDate);
+
         Integer year  = DateUtils.getCurrentYear(this.endDate);
         Integer month = DateUtils.getCurrentMonth(this.endDate);
 
