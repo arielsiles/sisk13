@@ -10,18 +10,16 @@
 <h:form id="fixedAssetBodyMovementsForm">
 
 <s:fragment id="movementsFragment">
-    <div class="buttons">
+    <!--<div class="buttons">
         <h:commandButton id="dischargeButton"
                          action="#{fixedAssetAction.discharge}"
-                         rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW')
-                             and fixedAssetAction.showDischargeButton}"
+                         rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW') and fixedAssetAction.showDischargeButton}"
                          value="#{messages['FixedAsset.dischargeFixedAsset']}"
                          styleClass="button"
                          tabindex="37"/>
         <h:commandButton id="positiveImprovementButton"
                          action="#{fixedAssetAction.positiveImprovement}"
-                         rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW')
-                             and fixedAssetAction.showPositiveImprovementButton}"
+                         rendered="#{s:hasPermission('FIXEDASSETPOSITIVEIMPROVEMENTAPPROVAL','VIEW') and fixedAssetAction.showPositiveImprovementButton}"
                          value="#{messages['FixedAssetmovement.positiveImprovement']}"
                          styleClass="button"
                          tabindex="38"/>
@@ -29,8 +27,31 @@
                          action="#{fixedAssetAction.transfer}"
                          value="#{messages['FixedAsset.Transfer']}"
                          styleClass="button"
-                         rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW') and
-                             fixedAssetAction.showTransferenceButton}"
+                         rendered="#{s:hasPermission('FIXEDASSETTRANSFERENCEAPPROVAL','VIEW') and fixedAssetAction.showTransferenceButton}"
+                         tabindex="40"/>
+
+        <h:commandButton action="#{fixedAssetAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"
+                         tabindex="41">
+        </h:commandButton>
+    </div>-->
+    <div class="buttons">
+        <h:commandButton id="dischargeButton"
+                         action="#{fixedAssetAction.discharge}"
+                         value="#{messages['FixedAsset.dischargeFixedAsset']}"
+                         styleClass="button"
+                         tabindex="37"/>
+        <h:commandButton id="positiveImprovementButton"
+                         action="#{fixedAssetAction.positiveImprovement}"
+                         value="#{messages['FixedAssetmovement.positiveImprovement']}"
+                         styleClass="button"
+                         tabindex="38"/>
+        <h:commandButton id="tarnsferenceButton"
+                         action="#{fixedAssetAction.transfer}"
+                         value="#{messages['FixedAsset.Transfer']}"
+                         styleClass="button"
                          tabindex="40"/>
 
         <h:commandButton action="#{fixedAssetAction.cancel}"
@@ -43,9 +64,7 @@
 </s:fragment>
 
 <rich:panel id="formPanel">
-<f:facet name="header">
-    #{messages['FixedAsset.title']}
-</f:facet>
+<f:facet name="header"> #{messages['FixedAsset.title']}</f:facet>
 
 <!--here are the movement to apply to the FixedAsset in non pendant state-->
 <app:fieldset id="fixedAssetMovementFieldset"

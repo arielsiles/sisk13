@@ -5,7 +5,6 @@
               xmlns:h="http://java.sun.com/jsf/html"
               xmlns:a4j="http://richfaces.org/a4j"
               xmlns:c="http://java.sun.com/jstl/core"
-              xmlns:rich="http://richfaces.org/rich"
               xmlns:app="http://encens.com/products/khipus/facelets"
               template="/layout/template.xhtml"
               id="fixedAssetPaymentFieldset"
@@ -169,7 +168,7 @@
                                 styleClass="formRow">
                         <ui:param name="required" value="falmse"/>
                         <a4j:commandButton id="calculatePayentValues"
-                                           action="#{mainAction.computePayment}"
+                                           action="#{fixedAssetAction.computePayment}"
                                            value="#{messages['FixedAsset.ComputePayment']}"
                                            styleClass="button"
                                            ajaxSingle="false"
