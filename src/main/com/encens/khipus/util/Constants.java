@@ -293,6 +293,10 @@ public final class Constants {
     public static final Integer MONTH = 1;
     public static final Integer DAY = 1;
 
+    public static final String VOUCHER_APR = "APR";
+    public static final String VOUCHER_ANL = "ANL";
+    public static final String VOUCHER_PEN = "PEN";
+
     private Constants() {
     }
 }

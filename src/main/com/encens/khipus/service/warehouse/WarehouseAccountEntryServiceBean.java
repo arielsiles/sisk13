@@ -576,6 +576,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
 
         warehouseVoucher.setVoucher(voucher);
+        voucher.setState(Constants.VOUCHER_APR);
         voucherAccoutingService.saveVoucher(voucher);
 
         /** Actualiza DocumentoCompra y la relacion con sf_tmpdet **/
