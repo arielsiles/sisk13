@@ -33,19 +33,19 @@
         </exception-sorter-class-name>
     </local-tx-datasource>-->
 
-    <!--<local-tx-datasource>
+    <local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
         <connection-url>jdbc:mysql://200.58.85.217:3306/khipus</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
         <user-name>admin</user-name>
-        <password>Ilva.13</password>
+        <password>Cisc.13</password>
         <min-pool-size>5</min-pool-size>
         <max-pool-size>100</max-pool-size>
         <blocking-timeout-millis>5000</blocking-timeout-millis>
         <idle-timeout-minutes>30</idle-timeout-minutes>
         <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
         </exception-sorter-class-name>
-    </local-tx-datasource>-->
+    </local-tx-datasource>
 
     <!--<local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
@@ -94,7 +94,7 @@
     </local-tx-datasource>-->
 
     <!-- FOR ILVA -->
-    <local-tx-datasource>
+    <!--<local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
         <connection-url>jdbc:mysql://localhost:3306/erp_ilvadev</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
@@ -106,6 +106,6 @@
         <idle-timeout-minutes>30</idle-timeout-minutes>
         <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
         </exception-sorter-class-name>
-    </local-tx-datasource>
+    </local-tx-datasource>-->
 
 </datasources>
