@@ -176,7 +176,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
                 /** ---- */
                 Voucher voucher = new Voucher();
                 voucher.setDocumentType(Constants.PD_VOUCHER_DOCTYPE);
-                voucher.setGloss("ORDEN DE PRODUCCION NRO (" + production.getCode() +") EN FECHA " + DateUtils.format(productionPlan.getDate(), "dd/MM/yyyy")+ ", " + production.getFormulation().getCategory().getName());
+                voucher.setGloss("ORDEN DE PRODUCCION EN FECHA " + DateUtils.format(productionPlan.getDate(), "dd/MM/yyyy")+ ", " + production.getFormulation().getCategory().getName());
                 voucher.setDate(production.getProductionPlan().getDate());
                 /** ---- */
 
