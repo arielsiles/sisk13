@@ -212,6 +212,11 @@
 
 <div class="buttons">
 
+    <s:button value="#{messages['Warehouse.button.postWarehouseOutput']}"
+              view="/warehouse/postWarehouseOutput.xhtml" styleClass="button"
+              propagation="begin" />
+
+
     <h:commandButton action="#{warehouseVoucherCreateAction.closeCurrentMonthProcess}"
                      value="#{messages['Warehouse.button.closeProcessMonth']}"
                      styleClass="button"/>

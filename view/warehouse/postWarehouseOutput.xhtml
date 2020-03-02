@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['WarehouseVoucher.postWarehouseOutput.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="postWarehouseOutputForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['WarehouseVoucher.postWarehouseOutput.title']}
+                </f:facet>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{warehouseVoucherAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{warehouseVoucherAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                    <h:selectOneMenu id="documentType"
+                                     value="#{warehouseVoucherAction.documentType}"
+                                     styleClass="input"
+                                     tabindex="8">
+                        <s:selectItems value="#{warehouseSpecialDocumentTypeList}"
+                                       var="element"
+                                       label="#{element.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <h:commandButton id="postWharehouseOutputId" styleClass="button"
+                                     value="#{messages['Common.accounting']}" tabindex="2">
+                        <rich:componentControl for="processConfirmation" event="onclick"  disableDefault="true" operation="show"/>
+                    </h:commandButton>
+
+                </div>
+
+            </rich:panel>
+
+        </h:form>
+
+
+        <s:decorate template="/include/modalDialog.xhtml" >
+            <ui:param name="dialogId" value="processConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['WarehouseVoucher.message.postWarehouseOutput']}" />
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{warehouseVoucherAction.postWarehouseOuput}"
+                                   value="#{messages['Common.process']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   reRender="postWarehouseOutputForm"
+                                   tabindex="1000">
+                    <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+                </a4j:commandButton>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{valuedPhysicalInventoryReportAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

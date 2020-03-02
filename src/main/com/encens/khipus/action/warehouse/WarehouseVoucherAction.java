@@ -34,6 +34,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
     private Date startDate;
     private Date endDate;
+    private WarehouseDocumentType documentType;
 
     @In
     private WarehouseAccountEntryService warehouseAccountEntryService;
@@ -210,6 +211,18 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
+    public void postWarehouseOuput(){
+        System.out.println("....Contabilizando Salidas de Almacen....");
+
+        if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.C)){ // Vale de consumo (Egreso)
+
+
+
+
+        }
+
+    }
+
 
     public Date getStartDate() {
         return startDate;
@@ -225,5 +238,13 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public WarehouseDocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(WarehouseDocumentType documentType) {
+        this.documentType = documentType;
     }
 }
