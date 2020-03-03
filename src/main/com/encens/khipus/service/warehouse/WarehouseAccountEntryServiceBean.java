@@ -1226,7 +1226,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                                 gloss[0]);
                     }
 
-                    if (MovementDetailType.S.equals(movementDetailType)) {
+                    Boolean defaultWarehouseOuput = Boolean.FALSE; // TODO TODO TODO
+                    if (MovementDetailType.S.equals(movementDetailType) && defaultWarehouseOuput) {
                         System.out.println("4--------------------->: createAccountEntryForOutputs(warehouseVoucher...");
                         createAccountEntryForOutputs(warehouseVoucher,
                                 warehouseVoucher.getExecutorUnit(),
