@@ -36,7 +36,8 @@ public class ControlReportDataModel extends QueryDataModel<Long, ControlReport> 
 
     @Create
     public void init() {
-        sortProperty = "controlReport.horaryBandContract.jobContract.contract.employee.idNumber";
+        //sortProperty = "controlReport.horaryBandContract.jobContract.contract.employee.idNumber";
+        sortProperty = "controlReport.date";
     }
 
     @Override
