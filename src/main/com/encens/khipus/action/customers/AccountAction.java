@@ -60,6 +60,9 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    private BigDecimal capitalDPF;
+    private BigDecimal interestDPF;
+
     /** For capitalization **/
     private Date startDate;
     private Date endDate;
@@ -108,6 +111,21 @@ public class AccountAction extends GenericAction<Account> {
             addDuplicatedMessage();
             return Outcome.REDISPLAY;
         }
+    }
+
+    @Begin(nested = true, flushMode = FlushModeType.MANUAL)
+    public String renewalDPF() {
+        setOp(OP_UPDATE);
+
+        if (!isForeignAccount())
+            setCapitalDPF(getTotalBalance());
+        if (isForeignAccount())
+            setCapitalDPF(getTotalBalanceMe());
+
+        BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
+        setInterestDPF(interestVal);
+
+        return Outcome.SUCCESS;
     }
 
 
@@ -584,6 +602,31 @@ public class AccountAction extends GenericAction<Account> {
         return interest;
     }
 
+    public BigDecimal calculateInterestForDays(Integer daysValue, BigDecimal balance, BigDecimal percentage){
+
+        BigDecimal saldoCapital = balance;
+
+        /*Date currentPaymentDate = currentDate;
+        currentPaymentDate      = DateUtils.removeTime(currentPaymentDate);
+        Date lastPaymentDate    = previousDate; // previous*/
+
+        /*Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate)-1;
+        if (previousDate.equals(startDate))
+            days = days+1;*/
+
+        Long days = daysValue.longValue();
+
+        System.out.println("--> D:" + days);
+
+        BigDecimal var_interest = BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 6);
+        BigDecimal var_time = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(days.toString()), BigDecimalUtil.toBigDecimal(360), 6);
+        BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
+        interest = BigDecimalUtil.multiply(interest, var_time, 6);
+
+
+        return interest;
+    }
+
 
     public void setAccountTransactionList(List<AccountTransaction> accountTransactionList) {
         this.accountTransactionList = accountTransactionList;
@@ -660,6 +703,22 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setSavingType(SavingType savingType) {
         this.savingType = savingType;
+    }
+
+    public BigDecimal getCapitalDPF() {
+        return capitalDPF;
+    }
+
+    public void setCapitalDPF(BigDecimal capitalDPF) {
+        this.capitalDPF = capitalDPF;
+    }
+
+    public BigDecimal getInterestDPF() {
+        return interestDPF;
+    }
+
+    public void setInterestDPF(BigDecimal interestDPF) {
+        this.interestDPF = interestDPF;
     }
 
 

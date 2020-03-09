@@ -43,6 +43,9 @@ public class AccountType implements BaseModel {
     @Length(max = 100)
     private String name;
 
+    @Column(name = "dias", nullable = true)
+    private Integer days;
+
     @Column(name = "inta", precision = 4, scale = 2, nullable = false)
     private BigDecimal inta;
 
@@ -178,5 +181,13 @@ public class AccountType implements BaseModel {
 
     public void setSavingType(SavingType savingType) {
         this.savingType = savingType;
+    }
+
+    public Integer getDays() {
+        return days;
+    }
+
+    public void setDays(Integer days) {
+        this.days = days;
     }
 }

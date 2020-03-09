@@ -8,16 +8,8 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
-    <ui:define name="pageTitle">
-        <c:choose>
-            <c:when test="#{accountAction.managed}">
-                #{messages['Account.edit']}
-            </c:when>
-            <c:otherwise>
-                #{messages['Account.new']}
-            </c:otherwise>
-        </c:choose>
-    </ui:define>
+
+    <ui:define name="pageTitle">#{messages['Account.renewal.title']}</ui:define>
     <ui:param name="bodyWidth" value="90%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
@@ -25,18 +17,6 @@
         <h:form id="accountForm">
 
             <div class="buttons">
-
-                <!--<h:commandButton action="#{accountAction.addPayment}"
-                                 value="#{messages['Account.newDeposit']}"
-                                 styleClass="button"
-                                 immediate="true"
-                                 rendered="#{accountAction.managed}"/>-->
-
-                <h:commandButton action="#{accountAction.renewalDPF}"
-                                 value="#{messages['Account.renewal']}"
-                                 styleClass="button"
-                                 immediate="true"
-                                 />
 
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.create}"
@@ -53,15 +33,6 @@
                     <s:defaultAction/>
                 </h:commandButton>
 
-                <!--<h:commandButton value="#{messages['Common.delete']}"
-                                 styleClass="button"
-                                 rendered="#{accountAction.managed}">
-                    <rich:componentControl for="deleteConfirmation"
-                                           event="onclick"
-                                           disableDefault="true"
-                                           operation="show"/>
-                </h:commandButton>-->
-
                 <h:commandButton action="#{accountAction.cancel}"
                                  value="#{messages['Common.cancel']}"
                                  styleClass="button"
@@ -70,16 +41,7 @@
             </div>
 
             <rich:panel id="formPanel">
-                <f:facet name="header">
-                    <c:choose>
-                        <c:when test="#{accountAction.managed}">
-                            #{messages['Account.edit']}
-                        </c:when>
-                        <c:otherwise>
-                            #{messages['Account.new']}
-                        </c:otherwise>
-                    </c:choose>
-                </f:facet>
+                <f:facet name="header">#{messages['Account.renewal']}</f:facet>
 
                 <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
                 <s:div id="leftSidePanel">
@@ -173,18 +135,14 @@
                         </rich:calendar>
                     </s:decorate>
 
-                    <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.retention']}</ui:define>
-                        <h:selectBooleanCheckbox id="retentionFlag"
-                                                 value="#{account.retentionFlag}"
-                                                 tabindex="17"/>
+                    <s:decorate id="capitalDpfField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.capital']}</ui:define>
+                        <h:outputText id="capitalDpf" value="#{accountAction.capitalDPF}" styleClass="input" />
                     </s:decorate>
 
-                    <s:decorate id="companyAccountFlagField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.companyAccount']}</ui:define>
-                        <h:selectBooleanCheckbox id="companyAccountFlag"
-                                                 value="#{account.companyAccountFlag}"
-                                                 tabindex="17"/>
+                    <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.interest']}</ui:define>
+                        <h:outputText id="interest" value="#{accountAction.interestDPF}" styleClass="input" />
                     </s:decorate>
 
                 </s:div>
@@ -244,115 +202,6 @@
                 </h:panelGrid>
 
             </rich:panel>
-
-            <c:if test="#{accountAction.managed}">
-                <rich:tabPanel switchType="ajax" selectedTab="accountTransactionTab">
-                    <rich:tab name="accountTransactionTab"
-                              label="#{messages['Account.transactions']}"
-                              ajaxSingle="true">
-                        <!--<rich:dataTable value="#{voucherAction.getVoucherDetailList(voucher.transactionNumber)}"-->
-                        <!--rows="#{sessionUser.rowsPerPage}"-->
-                        <rich:dataTable id="accountTransactionListId"
-                                        value="#{accountAction.getAccountDetailList(account)}"
-                                        var="accountDetailItem"
-                                        width="100%"
-                                        columnsWidth="10%, 10%, 45%, 15%, 10%, 10%">
-                            <f:facet name="header">
-                                <rich:columnGroup>
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.date']}" />
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.account']}" />
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.gloss']}" />
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.document']}" />
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.debit']}" >
-                                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                        </h:outputText>
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['AccountTransaction.credit']}" />
-                                    </rich:column>
-
-                                    <!--<rich:column styleClass="center">
-                                        <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>-->
-
-                                </rich:columnGroup>
-                            </f:facet>
-
-                            <rich:column styleClass="center">
-                                <h:outputText value="#{accountDetailItem.voucher.date}">
-                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                                       timeZone="#{sessionUser.timeZone}"
-                                                       type="date"/>
-                                </h:outputText>
-                            </rich:column>
-
-                            <rich:column styleClass="center">
-                                <h:outputText value="#{accountDetailItem.account}"/>
-                            </rich:column>
-
-                            <rich:column>
-                                <h:outputText value="#{accountDetailItem.voucher.gloss}"/>
-                            </rich:column>
-
-                            <rich:column styleClass="center">
-                                <h:outputText value="#{accountDetailItem.voucher.fullDocument}"/>
-                            </rich:column>
-
-                            <c:if test="#{accountAction.isForeignAccount()}">
-                                <rich:column styleClass="right">
-                                    <h:outputText value="#{accountDetailItem.debitMe}">
-                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                    </h:outputText>
-                                </rich:column>
-
-                                <rich:column styleClass="right">
-                                    <h:outputText value="#{accountDetailItem.creditMe}">
-                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                    </h:outputText>
-                                </rich:column>
-                            </c:if>
-
-                            <c:if test="#{!accountAction.isForeignAccount()}">
-                                <rich:column styleClass="right">
-                                    <h:outputText value="#{accountDetailItem.debit}">
-                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                    </h:outputText>
-                                </rich:column>
-
-                                <rich:column styleClass="right">
-                                    <h:outputText value="#{accountDetailItem.credit}">
-                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                    </h:outputText>
-                                </rich:column>
-                            </c:if>
-
-                            <!--<rich:column styleClass="center">
-                                <h:commandLink value="#{messages['Common.select']}"
-                                               immediate="true"
-                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
-                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
-                            </rich:column>-->
-
-                        </rich:dataTable>
-                        <!--<app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId" dataModel="#{accountTransactionDataModel}"/>-->
-                        <app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId"/>
-                    </rich:tab>
-                </rich:tabPanel>
-            </c:if>
 
         </h:form>
 
