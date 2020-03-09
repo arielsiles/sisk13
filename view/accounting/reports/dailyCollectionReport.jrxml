@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dailyCollectionReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
-	<property name="ireport.zoom" value="3.452271214393126"/>
-	<property name="ireport.x" value="897"/>
-	<property name="ireport.y" value="69"/>
+	<property name="ireport.zoom" value="3.4522712143931265"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="35"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="exchangeRate" class="java.math.BigDecimal"/>
 	<parameter name="userLoginParam" class="java.lang.String"/>
+	<parameter name="number" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="min" class="java.lang.String"/>
+	<parameter name="max" class="java.lang.String"/>
+	<parameter name="docType" class="java.lang.String"/>
 	<field name="accountCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -186,11 +192,18 @@
 			<frame>
 				<reportElement x="0" y="21" width="561" height="15"/>
 				<textField>
-					<reportElement x="216" y="0" width="133" height="15"/>
+					<reportElement x="218" y="0" width="117" height="15"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Arial" size="10" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="335" y="0" width="29" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{number}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>
@@ -200,14 +213,14 @@
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{subTitle}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="0" width="400" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyTitle}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
@@ -261,7 +274,7 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="14" splitType="Stretch"/>
+		<band height="4" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
 		<band height="88" splitType="Stretch">
@@ -278,6 +291,41 @@
 					<pen lineWidth="0.5" lineStyle="Dashed"/>
 				</graphicElement>
 			</line>
+			<textField>
+				<reportElement x="18" y="0" width="10" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docType}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="28" y="0" width="15" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[del]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="43" y="0" width="20" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{min}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="63" y="0" width="12" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[al]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="75" y="0" width="20" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{max}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

@@ -11,6 +11,7 @@ import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
+import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -25,6 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Encens S.R.L.
@@ -41,6 +43,7 @@ public class DailyCollectionReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
     private DocType documentType;
+    private String number;
 
     @In
     User currentUser;
@@ -50,6 +53,8 @@ public class DailyCollectionReportAction extends GenericReportAction {
     private CompanyConfigurationService companyConfigurationService;
     @In
     protected FacesMessages facesMessages;
+    @In
+    private VoucherService voucherService;
 
     @Create
     public void init() {
@@ -98,7 +103,15 @@ public class DailyCollectionReportAction extends GenericReportAction {
 
         log.debug("Generating products produced report...................");
 
+
+        List<String> resultMinMax = voucherService.getMinMaxNumber(startDate, endDate, documentType.getName());
+        String min = resultMinMax.get(0);
+        String max = resultMinMax.get(1);
+        String docType = documentType.getName();
+
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
 
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("startDate", startDate);
@@ -107,6 +120,10 @@ public class DailyCollectionReportAction extends GenericReportAction {
         reportParameters.put("userLoginParam", currentUser.getEmployee().getFullName());
         reportParameters.put("companyTitle", companyTitle);
         reportParameters.put("subTitle", subTitle);
+        reportParameters.put("number", number);
+        reportParameters.put("min", min);
+        reportParameters.put("max", max);
+        reportParameters.put("docType", docType);
 
         super.generateReport(
                 "dailyCollectionReport",
@@ -148,5 +165,13 @@ public class DailyCollectionReportAction extends GenericReportAction {
 
     public void setDocumentType(DocType documentType) {
         this.documentType = documentType;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 }

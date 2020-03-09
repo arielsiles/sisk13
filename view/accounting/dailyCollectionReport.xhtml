@@ -55,6 +55,7 @@
                     <h:selectOneMenu id="documType"
                                      value="#{dailyCollectionReportAction.documentType}"
                                      styleClass="input"
+                                     required="true"
                                      tabindex="1">
                         <s:selectItems value="#{voucherDocumentTypeList}"
                                        var="element"
@@ -63,6 +64,17 @@
                                        hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.cashCollection.number']}</ui:define>
+                    <h:inputText id="number"
+                                 value="#{dailyCollectionReportAction.number}"
+                                 required="true"
+                                 maxlength="3"
+                                 tabindex="12"
+                                 styleClass="input" />
+
                 </s:decorate>
 
             </h:panelGrid>

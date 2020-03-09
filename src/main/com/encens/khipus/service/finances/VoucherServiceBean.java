@@ -277,6 +277,33 @@ public class VoucherServiceBean implements VoucherService {
         return  voucherTransactionList;
     }
 
+    public List<String> getMinMaxNumber(Date start, Date end, String documentType){
+
+        List<String> resultMinMax = new ArrayList<String>();
+
+        List<Object[]> resultList = em.createNativeQuery("select " +
+                " MIN(CAST(no_doc as decimal)), MAX(CAST(no_doc as decimal)) " +
+                " FROM sf_tmpenc " +
+                " WHERE tipo_doc =:documentType" +
+                " AND fecha BETWEEN :start and :end" +
+                " AND estado <> 'ANL' ")
+                .setParameter("documentType", documentType)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getResultList();
+
+        for(Object[] data:resultList){
+            Integer minValue = 0;
+            Integer maxValue = 0;
+            if (data[0] != null) minValue = BigDecimalUtil.toBigDecimal(data[0]).intValue();
+            if (data[1] != null) maxValue = BigDecimalUtil.toBigDecimal(data[1]).intValue();
+            resultMinMax.add(minValue.toString());
+            resultMinMax.add(maxValue.toString());
+        }
+
+        return resultMinMax;
+    }
+
     public class VoucherTransaction{
 
         private String date;
