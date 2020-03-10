@@ -4,7 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
@@ -147,57 +146,69 @@
 
                 </s:div>
 
-                    <!-- Moneda Extranjera -->
-                    <c:if test="#{accountAction.isForeignAccount()}">
-                    <s:div id="rightSidePanel">
-                        <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
-                            <h:outputText value="#{accountAction.totalCreditMe}">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                            </h:outputText>
-                        </s:decorate>
+                 <s:div id="rightSidePanel">
+                     <s:decorate id="capitalRenewField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.capitalRenewDPF']}</ui:define>
+                         <h:inputText id="capitalRenew" styleClass="input100"
+                                      required="true"
+                                      value="#{accountAction.capitalRenewDPF}" >
+                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalRenew"/>
+                             <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="capitalRenewField"/>
+                         </h:inputText>
+                     </s:decorate>
 
-                        <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
-                            <h:outputText value="#{accountAction.totalDebitMe}">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                            </h:outputText>
-                        </s:decorate>
+                     <s:decorate id="newAccountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                         <h:selectOneMenu id="newAccountTypeId" value="#{accountAction.accountTypeRenewDPF}"
+                                          styleClass="input"
+                                          required="true"
+                                          tabindex="1">
+                             <s:selectItems value="#{accountTypeList.resultList}"
+                                            var="accountType"
+                                            label="#{accountType.name}"
+                                            noSelectionLabel=""
+                                            hideNoSelectionLabel="false"/>
+                             <s:convertEntity/>
+                             <a4j:support event="onchange"
+                                          action="#{accountAction.calculateInterestForNewDPF}"
+                                          reRender="interestToReceiveField,exprirationDateRenewField" ajaxSingle="true"/>
+                             <s:convertEntity/>
+                         </h:selectOneMenu>
+                     </s:decorate>
 
-                        <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
-                            <h:outputText value="#{accountAction.totalBalanceMe}">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                            </h:outputText>
-                        </s:decorate>
-                    </s:div>
-                    </c:if>
+                     <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.startDate']}</ui:define>
+                         <rich:calendar value="#{accountAction.startDateDPF}"
+                                        popup="true"
+                                        required="false"
+                                        datePattern="#{messages['patterns.date']}"
+                                        styleClass="input"
+                                        enableManualInput="true"
+                                        tabindex="6">
+                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                         </rich:calendar>
+                     </s:decorate>
 
-                    <!-- Moneda Nacional -->
-                    <c:if test="#{!accountAction.isForeignAccount()}">
-                        <s:div id="rightSidePanel">
-                            <s:decorate id="totalCreditField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['AccountTransaction.totalCredit']}</ui:define>
-                                <h:outputText value="#{accountAction.totalCredit}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                </h:outputText>
-                            </s:decorate>
+                     <s:decorate id="exprirationDateRenewField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
+                         <rich:calendar value="#{accountAction.expirationDateDPF}"
+                                        popup="true"
+                                        required="true"
+                                        datePattern="#{messages['patterns.date']}"
+                                        styleClass="input"
+                                        enableManualInput="true"
+                                        tabindex="6">
+                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                         </rich:calendar>
+                     </s:decorate>
 
-                            <s:decorate id="totalDebitField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['AccountTransaction.totalDebit']}</ui:define>
-                                <h:outputText value="#{accountAction.totalDebit}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                </h:outputText>
-                            </s:decorate>
+                     <s:decorate id="interestToReceiveField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.interestToReceiveDPF']}</ui:define>
+                         <h:outputText id="interestToReceive" value="#{accountAction.interestRenewDPF}" styleClass="input" />
+                     </s:decorate>
 
-                            <s:decorate id="totalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
-                                <ui:define name="label">#{messages['AccountTransaction.totalBalance']}</ui:define>
-                                <h:outputText value="#{accountAction.totalBalance}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                                </h:outputText>
-                            </s:decorate>
-                        </s:div>
-                    </c:if>
+
+                 </s:div>
 
                 </h:panelGrid>
 

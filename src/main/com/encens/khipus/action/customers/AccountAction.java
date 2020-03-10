@@ -60,8 +60,16 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    /** For renovation DPF **/
     private BigDecimal capitalDPF;
     private BigDecimal interestDPF;
+
+    private BigDecimal capitalRenewDPF;
+    private AccountType accountTypeRenewDPF;
+    private BigDecimal interestRenewDPF;
+
+    private Date startDateDPF = new Date();
+    private Date expirationDateDPF;
 
     /** For capitalization **/
     private Date startDate;
@@ -124,6 +132,7 @@ public class AccountAction extends GenericAction<Account> {
 
         BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
         setInterestDPF(interestVal);
+        setCapitalRenewDPF(BigDecimalUtil.sum(getCapitalDPF(), getInterestDPF()));
 
         return Outcome.SUCCESS;
     }
@@ -605,17 +614,8 @@ public class AccountAction extends GenericAction<Account> {
     public BigDecimal calculateInterestForDays(Integer daysValue, BigDecimal balance, BigDecimal percentage){
 
         BigDecimal saldoCapital = balance;
-
-        /*Date currentPaymentDate = currentDate;
-        currentPaymentDate      = DateUtils.removeTime(currentPaymentDate);
-        Date lastPaymentDate    = previousDate; // previous*/
-
-        /*Long days = DateUtils.daysBetween(lastPaymentDate, currentPaymentDate)-1;
-        if (previousDate.equals(startDate))
-            days = days+1;*/
-
         Long days = daysValue.longValue();
-
+        System.out.println("--> SALDO:" + balance);
         System.out.println("--> D:" + days);
 
         BigDecimal var_interest = BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 6);
@@ -623,8 +623,15 @@ public class AccountAction extends GenericAction<Account> {
         BigDecimal interest = BigDecimalUtil.multiply(saldoCapital, var_interest, 6);
         interest = BigDecimalUtil.multiply(interest, var_time, 6);
 
-
         return interest;
+    }
+
+
+    public void calculateInterestForNewDPF(){
+
+        BigDecimal interestValue = calculateInterestForDays(accountTypeRenewDPF.getDays(), getCapitalRenewDPF(), accountTypeRenewDPF.getInta());
+        setInterestRenewDPF(interestValue);
+        setExpirationDateDPF(DateUtils.addDay(startDateDPF, accountTypeRenewDPF.getDays()));
     }
 
 
@@ -719,6 +726,46 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setInterestDPF(BigDecimal interestDPF) {
         this.interestDPF = interestDPF;
+    }
+
+    public BigDecimal getCapitalRenewDPF() {
+        return capitalRenewDPF;
+    }
+
+    public void setCapitalRenewDPF(BigDecimal capitalRenewDPF) {
+        this.capitalRenewDPF = capitalRenewDPF;
+    }
+
+    public AccountType getAccountTypeRenewDPF() {
+        return accountTypeRenewDPF;
+    }
+
+    public void setAccountTypeRenewDPF(AccountType accountTypeRenewDPF) {
+        this.accountTypeRenewDPF = accountTypeRenewDPF;
+    }
+
+    public Date getExpirationDateDPF() {
+        return expirationDateDPF;
+    }
+
+    public void setExpirationDateDPF(Date expirationDateDPF) {
+        this.expirationDateDPF = expirationDateDPF;
+    }
+
+    public Date getStartDateDPF() {
+        return startDateDPF;
+    }
+
+    public void setStartDateDPF(Date startDateDPF) {
+        this.startDateDPF = startDateDPF;
+    }
+
+    public BigDecimal getInterestRenewDPF() {
+        return interestRenewDPF;
+    }
+
+    public void setInterestRenewDPF(BigDecimal interestRenewDPF) {
+        this.interestRenewDPF = interestRenewDPF;
     }
 
 
