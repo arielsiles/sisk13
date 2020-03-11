@@ -32,7 +32,7 @@
                     <s:defaultAction/>
                 </h:commandButton>
 
-                <h:commandButton action="#{accountAction.cancel}"
+                <h:commandButton action="#{accountAction.cancelRenovationDPF}"
                                  value="#{messages['Common.cancel']}"
                                  styleClass="button"
                                  immediate="true">
@@ -136,24 +136,36 @@
 
                     <s:decorate id="capitalDpfField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.capital']}</ui:define>
-                        <h:outputText id="capitalDpf" value="#{accountAction.capitalDPF}" styleClass="input" />
+                        <h:outputText id="capitalDpf" value="#{accountAction.capitalDPF}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalDpf"/>
+                        </h:outputText>
                     </s:decorate>
 
                     <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.interest']}</ui:define>
-                        <h:outputText id="interest" value="#{accountAction.interestDPF}" styleClass="input" />
+                        <ui:define name="label">#{messages['Account.interestGained']}</ui:define>
+                        <h:outputText id="interest" value="#{accountAction.interestDPF}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                        </h:outputText>
                     </s:decorate>
 
                 </s:div>
 
                  <s:div id="rightSidePanel">
+                     <s:decorate id="newAccountCodeDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.newAccountCodeDPF']}</ui:define>
+                         <h:inputText id="newAccountCodeDPF" styleClass="input100"
+                                      value="#{accountAction.newAccountCodeDPF}"
+                                      required="true">
+                         </h:inputText>
+                     </s:decorate>
+
                      <s:decorate id="capitalRenewField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.capitalRenewDPF']}</ui:define>
                          <h:inputText id="capitalRenew" styleClass="input100"
-                                      required="true"
-                                      value="#{accountAction.capitalRenewDPF}" >
+                                      value="#{accountAction.capitalRenewDPF}"
+                                      required="true">
                              <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalRenew"/>
-                             <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="capitalRenewField"/>
+                             <a4j:support event="onblur" reRender="capitalRenewField"/>
                          </h:inputText>
                      </s:decorate>
 
@@ -169,8 +181,7 @@
                                             noSelectionLabel=""
                                             hideNoSelectionLabel="false"/>
                              <s:convertEntity/>
-                             <a4j:support event="onchange"
-                                          action="#{accountAction.calculateInterestForNewDPF}"
+                             <a4j:support event="onchange" action="#{accountAction.calculateExpirationDateDPF}"
                                           reRender="interestToReceiveField,exprirationDateRenewField" ajaxSingle="true"/>
                              <s:convertEntity/>
                          </h:selectOneMenu>
@@ -204,7 +215,45 @@
 
                      <s:decorate id="interestToReceiveField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.interestToReceiveDPF']}</ui:define>
-                         <h:outputText id="interestToReceive" value="#{accountAction.interestRenewDPF}" styleClass="input" />
+                         <h:inputText id="interestToReceive" value="#{accountAction.interestRenewDPF}" styleClass="input100" >
+                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interestToReceive"/>
+                         </h:inputText>
+                         <a4j:commandLink id="calculateTotalAmountButton"
+                                          ajaxSingle="true"
+                                          immediate="true"
+                                          title="#{messages['Common.calculate']}"
+                                          reRender="interestToReceiveField"
+                                          action="#{accountAction.calculateInterestForNewDPF}"
+                                          tabindex="6">
+                             <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
+                             <a4j:support event="onclick" reRender="interestToReceiveField"/>
+                         </a4j:commandLink>
+                     </s:decorate>
+
+                     <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Voucher.type']}</ui:define>
+                         <h:selectOneMenu id="documentType" value="#{accountAction.documentType}"
+                                          styleClass="input"
+                                          required="false">
+                             <s:selectItems value="#{voucherDocumentTypeList}"
+                                            var="element"
+                                            label="#{element.fullName}"
+                                            noSelectionLabel=""
+                                            hideNoSelectionLabel="false"/>
+                             <s:convertEntity/>
+                         </h:selectOneMenu>
+                     </s:decorate>
+
+                     <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
+                         <h:inputTextarea  id="description"
+                                           value="#{accountAction.glossRenewDPF}"
+                                           required="false"
+                                           styleClass="textarea-medium"
+                                           rows="3"
+                                           tabindex="3">
+                             <f:validateLength maximum="500"/>
+                         </h:inputTextarea>
                      </s:decorate>
 
 

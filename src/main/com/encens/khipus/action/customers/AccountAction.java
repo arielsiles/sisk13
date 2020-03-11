@@ -5,6 +5,7 @@ import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
@@ -60,7 +61,7 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
-    /** For renovation DPF **/
+    private String newAccountCodeDPF;
     private BigDecimal capitalDPF;
     private BigDecimal interestDPF;
 
@@ -70,6 +71,9 @@ public class AccountAction extends GenericAction<Account> {
 
     private Date startDateDPF = new Date();
     private Date expirationDateDPF;
+
+    private DocType documentType = new DocType();
+    private String glossRenewDPF;
 
     /** For capitalization **/
     private Date startDate;
@@ -119,6 +123,18 @@ public class AccountAction extends GenericAction<Account> {
             addDuplicatedMessage();
             return Outcome.REDISPLAY;
         }
+    }
+
+    @End(beforeRedirect = true)
+    public String cancelRenovationDPF() {
+
+        setCapitalRenewDPF(null);
+        setInterestRenewDPF(null);
+        setAccountTypeRenewDPF(null);
+        setDocumentType(null);
+        setGlossRenewDPF(null);
+
+        return Outcome.CANCEL;
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
@@ -628,9 +644,11 @@ public class AccountAction extends GenericAction<Account> {
 
 
     public void calculateInterestForNewDPF(){
-
         BigDecimal interestValue = calculateInterestForDays(accountTypeRenewDPF.getDays(), getCapitalRenewDPF(), accountTypeRenewDPF.getInta());
         setInterestRenewDPF(interestValue);
+    }
+
+    public void calculateExpirationDateDPF(){
         setExpirationDateDPF(DateUtils.addDay(startDateDPF, accountTypeRenewDPF.getDays()));
     }
 
@@ -766,6 +784,30 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setInterestRenewDPF(BigDecimal interestRenewDPF) {
         this.interestRenewDPF = interestRenewDPF;
+    }
+
+    public DocType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocType documentType) {
+        this.documentType = documentType;
+    }
+
+    public String getGlossRenewDPF() {
+        return glossRenewDPF;
+    }
+
+    public void setGlossRenewDPF(String glossRenewDPF) {
+        this.glossRenewDPF = glossRenewDPF;
+    }
+
+    public String getNewAccountCodeDPF() {
+        return newAccountCodeDPF;
+    }
+
+    public void setNewAccountCodeDPF(String newAccountCodeDPF) {
+        this.newAccountCodeDPF = newAccountCodeDPF;
     }
 
 
