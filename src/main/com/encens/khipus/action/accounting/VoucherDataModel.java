@@ -26,7 +26,7 @@ public class VoucherDataModel extends QueryDataModel<Long, Voucher> {
     private Date endDate;
 
     private static final String[] RESTRICTIONS =
-            {"lower(voucher.documentNumber) like concat('%', concat(lower(#{voucherDataModel.criteria.documentNumber}), '%'))",
+            {"voucher.documentNumber = #{voucherDataModel.criteria.documentNumber}",
              "lower(voucher.gloss) like concat('%', concat(lower(#{voucherDataModel.criteria.gloss}), '%'))",
              "lower(voucher.documentType) like concat('%', concat(lower(#{voucherDataModel.criteria.documentType}), '%'))",
              "voucher.date >= #{voucherDataModel.startDate}",

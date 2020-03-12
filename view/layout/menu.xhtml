@@ -318,8 +318,21 @@
             s:hasPermission('CASHACCOUNTGROUP','VIEW') or
             s:hasPermission('COSTCENTER','VIEW') or
             s:hasPermission('COSTCENTERGROUP','VIEW')}">
-<h:panelGrid columns="8" cellpadding="0" cellspacing="0" border="0"
+<h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0"
              columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+
+<rich:dropDownMenu value="#{messages['menu.finances.books']}" rendered="#{s:hasPermission('BOOKS_PURCHASE_SALE','VIEW')}">
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/accounting/purchaseBookList.xhtml"
+                value="#{messages['menu.finances.books.purchaseBook']}"
+                propagation="none" />
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/accounting/salesBookList.xhtml"
+                value="#{messages['menu.finances.books.salesBook']}"
+                propagation="none" />
+    </rich:menuItem>
+</rich:dropDownMenu>
 
 <rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW')}">
     <rich:menuItem submitMode="none"

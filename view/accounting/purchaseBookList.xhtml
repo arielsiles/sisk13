@@ -1,0 +1,167 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Voucher.purchaseBook.title']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="97%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="VoucherSearch">
+<rich:simpleTogglePanel id="voucherSearchPanelId"
+                        label="#{messages['Voucher.purchaseBook.title']}"
+                        switchType="client">
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width50percent,width50percent">
+        <s:div id="leftSidePanel">
+
+            <s:decorate id="documentNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Voucher.purchaseBook.invoice']}</ui:define>
+                <h:inputText id="documentNumber"
+                             value="#{purchaseDocumentDataModel.number}"
+                             styleClass="input"
+                             maxlength="150"
+                             tabindex="2"/>
+                <a4j:commandButton action="#{purchaseDocumentDataModel.search}"
+                                   reRender="purchaseDocumentList, dataScroller"
+                                   styleClass="button"
+                                   value="#{messages['Common.search']}"
+                                   id="searchButtonId"
+                                   tabindex="6">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="rightSidePanel">
+            <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                <h:panelGrid columns="4" width="100%"
+                             columnClasses="top,top,top,top">
+                    <h:outputText value="#{messages['Common.dateFrom']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="startDate"
+                                       value="#{purchaseDocumentDataModel.startDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="4">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                    <h:outputText value="#{messages['Common.dateTo']}"/>
+                    <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                        <rich:calendar id="endDate"
+                                       value="#{purchaseDocumentDataModel.endDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </h:panelGrid>
+            </s:decorate>
+        </s:div>
+
+    </h:panelGrid>
+
+    <!--<rich:jQuery selector="#documentType" query="focus()" timing="onload"/>-->
+
+</rich:simpleTogglePanel>
+
+<div class="buttons">
+    <s:button value="#{messages['Voucher.purchaseBook.generateBook']}"
+              view="/accounting/generatePurchaseBook.xhtml"
+              styleClass="button"
+              propagation="begin"/>
+</div>
+
+<rich:dataTable id="purchaseDocumentList"
+                value="#{purchaseDocumentDataModel}"
+                var="purchaseDocumentItem"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%"
+                columnsWidth="10%, 10%, 10%, 10%, 40%, 10%, 10%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="purchaseDocument.date"
+                                       dataModel="#{purchaseDocumentDataModel}"
+                                       reRender="purchaseDocumentList, dataScroller">
+                    #{messages['Voucher.purchaseBook.date']}
+                </app:commandSortHeader>
+            </rich:column>
+
+            <!--<rich:column>#{messages['Voucher.purchaseBook.date']}</rich:column>-->
+
+            <rich:column>#{messages['Voucher.purchaseBook.nit']}</rich:column>
+
+            <rich:column>#{messages['Voucher.purchaseBook.autorization']}</rich:column>
+
+            <rich:column>#{messages['Voucher.purchaseBook.number']}</rich:column>
+
+            <rich:column>#{messages['Voucher.purchaseBook.name']}</rich:column>
+
+            <rich:column>#{messages['Voucher.purchaseBook.amount']}</rich:column>
+
+            <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+
+        </rich:columnGroup>
+    </f:facet>
+    <rich:column styleClass="center">
+        <h:outputText value="#{purchaseDocumentItem.date}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{purchaseDocumentItem.nit}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{purchaseDocumentItem.authorizationNumber}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{purchaseDocumentItem.number}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{purchaseDocumentItem.name}"/>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{purchaseDocumentItem.amount}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:commandLink value="#{messages['Common.select']}"
+                       immediate="true"
+                       action="#{voucherCreateAction.select(voucherItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{voucherCreateAction.generateReport(voucherItem)}"
+                       immediate="true">
+            <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                            title="#{messages['Voucher.report.generateReport']}"/>
+        </h:commandLink>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="purchaseDocumentList" dataModel="#{purchaseDocumentDataModel}"/>
+
+</h:form>
+</ui:define>
+
+</ui:composition>
