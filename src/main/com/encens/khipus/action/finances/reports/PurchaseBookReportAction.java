@@ -36,7 +36,7 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
     @Override
     protected String getEjbql() {
-        return "select " +
+        /*return "select " +
                 "financeAccountingDocument.nit, " +
                 "financeAccountingDocument.socialName, " +
                 "financeAccountingDocument.id.invoiceNumber, " +
@@ -48,17 +48,30 @@ public class PurchaseBookReportAction extends GenericReportAction {
                 "(financeAccountingDocument.amount-financeAccountingDocument.ice-financeAccountingDocument.exempt), " +
                 "financeAccountingDocument.tax, " +
                 "financeAccountingDocument.controlCode " +
-                "from FinanceAccountingDocument financeAccountingDocument ";
+                "from FinanceAccountingDocument financeAccountingDocument ";*/
+        return "select " +
+                "purchaseDocument.nit, " +
+                "purchaseDocument.name as socialName, " +
+                "purchaseDocument.number as invoiceNumber, " +
+                "purchaseDocument.authorizationNumber, " +
+                "purchaseDocument.date, " +
+                "purchaseDocument.amount, " +
+                "purchaseDocument.ice, " +
+                "purchaseDocument.exempt, " +
+                "(purchaseDocument.amount-purchaseDocument.ice-purchaseDocument.exempt), " +
+                "purchaseDocument.iva as tax, " +
+                "purchaseDocument.controlCode " +
+                "from PurchaseDocument purchaseDocument ";
     }
 
     @Create
     public void init() {
         restrictions = new String[]{
-                "financeAccountingDocument.date >= #{purchaseBookReportAction.startDate}",
-                "financeAccountingDocument.date <= #{purchaseBookReportAction.endDate}"
+                "purchaseDocument.date >= #{purchaseBookReportAction.startDate}",
+                "purchaseDocument.date <= #{purchaseBookReportAction.endDate}"
         };
 
-        sortProperty = "financeAccountingDocument.date";
+        sortProperty = "purchaseDocument.date";
     }
 
     private Map readReportParamsInfo() {

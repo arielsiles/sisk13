@@ -141,7 +141,6 @@
                 <redirect view-id="/accounting/voucherCreate.xhtml"/>
             </rule>
         </navigation>
-
     </page>
 
 </pages>        
