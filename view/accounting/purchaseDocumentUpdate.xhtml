@@ -1,0 +1,183 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['PurchaseDocument.editInvoice']}</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+
+<h:form id="specialDateForm">
+
+<!--<c:set var="readOnly" value="${specialDateAction.readOnly}"/>-->
+    <c:set var="isPurchaseDocumentApproved" value="#{purchaseDocument.approved}"/>
+    <c:set var="isPurchaseDocumentPending" value="#{purchaseDocument.pending}"/>
+    <c:set var="isPurchaseDocumentNullified" value="#{purchaseDocument.nullified}"/>
+    <c:set var="isReadOnly" value="#{action.managed and (isPurchaseDocumentApproved or isPurchaseDocumentNullified)}"/>
+
+<div class="buttons">
+
+    <h:commandButton action="#{purchaseDocumentAction.updatePurchaseDocument}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}"/>
+
+    <h:commandButton action="#{purchaseDocumentAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+        <f:facet name="header">#{messages['PurchaseDocument.editInvoice']}</f:facet>
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent, width50percent">
+
+            <s:div id="leftDocDiv">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{action.managed}">
+
+                    <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+                    <h:outputText value="#{purchaseDocument.number}"/>
+                </s:decorate>
+
+
+                <s:decorate id="nameField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{purchaseDocument.name}"
+                                 required="true"
+                                 styleClass="input"
+                                 tabindex="3">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="documentDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.date']}</ui:define>
+                    <rich:calendar id="purchaseDocumentDate"
+                                   value="#{purchaseDocument.date}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="4">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="amountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.amount']}</ui:define>
+                    <h:inputText id="amountInputText"
+                                 value="#{purchaseDocument.amount}"
+                                 required="true"
+                                 readonly="true"
+                                 styleClass="input right"
+                                 tabindex="5">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="amountInputText"/>
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+
+            <s:div id="rigthInvoicePanel" rendered="#{purchaseDocument.invoiceDocument}">
+
+                <s:decorate id="nitField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
+                    <h:inputText id="nit"
+                                 value="#{purchaseDocument.nit}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="9">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="authorizationNumberField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.authorizationNumber']}</ui:define>
+                    <h:inputText id="authorizationNumber"
+                                 value="#{purchaseDocument.authorizationNumber}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="10">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="controlCodeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.controlCode']}</ui:define>
+                    <h:inputText id="controlCode"
+                                 value="#{purchaseDocument.controlCode}"
+                                 styleClass="input right"
+                                 tabindex="11">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="exemptField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.exempt']}</ui:define>
+                    <h:inputText id="exempt"
+                                 value="#{purchaseDocument.exempt}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="12">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                 minimum="0"
+                                                 forId="exempt"/>
+                        <a4j:support event="onchange"
+                                     reRender="exemptField"
+                                     ajaxSingle="true"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="iceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.ice']}</ui:define>
+                    <h:inputText id="ice"
+                                 value="#{purchaseDocument.ice}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="13">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                 minimum="0"
+                                                 forId="ice"/>
+                        <a4j:support event="onchange"
+                                     reRender="iceField"
+                                     ajaxSingle="true"/>
+                    </h:inputText>
+                </s:decorate>
+
+            </s:div>
+        </h:panelGrid>
+    </rich:panel>
+
+</h:form>
+
+
+<!--<rich:jQuery selector="#title" query="focus()" timing="onload"/>-->
+
+</ui:define>
+</ui:composition>
+

@@ -9,7 +9,6 @@ import com.encens.khipus.exception.purchase.PurchaseDocumentNotFoundException;
 import com.encens.khipus.exception.purchase.PurchaseDocumentStateException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.finances.CollectionDocumentType;
-import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -35,6 +34,8 @@ public interface PurchaseDocumentService extends GenericService {
             PurchaseDocumentAmountException,
             PurchaseDocumentException,
             ConcurrencyException, PurchaseDocumentNotFoundException;
+
+    void updatePurchaseDocumentInvoice(PurchaseDocument purchaseDocument);
 
     void approveDocument(PurchaseDocument document) throws PurchaseDocumentStateException,
             PurchaseDocumentNotFoundException, DuplicatedFinanceAccountingDocumentException, CompanyConfigurationNotFoundException, PurchaseDocumentAmountException;

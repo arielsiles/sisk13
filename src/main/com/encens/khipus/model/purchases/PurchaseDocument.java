@@ -52,7 +52,7 @@ import java.math.BigDecimal;
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
 @Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DOCUMENTOCOMPRA")
 public class PurchaseDocument extends AccountingDocument {
-    @Column(name = "TIPO", nullable = false, length = 25)
+    @Column(name = "TIPO", length = 25)
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType type;
 
@@ -60,7 +60,7 @@ public class PurchaseDocument extends AccountingDocument {
     @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "ESTADO", nullable = false, length = 25)
+    @Column(name = "ESTADO", length = 25)
     @Enumerated(EnumType.STRING)
     private PurchaseDocumentState state;
 

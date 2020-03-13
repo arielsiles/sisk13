@@ -10,7 +10,6 @@ import com.encens.khipus.exception.purchase.PurchaseDocumentNotFoundException;
 import com.encens.khipus.exception.purchase.PurchaseDocumentStateException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.finances.CollectionDocumentType;
-import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.purchases.PurchaseDocumentState;
@@ -130,6 +129,13 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
         } catch (EntryDuplicatedException e) {
             throw new RuntimeException("Unexpected error was happen. ", e);
         }
+    }
+
+    public void updatePurchaseDocumentInvoice(PurchaseDocument purchaseDocument){
+
+            eventEm.merge(purchaseDocument);
+            eventEm.flush();
+
     }
 
     public void removeDocument(PurchaseDocument document){

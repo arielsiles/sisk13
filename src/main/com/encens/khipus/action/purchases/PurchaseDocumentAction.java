@@ -26,10 +26,7 @@ import com.encens.khipus.util.FormatUtils;
 import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.ValidatorUtil;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
@@ -132,6 +129,13 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
         }
     }
 
+    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String selectPurchaseDocument(PurchaseDocument purchaseDocument) {
+        setOp(OP_UPDATE);
+        setInstance(purchaseDocument);
+        return Outcome.SUCCESS;
+    }
+
     @Override
     public String create() {
         try {
@@ -176,6 +180,12 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
 
             return Outcome.REDISPLAY;
         }
+    }
+
+    public String updatePurchaseDocument(){
+
+        purchaseDocumentService.updatePurchaseDocumentInvoice(getInstance());
+        return Outcome.SUCCESS;
     }
 
     @Override

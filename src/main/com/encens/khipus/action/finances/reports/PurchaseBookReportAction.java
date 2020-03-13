@@ -1,6 +1,8 @@
 package com.encens.khipus.action.finances.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.model.finances.CollectionDocumentType;
+import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -27,6 +29,9 @@ public class PurchaseBookReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
 
+    private CollectionDocumentType invoiceDocumentType = CollectionDocumentType.INVOICE;
+    private PurchaseDocumentState nullifiedDocumentState = PurchaseDocumentState.NULLIFIED;
+
     public void generateReport() {
         log.debug("Generating reporte de libro de compras");
         Map params = readReportParamsInfo();
@@ -36,19 +41,6 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
     @Override
     protected String getEjbql() {
-        /*return "select " +
-                "financeAccountingDocument.nit, " +
-                "financeAccountingDocument.socialName, " +
-                "financeAccountingDocument.id.invoiceNumber, " +
-                "financeAccountingDocument.id.authorizationNumber, " +
-                "financeAccountingDocument.date, " +
-                "financeAccountingDocument.amount, " +
-                "financeAccountingDocument.ice, " +
-                "financeAccountingDocument.exempt, " +
-                "(financeAccountingDocument.amount-financeAccountingDocument.ice-financeAccountingDocument.exempt), " +
-                "financeAccountingDocument.tax, " +
-                "financeAccountingDocument.controlCode " +
-                "from FinanceAccountingDocument financeAccountingDocument ";*/
         return "select " +
                 "purchaseDocument.nit, " +
                 "purchaseDocument.name as socialName, " +
@@ -59,9 +51,11 @@ public class PurchaseBookReportAction extends GenericReportAction {
                 "purchaseDocument.ice, " +
                 "purchaseDocument.exempt, " +
                 "(purchaseDocument.amount-purchaseDocument.ice-purchaseDocument.exempt), " +
-                "purchaseDocument.iva as tax, " +
+                "purchaseDocument.iva, " +
                 "purchaseDocument.controlCode " +
-                "from PurchaseDocument purchaseDocument ";
+                "from PurchaseDocument purchaseDocument " +
+                "where purchaseDocument.type = #{purchaseBookReportAction.invoiceDocumentType} " +
+                "and purchaseDocument.state <> #{purchaseBookReportAction.nullifiedDocumentState}";
     }
 
     @Create
@@ -80,10 +74,10 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
         String filterInfo = "";
         if (startDate != null) {
-            filterInfo = filterInfo + MessageUtils.getMessage("Reports.purchaseBookReport.dateFrom") + ":" + formatter.format(startDate);
+            filterInfo = filterInfo + MessageUtils.getMessage("Reports.purchaseBookReport.period") + ": " + formatter.format(startDate);
         }
         if (endDate != null) {
-            filterInfo = filterInfo + " " + MessageUtils.getMessage("Reports.purchaseBookReport.dateTo") + ":" + formatter.format(endDate);
+            filterInfo = filterInfo + " - " + formatter.format(endDate);
         }
 
         paramMap.put("filterInfoParam", filterInfo);
@@ -106,5 +100,22 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+
+    public CollectionDocumentType getInvoiceDocumentType() {
+        return invoiceDocumentType;
+    }
+
+    public void setInvoiceDocumentType(CollectionDocumentType invoiceDocumentType) {
+        this.invoiceDocumentType = invoiceDocumentType;
+    }
+
+    public PurchaseDocumentState getNullifiedDocumentState() {
+        return nullifiedDocumentState;
+    }
+
+    public void setNullifiedDocumentState(PurchaseDocumentState nullifiedDocumentState) {
+        this.nullifiedDocumentState = nullifiedDocumentState;
     }
 }

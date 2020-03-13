@@ -60,10 +60,10 @@ public class AccountingDocument implements BaseModel {
     @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "IMPORTE", nullable = false, precision = 12, scale = 2)
+    @Column(name = "IMPORTE", precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "IMPORTENETO", nullable = false, precision = 12, scale = 2)
+    @Column(name = "IMPORTENETO", precision = 12, scale = 2)
     private BigDecimal netAmount;
 
     @Column(name = "IVA", precision = 12, scale = 2)
@@ -77,7 +77,7 @@ public class AccountingDocument implements BaseModel {
     @Length(max = 100)
     private String name;
 
-    @Column(name = "NUMERO", nullable = false, length = 20)
+    @Column(name = "NUMERO", length = 20)
     @Length(max = 20)
     private String number;
 

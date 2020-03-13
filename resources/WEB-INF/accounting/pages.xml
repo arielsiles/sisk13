@@ -143,4 +143,26 @@
         </navigation>
     </page>
 
+    <page view-id="/accounting/purchaseBookList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{purchaseDocumentAction.selectPurchaseDocument(purchaseDocumentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/purchaseDocumentUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/accounting/purchaseDocumentUpdate.xhtml" no-conversation-view-id="/accounting/purchaseBookList.xhtml">
+        <navigation from-action="#{purchaseDocumentAction.updatePurchaseDocument}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/purchaseBookList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{purchaseDocumentAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/accounting/purchaseBookList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>        

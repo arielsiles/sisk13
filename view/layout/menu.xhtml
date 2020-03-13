@@ -321,7 +321,7 @@
 <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0"
              columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
-<rich:dropDownMenu value="#{messages['menu.finances.books']}" rendered="#{s:hasPermission('BOOKS_PURCHASE_SALE','VIEW')}">
+<rich:dropDownMenu value="#{messages['menu.finances.books']}" rendered="#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}">
     <rich:menuItem submitMode="none" styleClass="main-menu-item">
         <s:link view="/accounting/purchaseBookList.xhtml"
                 value="#{messages['menu.finances.books.purchaseBook']}"
