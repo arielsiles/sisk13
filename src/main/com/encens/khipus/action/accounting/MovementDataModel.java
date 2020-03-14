@@ -1,13 +1,11 @@
 package com.encens.khipus.action.accounting;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.purchases.PurchaseDocumentState;
+import com.encens.khipus.model.customers.Movement;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -17,34 +15,31 @@ import java.util.List;
  * @author
  * @version 2.25
  */
-@Name("purchaseDocumentDataModel")
+@Name("movementDataModel")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}")
-public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocument> {
+public class MovementDataModel extends QueryDataModel<Long, Movement> {
 
     private Date startDate;
     private Date endDate;
     private String number;
     private String name;
-    private PurchaseDocumentState stateNullified = PurchaseDocumentState.NULLIFIED;
 
     private static final String[] RESTRICTIONS = {
-            "purchaseDocument.state <> #{purchaseDocumentDataModel.stateNullified}",
-            "purchaseDocument.number = #{purchaseDocumentDataModel.number}",
-            "lower(purchaseDocument.name) like concat('%', concat(lower(#{purchaseDocumentDataModel.name}), '%'))",
-            "purchaseDocument.date >= #{purchaseDocumentDataModel.startDate}",
-            "purchaseDocument.date <= #{purchaseDocumentDataModel.endDate}"
+            "movement.number = #{movementDataModel.number}",
+            "lower(movement.name) like concat('%', concat(lower(#{movementDataModel.name}), '%'))",
+            "movement.date >= #{movementDataModel.startDate}",
+            "movement.date <= #{movementDataModel.endDate}"
     };
 
     @Create
     public void init() {
-        sortProperty = "purchaseDocument.date";
+        sortProperty = "movement.date";
         sortAsc = false;
     }
 
     @Override
     public String getEjbql() {
-        return "select purchaseDocument from PurchaseDocument purchaseDocument";
+        return "select movement from Movement movement";
     }
 
     @Override
@@ -84,11 +79,4 @@ public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocu
         this.name = name;
     }
 
-    public PurchaseDocumentState getStateNullified() {
-        return stateNullified;
-    }
-
-    public void setStateNullified(PurchaseDocumentState stateNullified) {
-        this.stateNullified = stateNullified;
-    }
 }

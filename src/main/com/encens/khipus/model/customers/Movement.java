@@ -1,9 +1,11 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -14,134 +16,84 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 
-@TableGenerator(name = "Movement_Generator",
+/*@TableGenerator(name = "Movement_Generator",
         table = "SECUENCIA",
         pkColumnName = "TABLA",
         valueColumnName = "VALOR",
         pkColumnValue = "ILVA_MOVIMIENTOS",
-        allocationSize = 10)
+        allocationSize = 10)*/
 
 @Entity
-@Table(name = "ILVA_MOVIMIENTOS",schema = Constants.CASHBOX_SCHEMA)
-//@Filter(name = "companyFilter")
-//@EntityListeners(CompanyListener.class)
+@Table(name = "MOVIMIENTO",schema = Constants.CASHBOX_SCHEMA)
 public class Movement implements BaseModel {
 
-    /*@EmbeddedId
-    private CustomerOrderPK id = new CustomerOrderPK();*/
     @Id
-    @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Movement_Generator")
+    @Column(name = "IDMOVIMIENTO", nullable = false)
     private Long id;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA")
+    @Column(name = "FECHA_FACTURA")
     private Date date;
 
-    @Column(name = "GLOSA", columnDefinition = "VARCHAR2(100 BYTE)")
+    @Column(name = "GLOSA")
     private String gloss;
 
-    @Column(name = "NRORECIBO", columnDefinition = "VARCHAR2(30 BYTE)")
-    private String numberVoucher;
+    @Column(name = "ESTADO")
+    private String state;
 
-    @Column(name = "ESTADO", columnDefinition = "VARCHAR2(1 BYTE)")
-    private String type;
+    @Column(name = "NROFACTURA")
+    private Integer number;
 
-    @Column(name = "OBSERVACION", columnDefinition = "VARCHAR2(300 BYTE)")
-    private String observation;
-
-    @Column(name = "CASOESPECIAL", columnDefinition = "VARCHAR2(1 BYTE)")
-    private String caseEspecial;
-
-    @Column(name = "MONTOTESO", columnDefinition = "DECIMAL(10,2)")
-    private Double mountTeso;
-
-    @Column(name = "MONTOCUST", columnDefinition = "DECIMAL(10,2)")
-    private Double mountCust;
-
-    @Column(name = "CUEN_ID")
-    private Long accountID;
-
-    @Column(name = "USUA_ID")
-    private Long usrID;
-
-    @Column(name = "EST_COD", columnDefinition = "VARCHAR2(15 BYTE)")
-    private String estCod;
-
-    @Column(name = "MONEDA", columnDefinition = "VARCHAR2(1 BYTE)")
-    private String coin;
-
-    @Column(name = "PI_ID", columnDefinition = "VARCHAR2(20 BYTE)")
-    private Long piID;
-
-    @Column(name = "EN_UN_RECIBO", columnDefinition = "VARCHAR2(1 BYTE)")
-    private String inVoucher;
-
-    @Column(name = "NROPREIMPRESO", columnDefinition = "VARCHAR2(30 BYTE)")
-    private String numberPrePrint;
-
-    @Column(name = "MOTIVO", columnDefinition = "VARCHAR2(300 BYTE)")
-    private String motive;
-
-    @Column(name = "NROFACTURA", columnDefinition = "VARCHAR2(12 BYTE)")
-    private Long numberInvoice;
-
-    @Column(name = "CODIGOCONTROL", columnDefinition = "VARCHAR2(256 BYTE)")
-    private String codControl;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "DOSI_ID")
-    private Dosage dosage;
-
-    @Column(name = "NIT", columnDefinition = "VARCHAR2(30 BYTE)")
+    @Column(name = "NIT_CLIENTE")
     private String nit;
 
-    @Column(name = "CANT")
-    private Integer mount;
+    @Column(name = "RAZON_SOCIAL")
+    private String name;
 
-    @Column(name = "DESCUENTO", columnDefinition = "DECIMAL(10,0)")
-    private Double discount;
+    @Column(name = "IMPORTE_TOTAL")
+    private BigDecimal amount;
 
-    @Column(name = "SOLIDARIDAD", columnDefinition = "VARCHAR2(1 BYTE)")
-    private String solidarity;
+    @Column(name = "IMPORTE_ICE_IEHD_TASAS")
+    private BigDecimal amountIce;
 
-    @Column(name = "MONTODESC", columnDefinition = "DECIMAL(10,2)")
-    private Double mountDiscount;
+    @Column(name = "EXPORT_EXENTAS")
+    private BigDecimal exemptExport;
 
-    @Column(name = "DESCREAL", columnDefinition = "DECIMAL(10,2)")
-    private Double descreal;
+    @Column(name = "VENTAS_GRAB_TASACERO")
+    private BigDecimal taxedSalesZero;
 
-    @Column(name = "MONTONETO", columnDefinition = "DECIMAL(10,2)")
-    private Double mountNeto;
+    @Column(name = "SUBTOTAL")
+    private BigDecimal subtotal;
 
-    @Column(name = "TIPO_PAGO", columnDefinition = "VARCHAR2(10 BYTE)")
-    private String typePay;
+    @Column(name = "DESCUENTOS")
+    private BigDecimal discount;
 
-    @Column(name = "UNIDAD_ACAD_ADM", columnDefinition = "VARCHAR2(10 BYTE)")
-    private String unitAcadAdm;
+    @Column(name = "IMPORTE_PARA_DEBITO_FISCAL")
+    private BigDecimal amountFiscalDebit;
 
-    @Column(name = "PLAN_ESTUDIO", columnDefinition = "VARCHAR2(30 BYTE)")
-    private String studyPlan;
+    @Column(name = "CODIGOCONTROL")
+    private String controlCode;
 
-    @Column(name = "TIPO_CAMBIO", columnDefinition = "DECIMAL(10,2)")
-    private Double typeChange;
+    @Column(name = "TIPOPAGO")
+    private String paymentType;
 
-    @Column(name = "TOTAL_FACTURA", columnDefinition = "DECIMAL(10,2)")
-    private Double totalInvoice;
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @Column(name = "FECHAREGISTRO")
+    private Date registrationDate;
 
-    @Column(name = "NRO_CREDITOS", columnDefinition = "DECIMAL(22,0)")
-    private Double numberCredit;
+    @Column(name = "CODIGO_QR")
+    private String qrCode;
 
-    @Column(name = "DESC_PEDIDO", columnDefinition = "VARCHAR2(500 BYTE)")
-    private String descrOrder;
+    @Column(name = "NRO_AUTORIZACION")
+    private String authorizationNumber;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "PEDIDO", columnDefinition = "VARCHAR2(50 BYTE)")
-    private CustomerOrder customerOrderMovement;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "ID_TMPDET", nullable = true, insertable = true, updatable = false)
+    private VoucherDetail voucherDetailFiscalDebit;
 
-    @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA_REGISTRO")
-    private Date dateRecord;
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "IDPEDIDOS", nullable = true, insertable = true, updatable = false)
+    private CustomerOrder customerOrder;
 
     public Long getId() {
         return id;
@@ -167,136 +119,12 @@ public class Movement implements BaseModel {
         this.gloss = gloss;
     }
 
-    public String getNumberVoucher() {
-        return numberVoucher;
+    public String getState() {
+        return state;
     }
 
-    public void setNumberVoucher(String numberVoucher) {
-        this.numberVoucher = numberVoucher;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getObservation() {
-        return observation;
-    }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
-
-    public String getCaseEspecial() {
-        return caseEspecial;
-    }
-
-    public void setCaseEspecial(String caseEspecial) {
-        this.caseEspecial = caseEspecial;
-    }
-
-    public Double getMountTeso() {
-        return mountTeso;
-    }
-
-    public void setMountTeso(Double mountTeso) {
-        this.mountTeso = mountTeso;
-    }
-
-    public Double getMountCust() {
-        return mountCust;
-    }
-
-    public void setMountCust(Double mountCust) {
-        this.mountCust = mountCust;
-    }
-
-    public Long getAccountID() {
-        return accountID;
-    }
-
-    public void setAccountID(Long accountID) {
-        this.accountID = accountID;
-    }
-
-    public Long getUsrID() {
-        return usrID;
-    }
-
-    public void setUsrID(Long usrID) {
-        this.usrID = usrID;
-    }
-
-    public String getEstCod() {
-        return estCod;
-    }
-
-    public void setEstCod(String estCod) {
-        this.estCod = estCod;
-    }
-
-    public String getCoin() {
-        return coin;
-    }
-
-    public void setCoin(String coin) {
-        this.coin = coin;
-    }
-
-    public void setPiID(Long piID) {
-        this.piID = piID;
-    }
-
-    public String getInVoucher() {
-        return inVoucher;
-    }
-
-    public void setInVoucher(String inVoucher) {
-        this.inVoucher = inVoucher;
-    }
-
-    public String getNumberPrePrint() {
-        return numberPrePrint;
-    }
-
-    public void setNumberPrePrint(String numberPrePrint) {
-        this.numberPrePrint = numberPrePrint;
-    }
-
-    public String getMotive() {
-        return motive;
-    }
-
-    public void setMotive(String motive) {
-        this.motive = motive;
-    }
-
-    public Long getNumberInvoice() {
-        return numberInvoice;
-    }
-
-    public void setNumberInvoice(Long numberInvoice) {
-        this.numberInvoice = numberInvoice;
-    }
-
-    public String getCodControl() {
-        return codControl;
-    }
-
-    public void setCodControl(String codControl) {
-        this.codControl = codControl;
-    }
-
-    public Dosage getDosage() {
-        return dosage;
-    }
-
-    public void setDosage(Dosage dosage) {
-        this.dosage = dosage;
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getNit() {
@@ -307,123 +135,131 @@ public class Movement implements BaseModel {
         this.nit = nit;
     }
 
-    public Integer getMount() {
-        return mount;
+    public String getName() {
+        return name;
     }
 
-    public void setMount(Integer mount) {
-        this.mount = mount;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Double getDiscount() {
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getAmountIce() {
+        return amountIce;
+    }
+
+    public void setAmountIce(BigDecimal amountIce) {
+        this.amountIce = amountIce;
+    }
+
+    public BigDecimal getExemptExport() {
+        return exemptExport;
+    }
+
+    public void setExemptExport(BigDecimal exemptExport) {
+        this.exemptExport = exemptExport;
+    }
+
+    public BigDecimal getTaxedSalesZero() {
+        return taxedSalesZero;
+    }
+
+    public void setTaxedSalesZero(BigDecimal taxedSalesZero) {
+        this.taxedSalesZero = taxedSalesZero;
+    }
+
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public BigDecimal getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Double discount) {
+    public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
 
-    public String getSolidarity() {
-        return solidarity;
+    public BigDecimal getAmountFiscalDebit() {
+        return amountFiscalDebit;
     }
 
-    public void setSolidarity(String solidarity) {
-        this.solidarity = solidarity;
+    public void setAmountFiscalDebit(BigDecimal amountFiscalDebit) {
+        this.amountFiscalDebit = amountFiscalDebit;
     }
 
-    public Double getMountDiscount() {
-        return mountDiscount;
+    public String getControlCode() {
+        return controlCode;
     }
 
-    public void setMountDiscount(Double mountDiscount) {
-        this.mountDiscount = mountDiscount;
+    public void setControlCode(String controlCode) {
+        this.controlCode = controlCode;
     }
 
-    public Double getDescreal() {
-        return descreal;
+    public String getPaymentType() {
+        return paymentType;
     }
 
-    public void setDescreal(Double descreal) {
-        this.descreal = descreal;
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
     }
 
-    public Double getMountNeto() {
-        return mountNeto;
+    public Date getRegistrationDate() {
+        return registrationDate;
     }
 
-    public void setMountNeto(Double mountNeto) {
-        this.mountNeto = mountNeto;
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
-    public String getTypePay() {
-        return typePay;
+    public String getQrCode() {
+        return qrCode;
     }
 
-    public void setTypePay(String typePay) {
-        this.typePay = typePay;
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 
-    public String getUnitAcadAdm() {
-        return unitAcadAdm;
+    public VoucherDetail getVoucherDetailFiscalDebit() {
+        return voucherDetailFiscalDebit;
     }
 
-    public void setUnitAcadAdm(String unitAcadAdm) {
-        this.unitAcadAdm = unitAcadAdm;
+    public void setVoucherDetailFiscalDebit(VoucherDetail voucherDetailFiscalDebit) {
+        this.voucherDetailFiscalDebit = voucherDetailFiscalDebit;
     }
 
-    public String getStudyPlan() {
-        return studyPlan;
+    public CustomerOrder getCustomerOrder() {
+        return customerOrder;
     }
 
-    public void setStudyPlan(String studyPlan) {
-        this.studyPlan = studyPlan;
+    public void setCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrder = customerOrder;
     }
 
-    public Double getTypeChange() {
-        return typeChange;
+    public Integer getNumber() {
+        return number;
     }
 
-    public void setTypeChange(Double typeChange) {
-        this.typeChange = typeChange;
+    public void setNumber(Integer number) {
+        this.number = number;
     }
 
-    public Double getTotalInvoice() {
-        return totalInvoice;
+    public String getAuthorizationNumber() {
+        return authorizationNumber;
     }
 
-    public void setTotalInvoice(Double totalInvoice) {
-        this.totalInvoice = totalInvoice;
-    }
-
-    public Double getNumberCredit() {
-        return numberCredit;
-    }
-
-    public void setNumberCredit(Double numberCredit) {
-        this.numberCredit = numberCredit;
-    }
-
-    public String getDescrOrder() {
-        return descrOrder;
-    }
-
-    public void setDescrOrder(String descrOrder) {
-        this.descrOrder = descrOrder;
-    }
-
-    public CustomerOrder getCustomerOrderMovement() {
-        return customerOrderMovement;
-    }
-
-    public void setCustomerOrderMovement(CustomerOrder customerOrderMovement) {
-        this.customerOrderMovement = customerOrderMovement;
-    }
-
-    public Date getDateRecord() {
-        return dateRecord;
-    }
-
-    public void setDateRecord(Date dateRecord) {
-        this.dateRecord = dateRecord;
+    public void setAuthorizationNumber(String authorizationNumber) {
+        this.authorizationNumber = authorizationNumber;
     }
 }

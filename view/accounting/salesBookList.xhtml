@@ -8,7 +8,7 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-<ui:define name="pageTitle">#{messages['Voucher.purchaseBook.title']}</ui:define>
+<ui:define name="pageTitle">#{messages['Voucher.salesBook.title']}</ui:define>
 <ui:param name="bodyAlign" value="center"/>
 <ui:param name="bodyWidth" value="97%"/>
 
@@ -16,7 +16,7 @@
 <ui:define name="body">
 <h:form id="VoucherSearch">
 <rich:simpleTogglePanel id="voucherSearchPanelId"
-                        label="#{messages['Voucher.purchaseBook.title']}"
+                        label="#{messages['Voucher.salesBook.title']}"
                         switchType="client">
     <h:panelGrid columns="2"
                  width="100%"
@@ -27,22 +27,22 @@
         <s:div id="leftSidePanel">
 
             <s:decorate id="documentNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Voucher.purchaseBook.invoice']}</ui:define>
+                <ui:define name="label">#{messages['Voucher.salesBook.invoice']}</ui:define>
                 <h:inputText id="documentNumber"
-                             value="#{purchaseDocumentDataModel.number}"
+                             value="#{movementDataModel.number}"
                              styleClass="input"
                              maxlength="150"
                              tabindex="2"/>
             </s:decorate>
 
             <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Voucher.purchaseBook.name']}</ui:define>
+                <ui:define name="label">#{messages['Voucher.salesBook.name']}</ui:define>
                 <h:inputText id="name"
-                             value="#{purchaseDocumentDataModel.name}"
+                             value="#{movementDataModel.name}"
                              styleClass="input"
                              maxlength="150"
                              tabindex="2"/>
-                <a4j:commandButton action="#{purchaseDocumentDataModel.search}"
+                <a4j:commandButton action="#{movementDataModel.search}"
                                    reRender="purchaseDocumentList, dataScroller"
                                    styleClass="button"
                                    value="#{messages['Common.search']}"
@@ -101,8 +101,8 @@
 </div>
 
 <rich:dataTable id="purchaseDocumentList"
-                value="#{purchaseDocumentDataModel}"
-                var="purchaseDocumentItem"
+                value="#{movementDataModel}"
+                var="movementItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
                 columnsWidth="8%, 10%, 10%, 10%, 35%, 10%, 10%, 7%">
@@ -110,7 +110,7 @@
         <rich:columnGroup>
             <rich:column>
                 <app:commandSortHeader sortProperty="purchaseDocument.date"
-                                       dataModel="#{purchaseDocumentDataModel}"
+                                       dataModel="#{movementDataModel}"
                                        reRender="purchaseDocumentList, dataScroller">
                     #{messages['Voucher.purchaseBook.date']}
                 </app:commandSortHeader>
@@ -135,28 +135,27 @@
         </rich:columnGroup>
     </f:facet>
     <rich:column styleClass="center">
-        <h:outputText value="#{purchaseDocumentItem.date}">
+        <h:outputText value="#{movementItem.date}">
             <f:convertDateTime pattern="#{messages['patterns.date']}"/>
         </h:outputText>
     </rich:column>
     <rich:column styleClass="center">
-        <h:outputText value="#{purchaseDocumentItem.nit}"/>
+        <h:outputText value="#{movementItem.nit}"/>
     </rich:column>
     <rich:column styleClass="center">
-        <h:outputText value="#{purchaseDocumentItem.authorizationNumber}"/>
+        <h:outputText value="#{movementItem.authorizationNumber}"/>
     </rich:column>
     <rich:column styleClass="center">
-        <h:outputText value="#{purchaseDocumentItem.number}"/>
+        <h:outputText value="#{movementItem.number}"/>
     </rich:column>
     <rich:column>
-        <h:outputText value="#{purchaseDocumentItem.name}"/>
+        <h:outputText value="#{movementItem.name}"/>
     </rich:column>
     <rich:column styleClass="center">
-        <h:outputText value="#{purchaseDocumentItem.voucherDetailFiscalCredit.voucher.fullDocument}"
-                      rendered="#{purchaseDocumentItem.getVoucherDetailFiscalCredit() != null}"/>
+
     </rich:column>
     <rich:column styleClass="right">
-        <h:outputText value="#{purchaseDocumentItem.amount}">
+        <h:outputText value="#{movementItem.amount}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
     </rich:column>
@@ -168,7 +167,7 @@
         </h:commandLink>
     </rich:column>
 </rich:dataTable>
-<app:dataScroller id="dataScroller" for="purchaseDocumentList" dataModel="#{purchaseDocumentDataModel}"/>
+<app:dataScroller id="dataScroller" for="purchaseDocumentList" dataModel="#{movementDataModel}"/>
 
 </h:form>
 </ui:define>
