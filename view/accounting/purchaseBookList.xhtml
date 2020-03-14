@@ -33,6 +33,15 @@
                              styleClass="input"
                              maxlength="150"
                              tabindex="2"/>
+            </s:decorate>
+
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Voucher.purchaseBook.name']}</ui:define>
+                <h:inputText id="name"
+                             value="#{purchaseDocumentDataModel.name}"
+                             styleClass="input"
+                             maxlength="150"
+                             tabindex="2"/>
                 <a4j:commandButton action="#{purchaseDocumentDataModel.search}"
                                    reRender="purchaseDocumentList, dataScroller"
                                    styleClass="button"

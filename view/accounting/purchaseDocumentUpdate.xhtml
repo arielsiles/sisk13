@@ -46,13 +46,12 @@
 
             <s:div id="leftDocDiv">
 
-                <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{action.managed}">
-
-                    <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
-                    <h:outputText value="#{purchaseDocument.number}"/>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.invoiceNumber']}</ui:define>
+                    <h:inputText id="number" value="#{purchaseDocument.number}"
+                                 styleClass="input100"
+                                 readonly="true"/>
                 </s:decorate>
-
 
                 <s:decorate id="nameField"
                             template="/include/inputField.xhtml"
@@ -61,7 +60,7 @@
                     <h:inputText id="name"
                                  value="#{purchaseDocument.name}"
                                  required="true"
-                                 styleClass="input"
+                                 styleClass="inputLarge"
                                  tabindex="3">
                     </h:inputText>
                 </s:decorate>
@@ -72,7 +71,7 @@
                     <ui:define name="label">#{messages['PurchaseDocument.date']}</ui:define>
                     <rich:calendar id="purchaseDocumentDate"
                                    value="#{purchaseDocument.date}"
-                                   styleClass="input"
+                                   inputClass="input100"
                                    datePattern="#{messages['patterns.date']}"
                                    enableManualInput="true"
                                    required="true"
@@ -91,7 +90,7 @@
                                  value="#{purchaseDocument.amount}"
                                  required="true"
                                  readonly="true"
-                                 styleClass="input right"
+                                 styleClass="input100 right"
                                  tabindex="5">
                         <app:realNumberConverter minimum="0"
                                                  pattern="#{messages['patterns.decimalNumber']}"
@@ -117,7 +116,7 @@
                 <s:decorate id="authorizationNumberField"
                             template="/include/inputField.xhtml"
                             styleClass="formRow">
-                    <ui:define name="label">#{messages['PurchaseDocument.authorizationNumber']}</ui:define>
+                    <ui:define name="label">#{messages['PurchaseDocument.authorization']}</ui:define>
                     <h:inputText id="authorizationNumber"
                                  value="#{purchaseDocument.authorizationNumber}"
                                  required="true"
@@ -132,6 +131,7 @@
                     <ui:define name="label">#{messages['PurchaseDocument.controlCode']}</ui:define>
                     <h:inputText id="controlCode"
                                  value="#{purchaseDocument.controlCode}"
+                                 required="true"
                                  styleClass="input right"
                                  tabindex="11">
                     </h:inputText>

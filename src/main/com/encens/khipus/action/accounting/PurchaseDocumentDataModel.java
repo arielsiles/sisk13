@@ -24,9 +24,11 @@ public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocu
     private Date startDate;
     private Date endDate;
     private String number;
+    private String name;
 
     private static final String[] RESTRICTIONS = {
             "purchaseDocument.number = #{purchaseDocumentDataModel.number}",
+            "lower(purchaseDocument.name) like concat('%', concat(lower(#{purchaseDocumentDataModel.name}), '%'))",
             "purchaseDocument.date >= #{purchaseDocumentDataModel.startDate}",
             "purchaseDocument.date <= #{purchaseDocumentDataModel.endDate}"
     };
@@ -68,5 +70,13 @@ public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocu
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
