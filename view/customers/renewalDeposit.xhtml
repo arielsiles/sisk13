@@ -18,18 +18,9 @@
             <div class="buttons">
 
                 <h:commandButton id="createButtonId"
-                                 action="#{accountAction.create}"
-                                 value="#{messages['Common.save']}"
-                                 styleClass="button"
-                                 rendered="#{!accountAction.managed and s:hasPermission('CREDIT','CREATE')}">
-                </h:commandButton>
-
-                <h:commandButton id="updateButtonId"
-                                 action="#{accountAction.update}"
-                                 value="#{messages['Common.save']}"
-                                 styleClass="button"
-                                 rendered="#{accountAction.managed}">
-                    <s:defaultAction/>
+                                 action="#{accountAction.createDpfRenewal}"
+                                 value="#{messages['Common.renew']}"
+                                 styleClass="button">
                 </h:commandButton>
 
                 <h:commandButton action="#{accountAction.cancelRenovationDPF}"

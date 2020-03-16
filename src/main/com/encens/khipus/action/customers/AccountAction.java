@@ -153,6 +153,54 @@ public class AccountAction extends GenericAction<Account> {
         return Outcome.SUCCESS;
     }
 
+    @End(beforeRedirect = true)
+    public String createDpfRenewal(){
+
+        BigDecimal exchangeRate = BigDecimal.ZERO;
+        try {
+            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+        }catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+        }catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundMessage();
+        }
+
+        Account currentAccount = getInstance();
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(documentType.getName());
+        voucher.setGloss(glossRenewDPF);
+
+        VoucherDetail vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        vd1.setPartnerAccount(currentAccount);
+
+        VoucherDetail vd2 = buildAccountEntryDetail("2180320000", interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        //vd2.setAccount("2180320000"); //Cargos financieros por pagar por DPF ME
+        //vd2.setDebitMe(interestDPF);
+
+        Account newAccount = new Account();
+        newAccount.setAccountNumber(generateAccountNumber());
+        newAccount.setAccountType(accountTypeRenewDPF);
+        newAccount.setCode(newAccountCodeDPF);
+        newAccount.setCurrency(currentAccount.getCurrency());
+
+        /*try {
+            getService().create(newAccount);
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+        }*/
+
+        VoucherDetail vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        //vd3.setPartnerAccount(newAccount);
+
+        voucher.getDetails().add(vd1);
+        voucher.getDetails().add(vd2);
+        voucher.getDetails().add(vd3);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        return Outcome.SUCCESS;
+    }
 
     public String generateAccountNumber(){
         String result = String.valueOf(sequenceGeneratorService.nextValue(Constants.SAVINGS_ACCOUNT_NUMBER));

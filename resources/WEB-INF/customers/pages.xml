@@ -198,10 +198,12 @@
     </page>
 
     <page view-id="/customers/renewalDeposit.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
-        <navigation>
+        <navigation from-action="#{accountAction.createDpfRenewal}">
             <rule if-outcome="Success">
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>
+        </navigation>
+        <navigation from-action="#{accountAction.cancel}">
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>
