@@ -95,7 +95,7 @@
 
 <div class="buttons">
     <s:button value="#{messages['Voucher.purchaseBook.generateBook']}"
-              view="/finances/purchaseBookReport.xhtml"
+              view="/accounting/salesBookReport.xhtml"
               styleClass="button"
               propagation="begin"/>
 </div>
@@ -126,6 +126,8 @@
 
             <rich:column>#{messages['Voucher.purchaseBook.name']}</rich:column>
 
+            <rich:column>#{messages['Voucher.salesBook.state']}</rich:column>
+
             <rich:column>#{messages['Voucher.documentNumber']}</rich:column>
 
             <rich:column>#{messages['Voucher.purchaseBook.amount']}</rich:column>
@@ -151,9 +153,12 @@
     <rich:column>
         <h:outputText value="#{movementItem.name}"/>
     </rich:column>
-    <rich:column styleClass="center">
-
+    <rich:column>
+        <h:outputText value="#{movementItem.state}"/>
     </rich:column>
+
+    <rich:column styleClass="center"> </rich:column>
+
     <rich:column styleClass="right">
         <h:outputText value="#{movementItem.amount}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>

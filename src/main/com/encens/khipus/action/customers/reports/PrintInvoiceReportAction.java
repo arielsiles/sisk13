@@ -258,12 +258,12 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         movement.setCodControl(codControl);
         movement.setDosage(dosage);
         movement.setNit(order.getClientOrder().getNumberDoc());*/
-        movement.setMount(articleOrder.getAmount());
+        /*movement.setMount(articleOrder.getAmount());
         movement.setTypePay("1");
         movement.setTypeChange(6.96);
-        movement.setTotalInvoice(order.getTotal().doubleValue());
+        movement.setTotalInvoice(order.getTotal().doubleValue());*/
         //movement.setDescrOrder();verificar
-        movement.setCustomerOrderMovement(order);
+        /*movement.setCustomerOrderMovement(order);*/
         movementsNews.add(movement);
         /*try {
             movementService.create(movement);
