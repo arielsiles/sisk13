@@ -203,7 +203,7 @@
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{accountAction.cancel}">
+        <navigation from-action="#{accountAction.cancelRenovationDPF}">
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>

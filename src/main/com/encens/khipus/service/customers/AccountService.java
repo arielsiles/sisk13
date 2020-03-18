@@ -20,6 +20,7 @@ import java.util.List;
 @Local
 public interface AccountService {
 
+    void createAccount(Account account);
     List<VoucherDetail> getAccountDetailList(Account account);
     List<VoucherDetail> getPartnerDetailList(Partner partner);
     BigDecimal  calculateAccountBalance(Account account, Date startDate, Date endDate);

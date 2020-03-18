@@ -75,6 +75,8 @@ public class AccountAction extends GenericAction<Account> {
     private DocType documentType = new DocType();
     private String glossRenewDPF;
 
+    private Partner partnerDPF;
+
     /** For capitalization **/
     private Date startDate;
     private Date endDate;
@@ -166,32 +168,46 @@ public class AccountAction extends GenericAction<Account> {
         }
 
         Account currentAccount = getInstance();
+        AccountType currentAccountType = currentAccount.getAccountType();
+
+        Account newAccount = new Account();
+        newAccount.setOpeningDate(startDateDPF);
+        newAccount.setExpirationDate(expirationDateDPF);
+        newAccount.setAccountNumber(generateAccountNumber());
+        newAccount.setAccountType(accountTypeRenewDPF);
+        newAccount.setCode(newAccountCodeDPF);
+        newAccount.setCurrency(currentAccount.getCurrency());
+        newAccount.setPartner(partnerDPF);
+        newAccount.setAccountState(AccountState.ACTIVE);
+        newAccount.setBalance(BigDecimal.ZERO);
+        newAccount.setRetentionFlag(Boolean.TRUE);
+        newAccount.setCompanyAccountFlag(Boolean.FALSE);
+        accountService.createAccount(newAccount);
+        System.out.println("------> New Account id: " + newAccount.getId());
+        System.out.println("------> New Account Full: " + newAccount.getFullAccountName());
 
         Voucher voucher = new Voucher();
         voucher.setDocumentType(documentType.getName());
         voucher.setGloss(glossRenewDPF);
 
-        VoucherDetail vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        VoucherDetail vd1 = new VoucherDetail();
+        VoucherDetail vd2 = new VoucherDetail();
+        VoucherDetail vd3 = new VoucherDetail();
+
+        if (currentAccount.getCurrency().equals(FinancesCurrencyType.D)) {
+            vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+            vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        }
+
+        if (currentAccount.getCurrency().equals(FinancesCurrencyType.P)) {
+            vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMn().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMn().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+            vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMn().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+        }
+
         vd1.setPartnerAccount(currentAccount);
-
-        VoucherDetail vd2 = buildAccountEntryDetail("2180320000", interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-        //vd2.setAccount("2180320000"); //Cargos financieros por pagar por DPF ME
-        //vd2.setDebitMe(interestDPF);
-
-        Account newAccount = new Account();
-        newAccount.setAccountNumber(generateAccountNumber());
-        newAccount.setAccountType(accountTypeRenewDPF);
-        newAccount.setCode(newAccountCodeDPF);
-        newAccount.setCurrency(currentAccount.getCurrency());
-
-        /*try {
-            getService().create(newAccount);
-        } catch (EntryDuplicatedException e) {
-            addDuplicatedMessage();
-        }*/
-
-        VoucherDetail vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-        //vd3.setPartnerAccount(newAccount);
+        vd3.setPartnerAccount(newAccount);
 
         voucher.getDetails().add(vd1);
         voucher.getDetails().add(vd2);
@@ -201,6 +217,33 @@ public class AccountAction extends GenericAction<Account> {
 
         return Outcome.SUCCESS;
     }
+
+    /*public String createDpfRenewal(BigDecimal exchangeRate, Account newAccount, FinancesCurrencyType currency){
+
+        Account currentAccount = getInstance();
+        AccountType currentAccountType = currentAccount.getAccountType();
+        //accountService.createAccount(newAccount);
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(documentType.getName());
+        voucher.setGloss(glossRenewDPF);
+
+        VoucherDetail vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        vd1.setPartnerAccount(currentAccount);
+
+        VoucherDetail vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+
+        VoucherDetail vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+        vd3.setPartnerAccount(newAccount);
+
+        voucher.getDetails().add(vd1);
+        voucher.getDetails().add(vd2);
+        voucher.getDetails().add(vd3);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        return Outcome.SUCCESS;
+    }*/
 
     public String generateAccountNumber(){
         String result = String.valueOf(sequenceGeneratorService.nextValue(Constants.SAVINGS_ACCOUNT_NUMBER));
@@ -293,6 +336,10 @@ public class AccountAction extends GenericAction<Account> {
 
     public void assignPartner(Partner partner){
         getInstance().setPartner(partner);
+    }
+
+    public void assignPartnerDPF(Partner partner){
+        setPartnerDPF(partner);
     }
 
     public void clearPartner(){
@@ -696,6 +743,11 @@ public class AccountAction extends GenericAction<Account> {
         setInterestRenewDPF(interestValue);
     }
 
+    public void calculateExpirationDate(){
+        if (getInstance().getAccountType().getSavingType().equals(SavingType.DPF))
+            getInstance().setExpirationDate(DateUtils.addDay(getInstance().getOpeningDate(), getInstance().getAccountType().getDays()));
+    }
+
     public void calculateExpirationDateDPF(){
         setExpirationDateDPF(DateUtils.addDay(startDateDPF, accountTypeRenewDPF.getDays()));
     }
@@ -856,6 +908,14 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setNewAccountCodeDPF(String newAccountCodeDPF) {
         this.newAccountCodeDPF = newAccountCodeDPF;
+    }
+
+    public Partner getPartnerDPF() {
+        return partnerDPF;
+    }
+
+    public void setPartnerDPF(Partner partnerDPF) {
+        this.partnerDPF = partnerDPF;
     }
 
 

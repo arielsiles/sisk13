@@ -89,6 +89,14 @@ public class AccountType implements BaseModel {
     })
     private CashAccount cashAccountMv;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CTACF_MN", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    private CashAccount cashAccountChargeMn;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CTACF_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    private CashAccount cashAccountChargeMe;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -189,5 +197,21 @@ public class AccountType implements BaseModel {
 
     public void setDays(Integer days) {
         this.days = days;
+    }
+
+    public CashAccount getCashAccountChargeMn() {
+        return cashAccountChargeMn;
+    }
+
+    public void setCashAccountChargeMn(CashAccount cashAccountChargeMn) {
+        this.cashAccountChargeMn = cashAccountChargeMn;
+    }
+
+    public CashAccount getCashAccountChargeMe() {
+        return cashAccountChargeMe;
+    }
+
+    public void setCashAccountChargeMe(CashAccount cashAccountChargeMe) {
+        this.cashAccountChargeMe = cashAccountChargeMe;
     }
 }

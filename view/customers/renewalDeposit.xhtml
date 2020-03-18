@@ -142,13 +142,6 @@
                 </s:div>
 
                  <s:div id="rightSidePanel">
-                     <s:decorate id="newAccountCodeDPFField" template="/include/inputField.xhtml" styleClass="formRow">
-                         <ui:define name="label">#{messages['Account.newAccountCodeDPF']}</ui:define>
-                         <h:inputText id="newAccountCodeDPF" styleClass="input100"
-                                      value="#{accountAction.newAccountCodeDPF}"
-                                      required="true">
-                         </h:inputText>
-                     </s:decorate>
 
                      <s:decorate id="capitalRenewField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.capitalRenewDPF']}</ui:define>
@@ -157,6 +150,28 @@
                                       required="true">
                              <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalRenew"/>
                              <a4j:support event="onblur" reRender="capitalRenewField"/>
+                         </h:inputText>
+                     </s:decorate>
+
+                     <s:decorate id="newPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+                         <app:selectPopUp id="newPartnerFieldId"
+                                          required="true"
+                                          textValue="#{accountAction.partnerDPF.fullName}"
+                                          value="#{accountAction.partnerDPF}"
+                                          clearAction="#{accountAction.clearPartner()}"
+                                          searchModalPanel="newPartnerListModalPanel"
+                                          dataModel="#{partnerDataModel}"
+                                          reRender="newPartnerField" styleClass="input"
+                                          tabindex="12">
+                         </app:selectPopUp>
+                     </s:decorate>
+
+                     <s:decorate id="newAccountCodeDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.newAccountCodeDPF']}</ui:define>
+                         <h:inputText id="newAccountCodeDPF" styleClass="input100"
+                                      value="#{accountAction.newAccountCodeDPF}"
+                                      required="true">
                          </h:inputText>
                      </s:decorate>
 
@@ -267,6 +282,21 @@
                                        styleClass="select-image-middle"
                                        reRender="partnerField"
                                        oncomplete="Richfaces.hideModalPanel('partnerListModalPanel');"/>
+                </ui:define>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="newPartnerListModalPanelDiv">
+            <s:decorate id="newPartnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">
+                <ui:param name="containerId" value="newPartnerListModalPanelContainer"/>
+                <ui:param name="dialogId" value="newPartnerListModalPanel"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton"
+                                       action="#{accountAction.assignPartnerDPF(partnerItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image-middle"
+                                       reRender="newPartnerField"
+                                       oncomplete="Richfaces.hideModalPanel('newPartnerListModalPanel');"/>
                 </ui:define>
             </s:decorate>
         </s:div>

@@ -26,11 +26,11 @@
 
             <div class="buttons">
 
-                <!--<h:commandButton action="#{accountAction.addPayment}"
-                                 value="#{messages['Account.newDeposit']}"
+                <h:commandButton id="generateReportButtonId"
+                                 action="#{accountDPFReportAction.generateReport(account)}"
+                                 value="#{messages['Account.generateDocumentDPF']}"
                                  styleClass="button"
-                                 immediate="true"
-                                 rendered="#{accountAction.managed}"/>-->
+                                 immediate="true"/>
 
                 <h:commandButton action="#{accountAction.renewalDPF}"
                                  value="#{messages['Account.renewal']}"
@@ -146,6 +146,8 @@
                                            noSelectionLabel=""
                                            hideNoSelectionLabel="false"/>
                             <s:convertEntity/>
+                            <a4j:support event="onchange" action="#{accountAction.calculateExpirationDate}"
+                                         reRender="exprirationDateField" ajaxSingle="true"/>
                         </h:selectOneMenu>
                     </s:decorate>
 
@@ -171,6 +173,16 @@
                                        tabindex="6">
                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                         </rich:calendar>
+                    </s:decorate>
+
+                    <s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.capital']}</ui:define>
+                        <h:inputText id="capital" styleClass="input100"
+                                     value="#{account.capital}"
+                                     required="true">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
+                            <a4j:support event="onblur" reRender="capitalField"/>
+                        </h:inputText>
                     </s:decorate>
 
                     <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">

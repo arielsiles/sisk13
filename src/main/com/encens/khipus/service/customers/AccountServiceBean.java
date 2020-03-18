@@ -31,6 +31,11 @@ public class AccountServiceBean implements AccountService {
     @In(value = "#{entityManager}")
     private EntityManager em;
 
+    public void createAccount(Account account){
+        em.persist(account);
+        em.flush();
+    }
+
     @Override
     public List<VoucherDetail> getAccountDetailList(Account account){
 

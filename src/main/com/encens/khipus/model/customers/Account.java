@@ -45,7 +45,7 @@ public class Account implements BaseModel {
 
     @Column(name = "fechaapertura", nullable = true)
     @Temporal(TemporalType.DATE)
-    private Date openingDate;
+    private Date openingDate = new Date();
 
     @Column(name = "fechavence", nullable = true)
     @Temporal(TemporalType.DATE)
@@ -62,6 +62,9 @@ public class Account implements BaseModel {
     @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
+
+    @Column(name = "capital", precision = 13, scale = 2, nullable = false)
+    private BigDecimal capital = new BigDecimal(0);
 
     @Column(name = "estado", updatable = false)
     @Enumerated(EnumType.STRING)
@@ -226,5 +229,13 @@ public class Account implements BaseModel {
 
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public BigDecimal getCapital() {
+        return capital;
+    }
+
+    public void setCapital(BigDecimal capital) {
+        this.capital = capital;
     }
 }
