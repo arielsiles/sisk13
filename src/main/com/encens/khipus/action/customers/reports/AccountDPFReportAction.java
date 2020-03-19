@@ -37,36 +37,28 @@ public class AccountDPFReportAction extends GenericReportAction {
 
     @Create
     public void init() {
+        //restrictions = new String[]{"account.id = #{accountDPFReportAction.accountId}"};
         restrictions = new String[]{};
-
         //sortProperty = "purchaseOrder.id, purchaseOrderDetail.detailNumber";
     }
 
 
     protected String getEjbql() {
+        //return "select account from Account account";
         return "";
-        /*return "SELECT purchaseOrder, " +
-                "      purchaseOrderDetail.detailNumber, " +
-                "      productItem.name, " +
-                "      purchaseOrderDetail.requestedQuantity, " +
-                "      measureUnit.name, " +
-                "      purchaseOrderDetail.totalAmount, " +
-                "      purchaseOrderDetail.unitCost, " +
-                "      productItem.productItemCode, " +
-                "      purchaseOrderDetail.warning " +
-                "FROM  PurchaseOrder as purchaseOrder " +
-                "      LEFT JOIN purchaseOrder.purchaseOrderDetailList purchaseOrderDetail" +
-                "      LEFT JOIN purchaseOrderDetail.productItem productItem" +
-                "      LEFT JOIN purchaseOrderDetail.purchaseMeasureUnit measureUnit";*/
     }
 
     public void generateReport(Account account) {
+
+        accountId = account.getId();
 
         String ci           = account.getPartner().getIdNumber();
         String cert         = account.getCode();
         Date openDate       = account.getOpeningDate();
         Date expirationDate = account.getExpirationDate();
         String name         = account.getPartner().getFullName();
+        String beneficiary1 = account.getBeneficiary1();
+        String beneficiary2 = account.getBeneficiary2();
         String address      = account.getPartner().getHomeAddress();
 
         MoneyUtil money = new MoneyUtil();
@@ -75,7 +67,7 @@ public class AccountDPFReportAction extends GenericReportAction {
         BigDecimal interest     = accountAction.calculateInterestForDays(account.getAccountType().getDays(), capital, account.getAccountType().getInta());
         BigDecimal rciva        = BigDecimalUtil.multiply(interest, Constants.VAT);
         String term             = account.getAccountType().getDays().toString();
-        String rate             = account.getAccountType().getInta().toString();
+        String rate             = (new Integer(account.getAccountType().getInta().intValue())).toString();
 
         BigDecimal totalAmount  = BigDecimalUtil.sum(capital, interest);
                    totalAmount  = BigDecimalUtil.subtract(totalAmount, rciva);
@@ -86,6 +78,8 @@ public class AccountDPFReportAction extends GenericReportAction {
         reportParameters.put("openDate", openDate);
         reportParameters.put("expirationDate", expirationDate);
         reportParameters.put("name", name);
+        reportParameters.put("beneficiary1", beneficiary1);
+        reportParameters.put("beneficiary2", beneficiary2);
         reportParameters.put("address", address);
         reportParameters.put("literalCapital", literalCapital);
         reportParameters.put("capital", capital);

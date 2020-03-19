@@ -29,11 +29,13 @@
                 <h:commandButton id="generateReportButtonId"
                                  action="#{accountDPFReportAction.generateReport(account)}"
                                  value="#{messages['Account.generateDocumentDPF']}"
+                                 rendered="#{accountAction.isDpfAccount(account)}"
                                  styleClass="button"
                                  immediate="true"/>
 
                 <h:commandButton action="#{accountAction.renewalDPF}"
                                  value="#{messages['Account.renewal']}"
+                                 rendered="#{accountAction.isDpfAccount(account)}"
                                  styleClass="button"
                                  immediate="true"
                                  />
@@ -52,15 +54,6 @@
                                  rendered="#{accountAction.managed}">
                     <s:defaultAction/>
                 </h:commandButton>
-
-                <!--<h:commandButton value="#{messages['Common.delete']}"
-                                 styleClass="button"
-                                 rendered="#{accountAction.managed}">
-                    <rich:componentControl for="deleteConfirmation"
-                                           event="onclick"
-                                           disableDefault="true"
-                                           operation="show"/>
-                </h:commandButton>-->
 
                 <h:commandButton action="#{accountAction.cancel}"
                                  value="#{messages['Common.cancel']}"
@@ -147,7 +140,7 @@
                                            hideNoSelectionLabel="false"/>
                             <s:convertEntity/>
                             <a4j:support event="onchange" action="#{accountAction.calculateExpirationDate}"
-                                         reRender="exprirationDateField" ajaxSingle="true"/>
+                                         reRender="targetDPF, exprirationDateField, capitalField" ajaxSingle="true" immediate="false"/>
                         </h:selectOneMenu>
                     </s:decorate>
 
@@ -162,14 +155,16 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <s:div id="targetDPF" rendered="#{accountAction.dpfFlag}">
                     <s:decorate id="exprirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
                         <rich:calendar value="#{account.expirationDate}"
                                        popup="true"
-                                       required="false"
+                                       required="true"
                                        datePattern="#{messages['patterns.date']}"
                                        styleClass="input"
                                        enableManualInput="true"
+                                       reRender="exprirationDateField"
                                        tabindex="6">
                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                         </rich:calendar>
@@ -184,6 +179,7 @@
                             <a4j:support event="onblur" reRender="capitalField"/>
                         </h:inputText>
                     </s:decorate>
+                    </s:div>
 
                     <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.retention']}</ui:define>
@@ -224,6 +220,17 @@
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                             </h:outputText>
                         </s:decorate>
+
+                        <s:decorate id="beneficiary1Field" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
+                            <h:inputText id="beneficiary1" value="#{account.beneficiary1}" styleClass="input" />
+                        </s:decorate>
+
+                        <s:decorate id="beneficiary2Field" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
+                            <h:inputText id="beneficiary2" value="#{account.beneficiary2}" styleClass="input" />
+                        </s:decorate>
+
                     </s:div>
                     </c:if>
 

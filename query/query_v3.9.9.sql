@@ -7,3 +7,7 @@ update cuenta set capital = 0;
 -- For FLech
 update tipocuenta t set t.`ctacf_mn` = 2180310000 where t.`idtipocuenta` in (2, 3, 4, 6);
 update tipocuenta t set t.`ctacf_me` = 2180320000 where t.`idtipocuenta` in (2, 3, 4, 6);
+
+/** 18.03.2020 **/
+alter table cuenta add column beneficio1 varchar(100) after saldo;
+alter table cuenta add column beneficio2 varchar(100) after beneficio1;

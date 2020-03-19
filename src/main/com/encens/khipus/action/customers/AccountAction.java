@@ -61,6 +61,7 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    private boolean dpfFlag = false;
     private String newAccountCodeDPF;
     private BigDecimal capitalDPF;
     private BigDecimal interestDPF;
@@ -357,6 +358,16 @@ public class AccountAction extends GenericAction<Account> {
             if (getInstance().getCurrency().equals(FinancesCurrencyType.D) || getInstance().getCurrency().equals(FinancesCurrencyType.M))
                 result = true;
         }
+
+        return result;
+    }
+
+    public boolean isDpfAccount(Account account){
+        boolean result = false;
+
+        if (account.getAccountType() != null)
+            if (account.getAccountType().getSavingType().equals(SavingType.DPF))
+                result = true;
 
         return result;
     }
@@ -744,8 +755,13 @@ public class AccountAction extends GenericAction<Account> {
     }
 
     public void calculateExpirationDate(){
-        if (getInstance().getAccountType().getSavingType().equals(SavingType.DPF))
+        System.out.println("-----------> Acount Type: " + getInstance().getAccountType());
+        System.out.println("-----------> Acount Type: " + getInstance().getAccountType());
+        if (getInstance().getAccountType().getSavingType().equals(SavingType.DPF)) {
+            dpfFlag = true;
             getInstance().setExpirationDate(DateUtils.addDay(getInstance().getOpeningDate(), getInstance().getAccountType().getDays()));
+        }
+        System.out.println("----------> DFPFlag: " + dpfFlag);
     }
 
     public void calculateExpirationDateDPF(){
@@ -916,6 +932,14 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setPartnerDPF(Partner partnerDPF) {
         this.partnerDPF = partnerDPF;
+    }
+
+    public boolean isDpfFlag() {
+        return dpfFlag;
+    }
+
+    public void setDpfFlag(boolean dpfFlag) {
+        this.dpfFlag = dpfFlag;
     }
 
 

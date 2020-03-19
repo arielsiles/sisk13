@@ -81,6 +81,14 @@ public class Account implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean companyAccountFlag = Boolean.FALSE;
 
+    @Column(name = "beneficio1", nullable = true, length = 100)
+    @Length(max = 100)
+    private String beneficiary1;
+
+    @Column(name = "beneficio2", nullable = true, length = 100)
+    @Length(max = 100)
+    private String beneficiary2;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
@@ -237,5 +245,21 @@ public class Account implements BaseModel {
 
     public void setCapital(BigDecimal capital) {
         this.capital = capital;
+    }
+
+    public String getBeneficiary1() {
+        return beneficiary1;
+    }
+
+    public void setBeneficiary1(String beneficiary1) {
+        this.beneficiary1 = beneficiary1;
+    }
+
+    public String getBeneficiary2() {
+        return beneficiary2;
+    }
+
+    public void setBeneficiary2(String beneficiary2) {
+        this.beneficiary2 = beneficiary2;
     }
 }
