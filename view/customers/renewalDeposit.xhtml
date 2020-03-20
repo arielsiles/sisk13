@@ -132,6 +132,13 @@
                         </h:outputText>
                     </s:decorate>
 
+                    <s:decorate id="rcivaDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.rciva']}</ui:define>
+                        <h:outputText id="rcivaDPF" value="#{accountAction.rcivaDPF}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rcivaDPF"/>
+                        </h:outputText>
+                    </s:decorate>
+
                     <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.interestGained']}</ui:define>
                         <h:outputText id="interest" value="#{accountAction.interestDPF}" >

@@ -140,7 +140,7 @@
                                            hideNoSelectionLabel="false"/>
                             <s:convertEntity/>
                             <a4j:support event="onchange" action="#{accountAction.calculateExpirationDate}"
-                                         reRender="targetDPF, exprirationDateField, capitalField" ajaxSingle="true" immediate="false"/>
+                                         reRender="targetDPF" ajaxSingle="true" />
                         </h:selectOneMenu>
                     </s:decorate>
 
@@ -155,30 +155,29 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
-                    <s:div id="targetDPF" rendered="#{accountAction.dpfFlag}">
-                    <s:decorate id="exprirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
-                        <rich:calendar value="#{account.expirationDate}"
-                                       popup="true"
-                                       required="true"
-                                       datePattern="#{messages['patterns.date']}"
-                                       styleClass="input"
-                                       enableManualInput="true"
-                                       reRender="exprirationDateField"
-                                       tabindex="6">
-                            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                        </rich:calendar>
-                    </s:decorate>
+                    <s:div id="targetDPF">
+                        <s:decorate id="expirationDateField" rendered="#{accountAction.isDpfAccount(account)}" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
+                            <rich:calendar value="#{account.expirationDate}"
+                                           popup="true"
+                                           required="true"
+                                           datePattern="#{messages['patterns.date']}"
+                                           styleClass="input"
+                                           enableManualInput="true"
+                                           tabindex="6">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
 
-                    <s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.capital']}</ui:define>
-                        <h:inputText id="capital" styleClass="input100"
-                                     value="#{account.capital}"
-                                     required="true">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <a4j:support event="onblur" reRender="capitalField"/>
-                        </h:inputText>
-                    </s:decorate>
+                        <s:decorate id="capitalField" rendered="#{accountAction.isDpfAccount(account)}" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Account.capital']}</ui:define>
+                            <h:inputText id="capital" styleClass="input100"
+                                         value="#{account.capital}"
+                                         required="true">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
+                                <a4j:support event="onblur" reRender="capitalField"/>
+                            </h:inputText>
+                        </s:decorate>
                     </s:div>
 
                     <s:decorate id="retentionFlagField" template="/include/inputField.xhtml" styleClass="formRow">

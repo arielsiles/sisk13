@@ -61,10 +61,10 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
-    private boolean dpfFlag = false;
     private String newAccountCodeDPF;
     private BigDecimal capitalDPF;
     private BigDecimal interestDPF;
+    private BigDecimal rcivaDPF;
 
     private BigDecimal capitalRenewDPF;
     private AccountType accountTypeRenewDPF;
@@ -151,7 +151,10 @@ public class AccountAction extends GenericAction<Account> {
 
         BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
         setInterestDPF(interestVal);
-        setCapitalRenewDPF(BigDecimalUtil.sum(getCapitalDPF(), getInterestDPF()));
+        setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
+        BigDecimal totalRenew = BigDecimalUtil.sum(getCapitalDPF(), getInterestDPF());
+                   totalRenew = BigDecimalUtil.subtract(totalRenew, getRcivaDPF());
+        setCapitalRenewDPF(totalRenew);
 
         return Outcome.SUCCESS;
     }
@@ -169,9 +172,11 @@ public class AccountAction extends GenericAction<Account> {
         }
 
         Account currentAccount = getInstance();
-        AccountType currentAccountType = currentAccount.getAccountType();
+        currentAccount.setAccountState(AccountState.INACTIVE);
 
+        AccountType currentAccountType = currentAccount.getAccountType();
         Account newAccount = new Account();
+        newAccount.setCapital(capitalRenewDPF);
         newAccount.setOpeningDate(startDateDPF);
         newAccount.setExpirationDate(expirationDateDPF);
         newAccount.setAccountNumber(generateAccountNumber());
@@ -183,7 +188,9 @@ public class AccountAction extends GenericAction<Account> {
         newAccount.setBalance(BigDecimal.ZERO);
         newAccount.setRetentionFlag(Boolean.TRUE);
         newAccount.setCompanyAccountFlag(Boolean.FALSE);
+
         accountService.createAccount(newAccount);
+
         System.out.println("------> New Account id: " + newAccount.getId());
         System.out.println("------> New Account Full: " + newAccount.getFullAccountName());
 
@@ -216,35 +223,10 @@ public class AccountAction extends GenericAction<Account> {
 
         voucherAccoutingService.saveVoucher(voucher);
 
+        accountService.updateAccount(currentAccount);
+
         return Outcome.SUCCESS;
     }
-
-    /*public String createDpfRenewal(BigDecimal exchangeRate, Account newAccount, FinancesCurrencyType currency){
-
-        Account currentAccount = getInstance();
-        AccountType currentAccountType = currentAccount.getAccountType();
-        //accountService.createAccount(newAccount);
-
-        Voucher voucher = new Voucher();
-        voucher.setDocumentType(documentType.getName());
-        voucher.setGloss(glossRenewDPF);
-
-        VoucherDetail vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-        vd1.setPartnerAccount(currentAccount);
-
-        VoucherDetail vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-
-        VoucherDetail vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-        vd3.setPartnerAccount(newAccount);
-
-        voucher.getDetails().add(vd1);
-        voucher.getDetails().add(vd2);
-        voucher.getDetails().add(vd3);
-
-        voucherAccoutingService.saveVoucher(voucher);
-
-        return Outcome.SUCCESS;
-    }*/
 
     public String generateAccountNumber(){
         String result = String.valueOf(sequenceGeneratorService.nextValue(Constants.SAVINGS_ACCOUNT_NUMBER));
@@ -362,13 +344,14 @@ public class AccountAction extends GenericAction<Account> {
         return result;
     }
 
-    public boolean isDpfAccount(Account account){
-        boolean result = false;
+    public Boolean isDpfAccount(Account account){
+        boolean result = Boolean.FALSE;
 
         if (account.getAccountType() != null)
             if (account.getAccountType().getSavingType().equals(SavingType.DPF))
-                result = true;
+                result = Boolean.TRUE;
 
+        System.out.println("-----> account.getAccountType(): " + account.getAccountType() + " - " + result);
         return result;
     }
 
@@ -756,12 +739,9 @@ public class AccountAction extends GenericAction<Account> {
 
     public void calculateExpirationDate(){
         System.out.println("-----------> Acount Type: " + getInstance().getAccountType());
-        System.out.println("-----------> Acount Type: " + getInstance().getAccountType());
         if (getInstance().getAccountType().getSavingType().equals(SavingType.DPF)) {
-            dpfFlag = true;
             getInstance().setExpirationDate(DateUtils.addDay(getInstance().getOpeningDate(), getInstance().getAccountType().getDays()));
         }
-        System.out.println("----------> DFPFlag: " + dpfFlag);
     }
 
     public void calculateExpirationDateDPF(){
@@ -934,14 +914,13 @@ public class AccountAction extends GenericAction<Account> {
         this.partnerDPF = partnerDPF;
     }
 
-    public boolean isDpfFlag() {
-        return dpfFlag;
+    public BigDecimal getRcivaDPF() {
+        return rcivaDPF;
     }
 
-    public void setDpfFlag(boolean dpfFlag) {
-        this.dpfFlag = dpfFlag;
+    public void setRcivaDPF(BigDecimal rcivaDPF) {
+        this.rcivaDPF = rcivaDPF;
     }
-
 
     private class AccountKardex{
 

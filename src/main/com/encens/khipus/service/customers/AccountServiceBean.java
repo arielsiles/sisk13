@@ -36,6 +36,11 @@ public class AccountServiceBean implements AccountService {
         em.flush();
     }
 
+    public void updateAccount(Account account){
+        em.merge(account);
+        em.flush();
+    }
+
     @Override
     public List<VoucherDetail> getAccountDetailList(Account account){
 
