@@ -11,3 +11,6 @@ update tipocuenta t set t.`ctacf_me` = 2180320000 where t.`idtipocuenta` in (2, 
 /** 18.03.2020 **/
 alter table cuenta add column beneficio1 varchar(100) after saldo;
 alter table cuenta add column beneficio2 varchar(100) after beneficio1;
+
+/** 20.03.2020 **/
+insert into `gensecuencia` values (9, "ACCOUNT_DPF_CODE", 100, 1);
