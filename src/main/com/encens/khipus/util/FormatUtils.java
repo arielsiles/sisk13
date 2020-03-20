@@ -535,9 +535,27 @@ public class FormatUtils {
 
     }
 
+    /**
+     *
+     * @param number 123
+     * @param strBuffer 000000
+     * @return 000123
+     */
     public static String convert(String number, String strBuffer){
         StringBuffer result = new StringBuffer(strBuffer);
         result.replace(result.length() - number.length(), result.length(), number);
+        return result.toString();
+    }
+
+    /**
+     *
+     * @param number 123
+     * @param strBuffer 000000
+     * @return 123000
+     */
+    public static String convertLeft(String number, String strBuffer){
+        StringBuffer result = new StringBuffer(strBuffer);
+        result.replace(0, result.length() - (result.length() - number.length()), number);
         return result.toString();
     }
 
