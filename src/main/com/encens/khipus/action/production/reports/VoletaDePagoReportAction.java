@@ -175,7 +175,7 @@ public class VoletaDePagoReportAction extends GenericReportAction {
         params.put("debReserva050", boleta.getDescuentoGA());
 
         params.put("liquidoPagable", boleta.getLiquidoPagable());
-        params.put("liquidoPagableLiteral", moneyUtil.Convertir(boleta.getLiquidoPagable().toString(), true));
+        params.put("liquidoPagableLiteral", moneyUtil.Convertir(boleta.getLiquidoPagable().toString(), true, messages.get("Reports.cashAvailable.bs")));
         //params.put("liquidoPagableLiteral", moneyUtil.Convertir( formatter.format(liquidoPagable), true));
 
     }
@@ -664,7 +664,7 @@ public class VoletaDePagoReportAction extends GenericReportAction {
         params.put("credReserva050", boleta.getDescuentoGA());
 
         params.put("liquidoPagable", boleta.getDescuentoGA());
-        params.put("liquidoPagableLiteral", moneyUtil.Convertir(boleta.getDescuentoGA().toString(), true));
+        params.put("liquidoPagableLiteral", moneyUtil.Convertir(boleta.getDescuentoGA().toString(), true, messages.get("Reports.cashAvailable.bs")));
         //params.put("liquidoPagableLiteral", moneyUtil.Convertir( formatter.format(liquidoPagable), true));
 
         aux = aux + boleta.getDescuentoGA();
@@ -783,7 +783,7 @@ public class VoletaDePagoReportAction extends GenericReportAction {
 
         params.put("credReserva050", boleta.getDescuentoGA());
         params.put("liquidoPagable", liquidoPagable.doubleValue());
-        params.put("liquidoPagableLiteral", moneyUtil.Convertir(liquidoPagable.toString(), true));
+        params.put("liquidoPagableLiteral", moneyUtil.Convertir(liquidoPagable.toString(), true, messages.get("Reports.cashAvailable.bs")));
     }
 
     /*********************** End Devolucion Reintegro **********************/

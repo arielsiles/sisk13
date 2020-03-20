@@ -61,20 +61,25 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    /** Current DPF **/
     private String newAccountCodeDPF;
     private BigDecimal capitalDPF;
     private BigDecimal interestDPF;
     private BigDecimal rcivaDPF;
+    private BigDecimal totalAmountDPF;
 
+    /** Renovation DPF **/
     private BigDecimal capitalRenewDPF;
     private AccountType accountTypeRenewDPF;
     private BigDecimal interestRenewDPF;
+    private DocType documentType = new DocType();
+    private String glossRenewDPF;
+    private String beneficiary1;
+    private String beneficiary2;
 
     private Date startDateDPF = new Date();
     private Date expirationDateDPF;
 
-    private DocType documentType = new DocType();
-    private String glossRenewDPF;
 
     private Partner partnerDPF;
 
@@ -152,9 +157,16 @@ public class AccountAction extends GenericAction<Account> {
         BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
         setInterestDPF(interestVal);
         setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
-        BigDecimal totalRenew = BigDecimalUtil.sum(getCapitalDPF(), getInterestDPF());
-                   totalRenew = BigDecimalUtil.subtract(totalRenew, getRcivaDPF());
-        setCapitalRenewDPF(totalRenew);
+        totalAmountDPF = BigDecimalUtil.sum(capitalDPF, interestDPF);
+        totalAmountDPF = BigDecimalUtil.subtract(totalAmountDPF, rcivaDPF);
+
+        /* Para asignar codigo automaticamente, hacerlo al momento de guardar ya que la secuencia se actualiza
+        String str = "ME0000";
+        Long number = sequenceGeneratorService.nextValue(Constants.ACCOUNT_DPF_CODE);
+        newAccountCodeDPF = FormatUtils.convert(number.toString(), str);
+        */
+
+        setCapitalRenewDPF(totalAmountDPF);
 
         return Outcome.SUCCESS;
     }
@@ -188,6 +200,8 @@ public class AccountAction extends GenericAction<Account> {
         newAccount.setBalance(BigDecimal.ZERO);
         newAccount.setRetentionFlag(Boolean.TRUE);
         newAccount.setCompanyAccountFlag(Boolean.FALSE);
+        newAccount.setBeneficiary1(beneficiary1);
+        newAccount.setBeneficiary2(beneficiary2);
 
         accountService.createAccount(newAccount);
 
@@ -202,15 +216,17 @@ public class AccountAction extends GenericAction<Account> {
         VoucherDetail vd2 = new VoucherDetail();
         VoucherDetail vd3 = new VoucherDetail();
 
+        BigDecimal interestValue = BigDecimalUtil.subtract(interestDPF, rcivaDPF);
+
         if (currentAccount.getCurrency().equals(FinancesCurrencyType.D)) {
             vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
-            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
         }
 
         if (currentAccount.getCurrency().equals(FinancesCurrencyType.P)) {
             vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMn().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
-            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMn().getAccountCode(), interestDPF, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+            vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMn().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMn().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
         }
 
@@ -753,6 +769,13 @@ public class AccountAction extends GenericAction<Account> {
         this.accountTransactionList = accountTransactionList;
     }
 
+    public boolean isActive(Account account){
+        if (account != null)
+            return account.getAccountState().equals(AccountState.ACTIVE);
+
+        return false;
+    }
+
     public BigDecimal getTotalCredit() {
         return totalCredit;
     }
@@ -920,6 +943,30 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setRcivaDPF(BigDecimal rcivaDPF) {
         this.rcivaDPF = rcivaDPF;
+    }
+
+    public BigDecimal getTotalAmountDPF() {
+        return totalAmountDPF;
+    }
+
+    public void setTotalAmountDPF(BigDecimal totalAmountDPF) {
+        this.totalAmountDPF = totalAmountDPF;
+    }
+
+    public String getBeneficiary1() {
+        return beneficiary1;
+    }
+
+    public void setBeneficiary1(String beneficiary1) {
+        this.beneficiary1 = beneficiary1;
+    }
+
+    public String getBeneficiary2() {
+        return beneficiary2;
+    }
+
+    public void setBeneficiary2(String beneficiary2) {
+        this.beneficiary2 = beneficiary2;
     }
 
     private class AccountKardex{

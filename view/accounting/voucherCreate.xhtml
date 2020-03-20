@@ -723,6 +723,7 @@
         <ui:define name="assignButton">
             <a4j:commandButton id="assignButton"
                                action="#{voucherCreateAction.setPartnerAccount(accountItem)}"
+                               rendered="#{accountAction.isActive(accountItem)}"
                                image="/img/active.gif"
                                styleClass="select-image-middle"
                                reRender="accountField,amountDepositId"

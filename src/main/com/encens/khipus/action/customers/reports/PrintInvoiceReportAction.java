@@ -318,7 +318,7 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         //verificar por que no requiere el codigo de control
 
         paramMap.put("llaveQR",keyQR);
-        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotal().toString(), true));
+        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotal().toString(), true, messages.get("Reports.cashAvailable.bs")));
         paramMap.put("total",customerOrder.getTotal());
         barcodeRenderer.generateQR(keyQR,filePath);
         return paramMap;

@@ -103,7 +103,7 @@ public class VoucherReportAction extends GenericReportAction {
 
         MoneyUtil money = new MoneyUtil();
         String literalAmount = "";
-        literalAmount = ( totalD.compareTo(totalC) == 0 ? money.Convertir(totalD.toString(), true) : "");
+        literalAmount = ( totalD.compareTo(totalC) == 0 ? money.Convertir(totalD.toString(), true, messages.get("Reports.cashAvailable.bs")) : "");
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();

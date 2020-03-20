@@ -66,7 +66,7 @@ public class Account implements BaseModel {
     @Column(name = "capital", precision = 13, scale = 2, nullable = false)
     private BigDecimal capital = new BigDecimal(0);
 
-    @Column(name = "estado", updatable = false)
+    @Column(name = "estado", updatable = true)
     @Enumerated(EnumType.STRING)
     private AccountState accountState;
 

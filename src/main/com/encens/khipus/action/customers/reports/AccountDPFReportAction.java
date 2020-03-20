@@ -62,7 +62,7 @@ public class AccountDPFReportAction extends GenericReportAction {
         String address      = account.getPartner().getHomeAddress();
 
         MoneyUtil money = new MoneyUtil();
-        String literalCapital   = money.Convertir(account.getCapital().toString(), true);
+        String literalCapital   = money.Convertir(account.getCapital().toString(), true, "");
         BigDecimal capital      = account.getCapital();
         BigDecimal interest     = accountAction.calculateInterestForDays(account.getAccountType().getDays(), capital, account.getAccountType().getInta());
         BigDecimal rciva        = BigDecimalUtil.multiply(interest, Constants.VAT);

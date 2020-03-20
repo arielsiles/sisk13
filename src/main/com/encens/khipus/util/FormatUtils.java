@@ -535,5 +535,11 @@ public class FormatUtils {
 
     }
 
+    public static String convert(String number, String strBuffer){
+        StringBuffer result = new StringBuffer(strBuffer);
+        result.replace(result.length() - number.length(), result.length(), number);
+        return result.toString();
+    }
+
 }
 

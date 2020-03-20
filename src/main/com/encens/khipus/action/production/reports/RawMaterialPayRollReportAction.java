@@ -149,7 +149,7 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
 
         Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
         MoneyUtil moneyUtil = new MoneyUtil();
-        params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true));
+        params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
         typedReportData = super.getReport("rotatoryFundReport"
                 , "/production/reports/rawMaterialPayRollReport.jrxml"
                 , MessageUtils.getMessage("Report.rawMaterialPayRollReportAction")
@@ -218,7 +218,7 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
 
             Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
             MoneyUtil moneyUtil = new MoneyUtil();
-            params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true));
+            params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
 
             typedReportData = super.getReport("RawMaterialPayRollReport", "/production/reports/rawMaterialPayRollReport.jrxml", MessageUtils.getMessage("Report.rawMaterialPayRollReportAction"), params);
 

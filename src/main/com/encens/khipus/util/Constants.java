@@ -125,6 +125,7 @@ public final class Constants {
     public static final String PURCHASEORDER_BY_BUSINESSUNIT = "PURCHASEORDER_BY_BUSINESSUNIT";
     public static final String PRODUCTION_CODE = "PRODUCTION_CODE";
     public static final String SAVINGS_ACCOUNT_NUMBER = "SAVINGS_ACCOUNT_NUMBER";
+    public static final String ACCOUNT_DPF_CODE = "ACCOUNT_DPF_CODE";
 
     /* Employee Constants*/
     public static final String DISMISSALCAUSE_CODE_SEQUENCE = "DISMISSALCAUSE_CODE_SEQUENCE";

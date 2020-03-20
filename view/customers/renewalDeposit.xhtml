@@ -132,17 +132,24 @@
                         </h:outputText>
                     </s:decorate>
 
+                    <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.interestGained']}</ui:define>
+                        <h:outputText id="interest" value="#{accountAction.interestDPF}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                        </h:outputText>
+                    </s:decorate>
+
                     <s:decorate id="rcivaDPFField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.rciva']}</ui:define>
+                        <ui:define name="label">#{messages['Account.retention']}</ui:define>
                         <h:outputText id="rcivaDPF" value="#{accountAction.rcivaDPF}" >
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rcivaDPF"/>
                         </h:outputText>
                     </s:decorate>
 
-                    <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.interestGained']}</ui:define>
-                        <h:outputText id="interest" value="#{accountAction.interestDPF}" >
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                    <s:decorate id="totalAmountDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.total']}</ui:define>
+                        <h:outputText id="totalAmountDPF" value="#{accountAction.totalAmountDPF}" >
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rcivaDPF"/>
                         </h:outputText>
                     </s:decorate>
 
@@ -195,7 +202,7 @@
                                             hideNoSelectionLabel="false"/>
                              <s:convertEntity/>
                              <a4j:support event="onchange" action="#{accountAction.calculateExpirationDateDPF}"
-                                          reRender="interestToReceiveField,exprirationDateRenewField" ajaxSingle="true"/>
+                                          reRender="exprirationDateRenewField" ajaxSingle="true"/>
                              <s:convertEntity/>
                          </h:selectOneMenu>
                      </s:decorate>
@@ -226,23 +233,6 @@
                          </rich:calendar>
                      </s:decorate>
 
-                     <s:decorate id="interestToReceiveField" template="/include/inputField.xhtml" styleClass="formRow">
-                         <ui:define name="label">#{messages['Account.interestToReceiveDPF']}</ui:define>
-                         <h:inputText id="interestToReceive" value="#{accountAction.interestRenewDPF}" styleClass="input100" >
-                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interestToReceive"/>
-                         </h:inputText>
-                         <a4j:commandLink id="calculateTotalAmountButton"
-                                          ajaxSingle="true"
-                                          immediate="true"
-                                          title="#{messages['Common.calculate']}"
-                                          reRender="interestToReceiveField"
-                                          action="#{accountAction.calculateInterestForNewDPF}"
-                                          tabindex="6">
-                             <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
-                             <a4j:support event="onclick" reRender="interestToReceiveField"/>
-                         </a4j:commandLink>
-                     </s:decorate>
-
                      <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Voucher.type']}</ui:define>
                          <h:selectOneMenu id="documentType" value="#{accountAction.documentType}"
@@ -255,6 +245,16 @@
                                             hideNoSelectionLabel="false"/>
                              <s:convertEntity/>
                          </h:selectOneMenu>
+                     </s:decorate>
+
+                     <s:decorate id="beneficiary1Field" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
+                         <h:inputText id="beneficiary1" value="#{accountAction.beneficiary1}" styleClass="inputLarge" />
+                     </s:decorate>
+
+                     <s:decorate id="beneficiary2Field" template="/include/inputField.xhtml" styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
+                         <h:inputText id="beneficiary2" value="#{accountAction.beneficiary2}" styleClass="inputLarge" />
                      </s:decorate>
 
                      <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">

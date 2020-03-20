@@ -34,7 +34,7 @@ public class MoneyUtil{
     public MoneyUtil() {
     }
 
-    public String Convertir(String numero, boolean mayusculas) {
+    public String Convertir(String numero, boolean mayusculas, String monedaLiteral) {
         String literal = "";
         String parte_decimal;
         //si el numero utiliza (.) en lugar de (,) -> se reemplaza
@@ -48,12 +48,12 @@ public class MoneyUtil{
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
-            parte_decimal = ( Integer.parseInt(Num[1]) < 10 ? "0" : "") + Num[1] + "/100 Bolivianos.";
+            parte_decimal = ( Integer.parseInt(Num[1]) < 10 ? "0" : "") + Num[1] + "/100 " + monedaLiteral;
 
             if ( (Integer.parseInt(Num[1]) < 10) && (Integer.parseInt(Num[1]) > 0) )
-                parte_decimal = "0" + Num[1] + "/100 Bolivianos.";
+                parte_decimal = "0" + Num[1] + "/100 " + monedaLiteral;
             else
-                parte_decimal = "" + Num[1] + "/100 Bolivianos.";
+                parte_decimal = "" + Num[1] + "/100 " + monedaLiteral;
 
             //se convierte el numero a literal
             if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
