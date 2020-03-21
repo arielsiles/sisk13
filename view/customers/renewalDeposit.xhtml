@@ -157,8 +157,21 @@
 
                  <s:div id="rightSidePanel">
 
+                     <s:decorate id="partialRenewalField"
+                                 template="/include/inputField.xhtml"
+                                 styleClass="formRow">
+                         <ui:define name="label">#{messages['Account.partialRenewal']}</ui:define>
+                         <h:selectBooleanCheckbox id="partialRenewal"
+                                                  value="#{accountAction.partialRenewal}"
+                                                  tabindex="14">
+                             <a4j:support event="onchange"
+                                          reRender="partialRenewalField, partialCapitalDiv"
+                                          ajaxSingle="true"/>
+                         </h:selectBooleanCheckbox>
+                     </s:decorate>
+
                      <s:decorate id="capitalRenewField" template="/include/inputField.xhtml" styleClass="formRow">
-                         <ui:define name="label">#{messages['Account.capitalRenewDPF']}</ui:define>
+                         <ui:define name="label">#{messages['Account.capital']}</ui:define>
                          <h:inputText id="capitalRenew" styleClass="input100"
                                       value="#{accountAction.capitalRenewDPF}"
                                       required="true">
@@ -166,6 +179,17 @@
                              <a4j:support event="onblur" reRender="capitalRenewField"/>
                          </h:inputText>
                      </s:decorate>
+                    <s:div id="partialCapitalDiv">
+                         <s:decorate id="partialCapitalRenewField" rendered="#{accountAction.partialRenewal}" template="/include/inputField.xhtml" styleClass="formRow">
+                             <ui:define name="label">#{messages['Account.partialCapital']}</ui:define>
+                             <h:inputText id="partialCapitalRenew" styleClass="input100"
+                                          value="#{accountAction.partialCapitalRenewDPF}"
+                                          required="true">
+                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="partialCapitalRenew"/>
+                                 <a4j:support event="onblur" reRender="partialCapitalRenewField"/>
+                             </h:inputText>
+                         </s:decorate>
+                    </s:div>
 
                      <s:decorate id="newPartnerField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
@@ -173,7 +197,7 @@
                                           required="true"
                                           textValue="#{accountAction.partnerDPF.fullName}"
                                           value="#{accountAction.partnerDPF}"
-                                          clearAction="#{accountAction.clearPartner()}"
+                                          clearAction="#{accountAction.clearPartnerDPF}"
                                           searchModalPanel="newPartnerListModalPanel"
                                           dataModel="#{partnerDataModel}"
                                           reRender="newPartnerField" styleClass="input"

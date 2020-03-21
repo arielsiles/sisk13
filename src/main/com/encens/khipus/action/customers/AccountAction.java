@@ -61,6 +61,8 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
 
+    private Boolean partialRenewal;
+
     /** Current DPF **/
     private String newAccountCodeDPF;
     private BigDecimal capitalDPF;
@@ -70,6 +72,7 @@ public class AccountAction extends GenericAction<Account> {
 
     /** Renovation DPF **/
     private BigDecimal capitalRenewDPF;
+    private BigDecimal partialCapitalRenewDPF;
     private AccountType accountTypeRenewDPF;
     private BigDecimal interestRenewDPF;
     private DocType documentType = new DocType();
@@ -343,6 +346,10 @@ public class AccountAction extends GenericAction<Account> {
 
     public void clearPartner(){
         getInstance().setPartner(null);
+    }
+
+    public void clearPartnerDPF(){
+        setPartnerDPF(null);
     }
 
     public List<AccountTransaction> getAccountTransactionList() {
@@ -967,6 +974,22 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setBeneficiary2(String beneficiary2) {
         this.beneficiary2 = beneficiary2;
+    }
+
+    public Boolean getPartialRenewal() {
+        return partialRenewal;
+    }
+
+    public void setPartialRenewal(Boolean partialRenewal) {
+        this.partialRenewal = partialRenewal;
+    }
+
+    public BigDecimal getPartialCapitalRenewDPF() {
+        return partialCapitalRenewDPF;
+    }
+
+    public void setPartialCapitalRenewDPF(BigDecimal partialCapitalRenewDPF) {
+        this.partialCapitalRenewDPF = partialCapitalRenewDPF;
     }
 
     private class AccountKardex{
