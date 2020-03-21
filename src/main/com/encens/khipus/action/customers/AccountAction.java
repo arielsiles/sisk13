@@ -72,7 +72,7 @@ public class AccountAction extends GenericAction<Account> {
 
     /** Renovation DPF **/
     private BigDecimal capitalRenewDPF;
-    private BigDecimal partialCapitalRenewDPF;
+    private BigDecimal partialCapitalRenewDPF = BigDecimal.ZERO;
     private AccountType accountTypeRenewDPF;
     private BigDecimal interestRenewDPF;
     private DocType documentType = new DocType();
@@ -191,7 +191,7 @@ public class AccountAction extends GenericAction<Account> {
 
         AccountType currentAccountType = currentAccount.getAccountType();
         Account newAccount = new Account();
-        newAccount.setCapital(capitalRenewDPF);
+        //newAccount.setCapital(capitalRenewDPF);
         newAccount.setOpeningDate(startDateDPF);
         newAccount.setExpirationDate(expirationDateDPF);
         newAccount.setAccountNumber(generateAccountNumber());
@@ -206,10 +206,9 @@ public class AccountAction extends GenericAction<Account> {
         newAccount.setBeneficiary1(beneficiary1);
         newAccount.setBeneficiary2(beneficiary2);
 
-        accountService.createAccount(newAccount);
+        //accountService.createAccount(newAccount);
 
-        System.out.println("------> New Account id: " + newAccount.getId());
-        System.out.println("------> New Account Full: " + newAccount.getFullAccountName());
+        BigDecimal withdrawal = BigDecimal.ZERO;
 
         Voucher voucher = new Voucher();
         voucher.setDocumentType(documentType.getName());
@@ -218,20 +217,37 @@ public class AccountAction extends GenericAction<Account> {
         VoucherDetail vd1 = new VoucherDetail();
         VoucherDetail vd2 = new VoucherDetail();
         VoucherDetail vd3 = new VoucherDetail();
+        VoucherDetail vd4 = new VoucherDetail();
 
         BigDecimal interestValue = BigDecimalUtil.subtract(interestDPF, rcivaDPF);
+        BigDecimal diff = BigDecimalUtil.subtract(totalAmountDPF, capitalRenewDPF);
+        interestValue   = BigDecimalUtil.subtract(interestValue, diff);
+
+        if (partialRenewal) {
+            withdrawal = BigDecimalUtil.subtract(capitalRenewDPF, partialCapitalRenewDPF);
+            capitalRenewDPF = partialCapitalRenewDPF;
+        }
 
         if (currentAccount.getCurrency().equals(FinancesCurrencyType.D)) {
             vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMe().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
             vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+            if (partialRenewal)
+                vd4 = buildAccountEntryDetail("1110220000", withdrawal, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+
         }
 
         if (currentAccount.getCurrency().equals(FinancesCurrencyType.P)) {
             vd1 = buildAccountEntryDetail(currentAccount.getAccountType().getCashAccountMn().getAccountCode(), capitalDPF, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
             vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMn().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMn().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+            if (partialRenewal)
+                vd4 = buildAccountEntryDetail("1110110100", withdrawal, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
         }
+
+        newAccount.setCapital(capitalRenewDPF);
+        accountService.createAccount(newAccount);
+        accountService.updateAccount(currentAccount);
 
         vd1.setPartnerAccount(currentAccount);
         vd3.setPartnerAccount(newAccount);
@@ -239,10 +255,11 @@ public class AccountAction extends GenericAction<Account> {
         voucher.getDetails().add(vd1);
         voucher.getDetails().add(vd2);
         voucher.getDetails().add(vd3);
+        if (partialRenewal)
+            voucher.getDetails().add(vd4);
 
         voucherAccoutingService.saveVoucher(voucher);
 
-        accountService.updateAccount(currentAccount);
 
         return Outcome.SUCCESS;
     }
