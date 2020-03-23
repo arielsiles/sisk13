@@ -472,13 +472,13 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByVoucher(warehouseVoucher);
         for (MovementDetail detail : movementDetailList){
 
-            System.out.println("----> executorUnitCode: " + executorUnitCode);
+            /*System.out.println("----> executorUnitCode: " + executorUnitCode);
             System.out.println("----> costCenterCode: " + costCenterCode);
             System.out.println("----> warehouseVoucher.getWarehouse().getCashAccount(): " + warehouseVoucher.getWarehouse().getCashAccount());
             System.out.println("----> cashAccountService.findByAccountCode: " + cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()));
             System.out.println("----> detail.getAmount(): " + detail.getAmount());
             System.out.println("----> detail.getProductItemCode(): " + detail.getProductItemCode());
-            System.out.println("----> detail.getQuantity(): " + detail.getQuantity());
+            System.out.println("----> detail.getQuantity(): " + detail.getQuantity());*/
 
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
@@ -532,6 +532,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     totalCreditAmount,
                     purchaseOrder.getProvider().getPayableAccount().getCurrency(),
                     financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+            voucherDetail.setProviderCode(purchaseOrder.getProviderCode()); /** Asocia con el proveedor **/
         }
         if (purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CASH)) {
             voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
@@ -543,14 +544,12 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
         }
 
-        voucherDetail.setProviderCode(purchaseOrder.getProviderCode());
         voucher.addVoucherDetail(voucherDetail);
 
         BigDecimal balanceAmount = BigDecimalUtil.subtract(totalDebitAmount, totalCreditAmount);
 
         System.out.println("---> Total Debit =  " + totalDebitAmount);
         System.out.println("---> Total Credit =  " + totalCreditAmount);
-
 
         /** En caso de haber diferencias, se ajusta en el articulo **/
         if (balanceAmount.doubleValue() > 0) { // Debit major
