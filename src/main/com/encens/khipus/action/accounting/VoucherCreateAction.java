@@ -2,6 +2,7 @@ package com.encens.khipus.action.accounting;
 
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
+import com.encens.khipus.action.warehouse.reports.ValuedPhysicalInventoryReportAction;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -13,12 +14,14 @@ import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
+import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -27,10 +30,7 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author
@@ -88,6 +88,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private VoucherAccoutingService voucherAccoutingService;
 
     @In
+    private WarehouseService warehouseService;
+
+    @In
     private VoucherService voucherService;
 
     @In(create = true)
@@ -95,6 +98,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     @In(create = true)
     private VoucherDetailAction voucherDetailAction;
+
+    @In(create = true, value = "valuedPhysicalInventoryReportAction")
+    private ValuedPhysicalInventoryReportAction physicalInventoryReportAction;
 
     @In
     private ClientService clientService;
@@ -336,16 +342,19 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         BigDecimal totalCredit  = new BigDecimal(0);
 
         List<Object[]> datas = voucherAccoutingService.getSumsBalanceClosure(this.startDate, this.endDate);
+        List<Warehouse> warehouseList = warehouseService.getWarehouseList();
 
         BigDecimal debit   = BigDecimal.ZERO;
         BigDecimal credit  = BigDecimal.ZERO;
         BigDecimal debitBalance  = BigDecimal.ZERO;
         BigDecimal creditBalance = BigDecimal.ZERO;
 
+        String cashAccountCode = null;
         for(Object[] data: datas){
-
-            debit  = (BigDecimal)data[2];
-            credit = (BigDecimal)data[3];
+            boolean flagWarehouse = false;
+            debit           = (BigDecimal)data[2];
+            credit          = (BigDecimal)data[3];
+            cashAccountCode = (String)data[0];
 
             if (debit.compareTo(credit) > 0){
                 debitBalance = BigDecimalUtil.subtract(debit, credit, 2);
@@ -354,21 +363,35 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 creditBalance = BigDecimalUtil.subtract(credit, debit, 2);
             }
 
-            if (debitBalance.compareTo(creditBalance) != 0){
-                VoucherDetail voucherDetail = new VoucherDetail();
-                voucherDetail.setDebit(creditBalance);
-                voucherDetail.setCredit(debitBalance);
-                voucherDetail.setAccount((String)data[0]);
-
-                CashAccount cashAccount = cashAccountService.findByAccountCode(voucherDetail.getAccount());
-                if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
-                    voucherDetail.setDebitMe(BigDecimalUtil.divide(voucherDetail.getDebit(), exchangeRate, 2));
-                    voucherDetail.setCreditMe(BigDecimalUtil.divide(voucherDetail.getCredit(), exchangeRate, 2));
-                    voucherDetail.setExchangeAmount(exchangeRate);
-                    voucherDetail.setCurrency(cashAccount.getCurrency());
+            /** Veerifica si es una cuenta de almacen **/
+            for (Warehouse warehouse:warehouseList){
+                if (cashAccountCode.equals(warehouse.getWarehouseCashAccount().getAccountCode())) {
+                    flagWarehouse = true;
+                    break;
                 }
+            }
 
-                voucher.getDetails().add(voucherDetail);
+            if (!flagWarehouse) { // Si no es una cuenta de almacen
+                if (debitBalance.compareTo(creditBalance) != 0){
+
+                    VoucherDetail voucherDetail = new VoucherDetail();
+                    voucherDetail.setDebit(creditBalance);
+                    voucherDetail.setCredit(debitBalance);
+                    voucherDetail.setAccount(cashAccountCode);
+
+                    CashAccount cashAccount = cashAccountService.findByAccountCode(voucherDetail.getAccount());
+
+                        if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)) {
+                            voucherDetail.setDebitMe(BigDecimalUtil.divide(voucherDetail.getDebit(), exchangeRate, 2));
+                            voucherDetail.setCreditMe(BigDecimalUtil.divide(voucherDetail.getCredit(), exchangeRate, 2));
+                            voucherDetail.setExchangeAmount(exchangeRate);
+                            voucherDetail.setCurrency(cashAccount.getCurrency());
+                        }
+                        voucher.getDetails().add(voucherDetail);
+                }
+            }else {
+                /** todo Genear cierre de inventario **/
+                generateInventoryClosure(cashAccountCode, voucher);
             }
 
             //Totaling
@@ -383,6 +406,27 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("===> TOTAL DIFF: " + BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
 
         voucherAccoutingService.saveVoucher(voucher);
+
+    }
+
+    private void generateInventoryClosure(String cashAccountCode, Voucher voucher){
+        Warehouse warehouse = warehouseService.findWarehouseByCashAccount(cashAccountCode);
+        physicalInventoryReportAction.setStartDate(startDate);
+        physicalInventoryReportAction.setEndDate(endDate);
+        physicalInventoryReportAction.setWarehouse(warehouse);
+
+        Collection<ValuedPhysicalInventoryReportAction.CollectionData> collectionDataInventory = physicalInventoryReportAction.calculateValuedInventory();
+
+        for (ValuedPhysicalInventoryReportAction.CollectionData data : collectionDataInventory){
+            VoucherDetail voucherDetail = new VoucherDetail();
+            voucherDetail.setDebit(BigDecimal.ZERO);
+            voucherDetail.setCredit(data.getAmount());
+            voucherDetail.setQuantityArt(data.getQuantity());
+            voucherDetail.setProductItemCode(data.getCodeArt());
+            voucherDetail.setAccount(warehouse.getCashAccount());
+            if (data.getAmount().doubleValue() > 0)
+                voucher.getDetails().add(voucherDetail);
+        }
 
     }
 
@@ -402,6 +446,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             newVoucherDetail.setAccount(voucherDetail.getAccount());
             newVoucherDetail.setDebit(voucherDetail.getCredit());
             newVoucherDetail.setCredit(voucherDetail.getDebit());
+            newVoucherDetail.setProductItemCode(voucherDetail.getProductItemCode());
+            newVoucherDetail.setQuantityArt(voucherDetail.getQuantityArt());
             BigDecimal exchangeRate = voucherDetail.getExchangeAmount();
             CashAccount cashAccount = cashAccountService.findByAccountCode(newVoucherDetail.getAccount());
             if (cashAccount.getCurrency().equals(FinancesCurrencyType.D) || cashAccount.getCurrency().equals(FinancesCurrencyType.M)){
@@ -410,7 +456,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 newVoucherDetail.setExchangeAmount(exchangeRate);
                 newVoucherDetail.setCurrency(cashAccount.getCurrency());
             }
-            newVoucher.getDetails().add(newVoucherDetail);
+
+            //Double amountAux = voucherDetail.getDebit().doubleValue() + voucherDetail.getCredit().doubleValue() + voucherDetail.getDebitMe().doubleValue() + voucherDetail.getCreditMe().doubleValue();
+            Double amountAux = 0.0;
+            if (voucherDetail.getDebit()    != null) amountAux = amountAux + voucherDetail.getDebit().doubleValue();
+            if (voucherDetail.getCredit()   != null) amountAux = amountAux + voucherDetail.getCredit().doubleValue();
+            if (voucherDetail.getDebitMe()  != null) amountAux = amountAux + voucherDetail.getDebitMe().doubleValue();
+            if (voucherDetail.getCreditMe() != null) amountAux = amountAux + voucherDetail.getCreditMe().doubleValue();
+
+            if (amountAux > 0)
+                newVoucher.getDetails().add(newVoucherDetail);
         }
         voucherAccoutingService.saveVoucher(newVoucher);
     }

@@ -118,6 +118,10 @@ public interface WarehouseService extends GenericService {
 
     public Warehouse findWarehouseByCode(String warehouseCode);
 
+    Warehouse findWarehouseByCashAccount(String cashAccountCode);
+
+    List<Warehouse> getWarehouseList();
+
     BigDecimal findAmountOrderByCodArt(String codArt,Gestion gestion,Date date);
 
     BigDecimal findExpectedAmountOrderProduction(String codArt,Gestion gestion);

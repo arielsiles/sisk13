@@ -882,6 +882,19 @@ public class WarehouseServiceBean extends GenericServiceBean implements Warehous
         return warehouse;
     }
 
+    public Warehouse findWarehouseByCashAccount(String cashAccountCode){
+        Warehouse warehouse = (Warehouse) em.createNamedQuery("Warehouse.findByCashAccount")
+                .setParameter("cashAccountCode", cashAccountCode)
+                .getSingleResult();
+        return warehouse;
+    }
+
+    public List<Warehouse> getWarehouseList(){
+        List<Warehouse> warehouseList = new ArrayList<Warehouse>();
+        warehouseList = em.createQuery("select w from Warehouse w ").getResultList();
+        return warehouseList;
+    }
+
     @Override
     public BigDecimal findAmountOrderByCodArt(String codArt,Gestion gestion,Date date) {
         BigDecimal amountOrderByCodArt = BigDecimal.ZERO;
