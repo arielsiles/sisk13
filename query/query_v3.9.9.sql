@@ -14,3 +14,7 @@ alter table cuenta add column beneficio2 varchar(100) after beneficio1;
 
 /** 20.03.2020 **/
 insert into `gensecuencia` values (9, "ACCOUNT_DPF_CODE", 100, 1);
+
+/** 25.03.2020 **/
+alter table inv_periodo add column no_cia varchar(2);
+update inv_periodo set no_cia = '01';
