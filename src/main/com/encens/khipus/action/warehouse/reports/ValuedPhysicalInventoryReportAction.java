@@ -6,6 +6,7 @@ import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.JRException;
@@ -165,6 +166,7 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
             inventory.setWarehouseCode(this.warehouse.getWarehouseCode());
             inventory.setYear(year);
             inventory.setMonth(month);
+            inventory.setCompanyNumber(Constants.COD_COMPANY_DEFAULT);
             inventoryPeriodList.add(inventory);
         }
         warehouseService.createTransferInventoryPeriod(inventoryPeriodList);

@@ -52,6 +52,10 @@ public class InventoryPeriod implements BaseModel {
     @Length(max = 6)
     private String warehouseCode;
 
+    @Column(name = "no_cia")
+    @Length(max = 2)
+    private String companyNumber;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
@@ -130,5 +134,13 @@ public class InventoryPeriod implements BaseModel {
 
     public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
+    }
+
+    public String getCompanyNumber() {
+        return companyNumber;
+    }
+
+    public void setCompanyNumber(String companyNumber) {
+        this.companyNumber = companyNumber;
     }
 }
