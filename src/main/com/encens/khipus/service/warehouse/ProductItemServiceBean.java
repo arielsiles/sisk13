@@ -10,16 +10,12 @@ import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.ArticulosPromocion;
 import com.encens.khipus.model.customers.Promocion;
-import com.encens.khipus.model.customers.Ventaarticulo;
-import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CompanyConfiguration;
-import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.admin.BusinessUnitService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
-import com.encens.khipus.util.employees.AccountingRecordResult;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -29,7 +25,6 @@ import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
-import javax.transaction.SystemException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -168,6 +163,17 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         return productItemList;
     }
 
+    public List<ProductItem> findByWarehouseCode(String warehouseCode) {
+        List<ProductItem> productItemList = new ArrayList<ProductItem>();
+        List<ProductItem> resultList = getEntityManager().createNamedQuery("ProductItem.findByWarehouseCode")
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+        if (resultList != null) {
+            productItemList = resultList;
+        }
+        return productItemList;
+    }
+
     /**
      * Finds a list of ProductItems involved in a ProductItem List
      *
@@ -224,6 +230,17 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         }
 
         return  quantity;
+    }
+
+    public List<InventoryPeriod> getInventoryPeriodInitialList(String warehouseCode, String year){
+        return (List<InventoryPeriod>)em.createQuery("select i from InventoryPeriod i " +
+                                 "where i.warehouseCode =:warehouseCode " +
+                                 "and i.year =:year " +
+                                 "and i.month =:month ")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("year", new Integer(year))
+                .setParameter("month", 1)
+                .getResultList();
     }
 
 }

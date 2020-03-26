@@ -130,7 +130,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
         Collection<CollectionData> beanCollection = new ArrayList();
         /** 1.- Listado de articulos con saldos iniciales de gestion **/
         // Inventario inicio gestion
-        List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
+        //List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
+        List<InventoryPeriod> InventoryPeriodList   = productInventoryService.findInitialInventoryAll(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
 
         /** 2.- Obtiene en listas entradas y salidas de articulos: vales, ordenes de produccion, ventas, pedidos, etc. **/
         // Vales de movimiento
@@ -156,22 +157,21 @@ public class ProductInventoryReportAction extends GenericReportAction {
         /** Se va llenando la lista final, con saldos fisicos a la fecha de inicio seleccionada **/
         /**  **/
         //* Inventario inicial inv_inicio **/
-        for (InitialInventory initialInventory:initialInventoryList){
-
-
+        //for (InitialInventory initialInventory:initialInventoryList){
+        for (InventoryPeriod inventoryPeriod:InventoryPeriodList){
 
             /** Fijando el saldo inicial de un articulo **/
             BigDecimal initQuantity = BigDecimal.ZERO;
             for (CollectionData article:initialArticleList){
-                if (initialInventory.getProductItemCode().equals(article.getCode())){
+                if (inventoryPeriod.getProductItemCode().equals(article.getCode())){
                     initQuantity = article.getBalance(); // Fijando solo el saldo fisico inicial
                     break;
                 }
             }
 
-            CollectionData data = new CollectionData(   initialInventory.getProductItemCode(),
-                    initialInventory.getProductItem().getName(),
-                    initialInventory.getProductItem().getUsageMeasureCode(),
+            CollectionData data = new CollectionData(inventoryPeriod.getProductItemCode(),
+                    inventoryPeriod.getProductItem().getName(),
+                    inventoryPeriod.getProductItem().getUsageMeasureCode(),
                     initQuantity,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
@@ -182,21 +182,21 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
             /** PR_PRODUCCION **/
             for (ProductionProduct product : productionProductList){
-                if (initialInventory.getProductItemCode().equals(product.getProductItemCode())){
+                if (inventoryPeriod.getProductItemCode().equals(product.getProductItemCode())){
                     data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), product.getQuantity(), 6));
                 }
             }
 
             /** Ordenes de produccion **/
             for (ProductionOrder productionOrder:productionOrderList){
-                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
+                if (inventoryPeriod.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
                     data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6));
                 }
             }
             /** Reprocesos **/
             for (BaseProduct baseProduct:baseProductList){
                 for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                    if (initialInventory.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
+                    if (inventoryPeriod.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
                         data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 6));
                     }
                 }
@@ -204,7 +204,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
             /** Sum Entry an Output **/
             for (MovementDetail detail:movementDetailList){
-                if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
+                if (inventoryPeriod.getProductItemCode().equals(detail.getProductItemCode())) {
                     if (detail.getMovementType().equals(MovementDetailType.E)) {
                         data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 6));
                     }
@@ -218,7 +218,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 Object[] row = (Object[]) cashSaleDetailList.get(i);
                 String codart = (String)row[0];
                 Long total = (Long) row[1];
-                if (initialInventory.getProductItemCode().equals(codart)) {
+                if (inventoryPeriod.getProductItemCode().equals(codart)) {
                     data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
                 }
             }
@@ -228,7 +228,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 Object[] row = (Object[]) orderDetailList.get(i);
                 String codart = (String)row[0];
                 Long total = (Long) row[1];
-                if (initialInventory.getProductItemCode().equals(codart)) {
+                if (inventoryPeriod.getProductItemCode().equals(codart)) {
                     data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
                 }
             }
@@ -252,6 +252,134 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         return beanCollection;
     }
+
+    /*public Collection<CollectionData> calculateCollectionData2(){
+
+        Collection<CollectionData> beanCollection = new ArrayList();
+        *//** 1.- Listado de articulos con saldos iniciales de gestion **//*
+        // Inventario inicio gestion
+        List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
+
+        *//** 2.- Obtiene en listas entradas y salidas de articulos: vales, ordenes de produccion, ventas, pedidos, etc. **//*
+        // Vales de movimiento
+        List<MovementDetail> movementDetailList;
+        if (warehouse.getWarehouseCode().equals("2"))
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
+        else
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
+
+        // Ordenes de produccion
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
+        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
+        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate);
+
+        // Ventas al contado y pedidos
+        List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(startDate, endDate);
+        List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(startDate, endDate);
+
+        *//** 3.-  Calcula (x almacen) en la lista los saldos de los articulos, desde el 1er dia de la gestion hasta la fecha de inicio seleccionada **//*
+        // solo calcula correctamente saldos fisicos ?
+        Collection<CollectionData> initialArticleList = calculateInitialArticle(warehouse.getWarehouseCode(), startDate);
+
+        *//** Se va llenando la lista final, con saldos fisicos a la fecha de inicio seleccionada **//*
+        *//**  **//*
+        /*//* Inventario inicial inv_inicio **//*
+        for (InitialInventory initialInventory:initialInventoryList){
+
+
+
+            *//** Fijando el saldo inicial de un articulo **//*
+            BigDecimal initQuantity = BigDecimal.ZERO;
+            for (CollectionData article:initialArticleList){
+                if (initialInventory.getProductItemCode().equals(article.getCode())){
+                    initQuantity = article.getBalance(); // Fijando solo el saldo fisico inicial
+                    break;
+                }
+            }
+
+            CollectionData data = new CollectionData(   initialInventory.getProductItemCode(),
+                    initialInventory.getProductItem().getName(),
+                    initialInventory.getProductItem().getUsageMeasureCode(),
+                    initQuantity,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    //initialInventory.getUnitCost()
+                    BigDecimal.ZERO
+            );
+
+            *//** PR_PRODUCCION **//*
+            for (ProductionProduct product : productionProductList){
+                if (initialInventory.getProductItemCode().equals(product.getProductItemCode())){
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), product.getQuantity(), 6));
+                }
+            }
+
+            *//** Ordenes de produccion **//*
+            for (ProductionOrder productionOrder:productionOrderList){
+                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6));
+                }
+            }
+            *//** Reprocesos **//*
+            for (BaseProduct baseProduct:baseProductList){
+                for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
+                    if (initialInventory.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 6));
+                    }
+                }
+            }
+
+            *//** Sum Entry an Output **//*
+            for (MovementDetail detail:movementDetailList){
+                if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
+                    if (detail.getMovementType().equals(MovementDetailType.E)) {
+                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 6));
+                    }
+                    if (detail.getMovementType().equals(MovementDetailType.S))
+                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 6));
+                }
+            }
+
+            *//** Ventas al contado **//*
+            for (int i = 0; i < cashSaleDetailList.size(); i++) {
+                Object[] row = (Object[]) cashSaleDetailList.get(i);
+                String codart = (String)row[0];
+                Long total = (Long) row[1];
+                if (initialInventory.getProductItemCode().equals(codart)) {
+                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
+                }
+            }
+
+            *//** Pedidos **//*
+            for (int i = 0; i < orderDetailList.size(); i++) {
+                Object[] row = (Object[]) orderDetailList.get(i);
+                String codart = (String)row[0];
+                Long total = (Long) row[1];
+                if (initialInventory.getProductItemCode().equals(codart)) {
+                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
+                }
+            }
+
+            *//** Añade a la lista Todos los articulos ó solo los con movimiento, segun se elija en la vista**//*
+            if (articlesWithMovement){ // Articulos solo con Movimiento o inventario inicial
+                if (data.getInitialAmount().compareTo(BigDecimal.ZERO) > 0 ||
+                        data.getEntryAmount().compareTo(BigDecimal.ZERO)   > 0 ||
+                        data.getOutputAmount().compareTo(BigDecimal.ZERO)  > 0){
+                    beanCollection.add(data);
+                }
+            }else {
+                beanCollection.add(data);
+            }
+        }
+
+        for (CollectionData data:beanCollection){
+            data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 6));
+            data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 6));
+        }
+
+        return beanCollection;
+    }*/
 
     /**
      * 1. Calcula inventario de articulos por almacen dadas Fecha inicio y Fecha fin

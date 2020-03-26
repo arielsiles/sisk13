@@ -7,7 +7,7 @@ import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.ArticulosPromocion;
-import com.encens.khipus.model.customers.Ventaarticulo;
+import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 
@@ -43,6 +43,8 @@ public interface ProductItemService extends GenericService {
     @SuppressWarnings(value = "unchecked")
     List<ProductItem> findByWarehouseVoucher(WarehouseVoucher warehouseVoucher);
 
+    List<ProductItem> findByWarehouseCode(String warehouseCode);
+
     /**
      * Finds a list of ProductItems involved in a ProductItem List
      *
@@ -62,4 +64,5 @@ public interface ProductItemService extends GenericService {
 
     void createProductInventory(ProductItem productItem);
 
+    List<InventoryPeriod> getInventoryPeriodInitialList(String warehouseCode, String year);
 }

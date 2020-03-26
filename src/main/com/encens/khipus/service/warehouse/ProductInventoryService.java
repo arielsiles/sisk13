@@ -4,6 +4,7 @@ import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.warehouse.InitialInventory;
+import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductInventory;
 import com.encens.khipus.model.warehouse.ProductInventoryRecordType;
 
@@ -33,4 +34,6 @@ public interface ProductInventoryService extends GenericService {
     public List<InitialInventory> findInitialInventory(String warehouseCode, String year);
 
     public BigDecimal findUnitCostbyCode(String productItemCode, String year);
+
+    List<InventoryPeriod> findInitialInventoryAll(String warehouseCode, String year);
 }

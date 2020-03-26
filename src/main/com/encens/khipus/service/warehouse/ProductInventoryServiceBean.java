@@ -4,10 +4,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.VentaDirecta;
-import com.encens.khipus.model.warehouse.InitialInventory;
-import com.encens.khipus.model.warehouse.ProductInventory;
-import com.encens.khipus.model.warehouse.ProductInventoryRecord;
-import com.encens.khipus.model.warehouse.ProductInventoryRecordType;
+import com.encens.khipus.model.warehouse.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -16,6 +13,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +24,9 @@ import java.util.List;
 @Name("productInventoryService")
 @AutoCreate
 public class ProductInventoryServiceBean extends GenericServiceBean implements ProductInventoryService {
+
+    @In
+    private ProductItemService productItemService;
 
     @In(value = "#{entityManager}")
     private EntityManager em;
@@ -157,6 +158,40 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
                 .setParameter("year", year)
                 .getResultList();
 
+    }
+
+    public List<InventoryPeriod> findInitialInventoryAll(String warehouseCode, String year){
+
+        List<InventoryPeriod> result = new ArrayList<InventoryPeriod>();
+        List<InventoryPeriod> inventoryPeriodList = productItemService.getInventoryPeriodInitialList(warehouseCode, year);
+        List<ProductItem> productItemList         = productItemService.findByWarehouseCode(warehouseCode); // Todos los productos del almacen
+
+        boolean flagProductItem = true;
+        for (ProductItem productItem:productItemList){
+            for (InventoryPeriod inventoryPeriod:inventoryPeriodList){
+                if (productItem.getProductItemCode().equals(inventoryPeriod.getProductItemCode())) {
+                    result.add(inventoryPeriod);
+                    flagProductItem = false;
+                    break;
+                }
+            }
+
+            if (flagProductItem){
+                InventoryPeriod invP = new InventoryPeriod();
+                invP.setProductItemCode(productItem.getProductItemCode());
+                invP.setProductItem(productItem);
+                invP.setQuantity(BigDecimal.ZERO);
+                invP.setAmount(BigDecimal.ZERO);
+                invP.setUnitCost(BigDecimal.ZERO);
+                invP.setMonth(1);
+                invP.setYear(new Integer(year));
+                invP.setWarehouseCode(warehouseCode);
+                result.add(invP);
+                //System.out.println("--------> Agregando... : " + productItem.getFullName());
+            }
+            flagProductItem = true;
+        }
+        return result;
     }
 
     public BigDecimal findUnitCostbyCode(String productItemCode, String year){
