@@ -226,8 +226,11 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
                     .setParameter("gestion", year)
                     .getSingleResult();
         }catch (NoResultException e){
-            return null;
+            return BigDecimal.ZERO;
         }
+
+        if (quantity == null)
+            quantity = BigDecimal.ZERO;
 
         return  quantity;
     }
