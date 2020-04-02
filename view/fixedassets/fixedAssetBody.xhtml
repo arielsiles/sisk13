@@ -20,8 +20,7 @@
         <h:commandButton action="#{fixedAssetAction.update}"
                          value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{s:hasPermission('FIXEDASSET','UPDATE') and
-                         !fixedAssetAction.showRegistrationDetail and !fixedAssetAction.dischargeState()}"
+                         rendered="#{s:hasPermission('FIXEDASSET','UPDATE')}"
                          tabindex="3"/>
 
         <h:commandButton action="#{fixedAssetAction.cancel}"
@@ -39,7 +38,7 @@
     #{messages['FixedAsset.title']}
 </f:facet>
 <!--only for approve registration-->
-<app:fieldset id="fixedAssetRegistrationMovementApprovalFieldset"
+<!--<app:fieldset id="fixedAssetRegistrationMovementApprovalFieldset"
               title="#{messages['FixedAsset.FixedAssetRegistrationDetail']}"
               rendered="#{s:hasPermission('FIXEDASSETREGISTRATIONAPPROVAL','VIEW')
               and fixedAssetAction.showRegistrationDetail}">
@@ -96,7 +95,9 @@
         </s:div>
 
     </h:panelGrid>
-</app:fieldset>
+</app:fieldset>-->
+
+
 
 <app:fieldset id="fixedAssetFieldset"
               title="#{messages['FixedAsset.FixedAssetDetail']}">
@@ -299,7 +300,7 @@
             </c:when>
             <c:otherwise>
                 <app:selectPopUp id="jobContract"
-                                 required="true"
+                                 required="false"
                                  textValue="#{fixedAssetAction.employeeFullName}"
                                  value="#{fixedAsset.custodianJobContract}"
                                  dataModel="#{jobContractDataModel}"
@@ -611,11 +612,11 @@
 <ui:include src="fixedAssetPart.xhtml"/>
 <!--here ends FixedAsset fields-->
 
-<c:if test="#{fixedAssetAction.showPaymentDetail}">
+<!--<c:if test="#{fixedAssetAction.showPaymentDetail}">
     <ui:include src="fixedAssetPayment.xhtml">
         <ui:param name="mainAction" value="#{fixedAssetAction}"/>
     </ui:include>
-</c:if>
+</c:if>-->
 
 </rich:panel>
 

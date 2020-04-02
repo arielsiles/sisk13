@@ -1,5 +1,6 @@
 package com.encens.khipus.action.fixedassets;
 
+import com.encens.khipus.action.warehouse.WarehousePurchaseOrderAction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
@@ -15,6 +16,7 @@ import com.encens.khipus.interceptor.BusinessUnitRestrict;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.CostCenter;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.fixedassets.FixedAsset;
@@ -23,6 +25,7 @@ import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.purchases.PurchaseOrderPayment;
 import com.encens.khipus.model.purchases.PurchaseOrderType;
 import com.encens.khipus.service.employees.JobContractService;
+import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.fixedassets.FixedAssetPurchaseOrderService;
 import com.encens.khipus.service.fixedassets.FixedAssetService;
 import com.encens.khipus.service.fixedassets.PurchaseOrderCauseFixedAssetStateService;
@@ -56,6 +59,9 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
     @In(create = true)
     private LiquidationPaymentAction liquidationPaymentAction;
 
+    @In(create = true)
+    private WarehousePurchaseOrderAction warehousePurchaseOrderAction;
+
     @In
     private User currentUser;
 
@@ -73,6 +79,9 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
     private PurchaseOrderCauseFixedAssetStateService purchaseOrderCauseFixedAssetStateService;
     @In
     private JobContractService jobContractService;
+
+    @In
+    private FinancesExchangeRateService financesExchangeRateService;
 
     @In(value = "#{listEntityManager}")
     private EntityManager listEm;
@@ -349,9 +358,19 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
 
         try {
             service.finalizePurchaseOrder(getInstance());
+            PurchaseOrderPayment purchaseOrderPayment = getLiquidationPayment();
+
+            System.out.println("------------> purchaseOrderPayment: " + purchaseOrderPayment);
+            System.out.println("------------> purchaseOrderPayment.getPayAmount(): " + purchaseOrderPayment.getPayAmount());
+            System.out.println("------------> purchaseOrderPayment.getSourceAmount(): " + purchaseOrderPayment.getSourceAmount());
+
+            BigDecimal defaultExchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.name());
+            service.createFixedAssetPurchaseOrderFinalizedAccountEntry(getInstance(), defaultExchangeRate);
+
             select(getInstance());
             addPurchaseOrderFinalizedMessage();
             return Outcome.SUCCESS;
+
         } catch (PurchaseOrderDetailEmptyException e) {
             addPurchaseOrderEmptyMessage();
             return Outcome.REDISPLAY;
@@ -360,6 +379,15 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
             return FINALIZED_OUTCOME;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
+            return Outcome.REDISPLAY;
+        } catch (FinancesExchangeRateNotFoundException e){
+            addFinancesExchangeRateNotFoundExceptionMessage();
+            return Outcome.REDISPLAY;
+        } catch (FinancesCurrencyNotFoundException e){
+            addFinancesCurrencyNotFoundExceptionMessage();
+            return Outcome.REDISPLAY;
+        } catch (CompanyConfigurationNotFoundException e){
+            addCompanyConfigurationNotFoundErrorMessage();
             return Outcome.REDISPLAY;
         }
 
@@ -648,6 +676,11 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
 
     /* messages*/
 
+    private void addFinancesCurrencyNotFoundExceptionMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "FixedAssets.FinancesCurrencyNotFoundException");
+    }
+
     private void addFinancesExchangeRateNotFoundExceptionMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "PurchaseOrder.financesExchangeRateNotFound");
@@ -811,4 +844,18 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
     public void addNotFoundMessage() {
         super.addNotFoundMessage();
     }
+
+    public void computePaymentFixedAsset(){
+        PurchaseOrder purchaseOrder = getInstance();
+        warehousePurchaseOrderAction.setInstance(purchaseOrder);
+
+        BigDecimal currentBalanceAmount = warehousePurchaseOrderAction.getCurrentBalanceAmount();
+        liquidationPaymentAction.computePayment(currentBalanceAmount);
+
+        System.out.println("----------> AF purchaseOrder: " + purchaseOrder);
+        System.out.println("----------> AF purchaseOrder.getId(): " + purchaseOrder.getId());
+        System.out.println("----------> AF currentBalanceAmount: " + currentBalanceAmount);
+
+    }
+
 }

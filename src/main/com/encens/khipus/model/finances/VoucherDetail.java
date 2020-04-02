@@ -167,6 +167,18 @@ public class VoucherDetail implements BaseModel {
     }
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
+                         BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String providerCode) {
+        this.businessUnitCode = businessUnitCode;
+        this.costCenterCode = costCenterCode;
+        this.account = account;
+        this.debit = debit;
+        this.credit = credit;
+        this.currency = currency;
+        this.exchangeAmount = exchangeAmount;
+        this.providerCode = providerCode;
+    }
+
+    public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount, String productItemCode, BigDecimal quantityArt) {
         this.businessUnitCode = businessUnitCode;
         this.costCenterCode = costCenterCode;

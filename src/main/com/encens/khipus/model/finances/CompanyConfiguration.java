@@ -509,6 +509,14 @@ public class CompanyConfiguration {
     })
     private CashAccount fixedTermInterestNationalCurrency;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAPROVAF", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fixedAssetProvidersAccount;
+
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1279,5 +1287,13 @@ public class CompanyConfiguration {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
+    }
+
+    public CashAccount getFixedAssetProvidersAccount() {
+        return fixedAssetProvidersAccount;
+    }
+
+    public void setFixedAssetProvidersAccount(CashAccount fixedAssetProvidersAccount) {
+        this.fixedAssetProvidersAccount = fixedAssetProvidersAccount;
     }
 }

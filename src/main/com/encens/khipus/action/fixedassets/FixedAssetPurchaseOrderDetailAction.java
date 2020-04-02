@@ -1,6 +1,7 @@
 package com.encens.khipus.action.fixedassets;
 
 import com.encens.khipus.exception.ConcurrencyException;
+import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
@@ -11,6 +12,7 @@ import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.interceptor.BusinessUnitRestrict;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.fixedassets.FixedAssetGroup;
 import com.encens.khipus.model.fixedassets.FixedAssetSubGroup;
 import com.encens.khipus.model.fixedassets.PurchaseOrderDetailPart;
@@ -573,4 +575,18 @@ public class FixedAssetPurchaseOrderDetailAction extends GenericAction<FixedAsse
         }
         return validationOutcome;
     }
+
+    public String getEmployeeFullName() {
+        return getInstance().getCustodianJobContract() != null ? getInstance().getCustodianJobContract().getContract().getEmployee().getFullName() : null;
+    }
+
+    public void assignJobContract(JobContract jobContract) {
+        try {
+            JobContract jobContractRetrieved = getService().findById(JobContract.class, jobContract.getId());
+            getInstance().setCustodianJobContract(jobContractRetrieved);
+        } catch (EntryNotFoundException e) {
+            log.error(e, "An unexpected error have happened");
+        }
+    }
+
 }

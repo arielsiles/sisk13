@@ -669,7 +669,7 @@
 
 
 <c:if test="#{fixedAssetPurchaseOrderAction.purchaseOrderFinalized and fixedAssetPurchaseOrderAction.hasBalanceAmount()}">
-    <ui:include src="/purchases/purchaseOrderLiquidationPayment.xhtml">
+    <ui:include src="/purchases/purchaseOrderLiquidationPaymentFixedAsset.xhtml">
         <ui:param name="mainAction" value="#{fixedAssetPurchaseOrderAction}"/>
         <ui:param name="purchaseOrder" value="#{fixedAssetPurchaseOrderAction.purchaseOrder}"/>
     </ui:include>

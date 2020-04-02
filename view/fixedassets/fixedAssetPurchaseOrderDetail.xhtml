@@ -463,6 +463,30 @@
                 <f:validateLength maximum="250"/>
             </h:inputTextarea>
         </s:decorate>
+
+        <s:decorate id="jobContractField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['FixedAsset.custodian']}</ui:define>
+            <c:choose>
+                <c:when test="#{fixedAssetAction.managed and !fixedAssetAction.showCustodianJobContractField()}">
+                    <h:outputText value="#{fixedAssetPurchaseOrderDetailAction.employeeFullName}"/>
+                </c:when>
+                <c:otherwise>
+                    <app:selectPopUp id="jobContract"
+                                     required="true"
+                                     textValue="#{fixedAssetPurchaseOrderDetailAction.employeeFullName}"
+                                     value="#{fixedAssetPurchaseOrderDetail.custodianJobContract}"
+                                     dataModel="#{jobContractDataModel}"
+                                     clearAction="fixedAssetAction.clearJobContract()"
+                                     searchModalPanel="jobContractListModalPanel"
+                                     reRender="jobContractField, jobContractDiv"
+                                     hotKeySelect="alt+3"
+                                     tabindex="15"/>
+                </c:otherwise>
+            </c:choose>
+        </s:decorate>
+
     </s:div>
 </s:div>
 </h:panelGrid>
@@ -555,6 +579,19 @@
                            oncomplete="Richfaces.hideModalPanel('fixedAssetSubGroupListModalPanel');"/>
     </ui:define>
 </s:decorate>
+
+    <s:decorate id="jobContractListModalPanelContainer"
+                template="/employees/jobContractListModalPanel.xhtml">
+        <ui:param name="dialogId" value="jobContractListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{fixedAssetPurchaseOrderDetailAction.assignJobContract(jobContractItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="jobContractField, jobContractDiv"
+                               oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#productItem" query="focus()" timing="onload"/>

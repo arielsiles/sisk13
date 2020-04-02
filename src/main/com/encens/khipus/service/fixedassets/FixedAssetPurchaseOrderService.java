@@ -15,6 +15,7 @@ import com.encens.khipus.model.purchases.PurchaseOrderPayment;
 import com.encens.khipus.service.purchases.PurchaseOrderService;
 
 import javax.ejb.Local;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -57,4 +58,8 @@ public interface FixedAssetPurchaseOrderService extends PurchaseOrderService {
             ConcurrencyException,
             PurchaseOrderNullifiedException,
             PurchaseOrderLiquidatedException, EntryDuplicatedException;
+
+    void createFixedAssetPurchaseOrderFinalizedAccountEntry(PurchaseOrder purchaseOrder, BigDecimal defaultExchangeRate)
+            throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException;
+
 }

@@ -197,7 +197,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
             //voucher.setTransactionNumber(financesPkGeneratorService.getNextTmpenc()); Error
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
-            voucherService.create(voucher);
+            //voucherService.create(voucher);
+            voucherAccoutingService.saveVoucher(voucher);
             purchaseOrderPayment.setTransactionNumber(voucher.getTransactionNumber());
             if (!getEntityManager().contains(purchaseOrderPayment)) {
                 getEntityManager().merge(purchaseOrderPayment);

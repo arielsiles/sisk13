@@ -784,7 +784,7 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
     public void setShowCalculatedValues(boolean showCalculatedValues) {
         this.showCalculatedValues = showCalculatedValues;
     }
-
+    // !True (False) ||  (  True || True || True)
     public boolean isShowRegistrationDetail() {
         showRegistrationDetail = !isManaged() || (showCostCenterField() || showCustodianJobContractField() || showFixedAssetCodeField());
         return showRegistrationDetail;

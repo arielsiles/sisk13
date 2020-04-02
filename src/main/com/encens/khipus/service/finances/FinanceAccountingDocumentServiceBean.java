@@ -6,6 +6,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.employees.DischargeDocument;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.*;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.purchases.GlossGeneratorService;
 import com.encens.khipus.util.*;
@@ -39,6 +40,9 @@ public class FinanceAccountingDocumentServiceBean extends GenericServiceBean imp
 
     @In
     private GlossGeneratorService glossGeneratorService;
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     public void validatePK(FinanceAccountingDocumentPk id) throws DuplicatedFinanceAccountingDocumentException {
         FinanceAccountingDocument element = eventEm.find(FinanceAccountingDocument.class, id);
@@ -138,7 +142,8 @@ public class FinanceAccountingDocumentServiceBean extends GenericServiceBean imp
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
 
-            voucherService.create(voucher);
+            //voucherService.create(voucher);
+            voucherAccoutingService.saveVoucher(voucher);
 
             document.setHasVoucher(true);
             getEntityManager().merge(document);

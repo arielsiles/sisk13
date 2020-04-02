@@ -175,7 +175,7 @@ public class FixedAsset implements BaseModel {
     })
     private CostCenter costCenter;
 
-    @Column(name = "cod_cc", length = 6, nullable = false)
+    @Column(name = "cod_cc", length = 6)
     @Length(max = 6)
     private String costCenterCode;
 
@@ -237,7 +237,7 @@ public class FixedAsset implements BaseModel {
     private Integer monthsGuaranty;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTO", referencedColumnName = "idcontratopuesto")
+    @JoinColumn(name = "idcontratopuesto", referencedColumnName = "idcontratopuesto")
     private JobContract custodianJobContract;
 
     @ManyToMany(mappedBy = "fixedAssets")

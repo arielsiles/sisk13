@@ -315,7 +315,12 @@ public class AdvancePaymentServiceBean extends GenericServiceBean implements Adv
 
     @SuppressWarnings(value = "unchecked")
     public BigDecimal sumAllAdvancePaymentAmountsByState(PurchaseOrder purchaseOrder, PurchaseOrderPaymentState purchaseOrderPaymentState) {
+
         List<PurchaseOrderPaymentState> states = Arrays.asList(purchaseOrderPaymentState);
+        System.out.println("-----AF purchaseOrder: " + purchaseOrder);
+        System.out.println("-----AF purchaseOrder: " + purchaseOrder.getId());
+        System.out.println("-----AF states: " + states);
+
         List<PurchaseOrderPayment> purchaseOrderPayments = listEm
                 .createNamedQuery("PurchaseOrderPayment.findByState")
                 .setParameter("purchaseOrder", purchaseOrder)

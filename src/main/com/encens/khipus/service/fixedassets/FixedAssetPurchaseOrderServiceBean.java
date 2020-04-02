@@ -13,6 +13,7 @@ import com.encens.khipus.model.fixedassets.FixedAssetState;
 import com.encens.khipus.model.fixedassets.PurchaseOrderFixedAssetPart;
 import com.encens.khipus.model.fixedassets.PurchaseOrdersFixedAssetCollection;
 import com.encens.khipus.model.purchases.*;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.finances.FinanceAccountingDocumentService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
@@ -94,6 +95,9 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
     @In
     private PurchaseOrderFixedAssetPartService purchaseOrderFixedAssetPartService;
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     @Override
     public void create(Object entity) throws EntryDuplicatedException {
@@ -251,7 +255,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             purchaseOrderPayment.setPurchaseOrderPaymentKind(PurchaseOrderPaymentKind.LIQUIDATION_PAYMENT);
             defaultExchangeRate = purchaseOrderPayment.getExchangeRate();
 
-            warehouseAccountEntryService.createEntryAccountForPurchaseOrderPayment(purchaseOrder, purchaseOrderPayment);
+            //warehouseAccountEntryService.createEntryAccountForPurchaseOrderPayment(purchaseOrder, purchaseOrderPayment);
             if (PurchaseOrderPaymentType.PAYMENT_ROTATORY_FUND.equals(purchaseOrderPayment.getPaymentType())) {
                 try {
                     rotatoryFundCollectionService.generateCollectionForPurchaseOrderPayment(purchaseOrderPayment);
@@ -268,7 +272,8 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 }
             }
         }
-        createFixedAssetPurchaseOrderLiquidationAccountEntry(purchaseOrder, defaultExchangeRate);
+
+        createFixedAssetPurchaseOrderLiquidationAccounting(purchaseOrder, defaultExchangeRate, purchaseOrderPayment);
 
         purchaseOrder.setState(PurchaseOrderState.LIQ);
         purchaseOrder.setBalanceAmount(BigDecimal.ZERO);
@@ -276,7 +281,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
         purchaseOrder = getEntityManager().merge(purchaseOrder);
         getEntityManager().flush();
 
-        financeAccountingDocumentService.createAccountingVoucherByPurchaseOrder(purchaseOrder);
+        //financeAccountingDocumentService.createAccountingVoucherByPurchaseOrder(purchaseOrder);
     }
 
     private void createFixedAssetsForPurchaseOrder(PurchaseOrder purchaseOrder, List<FixedAssetPurchaseOrderDetail> fixedAssetPurchaseOrderDetailList) throws EntryDuplicatedException {
@@ -291,7 +296,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             for (int i = 0; i < requestedQuantity; i++) {
                 FixedAsset fixedAsset = new FixedAsset();
                 fixedAsset.setState(FixedAssetState.PEN);
-                fixedAsset.setCurrencyType(FinancesCurrencyType.U);
+                fixedAsset.setCurrencyType(FinancesCurrencyType.P);
                 fixedAsset.setAcumulatedDepreciation(BigDecimal.ZERO);
                 fixedAsset.setImprovement(BigDecimal.ZERO);
                 fixedAsset.setDepreciation(BigDecimal.ZERO);
@@ -305,7 +310,10 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 fixedAsset.setBsSusRate(fixedAssetPurchaseOrderDetail.getBsSusRate());
                 fixedAsset.setLastBsSusRate(fixedAsset.getBsSusRate());
                 fixedAsset.setLastBsUfvRate(fixedAsset.getBsUfvRate());
-                fixedAsset.setCostCenter(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter());
+                //fixedAsset.setCostCenter(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter());
+                fixedAsset.setCostCenter(purchaseOrder.getCostCenter());
+                fixedAsset.setCostCenterCode(purchaseOrder.getCostCenter().getCode());
+                //fixedAsset.setCostCenterCode(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter().getCode());
                 fixedAsset.setBusinessUnit(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getExecutorUnit());
                 fixedAsset.setDepreciationRate(fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getDepreciationRate());
                 fixedAsset.setDescription(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getGloss());
@@ -318,6 +326,8 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 fixedAsset.setPurchaseOrder(fixedAssetPurchaseOrderDetail.getPurchaseOrder());
                 fixedAsset.setRubbish(fixedAssetPurchaseOrderDetail.getRubbish());
                 fixedAsset.setTrademark(fixedAssetPurchaseOrderDetail.getTrademark());
+                fixedAsset.setCustodianJobContract(fixedAssetPurchaseOrderDetail.getCustodianJobContract());
+                fixedAsset.setRegistrationDate(purchaseOrder.getReceptionDate());
 
                 try {
                     //this is gonna persist the entity if it is not managed and if for some reason the entity was already added
@@ -497,8 +507,106 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
         return purchaseOrder.getPurchaseOrderCause().isFixedassetPurchase() ? purchaseOrderDetailService.isPurchaseOrderDetailEmpty(purchaseOrder) :
                 purchaseOrderFixedAssetPartService.isPurchaseOrderFixedAssetPartEmpty(purchaseOrder);
     }
-    /* fixed Asset liquidation case */
 
+
+    public void createFixedAssetPurchaseOrderFinalizedAccountEntry(PurchaseOrder purchaseOrder, BigDecimal defaultExchangeRate)
+            throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException {
+
+
+        BigDecimal sumAdvancePaymentAmount = advancePaymentService.sumAllPaymentAmountsByKind(purchaseOrder, PurchaseOrderPaymentKind.ADVANCE_PAYMENT);
+        BigDecimal sumLiquidationPaymentAmount = advancePaymentService.sumAllPaymentAmountsByKind(purchaseOrder, PurchaseOrderPaymentKind.LIQUIDATION_PAYMENT);
+
+        if (BigDecimalUtil.isZeroOrNull(sumAdvancePaymentAmount))
+            sumAdvancePaymentAmount = BigDecimal.ZERO;
+        if (BigDecimalUtil.isZeroOrNull(sumLiquidationPaymentAmount))
+            sumLiquidationPaymentAmount = BigDecimal.ZERO;
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        String executorUnitCode = purchaseOrder.getExecutorUnit().getExecutorUnitCode();
+        String costCenterCode = purchaseOrder.getCostCenter().getCode();
+
+        String gloss = glossGeneratorService.generatePurchaseOrderGloss(purchaseOrder, MessageUtils.getMessage("FixedAssetPurchaseOrder.fixedAssets"), MessageUtils.getMessage("FixedAssetPurchaseOrder.orderNumberAcronym"));
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
+        voucher.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
+        voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
+
+        if (CollectionDocumentType.INVOICE.equals(purchaseOrder.getDocumentType())) {
+
+            for (FixedAssetPurchaseOrderDetail fixedAssetPurchaseOrderDetail : purchaseOrder.getFixedAssetPurchaseOrderDetailList()){
+                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                        executorUnitCode,
+                        costCenterCode,
+                        fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getWarehouseCashAccount(),
+                        BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
+                        FinancesCurrencyType.P,
+                        BigDecimal.ONE));
+            }
+
+            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                    BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }/* else {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    companyConfiguration.getFixedAssetInTransitAccount(),
+                    purchaseOrder.getTotalAmount(),
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }*/
+
+        /*if (BigDecimalUtil.isPositive(sumAdvancePaymentAmount)) {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrder.getProvider().getPayableAccount(),
+                    sumAdvancePaymentAmount,
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }*/
+
+        /*if (BigDecimalUtil.isPositive(sumLiquidationPaymentAmount)) {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrder.getProvider().getPayableAccount(),
+                    sumLiquidationPaymentAmount,
+                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), defaultExchangeRate)));
+        }*/
+
+        BigDecimal balanceAmount = BigDecimalUtil.subtract(purchaseOrder.getTotalAmount(), sumAdvancePaymentAmount, sumLiquidationPaymentAmount);
+        if (balanceAmount.doubleValue() > 0) {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
+                    //purchaseOrder.getProvider().getPayableAccount(),
+                    companyConfiguration.getFixedAssetProvidersAccount(),
+                    balanceAmount,
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE,
+                    purchaseOrder.getProviderCode()));
+        } /*else if (balanceAmount.doubleValue() < 0) {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnitCode,
+                    companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
+                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    balanceAmount.abs(),
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }*/
+        //voucherService.create(voucher);
+        voucherAccoutingService.saveVoucher(voucher);
+
+    }
+
+
+    /* fixed Asset liquidation case */
     public void createFixedAssetPurchaseOrderLiquidationAccountEntry(PurchaseOrder purchaseOrder, BigDecimal defaultExchangeRate)
             throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException {
 
@@ -588,6 +696,67 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
         }
-        voucherService.create(voucher);
+        //voucherService.create(voucher);
+        voucherAccoutingService.saveVoucher(voucher);
+    }
+
+    public void createFixedAssetPurchaseOrderLiquidationAccounting(PurchaseOrder purchaseOrder, BigDecimal defaultExchangeRate, PurchaseOrderPayment purchaseOrderPayment)
+            throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException {
+
+        BigDecimal sumAdvancePaymentAmount = advancePaymentService.sumAllPaymentAmountsByKind(purchaseOrder, PurchaseOrderPaymentKind.ADVANCE_PAYMENT);
+        BigDecimal sumLiquidationPaymentAmount = advancePaymentService.sumAllPaymentAmountsByKind(purchaseOrder, PurchaseOrderPaymentKind.LIQUIDATION_PAYMENT);
+
+        if (BigDecimalUtil.isZeroOrNull(sumAdvancePaymentAmount))
+            sumAdvancePaymentAmount = BigDecimal.ZERO;
+        if (BigDecimalUtil.isZeroOrNull(sumLiquidationPaymentAmount))
+            sumLiquidationPaymentAmount = BigDecimal.ZERO;
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        String executorUnitCode = purchaseOrder.getExecutorUnit().getExecutorUnitCode();
+        String costCenterCode = purchaseOrder.getCostCenter().getCode();
+
+        String gloss = glossGeneratorService.generatePurchaseOrderGloss(purchaseOrder, MessageUtils.getMessage("FixedAssetPurchaseOrder.fixedAssets"), MessageUtils.getMessage("FixedAssetPurchaseOrder.orderNumberAcronym"));
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
+        voucher.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
+        voucher.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
+
+
+        System.out.println("------> PURCHASE ORDER PAYMENT: " + purchaseOrderPayment);
+        System.out.println("------> PURCHASE ORDER PAYMENT type: " + purchaseOrderPayment.getPaymentType());
+
+        BigDecimal balanceAmount = BigDecimalUtil.subtract(purchaseOrder.getTotalAmount(), sumAdvancePaymentAmount, sumLiquidationPaymentAmount);
+        if (balanceAmount.doubleValue() > 0) {
+            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                    executorUnitCode,
+                    companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
+                    companyConfiguration.getFixedAssetProvidersAccount(),
+                    balanceAmount,
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE,
+                    purchaseOrder.getProviderCode()));
+        }
+
+
+        if (PurchaseOrderPaymentType.PAYMENT_CASHBOX.equals(purchaseOrderPayment.getPaymentType())){
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getCashBoxCashAccount(),
+                    balanceAmount,
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }
+
+        if (PurchaseOrderPaymentType.PAYMENT_BANK_ACCOUNT.equals(purchaseOrderPayment.getPaymentType())){
+            voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getBankAccount().getCashAccount(),
+                    balanceAmount,
+                    FinancesCurrencyType.P,
+                    BigDecimal.ONE));
+        }
+        voucherAccoutingService.saveVoucher(voucher);
     }
 }

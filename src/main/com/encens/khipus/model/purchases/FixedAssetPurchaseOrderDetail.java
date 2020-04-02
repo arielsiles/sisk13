@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.fixedassets.FixedAssetSubGroup;
 import com.encens.khipus.model.fixedassets.Model;
 import com.encens.khipus.model.fixedassets.PurchaseOrderDetailPart;
@@ -184,6 +185,11 @@ public class FixedAssetPurchaseOrderDetail implements BaseModel {
 
     @OneToMany(mappedBy = "detail", fetch = FetchType.LAZY)
     private List<PurchaseOrderDetailPart> orderDetailPartList = new ArrayList<PurchaseOrderDetailPart>(0);
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcontratopuesto", referencedColumnName = "idcontratopuesto")
+    private JobContract custodianJobContract;
+
 
     public Long getId() {
         return id;
@@ -468,5 +474,13 @@ public class FixedAssetPurchaseOrderDetail implements BaseModel {
         } else {
             this.trademarkName = null;
         }
+    }
+
+    public JobContract getCustodianJobContract() {
+        return custodianJobContract;
+    }
+
+    public void setCustodianJobContract(JobContract custodianJobContract) {
+        this.custodianJobContract = custodianJobContract;
     }
 }
