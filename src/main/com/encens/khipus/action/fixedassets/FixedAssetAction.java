@@ -144,7 +144,6 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
     @Restrict("#{s:hasPermission('FIXEDASSET','VIEW')}")
     public String select(FixedAsset instance) {
         validateBusinessUnit(instance.getBusinessUnit());
-
         showCalculatedValues = true;
         String outcome = super.select(instance);
         if (Outcome.SUCCESS.equals(outcome)) {
@@ -162,6 +161,11 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
             barcodeData.setHeight(100);
         }
 
+        System.out.println("+++++++++++++> getInstance().getCostCenterCode(): " + getInstance().getCostCenterCode());
+        System.out.println("+++++++++++++> getInstance().getCostCenter(): " + getInstance().getCostCenter());
+
+        setInstance(getInstance());
+        System.out.println("+++++++++++++> outcome: " + outcome);
         return outcome;
     }
 
@@ -318,6 +322,7 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
         return Outcome.SUCCESS;
     }
 
+    @Begin(flushMode = FlushModeType.MANUAL, join=true)
     public String transfer() {
         //validate BusinessUnit access manually because the old business unit was over write by the new business unit
         validateBusinessUnit(getDatabaseFixedAsset().getBusinessUnit());
@@ -326,6 +331,11 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
             //noinspection NullableProblems
             getInstance().setPhoto(null);
         }
+
+        System.out.println("+++++++++------->> getInstance().getFullName() " + getInstance().getFullName());
+        System.out.println("+++++++++------->> getInstance().getFixedAssetLocation().getName() " + getInstance().getFixedAssetLocation().getName());
+        System.out.println("+++++++++------->> getInstance().getCostCenterCode(): " + getInstance().getCostCenterCode());
+        System.out.println("+++++++++------->> getInstance().getCostCenter(): " + getInstance().getCostCenter());
 
         try {
             fixedAssetService.transference(getInstance(), fixedAssetMovementType);

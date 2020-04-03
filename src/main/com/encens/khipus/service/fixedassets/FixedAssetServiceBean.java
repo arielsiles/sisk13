@@ -142,6 +142,15 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     public void transference(FixedAsset fixedAsset, FixedAssetMovementType fixedAssetMovementType)
             throws ConcurrencyException, EntryDuplicatedException, NoChangeForTransferenceException {
         FixedAsset databaseFixedAsset = listEm.find(FixedAsset.class, fixedAsset.getId());
+
+        /** By error **/
+        fixedAsset.setCostCenter(databaseFixedAsset.getCostCenter());
+        fixedAsset.setCostCenterCode(databaseFixedAsset.getCostCenter().getCode());
+        /** end **/
+
+        System.out.println("+++++++++-------+++>> fixedAsset.getCostCenterCode(): " + fixedAsset.getCostCenterCode());
+        System.out.println("+++++++++-------+++>> fixedAsset.getCostCenter(): " + fixedAsset.getCostCenter());
+
         if (!validateTransferenceValues(fixedAsset)) {
             throw new NoChangeForTransferenceException("there isn't any change");
         }
@@ -167,8 +176,17 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             if (!fixedAsset.getBusinessUnit().getId().equals(databaseFixedAsset.getBusinessUnit().getId())) {
                 fixedAssetMovement.setLastBusinessUnit(databaseFixedAsset.getBusinessUnit());
             }
-            if (!fixedAsset.getCostCenter().getId().getCode().equals(
-                    databaseFixedAsset.getCostCenter().getId().getCode())) {
+
+            System.out.println("======> fixedAsset: " + fixedAsset);
+            System.out.println("======> fixedAsset.getCostCenter(): " + fixedAsset.getCostCenter());
+            System.out.println("======> fixedAsset.getCostCenter().getId(): " + fixedAsset.getCostCenter().getId());
+            System.out.println("======> fixedAsset.getCostCenter().getId().getCode(): " + fixedAsset.getCostCenter().getId().getCode());
+            System.out.println("======> databaseFixedAsset: " + databaseFixedAsset);
+            System.out.println("======> fixedAsset.getCostCenter().getId().getCode(): " + fixedAsset.getCostCenter().getId().getCode());
+            System.out.println("======> databaseFixedAsset.getCostCenter().getId().getCode(): " + databaseFixedAsset.getCostCenter().getId().getCode());
+
+
+            if (!fixedAsset.getCostCenter().getId().getCode().equals(databaseFixedAsset.getCostCenter().getId().getCode())) {
                 fixedAssetMovement.setLastCostCenter(databaseFixedAsset.getCostCenter());
             }
 
@@ -205,7 +223,10 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     }
 
     private boolean validateTransferenceValues(FixedAsset fixedAsset) {
+        System.out.println("==> !fixedAsset.getCostCenter().getId().getCode(): " + fixedAsset.getCostCenter());
         FixedAsset databaseFixedAsset = listEm.find(FixedAsset.class, fixedAsset.getId());
+        System.out.println("==> !!fixedAsset.getCostCenter().getId().getCode(): " + fixedAsset.getCostCenter());
+
         return !fixedAsset.getCustodianJobContract().getContract().getEmployee().getId()
                 .equals(databaseFixedAsset.getCustodianJobContract().getContract().getEmployee().getId())
                 || !fixedAsset.getBusinessUnit().getId().equals(databaseFixedAsset.getBusinessUnit().getId())
