@@ -7,6 +7,7 @@ import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.exception.purchase.*;
 import com.encens.khipus.exception.warehouse.AdvancePaymentPendingException;
+import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.fixedassets.FixedAsset;
 import com.encens.khipus.model.fixedassets.FixedAssetState;
@@ -98,6 +99,9 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
+
+    @In
+    private User currentUser;
 
     @Override
     public void create(Object entity) throws EntryDuplicatedException {
@@ -715,6 +719,21 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
         String executorUnitCode = purchaseOrder.getExecutorUnit().getExecutorUnitCode();
         String costCenterCode = purchaseOrder.getCostCenter().getCode();
 
+        //if (purchaseOrderPayment != null && !BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getPayAmount()) && !BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getSourceAmount())) {
+
+        purchaseOrderPayment.setPayCurrency(FinancesCurrencyType.P);
+        purchaseOrderPayment.setState(PurchaseOrderPaymentState.APPROVED);
+        purchaseOrderPayment.setCreationDate(new Date());
+        purchaseOrderPayment.setRegisterEmployee(currentUser);
+        purchaseOrderPayment.setApprovalDate(new Date());
+        purchaseOrderPayment.setApprovedByEmployee(currentUser);
+        purchaseOrderPayment.setPurchaseOrder(purchaseOrder);
+
+        if (BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getExchangeRate()))
+            purchaseOrderPayment.setExchangeRate(BigDecimal.ONE);
+
+        //}
+
         String gloss = glossGeneratorService.generatePurchaseOrderGloss(purchaseOrder, MessageUtils.getMessage("FixedAssetPurchaseOrder.fixedAssets"), MessageUtils.getMessage("FixedAssetPurchaseOrder.orderNumberAcronym"));
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
@@ -757,6 +776,13 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
         }
+
+        purchaseOrderPayment.setTransactionNumber(voucher.getTransactionNumber());
+        getEntityManager().persist(purchaseOrderPayment);
+        getEntityManager().flush();
         voucherAccoutingService.saveVoucher(voucher);
+        purchaseOrderPayment.setVoucher(voucher);
+        getEntityManager().flush();
+
     }
 }

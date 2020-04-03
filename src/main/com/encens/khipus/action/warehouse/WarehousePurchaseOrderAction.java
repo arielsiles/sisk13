@@ -1,6 +1,7 @@
 package com.encens.khipus.action.warehouse;
 
 import com.encens.khipus.action.SessionUser;
+import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.fixedassets.LiquidationPaymentAction;
@@ -86,6 +87,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     @In(create = true)
     private VoucherUpdateAction voucherUpdateAction;
+
+    @In(create = true)
+    private VoucherCreateAction voucherCreateAction;
 
     @In(create = true)
     private VoucherReportAction voucherReportAction;
@@ -974,9 +978,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
         System.out.println("----> generateVoucherReport : " + purchaseOrderPayment.getDescription());
         System.out.println("----> generateVoucherReport : " + purchaseOrderPayment.getVoucher());
 
-        voucherUpdateAction.setVoucher(voucher);
-        voucherUpdateAction.setVoucherDetails(voucherDetails);
-        voucherReportAction.generateReport(voucher);
+        voucherCreateAction.setVoucher(voucher);
+        voucherCreateAction.setVoucherDetails(voucherDetails);
+        voucherCreateAction.generateReport(voucher);
 
     }
 

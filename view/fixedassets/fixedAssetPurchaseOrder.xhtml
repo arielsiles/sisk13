@@ -658,6 +658,8 @@
         <ui:include src="associatedFixedAssetPartsToPurchaseOrder.xhtml"/>
     </s:div>
 </s:div>
+
+<!--
 <c:if test="#{not fixedAssetPurchaseOrderAction.managed and s:hasPermission('FIXEDASSETPURCHASEORDERADDDETAIL','VIEW')}">
     <s:div id="fixedAssetPurchaseOrderDetailDiv">
         <app:fieldset id="purchaseOrderDetails" title="#{messages['FixedAssetPurchaseOrderDetail.title']}"
@@ -666,7 +668,7 @@
         </app:fieldset>
     </s:div>
 </c:if>
-
+-->
 
 <c:if test="#{fixedAssetPurchaseOrderAction.purchaseOrderFinalized and fixedAssetPurchaseOrderAction.hasBalanceAmount()}">
     <ui:include src="/purchases/purchaseOrderLiquidationPaymentFixedAsset.xhtml">
@@ -943,6 +945,13 @@
                            immediate="true"
                            action="#{fixedAssetAdvancePaymentAction.select(purchaseOrderPaymentItem)}"
                            rendered="#{not isEnabledToRemake}"/>
+
+            <h:commandLink action="#{warehousePurchaseOrderAction.generateVoucherReport(purchaseOrderPaymentItem)}"
+                           immediate="true">
+                <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                title="#{messages['WarehouseVoucher.button.generateDocument']}"/>
+            </h:commandLink>
+
         </rich:column>
     </rich:dataTable>
     <app:dataScroller id="purchaseOrderPaymentDataScroller"
