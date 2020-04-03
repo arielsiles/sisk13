@@ -972,12 +972,6 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
         Voucher voucher = voucherAccoutingService.getVoucher(purchaseOrderPayment.getIdtmpenc());
         List<VoucherDetail> voucherDetails = voucherAccoutingService.getVoucherDetailList(voucher);
 
-        System.out.println("==> " + voucher.getTransactionNumber());
-        System.out.println("==> " + voucher.getVoucherDetailList().size());
-
-        System.out.println("----> generateVoucherReport : " + purchaseOrderPayment.getDescription());
-        System.out.println("----> generateVoucherReport : " + purchaseOrderPayment.getVoucher());
-
         voucherCreateAction.setVoucher(voucher);
         voucherCreateAction.setVoucherDetails(voucherDetails);
         voucherCreateAction.generateReport(voucher);

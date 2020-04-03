@@ -851,11 +851,6 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
 
         BigDecimal currentBalanceAmount = warehousePurchaseOrderAction.getCurrentBalanceAmount();
         liquidationPaymentAction.computePayment(currentBalanceAmount);
-
-        System.out.println("----------> AF purchaseOrder: " + purchaseOrder);
-        System.out.println("----------> AF purchaseOrder.getId(): " + purchaseOrder.getId());
-        System.out.println("----------> AF currentBalanceAmount: " + currentBalanceAmount);
-
     }
 
 }
