@@ -315,8 +315,10 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 fixedAsset.setLastBsSusRate(fixedAsset.getBsSusRate());
                 fixedAsset.setLastBsUfvRate(fixedAsset.getBsUfvRate());
                 //fixedAsset.setCostCenter(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter());
-                fixedAsset.setCostCenter(purchaseOrder.getCostCenter());
-                fixedAsset.setCostCenterCode(purchaseOrder.getCostCenter().getCode());
+                System.out.println("===========> purchaseOrder.getCostCenterCode(): " + purchaseOrder.getCostCenterCode());
+                //fixedAsset.setCostCenter(purchaseOrder.getCostCenter());
+                fixedAsset.setCostCenterCode(Constants.DEFAULT_COST_CENTER_PRODUCTION);
+                System.out.println("===========> fixedAsset.getCostCenterCode(): " + fixedAsset.getCostCenterCode());
                 //fixedAsset.setCostCenterCode(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter().getCode());
                 fixedAsset.setBusinessUnit(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getExecutorUnit());
                 fixedAsset.setDepreciationRate(fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getDepreciationRate());

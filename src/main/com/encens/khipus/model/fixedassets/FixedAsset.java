@@ -168,15 +168,14 @@ public class FixedAsset implements BaseModel {
     @Column(name = "desecho", precision = 12, scale = 2)
     private BigDecimal rubbish;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
             @JoinColumn(name = "cod_cc", referencedColumnName = "COD_CC", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "cod_cc", length = 6)
-    @Length(max = 6)
+    @Column(name = "cod_cc")
     private String costCenterCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

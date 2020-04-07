@@ -43,13 +43,8 @@ public class FixedAssetMonthProcessServiceBean extends GenericServiceBean implem
 
     public boolean isDateAfterFixedAssetMothProcessInitDate(Date date) {
         FinancesModule financesModule = getFinancesModule(FixedAssetDefaultConstants.getFixedAssetModulePK());
-
         Date firstDayOfCurrentProcessMonth = financesModule.getDate();
-        System.out.println("----- DATE AFTER ------> firstDayOfCurrentProcessMonth: " + firstDayOfCurrentProcessMonth);
-        System.out.println("----- DATE AFTER ------> firstDayOfCurrentProcessMonth.after: " + firstDayOfCurrentProcessMonth.after(date));
-        //return firstDayOfCurrentProcessMonth.after(date);
-
-        return true;
+        return firstDayOfCurrentProcessMonth.after(date);
     }
 
 

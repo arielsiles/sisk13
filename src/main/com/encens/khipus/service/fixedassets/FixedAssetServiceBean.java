@@ -887,7 +887,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                             ),
                             FinancesCurrencyType.P, Constants.BASE_CURRENCY_EXCHANGE_RATE));
 
-            voucherService.create(voucherForGeneration);
+            //voucherService.create(voucherForGeneration);
+            voucherAccoutingService.saveVoucher(voucherForGeneration);
             fixedAssetMovement.setTransactionNumber(voucherForGeneration.getTransactionNumber());
             getEntityManager().persist(fixedAssetMovement);
             getEntityManager().flush();
@@ -923,14 +924,15 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
         try {
             userTransaction.begin();
             em.joinTransaction();
+            BigDecimal netAmount = BigDecimalUtil.multiply(fixedAssetMovement.getBsAmount(), Constants.VAT_COMPLEMENT);
             fixedAsset.setImprovement(
-                    BigDecimalUtil.sum(fixedAsset.getImprovement(), fixedAssetMovement.getUfvAmount()));
+                    BigDecimalUtil.sum(fixedAsset.getImprovement(), netAmount));
             getEntityManager().merge(fixedAsset);
             getEntityManager().flush();
 
             // Always approved state
             fixedAssetMovement.setState(FixedAssetMovementState.APR);
-            fixedAssetMovement.setCurrency(FinancesCurrencyType.U);
+            fixedAssetMovement.setCurrency(FinancesCurrencyType.P);
             fixedAssetMovement.setCustodian(fixedAsset.getCustodianJobContract().getContract().getEmployee());
             fixedAssetMovement.setCostCenterCode(fixedAsset.getCostCenterCode());
             fixedAssetMovement.setBusinessUnit(fixedAsset.getBusinessUnit());
@@ -954,15 +956,17 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             getEntityManager().flush();
             fixedAssetMovement.setFixedAssetPayment(fixedAssetPayment);
 
+            /* Uncomment, old version
             createFixedAssetAccountVsBankAccountEntry(
                     fixedAsset.getBusinessUnit().getExecutorUnitCode(),
                     fixedAsset.getCostCenter().getCode(),
                     fixedAsset.getFixedAssetSubGroup().getImprovementCashAccount(),
                     fixedAssetMovement.getBsAmount(),
-                    fixedAssetPayment, fixedAssetMovement);
+                    fixedAssetPayment, fixedAssetMovement);*/
 
 
             Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
+            voucherForGeneration.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
             voucherForGeneration.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
             voucherForGeneration.addVoucherDetail(
                     VoucherDetailBuilder.newDebitVoucherDetail(
@@ -971,14 +975,26 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                             fixedAssetMovement.getBsAmount(),
                             FinancesCurrencyType.P, BigDecimal.ONE)
             );
+
+            CashAccount cashAccount = null;
+            if (PurchaseOrderPaymentType.PAYMENT_BANK_ACCOUNT.equals(fixedAssetPayment.getPaymentType())) {
+                cashAccount = fixedAssetPayment.getBankAccount().getCashAccount();
+            }
+            if (PurchaseOrderPaymentType.PAYMENT_CASHBOX.equals(fixedAssetPayment.getPaymentType())) {
+                cashAccount = fixedAssetPayment.getCashBoxCashAccount();
+            }
+
             voucherForGeneration.addVoucherDetail(
                     VoucherDetailBuilder.newCreditVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
-                            fixedAsset.getFixedAssetSubGroup().getImprovementCashAccount(),
+                            //fixedAsset.getFixedAssetSubGroup().getImprovementCashAccount(),
+                            cashAccount,
                             fixedAssetMovement.getBsAmount(),
                             FinancesCurrencyType.P, BigDecimal.ONE)
             );
-            voucherService.create(voucherForGeneration);
+            //voucherService.create(voucherForGeneration);
+            voucherAccoutingService.saveVoucher(voucherForGeneration);
+
             fixedAssetMovement.setTransactionNumber(voucherForGeneration.getTransactionNumber());
             fixedAssetMovement.setState(FixedAssetMovementState.APR);
 
@@ -1431,7 +1447,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
                         companyConfiguration.getFixedAssetInTransitAccount(),
                         fixedAsset.getBsOriginalValue(), FinancesCurrencyType.P, BigDecimal.ONE));
-        voucherService.create(voucherForGeneration);
+        //voucherService.create(voucherForGeneration);
+        voucherAccoutingService.saveVoucher(voucherForGeneration);
 
         return voucherForGeneration;
     }
