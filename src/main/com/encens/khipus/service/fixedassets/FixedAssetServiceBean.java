@@ -824,6 +824,8 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             // Always approved state
             fixedAssetMovement.setState(FixedAssetMovementState.APR);
             fixedAssetMovement.setMovementNumber(fixedAssetMovementService.getNextMovementNumberByFixedAsset(fixedAsset));
+
+            /* Old version
             fixedAssetMovement.setUfvAmount(
                     BigDecimalUtil.sum(fixedAsset.getImprovement(),
                             BigDecimalUtil.subtract(
@@ -831,15 +833,18 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                                     fixedAsset.getAcumulatedDepreciation()
                             )
                     )
-            );
+            );*/
+
             /* It is necessary to compute each movement because they may have different rates, because when a improvement is registered
              * its lastMonthBsSusRate and lastMonthBsUfvRate are the rates given by the date retrieved from the ARGCTC table */
             BigDecimal bsImprovement = BigDecimal.ZERO;
             List<FixedAssetMovement> fixedAssetMovementList =
                     fixedAssetMovementService.findFixedAssetMovementListByFixedAssetByMovementTypeAndState(fixedAsset, FixedAssetMovementTypeEnum.MEJ, FixedAssetMovementState.APR);
+            /* Old version
             for (FixedAssetMovement fixedAssetMovementAux : fixedAssetMovementList) {
                 bsImprovement = BigDecimalUtil.multiply(fixedAssetMovementAux.getUfvAmount(), fixedAssetMovementAux.getLastMonthBsUfvRate());
             }
+
             BigDecimal bsAmount =
                     BigDecimalUtil.sum(
                             BigDecimalUtil.multiply(
@@ -850,7 +855,19 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                                     fixedAsset.getLastBsUfvRate()
                             ),
                             bsImprovement
+                    );*/
+
+            bsImprovement = fixedAsset.getImprovement();
+            BigDecimal bsAmount =
+                    BigDecimalUtil.sum(
+                            BigDecimalUtil.subtract(
+                                fixedAsset.getBsOriginalValue(),
+                                fixedAsset.getAcumulatedDepreciation()
+                            ),
+                            bsImprovement
                     );
+            fixedAssetMovement.setUfvAmount(BigDecimalUtil.divide(bsAmount, fixedAsset.getLastBsUfvRate()));
+
             fixedAssetMovement.setBsAmount(bsAmount);
             fixedAssetMovement.setCustodian(fixedAsset.getCustodianJobContract().getContract().getEmployee());
             fixedAssetMovement.setCostCenterCode(fixedAsset.getCostCenterCode());
@@ -873,26 +890,29 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                     VoucherDetailBuilder.newDebitVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
                             fixedAsset.getFixedAssetSubGroup().getAccumulatedDepreciationCashAccount(),
-                            BigDecimalUtil.multiply(fixedAsset.getAcumulatedDepreciation(), fixedAsset.getLastBsUfvRate()),
+                            //BigDecimalUtil.multiply(fixedAsset.getAcumulatedDepreciation(), fixedAsset.getLastBsUfvRate()),
+                            fixedAsset.getAcumulatedDepreciation(),
                             FinancesCurrencyType.P, Constants.BASE_CURRENCY_EXCHANGE_RATE));
             voucherForGeneration.addVoucherDetail(
                     VoucherDetailBuilder.newCreditVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
                             fixedAsset.getFixedAssetSubGroup().getOriginalValueCashAccount(),
                             BigDecimalUtil.sum(
-                                    BigDecimalUtil.multiply(fixedAsset.getLastBsUfvRate(),
-                                            fixedAsset.getUfvOriginalValue()
-                                    ),
+                                    //BigDecimalUtil.multiply(fixedAsset.getLastBsUfvRate(),fixedAsset.getUfvOriginalValue()),
+                                    fixedAsset.getBsOriginalValue(),
                                     bsImprovement
                             ),
                             FinancesCurrencyType.P, Constants.BASE_CURRENCY_EXCHANGE_RATE));
 
             //voucherService.create(voucherForGeneration);
-            voucherAccoutingService.saveVoucher(voucherForGeneration);
-            fixedAssetMovement.setTransactionNumber(voucherForGeneration.getTransactionNumber());
             getEntityManager().persist(fixedAssetMovement);
             getEntityManager().flush();
+            voucherAccoutingService.saveVoucher(voucherForGeneration);
+            fixedAssetMovement.setTransactionNumber(voucherForGeneration.getTransactionNumber());
+            getEntityManager().merge(fixedAssetMovement);
+            getEntityManager().flush();
             userTransaction.commit();
+
         } catch (OptimisticLockException e) {
             try {
                 userTransaction.rollback();

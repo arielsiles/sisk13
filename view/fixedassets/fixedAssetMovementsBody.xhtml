@@ -10,7 +10,7 @@
 <h:form id="fixedAssetBodyMovementsForm">
 
 <s:fragment id="movementsFragment">
-    <!--<div class="buttons">
+    <div class="buttons">
         <h:commandButton id="dischargeButton"
                          action="#{fixedAssetAction.discharge}"
                          rendered="#{s:hasPermission('FIXEDASSETDISCHARGE','VIEW') and fixedAssetAction.showDischargeButton}"
@@ -36,7 +36,8 @@
                          immediate="true"
                          tabindex="41">
         </h:commandButton>
-    </div>-->
+    </div>
+    <!-- Without permission
     <div class="buttons">
         <h:commandButton id="dischargeButton"
                          action="#{fixedAssetAction.discharge}"
@@ -60,7 +61,7 @@
                          immediate="true"
                          tabindex="41">
         </h:commandButton>
-    </div>
+    </div>-->
 </s:fragment>
 
 <rich:panel id="formPanel">
