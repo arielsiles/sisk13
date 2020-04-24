@@ -86,6 +86,7 @@ public final class Constants {
     public static final String RI_VOUCHER_DOCTYPE = "RI";
     public static final String TR_VOUCHER_DOCTYPE = "TR";
     public static final String PD_VOUCHER_DOCTYPE = "PD";
+    public static final String SA_VOUCHER_DOCTYPE = "SA";
 
     public static final BigDecimal BASE_CURRENCY_EXCHANGE_RATE = BigDecimal.ONE;
 

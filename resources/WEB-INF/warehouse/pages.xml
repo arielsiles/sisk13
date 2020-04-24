@@ -676,4 +676,12 @@
         </navigation>
     </page>
 
+    <page view-id="/warehouse/postWarehouseOutput.xhtml" no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">
+        <navigation from-action="#{warehouseVoucherAction.postWarehouseOuput}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml" />
+            </rule>
+        </navigation>
+    </page>
+
 </pages>        

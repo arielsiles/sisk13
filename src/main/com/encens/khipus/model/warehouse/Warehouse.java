@@ -9,6 +9,7 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
@@ -71,6 +72,10 @@ public class Warehouse implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "COD_EST")
     private Branch branch;
+
+    @Column(name = "INV_EGR", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private boolean defaultOutputWarehouse;
 
     public WarehousePK getId() {
         return id;
@@ -162,5 +167,13 @@ public class Warehouse implements BaseModel {
 
     public void setWarehouseCashAccount(CashAccount warehouseCashAccount) {
         this.warehouseCashAccount = warehouseCashAccount;
+    }
+
+    public boolean getDefaultOutputWarehouse() {
+        return defaultOutputWarehouse;
+    }
+
+    public void setDefaultOutputWarehouse(boolean defaultOutputWarehouse) {
+        this.defaultOutputWarehouse = defaultOutputWarehouse;
     }
 }

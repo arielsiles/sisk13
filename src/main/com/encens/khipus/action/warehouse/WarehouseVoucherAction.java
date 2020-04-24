@@ -2,6 +2,7 @@ package com.encens.khipus.action.warehouse;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
@@ -11,13 +12,11 @@ import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
+import com.encens.khipus.service.warehouse.WarehouseVoucherService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -32,8 +31,8 @@ import java.util.List;
 @Scope(ScopeType.CONVERSATION)
 public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
-    private Date startDate;
-    private Date endDate;
+    private Date startDate = new Date();
+    private Date endDate  = new Date();
     private WarehouseDocumentType documentType;
 
     @In
@@ -44,6 +43,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
     private CompanyConfigurationService companyConfigurationService;
     @In
     ApprovalWarehouseVoucherService approvalWarehouseVoucherService;
+    @In
+    WarehouseVoucherService warehouseVoucherService;
 
     @Factory(value = "warehouseVoucher", scope = ScopeType.STATELESS)
     public WarehouseVoucher initWarehouseVoucher() {
@@ -211,16 +212,23 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
-    public void postWarehouseOuput(){
+    @End
+    public String postWarehouseOuput(){
         System.out.println("....Contabilizando Salidas de Almacen....");
-
-        if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.C)){ // Vale de consumo (Egreso)
-
-
-
-
+        List<WarehouseVoucher> warehouseVoucherList = warehouseVoucherService.findWarehouseVoucherNoAccounting(this.documentType, this.startDate, this.endDate);
+        System.out.println("----------> size: " + warehouseVoucherList.size());
+        for (WarehouseVoucher warehouseVoucher : warehouseVoucherList){
+            System.out.println("------------> wv: " + warehouseVoucher.getDocumentCode() + " - " + warehouseVoucher.getDate() + " - " + warehouseVoucher.getVoucher());
         }
 
+        String outcome = Outcome.FAIL;
+        if (warehouseVoucherList.size() > 0)
+            outcome = warehouseVoucherService.createWarehouseVoucherListAccounting(warehouseVoucherList);
+
+        if (outcome.equals(Outcome.SUCCESS))
+            addCreatedMessage();
+
+        return outcome;
     }
 
 

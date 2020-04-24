@@ -14,6 +14,13 @@ delete from arcgms where cuenta = '1110110101';
 -- 
 alter table configuracion add column ctaprovaf varchar(20);
 update configuracion set ctaprovaf = '2429910700';
-
 alter table `com_af_detoc` add column idcontratopuesto bigint(20);
 
+/** 14.04.2020 **/
+insert into _sequence values ('SA', 0);
+update tipodoc t set t.`NOMBRE` = 'SA', T.`DESCRIPCION` = 'SALIDA DE ALMACEN' where t.`IDTIPODOC` = 11;
+
+/** 21.04.2020 **/
+alter table inv_almacenes add column inv_egr int(10);
+update inv_almacenes set inv_egr = 1;
+-- Executed in production

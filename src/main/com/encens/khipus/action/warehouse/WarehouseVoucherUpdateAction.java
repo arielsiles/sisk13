@@ -151,13 +151,8 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
                    /*(warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITH_BILL) || warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITHOUT_BILL)) &&*/
                     (warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CREDIT) ||
                      warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH) ) ) {
-
                 //System.out.println("=======> O.C. con Factura ");
-                //voucher = warehousePurchaseOrderService.liquidatePurchaseOrder(warehouseVoucher.getPurchaseOrder()); **/ // Before testing
                 voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
-
-                //System.out.println("=====================> VOUCHER ID: " + voucher.getId());
-                //System.out.println("=====================> VOUCHER ID: " + voucher.getDetails().size());
 
                 voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
 

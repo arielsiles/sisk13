@@ -1226,8 +1226,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                                 gloss[0]);
                     }
 
-                    Boolean defaultWarehouseOuput = Boolean.FALSE; // TODO TODO TODO
-                    if (MovementDetailType.S.equals(movementDetailType) && defaultWarehouseOuput) {
+                    if (MovementDetailType.S.equals(movementDetailType)) {
                         System.out.println("4--------------------->: createAccountEntryForOutputs(warehouseVoucher...");
                         createAccountEntryForOutputs(warehouseVoucher,
                                 warehouseVoucher.getExecutorUnit(),
@@ -1727,7 +1726,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         String transactionNumber = financesPkGeneratorService.getNextNoTransTmpenc();
         voucherForGeneration.setTransactionNumber(transactionNumber);
-
+        voucherForGeneration.setDocumentType(Constants.SA_VOUCHER_DOCTYPE);
         BigDecimal total = BigDecimal.ZERO;
         for (MovementDetail movementDetail : movementDetails) {
             if (!movementDetail.getProductItem().getControlValued()) {

@@ -123,8 +123,8 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         WarehouseVoucher warehouseVoucher = getEntityManager().find(WarehouseVoucher.class, id);
         getEntityManager().refresh(warehouseVoucher);
 
-        /*if(warehouseVoucher.getWarehouse().getCashAccount() == null)
-            throw new WarehouseAccountCashNotFoundException();*/
+        if(warehouseVoucher.getWarehouse().getCashAccount() == null)
+            throw new WarehouseAccountCashNotFoundException();
 
         InventoryMovement pendantInventoryMovement = getPendantMovement(warehouseVoucher);
         getEntityManager().refresh(pendantInventoryMovement);
@@ -214,12 +214,11 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             warehouseAccountEntryService.createAccountEntryFromCollection(warehouseVoucher, gloss);
         else{
 
-            /** Solo crea el asiento para vales que BO tienen operacion (TP, BA, DEV)**/
+            /** Solo crea el asiento para vales que NO tienen operacion (TP, BA, DEV) **/
             if (warehouseVoucher.getOperation() == null){
-
                 if (!warehouseVoucher.hasPurchaseOrder())
-                    warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
-
+                    if (warehouseVoucher.getWarehouse().getDefaultOutputWarehouse())
+                        warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
             }
 
         }
