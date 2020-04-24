@@ -474,6 +474,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     private Voucher createVoucherByDetailMappings(Map<BusinessUnit, Map<CostCenter, Map<CashAccount, Map<VoucherDetailType, BigDecimal>>>> businessUnitDepreciationVoucherMappings,
                                                   String gloss) {
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
+        voucherForGeneration.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
         voucherForGeneration.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
 
         // add details to depreciation voucher

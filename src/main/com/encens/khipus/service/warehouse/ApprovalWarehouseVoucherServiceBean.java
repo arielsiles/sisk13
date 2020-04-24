@@ -217,7 +217,7 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             /** Solo crea el asiento para vales que NO tienen operacion (TP, BA, DEV) **/
             if (warehouseVoucher.getOperation() == null){
                 if (!warehouseVoucher.hasPurchaseOrder())
-                    if (warehouseVoucher.getWarehouse().getDefaultOutputWarehouse())
+                    //if (warehouseVoucher.getWarehouse().getDefaultOutputWarehouse())
                         warehouseAccountEntryService.createAccountEntry(warehouseVoucher, gloss);
             }
 

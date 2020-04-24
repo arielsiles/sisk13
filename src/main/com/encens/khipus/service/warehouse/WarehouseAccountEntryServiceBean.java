@@ -1228,10 +1228,11 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
                     if (MovementDetailType.S.equals(movementDetailType)) {
                         System.out.println("4--------------------->: createAccountEntryForOutputs(warehouseVoucher...");
-                        createAccountEntryForOutputs(warehouseVoucher,
-                                warehouseVoucher.getExecutorUnit(),
-                                warehouseVoucher.getCostCenterCode(),
-                                gloss[0]);
+                        if (warehouseVoucher.getWarehouse().getDefaultOutputWarehouse())
+                            createAccountEntryForOutputs(warehouseVoucher,
+                                    warehouseVoucher.getExecutorUnit(),
+                                    warehouseVoucher.getCostCenterCode(),
+                                    gloss[0]);
                     }
                 }
             }
@@ -1446,6 +1447,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         BigDecimal voucherAmount = movementDetailService.sumWarehouseVoucherMovementDetailAmount(warehouseVoucher.getId().getCompanyNumber(), warehouseVoucher.getState(), warehouseVoucher.getId().getTransactionNumber());
 
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.WAREHOUSE_VOUCHER_FORM, gloss);
+        voucherForGeneration.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
         voucherForGeneration.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
 
         //String transactionNumber = financesPkGeneratorService.getNextTmpenc(); Error
@@ -1671,6 +1673,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             FinancesCurrencyNotFoundException,
             FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException {
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.WAREHOUSE_VOUCHER_FORM, gloss);
+        voucherForGeneration.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         List<MovementDetail> movementDetails = movementDetailService.findDetailByVoucherAndType(warehouseVoucher, MovementDetailType.E);
 
