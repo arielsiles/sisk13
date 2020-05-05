@@ -1,6 +1,7 @@
 build/
 dist/
 .idea/
+out/
 .idea/workspace.xml
 *.iml
 build.properties
