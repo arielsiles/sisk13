@@ -45,16 +45,11 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         creditAction.setInstance(credit);
         creditTransactionAction.setDateTransaction(dateTransaction);
         BigDecimal interestToDate = creditTransactionAction.calculateInterest();
-
-        /*Calendar cal = Calendar.getInstance();
-        cal.setTime(credit.getFirstPayment());
-        cal.add(Calendar.MONTH, credit.getTerm()-1);
-        Date expirationDate = cal.getTime();*/
-
         Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);
-        //System.out.println("------------------> expiration Date: " + expirationDate);
 
-        BigDecimal quota = credit.getQuota();
+        //BigDecimal quota = credit.getQuota(); /* Revision */
+        BigDecimal quota = creditTransactionAction.calculateCapitalBaseCapital(credit); /* Revision */
+
 
         if (credit.getNumberQuota() == 1)
             quota = BigDecimal.ZERO;
@@ -63,7 +58,6 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
 
         //initialize group values
         this.setVariableValue("interestToDateVar", interestToDate);
-        //this.setVariableValue("expirationDateVar", expirationDate);
         this.setVariableValue("expiredDaysVar", expiredDays);
         this.setVariableValue("quotaVar", quota);
 
