@@ -95,7 +95,7 @@
 
 <div class="buttons">
     <s:button value="#{messages['Voucher.purchaseBook.generateBook']}"
-              view="/accounting/salesBookReport.xhtml"
+              view="/accounting/saleBookReport.xhtml"
               styleClass="button"
               propagation="begin"/>
 </div>
@@ -105,7 +105,7 @@
                 var="movementItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="8%, 10%, 10%, 10%, 35%, 10%, 10%, 7%">
+                columnsWidth="8%, 10%, 10%, 10%, 45%, 10%, 7%">
     <f:facet name="header">
         <rich:columnGroup>
             <rich:column>
@@ -128,7 +128,7 @@
 
             <rich:column>#{messages['Voucher.salesBook.state']}</rich:column>
 
-            <rich:column>#{messages['Voucher.documentNumber']}</rich:column>
+            <!--<rich:column>#{messages['Voucher.documentNumber']}</rich:column>-->
 
             <rich:column>#{messages['Voucher.purchaseBook.amount']}</rich:column>
 
@@ -153,24 +153,16 @@
     <rich:column>
         <h:outputText value="#{movementItem.name}"/>
     </rich:column>
-    <rich:column>
+    <rich:column styleClass="center">
         <h:outputText value="#{movementItem.state}"/>
     </rich:column>
-
-    <rich:column styleClass="center"> </rich:column>
 
     <rich:column styleClass="right">
         <h:outputText value="#{movementItem.amount}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
     </rich:column>
-    <rich:column styleClass="center">
-        <h:commandLink value="#{messages['Common.select']}"
-                       immediate="true"
-                       action="#{purchaseDocumentAction.selectPurchaseDocument(purchaseDocumentItem)}">
-            <s:conversationPropagation value="none"/>
-        </h:commandLink>
-    </rich:column>
+    <rich:column styleClass="center"></rich:column>
 </rich:dataTable>
 <app:dataScroller id="dataScroller" for="purchaseDocumentList" dataModel="#{movementDataModel}"/>
 

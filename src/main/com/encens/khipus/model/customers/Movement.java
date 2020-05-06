@@ -71,6 +71,9 @@ public class Movement implements BaseModel {
     @Column(name = "IMPORTE_PARA_DEBITO_FISCAL")
     private BigDecimal amountFiscalDebit;
 
+    @Column(name = "DEBITO_FISCAL")
+    private BigDecimal fiscalDebit;
+
     @Column(name = "CODIGOCONTROL")
     private String controlCode;
 
@@ -261,5 +264,13 @@ public class Movement implements BaseModel {
 
     public void setAuthorizationNumber(String authorizationNumber) {
         this.authorizationNumber = authorizationNumber;
+    }
+
+    public BigDecimal getFiscalDebit() {
+        return fiscalDebit;
+    }
+
+    public void setFiscalDebit(BigDecimal fiscalDebit) {
+        this.fiscalDebit = fiscalDebit;
     }
 }

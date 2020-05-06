@@ -74,7 +74,7 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
         String filterInfo = "";
         if (startDate != null) {
-            filterInfo = filterInfo + MessageUtils.getMessage("Reports.purchaseBookReport.period") + ": " + formatter.format(startDate);
+            filterInfo = filterInfo + MessageUtils.getMessage("Reports.salesBookReport.period") + ": " + formatter.format(startDate);
         }
         if (endDate != null) {
             filterInfo = filterInfo + " - " + formatter.format(endDate);

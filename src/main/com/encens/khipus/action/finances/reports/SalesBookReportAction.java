@@ -6,7 +6,6 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -20,7 +19,6 @@ import java.util.Map;
  */
 @Name("salesBookReportAction")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('SALESBOOKREPORT','VIEW')}")
 public class SalesBookReportAction extends GenericReportAction {
     private Date startDate;
     private Date endDate;
@@ -35,29 +33,32 @@ public class SalesBookReportAction extends GenericReportAction {
     @Override
     protected String getEjbql() {
         return "select " +
-                "salesBook.nit, " +
-                "salesBook.socialName, " +
-                "salesBook.invoiceNumber, " +
-                "salesBook.authorizationNumber, " +
-                "salesBook.date, " +
-                "salesBook.amount, " +
-                "salesBook.ice, " +
-                "salesBook.exempt, " +
-                "salesBook.netAmount, " +
-                "salesBook.tax, " +
-                "salesBook.status, " +
-                "salesBook.controlCode " +
-                "from SalesBook salesBook ";
+                "movement.date, " +
+                "movement.number, " +
+                "movement.authorizationNumber, " +
+                "movement.state, " +
+                "movement.nit, " +
+                "movement.name, " +
+                "movement.amount, " +
+                "movement.amountIce, " +
+                "movement.exemptExport, " +
+                "movement.taxedSalesZero, " +
+                "movement.subtotal, " +
+                "movement.discount, " +
+                "movement.amountFiscalDebit, " +
+                "movement.fiscalDebit, " +
+                "movement.controlCode " +
+                "from Movement movement ";
     }
 
     @Create
     public void init() {
         restrictions = new String[]{
-                "salesBook.date >= #{salesBookReportAction.startDate}",
-                "salesBook.date <= #{salesBookReportAction.endDate}"
+                "movement.date >= #{salesBookReportAction.startDate}",
+                "movement.date <= #{salesBookReportAction.endDate}"
         };
 
-        sortProperty = "salesBook.date";
+        sortProperty = "movement.date";
     }
 
     private Map readReportParamsInfo() {
@@ -66,10 +67,10 @@ public class SalesBookReportAction extends GenericReportAction {
 
         String filterInfo = "";
         if (startDate != null) {
-            filterInfo = filterInfo + MessageUtils.getMessage("Reports.salesBookReport.dateFrom") + ":" + formatter.format(startDate);
+            filterInfo = filterInfo + MessageUtils.getMessage("Reports.salesBookReport.period") + ": " + formatter.format(startDate);
         }
         if (endDate != null) {
-            filterInfo = filterInfo + " " + MessageUtils.getMessage("Reports.salesBookReport.dateTo") + ":" + formatter.format(endDate);
+            filterInfo = filterInfo + " - " + formatter.format(endDate);
         }
 
         paramMap.put("filterInfoParam", filterInfo);
