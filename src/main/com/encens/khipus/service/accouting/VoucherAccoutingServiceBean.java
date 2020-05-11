@@ -1093,7 +1093,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal quantity = (BigDecimal) sale[1];
 
             /** Uncomment for test **/
-            //System.out.println("=============> Create CV for: " + codArt + " - " + quantity);
+            System.out.println("=============> Create CV for: " + codArt + " - " + quantity);
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostVeterinaryProducts.get(codArt);
@@ -1153,7 +1153,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal unitCost = (BigDecimal) purchase[1];
             result.put(codArt, unitCost);
             /** Uncomment for test **/
-            //System.out.println("----> MAP: " + codArt + "\t " + unitCost);
+            System.out.println("----> MAP: " + codArt + "\t " + unitCost);
         }
 
         return result;
