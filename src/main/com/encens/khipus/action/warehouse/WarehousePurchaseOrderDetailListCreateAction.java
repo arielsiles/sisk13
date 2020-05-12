@@ -161,4 +161,13 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
 
         return 1;
     }
+
+    public BigDecimal getTotalAmountGeneral(){
+        BigDecimal result = BigDecimal.ZERO;
+        for (PurchaseOrderDetail purchaseOrderDetail:instances){
+            result = BigDecimalUtil.sum(result, purchaseOrderDetail.getTotalAmount());
+        }
+        return result;
+    }
+
 }

@@ -4,7 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets">
     <h:panelGrid columns="1"
@@ -76,7 +75,7 @@
                             <a4j:support event="onblur"
                                          ajaxSingle="true"
                                          action="#{warehousePurchaseOrderDetailListCreateAction.updateTotalAmount(instance)}"
-                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId"/>
+                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId, totalAmountGralDivId"/>
                         </h:inputText>
                         <h:message for="unitCostInputTextId"
                                    styleClass="errors"
@@ -95,7 +94,7 @@
                             <a4j:support event="onblur"
                                          ajaxSingle="true"
                                          action="#{warehousePurchaseOrderDetailListCreateAction.updateTotalAmount(instance)}"
-                                         reRender="quantityDivId, totalAmountDivId"/>
+                                         reRender="quantityDivId, totalAmountDivId, totalAmountGralDivId"/>
                         </h:inputText>
                         <h:message for="quantityInputTextId"
                                    styleClass="errors"
@@ -114,7 +113,7 @@
                             <a4j:support event="onblur"
                                          ajaxSingle="true"
                                          action="#{warehousePurchaseOrderDetailListCreateAction.updateUnitCost(instance)}"
-                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId"/>
+                                         reRender="unitCostDivId, quantityDivId, totalAmountDivId, totalAmountGralDivId"/>
                         </h:inputText>
                         <h:message for="totalAmountInputTextId"
                                    styleClass="errors"
@@ -132,6 +131,22 @@
                         </a4j:commandLink>
                     </s:div>
                 </rich:column>
+                <f:facet name="footer">
+                    <rich:columnGroup>
+                        <rich:column styleClass="center"></rich:column>
+                        <rich:column styleClass="center"></rich:column>
+                        <rich:column styleClass="center"></rich:column>
+                        <rich:column styleClass="center"></rich:column>
+                        <rich:column styleClass="center">
+                            <s:div id="totalAmountGralDivId">
+                                <h:outputText value="#{warehousePurchaseOrderDetailListCreateAction.totalAmountGeneral}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                </h:outputText>
+                            </s:div>
+                        </rich:column>
+                        <rich:column styleClass="center"></rich:column>
+                    </rich:columnGroup>
+                </f:facet>
             </rich:dataTable>
         </s:div>
     </h:panelGrid>

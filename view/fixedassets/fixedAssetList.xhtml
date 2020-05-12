@@ -25,7 +25,7 @@
 <s:div>
     <s:decorate id="dateProcess" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['FixedAsset.monthProcess']}</ui:define>
-        <h:outputText value="#{fixedAssetAction.monthProcess}">
+        <h:outputText value="#{fixedAssetAction.monthProcessLiteral}">
             <f:convertDateTime pattern="#{messages['patterns.date']}"
                                timeZone="#{sessionUser.timeZone}"
                                type="date"/>
