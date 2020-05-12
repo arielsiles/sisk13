@@ -276,7 +276,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     }
 
     @End
-    public void depreciate(List<Integer> result, String gloss)
+    public void depreciate(List<Integer> result, String gloss, String documentType)
             throws FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException, OutOfDateException,
             ConcurrencyException, EntryDuplicatedException, ThereIsNoActualFixedAssetException, CompanyConfigurationNotFoundException {
 
@@ -418,6 +418,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             // create the vouchers for depreciation
             if (businessUnitDepreciationVoucherMappings.size() > 0) {
                 Voucher depreciationVoucher = createVoucherByDetailMappings(businessUnitDepreciationVoucherMappings, gloss + " al " + DateUtils.format(lastDayOfCurrentProcessMonth, "dd/MM/yyyy"));
+                depreciationVoucher.setDocumentType(documentType);
                 //voucherService.create(depreciationVoucher);
                 voucherAccoutingService.saveVoucher(depreciationVoucher);
             }
@@ -474,7 +475,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
     private Voucher createVoucherByDetailMappings(Map<BusinessUnit, Map<CostCenter, Map<CashAccount, Map<VoucherDetailType, BigDecimal>>>> businessUnitDepreciationVoucherMappings,
                                                   String gloss) {
         Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
-        voucherForGeneration.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
+        //voucherForGeneration.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
         voucherForGeneration.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
 
         // add details to depreciation voucher

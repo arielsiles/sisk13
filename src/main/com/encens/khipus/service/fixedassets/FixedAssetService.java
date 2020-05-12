@@ -29,7 +29,7 @@ import java.util.List;
 @Local
 public interface FixedAssetService extends GenericService {
 
-    void depreciate(List<Integer> result, String gloss) throws FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException,
+    void depreciate(List<Integer> result, String gloss, String documentType) throws FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException,
             OutOfDateException, ConcurrencyException, EntryDuplicatedException, ThereIsNoActualFixedAssetException, CompanyConfigurationNotFoundException;
 
     void closeActualMonth() throws DateBeforeModuleMonthException, ConcurrencyException, EntryDuplicatedException, ThereAreActualFixedAssetException, ThereAreNotAdjustedFixedAssetException;

@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['FixedAsset.adjustAndDepreciate']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="50%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="fixedAssetsReportForm">
+
+<rich:panel>
+<f:facet name="header">
+    #{messages['FixedAsset.adjustAndDepreciate']}
+</f:facet>
+    <s:decorate id="dateProcess" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAsset.monthProcess']}</ui:define>
+        <h:outputText value="#{fixedAssetAction.monthProcessLiteral}" />
+    </s:decorate>
+
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAsset.documentType']}</ui:define>
+        <h:selectOneMenu id="documentType"
+                         value="#{fixedAssetAction.documentType}"
+                         styleClass="input"
+                         required="true">
+            <s:selectItems value="#{voucherDocumentTypeList}"
+                           var="element"
+                           label="#{element.fullName}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+</rich:panel>
+
+
+<div class="buttons">
+
+    <h:commandButton value="#{messages['FixedAsset.adjustAndDepreciate']}"
+                     action="#{fixedAssetAction.depreciateAllFixedAssets}"
+                     styleClass="button"
+                     rendered="#{s:hasPermission('DEPRECIATEFIXEDASSET','VIEW')}"/>
+
+    <h:commandButton action="#{fixedAssetAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+
+</div>
+</h:form>
+
+</ui:define>
+</ui:composition>
+
+

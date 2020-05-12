@@ -4,7 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
@@ -19,37 +18,9 @@
         <h:commandButton action="#{cashSaleAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"/>
     </div>
-    <!--<div class="buttons">
-        <h:commandButton action="#{bankAction.create}" value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{!bankAction.managed and s:hasPermission('BANKENTITY','CREATE')}"
-                         id="createButtonId">
-            <s:defaultAction/>
-        </h:commandButton>
-        <h:commandButton id="updateButtonId" action="#{bankAction.update}" value="#{messages['Common.save']}"
-                         styleClass="button"
-                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','UPDATE')}">
-            <s:defaultAction/>
-        </h:commandButton>
-        <h:commandButton value="#{messages['Common.delete']}"
-                         styleClass="button"
-                         rendered="#{bankAction.managed and s:hasPermission('BANKENTITY','DELETE')}">
-            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
-                                   operation="show"/>
-        </h:commandButton>
-        <h:commandButton action="#{bankAction.cancel}" value="#{messages['Common.cancel']}"
-                         styleClass="button" immediate="true"/>
-    </div>-->
 
     <rich:panel id="formPanel">
         <f:facet name="header">#{messages['CashSale.transferCash']}</f:facet>
-
-
-        <!--<s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['CashSale.transfer.gloss']}</ui:define>
-            <h:inputText id="name" value="#{cashSaleAction.gloss}" styleClass="inputLarge400" required="true" tabindex="1"/>
-        </s:decorate>-->
-
         <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['CashSale.transfer.gloss']}</ui:define>
             <h:inputTextarea id="gloss"
@@ -109,13 +80,6 @@
                          value="#{messages['CashSale.generateTransfer']}"
                          styleClass="button" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}" />
         </div>
-
-        <!--<s:decorate id="transferField" template="/include/inputField.xhtml" styleClass="formRow">
-            <h:commandButton value="#{messages['CashSale.generateTransfer']}"
-                             styleClass="button">
-                <rich:componentControl for="generateTransferConfirmation" event="onclick" disableDefault="true" operation="show"/>
-            </h:commandButton>
-        </s:decorate>-->
 
     </rich:panel>
 

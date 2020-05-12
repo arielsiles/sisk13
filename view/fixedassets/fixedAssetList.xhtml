@@ -255,13 +255,19 @@
 
 <div class="buttons">
 
+    <!--
     <s:button value="#{messages['FixedAsset.adjustAndDepreciate']}"
               action="#{fixedAssetAction.depreciateAllFixedAssets}"
               rendered="#{s:hasPermission('DEPRECIATEFIXEDASSET','VIEW')}"
               styleClass="button"
               propagation="begin"
               tabindex="19">
-    </s:button>
+    </s:button>-->
+
+    <s:button value="#{messages['FixedAsset.adjustAndDepreciate']}"
+              view="/fixedassets/depreciateFixedAssets.xhtml" styleClass="button"
+              propagation="begin" />
+
     <s:button value="#{messages['FixedAsset.closeMonth']}"
               action="#{fixedAssetAction.closeFixedAssetMonth}"
               rendered="#{s:hasPermission('FIXEDASSETCLOSEMODULEMONTH','VIEW')}"

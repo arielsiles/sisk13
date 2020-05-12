@@ -691,4 +691,13 @@
             </rule>
         </navigation>
     </page>
+
+    <page view-id="/fixedassets/depreciateFixedAssets.xhtml" no-conversation-view-id="/fixedassets/fixedAssetList.xhtml">
+        <navigation from-action="#{fixedAssetAction.cancel}">
+            <rule>
+                <redirect view-id="/fixedassets/fixedAssetList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

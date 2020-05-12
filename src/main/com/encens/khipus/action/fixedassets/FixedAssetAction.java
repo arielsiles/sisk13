@@ -10,6 +10,7 @@ import com.encens.khipus.exception.fixedassets.*;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.finances.CostCenter;
@@ -20,10 +21,7 @@ import com.encens.khipus.model.fixedassets.*;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.fixedassets.FixedAssetMonthProcessService;
 import com.encens.khipus.service.fixedassets.FixedAssetService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.BusinessUnitValidatorUtil;
-import com.encens.khipus.util.FileUtil;
-import com.encens.khipus.util.ValidatorUtil;
+import com.encens.khipus.util.*;
 import com.encens.khipus.util.barcode.BarcodeData;
 import com.encens.khipus.util.barcode.BarcodeRenderer;
 import com.encens.khipus.util.fixedassets.FixedAssetDefaultConstants;
@@ -93,6 +91,8 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
     private Integer monthsGuaranty;
 
     private Boolean payNowConditions;
+
+    private DocType documentType;
 
     @Create
     @SuppressWarnings({"UnusedDeclaration"})
@@ -184,7 +184,7 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
         result.add(depreciated);
         result.add(adjusted);
         try {
-            fixedAssetService.depreciate(result, messages.get("FixedAsset.depreciationGloss"));
+            fixedAssetService.depreciate(result, messages.get("FixedAsset.depreciationGloss"), documentType.getName());
         } catch (CompanyConfigurationNotFoundException e) {
             addCompanyConfigurationNotFoundErrorMessage();
             return Outcome.REDISPLAY;
@@ -1003,5 +1003,16 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
         return financesModule.getDate();
     }
 
+    public String getMonthProcessLiteral(){
+        FinancesModule financesModule = fixedAssetMonthProcessService.getFinancesModule(FixedAssetDefaultConstants.getFixedAssetModulePK());
+        return  DateUtils.getMonthLiteral(financesModule.getDate());
+    }
 
+    public DocType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocType documentType) {
+        this.documentType = documentType;
+    }
 }
