@@ -30,303 +30,368 @@
 
 <h:form id="warehouseVoucherForm">
 
-<!--<div class="buttons">
+    <rich:panel id="formPanel">
+    <f:facet name="header">V E N T A S</f:facet>
+        <h:panelGrid columns="3" border="0" width="100%" styleClass="left">
+            <s:div id="part1">
+                <s:decorate id="cashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <!--<ui:param name="required" value="#{true}"/>-->
+                    <ui:define name="label"><h:outputText value="Producto:"/></ui:define>
+                    <h:inputText styleClass="input250" />
+                    <!--<app:suggestionBox id="payableAccountSuggestionBox"
+                                       value="#{providerEntity.payableAccountFullName}"
+                                       entity="#{providerEntity.payableAccount}"
+                                       styleClass="inputLarge"
+                                       entityAlias="payableAccount"
+                                       searchField="fullName"
+                                       searchCompoundFields="payableAccount.accountCode,payableAccount.description"
+                                       searchCompoundCondition="concat(concat(payableAccount.accountCode,' - '),payableAccount.description)"
+                                       updateFocusOnSelect="true">
+                        <ui:define name="columns">
+                            <h:column>
+                                <h:outputText value="#{entityItem.fullName}"/>
+                            </h:column>
+                        </ui:define>
+                        <ui:define name="restrictions">
+                            <app:restriction condition="payableAccount.active = #{true}"/>
+                            <app:restriction condition="payableAccount.movementAccount = #{true}"/>
+                        </ui:define>
+                    </app:suggestionBox>-->
 
-    <h:commandButton id="createButtonId"
-                     action="#{voucherCreateAction.create}"
-                     value="#{messages['Common.save']}"
-                     rendered="#{s:hasPermission('VOUCHER','CREATE')}"
-                     styleClass="button">
-        <s:defaultAction/>
-    </h:commandButton>
+                    <a4j:commandButton action="#{voucherAction.search}"
+                                       reRender="voucherSearchPanelId, voucherList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}"
+                                       id="searchButtonId"
+                                       tabindex="6">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
 
-    <h:commandButton action="#{voucherCreateAction.cancel}"
-                     value="#{messages['Common.cancel']}"
-                     styleClass="button"
-                     immediate="true"/>
-</div>-->
+                </s:decorate>
 
-<rich:panel id="formPanel">
-<f:facet name="header">CAJA</f:facet>
+            </s:div>
 
-<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
+            <s:div id="part2">
+                <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label"><h:outputText value="#{messages['Client.client']}"/></ui:define>
+                    <app:selectPopUp id="clientFieldId"
+                                     required="false"
+                                     textValue="#{voucherCreateAction.client.fullName}"
+                                     value="#{voucherCreateAction.client}"
+                                     clearAction="voucherCreateAction.clearClient()"
+                                     searchModalPanel="clientListModalPanel"
+                                     dataModel="#{clientDataModel}"
+                                     reRender="clientField"
+                                     tabindex="12">
+                    </app:selectPopUp>
+                </s:decorate>
+            </s:div>
 
-    <s:div id="leftSidePanel">
-        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Voucher.date']}</ui:define>
-            <rich:calendar value="#{voucherCreateAction.voucher.date}"
-                           popup="true"
-                           datePattern="#{messages['patterns.date']}"
-                           styleClass="input"
-                           enableManualInput="true"
-                           tabindex="1"
-                           required="true">
-            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-            </rich:calendar>
-        </s:decorate>
+            <s:div id="part3">
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <!--<ui:define name="label">#{messages['Voucher.date']}</ui:define>-->
+                    <rich:calendar value="#{voucherCreateAction.voucher.date}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="1"
+                                   required="false">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+            </s:div>
 
-        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
-            <h:selectOneMenu id="documentType"
-                             value="#{voucherCreateAction.docType}"
-                             styleClass="input"
-                             required="true">
-                <s:selectItems value="#{selectList}"
-                               var="element"
-                               label="#{element.fullName}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <a4j:support event="onchange"
-                             action="#{voucherCreateAction.cleanMainFields()}"
-                             reRender="#{mainComponentIdsToRerender}"
-                             ajaxSingle="true"/>
-                <s:convertEntity/>
+        </h:panelGrid>
+
+        <h:panelGrid columns="14">
+            <h:selectOneMenu>
+                <f:selectItem itemValue="0" itemLabel="Normal" />
+                <f:selectItem itemValue="1" itemLabel="Degustacion" />
+                <f:selectItem itemValue="2" itemLabel="Refrigerio" />
+                <f:selectItem itemValue="3" itemLabel="Descontar Productores" />
+                <f:selectItem itemValue="4" itemLabel="Descontar Veterinarios " />
             </h:selectOneMenu>
-        </s:decorate>
 
-        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
-            <h:inputText  id="description"
-                             value="#{voucherCreateAction.voucher.gloss}"
-                             required="true"
-                             styleClass="inputLarge"
-                             tabindex="3">
-                <f:validateLength maximum="500"/>
-            </h:inputText>
-        </s:decorate>
+            <h:commandButton value="LUHT 950" styleClass="button" />
+            <h:commandButton value="CHI 1L" styleClass="button" />
+            <h:commandButton value="CHI 160" styleClass="button" />
+            <h:commandButton value="YFR 80" styleClass="button" />
+            <h:commandButton value="YFR 2L" styleClass="button" />
+            <h:commandButton value="YDU 2L" styleClass="button" />
+            <h:commandButton value="YCO 2L" styleClass="button" />
+            <h:commandButton value="YMO 2L" styleClass="button" />
+            <h:commandButton value="YCH 2L" styleClass="button" />
+            <h:commandButton value="ILDU 120" styleClass="button" />
+            <h:commandButton value="ILMA 120" styleClass="button" />
+            <h:commandButton value="ILNA 120" styleClass="button" />
+            <h:commandButton value="ILPI 120" styleClass="button" />
 
-    </s:div>
+        </h:panelGrid>
 
-    <s:div id="rightSidePanel">
+        <h:panelGrid columns="4">
 
-        <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
-            <app:selectPopUp id="productItemAccount"
-                             required="false"
-                             textValue="#{voucherCreateAction.account.fullName}"
-                             value="#{voucherCreateAction.account}"
-                             clearAction="voucherCreateAction.clearAccount()"
-                             searchModalPanel="cashAccountListModalPanel"
-                             dataModel="#{cashAccountDataModel}"
-                             reRender="itemAccountField, debitInputField, creditInputField, debitField, creditField"
-                             tabindex="11">
-            </app:selectPopUp>
-        </s:decorate>
+        </h:panelGrid>
+    </rich:panel>
 
-        <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label"><h:outputText value="#{messages['Client.client']}"/></ui:define>
-            <app:selectPopUp id="clientFieldId"
-                             required="false"
-                             textValue="#{voucherCreateAction.client.fullName}"
-                             value="#{voucherCreateAction.client}"
-                             clearAction="voucherCreateAction.clearClient()"
-                             searchModalPanel="clientListModalPanel"
-                             dataModel="#{clientDataModel}"
-                             reRender="clientField"
-                             tabindex="12">
-            </app:selectPopUp>
-        </s:decorate>
+    <div class="buttonsRight">
+        <a4j:commandButton id="addProductItemCommandButton"
+                           action="#{provideSearchDataModel.reset()}"
+                           value="#{messages['PurchaseOrderDetail.button.addProductItem']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('confirmSalesModalPanelModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           reRender="confirmSalesModalPanelModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{provideSearchDataModel}"/>
+            <app:criteriaValue fieldName="providerCode"
+                               value="#{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}"/>
+        </a4j:commandButton>
 
-        <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">
-                <h:outputText value="#{messages['WarehousePurchaseOrder.provider']}"/>
-            </ui:define>
-            <app:selectPopUp id="provider"
-                             required="false"
-                             textValue="#{voucherCreateAction.provider.fullName}"
-                             value="#{voucherCreateAction.provider}"
-                             clearAction="voucherCreateAction.clearProvider()"
-                             searchModalPanel="providerListModalPanel"
-                             dataModel="#{providerDataModel}"
-                             reRender="providerField"
-                             hotKeySelect="alt+3">
-            </app:selectPopUp>
-        </s:decorate>
+        <a4j:commandButton id="chargeButtonId" value="Cobrar"
 
-        <s:decorate id="dataField" template="/include/inputField.xhtml" styleClass="formRow">
-            <span id="debitField">
-            <h:inputText id="debitInputField"
-                         value="#{voucherCreateAction.debit}"
-                         styleClass="inputSmall right"
-                         required="false">
-                <app:realNumberConverter minimum="0"
-                                         pattern="#{messages['patterns.decimalNumber']}"
-                                         forId="debitInputField"/>
-                <a4j:support event="onblur" ajaxSingle="true" reRender="debitInputField"/>
-            </h:inputText>
-            <h:message for="debitInputField" styleClass="errors" style="display:block;" rendered="true"/>
-            </span>
-            <span id="creditField">
-            <h:inputText id="creditInputField"
-                         value="#{voucherCreateAction.credit}"
-                         styleClass="inputSmall right"
-                         required="false">
-                <app:realNumberConverter minimum="0"
-                                         pattern="#{messages['patterns.decimalNumber']}"
-                                         forId="creditInputField"/>
-                <a4j:support event="onblur" ajaxSingle="true" reRender="creditInputField"/>
-            </h:inputText>
-            <h:message for="creditInputField" styleClass="errors" style="display:block;" rendered="true"/>
-            </span>
-            <a4j:commandButton id="newRegisterId"
-                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
-                               value=" + "
-                               styleClass="button"
-                               immediate="true"
-                               reRender="movementDetailListPanel,dataVoucherFields,itemAccountField,clientField, providerField, debitInputField, creditInputField">
-            </a4j:commandButton>
-        </s:decorate>
-    </s:div>
+                           styleClass="button"
+                           tabindex="6">
+            <s:defaultAction/>
+        </a4j:commandButton>
+        <a4j:commandButton id="registerButtonId" value="Registrar"
+                           styleClass="button"
+                           tabindex="6">
+            <s:defaultAction/>
+        </a4j:commandButton>
+    </div>
 
-</h:panelGrid>
+    <rich:panel id="panelProdutcs">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+            <thead class="rich-table-thead">
+            <tr class="rich-table-header">
+                <th class="rich-table-headercell" width="5%">Cod</th>
+                <th class="rich-table-headercell" width="30%">Descripción</th>
+                <th class="rich-table-headercell" width="10%">Precio</th>
+                <th class="rich-table-headercell" width="10%">Cantidad</th>
+                <th class="rich-table-headercell" width="10%">Importe</th>
+                <th class="rich-table-headercell" width="10%">Existencia</th>
+                <th class="rich-table-headercell" width="10%">Promo</th>
+                <th class="rich-table-headercell" width="10%">Repos</th>
+                <th class="rich-table-headercell" width="5%">Acción</th>
+            </tr>
+            </thead>
 
-    <rich:spacer height="5" />
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="LECHE NATURAL UHT 950 ML" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="CHICOTRON 1LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT SACHET FRUTILLA 80ML" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT CHIRIMOYA 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <!---->
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell" align="center"><h:outputText value="10" /></td>
+                <td class="rich-table-cell"><h:outputText value="YOGURT DURAZNO 2LT" /></td>
+                <td class="rich-table-cell" align="center"><h:outputText value="5.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="100" styleClass="inputSmall" /></td>
+                <td class="rich-table-cell"><h:outputText value="500.00" /></td>
+                <td class="rich-table-cell"><h:outputText value="8.500.00" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="10" styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center"><h:inputText value="5"  styleClass="inputTiny" /></td>
+                <td class="rich-table-cell" align="center">
+                    <a4j:commandLink immediate="true" title="#{messages['Common.remove']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </td>
+            </tr>
+            <tr class="rich-table-row" style="background-color: azure">
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center">15,000.00</td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+                <td class="rich-table-cell" align="center"></td>
+            </tr>
 
-<!--<app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">-->
-    <h:panelGrid columns="1"
-                 width="100%"
-                 cellpadding="0"
-                 cellspacing="0"
-                 border="0">
-        <s:div id="movementDetailListPanel">
-
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
-                <thead class="rich-table-thead">
-                <tr class="rich-table-header">
-                    <th class="rich-table-headercell">Descripcion</th>
-                    <th class="rich-table-headercell">Cantidad</th>
-                    <th class="rich-table-headercell">Monto</th>
-                    <th class="rich-table-headercell">#{messages['Common.action']}</th>
-                </tr>
-                </thead>
-
-                <c:forEach var="voucherDetail" items="#{voucherCreateAction.voucherDetails}" varStatus="row">
-                    <c:set var="debitFieldId" value="debitField_#{row.index}"/>
-                    <c:set var="creditFieldId" value="creditField_#{row.index}"/>
-                    <c:set var="debitInputFieldId" value="debitInputField_#{row.index}"/>
-                    <c:set var="creditInputFieldId" value="creditInputField_#{row.index}"/>
-
-                    <tr class="rich-table-row">
-                        <!--<td class="rich-table-cell"><h:outputText value="#{voucherDetail.cashAccount.accountCode}"/></td>-->
-                        <!--<td class="rich-table-cell"><h:outputText value="#{voucherDetail.cashAccount.description}"/></td>-->
-
-                        <td class="rich-table-cell">
-                            <!--<h:outputText value="#{voucherDetail.cashAccount.fullName}"/>-->
-                            <h:outputText value="#{voucherDetail.fullCashAccount}"/>
-                            <!--<h:outputText value="#{voucherDetail.fullCashAccount}"/>-->
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{debitFieldId}">
-                                <h:inputText id="#{debitInputFieldId}"
-                                             value="#{voucherDetail.debit}"
-                                             styleClass="inputSmall right"
-                                             required="true"
-                                             rendered="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{debitInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="movementDetailListPanel"/>
-                                </h:inputText>
-                                <h:message for="#{debitInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{creditFieldId}">
-                                <h:inputText id="#{creditInputFieldId}"
-                                             value="#{voucherDetail.credit}"
-                                             styleClass="inputSmall right"
-                                             required="true"
-                                             rendered="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{creditInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{creditFieldId}, totalCredit"/>
-                                </h:inputText>
-                                <h:message for="#{creditInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <a4j:commandLink immediate="true"
-                                             title="#{messages['Common.remove']}"
-                                             action="#{voucherCreateAction.removeVoucherDetail(voucherDetail)}"
-                                             ajaxSingle="true"
-                                             reRender="movementDetailListPanel">
-                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                            </a4j:commandLink>
-                        </td>
-                    </tr>
-                </c:forEach>
-
-                <tr class="rich-table-row">
-                    <td class="rich-table-cell center">-</td>
-                    <td class="rich-table-cell center">
-                        <s:div id="totalDebit">
-                            <h:outputText value="#{voucherCreateAction.totalsDebit}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
-                        </s:div>
-                    </td>
-                    <td class="rich-table-cell center">
-                        <s:div id="totalCredit">
-                            <h:outputText value="#{voucherCreateAction.totalsCredit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
-                        </s:div>
-                    </td>
-                    <td class="rich-table-cell center">-</td>
-                </tr>
-            </table>
-        </s:div>
-    </h:panelGrid>
-<!--</app:fieldset>-->
-</rich:panel>
+        </table>
+    </rich:panel>
 
 <div class="buttons"></div>
 </h:form>
 
-<s:div id="cashAccountListModalPanelDiv">
+    <s:div id="clientListModalPanelDiv">
+        <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
+            <ui:param name="containerId" value="clientListModalPanelContainer"/>
+            <ui:param name="dialogId" value="clientListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{voucherCreateAction.setClient(clientItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="clientField"
+                                   oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
 
-    <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-        <ui:param name="hasWarehousePermission" value="true"/>
-        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
-        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
-        <ui:define name="assignButton">
-            <a4j:commandButton id="assignButton"
-                               action="#{voucherCreateAction.setAccount(cashAccountItem)}"
-                               image="/img/active.gif"
-                               styleClass="select-image-middle"
-                               reRender="itemAccountField, debitInputField, creditInputField"
-                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    <s:decorate id="confirmSalesModalPanelModalPanelContainer"
+                template="/customers/confirmSalesModalPanel.xhtml">
+        <ui:param name="containerId" value="confirmSalesModalPanelModalPanelContainer"/>
+        <ui:param name="dialogId" value="confirmSalesModalPanelModalPanel"/>
+        <ui:define name="addButton">
+            <a4j:commandButton id="addButton"
+                               immediate="true"
+                               ajaxSingle="true"
+                               action="#{warehousePurchaseOrderDetailListCreateAction.addProductItems(provideSearchDataModel.selectedProductItems)}"
+                               value="#{messages['Common.add']}"
+                               reRender="purchaseOrderDetailsPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('confirmSalesModalPanelModalPanel');"/>
         </ui:define>
     </s:decorate>
-
-</s:div>
-
-<s:div id="clientListModalPanelDiv">
-    <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
-        <ui:param name="containerId" value="clientListModalPanelContainer"/>
-        <ui:param name="dialogId" value="clientListModalPanel"/>
-        <ui:define name="assignButton">
-            <a4j:commandButton id="assignButton"
-                               action="#{voucherCreateAction.setClient(clientItem)}"
-                               image="/img/active.gif"
-                               styleClass="select-image-middle"
-                               reRender="clientField"
-                               oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
-        </ui:define>
-    </s:decorate>
-</s:div>
-
-<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           title="#{messages['Common.choose']}"
-                           action="#{voucherCreateAction.assignProvider(providerItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image"
-                           reRender="providerField"
-                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
-    </ui:define>
-</s:decorate>
 
 <!---->
 
