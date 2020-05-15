@@ -67,8 +67,11 @@ public class ArticleOrder {
     @Length(max = 6)
     private String codArt;
 
-    @Column(name = "CU", precision = 16, scale = 6)
+    @Column(name = "cu", precision = 16, scale = 6)
     private BigDecimal cu;
+
+    @Column(name = "costo_uni", precision = 16, scale = 6)
+    private BigDecimal unitCost;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -86,7 +89,7 @@ public class ArticleOrder {
     private VentaDirecta ventaDirecta;
 
     @Column(name = "CANTIDAD", nullable = true)
-    private Integer amount;
+    private Integer quantity;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     //@JoinColumn(name = "COD_ALM", nullable = true, updatable = false, insertable = true)
@@ -111,6 +114,9 @@ public class ArticleOrder {
     @Column(name="TIPO")
     private String tipo;
 
+    @Column(name = "importe",nullable = true )
+    private Double amount;
+
 
     public String getCodArt() {
         return codArt;
@@ -120,12 +126,12 @@ public class ArticleOrder {
         this.codArt = codArt;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setQuantity(Integer amount) {
+        this.quantity = amount;
     }
 
     public Warehouse getWarehouse() {
@@ -214,5 +220,21 @@ public class ArticleOrder {
 
     public void setCu(BigDecimal cu) {
         this.cu = cu;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getUnitCost() {
+        return unitCost;
+    }
+
+    public void setUnitCost(BigDecimal unitCost) {
+        this.unitCost = unitCost;
     }
 }

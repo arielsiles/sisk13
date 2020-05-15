@@ -173,7 +173,7 @@
                             <f:facet name="header">
                                 #{messages['SoldProduct.quantity']}
                             </f:facet>
-                            <h:outputText value="#{soldProduct.amount}">
+                            <h:outputText value="#{soldProduct.quantity}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                         </rich:column>

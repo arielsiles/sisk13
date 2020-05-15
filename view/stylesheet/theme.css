@@ -187,6 +187,16 @@ ul {
     font-size: 8pt;
 }
 
+.text12 {
+    font-size: 12pt;
+}
+
+.textBold12Blue {
+    font-size: 12pt;
+    font-weight: bold;
+    color: blue;
+}
+
 /*
 .entry .label {
 

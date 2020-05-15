@@ -250,7 +250,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                 for(ArticulosPromocion articuloCombo :articulosCombo) {
                     try {
 
-                        approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articuloCombo.getCantidad()*articulo.getAmount()),
+                        approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articuloCombo.getCantidad()*articulo.getQuantity()),
                                 warehouse,
                                 articuloCombo.getVentaarticulo().getProductItem(),
                                 costCenter);
@@ -264,7 +264,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
             }else {
                 try {
 
-                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getAmount()),
+                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getQuantity()),
                             warehouse,
                             articulo.getProductItem(),
                             costCenter);
@@ -275,7 +275,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
             }else{
                 try {
 
-                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getAmount()),
+                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getQuantity()),
                             warehouse,
                             articulo.getProductItem(),
                             costCenter);
@@ -326,7 +326,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                 for(ArticulosPromocion articuloCombo :articulosCombo) {
                     try {
 
-                        approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articuloCombo.getCantidad()*articulo.getAmount()),
+                        approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articuloCombo.getCantidad()*articulo.getQuantity()),
                                 warehouse,
                                 articuloCombo.getVentaarticulo().getProductItem(),
                                 costCenter);
@@ -340,7 +340,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
             }else {
                 try {
 
-                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getAmount()),
+                    approvalWarehouseVoucherService.validateOutputQuantity(new BigDecimal(articulo.getQuantity()),
                             warehouse,
                             articulo.getProductItem(),
                             costCenter);
@@ -1076,7 +1076,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                     movementDetailTemp.setWarehouse(warehouse); //revisar
                     movementDetailTemp.setProductItem(articuloCombo.getVentaarticulo().getProductItem());
                     movementDetailTemp.setProductItemAccount(articuloCombo.getVentaarticulo().getProductItem().getProductItemAccount());
-                    movementDetailTemp.setQuantity(new BigDecimal(articuloCombo.getCantidad() * articleOrder.getAmount()));
+                    movementDetailTemp.setQuantity(new BigDecimal(articuloCombo.getCantidad() * articleOrder.getQuantity()));
                     movementDetailTemp.setUnitCost(articuloCombo.getVentaarticulo().getProductItem().getUnitCost());
                     movementDetailTemp.setAmount(null);
                     movementDetailTemp.setExecutorUnit(warehouse.getExecutorUnit());
@@ -1110,7 +1110,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                 movementDetailTemp.setWarehouse(warehouse); //revisar
                 movementDetailTemp.setProductItem(articleOrder.getProductItem());
                 movementDetailTemp.setProductItemAccount(articleOrder.getProductItem().getProductItemAccount());
-                movementDetailTemp.setQuantity(new BigDecimal(articleOrder.getAmount()));
+                movementDetailTemp.setQuantity(new BigDecimal(articleOrder.getQuantity()));
                 movementDetailTemp.setUnitCost(articleOrder.getProductItem().getUnitCost());
                 movementDetailTemp.setAmount(null);
                 movementDetailTemp.setExecutorUnit(warehouse.getExecutorUnit());
@@ -1177,7 +1177,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                         movementDetailTemp.setWarehouse(warehouse); //revisar
                         movementDetailTemp.setProductItem(articuloCombo.getVentaarticulo().getProductItem());
                         movementDetailTemp.setProductItemAccount(articuloCombo.getVentaarticulo().getProductItem().getProductItemAccount());
-                        movementDetailTemp.setQuantity(new BigDecimal(articuloCombo.getCantidad() * articleOrder.getAmount()));
+                        movementDetailTemp.setQuantity(new BigDecimal(articuloCombo.getCantidad() * articleOrder.getQuantity()));
                         movementDetailTemp.setUnitCost(articuloCombo.getVentaarticulo().getProductItem().getUnitCost());
                         movementDetailTemp.setAmount(null);
                         movementDetailTemp.setExecutorUnit(warehouse.getExecutorUnit());
@@ -1221,7 +1221,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
         movementDetailTemp.setWarehouse(warehouse); //revisar
         movementDetailTemp.setProductItem(articleOrder.getProductItem());
         movementDetailTemp.setProductItemAccount(articleOrder.getProductItem().getProductItemAccount());
-        movementDetailTemp.setQuantity(new BigDecimal(articleOrder.getAmount()));
+        movementDetailTemp.setQuantity(new BigDecimal(articleOrder.getQuantity()));
         movementDetailTemp.setUnitCost(articleOrder.getProductItem().getUnitCost());
         movementDetailTemp.setAmount(null);
         movementDetailTemp.setExecutorUnit(warehouse.getExecutorUnit());
