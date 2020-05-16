@@ -15,3 +15,8 @@ alter table tipoventa add foreign key (idcompania) references compania (idcompan
 
 alter table pedidos add column idtipoventa bigint(20) after IDCLIENTE;
 alter table pedidos add foreign key (idtipoventa) references tipoventa (idtipoventa);
+
+/** 15.05.2020 **/
+alter table inv_articulos add column fix int(1) after vendible;
+alter table inv_articulos add column sigla varchar(14) after fix;
+alter table

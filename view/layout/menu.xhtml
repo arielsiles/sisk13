@@ -472,6 +472,13 @@
         s:hasPermission('PREPAREDELIVERY','VIEW') or
         s:hasPermission('APPROVEDALLACCOUNTENTRIES','VIEW')}">
     <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}">
+        <s:link view="/warehouse/productItemList.xhtml"
+                value="#{messages['menu.warehouse.configuration.productItem']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/warehouse/warehousePurchaseOrderList.xhtml"

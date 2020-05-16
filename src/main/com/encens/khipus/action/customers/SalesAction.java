@@ -21,6 +21,12 @@ public class SalesAction {
     private String productItemFullName;
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
+    private BigDecimal moneyReceived = BigDecimal.ZERO;
+    private BigDecimal moneyReturned = BigDecimal.ZERO;
+
+    private Boolean cashSaleCheck;
+    private Boolean creditSaleCheck;
+
     private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
 
@@ -28,6 +34,10 @@ public class SalesAction {
     private ProductItemService productItemService;
 
 
+    public void addProduct(ProductItem productItem){
+        setProductItem(productItem);
+        addProduct();
+    }
 
     public void addProduct(){
         System.out.println("--------> productItemFullName: " + productItemFullName);
@@ -82,6 +92,15 @@ public class SalesAction {
         setProductItemFullName(null);
     }
 
+    public void registerSale(){
+        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
+    }
+
+
+    public List<ProductItem> getBestProductList(){
+        return productItemService.findBestProductList();
+    }
+
     public ProductItem getProductItem() {
         return productItem;
     }
@@ -125,5 +144,37 @@ public class SalesAction {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public BigDecimal getMoneyReceived() {
+        return moneyReceived;
+    }
+
+    public void setMoneyReceived(BigDecimal moneyReceived) {
+        this.moneyReceived = moneyReceived;
+    }
+
+    public BigDecimal getMoneyReturned() {
+        return moneyReturned;
+    }
+
+    public void setMoneyReturned(BigDecimal moneyReturned) {
+        this.moneyReturned = moneyReturned;
+    }
+
+    public Boolean getCashSaleCheck() {
+        return cashSaleCheck;
+    }
+
+    public void setCashSaleCheck(Boolean cashSaleCheck) {
+        this.cashSaleCheck = cashSaleCheck;
+    }
+
+    public Boolean getCreditSaleCheck() {
+        return creditSaleCheck;
+    }
+
+    public void setCreditSaleCheck(Boolean creditSaleCheck) {
+        this.creditSaleCheck = creditSaleCheck;
     }
 }

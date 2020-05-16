@@ -67,4 +67,7 @@ public interface ProductItemService extends GenericService {
     List<InventoryPeriod> getInventoryPeriodInitialList(String warehouseCode, String year);
 
     List<ProductItem> findProductItemList();
+
+    List<ProductItem> findBestProductList();
+
 }

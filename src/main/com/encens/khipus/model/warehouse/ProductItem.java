@@ -7,6 +7,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.production.MeasurementUnit;
 import com.encens.khipus.model.production.OrderMaterial;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -113,6 +114,17 @@ public class ProductItem implements BaseModel {
     @Column(name = "VENDIBLE", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean saleable;
+
+    @Column(name = "fix")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean fixSale = Boolean.FALSE;
+
+    @Column(name = "sigla", nullable = true, length = 14)
+    @Length(max = 14)
+    private String acronym;
+
+    @Column(name = "pos", nullable = true)
+    private Integer position;
 
     @Column(name = "med_pr")
     @Enumerated(EnumType.STRING)
@@ -467,5 +479,29 @@ public class ProductItem implements BaseModel {
 
     public void setBasicQuantity(BigDecimal basicQuantity) {
         this.basicQuantity = basicQuantity;
+    }
+
+    public Boolean getFixSale() {
+        return fixSale;
+    }
+
+    public void setFixSale(Boolean fixSale) {
+        this.fixSale = fixSale;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

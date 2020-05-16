@@ -14,14 +14,14 @@
 
 <ui:param name="bodyAlign" value="center"/>
 <ui:param name="bodyWidth" value="100%"/>
-
+    productInventoryList
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
 
-<h:form id="warehouseVoucherForm">
+<h:form id="salesForm">
 
-    <rich:panel id="formPanel">
+    <rich:panel id="salesPanel">
     <f:facet name="header">V e n t a s</f:facet>
         <h:panelGrid columns="3" border="0" width="100%" styleClass="left">
             <s:div id="part1">
@@ -87,54 +87,71 @@
             </s:div>
 
             <s:div id="part3">
-                <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label"><h:outputText value="#{messages['Client.client']}"/></ui:define>
-                    <app:selectPopUp id="clientFieldId"
-                                     required="false"
-                                     textValue="#{voucherCreateAction.client.fullName}"
-                                     value="#{voucherCreateAction.client}"
-                                     clearAction="voucherCreateAction.clearClient()"
-                                     searchModalPanel="clientListModalPanel"
-                                     dataModel="#{clientDataModel}"
-                                     reRender="clientField"
-                                     tabindex="12">
-                    </app:selectPopUp>
+
+                <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <!--<ui:define name="label">#{messages['Sales.cash']}</ui:define>-->
+                    <h:outputText>#{messages['Sales.cash']}</h:outputText>
+                    <h:selectBooleanCheckbox id="cashSaleCheck" value="#{salesAction.cashSaleCheck}"
+                                             tabindex="16">
+                        <!--<a4j:support event="onchange" action="#{creditTransactionAction.clearPartnerAccount()}"
+                                     reRender="transferSavingField, savingAccountDiv, capitalField" ajaxSingle="true"/>-->
+                    </h:selectBooleanCheckbox>
+                    <h:outputText>#{messages['Sales.credit']}</h:outputText>
+                    <h:selectBooleanCheckbox id="creditSaleCheck" value="#{salesAction.creditSaleCheck}"
+                                             tabindex="16">
+                        <!--<a4j:support event="onchange" action="#{creditTransactionAction.clearPartnerAccount()}"
+                                     reRender="transferSavingField, savingAccountDiv, capitalField" ajaxSingle="true"/>-->
+                    </h:selectBooleanCheckbox>
                 </s:decorate>
+
             </s:div>
 
         </h:panelGrid>
 
-        <h:panelGrid columns="14">
-            <h:selectOneMenu>
-                <f:selectItem itemValue="0" itemLabel="Normal" />
-                <f:selectItem itemValue="1" itemLabel="Degustacion" />
-                <f:selectItem itemValue="2" itemLabel="Refrigerio" />
-                <f:selectItem itemValue="3" itemLabel="Descontar Productores" />
-                <f:selectItem itemValue="4" itemLabel="Descontar Veterinarios " />
-            </h:selectOneMenu>
+        <h:panelGrid columns="2" cellpadding="0" cellspacing="0"  border="0" width="100%" columnClasses="width10percent,width90percent">
 
-            <h:commandButton value="LUHT 950" styleClass="button" />
-            <h:commandButton value="CHI 1L" styleClass="button" />
-            <h:commandButton value="CHI 160" styleClass="button" />
-            <h:commandButton value="YFR 80" styleClass="button" />
-            <h:commandButton value="YFR 2L" styleClass="button" />
-            <h:commandButton value="YDU 2L" styleClass="button" />
-            <h:commandButton value="YCO 2L" styleClass="button" />
-            <h:commandButton value="YMO 2L" styleClass="button" />
-            <h:commandButton value="YCH 2L" styleClass="button" />
-            <h:commandButton value="ILDU 120" styleClass="button" />
-            <h:commandButton value="ILMA 120" styleClass="button" />
-            <h:commandButton value="ILNA 120" styleClass="button" />
-            <h:commandButton value="ILPI 120" styleClass="button" />
+            <s:div>
+                <h:selectOneMenu>
+                    <f:selectItem itemValue="0" itemLabel="Normal" />
+                    <f:selectItem itemValue="1" itemLabel="Degustacion" />
+                    <f:selectItem itemValue="2" itemLabel="Refrigerio" />
+                    <f:selectItem itemValue="3" itemLabel="Descontar Productores" />
+                    <f:selectItem itemValue="4" itemLabel="Descontar Veterinarios " />
+                </h:selectOneMenu>
+            </s:div>
+            <s:div>
+                <c:forEach items="#{salesAction.bestProductList}" var="productItem">
+                    <!--<h:commandButton value="#{productItem.acronym}" styleClass="button" />-->
+                    <a4j:commandButton action="#{salesAction.addProduct(productItem)}"
+                                       value="#{productItem.acronym}" styleClass="button"
+                                       reRender="productDataTable" />
+
+                </c:forEach>
+            </s:div>
 
         </h:panelGrid>
+
     </rich:panel>
 
-    <h:panelGrid columns="3" cellpadding="0" cellspacing="0"  border="0"
+    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0"
                  width="100%" columnClasses="width33percent,width33percent,width33percent">
 
         <s:div>
-
+            <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.client']}</ui:define>
+                <!--<h:outputText value="#{messages['Client.client']}" />-->
+                <!--<rich:spacer width="5px" />-->
+                <app:selectPopUp id="clientFieldId"
+                                 required="false"
+                                 textValue="#{voucherCreateAction.client.fullName}"
+                                 value="#{voucherCreateAction.client}"
+                                 clearAction="voucherCreateAction.clearClient()"
+                                 searchModalPanel="clientListModalPanel"
+                                 dataModel="#{clientDataModel}"
+                                 reRender="clientField"
+                                 tabindex="12">
+                </app:selectPopUp>
+            </s:decorate>
         </s:div>
         <s:div styleClass="right">
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
@@ -148,7 +165,7 @@
         <s:div styleClass="buttonsRight">
             <a4j:commandButton id="addProductItemCommandButton"
                                action="#{provideSearchDataModel.reset()}"
-                               value="#{messages['PurchaseOrderDetail.button.addProductItem']}"
+                               value="Registrar venta"
                                styleClass="button"
                                immediate="true"
                                oncomplete="Richfaces.showModalPanel('confirmSalesModalPanelModalPanel');"
@@ -275,9 +292,9 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{warehousePurchaseOrderDetailListCreateAction.addProductItems(provideSearchDataModel.selectedProductItems)}"
-                               value="#{messages['Common.add']}"
-                               reRender="purchaseOrderDetailsPanel"
+                               action="#{salesAction.registerSale()}"
+                               value="#{messages['Sales.charge']}"
+                               reRender="salesPanel"
                                styleClass="button"
                                oncomplete="Richfaces.hideModalPanel('confirmSalesModalPanelModalPanel');"/>
         </ui:define>
