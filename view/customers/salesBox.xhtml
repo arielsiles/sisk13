@@ -14,7 +14,6 @@
 
 <ui:param name="bodyAlign" value="center"/>
 <ui:param name="bodyWidth" value="100%"/>
-    productInventoryList
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
@@ -23,10 +22,9 @@
 
     <rich:panel id="salesPanel">
     <f:facet name="header">V e n t a s</f:facet>
-        <h:panelGrid columns="3" border="0" width="100%" styleClass="left">
+        <h:panelGrid columns="3" border="0" width="100%" columnClasses="width40percent,width30percent,width30percent">
             <s:div id="part1">
-
-                <s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">
+                <!--<s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">-->
                     <app:suggestionBox id="productSuggestionBox"
                                        value="#{salesAction.productItemFullName}"
                                        entity="#{salesAction.productItem}"
@@ -43,67 +41,61 @@
                     </app:suggestionBox>
 
                     <a4j:commandButton action="#{salesAction.addProduct()}"
-                                       value="Agregar Producto" styleClass="button"
-                                       reRender="productDataTable, productField" />
-                </s:decorate>
-                <!--<s:decorate id="productInventoryField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">
-                        <h:outputText value="Productos"/>
-                    </ui:define>
-                    <app:suggestionBox id="productInventorySuggestionBox"
-                                       value="#{productInventoryAction.productItemFullname}"
-                                       entity="#{productInventory.productItem}"
-                                       styleClass="inputLarge"
-                                       entityAlias="productItem"
-                                       searchField="fullName2"
-                                       searchCompoundFields="productItem.productItemCode,productItem.name"
-                                       searchCompoundCondition="concat(concat(productItem.productItemCode,' - '),productItem.name)"
-                                       updateFocusOnSelect="true">
-                        <ui:define name="columns">
-                            <h:column>
-                                <h:outputText value="#{entityItem.fullName}" />
-                            </h:column>
-                        </ui:define>
-                    </app:suggestionBox>
-                    <a4j:commandButton action="#{productInventoryAction.updateStock}"
-                                       value="Agregar"
-                                       styleClass="button"
-                                       reRender="updateStockForm"/>
-                </s:decorate>-->
+                                       value="Agregar" styleClass="button"
+                                       reRender="productDataTable, productSuggestionBox" />
+                <!--</s:decorate>-->
             </s:div>
 
             <s:div id="part2">
-                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <rich:calendar value="#{voucherCreateAction.voucher.date}"
+                <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">-->
+                <!--<div class="margin-t2">-->
+                    <!--<s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">-->
+                    <rich:calendar id="orderDate" value="#{salesAction.orderDate}"
                                    popup="true"
                                    datePattern="#{messages['patterns.date']}"
-                                   inputClass="inputSmall"
                                    enableManualInput="true"
-                                   tabindex="1"
+                                   inputClass="input80"
+                                   tabindex="100"
+                                   ajaxSingle="true"
                                    required="false">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                        <a4j:support event="onchanged" reRender="orderDate"/>
+                        <a4j:support event="oninputchange" reRender="orderDate"/>
                     </rich:calendar>
-                </s:decorate>
+                    <!--</s:decorate>-->
+                <!--</div>-->
+                <!--</s:decorate>-->
             </s:div>
 
             <s:div id="part3">
-
-                <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <!--<ui:define name="label">#{messages['Sales.cash']}</ui:define>-->
-                    <h:outputText>#{messages['Sales.cash']}</h:outputText>
-                    <h:selectBooleanCheckbox id="cashSaleCheck" value="#{salesAction.cashSaleCheck}"
-                                             tabindex="16">
-                        <!--<a4j:support event="onchange" action="#{creditTransactionAction.clearPartnerAccount()}"
-                                     reRender="transferSavingField, savingAccountDiv, capitalField" ajaxSingle="true"/>-->
-                    </h:selectBooleanCheckbox>
-                    <h:outputText>#{messages['Sales.credit']}</h:outputText>
-                    <h:selectBooleanCheckbox id="creditSaleCheck" value="#{salesAction.creditSaleCheck}"
-                                             tabindex="16">
-                        <!--<a4j:support event="onchange" action="#{creditTransactionAction.clearPartnerAccount()}"
-                                     reRender="transferSavingField, savingAccountDiv, capitalField" ajaxSingle="true"/>-->
-                    </h:selectBooleanCheckbox>
-                </s:decorate>
-
+                <!--<div class="margin-t2"></div>-->
+                <!--<div id="clientField">
+                    <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
+                    <rich:spacer width="5px" />
+                    <app:selectPopUp id="clientFieldId"
+                                     required="false"
+                                     textValue="#{salesAction.client.fullName}"
+                                     value="#{salesAction.client}"
+                                     clearAction="#{salesAction.clearClient()}"
+                                     searchModalPanel="clientListModalPanel"
+                                     dataModel="#{clientDataModel}"
+                                     reRender="clientField,clientFieldId"
+                                     tabindex="12">
+                    </app:selectPopUp>
+                </div>-->
+                <s:div id="clientField" styleClass="buttonsLeft">
+                    <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
+                    <rich:spacer width="5px" />
+                    <app:selectPopUp id="clientFieldId"
+                                     required="false"
+                                     textValue="#{salesAction.client.fullName}"
+                                     value="#{salesAction.client}"
+                                     clearAction="#{salesAction.clearClient()}"
+                                     searchModalPanel="clientListModalPanel"
+                                     dataModel="#{clientDataModel}"
+                                     reRender="clientField"
+                                     tabindex="12">
+                    </app:selectPopUp>
+                </s:div>
             </s:div>
 
         </h:panelGrid>
@@ -111,13 +103,19 @@
         <h:panelGrid columns="2" cellpadding="0" cellspacing="0"  border="0" width="100%" columnClasses="width10percent,width90percent">
 
             <s:div>
-                <h:selectOneMenu>
-                    <f:selectItem itemValue="0" itemLabel="Normal" />
-                    <f:selectItem itemValue="1" itemLabel="Degustacion" />
-                    <f:selectItem itemValue="2" itemLabel="Refrigerio" />
-                    <f:selectItem itemValue="3" itemLabel="Descontar Productores" />
-                    <f:selectItem itemValue="4" itemLabel="Descontar Veterinarios " />
-                </h:selectOneMenu>
+                <!--<s:decorate id="customerOrderTypeField" template="/include/inputField.xhtml" styleClass="formRow">-->
+                    <!--<ui:define name="label">#{messages['Template.type']}</ui:define>-->
+                    <h:selectOneMenu id="customerOrderType"
+                                     value="#{salesAction.customerOrderTypeEnum}"
+                                     styleClass="inputMedium"
+                                     tabindex="7">
+                        <s:selectItems value="#{customerOrderTypeEnumList}" var="customerOrderTypeEnum"
+                                       label="#{messages[customerOrderTypeEnum.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                <!--</s:decorate>-->
             </s:div>
             <s:div>
                 <c:forEach items="#{salesAction.bestProductList}" var="productItem">
@@ -133,65 +131,53 @@
 
     </rich:panel>
 
-    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0"
-                 width="100%" columnClasses="width33percent,width33percent,width33percent">
-
-        <s:div>
-            <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Client.client']}</ui:define>
-                <!--<h:outputText value="#{messages['Client.client']}" />-->
-                <!--<rich:spacer width="5px" />-->
+    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">
+        <!--<s:div id="clientField" styleClass="buttonsLeft">
+            <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
+                <rich:spacer width="5px" />
                 <app:selectPopUp id="clientFieldId"
                                  required="false"
-                                 textValue="#{voucherCreateAction.client.fullName}"
-                                 value="#{voucherCreateAction.client}"
-                                 clearAction="voucherCreateAction.clearClient()"
+                                 textValue="#{salesAction.client.fullName}"
+                                 value="#{salesAction.client}"
+                                 clearAction="#{salesAction.clearClient()}"
                                  searchModalPanel="clientListModalPanel"
                                  dataModel="#{clientDataModel}"
                                  reRender="clientField"
                                  tabindex="12">
                 </app:selectPopUp>
-            </s:decorate>
-        </s:div>
-        <s:div styleClass="right">
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <h:outputText value="Total:" styleClass="text12" />
+        </s:div>-->
+        <s:div id="totalAmountField">
+            <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">-->
+                <h:outputText value="Total:" styleClass="text10" />
                 <h:outputText id="totalAmount" value="#{salesAction.totalAmount}" styleClass="textBold12Blue" >
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
-            </s:decorate>
+            <!--</s:decorate>-->
         </s:div>
 
         <s:div styleClass="buttonsRight">
-            <a4j:commandButton id="addProductItemCommandButton"
-                               action="#{provideSearchDataModel.reset()}"
+            <a4j:commandButton id="creditSaleCommandButton"
+                               action="#{salesAction.initCreditSale()}"
                                value="Registrar venta"
                                styleClass="button"
                                immediate="true"
-                               oncomplete="Richfaces.showModalPanel('confirmSalesModalPanelModalPanel');"
-                               actionListener="#{selectPopUpAction.select}"
-                               reRender="confirmSalesModalPanelModalPanel">
-                <f:attribute name="entityManagerName" value=""/>
-                <f:attribute name="dataModelObject" value="#{provideSearchDataModel}"/>
-                <app:criteriaValue fieldName="providerCode"
-                                   value="#{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}"/>
+                               oncomplete="Richfaces.showModalPanel('confirmCreditSaleModalPanel');"
+                               reRender="productDataTable,confirmCreditSaleModalPanel">
             </a4j:commandButton>
 
-            <a4j:commandButton id="chargeButtonId" value="Cobrar"
+            <a4j:commandButton id="cashSaleCommandButton"
+                               action="#{salesAction.initCashSale}"
+                               value="Cobrar venta"
+                               styleClass="button"
+                               immediate="true"
+                               oncomplete="Richfaces.showModalPanel('confirmCashSaleModalPanel');"
+                               reRender="productDataTable,confirmCashSaleModalPanel">
+            </a4j:commandButton>
 
-                               styleClass="button"
-                               tabindex="6">
-                <s:defaultAction/>
-            </a4j:commandButton>
-            <a4j:commandButton id="registerButtonId" value="Registrar"
-                               styleClass="button"
-                               tabindex="6">
-                <s:defaultAction/>
-            </a4j:commandButton>
         </s:div>
     </h:panelGrid>
 
-    <rich:panel id="panelProdutcs">
+    <!--<rich:panel id="panelProdutcs">-->
 
         <rich:dataTable id="productDataTable" value="#{salesAction.articleOrderList}"  var="articleItem" rowKeyVar="row"
                         width="100%" columnsWidth="5%, 30%, 10%, 10%, 10%, 10%, 10%, 10%, 5%">
@@ -265,7 +251,7 @@
             </rich:column>
 
         </rich:dataTable>
-    </rich:panel>
+    <!--</rich:panel>-->
 
 <div class="buttons"></div>
 </h:form>
@@ -276,7 +262,7 @@
             <ui:param name="dialogId" value="clientListModalPanel"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
-                                   action="#{voucherCreateAction.setClient(clientItem)}"
+                                   action="#{salesAction.setClient(clientItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
                                    reRender="clientField"
@@ -285,22 +271,15 @@
         </s:decorate>
     </s:div>
 
-    <s:decorate id="confirmSalesModalPanelModalPanelContainer" template="/customers/confirmSalesModalPanel.xhtml">
-        <ui:param name="containerId" value="confirmSalesModalPanelModalPanelContainer"/>
-        <ui:param name="dialogId" value="confirmSalesModalPanelModalPanel"/>
-        <ui:define name="addButton">
-            <a4j:commandButton id="addButton"
-                               immediate="true"
-                               ajaxSingle="true"
-                               action="#{salesAction.registerSale()}"
-                               value="#{messages['Sales.charge']}"
-                               reRender="salesPanel"
-                               styleClass="button"
-                               oncomplete="Richfaces.hideModalPanel('confirmSalesModalPanelModalPanel');"/>
-        </ui:define>
+    <s:decorate id="confirmCreditSaleModalPanelContainer" template="/customers/confirmCreditSaleModalPanel.xhtml">
+        <ui:param name="containerId" value="confirmCreditSaleModalPanelContainer"/>
+        <ui:param name="dialogId" value="confirmCreditSaleModalPanel"/>
     </s:decorate>
 
-<!---->
+    <s:decorate id="confirmCashSaleModalPanelContainer" template="/customers/confirmCashSaleModalPanel.xhtml">
+        <ui:param name="containerId" value="confirmCashSaleModalPanelContainer"/>
+        <ui:param name="dialogId" value="confirmCashSaleModalPanel"/>
+    </s:decorate>
 
 
 <!--Set selector Id to enable focus-->

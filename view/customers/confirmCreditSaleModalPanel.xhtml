@@ -1,0 +1,77 @@
+<rich:modalPanel height="250" width="500" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Sales.confirmSale.title']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemListForm">
+
+        <!--<rich:panel id="registerSalePanel">-->
+        <app:fieldset id="managementFieldSet" title="#{messages['Sales.confirmSale.resume']}">
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">::</ui:define>
+                <h:outputText value="#{messages[salesAction.saleType.resourceKey]}" styleClass="msgText1"/>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Tipo:</ui:define>
+                <h:outputText value="#{messages[salesAction.customerOrderTypeEnum.resourceKey]}" />
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Cliente:</ui:define>
+                <h:outputText value="#{salesAction.client.fullName}"/>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha:</ui:define>
+                <h:outputText value="#{salesAction.orderDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                </h:outputText>
+            </s:decorate>
+            <br/>
+            <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">TOTAL:</ui:define>
+                <h:outputText value="#{salesAction.totalAmount}" styleClass="textBold12Blue">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+            <br/>
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Notas:</ui:define>
+                <h:inputText value="#{salesAction.description}" styleClass="input250"/>
+            </s:decorate>
+            <br/>
+            <!--<s:decorate id="moneyReturnedField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Pagó con:</ui:define>
+                <h:outputText value="#{salesAction.moneyReturned}"/>
+            </s:decorate>-->
+        </app:fieldset>
+        <!--</rich:panel>-->
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="confirmRegisterButton" value="Confirmar"
+                               action="#{salesAction.registerSale()}"
+                               styleClass="button"
+                               reRender="salesPanel,clientField,totalAmount,productDataTable"
+            />
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, confirmRegisterButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

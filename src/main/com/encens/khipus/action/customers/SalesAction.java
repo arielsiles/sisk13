@@ -1,9 +1,13 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
+import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -11,6 +15,7 @@ import org.jboss.seam.annotations.Scope;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Name("salesAction")
@@ -27,12 +32,23 @@ public class SalesAction {
     private Boolean cashSaleCheck;
     private Boolean creditSaleCheck;
 
+    private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
+    private SaleTypeEnum saleType;
+    private Client client;
+    private Date orderDate = new Date();
+    private String description;
+
     private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
 
     @In
     private ProductItemService productItemService;
 
+    /*@Create
+    public void initialize() {
+        System.out.println("------------------> Inicializando..............");
+        setOrderDate(new Date());
+    }*/
 
     public void addProduct(ProductItem productItem){
         setProductItem(productItem);
@@ -69,6 +85,12 @@ public class SalesAction {
         clearProduct();
     }
 
+    public void calculateChange(){
+        BigDecimal change = BigDecimal.ZERO;
+        change = BigDecimalUtil.subtract(moneyReceived, totalAmount);
+        setMoneyReturned(change);
+    }
+
     public void removeProduct(ArticleOrder articleOrder){
         articleOrderList.remove(articleOrder);
         productsSelected.remove(articleOrder.getProductItem());
@@ -92,10 +114,43 @@ public class SalesAction {
         setProductItemFullName(null);
     }
 
-    public void registerSale(){
-        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
+    public void clearProductsSelected(){
+        setProductsSelected(new ArrayList<ProductItem>());
+        setArticleOrderList(new ArrayList<ArticleOrder>());
     }
 
+    public void clearTotalAmount(){
+        setTotalAmount(BigDecimal.ZERO);
+    }
+
+    public void clearAll(){
+        clearProduct();
+        clearClient();
+        clearProductsSelected();
+        clearTotalAmount();
+        setDescription(null);
+    }
+
+    public void registerSale(){
+        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
+        System.out.println("------------> Description: " + getDescription());
+        System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
+        clearAll();
+    }
+
+    public void registerCashSale(){
+        System.out.println("......Registrando Venta al Contado...");
+    }
+
+    public void initCreditSale(){
+        setSaleType(SaleTypeEnum.CREDIT);
+        System.out.println("====>Credit Fecha: " + this.orderDate);
+    }
+
+    public void initCashSale(){
+        setSaleType(SaleTypeEnum.CASH);
+        System.out.println("====>Cash Fecha: " + this.orderDate);
+    }
 
     public List<ProductItem> getBestProductList(){
         return productItemService.findBestProductList();
@@ -147,6 +202,7 @@ public class SalesAction {
     }
 
     public BigDecimal getMoneyReceived() {
+        moneyReceived = getTotalAmount();
         return moneyReceived;
     }
 
@@ -176,5 +232,49 @@ public class SalesAction {
 
     public void setCreditSaleCheck(Boolean creditSaleCheck) {
         this.creditSaleCheck = creditSaleCheck;
+    }
+
+    public CustomerOrderTypeEnum getCustomerOrderTypeEnum() {
+        return customerOrderTypeEnum;
+    }
+
+    public void setCustomerOrderTypeEnum(CustomerOrderTypeEnum customerOrderTypeEnum) {
+        this.customerOrderTypeEnum = customerOrderTypeEnum;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public void clearClient(){
+        setClient(null);
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public SaleTypeEnum getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(SaleTypeEnum saleType) {
+        this.saleType = saleType;
     }
 }

@@ -1193,11 +1193,36 @@
                 value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
-                   >
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
         <s:link view="/finances/cashBoxList.xhtml"
                 value="#{messages['menu.finances.configuration.cashBox']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/cashBoxTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.cashBoxType']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxRuleList.xhtml"
+                value="#{messages['menu.finances.taxRule']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxPercentageList.xhtml"
+                value="#{messages['menu.finances.configuration.taxPercentage']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxPercentageTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.taxPercentageType']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/dosageTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.dosageType']}"
                 propagation="none"/>
     </rich:menuItem>
 

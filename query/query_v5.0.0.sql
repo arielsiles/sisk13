@@ -19,4 +19,7 @@ alter table pedidos add foreign key (idtipoventa) references tipoventa (idtipove
 /** 15.05.2020 **/
 alter table inv_articulos add column fix int(1) after vendible;
 alter table inv_articulos add column sigla varchar(14) after fix;
-alter table
+alter table inv_articulos add column pos int(2) after sigla;
+
+/** 16.05.2020 **/
+insert into funcionalidad values (261, 'PRINTINVOICE', null, 1, 15, 'menu.customers.order.printInvoice', 1);
