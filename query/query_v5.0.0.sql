@@ -16,6 +16,14 @@ alter table tipoventa add foreign key (idcompania) references compania (idcompan
 alter table pedidos add column idtipoventa bigint(20) after IDCLIENTE;
 alter table pedidos add foreign key (idtipoventa) references tipoventa (idtipoventa);
 
+alter table tipopedido add column tipo varchar(100);
+update tipopedido set tipo = 'NORMAL' where IDTIPOPEDIDO = 1;
+update tipopedido set tipo = 'TASTING' where IDTIPOPEDIDO = 2;
+update tipopedido set tipo = 'REFRESHMENT' where IDTIPOPEDIDO = 3;
+update tipopedido set tipo = 'REPLACEMENT' where IDTIPOPEDIDO = 4;
+update tipopedido set tipo = 'MILK' where IDTIPOPEDIDO = 5;
+update tipopedido set tipo = 'VETERINARY' where IDTIPOPEDIDO = 6;
+
 /** 15.05.2020 **/
 alter table inv_articulos add column fix int(1) after vendible;
 alter table inv_articulos add column sigla varchar(14) after fix;
