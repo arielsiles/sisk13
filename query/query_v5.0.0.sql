@@ -16,6 +16,9 @@ alter table tipoventa add foreign key (idcompania) references compania (idcompan
 alter table pedidos add column idtipoventa bigint(20) after IDCLIENTE;
 alter table pedidos add foreign key (idtipoventa) references tipoventa (idtipoventa);
 
+alter table pedidos add column tipoventa varchar(100) after idcliente;
+
+
 alter table tipopedido add column tipo varchar(100);
 update tipopedido set tipo = 'NORMAL' where IDTIPOPEDIDO = 1;
 update tipopedido set tipo = 'TASTING' where IDTIPOPEDIDO = 2;
@@ -31,3 +34,11 @@ alter table inv_articulos add column pos int(2) after sigla;
 
 /** 16.05.2020 **/
 insert into funcionalidad values (261, 'PRINTINVOICE', null, 1, 15, 'menu.customers.order.printInvoice', 1);
+
+/** 18.05.2020 **/
+select max(a.`IDARTICULOSPEDIDO`)+100 from articulos_pedido a;
+select max(a.`IDPEDIDOS`)+100 from pedidos a;
+
+insert into secuencia values ('articulos_pedido', 400000);
+insert into secuencia values ('pedidos', 50000);
+
