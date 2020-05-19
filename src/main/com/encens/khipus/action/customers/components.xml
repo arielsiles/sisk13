@@ -52,4 +52,8 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <factory name="customerOrderTypeList" value="#{customerOrderTypeQuery}"/>
+    <framework:entity-query name="customerOrderTypeQuery"
+                            ejbql="select c from CustomerOrderType c "/>
+
 </components>

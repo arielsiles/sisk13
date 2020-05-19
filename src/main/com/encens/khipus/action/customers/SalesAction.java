@@ -1,10 +1,9 @@
 package com.encens.khipus.action.customers;
 
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.Client;
-import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
-import com.encens.khipus.model.customers.SaleTypeEnum;
+import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
@@ -33,17 +32,22 @@ public class SalesAction {
     private Boolean creditSaleCheck;
 
     private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
+    private CustomerOrderType customerOrderType;
     private SaleTypeEnum saleType;
     private Client client;
     private Date orderDate = new Date();
-    private String description;
+    private String observation;
 
     private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
 
+    @In(required = false)
+    private User currentUser;
+
     @In
     private ProductItemService productItemService;
-
+    @In
+    private SaleService saleService;
     /*@Create
     public void initialize() {
         System.out.println("------------------> Inicializando..............");
@@ -101,12 +105,13 @@ public class SalesAction {
         articleOrder.setAmount(BigDecimalUtil.toBigDecimal(amount).doubleValue());
     }
 
-    public void calculateTotalAmount(){
-        BigDecimal amount = BigDecimal.ZERO;
+    public BigDecimal calculateTotalAmount(){
+        BigDecimal result = BigDecimal.ZERO;
         for (ArticleOrder articleOrder:articleOrderList){
-            amount = BigDecimalUtil.sum(amount, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
+            result = BigDecimalUtil.sum(result, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
         }
-        setTotalAmount(amount);
+        setTotalAmount(result);
+        return result;
     }
 
     public void clearProduct(){
@@ -128,28 +133,54 @@ public class SalesAction {
         clearClient();
         clearProductsSelected();
         clearTotalAmount();
-        setDescription(null);
+        setObservation(null);
     }
 
     public void registerSale(){
         System.out.println("------------> Registrando venta Total: " + getTotalAmount());
-        System.out.println("------------> Description: " + getDescription());
+        System.out.println("------------> Description: " + getObservation());
         System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
+        createSale();
         clearAll();
     }
 
     public void registerCashSale(){
         System.out.println("......Registrando Venta al Contado...");
+        createSale();
+        clearAll();
+    }
+
+    public void createSale(){
+
+        System.out.println("------------> user: " + currentUser);
+        System.out.println("------------> tipo pedido: " + customerOrderType);
+
+        CustomerOrder customerOrder = new CustomerOrder();
+        customerOrder.setUser(currentUser);
+        customerOrder.setOrderDate(orderDate);
+        customerOrder.setObservation(observation);
+        customerOrder.setState(SaleStatus.PREPARAR);
+        customerOrder.setTotalAmount(totalAmount.doubleValue());
+        customerOrder.setSaleType(saleType);
+        customerOrder.setCustomerOrderType(customerOrderType);
+        customerOrder.setClient(client);
+
+        customerOrder.setArticleOrderList(articleOrderList);
+
+        String outcome = saleService.createSale(customerOrder);
+
     }
 
     public void initCreditSale(){
         setSaleType(SaleTypeEnum.CREDIT);
-        System.out.println("====>Credit Fecha: " + this.orderDate);
+        calculateTotalAmount();
+        System.out.println("====>Credit Sale Fecha: " + this.orderDate);
     }
 
     public void initCashSale(){
+        System.out.println("====>Cash Sale Fecha: " + this.orderDate);
         setSaleType(SaleTypeEnum.CASH);
-        System.out.println("====>Cash Fecha: " + this.orderDate);
+        setMoneyReceived(calculateTotalAmount());
     }
 
     public List<ProductItem> getBestProductList(){
@@ -193,7 +224,6 @@ public class SalesAction {
     }
 
     public BigDecimal getTotalAmount() {
-        calculateTotalAmount();
         return totalAmount;
     }
 
@@ -202,7 +232,6 @@ public class SalesAction {
     }
 
     public BigDecimal getMoneyReceived() {
-        moneyReceived = getTotalAmount();
         return moneyReceived;
     }
 
@@ -262,12 +291,12 @@ public class SalesAction {
         this.orderDate = orderDate;
     }
 
-    public String getDescription() {
-        return description;
+    public String getObservation() {
+        return observation;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     public SaleTypeEnum getSaleType() {
@@ -276,5 +305,13 @@ public class SalesAction {
 
     public void setSaleType(SaleTypeEnum saleType) {
         this.saleType = saleType;
+    }
+
+    public CustomerOrderType getCustomerOrderType() {
+        return customerOrderType;
+    }
+
+    public void setCustomerOrderType(CustomerOrderType customerOrderType) {
+        this.customerOrderType = customerOrderType;
     }
 }

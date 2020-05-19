@@ -318,15 +318,15 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         //verificar por que no requiere el codigo de control
 
         paramMap.put("llaveQR",keyQR);
-        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotal().toString(), true, messages.get("Reports.cashAvailable.bs")));
-        paramMap.put("total",customerOrder.getTotal());
+        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs")));
+        paramMap.put("total",customerOrder.getTotalAmount());
         barcodeRenderer.generateQR(keyQR,filePath);
         return paramMap;
     }
 
     private ControlCode generateCodControl(CustomerOrder order,Integer numberInvoice,BigDecimal numberAutorization,String key)
     {
-        Double importeBaseCreditFisical = order.getTotal().doubleValue() * 0.13;
+        //Double importeBaseCreditFisical = order.getTotalAmount().doubleValue() * 0.13;
         ControlCode controlCode = null;
           moneyUtil.getLlaveQR(controlCode,key);
         controlCode.generarCodigoQR();

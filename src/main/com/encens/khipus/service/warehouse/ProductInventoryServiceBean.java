@@ -91,7 +91,7 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
     @Override
     public void outputProducts(CustomerOrder customerOrder) {
 
-        for ( ArticleOrder articleOrder : customerOrder.getArticulosPedidos() ){
+        for ( ArticleOrder articleOrder : customerOrder.getArticleOrderList() ){
             ProductInventory productInventory = findProductInventoryByCode(articleOrder.getCodArt());
             System.out.println("---> Articulo: " + productInventory.getProductItem().getName());
             Double stock = productInventory.getQuantity().doubleValue();

@@ -1,7 +1,6 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
 
@@ -28,8 +27,8 @@ import java.math.BigDecimal;
                         "from ArticleOrder articleOrder " +
                         "left join articleOrder.customerOrder customerOrder " +
                         "where articleOrder.codArt =:productItemCode " +
-                        "and customerOrder.estado <> 'ANULADO' " +
-                        "and customerOrder.fechaEntrega between :startDate and :endDate "),
+                        "and customerOrder.state <> 'ANULADO' " +
+                        "and customerOrder.orderDate between :startDate and :endDate "),
         @NamedQuery(name  = "ArticleOrder.findCashSaleDetailListGroupBy",
                 query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
                         "from ArticleOrder articleOrder " +
@@ -41,8 +40,8 @@ import java.math.BigDecimal;
                 query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
                         "from ArticleOrder articleOrder " +
                         "left join articleOrder.customerOrder customerOrder " +
-                        "where customerOrder.estado <> 'ANULADO' " +
-                        "and customerOrder.fechaEntrega between :startDate and :endDate " +
+                        "where customerOrder.state <> 'ANULADO' " +
+                        "and customerOrder.orderDate between :startDate and :endDate " +
                         "group by articleOrder.codArt "),
         @NamedQuery(name  = "ArticleOrder.findCashSaleDetailList",
                 query = "select articleOrder " +
@@ -52,15 +51,24 @@ import java.math.BigDecimal;
         @NamedQuery(name  = "ArticleOrder.findCustomerOrderDetailList",
                 query = "select articleOrder " +
                         "from ArticleOrder articleOrder " +
-                        "where articleOrder.customerOrder.estado <> 'ANULADO' " +
-                        "and articleOrder.customerOrder.fechaEntrega between :startDate and :endDate ")
+                        "where articleOrder.customerOrder.state <> 'ANULADO' " +
+                        "and articleOrder.customerOrder.orderDate between :startDate and :endDate ")
         })
 
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "ArticleOrder.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "articulos_pedido",
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
+
 @Entity
-@Table(name = "ARTICULOS_PEDIDO",schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "articulos_pedido", schema = Constants.KHIPUS_SCHEMA)
 public class ArticleOrder {
+
     @Id
-    @Column(name = "IDARTICULOSPEDIDO")
+    @Column(name = "idarticulospedido")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ArticleOrder.tableGenerator")
     private Long id;
 
     @Column(name = "COD_ART", nullable = false, length = 6,insertable=false,updatable=false)
@@ -91,13 +99,12 @@ public class ArticleOrder {
     @Column(name = "CANTIDAD", nullable = true)
     private Integer quantity;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    //@JoinColumn(name = "COD_ALM", nullable = true, updatable = false, insertable = true)
+    /*@ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA",nullable = true,updatable = false,insertable = false),
             @JoinColumn(name = "COD_ALM", referencedColumnName = "COD_ALM",nullable = true,updatable = false,insertable = false)
     })
-    private Warehouse warehouse;
+    private Warehouse warehouse;*/
 
     @Column(name = "PRECIO",nullable = true )
     private Double price;
@@ -117,6 +124,9 @@ public class ArticleOrder {
     @Column(name = "importe",nullable = true )
     private Double amount;
 
+    @Column(name = "NO_CIA", updatable = false, insertable = false, length = 2)
+    @Length(max = 2)
+    private String companyNumber = "01";
 
     public String getCodArt() {
         return codArt;
@@ -134,13 +144,13 @@ public class ArticleOrder {
         this.quantity = amount;
     }
 
-    public Warehouse getWarehouse() {
+    /*public Warehouse getWarehouse() {
         return warehouse;
     }
 
     public void setWarehouse(Warehouse warehouse) {
         this.warehouse = warehouse;
-    }
+    }*/
 
     public Double getPrice() {
         return price;
@@ -236,5 +246,13 @@ public class ArticleOrder {
 
     public void setUnitCost(BigDecimal unitCost) {
         this.unitCost = unitCost;
+    }
+
+    public String getCompanyNumber() {
+        return companyNumber;
+    }
+
+    public void setCompanyNumber(String companyNumber) {
+        this.companyNumber = companyNumber;
     }
 }

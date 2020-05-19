@@ -105,7 +105,7 @@
             <s:div>
                 <!--<s:decorate id="customerOrderTypeField" template="/include/inputField.xhtml" styleClass="formRow">-->
                     <!--<ui:define name="label">#{messages['Template.type']}</ui:define>-->
-                    <h:selectOneMenu id="customerOrderType"
+                    <!--<h:selectOneMenu id="customerOrderType"
                                      value="#{salesAction.customerOrderTypeEnum}"
                                      styleClass="inputMedium"
                                      tabindex="7">
@@ -114,12 +114,23 @@
                                        noSelectionLabel=""
                                        hideNoSelectionLabel="false"/>
                         <s:convertEnum/>
-                    </h:selectOneMenu>
+                    </h:selectOneMenu>-->
+
+                <h:selectOneMenu id="customerOrderType"
+                                 value="#{salesAction.customerOrderType}"
+                                 styleClass="inputMedium"
+                                 tabindex="10">
+                    <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
+                                   label="#{messages[customerOrderType.type.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+
                 <!--</s:decorate>-->
             </s:div>
             <s:div>
                 <c:forEach items="#{salesAction.bestProductList}" var="productItem">
-                    <!--<h:commandButton value="#{productItem.acronym}" styleClass="button" />-->
                     <a4j:commandButton action="#{salesAction.addProduct(productItem)}"
                                        value="#{productItem.acronym}" styleClass="button"
                                        reRender="productDataTable" />
@@ -149,7 +160,7 @@
         <s:div id="totalAmountField">
             <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">-->
                 <h:outputText value="Total:" styleClass="text10" />
-                <h:outputText id="totalAmount" value="#{salesAction.totalAmount}" styleClass="textBold12Blue" >
+                <h:outputText id="totalAmount" value="#{salesAction.calculateTotalAmount()}" styleClass="textBold12Blue" >
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
             <!--</s:decorate>-->

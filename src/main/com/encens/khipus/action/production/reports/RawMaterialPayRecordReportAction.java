@@ -12,11 +12,12 @@ import org.jboss.beans.metadata.api.annotations.Create;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import sun.util.calendar.BaseCalendar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+
+//import sun.util.calendar.BaseCalendar;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +38,7 @@ public class RawMaterialPayRecordReportAction extends GenericReportAction {
     private String concept;
     private String period;
     private String ci;
-    private BaseCalendar.Date birthDay;
+    private Date birthDay;
     private String birthPlace;
     private String isRetention;
     private Periodo periodo;

@@ -21,7 +21,7 @@
         <app:fieldset id="managementFieldSet"  title="#{messages['Sales.confirmSale.resume']}">
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Tipo:</ui:define>
+                <ui:define name="label"></ui:define>
                 <h:outputText value="#{messages[salesAction.saleType.resourceKey]}" styleClass="msgText1"/>
             </s:decorate>
 
@@ -63,8 +63,8 @@
         </app:fieldset>
         <!--</rich:panel>-->
 
-        <div class="center-buttons">
-            <a4j:commandButton id="confirmCashRegisterButton" value="Confirmar"
+        <div class="buttonsRight">
+            <a4j:commandButton id="confirmRegisterButton" value="Confirmar"
                                action="#{salesAction.registerCashSale()}"
                                styleClass="button"
                                reRender="salesPanel,clientField,totalAmount,productDataTable"

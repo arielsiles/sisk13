@@ -233,17 +233,17 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
         Boolean result = false;
         if(customerOrder == null)
             return result;
-        if(new ArrayList<ArticleOrder>(customerOrder.getArticulosPedidos()).size() == 0)
+        if(new ArrayList<ArticleOrder>(customerOrder.getArticleOrderList()).size() == 0)
             return result;
 
         List<InventoryMessage> errorMessages = new ArrayList<InventoryMessage>();
 
         WarehouseDocumentType documentType = getFirstConsumptionType();
 
-        Warehouse warehouse = inventoryService.findWarehouseByItemArticle(new ArrayList<ArticleOrder>(customerOrder.getArticulosPedidos()).get(0).getProductItem());
+        Warehouse warehouse = inventoryService.findWarehouseByItemArticle(new ArrayList<ArticleOrder>(customerOrder.getArticleOrderList()).get(0).getProductItem());
         CostCenter costCenter = findPublicCostCenter(warehouse);
 
-        for(ArticleOrder articulo:customerOrder.getArticulosPedidos()) {
+        for(ArticleOrder articulo:customerOrder.getArticleOrderList()) {
             if(!StringUtils.isEmpty(articulo.getTipo())){
             if(articulo.getTipo().equals("COMBO")){
                 List<ArticulosPromocion> articulosCombo = productItemService.findArticuloCombo(articulo);
@@ -290,7 +290,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
             return true;
         }
 
-        if (customerOrder.getArticulosPedidos().size() == 0) {
+        if (customerOrder.getArticleOrderList().size() == 0) {
             addSoldProductNotFoundMessages(customerOrder.getCodigo().toString());
             result = true;
         }
@@ -400,7 +400,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
 
 
             String warehouseDescription = MessageUtils.getMessage("ProductDelivery.warehouseVoucher.description", customerOrder.getCodigo());
-            List<ArticleOrder> articleOrders = new ArrayList<ArticleOrder>(customerOrder.getArticulosPedidos());
+            List<ArticleOrder> articleOrders = new ArrayList<ArticleOrder>(customerOrder.getArticleOrderList());
 
             if(articleOrders.size() != 0) {
 
@@ -442,8 +442,8 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
                 create(productDelivery);
 */
                 //update state of order
-                customerOrder.setEstado("ENTREGADO");
-                updateCustomerOrder(customerOrder.getIdpedidos(),"ENTREGADO");
+                //customerOrder.setEstado("ENTREGADO");
+                //updateCustomerOrder(customerOrder.getIdpedidos(),"ENTREGADO");
             }
 
     }
@@ -1154,7 +1154,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
         WarehouseVoucher warehouseVoucher = new WarehouseVoucher();
         warehouseVoucher.setDocumentType(warehouseDocumentType);
         warehouseVoucher.setWarehouse(warehouse);
-        warehouseVoucher.setDate(customerOrder.getFechaEntrega());
+        warehouseVoucher.setDate(customerOrder.getOrderDate());
         //todo: cambiar el estado del vale
         warehouseVoucher.setState(WarehouseVoucherState.PEN);
 
@@ -1168,7 +1168,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
         warehouseService.createWarehouseVoucher(warehouseVoucher, inventoryMovement, null, null, null, null);
 
         //Create the MovementDetails
-        for (ArticleOrder articleOrder: customerOrder.getArticulosPedidos()) {
+        for (ArticleOrder articleOrder: customerOrder.getArticleOrderList()) {
             if(!StringUtils.isEmpty(articleOrder.getTipo())) {
                 if (articleOrder.getTipo().equals("COMBO")) {
                     List<ArticulosPromocion> articulosCombo = productItemService.findArticuloCombo(articleOrder);

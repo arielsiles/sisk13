@@ -135,20 +135,20 @@
             <s:fragment id="soldProductInformationPanel" rendered="#{productDeliveryAction.customerOrder != null}">
                 <s:decorate id="namesField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.names']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.customerOrder.cliente.name}"/>
+                    <h:outputText value="#{productDeliveryAction.customerOrder.client.name}"/>
                 </s:decorate>
                 <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.firstName']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.customerOrder.cliente.ap}"/>
+                    <h:outputText value="#{productDeliveryAction.customerOrder.client.ap}"/>
                 </s:decorate>
                 <s:decorate id="secondNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.secondName']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.customerOrder.cliente.am}"/>
+                    <h:outputText value="#{productDeliveryAction.customerOrder.client.am}"/>
                 </s:decorate>
                 <s:decorate id="personalIdentificationField" template="/include/inputField.xhtml"
                             styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.personalIdentification']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.customerOrder.cliente.nroDoc}"/>
+                    <h:outputText value="#{productDeliveryAction.customerOrder.client.nroDoc}"/>
                 </s:decorate>
                 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.state']}</ui:define>
@@ -159,7 +159,7 @@
                             styleClass="formRow">
                     <ui:define name="label">#{messages['ProductDelivery.soldProduct']}</ui:define>
                     <ui:param name="vertical" value="true"/>
-                    <rich:dataTable value="#{productDeliveryAction.customerOrder.articulosPedidos}"
+                    <rich:dataTable value="#{productDeliveryAction.customerOrder.articleOrderList}"
                                     var="soldProduct"
                                     columnsWidth="70%, 30%"
                                     width="98%">

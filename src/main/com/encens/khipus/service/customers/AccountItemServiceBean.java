@@ -2,7 +2,6 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
 import com.encens.khipus.model.customers.Territoriotrabajo;
-import com.sun.org.apache.bcel.internal.generic.InstructionListObserver;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -610,9 +609,9 @@ public class AccountItemServiceBean extends ExtendedGenericServiceBean implement
         try {
                 datas = (List<Object[]>)getEntityManager()
                         .createQuery("select distinct articulos.productItem.name,articulos.productItem.productItemCode  " +
-                                "from CustomerOrder pe inner join pe.articulosPedidos articulos " +
+                                "from CustomerOrder pe inner join pe.articleOrderList articulos " +
                                 "where pe.estado <> 'ANULADO' " +
-                                "and pe.fechaEntrega =:fecha")
+                                "and pe.orderDate =:fecha")
                 .setParameter("fecha",date,TemporalType.DATE)
                 .getResultList();
 
@@ -634,10 +633,10 @@ public class AccountItemServiceBean extends ExtendedGenericServiceBean implement
         List<Territoriotrabajo> territorios = new ArrayList<Territoriotrabajo>();
         List<Object[]> datas = new ArrayList<Object[]>();
         try{
-            datas = (List<Object[]>)em.createQuery("select distinct pe.cliente.territoriotrabajo.nombre,pe.cliente.territoriotrabajo.idterritoriotrabajo  " +
+            datas = (List<Object[]>)em.createQuery("select distinct pe.client.territoriotrabajo.nombre,pe.client.territoriotrabajo.idterritoriotrabajo  " +
                     "from CustomerOrder pe " +
                     "where pe.estado <> 'ANULADO' " +
-                    "and pe.fechaEntrega =:fecha")
+                    "and pe.orderDate =:fecha")
                     .setParameter("fecha",date,TemporalType.DATE)
                     .getResultList();
         }catch (NoResultException e){
