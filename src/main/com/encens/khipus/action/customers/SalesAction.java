@@ -3,6 +3,7 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.customers.CustomerOrderTypeService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -31,7 +32,8 @@ public class SalesAction {
     private Boolean cashSaleCheck;
     private Boolean creditSaleCheck;
 
-    private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
+    //private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
+
     private CustomerOrderType customerOrderType;
     private SaleTypeEnum saleType;
     private Client client;
@@ -48,11 +50,18 @@ public class SalesAction {
     private ProductItemService productItemService;
     @In
     private SaleService saleService;
+    @In
+    private CustomerOrderTypeService customerOrderTypeService;
+
     /*@Create
     public void initialize() {
         System.out.println("------------------> Inicializando..............");
         setOrderDate(new Date());
     }*/
+
+    public void openSale(){
+        setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
+    }
 
     public void addProduct(ProductItem productItem){
         setProductItem(productItem);
@@ -142,12 +151,14 @@ public class SalesAction {
         System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
         createSale();
         clearAll();
+        assignCustomerOrderTypeDefault();
     }
 
     public void registerCashSale(){
         System.out.println("......Registrando Venta al Contado...");
         createSale();
         clearAll();
+        assignCustomerOrderTypeDefault();
     }
 
     public void createSale(){
@@ -169,6 +180,11 @@ public class SalesAction {
 
         String outcome = saleService.createSale(customerOrder);
 
+    }
+
+    public void assignCustomerOrderTypeDefault(){
+        System.out.println("--------> findCustomerOrderTypeDefault: " + customerOrderTypeService.findCustomerOrderTypeDefault());
+        setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
     }
 
     public void initCreditSale(){
@@ -263,13 +279,13 @@ public class SalesAction {
         this.creditSaleCheck = creditSaleCheck;
     }
 
-    public CustomerOrderTypeEnum getCustomerOrderTypeEnum() {
+    /*public CustomerOrderTypeEnum getCustomerOrderTypeEnum() {
         return customerOrderTypeEnum;
     }
 
     public void setCustomerOrderTypeEnum(CustomerOrderTypeEnum customerOrderTypeEnum) {
         this.customerOrderTypeEnum = customerOrderTypeEnum;
-    }
+    }*/
 
     public Client getClient() {
         return client;

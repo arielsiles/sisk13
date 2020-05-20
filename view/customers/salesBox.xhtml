@@ -67,21 +67,6 @@
             </s:div>
 
             <s:div id="part3">
-                <!--<div class="margin-t2"></div>-->
-                <!--<div id="clientField">
-                    <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
-                    <rich:spacer width="5px" />
-                    <app:selectPopUp id="clientFieldId"
-                                     required="false"
-                                     textValue="#{salesAction.client.fullName}"
-                                     value="#{salesAction.client}"
-                                     clearAction="#{salesAction.clearClient()}"
-                                     searchModalPanel="clientListModalPanel"
-                                     dataModel="#{clientDataModel}"
-                                     reRender="clientField,clientFieldId"
-                                     tabindex="12">
-                    </app:selectPopUp>
-                </div>-->
                 <s:div id="clientField" styleClass="buttonsLeft">
                     <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
                     <rich:spacer width="5px" />
@@ -102,29 +87,18 @@
 
         <h:panelGrid columns="2" cellpadding="0" cellspacing="0"  border="0" width="100%" columnClasses="width10percent,width90percent">
 
-            <s:div>
-                <!--<s:decorate id="customerOrderTypeField" template="/include/inputField.xhtml" styleClass="formRow">-->
-                    <!--<ui:define name="label">#{messages['Template.type']}</ui:define>-->
-                    <!--<h:selectOneMenu id="customerOrderType"
-                                     value="#{salesAction.customerOrderTypeEnum}"
-                                     styleClass="inputMedium"
-                                     tabindex="7">
-                        <s:selectItems value="#{customerOrderTypeEnumList}" var="customerOrderTypeEnum"
-                                       label="#{messages[customerOrderTypeEnum.resourceKey]}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>-->
-
+            <s:div id="customerOrderTypeField">
                 <h:selectOneMenu id="customerOrderType"
                                  value="#{salesAction.customerOrderType}"
                                  styleClass="inputMedium"
+                                 immediate="true"
                                  tabindex="10">
                     <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
                                    label="#{messages[customerOrderType.type.resourceKey]}"
                                    noSelectionLabel=""
                                    hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
+                    <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderType"/>
                 </h:selectOneMenu>
 
                 <!--</s:decorate>-->
@@ -167,6 +141,12 @@
         </s:div>
 
         <s:div styleClass="buttonsRight">
+            <h:commandButton id="generateReportButtonId"
+                             action="#{saleReportAction.generateReport()}"
+                             value="#{messages['SaleStatus.printSale']}"
+                             styleClass="button"
+                             immediate="true"/>
+
             <a4j:commandButton id="creditSaleCommandButton"
                                action="#{salesAction.initCreditSale()}"
                                value="Registrar venta"

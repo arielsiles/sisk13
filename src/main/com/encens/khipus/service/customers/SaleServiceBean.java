@@ -2,6 +2,7 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericServiceBean;
+import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import org.jboss.seam.annotations.AutoCreate;
@@ -30,5 +31,18 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
         em.flush();
 
         return Outcome.SUCCESS;
+    }
+
+    @Override
+    public Long findLastSaleId(User user) {
+        System.out.println("------>> userid: " + user.getId());
+        System.out.println("------>> user: " + user.getUsername());
+        Long result =  null;
+        result = (Long) em.createQuery("select max(c.id) from CustomerOrder c " +
+                " where c.user =:user")
+        .setParameter("user", user)
+        .getSingleResult();
+
+        return result;
     }
 }

@@ -70,7 +70,6 @@ public class CustomerOrder implements BaseModel  {
 
     /* -- */
 
-
     @Column(name = "DESCRIPCION")
     private String descripcion;
 

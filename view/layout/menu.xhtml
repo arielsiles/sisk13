@@ -81,9 +81,10 @@
         </rich:dropDownMenu>
 
         <s:link view="/customers/salesBox.xhtml"
-                value="#{messages['menu.customers.box']}"
+                value="#{messages['menu.customers.sales']}"
+                action="#{salesAction.openSale()}"
                 styleClass="tab-cell"
-                propagation="begin"/>
+                propagation="none"/>
 
         <s:link view="/customers/cashSaleList.xhtml"
                 value="#{messages['menu.customers.sales.cashSales']}"

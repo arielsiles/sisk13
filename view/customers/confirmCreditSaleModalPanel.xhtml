@@ -27,7 +27,7 @@
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">Tipo:</ui:define>
-                <h:outputText value="#{messages[salesAction.customerOrderTypeEnum.resourceKey]}" />
+                <h:outputText value="#{messages[salesAction.customerOrderType.type.resourceKey]}" />
             </s:decorate>
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
@@ -65,7 +65,7 @@
             <a4j:commandButton id="confirmRegisterButton" value="Confirmar"
                                action="#{salesAction.registerSale()}"
                                styleClass="button"
-                               reRender="salesPanel,clientField,totalAmount,productDataTable"
+                               reRender="clientField,totalAmount,productDataTable"
             />
         </div>
 
