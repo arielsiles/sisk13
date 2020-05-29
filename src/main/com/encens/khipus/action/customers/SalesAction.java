@@ -5,6 +5,7 @@ import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.CustomerOrderTypeService;
 import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
@@ -52,6 +53,8 @@ public class SalesAction {
     private SaleService saleService;
     @In
     private CustomerOrderTypeService customerOrderTypeService;
+    @In
+    private FinancesPkGeneratorService financesPkGeneratorService;
 
     /*@Create
     public void initialize() {
@@ -167,6 +170,8 @@ public class SalesAction {
         System.out.println("------------> tipo pedido: " + customerOrderType);
 
         CustomerOrder customerOrder = new CustomerOrder();
+        Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
+        customerOrder.setCodigo(saleCode);
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);
