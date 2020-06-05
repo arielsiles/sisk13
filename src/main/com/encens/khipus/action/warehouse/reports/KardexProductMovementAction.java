@@ -181,11 +181,11 @@ public class KardexProductMovementAction extends GenericReportAction {
         for (ArticleOrder ao:orderDetailList){
             CollectionData collectionData = new CollectionData(
                                                                 ao.getCustomerOrder().getOrderDate(),
-                                                                ao.getCustomerOrder().getCodigo().toString(),
+                                                                ao.getCustomerOrder().getCode().toString(),
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
                                                                 "S",
-                                                                "Venta a credito " + ao.getCustomerOrder().getCodigo() + " " + ao.getCustomerOrder().getClient().getFullName());
+                                                                "Venta a credito " + ao.getCustomerOrder().getCode() + " " + ao.getCustomerOrder().getClient().getFullName());
             datas.add(collectionData);
         }
 

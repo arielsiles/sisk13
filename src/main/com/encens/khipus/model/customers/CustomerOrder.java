@@ -98,7 +98,7 @@ public class CustomerOrder implements BaseModel  {
     private Double guaranteeValue = 0.0;
 
     @Column(name="codigo")
-    private Long codigo;
+    private Long code;
 
     @Column(name = "ESTADO")
     @Enumerated(EnumType.STRING)
@@ -203,12 +203,12 @@ public class CustomerOrder implements BaseModel  {
         this.guaranteeValue = guaranteeValue;
     }
 
-    public Long getCodigo() {
-        return codigo;
+    public Long getCode() {
+        return code;
     }
 
-    public void setCodigo(Long codigo) {
-        this.codigo = codigo;
+    public void setCode(Long codigo) {
+        this.code = codigo;
     }
 
     public SaleStatus getState() {

@@ -291,12 +291,12 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
         }
 
         if (customerOrder.getArticleOrderList().size() == 0) {
-            addSoldProductNotFoundMessages(customerOrder.getCodigo().toString());
+            addSoldProductNotFoundMessages(customerOrder.getCode().toString());
             result = true;
         }
 
         if (null == documentType) {
-            addWarehouseDocumentTypeErrorMessage(customerOrder.getCodigo().toString());
+            addWarehouseDocumentTypeErrorMessage(customerOrder.getCode().toString());
             result = true;
         }
 
@@ -399,7 +399,7 @@ public class ProductDeliveryServiceBean extends GenericServiceBean implements Pr
             EntryDuplicatedException {
 
 
-            String warehouseDescription = MessageUtils.getMessage("ProductDelivery.warehouseVoucher.description", customerOrder.getCodigo());
+            String warehouseDescription = MessageUtils.getMessage("ProductDelivery.warehouseVoucher.description", customerOrder.getCode());
             List<ArticleOrder> articleOrders = new ArrayList<ArticleOrder>(customerOrder.getArticleOrderList());
 
             if(articleOrders.size() != 0) {

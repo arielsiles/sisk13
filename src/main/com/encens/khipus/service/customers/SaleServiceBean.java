@@ -45,4 +45,17 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
         return result;
     }
+
+    @Override
+    public CustomerOrder findSaleById(Long id) {
+        CustomerOrder result;
+        result = (CustomerOrder) em.createQuery("select c from CustomerOrder c " +
+                " where c.id =:id")
+                .setParameter("id", id)
+                .getSingleResult();
+
+        System.out.println("----------------> ultima venta:" + result);
+
+        return result;
+    }
 }

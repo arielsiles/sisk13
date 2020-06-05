@@ -24,7 +24,7 @@
     <f:facet name="header">V e n t a s</f:facet>
         <h:panelGrid columns="3" border="0" width="100%" columnClasses="width40percent,width30percent,width30percent">
             <s:div id="part1">
-                <!--<s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">-->
+                <s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">
                     <app:suggestionBox id="productSuggestionBox"
                                        value="#{salesAction.productItemFullName}"
                                        entity="#{salesAction.productItem}"
@@ -38,12 +38,15 @@
                                 <h:outputText value="#{entityItem.fullName2}" />
                             </h:column>
                         </ui:define>
+                        <ui:define name="restrictions">
+                            <app:restriction condition="productItem.saleable = #{true}"/>
+                        </ui:define>
                     </app:suggestionBox>
 
                     <a4j:commandButton action="#{salesAction.addProduct()}"
                                        value="Agregar" styleClass="button"
-                                       reRender="productDataTable, productSuggestionBox" />
-                <!--</s:decorate>-->
+                                       reRender="productDataTable, productField" />
+                </s:decorate>
             </s:div>
 
             <s:div id="part2">

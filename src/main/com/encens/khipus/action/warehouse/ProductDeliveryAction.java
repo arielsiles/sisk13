@@ -504,8 +504,8 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
             for(Territoriotrabajo territorio:territorios) {
                 for (CustomerOrder pedido : soldProductService.findPedidosPorFechaTerritorio(date,territorio)) {
                     OrderClient orderClient = new OrderClient();
-                    orderClient.setIdOrder(pedido.getCodigo().toString());
-                    orderClient.setName(pedido.getCodigo().toString() + "-" + pedido.getClient().getNombreCompleto());
+                    orderClient.setIdOrder(pedido.getCode().toString());
+                    orderClient.setName(pedido.getCode().toString() + "-" + pedido.getClient().getNombreCompleto());
                     orderClient.setType("CLIENTE");
                     /*orderClient.setState(pedido.getEstado());*/
                     orderClient.setCliente(pedido.getClient());
@@ -521,7 +521,7 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         }else{
             for (CustomerOrder pedido : pedidos) {
                 OrderClient orderClient = new OrderClient();
-                orderClient.setIdOrder(pedido.getCodigo().toString());
+                orderClient.setIdOrder(pedido.getCode().toString());
                 orderClient.setName(pedido.getClient().getNombreCompleto());
                 orderClient.setType("CLIENTE");
                 orderClient.setStockFlag(pedido.getStockFlag());
@@ -882,7 +882,7 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         if(!client.getType().equals("TERRITORIO"))
         for(CustomerOrder pedido:pedidos)
         {
-            if(pedido.getCodigo().toString().equals(client.getIdOrder()))
+            if(pedido.getCode().toString().equals(client.getIdOrder()))
             {
                 for(ArticleOrder articulo: pedido.getArticleOrderList()) {
                     if(articulo.getCodArt().equals(item.getCodArt()))

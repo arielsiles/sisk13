@@ -41,7 +41,9 @@ public class SalesAction {
     private Date orderDate = new Date();
     private String observation;
 
-    private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
+    //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
+    private List<String> productItemCodesSelected = new ArrayList<String>();
+
     private List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
 
     @In(required = false)
@@ -75,14 +77,23 @@ public class SalesAction {
         System.out.println("--------> productItemFullName: " + productItemFullName);
         System.out.println("--------> Producto: " + productItem);
 
-        if (productsSelected.contains(productItem)){
+        /*if (productsSelected.contains(productItem)){
+            System.out.println("------>>> productsSelected.contains(productItem): " + productsSelected.contains(productItem));
+            clearProduct();
+            return;
+        }*/
+
+        if (productItemCodesSelected.contains(productItem.getProductItemCode())){
+            System.out.println("------>>> contains(productItemCode): " + productItemCodesSelected.contains(productItem.getProductItemCode()));
             clearProduct();
             return;
         }
+
         if (productItem == null) return;
         if (productItem.getSalePrice() == null) return;
 
-        productsSelected.add(productItem);
+        //productsSelected.add(productItem);
+        productItemCodesSelected.add(productItem.getProductItemCode());
 
         ArticleOrder articleOrder = new ArticleOrder();
         articleOrder.setCodArt(productItem.getProductItemCode());
@@ -109,7 +120,8 @@ public class SalesAction {
 
     public void removeProduct(ArticleOrder articleOrder){
         articleOrderList.remove(articleOrder);
-        productsSelected.remove(articleOrder.getProductItem());
+        //productsSelected.remove(articleOrder.getProductItem());
+        productItemCodesSelected.remove(articleOrder.getProductItem().getProductItemCode());
     }
 
     public void calculateAmount(ArticleOrder articleOrder){
@@ -132,7 +144,8 @@ public class SalesAction {
     }
 
     public void clearProductsSelected(){
-        setProductsSelected(new ArrayList<ProductItem>());
+        //setProductsSelected(new ArrayList<ProductItem>());
+        setProductItemCodesSelected(new ArrayList<String>());
         setArticleOrderList(new ArrayList<ArticleOrder>());
     }
 
@@ -171,7 +184,7 @@ public class SalesAction {
 
         CustomerOrder customerOrder = new CustomerOrder();
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
-        customerOrder.setCodigo(saleCode);
+        customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);
@@ -228,13 +241,13 @@ public class SalesAction {
         this.productItemFullName = productItemFullName;
     }
 
-    public List<ProductItem> getProductsSelected() {
+    /*public List<ProductItem> getProductsSelected() {
         return productsSelected;
     }
 
     public void setProductsSelected(List<ProductItem> productsSelected) {
         this.productsSelected = productsSelected;
-    }
+    }*/
 
     public List<ArticleOrder> getArticleOrderList() {
         return articleOrderList;
@@ -334,5 +347,13 @@ public class SalesAction {
 
     public void setCustomerOrderType(CustomerOrderType customerOrderType) {
         this.customerOrderType = customerOrderType;
+    }
+
+    public List<String> getProductItemCodesSelected() {
+        return productItemCodesSelected;
+    }
+
+    public void setProductItemCodesSelected(List<String> productItemCodesSelected) {
+        this.productItemCodesSelected = productItemCodesSelected;
     }
 }

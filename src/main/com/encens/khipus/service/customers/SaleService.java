@@ -13,4 +13,6 @@ public interface SaleService extends GenericService {
 
     Long findLastSaleId(User user);
 
+    CustomerOrder findSaleById(Long id);
+
 }
