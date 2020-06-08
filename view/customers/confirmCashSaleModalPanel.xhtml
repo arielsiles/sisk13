@@ -64,6 +64,9 @@
         <!--</rich:panel>-->
 
         <div class="buttonsRight">
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
             <a4j:commandButton id="confirmRegisterButton" value="Confirmar"
                                action="#{salesAction.registerCashSale()}"
                                styleClass="button"

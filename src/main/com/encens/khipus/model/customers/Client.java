@@ -1,11 +1,12 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.CompanyListener;
+import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.util.Constants;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -22,13 +23,21 @@ import java.util.Date;
         }
 )
 
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "Client.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "personacliente",
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "personacliente",schema = Constants.CASHBOX_SCHEMA)
-public class Client implements Serializable, BaseModel {
+@EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "personacliente")
+public class Client implements BaseModel {
 
     @Id
-    @Column(name = "IDPERSONACLIENTE")
+    @Column(name = "IDPERSONACLIENTE", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Client.tableGenerator")
     private Long id;
 
     @Column(name = "NRO_DOC")
@@ -67,6 +76,9 @@ public class Client implements Serializable, BaseModel {
 
     @Column(name = "DIRECCION")
     private String direccion;
+
+    @Column(name = "TELEFONO")
+    private Integer phone;
 
     @Column(name = "NIT")
     private String nit;
@@ -242,5 +254,13 @@ public class Client implements Serializable, BaseModel {
 
     public void setTerritoriotrabajo(Territoriotrabajo territoriotrabajo) {
         this.territoriotrabajo = territoriotrabajo;
+    }
+
+    public Integer getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Integer phone) {
+        this.phone = phone;
     }
 }

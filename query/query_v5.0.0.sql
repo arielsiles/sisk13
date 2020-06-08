@@ -39,6 +39,15 @@ insert into funcionalidad values (261, 'PRINTINVOICE', null, 1, 15, 'menu.custom
 select max(a.`IDARTICULOSPEDIDO`)+100 from articulos_pedido a;
 select max(a.`IDPEDIDOS`)+100 from pedidos a;
 
-insert into secuencia values ('articulos_pedido', 400000);
-insert into secuencia values ('pedidos', 50000);
+insert into secuencia values ('articulos_pedido', 400000); -- verificar secuencia
+insert into secuencia values ('pedidos', 50000);	   -- verificar secuencia
+
+/** 08.06.2020 **/
+
+
+
+
+
+
+
 

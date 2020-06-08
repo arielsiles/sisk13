@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Client.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+    <h:form id="creditSearch">
+
+    <rich:simpleTogglePanel label="#{messages['Client.search']}" switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Client.name']}</ui:define>
+                    <h:inputText id="firstName" value="#{clientDataModel.criteria.name}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Client.lastName']}</ui:define>
+                    <h:inputText id="firstName" value="#{clientDataModel.criteria.ap}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+            </s:div>
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
+                    <h:inputText id="firstName" value="#{clientDataModel.criteria.am}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{clientDataModel.search}" reRender="clientList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </s:div>
+        </h:panelGrid>
+        <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/client.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CLIENT','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{clientDataModel}" var="clientItem" id="clientList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="10%, 50%, 10%, 10%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+
+                        <rich:column>#{messages['Client.code']}</rich:column>
+
+                        <rich:column>#{messages['Client.name']}</rich:column>
+
+                        <rich:column>#{messages['Client.ci']}</rich:column>
+
+                        <rich:column>#{messages['Client.nit']}</rich:column>
+
+                        <rich:column>#{messages['Client.phone']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.id}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.fullName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.nroDoc}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.nit}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.phone}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{clientAction.select(clientItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('CLIENT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="clientList" dataModel="#{clientDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/client.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('CLIENT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
