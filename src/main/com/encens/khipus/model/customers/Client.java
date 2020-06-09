@@ -41,16 +41,16 @@ public class Client implements BaseModel {
     private Long id;
 
     @Column(name = "NRO_DOC")
-    private String nroDoc;
+    private String idNumber;
 
     @Column(name = "AP")
-    private String ap = "";
+    private String lastName;
 
     @Column(name = "AM")
-    private String am = "";
+    private String maidenName;
 
     @Column(name = "NOM")
-    private String name = "";
+    private String name;
 
     @Column(name = "SEXO")
     private String sexo;
@@ -75,22 +75,26 @@ public class Client implements BaseModel {
     private String sisCod;
 
     @Column(name = "DIRECCION")
-    private String direccion;
+    private String address;
 
     @Column(name = "TELEFONO")
     private Integer phone;
 
     @Column(name = "NIT")
-    private String nit;
+    private String nitNumber;
 
     @Column(name = "RAZONSOCIAL")
-    private String razonsocial = "";
+    private String businessName;
 
     @Column(name = "PORCENTAJECOMISION")
-    private Double porcentajeComision = 0.0;
+    private Double commission;
 
     @Column(name = "CODIGOCLIENTE")
     private String codigo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
+    private ClientType clientType;
 
     @JoinColumn(name = "IDTERRITORIOTRABAJO", referencedColumnName = "IDTERRITORIOTRABAJO")
     @ManyToOne
@@ -104,28 +108,28 @@ public class Client implements BaseModel {
         this.id = id;
     }
 
-    public String getNroDoc() {
-        return nroDoc;
+    public String getIdNumber() {
+        return idNumber;
     }
 
-    public void setNroDoc(String nroDoc) {
-        this.nroDoc = nroDoc;
+    public void setIdNumber(String nroDoc) {
+        this.idNumber = nroDoc;
     }
 
-    public String getAp() {
-        return ap;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setAp(String ap) {
-        this.ap = ap;
+    public void setLastName(String ap) {
+        this.lastName = ap;
     }
 
-    public String getAm() {
-        return am;
+    public String getMaidenName() {
+        return maidenName;
     }
 
-    public void setAm(String am) {
-        this.am = am;
+    public void setMaidenName(String am) {
+        this.maidenName = am;
     }
 
     public String getName() {
@@ -194,37 +198,37 @@ public class Client implements BaseModel {
         this.sisCod = sisCod;
     }
 
-    public String getDireccion() {
-        return direccion;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
+    public void setAddress(String direccion) {
+        this.address = direccion;
     }
 
 
-    public String getNit() {
-        return nit;
+    public String getNitNumber() {
+        return nitNumber;
     }
 
-    public void setNit(String nit) {
-        this.nit = nit;
+    public void setNitNumber(String nit) {
+        this.nitNumber = nit;
     }
 
-    public String getRazonsocial() {
-        return razonsocial;
+    public String getBusinessName() {
+        return businessName;
     }
 
-    public void setRazonsocial(String razonsocial) {
-        this.razonsocial = razonsocial;
+    public void setBusinessName(String razonsocial) {
+        this.businessName = razonsocial;
     }
 
-    public Double getPorcentajeComision() {
-        return porcentajeComision;
+    public Double getCommission() {
+        return commission;
     }
 
-    public void setPorcentajeComision(Double descuento) {
-        this.porcentajeComision = descuento;
+    public void setCommission(Double descuento) {
+        this.commission = descuento;
     }
 
     public String getCodigo() {
@@ -238,14 +242,14 @@ public class Client implements BaseModel {
     public String getNombreCompleto(){
         if(this.id == null)
             return "";
-        if(StringUtils.isEmpty(razonsocial))
-            return name +" "+ap+" "+am;
+        if(StringUtils.isEmpty(businessName))
+            return name +" "+ lastName +" "+ maidenName;
         else
-            return razonsocial;
+            return businessName;
     }
 
     public String getFullName(){
-        return getName() + " " + getAp() + " " + getAm();
+        return getName() + " " + getLastName() + " " + getMaidenName();
     }
 
     public Territoriotrabajo getTerritoriotrabajo() {
@@ -262,5 +266,13 @@ public class Client implements BaseModel {
 
     public void setPhone(Integer phone) {
         this.phone = phone;
+    }
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientType clientType) {
+        this.clientType = clientType;
     }
 }

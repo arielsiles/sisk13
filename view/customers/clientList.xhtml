@@ -32,7 +32,7 @@
 
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Client.lastName']}</ui:define>
-                    <h:inputText id="firstName" value="#{clientDataModel.criteria.ap}"
+                    <h:inputText id="firstName" value="#{clientDataModel.criteria.lastName}"
                                  maxlength="80" tabindex="1" styleClass="input">
                     </h:inputText>
                 </s:decorate>
@@ -41,7 +41,7 @@
             <s:div>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
-                    <h:inputText id="firstName" value="#{clientDataModel.criteria.am}"
+                    <h:inputText id="firstName" value="#{clientDataModel.criteria.maidenName}"
                                  maxlength="80" tabindex="1" styleClass="input">
                     </h:inputText>
                 </s:decorate>
@@ -90,7 +90,7 @@
                     </rich:columnGroup>
                 </f:facet>
 
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{clientItem.id}"/>
                 </rich:column>
 
@@ -99,11 +99,11 @@
                 </rich:column>
 
                 <rich:column>
-                    <h:outputText value="#{clientItem.nroDoc}"/>
+                    <h:outputText value="#{clientItem.idNumber}"/>
                 </rich:column>
 
                 <rich:column>
-                    <h:outputText value="#{clientItem.nit}"/>
+                    <h:outputText value="#{clientItem.nitNumber}"/>
                 </rich:column>
 
                 <rich:column>

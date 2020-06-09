@@ -145,7 +145,7 @@
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="9"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{client}.getNit()]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{client}.getNitNumber()]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

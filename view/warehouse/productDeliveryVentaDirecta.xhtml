@@ -139,16 +139,16 @@
                 </s:decorate>
                 <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.firstName']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.ap}"/>
+                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.lastName}"/>
                 </s:decorate>
                 <s:decorate id="secondNameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.secondName']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.am}"/>
+                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.maidenName}"/>
                 </s:decorate>
                 <s:decorate id="personalIdentificationField" template="/include/inputField.xhtml"
                             styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.personalIdentification']}</ui:define>
-                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.nroDoc}"/>
+                    <h:outputText value="#{productDeliveryAction.ventaDirecta.cliente.idnumber}"/>
                 </s:decorate>
                 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['SoldProduct.state']}</ui:define>

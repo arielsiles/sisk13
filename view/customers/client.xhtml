@@ -18,11 +18,11 @@
         </c:otherwise>
     </c:choose>
 </ui:define>
-<ui:param name="bodyWidth" value="70%"/>
+<ui:param name="bodyWidth" value="80%"/>
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
-<h:form id="employeeForm">
+<h:form id="clientForm">
 
 <div class="buttons">
     <h:commandButton action="#{clientAction.create}" value="#{messages['Common.save']}"
@@ -65,242 +65,134 @@
 <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
              columnClasses="width50percent,width50percent">
 <s:div>
-    <s:decorate id="idNumberField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.idNumber']}</ui:define>
+    <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.idNumber']}</ui:define>
         <h:inputText id="idNumber"
-                     value="#{employee.idNumber}"
+                     value="#{client.idNumber}"
                      required="true"
                      maxlength="100"
                      styleClass="input"
                      tabindex="5">
-            <app:naturalNumberConverter forId="idNumber"/>
         </h:inputText>
     </s:decorate>
 
-    <s:div id="documentDiv">
-        <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Employee.documentType']}</ui:define>
-            <h:selectOneMenu id="documentType"
-                             value="#{employee.documentType}"
-                             styleClass="input"
-                             required="true"
-                             tabindex="6">
-                <s:selectItems value="#{personDocumentTypeList}" var="documentType"
-                               label="#{documentType.name}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-                <a4j:support event="onchange"
-                             action="#{employeeAction.updateShowExtension()}"
-                             reRender="documentDiv"
-                             ajaxSingle="true"/>
-            </h:selectOneMenu>
-        </s:decorate>
-        <s:decorate id="extensionField" template="/include/inputField.xhtml"
-                    rendered="#{employeeAction.showExtension}"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['Entity.extension']}</ui:define>
-            <h:selectOneMenu id="extension"
-                             value="#{employee.extensionSite}"
-                             styleClass="input"
-                             required="false"
-                             tabindex="7">
-                <s:selectItems value="#{extensionList}"
-                               var="extension"
-                               label="#{extension.extension}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-            </h:selectOneMenu>
-        </s:decorate>
-    </s:div>
+    <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.nitNumber']}</ui:define>
+        <h:inputText id="idNumber"
+                     value="#{client.nitNumber}"
+                     required="true"
+                     maxlength="100"
+                     styleClass="input"
+                     tabindex="5">
+        </h:inputText>
+    </s:decorate>
 
-
-</s:div>
-
-<s:div>
-    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.firstName']}</ui:define>
-        <h:inputText id="firstName" value="#{employee.firstName}" required="true"
+    <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.businessName']}</ui:define>
+        <h:inputText id="businessName" value="#{client.businessName}" required="true"
                      maxlength="200" tabindex="11" styleClass="input">
         </h:inputText>
     </s:decorate>
+
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.name']}</ui:define>
+        <h:inputText id="name" value="#{client.name}" required="true"
+                     maxlength="200" tabindex="11" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
     <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.lastName']}</ui:define>
-        <h:inputText id="lastName" value="#{employee.lastName}" required="true"
+        <ui:define name="label">#{messages['Client.lastName']}</ui:define>
+        <h:inputText id="lastName" value="#{client.lastName}" required="true"
                      maxlength="80" tabindex="12" styleClass="input">
         </h:inputText>
     </s:decorate>
+
     <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.maidenName']}</ui:define>
-        <h:inputText id="maidenName" value="#{employee.maidenName}" required="true"
+        <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
+        <h:inputText id="maidenName" value="#{client.maidenName}" required="true"
                      maxlength="200" tabindex="13" styleClass="input">
         </h:inputText>
     </s:decorate>
 
-    <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.profession']}</ui:define>
-        <h:inputText id="maidenName" value="#{employee.profession}"
-                     maxlength="200" tabindex="14" styleClass="input">
+    <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.phone']}</ui:define>
+        <h:inputText id="phone" value="#{client.phone}" required="true"
+                     maxlength="200" tabindex="13" styleClass="input">
         </h:inputText>
     </s:decorate>
-    <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.salutation']}</ui:define>
-        <h:selectOneMenu id="salutation" value="#{employee.salutation}" styleClass="input"
-                         required="true" tabindex="15">
-            <s:selectItems value="#{salutationList.resultList}" var="salutation"
-                           label="#{salutation.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-    <s:decorate id="maritalStatusField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.maritalStatus']}</ui:define>
-        <h:selectOneMenu id="maritalStatus"
-                         value="#{employee.maritalStatus}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="15">
-            <s:selectItems value="#{maritalStatusList.resultList}" var="maritalStatus"
-                           label="#{maritalStatus.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-    <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.gender']}</ui:define>
-        <h:selectOneMenu id="genderType"
-                         value="#{employee.gender}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="15">
-            <s:selectItems value="#{genderEnum}"
-                           var="gender"
-                           label="#{messages[gender.resourceKey]}"
-                           hideNoSelectionLabel="false"
-                           noSelectionLabel=""/>
-            <s:convertEnum/>
-        </h:selectOneMenu>
-    </s:decorate>
-    <s:decorate id="homeAddressField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Employee.homeAddress']}</ui:define>
-        <h:inputTextarea id="homeAddress"
-                         value="#{employee.homeAddress}"
+
+    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.address']}</ui:define>
+        <h:inputTextarea id="address"
+                         value="#{client.address}"
                          styleClass="textarea"
                          tabindex="15"
                          style="width:200px;height:40px;"/>
     </s:decorate>
+
+</s:div>
+
+<s:div>
+
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.clientType']}</ui:define>
+        <h:selectOneMenu id="documentType"
+                         value="#{client.clientType}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="6">
+            <s:selectItems value="#{clientTypeList}" var="clientType"
+                           label="#{clientType.name}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="commissionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.phone']}</ui:define>
+        <h:inputText id="commission" value="#{client.phone}" required="true"
+                     maxlength="200" tabindex="13" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
 </s:div>
 
 </h:panelGrid>
 </rich:panel>
 
 <div class="buttons">
-    <h:commandButton action="#{employeeAction.create}"
-                     value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{!employeeAction.managed and s:hasPermission('EMPLOYEE','CREATE')}"
-                     tabindex="20"/>
 
-    <h:commandButton action="#{employeeAcademicFormationAction.assignAcademicFormation}"
-                     value="#{messages['AcademicFormation.add']}"
-                     styleClass="button"
-                     rendered="#{employeeAction.managed and s:hasPermission('EMPLOYEEACADEMICFORMATION','CREATE')}"
-                     immediate="true"
-                     tabindex="21"/>
-
-    <h:commandButton action="#{employeeAction.update}"
-                     value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{employeeAction.managed and s:hasPermission('EMPLOYEE','UPDATE')}"
-                     tabindex="22"/>
-
-    <h:commandButton value="#{messages['Common.delete']}"
-                     styleClass="button"
-                     rendered="#{employeeAction.managed and s:hasPermission('EMPLOYEE','DELETE')}"
-                     tabindex="23">
-        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
-    </h:commandButton>
-
-    <h:commandButton action="#{employeeAction.cancel}" value="#{messages['Common.cancel']}"
-                     styleClass="button" tabindex="24" immediate="true"/>
 </div>
-
-<c:if test="#{employeeAction.managed and  s:hasPermission('EMPLOYEEACADEMICFORMATION','VIEW')}">
-    <rich:spacer height="15px"/>
-    <rich:dataTable value="#{employeeAcademicFormationDataModel}"
-                    var="academicFormationItem"
-                    id="academicFormationList"
-                    rows="#{sessionUser.rowsPerPage}"
-                    width="100%"
-                    columnsWidth="40%, 40%, 10%, 10%">
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column>
-                    #{messages['AcademicFormation.name']}
-                </rich:column>
-                <rich:column>
-                    #{messages['AcademicFormation.university']}
-                </rich:column>
-                <rich:column>
-                    #{messages['AcademicFormation.type']}
-                </rich:column>
-                <rich:column styleClass="center">
-                    <h:outputText value="#{messages['Common.action']}"/>
-                </rich:column>
-            </rich:columnGroup>
-        </f:facet>
-        <rich:column>
-            <h:outputText value="#{academicFormationItem.name}"/>
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{academicFormationItem.university}"/>
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{messages[academicFormationItem.academicFormationType.resourceKey]}"/>
-        </rich:column>
-        <rich:column styleClass="center">
-            <h:commandLink value="#{messages['Common.select']}"
-                           immediate="true"
-                           action="#{employeeAcademicFormationAction.select(academicFormationItem)}"/>
-        </rich:column>
-    </rich:dataTable>
-
-    <app:dataScroller id="dataScroller" for="academicFormationList" dataModel="#{employeeAcademicFormationDataModel}"/>
-</c:if>
 
 </h:form>
 
-<s:decorate template="/include/modalDialog.xhtml"
-            rendered="#{employeeAction.managed and s:hasPermission('EMPLOYEE','DELETE')}">
+<s:decorate template="/include/modalDialog.xhtml" rendered="#{clientAction.managed and s:hasPermission('CLIENT','DELETE')}">
     <ui:param name="dialogId" value="deleteConfirmation"/>
     <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
     <ui:define name="dialogContent">
         <p>
-            <h:outputFormat value="#{messages['Employee.delete.confirmation']}">
-                <f:param value="#{employee.fullName}"/>
+            <h:outputFormat value="#{messages['Client.delete.confirmation']}">
+                <f:param value="#{client.fullName}"/>
             </h:outputFormat>
         </p>
     </ui:define>
     <ui:define name="dialogOption">
-        <a4j:commandButton action="#{employeeAction.delete}"
+        <a4j:commandButton action="#{clientAction.delete}"
                            value="#{messages['Common.delete']}"
                            immediate="true"
-                           rendered="#{s:hasPermission('EMPLOYEE','DELETE')}"
+                           rendered="#{s:hasPermission('CLIENT','DELETE')}"
                            tabindex="1000"
                            styleClass="button"/>
     </ui:define>
 </s:decorate>
 
 
-<s:fragment rendered="#{!employeeAction.managed}">
+<s:fragment rendered="#{!clientAction.managed}">
     <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
 </s:fragment>
-<s:fragment rendered="#{employeeAction.managed}">
+<s:fragment rendered="#{clientAction.managed}">
     <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
 </s:fragment>
 </ui:define>

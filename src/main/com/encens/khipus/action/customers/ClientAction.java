@@ -1,11 +1,10 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Client;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 
 /**
  * @author
@@ -30,6 +29,13 @@ public class ClientAction extends GenericAction<Client> {
     @Override
     protected String getDisplayNameProperty() {
         return "fullName";
+    }
+
+    @Override
+    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(Client instance) {
+        String outCome = super.select(instance);
+        return outCome;
     }
 
     public String getClientName() {

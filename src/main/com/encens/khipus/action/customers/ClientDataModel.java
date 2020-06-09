@@ -22,8 +22,8 @@ public class ClientDataModel extends QueryDataModel<Long, Client> {
 
     private static final String[] RESTRICTIONS = {
             "lower(client.name) like concat('%', concat(lower(#{clientDataModel.criteria.name}), '%'))",
-            "lower(client.ap) like concat('%', concat(lower(#{clientDataModel.criteria.ap}), '%'))",
-            "lower(client.am) like concat('%', concat(lower(#{clientDataModel.criteria.am}), '%'))"
+            "lower(client.lastName) like concat('%', concat(lower(#{clientDataModel.criteria.lastName}), '%'))",
+            "lower(client.maidenName) like concat('%', concat(lower(#{clientDataModel.criteria.maidenName}), '%'))"
     };
 
     @Create

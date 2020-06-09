@@ -43,7 +43,7 @@ insert into secuencia values ('articulos_pedido', 400000); -- verificar secuenci
 insert into secuencia values ('pedidos', 50000);	   -- verificar secuencia
 
 /** 08.06.2020 **/
-
+insert into funcionalidad values (262, 'CLIENT', null, 1, 15, 'Functionality.customers.client', 1);
 
 
 

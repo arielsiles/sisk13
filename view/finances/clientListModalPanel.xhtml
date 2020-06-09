@@ -34,14 +34,14 @@
 
                 <s:decorate id="apField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Client.lastName']}</ui:define>
-                    <h:inputText id="ap" value="#{dataModel.criteria.ap}" maxlength="100"
+                    <h:inputText id="ap" value="#{dataModel.criteria.lastName}" maxlength="100"
                                  styleClass="input"
                                  tabindex="2002"/>
                 </s:decorate>
 
                 <s:decorate id="amField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
-                    <h:inputText id="am" value="#{dataModel.criteria.am}" maxlength="100"
+                    <h:inputText id="am" value="#{dataModel.criteria.maidenName}" maxlength="100"
                                  styleClass="input"
                                  tabindex="2002"/>
                 </s:decorate>
@@ -69,14 +69,14 @@
                         </app:commandSortHeader>
                     </rich:column>
                     <rich:column>
-                        <app:commandSortHeader sortProperty="client.ap"
+                        <app:commandSortHeader sortProperty="client.lastName"
                                                dataModel="#{dataModel}"
                                                reRender="clientList, dataScroller">
                             #{messages['Client.lastName']}
                         </app:commandSortHeader>
                     </rich:column>
                     <rich:column>
-                        <app:commandSortHeader sortProperty="client.am"
+                        <app:commandSortHeader sortProperty="client.maidenName"
                                                dataModel="#{dataModel}"
                                                reRender="clientList, dataScroller">
                             #{messages['Client.maidenName']}
@@ -91,10 +91,10 @@
                 <h:outputText value="#{clientItem.name}"/>
             </rich:column>
             <rich:column>
-                <h:outputText value="#{clientItem.ap}"/>
+                <h:outputText value="#{clientItem.lastName}"/>
             </rich:column>
             <rich:column>
-                <h:outputText value="#{clientItem.am}"/>
+                <h:outputText value="#{clientItem.maidenName}"/>
             </rich:column>
             <rich:column styleClass="center">
                 <ui:insert name="assignButton"/>

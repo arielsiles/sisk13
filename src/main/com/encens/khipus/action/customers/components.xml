@@ -56,4 +56,8 @@
     <framework:entity-query name="customerOrderTypeQuery"
                             ejbql="select c from CustomerOrderType c "/>
 
+    <factory name="clientTypeList" value="#{clientTypeQuery}"/>
+    <framework:entity-query name="clientTypeQuery" ejbql="select c from ClientType c">
+    </framework:entity-query>
+
 </components>

@@ -70,10 +70,10 @@ public class SummaryClientStateReportAction extends GenericReportAction {
         ejbql = " SELECT " +
                 "        client.territoriotrabajo.nombre as group, " +
                 "        client.id, " +
-                "        client.nit, " +
+                "        client.nitNumber, " +
                 "        client.name, " +
-                "        client.ap, " +
-                "        client.am, " +
+                "        client.lastName, " +
+                "        client.maidenName, " +
                 "        SUM(voucherDetail.debit) as debit, " +
                 "        SUM(voucherDetail.credit) as credit " +
                 "  FROM  Voucher voucher " +
@@ -82,7 +82,7 @@ public class SummaryClientStateReportAction extends GenericReportAction {
                 "  WHERE voucher.date <= '" + end + "' " +
                 "  AND   voucherDetail.account = '" + cashAccount.getAccountCode() + "'" +
                 "  AND   voucher.state <> 'ANL' " +
-                "  group by client.id, client.nit, client.name, client.ap, client.am " +
+                "  group by client.id, client.nitNumber, client.name, client.lastName, client.maidenName " +
                 "  order by client.territoriotrabajo.nombre, client.name";
 
         return ejbql;
