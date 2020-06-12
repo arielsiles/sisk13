@@ -45,8 +45,13 @@ insert into secuencia values ('pedidos', 50000);	   -- verificar secuencia
 /** 08.06.2020 **/
 insert into funcionalidad values (262, 'CLIENT', null, 1, 15, 'Functionality.customers.client', 1);
 
+/** 11.06.2020 **/
+alter table personacliente modify column ESPERSONA int(1);
+alter table personacliente modify column con_factura int(11) not null default 1;
 
+select max(a.`idpersonacliente`)+1 from personacliente a;
 
+insert into secuencia values ('personacliente', (select max(idpersonacliente)+1 from personacliente));
 
 
 
