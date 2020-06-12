@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 <ui:define name="pageTitle">
     <c:choose>
@@ -28,25 +27,25 @@
     <h:commandButton action="#{clientAction.create}" value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{!clientAction.managed and s:hasPermission('CLIENT','CREATE')}"
-                     tabindex="1">
+                     tabindex="101">
         <s:defaultAction/>
     </h:commandButton>
 
     <h:commandButton action="#{clientAction.update}" value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{clientAction.managed and s:hasPermission('CLIENT','UPDATE')}"
-                     tabindex="2"/>
+                     tabindex="102"/>
 
     <h:commandButton value="#{messages['Common.delete']}"
                      styleClass="button"
                      rendered="#{clientAction.managed and s:hasPermission('CLIENT','DELETE')}"
-                     tabindex="3">
+                     tabindex="103">
         <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
     </h:commandButton>
 
     <h:commandButton action="#{clientAction.cancel}" value="#{messages['Common.cancel']}"
                      styleClass="button" immediate="true"
-                     tabindex="4">
+                     tabindex="104">
     </h:commandButton>
 </div>
 
@@ -65,60 +64,82 @@
 <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
              columnClasses="width50percent,width50percent">
 <s:div>
-    <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.idNumber']}</ui:define>
-        <h:inputText id="idNumber"
-                     value="#{client.idNumber}"
-                     required="true"
-                     maxlength="100"
-                     styleClass="input"
-                     tabindex="5">
-        </h:inputText>
+
+    <s:decorate id="personFlagField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.message.select']}</ui:define>
+        <h:selectOneRadio id="personFlag" value="#{client.personFlag}" layout="lineDirection"
+                          required="false" disabled="#{clientAction.managed}"
+                          tabindex="1">
+            <f:selectItem itemValue="true" itemLabel="#{messages['Client.person']}"/>
+            <f:selectItem itemValue="false" itemLabel="#{messages['Client.institution']}"/>
+
+            <a4j:support event="onchange"
+                         reRender="personData, institutionData" ajaxSingle="true"/>
+
+        </h:selectOneRadio>
     </s:decorate>
 
-    <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.nitNumber']}</ui:define>
-        <h:inputText id="idNumber"
-                     value="#{client.nitNumber}"
-                     required="true"
-                     maxlength="100"
-                     styleClass="input"
-                     tabindex="5">
-        </h:inputText>
-    </s:decorate>
+    <s:div id="personData">
+        <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{client.personFlag}">
+            <ui:define name="label">#{messages['Client.idNumber']}</ui:define>
+            <h:inputText id="idNumber"
+                         value="#{client.idNumber}"
+                         required="false"
+                         maxlength="100"
+                         styleClass="input"
+                         tabindex="2">
+            </h:inputText>
+        </s:decorate>
 
-    <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.businessName']}</ui:define>
-        <h:inputText id="businessName" value="#{client.businessName}" required="true"
-                     maxlength="200" tabindex="11" styleClass="input">
-        </h:inputText>
-    </s:decorate>
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Client.name']}</ui:define>
+            <h:inputText id="name" value="#{client.name}" required="false"
+                         maxlength="200" styleClass="input" tabindex="3">
+            </h:inputText>
+        </s:decorate>
 
-    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.name']}</ui:define>
-        <h:inputText id="name" value="#{client.name}" required="true"
-                     maxlength="200" tabindex="11" styleClass="input">
-        </h:inputText>
-    </s:decorate>
+        <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{client.personFlag}">
+            <ui:define name="label">#{messages['Client.lastName']}</ui:define>
+            <h:inputText id="lastName" value="#{client.lastName}" required="false"
+                         maxlength="80" styleClass="input" tabindex="4">
+            </h:inputText>
+        </s:decorate>
 
-    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.lastName']}</ui:define>
-        <h:inputText id="lastName" value="#{client.lastName}" required="true"
-                     maxlength="80" tabindex="12" styleClass="input">
-        </h:inputText>
-    </s:decorate>
+        <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{client.personFlag}">
+            <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
+            <h:inputText id="maidenName" value="#{client.maidenName}" required="false"
+                         maxlength="200" tabindex="5" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+    </s:div>
 
-    <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
-        <h:inputText id="maidenName" value="#{client.maidenName}" required="true"
-                     maxlength="200" tabindex="13" styleClass="input">
-        </h:inputText>
-    </s:decorate>
+    <s:div id="institutionData">
+        <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Client.nit']}</ui:define>
+            <h:inputText id="idNumber"
+                         value="#{client.nitNumber}"
+                         required="false"
+                         maxlength="100"
+                         styleClass="input"
+                         tabindex="6">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Client.businessName']}</ui:define>
+            <h:inputText id="businessName" value="#{client.businessName}" required="false"
+                         maxlength="200" tabindex="7" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+    </s:div>
 
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.phone']}</ui:define>
-        <h:inputText id="phone" value="#{client.phone}" required="true"
-                     maxlength="200" tabindex="13" styleClass="input">
+        <h:inputText id="phone" value="#{client.phone}" required="false"
+                     maxlength="200" tabindex="8" styleClass="input">
         </h:inputText>
     </s:decorate>
 
@@ -127,7 +148,7 @@
         <h:inputTextarea id="address"
                          value="#{client.address}"
                          styleClass="textarea"
-                         tabindex="15"
+                         tabindex="9"
                          style="width:200px;height:40px;"/>
     </s:decorate>
 
@@ -141,7 +162,7 @@
                          value="#{client.clientType}"
                          styleClass="input"
                          required="true"
-                         tabindex="6">
+                         tabindex="10">
             <s:selectItems value="#{clientTypeList}" var="clientType"
                            label="#{clientType.name}"
                            noSelectionLabel=""
@@ -150,12 +171,6 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <s:decorate id="commissionField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.phone']}</ui:define>
-        <h:inputText id="commission" value="#{client.phone}" required="true"
-                     maxlength="200" tabindex="13" styleClass="input">
-        </h:inputText>
-    </s:decorate>
 
 </s:div>
 

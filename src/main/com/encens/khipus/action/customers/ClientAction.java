@@ -16,6 +16,7 @@ import org.jboss.seam.annotations.*;
 public class ClientAction extends GenericAction<Client> {
 
     private String clientName;
+    private Boolean personFlag = Boolean.TRUE;
 
     @Factory(value = "client", scope = ScopeType.STATELESS)
     public Client initClient() {
@@ -38,6 +39,11 @@ public class ClientAction extends GenericAction<Client> {
         return outCome;
     }
 
+
+    public void changePersonFlag(){
+        System.out.println("------------> changePersonFlag: " + this.personFlag);
+    }
+
     public String getClientName() {
         return clientName;
     }
@@ -47,5 +53,11 @@ public class ClientAction extends GenericAction<Client> {
     }
 
 
+    public Boolean getPersonFlag() {
+        return personFlag;
+    }
 
+    public void setPersonFlag(Boolean personFlag) {
+        this.personFlag = personFlag;
+    }
 }

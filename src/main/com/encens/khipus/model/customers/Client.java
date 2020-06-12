@@ -1,10 +1,10 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.util.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -31,7 +31,7 @@ import java.util.Date;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
+@EntityListeners({UpperCaseStringListener.class})
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "personacliente")
 public class Client implements BaseModel {
 
@@ -91,6 +91,10 @@ public class Client implements BaseModel {
 
     @Column(name = "CODIGOCLIENTE")
     private String codigo;
+
+    @Column(name = "ESPERSONA", nullable = true)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean personFlag = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
@@ -249,7 +253,9 @@ public class Client implements BaseModel {
     }
 
     public String getFullName(){
-        return getName() + " " + getLastName() + " " + getMaidenName();
+        String result = getName();
+        result = result + (getLastName() != null ? getLastName() : "") + (getMaidenName() != null ? getMaidenName() : "");
+        return result;
     }
 
     public Territoriotrabajo getTerritoriotrabajo() {
@@ -274,5 +280,13 @@ public class Client implements BaseModel {
 
     public void setClientType(ClientType clientType) {
         this.clientType = clientType;
+    }
+
+    public Boolean getPersonFlag() {
+        return personFlag;
+    }
+
+    public void setPersonFlag(Boolean personFlag) {
+        this.personFlag = personFlag;
     }
 }
