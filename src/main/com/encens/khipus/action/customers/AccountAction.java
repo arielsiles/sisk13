@@ -159,7 +159,12 @@ public class AccountAction extends GenericAction<Account> {
 
         BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
         setInterestDPF(interestVal);
-        setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
+
+        if (getInstance().getRetentionFlag())
+            setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
+        else
+            setRcivaDPF(BigDecimal.ZERO);
+
         totalAmountDPF = BigDecimalUtil.sum(capitalDPF, interestDPF);
         totalAmountDPF = BigDecimalUtil.subtract(totalAmountDPF, rcivaDPF);
 
