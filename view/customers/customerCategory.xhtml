@@ -72,6 +72,71 @@
                 </s:decorate>
             </rich:panel>
 
+            <c:if test="#{customerCategoryAction.managed}">
+                <rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">
+                    <rich:tab name="priceItemTab" label="#{messages['CustomerCategory.products']}" ajaxSingle="true">
+                        <rich:dataTable id="priceItemListId"
+                                        value="#{priceItemDataModel}"
+                                        var="priceItem"
+                                        rows="#{sessionUser.rowsPerPage}"
+                                        width="100%"
+                                        columnsWidth="10%, 60%, 20%, 10%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.code']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.name']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.price']}" />
+                                    </rich:column>
+
+                                    <rich:column styleClass="center">
+                                        <h:outputText value="#{messages['Common.action']}" />
+                                    </rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+
+                            <rich:column>
+                                <h:outputText value="#{priceItem.productItemCode}"/>
+                            </rich:column>
+
+                            <rich:column>
+                                <h:outputText value="#{priceItem.productItemCode}"/>
+                            </rich:column>
+
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{creditTransactionItem.capital}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+
+                            <rich:column styleClass="center">
+                                <!--<h:commandLink value="#{messages['Common.select']}"
+                                               immediate="true"
+                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
+                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
+                                &#160;-->
+                                <!--<h:commandLink action="#{voucherCreateAction.generateReport(creditTransactionItem.voucher)}" immediate="true">-->
+                                <h:commandLink action="#{creditAction.generateTransactionReport(creditTransactionItem)}" immediate="true">
+
+                                    <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                                    title="#{messages['Voucher.report.generateReport']}"/>
+                                </h:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                        <app:dataScroller id="ListIdListDataScrollerId"
+                                          for="creditTransactionListId"
+                                          dataModel="#{creditTransactionDataModel}"/>
+                    </rich:tab>
+                </rich:tabPanel>
+            </c:if>
+
+
             <div class="buttons">
                 <h:commandButton action="#{customerCategoryAction.create}"
                                  value="#{messages['Common.save']}"

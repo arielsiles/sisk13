@@ -253,8 +253,8 @@ public class Client implements BaseModel {
     }
 
     public String getFullName(){
-        String result = getName();
-        result = result + (getLastName() != null ? getLastName() : "") + (getMaidenName() != null ? getMaidenName() : "");
+        String result = getName() + " ";
+        result = result + (getLastName() != null ? getLastName() + " " : "") + (getMaidenName() != null ? getMaidenName() : "");
         return result;
     }
 

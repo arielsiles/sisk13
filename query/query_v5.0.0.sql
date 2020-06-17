@@ -50,8 +50,25 @@ alter table personacliente modify column ESPERSONA int(1);
 alter table personacliente modify column con_factura int(11) not null default 1;
 
 select max(a.`idpersonacliente`)+1 from personacliente a;
-
 insert into secuencia values ('personacliente', (select max(idpersonacliente)+1 from personacliente));
+
+/** 17.06.2020 **/
+alter table categoriacliente add primary key (idcategoriacliente);
+
+create table precioarticulo (
+	idprecioarticulo 	bigint(20) not null,
+	cod_art 		varchar(6) not null,
+	precio 			decimal(12, 2) not null,
+	idcategoriacliente 	bigint(20) not null,
+	no_cia 			varchar(2) not null,
+	version 		bigint(20) not null,
+	idcompania 		bigint(20) not null,
+	primary key (idprecioarticulo)
+);
+
+alter table precioarticulo add foreign key (idcategoriacliente) references categoriacliente (idcategoriacliente);
+alter table precioarticulo add foreign key (idcompania) references compania (idcompania);
+
 
 
 
