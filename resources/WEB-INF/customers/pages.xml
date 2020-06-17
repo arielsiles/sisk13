@@ -177,12 +177,31 @@
         <param name="id" value="#{invoicePrintAction.invoiceId}"/>
     </page>
 
+    <!--
     <page view-id="/customers/account.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
-        <navigation>
+
+    </page>
+    -->
+
+    <page view-id="/customers/account.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
+        <!--<navigation>
             <rule if-outcome="Success">
                 <redirect view-id="/customers/accountList.xhtml"/>
             </rule>
             <rule if-outcome="Cancel">
+                <redirect view-id="/customers/accountList.xhtml"/>
+            </rule>
+        </navigation>-->
+
+        <navigation from-action="#{accountAction.update}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{accountAction.cancel}">
+            <rule if-outcome="Cancel">
+                <begin-conversation flush-mode="MANUAL"/>
                 <redirect view-id="/customers/accountList.xhtml"/>
             </rule>
         </navigation>

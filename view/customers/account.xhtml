@@ -127,11 +127,13 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <!-- disabled="false" : todo: implement access rights -->
                     <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.accountType']}</ui:define>
                         <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
                                          styleClass="input"
-                                         required="true" disabled="#{accountAction.managed}"
+                                         required="true"
+                                         disabled="false"
                                          tabindex="1">
                             <s:selectItems value="#{accountTypeList.resultList}"
                                            var="accountType"
