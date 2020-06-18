@@ -69,7 +69,8 @@ create table precioarticulo (
 alter table precioarticulo add foreign key (idcategoriacliente) references categoriacliente (idcategoriacliente);
 alter table precioarticulo add foreign key (idcompania) references compania (idcompania);
 
-
+alter table personacliente add column idcategoriacliente bigint(20) after idtipocliente;
+alter table personacliente add foreign key (idcategoriacliente) references categoriacliente (idcategoriacliente);
 
 
 
