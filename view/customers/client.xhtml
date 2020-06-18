@@ -171,6 +171,20 @@
         </h:selectOneMenu>
     </s:decorate>
 
+    <s:decorate id="territoryField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.territory']}</ui:define>
+        <h:selectOneMenu id="territory"
+                         value="#{client.territoriotrabajo}"
+                         styleClass="input">
+            <s:selectItems value="#{territorioList}"
+                           var="territorio"
+                           label="#{territorio.nombre}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
     <s:decorate id="customerCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.customerCategory']}</ui:define>
         <h:selectOneMenu id="documentType"

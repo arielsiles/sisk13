@@ -20,14 +20,19 @@ public class Territoriotrabajo implements Serializable {
     @Id
     @Column(name = "IDTERRITORIOTRABAJO")
     private Long idterritoriotrabajo;
+
     @Column(name = "NOMBRE")
     private String nombre;
+
     @Column(name = "PAIS")
     private String pais;
+
     @Column(name = "DESCRIPCION")
     private String descripcion;
+
     @OneToMany(mappedBy = "territoriotrabajo")
     private Collection<Client> clientes;
+
     @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDPERSONACLIENTE")
     @ManyToOne
     private Client distribuidor;

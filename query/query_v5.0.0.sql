@@ -72,5 +72,46 @@ alter table precioarticulo add foreign key (idcompania) references compania (idc
 alter table personacliente add column idcategoriacliente bigint(20) after idtipocliente;
 alter table personacliente add foreign key (idcategoriacliente) references categoriacliente (idcategoriacliente);
 
+/** 18.06.2020 **/
+-- Configurando articulos para ventas, fijando precio por defecto
+-- Productos comercial
+update inv_articulos set 	fix = 1, sigla = 	'CHI 160'	, pos = 	3	, precio_venta=	1.30	, vendible = 'S'	 where cod_art = 	667	;
+update inv_articulos set 	fix = 1, sigla = 	'CHI 1L'	, pos = 	2	, precio_venta=	7	, vendible = 'S'	 where cod_art = 	119	;
+update inv_articulos set 	fix = 1, sigla = 	'ILFDU 120'	, pos = 	4	, precio_venta=	0.42	, vendible = 'S'	 where cod_art = 	589	;
+update inv_articulos set 	fix = 1, sigla = 	'ILFMA 120'	, pos = 	5	, precio_venta=	0.42	, vendible = 'S'	 where cod_art = 	588	;
+update inv_articulos set 	fix = 1, sigla = 	'ILFNA 120'	, pos = 	6	, precio_venta=	0.42	, vendible = 'S'	 where cod_art = 	606	;
+update inv_articulos set 	fix = 1, sigla = 	'ILFPI 120'	, pos = 	7	, precio_venta=	0.42	, vendible = 'S'	 where cod_art = 	594	;
+update inv_articulos set 	fix = 1, sigla = 	'LUHT 950'	, pos = 	1	, precio_venta=	5.5	, vendible = 'S'	 where cod_art = 	118	;
+update inv_articulos set 	fix = 1, sigla = 	'YFR 2L'	, pos = 	8	, precio_venta=	14.5	, vendible = 'S'	 where cod_art = 	131	;
+update inv_articulos set 	fix = 1, sigla = 	'YDU 2L'	, pos = 	9	, precio_venta=	14.5	, vendible = 'S'	 where cod_art = 	130	;
+update inv_articulos set 	fix = 1, sigla = 	'YCO 2L'	, pos = 	10	, precio_venta=	14.5	, vendible = 'S'	 where cod_art = 	129	;
+update inv_articulos set 	fix = 1, sigla = 	'YMO 2L'	, pos = 	11	, precio_venta=	14.5	, vendible = 'S'	 where cod_art = 	132	;
+update inv_articulos set 	fix = 1, sigla = 	'YCH 2L'	, pos = 	12	, precio_venta=	14.5	, vendible = 'S'	 where cod_art = 	128	;
+update inv_articulos set 	fix = 1, sigla = 	'YFR 80ML'	, pos = 	13	, precio_venta=	0.55	, vendible = 'S'	 where cod_art = 	143	;
+update inv_articulos set 	fix = 1, sigla = 	'FRUTA 1L'	, pos = 	14	, precio_venta=	12.5	, vendible = 'S'	 where cod_art = 	808	;
+update inv_articulos set 	fix = 1, sigla = 	'FRUTA 750'	, pos = 	15	, precio_venta=	11.5	, vendible = 'S'	 where cod_art = 	135	;
+
+update inv_articulos set precio_venta =	35, vendible = 'S'	 where cod_art = 148;
+update inv_articulos set precio_venta =	30, vendible = 'S'	 where cod_art = 150;
+update inv_articulos set precio_venta =	30, vendible = 'S'	 where cod_art = 151;
 
 
+-- Productos categoria A
+insert into precioarticulo values (	1	,	118	,	5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	2	,	119	,	6.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	3	,	667	,	1.05	,	1	, '01', 0, 1);
+insert into precioarticulo values (	4	,	589	,	0.38	,	1	, '01', 0, 1);
+insert into precioarticulo values (	5	,	588	,	0.38	,	1	, '01', 0, 1);
+insert into precioarticulo values (	6	,	606	,	0.38	,	1	, '01', 0, 1);
+insert into precioarticulo values (	7	,	594	,	0.38	,	1	, '01', 0, 1);
+insert into precioarticulo values (	8	,	131	,	13.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	9	,	130	,	13.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	10	,	129	,	13.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	11	,	132	,	13.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	12	,	128	,	13.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	13	,	138	,	0.46	,	1	, '01', 0, 1);
+insert into precioarticulo values (	14	,	808	,	11.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	15	,	135	,	10.5	,	1	, '01', 0, 1);
+insert into precioarticulo values (	16	,	148	,	35	,	1	, '01', 0, 1);
+insert into precioarticulo values (	17	,	151	,	30	,	1	, '01', 0, 1);
+insert into precioarticulo values (	18	,	150	,	30	,	1	, '01', 0, 1);

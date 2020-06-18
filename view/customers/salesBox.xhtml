@@ -21,10 +21,25 @@
 <h:form id="salesForm">
 
     <rich:panel id="salesPanel">
-    <f:facet name="header">V e n t a s</f:facet>
+        <!--<f:facet name="header">V e n t a s</f:facet>-->
         <h:panelGrid columns="3" border="0" width="100%" columnClasses="width40percent,width30percent,width30percent">
             <s:div id="part1">
-                <s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">
+                <s:div id="clientField" styleClass="formRow,left">
+                    <!--<h:outputText value="#{messages['Client.client']}" styleClass="text09" />-->
+                    <!--<rich:spacer width="5px" />-->
+                    <app:selectPopUp id="clientFieldId"
+                                     required="false"
+                                     textValue="#{salesAction.client.fullName}"
+                                     value="#{salesAction.client}"
+                                     clearAction="#{salesAction.clearClient()}"
+                                     searchModalPanel="clientListModalPanel"
+                                     dataModel="#{clientDataModel}"
+                                     reRender="clientField"
+                                     tabindex="12">
+                    </app:selectPopUp>
+                </s:div>
+
+                <s:div id="productField" styleClass="formRow,left">
                     <app:suggestionBox id="productSuggestionBox"
                                        value="#{salesAction.productItemFullName}"
                                        entity="#{salesAction.productItem}"
@@ -46,12 +61,37 @@
                     <a4j:commandButton action="#{salesAction.addProduct()}"
                                        value="Agregar" styleClass="button"
                                        reRender="productDataTable, productField" />
-                </s:decorate>
+                </s:div>
+
+
+                <!--<s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">
+                    <app:suggestionBox id="productSuggestionBox"
+                                       value="#{salesAction.productItemFullName}"
+                                       entity="#{salesAction.productItem}"
+                                       styleClass="input250"
+                                       entityAlias="productItem"
+                                       searchField="name"
+                                       searchCompoundFields="productItem.productItemCode,productItem.name"
+                                       updateFocusOnSelect="true">
+                        <ui:define name="columns">
+                            <h:column>
+                                <h:outputText value="#{entityItem.fullName2}" />
+                            </h:column>
+                        </ui:define>
+                        <ui:define name="restrictions">
+                            <app:restriction condition="productItem.saleable = #{true}"/>
+                        </ui:define>
+                    </app:suggestionBox>
+
+                    <a4j:commandButton action="#{salesAction.addProduct()}"
+                                       value="Agregar" styleClass="button"
+                                       reRender="productDataTable, productField" />
+                </s:decorate>-->
             </s:div>
 
             <s:div id="part2">
                 <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">-->
-                <!--<div class="margin-t2">-->
+                <div class="margin-t2">
                     <!--<s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">-->
                     <rich:calendar id="orderDate" value="#{salesAction.orderDate}"
                                    popup="true"
@@ -65,12 +105,28 @@
                         <a4j:support event="oninputchange" reRender="orderDate"/>
                     </rich:calendar>
                     <!--</s:decorate>-->
-                <!--</div>-->
+                </div>
                 <!--</s:decorate>-->
+
+                <s:div id="customerOrderTypeField">
+                    <h:selectOneMenu id="customerOrderType"
+                                     value="#{salesAction.customerOrderType}"
+                                     styleClass="inputMedium"
+                                     immediate="true"
+                                     tabindex="10">
+                        <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
+                                       label="#{messages[customerOrderType.type.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderType"/>
+                    </h:selectOneMenu>
+                </s:div>
+
             </s:div>
 
             <s:div id="part3">
-                <s:div id="clientField" styleClass="buttonsLeft">
+                <!--<s:div id="clientField" styleClass="buttonsLeft">
                     <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
                     <rich:spacer width="5px" />
                     <app:selectPopUp id="clientFieldId"
@@ -83,29 +139,12 @@
                                      reRender="clientField"
                                      tabindex="12">
                     </app:selectPopUp>
-                </s:div>
+                </s:div>-->
             </s:div>
 
         </h:panelGrid>
 
         <h:panelGrid columns="2" cellpadding="0" cellspacing="0"  border="0" width="100%" columnClasses="width10percent,width90percent">
-
-            <s:div id="customerOrderTypeField">
-                <h:selectOneMenu id="customerOrderType"
-                                 value="#{salesAction.customerOrderType}"
-                                 styleClass="inputMedium"
-                                 immediate="true"
-                                 tabindex="10">
-                    <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
-                                   label="#{messages[customerOrderType.type.resourceKey]}"
-                                   noSelectionLabel=""
-                                   hideNoSelectionLabel="false"/>
-                    <s:convertEntity/>
-                    <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderType"/>
-                </h:selectOneMenu>
-
-                <!--</s:decorate>-->
-            </s:div>
             <s:div>
                 <c:forEach items="#{salesAction.bestProductList}" var="productItem">
                     <a4j:commandButton action="#{salesAction.addProduct(productItem)}"
@@ -114,9 +153,7 @@
 
                 </c:forEach>
             </s:div>
-
         </h:panelGrid>
-
     </rich:panel>
 
     <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">
