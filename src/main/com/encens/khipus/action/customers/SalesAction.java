@@ -4,6 +4,7 @@ import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.CustomerOrderTypeService;
+import com.encens.khipus.service.customers.PriceItemService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Name("salesAction")
 @Scope(ScopeType.PAGE)
@@ -46,17 +48,26 @@ public class SalesAction {
 
     private List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
 
+    //private Map<String, BigDecimal> priceItemListMap = new HashMap<String, BigDecimal>();
+    private Map<String, BigDecimal> priceItemListMap;
+
     @In(required = false)
     private User currentUser;
 
     @In
     private ProductItemService productItemService;
+
     @In
     private SaleService saleService;
+
     @In
     private CustomerOrderTypeService customerOrderTypeService;
+
     @In
     private FinancesPkGeneratorService financesPkGeneratorService;
+
+    @In
+    private PriceItemService priceItemService;
 
     /*@Create
     public void initialize() {
@@ -77,12 +88,6 @@ public class SalesAction {
         System.out.println("--------> productItemFullName: " + productItemFullName);
         System.out.println("--------> Producto: " + productItem);
 
-        /*if (productsSelected.contains(productItem)){
-            System.out.println("------>>> productsSelected.contains(productItem): " + productsSelected.contains(productItem));
-            clearProduct();
-            return;
-        }*/
-
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
             System.out.println("------>>> contains(productItemCode): " + productItemCodesSelected.contains(productItem.getProductItemCode()));
             clearProduct();
@@ -92,20 +97,26 @@ public class SalesAction {
         if (productItem == null) return;
         if (productItem.getSalePrice() == null) return;
 
-        //productsSelected.add(productItem);
         productItemCodesSelected.add(productItem.getProductItemCode());
 
         ArticleOrder articleOrder = new ArticleOrder();
         articleOrder.setCodArt(productItem.getProductItemCode());
         articleOrder.setProductItem(productItem);
         articleOrder.setQuantity(0);
-        articleOrder.setPrice(productItem.getSalePrice().doubleValue());
         articleOrder.setPromotion(0);
         articleOrder.setReposicion(0);
         articleOrder.setTotal(0);
         articleOrder.setAmount(0.0);
         articleOrder.setCu(BigDecimal.ZERO);
         articleOrder.setUnitCost(BigDecimal.ZERO);
+        articleOrder.setPrice(productItem.getSalePrice().doubleValue());
+
+        if (priceItemListMap != null){
+            BigDecimal price = priceItemListMap.get(productItem.getProductItemCode());
+            System.out.println("--------------> PRICE: " + price);
+            if (price != null)
+                articleOrder.setPrice(price.doubleValue());
+        }
 
         articleOrderList.add(articleOrder);
 
@@ -198,6 +209,14 @@ public class SalesAction {
 
         String outcome = saleService.createSale(customerOrder);
 
+    }
+
+    public void assignClient(Client client){
+
+        if (client.getCustomerCategory() != null)
+            priceItemListMap = priceItemService.getPriceItemsMap(client.getCustomerCategory());
+
+        setClient(client);
     }
 
     public void assignCustomerOrderTypeDefault(){
@@ -315,6 +334,7 @@ public class SalesAction {
 
     public void clearClient(){
         setClient(null);
+        this.priceItemListMap = null;
     }
 
     public Date getOrderDate() {

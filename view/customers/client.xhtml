@@ -171,6 +171,21 @@
         </h:selectOneMenu>
     </s:decorate>
 
+    <s:decorate id="customerCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.customerCategory']}</ui:define>
+        <h:selectOneMenu id="documentType"
+                         value="#{client.customerCategory}"
+                         styleClass="input"
+                         required="false"
+                         tabindex="10">
+            <s:selectItems value="#{customerCategoryList}" var="customerCategory"
+                           label="#{customerCategory.name}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
 
 </s:div>
 

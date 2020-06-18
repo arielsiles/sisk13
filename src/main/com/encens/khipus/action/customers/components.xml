@@ -57,7 +57,9 @@
                             ejbql="select c from CustomerOrderType c "/>
 
     <factory name="clientTypeList" value="#{clientTypeQuery}"/>
-    <framework:entity-query name="clientTypeQuery" ejbql="select c from ClientType c">
-    </framework:entity-query>
+    <framework:entity-query name="clientTypeQuery" ejbql="select c from ClientType c" />
+
+    <factory name="customerCategoryList" value="#{customerCategoryQuery}"/>
+    <framework:entity-query name="customerCategoryQuery" ejbql="select c from CustomerCategory c" />
 
 </components>

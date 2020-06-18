@@ -100,6 +100,10 @@ public class Client implements BaseModel {
     @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
     private ClientType clientType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
+    private CustomerCategory customerCategory;
+
     @JoinColumn(name = "IDTERRITORIOTRABAJO", referencedColumnName = "IDTERRITORIOTRABAJO")
     @ManyToOne
     private Territoriotrabajo territoriotrabajo;
@@ -288,5 +292,13 @@ public class Client implements BaseModel {
 
     public void setPersonFlag(Boolean personFlag) {
         this.personFlag = personFlag;
+    }
+
+    public CustomerCategory getCustomerCategory() {
+        return customerCategory;
+    }
+
+    public void setCustomerCategory(CustomerCategory customerCategory) {
+        this.customerCategory = customerCategory;
     }
 }

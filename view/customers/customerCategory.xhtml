@@ -73,14 +73,14 @@
             </rich:panel>
 
             <c:if test="#{customerCategoryAction.managed}">
-                <rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">
-                    <rich:tab name="priceItemTab" label="#{messages['CustomerCategory.products']}" ajaxSingle="true">
+                <!--<rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">-->
+                    <!--<rich:tab name="priceItemTab" label="#{messages['CustomerCategory.products']}" ajaxSingle="true">-->
                         <rich:dataTable id="priceItemListId"
                                         value="#{priceItemDataModel}"
                                         var="priceItem"
                                         rows="#{sessionUser.rowsPerPage}"
                                         width="100%"
-                                        columnsWidth="10%, 60%, 20%, 10%">
+                                        columnsWidth="10%, 60%, 30%">
                             <f:facet name="header">
                                 <rich:columnGroup>
                                     <rich:column>
@@ -95,9 +95,10 @@
                                         <h:outputText value="#{messages['CustomerCategory.productItem.price']}" />
                                     </rich:column>
 
-                                    <rich:column styleClass="center">
+                                    <!--<rich:column styleClass="center">
                                         <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>
+                                    </rich:column>-->
+
                                 </rich:columnGroup>
                             </f:facet>
 
@@ -106,63 +107,28 @@
                             </rich:column>
 
                             <rich:column>
-                                <h:outputText value="#{priceItem.productItemCode}"/>
+                                <h:outputText value="#{priceItem.productItem.name}"/>
                             </rich:column>
 
                             <rich:column styleClass="right">
-                                <h:outputText value="#{creditTransactionItem.capital}">
+                                <h:outputText value="#{priceItem.salePrice}">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                                 </h:outputText>
                             </rich:column>
 
-                            <rich:column styleClass="center">
-                                <!--<h:commandLink value="#{messages['Common.select']}"
-                                               immediate="true"
-                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
-                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
-                                &#160;-->
-                                <!--<h:commandLink action="#{voucherCreateAction.generateReport(creditTransactionItem.voucher)}" immediate="true">-->
-                                <h:commandLink action="#{creditAction.generateTransactionReport(creditTransactionItem)}" immediate="true">
+                            <!--<rich:column styleClass="center"></rich:column>-->
 
-                                    <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
-                                                    title="#{messages['Voucher.report.generateReport']}"/>
-                                </h:commandLink>
-                            </rich:column>
                         </rich:dataTable>
                         <app:dataScroller id="ListIdListDataScrollerId"
-                                          for="creditTransactionListId"
-                                          dataModel="#{creditTransactionDataModel}"/>
-                    </rich:tab>
-                </rich:tabPanel>
+                                          for="priceItemListId"
+                                          dataModel="#{priceItemDataModel}"/>
+                    <!--</rich:tab>-->
+                <!--</rich:tabPanel>-->
             </c:if>
 
 
             <div class="buttons">
-                <h:commandButton action="#{customerCategoryAction.create}"
-                                 value="#{messages['Common.save']}"
-                                 rendered="#{!customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','CREATE')}"
-                                 styleClass="button"
-                                 tabindex="2"/>
 
-                <h:commandButton action="#{customerCategoryAction.update}"
-                                 value="#{messages['Common.save']}"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','UPDATE')}"
-                                 styleClass="button"
-                                 tabindex="3"/>
-                <h:commandButton value="#{messages['Common.delete']}"
-                                 styleClass="button"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}"
-                                 tabindex="4">
-                    <rich:componentControl for="deleteConfirmation"
-                                           event="onclick"
-                                           disableDefault="true"
-                                           operation="show"/>
-                </h:commandButton>
-                <h:commandButton action="#{customerCategoryAction.cancel}"
-                                 styleClass="button"
-                                 value="#{messages['Common.cancel']}"
-                                 immediate="true"
-                                 tabindex="4"/>
             </div>
 
         </h:form>

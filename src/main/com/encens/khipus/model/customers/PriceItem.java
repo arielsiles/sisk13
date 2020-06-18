@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
@@ -16,17 +17,17 @@ import java.math.BigDecimal;
  * @author:
  */
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "PriceItem.tableGenerator",
-        table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
-        pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
-        valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "PriceItem.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         pkColumnValue = "precioarticulo",
-        allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "precioarticulo", uniqueConstraints = @UniqueConstraint(columnNames = {"idcategoriacliente", "productItemCode"}))
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "precioarticulo", uniqueConstraints = @UniqueConstraint(columnNames = {"idcategoriacliente", "cod_art"}))
 public class PriceItem implements BaseModel {
 
     @Id
