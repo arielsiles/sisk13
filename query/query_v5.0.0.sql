@@ -115,3 +115,21 @@ insert into precioarticulo values (	15	,	135	,	10.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	16	,	148	,	35	,	1	, '01', 0, 1);
 insert into precioarticulo values (	17	,	151	,	30	,	1	, '01', 0, 1);
 insert into precioarticulo values (	18	,	150	,	30	,	1	, '01', 0, 1);
+
+-- 19.06.2020
+create table distribuidor (
+	iddistribuidor 		bigint(20) not null,
+	descripcion 		varchar(100) not null,
+	version 		bigint(20) not null,
+	idcompania 		bigint(20) not null,
+	primary key (iddistribuidor)
+);
+
+alter table distribuidor add foreign key (iddistribuidor) references persona (idpersona);
+
+insert into funcionalidad values (263, 'DISTRIBUTOR', null, 1, 15, 'Functionality.customers.distributor', 1);
+
+
+
+
+

@@ -194,6 +194,14 @@
 
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DISTRIBUTOR','VIEW')}">
+                <s:link view="/customers/distributorList.xhtml"
+                        value="#{messages['menu.customers.configuration.distributor']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
                            rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/partnerList.xhtml"
                         value="#{messages['menu.customers.configuration.partner']}"
