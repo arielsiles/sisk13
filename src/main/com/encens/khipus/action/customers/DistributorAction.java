@@ -8,6 +8,7 @@ import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.contacts.Extension;
 import com.encens.khipus.model.contacts.Person;
 import com.encens.khipus.model.customers.Distributor;
+import com.encens.khipus.service.customers.DistributorService;
 import com.encens.khipus.service.customers.ExtensionService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -26,6 +27,8 @@ public class DistributorAction extends GenericAction<Distributor> {
 
     @In
     private ExtensionService extensionService;
+    @In
+    private DistributorService distributorService;
 
     public List<Extension> extensionList;
     private boolean showExtension = false;
@@ -34,7 +37,7 @@ public class DistributorAction extends GenericAction<Distributor> {
     private Department department;
     private Person person;
 
-    @Factory(value = "distributor")
+    @Factory(value = "distributor", scope = ScopeType.STATELESS)
     public Distributor initDistributor() {
         return getInstance();
     }
@@ -56,43 +59,22 @@ public class DistributorAction extends GenericAction<Distributor> {
     @Override
     @End
     public String create() {
-        try {
-
-            if (this.person != null) {
+        String outcome = Outcome.FAIL;
+        if (person != null){
+            distributorService.addDistributor(person);
+            outcome = Outcome.SUCCESS;
+        }
+        return outcome;
+        /*try {
+            if (this.person == null){
+                getService().create(getInstance());
                 addCreatedMessage();
             }
-
-            /*if (this.person == null){
-
-                Person person = new Person();
-                person.setFirstName(getInstance().getFirstName());
-                person.setLastName(getInstance().getLastName());
-                person.setMaidenName(getInstance().getMaidenName());
-
-                person.setDocumentType(getInstance().getDocumentType());
-                person.setIdNumber(getInstance().getIdNumber());
-                person.setExtensionSite(getInstance().getExtensionSite());
-
-                person.setBirthDay(getInstance().getBirthDay());
-                person.setSalutation(getInstance().getSalutation());
-                person.setCellphone(getInstance().getCellphone());
-                person.setHomeAddress(getInstance().getHomeAddress());
-                person.setProfession(getInstance().getProfession());
-                person.setMaritalStatus(getInstance().getMaritalStatus());
-                person.setGender(getInstance().getGender());
-
-                getService().create(person);
-                getInstance().setPerson(person);
-                partnerService.createPartner(getInstance());
-                addCreatedMessage();
-            }*/
-
-
             return Outcome.SUCCESS;
         } catch (Exception e) {
             addDuplicatedMessage();
             return Outcome.REDISPLAY;
-        }
+        }*/
     }
 
     /*@Override
@@ -122,31 +104,17 @@ public class DistributorAction extends GenericAction<Distributor> {
 
 
     public void assignPerson(Person person) {
+
+        this.person = person;
         if (person != null) {
             try {
                 person = getService().findById(Person.class, person.getId());
+                setPerson(person);
             } catch (EntryNotFoundException e) {
                 entryNotFoundLog();
             }
         }
-
-        setPerson(person);
-        updateShowExtensionPerson();
-        getInstance().setFirstName(person.getFirstName());
-        getInstance().setLastName(person.getLastName());
-        getInstance().setMaidenName(person.getMaidenName());
-        getInstance().setGender(person.getGender());
-        getInstance().setSalutation(person.getSalutation());
-        getInstance().setProfession(person.getProfession());
-        getInstance().setMaritalStatus(person.getMaritalStatus());
-
-        getInstance().setIdNumber(person.getIdNumber());
-        getInstance().setDocumentType(person.getDocumentType());
-        getInstance().setExtensionSite(person.getExtensionSite());
-
-        System.out.println("DocumentType: " + getPerson().getDocumentType().getName());
-        System.out.println("Extension: " + getPerson().getExtensionSite().getExtension());
-
+        System.out.println("--> Person Selected: " + this.person.getFullName());
     }
 
     public void updateShowExtensionPerson() {

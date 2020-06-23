@@ -19,7 +19,7 @@
     </c:choose>
 </ui:define>
 <ui:param name="bodyWidth" value="80%"/>
-<ui:param name="selectedTab" value="customer"/>
+<ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
 <h:form id="partnerForm">
@@ -32,7 +32,7 @@
         <s:defaultAction/>
     </h:commandButton>
 
-    <h:commandButton action="#{distributorAction.update}" value="#{messages['Common.save']}"
+    <!--<h:commandButton action="#{distributorAction.update}" value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{distributorAction.managed and s:hasPermission('DISTRIBUTOR','UPDATE')}"
                      tabindex="2"/>
@@ -42,7 +42,7 @@
                      rendered="#{distributorAction.managed and s:hasPermission('DISTRIBUTOR','DELETE')}"
                      tabindex="3">
         <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
-    </h:commandButton>
+    </h:commandButton>-->
 
     <h:commandButton action="#{distributorAction.cancel}" value="#{messages['Common.cancel']}"
                      styleClass="button" immediate="true"
@@ -96,42 +96,6 @@
                                  tabindex="2">
                     </h:inputText>
                 </s:decorate>
-
-                <!--<s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Employee.documentType']}</ui:define>
-                    <h:selectOneMenu id="documentType"
-                                     value="#{distributorAction.person.documentType}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="8">
-                        <s:selectItems value="#{personDocumentTypeList}"
-                                       var="documentType"
-                                       label="#{documentType.name}"
-                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                        <a4j:support event="onchange"
-                                     action="#{distributorAction.updateShowExtension()}"
-                                     reRender="documentDiv"
-                                     ajaxSingle="true"/>
-                    </h:selectOneMenu>
-                </s:decorate>
-                <s:decorate id="extensionField" template="/include/inputField.xhtml"
-                            rendered="#{distributorAction.showExtension}"
-                            styleClass="formRow">
-                    <ui:define name="label">#{messages['Entity.extension']}</ui:define>
-                    <h:selectOneMenu id="extension"
-                                     value="#{distributorAction.person.extensionSite}"
-                                     styleClass="input"
-                                     required="false"
-                                     tabindex="4">
-                        <s:selectItems value="#{extensionList}"
-                                       var="extension"
-                                       label="#{extension.extension}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>-->
             </s:div>
             <s:div>
 
@@ -139,10 +103,10 @@
         </h:panelGrid>
     </app:fieldset>
 
+    <!--<s:div id="distributorDetail" rendered="#{not empty distributorAction.person}">
     <app:fieldset id="contractFieldset" title="#{messages['Partner.partnerDetails']}">
     <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
     <s:div>
-
         <s:decorate id="idNumberField1"
                     template="/include/inputField.xhtml"
                     styleClass="formRow">
@@ -297,7 +261,7 @@
     </s:div>
     </h:panelGrid>
     </app:fieldset>
-
+    </s:div>-->
 
 </rich:panel>
 
@@ -306,13 +270,6 @@
     </div>
 
 </h:form>
-
-    <!--<s:decorate id="personPartnerModalPanelContainer" template="/contacts/personPartnerModalPanel.xhtml">
-        <ui:param name="containerId" value="personPartnerModalPanelContainer"/>
-        <ui:param name="dialogId" value="personPartnerModalPanel"/>
-        <ui:param name="reRender" value="idNumberField, firstNameField"/>
-    </s:decorate>-->
-
 
     <s:decorate id="personListModalPanelContainer" template="/employees/personListModalPanel.xhtml">
         <ui:param name="dialogId" value="personListModalPanel"/>
@@ -323,31 +280,10 @@
                                image="/img/active.gif"
                                styleClass="select-image"
                                ajaxSingle="true"
-                               reRender="personInformationFieldset, contractFieldset"
+                               reRender="personInformationFieldset, distributorDetail"
                                oncomplete="Richfaces.hideModalPanel('personListModalPanel');"/>
         </ui:define>
     </s:decorate>
-
-<!--<s:decorate template="/include/modalDialog.xhtml"
-            rendered="#{distributorAction.managed and s:hasPermission('PARTNER','DELETE')}">
-    <ui:param name="dialogId" value="deleteConfirmation"/>
-    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
-    <ui:define name="dialogContent">
-        <p>
-            <h:outputFormat value="#{messages['Partner.delete.confirmation']}">
-                <f:param value="#{partner.fullName}"/>
-            </h:outputFormat>
-        </p>
-    </ui:define>
-    <ui:define name="dialogOption">
-        <a4j:commandButton action="#{partnerAction.delete}"
-                           value="#{messages['Common.delete']}"
-                           immediate="true"
-                           rendered="#{s:hasPermission('EMPLOYEE','DELETE')}"
-                           tabindex="1000"
-                           styleClass="button"/>
-    </ui:define>
-</s:decorate>-->
 
 
 <s:fragment rendered="#{distributorAction.managed}">

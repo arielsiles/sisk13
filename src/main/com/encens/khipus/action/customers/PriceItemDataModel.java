@@ -20,8 +20,7 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class PriceItemDataModel extends QueryDataModel<Long, PriceItem> {
 
-    private static final String[] RESTRICTIONS =
-            {"lower(priceItem.productItemCode) like concat('%', concat(lower(#{priceItemDataModel.criteria.productItemCode}), '%'))"};
+    private static final String[] RESTRICTIONS = {"priceItem.customerCategory = #{customerCategory}"};
 
     @Create
     public void init() {

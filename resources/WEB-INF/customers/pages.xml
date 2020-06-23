@@ -446,4 +446,17 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/distributor.xhtml" no-conversation-view-id="/customers/distributorList.xhtml">
+        <navigation from-action="#{distributorAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/distributorList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/distributorList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>
