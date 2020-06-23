@@ -134,7 +134,7 @@ alter table distribuidor add foreign key (idcompania) references compania (idcom
 
 insert into funcionalidad values (263, 'DISTRIBUTOR', null, 1, 15, 'Functionality.customers.distributor', 1);
 
-
-
-
+-- 23.06.2020
+alter table pedidos add column iddistribuidor bigint(20) null after IDCLIENTE;
+alter table pedidos add foreign key (iddistribuidor) references distribuidor (iddistribuidor);
 

@@ -130,6 +130,10 @@ public class CustomerOrder implements BaseModel  {
     @ManyToOne(optional = false)
     private Client client;
 
+    @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDDISTRIBUIDOR")
+    @ManyToOne(optional = true)
+    private Distributor distributor;
+
     @Override
     public Long getId() {
         return id;
@@ -281,5 +285,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setCvFlag(Boolean cvFlag) {
         this.cvFlag = cvFlag;
+    }
+
+    public Distributor getDistributor() {
+        return distributor;
+    }
+
+    public void setDistributor(Distributor distributor) {
+        this.distributor = distributor;
     }
 }

@@ -123,23 +123,39 @@
                     </h:selectOneMenu>
                 </s:div>
 
+                <s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerOrder.subsidy']}</ui:define>
+                    <h:selectOneMenu id="subsidy"
+                                     value="#{salesAction.subsidyEnun}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="4">
+                        <s:selectItems value="#{subsidyEnumList}" var="subsidy" label="#{messages[subsidy.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+
             </s:div>
 
             <s:div id="part3">
-                <!--<s:div id="clientField" styleClass="buttonsLeft">
-                    <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
-                    <rich:spacer width="5px" />
-                    <app:selectPopUp id="clientFieldId"
-                                     required="false"
-                                     textValue="#{salesAction.client.fullName}"
-                                     value="#{salesAction.client}"
-                                     clearAction="#{salesAction.clearClient()}"
-                                     searchModalPanel="clientListModalPanel"
-                                     dataModel="#{clientDataModel}"
-                                     reRender="clientField"
-                                     tabindex="12">
-                    </app:selectPopUp>
-                </s:div>-->
+                <s:div id="distributorField">
+                    <label>Delivery: </label>
+                    <h:selectOneMenu id="distributor"
+                                     value="#{salesAction.distributor}"
+                                     styleClass="inputMedium"
+                                     immediate="true"
+                                     tabindex="10">
+                        <s:selectItems value="#{distributorList}" var="distributor"
+                                       label="#{distributor.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
+                    </h:selectOneMenu>
+                </s:div>
             </s:div>
 
         </h:panelGrid>

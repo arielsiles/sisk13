@@ -11,6 +11,7 @@ import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -40,8 +41,12 @@ public class SalesAction {
     private CustomerOrderType customerOrderType;
     private SaleTypeEnum saleType;
     private Client client;
+    private Distributor distributor;
     private Date orderDate = new Date();
     private String observation;
+
+    private SubsidyEnun subsidyEnun;
+
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -74,6 +79,11 @@ public class SalesAction {
         System.out.println("------------------> Inicializando..............");
         setOrderDate(new Date());
     }*/
+
+    @Factory(value = "subsidyEnumList")
+    public SubsidyEnun[] getExperienceType() {
+        return SubsidyEnun.values();
+    }
 
     public void openSale(){
         setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
@@ -170,6 +180,7 @@ public class SalesAction {
         clearProductsSelected();
         clearTotalAmount();
         setObservation(null);
+        setDistributor(null);
     }
 
     public void registerSale(){
@@ -204,6 +215,10 @@ public class SalesAction {
         customerOrder.setSaleType(saleType);
         customerOrder.setCustomerOrderType(customerOrderType);
         customerOrder.setClient(client);
+        customerOrder.setDistributor(distributor);
+
+        if (subsidyEnun != null)
+            customerOrder.setDescripcion(subsidyEnun.getSubsidyType());
 
         customerOrder.setArticleOrderList(articleOrderList);
 
@@ -375,5 +390,21 @@ public class SalesAction {
 
     public void setProductItemCodesSelected(List<String> productItemCodesSelected) {
         this.productItemCodesSelected = productItemCodesSelected;
+    }
+
+    public Distributor getDistributor() {
+        return distributor;
+    }
+
+    public void setDistributor(Distributor distributor) {
+        this.distributor = distributor;
+    }
+
+    public SubsidyEnun getSubsidyEnun() {
+        return subsidyEnun;
+    }
+
+    public void setSubsidyEnun(SubsidyEnun subsidyEnun) {
+        this.subsidyEnun = subsidyEnun;
     }
 }
