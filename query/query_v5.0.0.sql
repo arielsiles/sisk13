@@ -109,7 +109,7 @@ insert into precioarticulo values (	9	,	130	,	13.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	10	,	129	,	13.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	11	,	132	,	13.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	12	,	128	,	13.5	,	1	, '01', 0, 1);
-insert into precioarticulo values (	13	,	138	,	0.46	,	1	, '01', 0, 1);
+insert into precioarticulo values (	13	,	143	,	0.46	,	1	, '01', 0, 1);
 insert into precioarticulo values (	14	,	808	,	11.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	15	,	135	,	10.5	,	1	, '01', 0, 1);
 insert into precioarticulo values (	16	,	148	,	35	,	1	, '01', 0, 1);

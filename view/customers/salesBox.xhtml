@@ -34,7 +34,7 @@
                                      clearAction="#{salesAction.clearClient()}"
                                      searchModalPanel="clientListModalPanel"
                                      dataModel="#{clientDataModel}"
-                                     reRender="clientField"
+                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
                 </s:div>
@@ -123,6 +123,41 @@
                     </h:selectOneMenu>
                 </s:div>
 
+            </s:div>
+
+            <s:div id="part3">
+                <!--<s:div id="distributorField">
+                    <label>Delivery: </label>
+                    <h:selectOneMenu id="distributor"
+                                     value="#{salesAction.distributor}"
+                                     styleClass="inputMedium"
+                                     immediate="true"
+                                     tabindex="10">
+                        <s:selectItems value="#{distributorList}" var="distributor"
+                                       label="#{distributor.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
+                    </h:selectOneMenu>
+                </s:div>-->
+
+                <s:decorate id="distributorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">Delivery</ui:define>
+                    <h:selectOneMenu id="distributor"
+                                     value="#{salesAction.distributor}"
+                                     styleClass="inputMedium"
+                                     immediate="true"
+                                     tabindex="10">
+                        <s:selectItems value="#{distributorList}" var="distributor"
+                                       label="#{distributor.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CustomerOrder.subsidy']}</ui:define>
                     <h:selectOneMenu id="subsidy"
@@ -137,25 +172,6 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
-
-            </s:div>
-
-            <s:div id="part3">
-                <s:div id="distributorField">
-                    <label>Delivery: </label>
-                    <h:selectOneMenu id="distributor"
-                                     value="#{salesAction.distributor}"
-                                     styleClass="inputMedium"
-                                     immediate="true"
-                                     tabindex="10">
-                        <s:selectItems value="#{distributorList}" var="distributor"
-                                       label="#{distributor.fullName}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                        <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
-                    </h:selectOneMenu>
-                </s:div>
             </s:div>
 
         </h:panelGrid>

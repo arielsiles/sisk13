@@ -98,6 +98,8 @@ public class SalesAction {
         System.out.println("--------> productItemFullName: " + productItemFullName);
         System.out.println("--------> Producto: " + productItem);
 
+        if (client == null) return;
+
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
             System.out.println("------>>> contains(productItemCode): " + productItemCodesSelected.contains(productItem.getProductItemCode()));
             clearProduct();
@@ -350,6 +352,15 @@ public class SalesAction {
     public void clearClient(){
         setClient(null);
         this.priceItemListMap = null;
+
+        clearProduct();
+        clearProductsSelected();
+        clearTotalAmount();
+        setObservation(null);
+        setDistributor(null);
+        setSubsidyEnun(null);
+
+        assignCustomerOrderTypeDefault();
     }
 
     public Date getOrderDate() {
