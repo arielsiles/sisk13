@@ -120,6 +120,27 @@ insert into precioarticulo values (	18	,	150	,	30	,	1	, '01', 0, 1);
 insert into precioarticulo values (	19	,	118	,	5.5	,	2	, '01', 0, 1);
 insert into precioarticulo values (	20	,	119	,	7	,	2	, '01', 0, 1);
 
+-- Productos categoria C
+insert into precioarticulo values (	41	,	118	,	6	,	3	, '01', 0, 1);
+insert into precioarticulo values (	42	,	119	,	7.5	,	3	, '01', 0, 1);
+insert into precioarticulo values (	43	,	667	,	1.50	,	3	, '01', 0, 1);
+insert into precioarticulo values (	44	,	589	,	0.50	,	3	, '01', 0, 1);
+insert into precioarticulo values (	45	,	588	,	0.50	,	3	, '01', 0, 1);
+insert into precioarticulo values (	46	,	606	,	0.50	,	3	, '01', 0, 1);
+insert into precioarticulo values (	47	,	594	,	0.50	,	3	, '01', 0, 1);
+insert into precioarticulo values (	48	,	131	,	15	,	3	, '01', 0, 1);
+insert into precioarticulo values (	49	,	130	,	15	,	3	, '01', 0, 1);
+insert into precioarticulo values (	50	,	129	,	15	,	3	, '01', 0, 1);
+insert into precioarticulo values (	51	,	132	,	15	,	3	, '01', 0, 1);
+insert into precioarticulo values (	52	,	128	,	15	,	3	, '01', 0, 1);
+insert into precioarticulo values (	53	,	143	,	0.60	,	3	, '01', 0, 1);
+insert into precioarticulo values (	54	,	808	,	13.5	,	3	, '01', 0, 1);
+insert into precioarticulo values (	55	,	135	,	12.5	,	3	, '01', 0, 1);
+insert into precioarticulo values (	56	,	148	,	39	,	3	, '01', 0, 1);
+insert into precioarticulo values (	57	,	151	,	34	,	3	, '01', 0, 1);
+insert into precioarticulo values (	58	,	150	,	34	,	3	, '01', 0, 1);
+
+
 
 -- 19.06.2020
 create table distribuidor (
