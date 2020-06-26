@@ -35,6 +35,7 @@ public class SalesAction {
 
     private Boolean cashSaleCheck;
     private Boolean creditSaleCheck;
+    private Boolean finalConsumer = Boolean.FALSE;
 
     //private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
 
@@ -183,6 +184,8 @@ public class SalesAction {
         clearTotalAmount();
         setObservation(null);
         setDistributor(null);
+        setSubsidyEnun(null);
+        setFinalConsumer(Boolean.FALSE);
     }
 
     public void registerSale(){
@@ -234,6 +237,13 @@ public class SalesAction {
             priceItemListMap = priceItemService.getPriceItemsMap(client.getCustomerCategory());
 
         setClient(client);
+    }
+
+    public void loadConsumerPrices(){
+        System.out.println("...............Cargando precios de consumidor...");
+        priceItemListMap = priceItemService.getConsumerPrices();
+        System.out.println("............... ejm: leche uht (118): " + priceItemListMap.get("118"));
+
     }
 
     public void assignCustomerOrderTypeDefault(){
@@ -417,5 +427,13 @@ public class SalesAction {
 
     public void setSubsidyEnun(SubsidyEnun subsidyEnun) {
         this.subsidyEnun = subsidyEnun;
+    }
+
+    public Boolean getFinalConsumer() {
+        return finalConsumer;
+    }
+
+    public void setFinalConsumer(Boolean finalConsumer) {
+        this.finalConsumer = finalConsumer;
     }
 }

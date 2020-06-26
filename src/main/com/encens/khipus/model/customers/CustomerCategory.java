@@ -35,6 +35,10 @@ public class CustomerCategory implements BaseModel {
     @Column(name = "nombre", nullable = false, length = 150)
     private String name;
 
+    @Column(name = "tipo")
+    @Enumerated(EnumType.STRING)
+    private CustomerCategoryType type;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -74,5 +78,14 @@ public class CustomerCategory implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+
+    public CustomerCategoryType getType() {
+        return type;
+    }
+
+    public void setType(CustomerCategoryType type) {
+        this.type = type;
     }
 }

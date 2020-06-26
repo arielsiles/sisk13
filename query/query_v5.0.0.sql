@@ -138,3 +138,9 @@ insert into funcionalidad values (263, 'DISTRIBUTOR', null, 1, 15, 'Functionalit
 alter table pedidos add column iddistribuidor bigint(20) null after IDCLIENTE;
 alter table pedidos add foreign key (iddistribuidor) references distribuidor (iddistribuidor);
 
+alter table categoriacliente add column tipo varchar(64) after nombre;
+
+-- Crear 3 categorias en produccion
+update categoriacliente set tipo = 'FACTORY' where idcategoriacliente = 1;
+update categoriacliente set tipo = 'STORE' where idcategoriacliente = 2;
+update categoriacliente set tipo = 'CONSUMER' where idcategoriacliente = 3;

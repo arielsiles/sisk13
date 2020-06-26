@@ -37,6 +37,14 @@
                                      reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
+                    <h:outputLabel>#{messages['Sales.finalConsumer']}</h:outputLabel>
+                    <h:selectBooleanCheckbox id="finalConsumerId"
+                                             value="#{salesAction.finalConsumer}"
+                                             tabindex="13">
+                        <a4j:support event="onclick" ajaxSingle="true"
+                                     action="#{salesAction.loadConsumerPrices}"
+                                     reRender="finalConsumerId"/>
+                    </h:selectBooleanCheckbox>
                 </s:div>
 
                 <s:div id="productField" styleClass="formRow,left">
