@@ -60,9 +60,7 @@
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.sales']}"
-                           rendered="#{
-        s:hasPermission('CASHBOX','VIEW') or
-        s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
+                           rendered="#{s:hasPermission('CASHBOX','VIEW') or s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
                            rendered="#{s:hasPermission('CASHBOX','VIEW')}">
@@ -83,6 +81,7 @@
         <s:link view="/customers/salesBox.xhtml"
                 value="#{messages['menu.customers.sales']}"
                 action="#{salesAction.openSale()}"
+                rendered="#{s:hasPermission('SALES', 'VIEW')}"
                 styleClass="tab-cell"
                 propagation="none"/>
 

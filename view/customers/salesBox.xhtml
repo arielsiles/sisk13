@@ -24,9 +24,8 @@
         <!--<f:facet name="header">V e n t a s</f:facet>-->
         <h:panelGrid columns="3" border="0" width="100%" columnClasses="width40percent,width30percent,width30percent">
             <s:div id="part1">
+                <!--<s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow,left">-->
                 <s:div id="clientField" styleClass="formRow,left">
-                    <!--<h:outputText value="#{messages['Client.client']}" styleClass="text09" />-->
-                    <!--<rich:spacer width="5px" />-->
                     <app:selectPopUp id="clientFieldId"
                                      required="false"
                                      textValue="#{salesAction.client.fullName}"
@@ -34,73 +33,52 @@
                                      clearAction="#{salesAction.clearClient()}"
                                      searchModalPanel="clientListModalPanel"
                                      dataModel="#{clientDataModel}"
-                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, distributorField, productDataTable"
+                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
-                    <h:outputLabel>#{messages['Sales.finalConsumer']}</h:outputLabel>
-                    <h:selectBooleanCheckbox id="finalConsumerId"
-                                             value="#{salesAction.finalConsumer}"
-                                             tabindex="13">
+                </s:div>
+
+                <s:div id="customerCategoryTypeField" styleClass="formRow,left">
+                    <h:selectOneRadio id="customerCategoryTypeId" value="#{salesAction.customerCategoryTypeEnum}"
+                                      layout="lineDirection">
+                        <s:selectItems value="#{customerCategoryTypes}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"/>
+                        <s:convertEnum/>
                         <a4j:support event="onclick" ajaxSingle="true"
-                                     action="#{salesAction.loadConsumerPrices}"
-                                     reRender="finalConsumerId"/>
-                    </h:selectBooleanCheckbox>
+                                     actionListener="#{salesAction.loadPricesByCategory}"
+                                     reRender="customerCategoryTypeId"/>
+                    </h:selectOneRadio>
                 </s:div>
 
                 <s:div id="productField" styleClass="formRow,left">
-                    <app:suggestionBox id="productSuggestionBox"
-                                       value="#{salesAction.productItemFullName}"
-                                       entity="#{salesAction.productItem}"
-                                       styleClass="input250"
-                                       entityAlias="productItem"
-                                       searchField="name"
-                                       searchCompoundFields="productItem.productItemCode,productItem.name"
-                                       updateFocusOnSelect="true">
-                        <ui:define name="columns">
-                            <h:column>
-                                <h:outputText value="#{entityItem.fullName2}" />
-                            </h:column>
-                        </ui:define>
-                        <ui:define name="restrictions">
-                            <app:restriction condition="productItem.saleable = #{true}"/>
-                        </ui:define>
-                    </app:suggestionBox>
+                        <app:suggestionBox id="productSuggestionBox"
+                                           value="#{salesAction.productItemFullName}"
+                                           entity="#{salesAction.productItem}"
+                                           styleClass="input250"
+                                           entityAlias="productItem"
+                                           searchField="name"
+                                           searchCompoundFields="productItem.productItemCode,productItem.name"
+                                           updateFocusOnSelect="true">
+                            <ui:define name="columns">
+                                <h:column>
+                                    <h:outputText value="#{entityItem.fullName2}" />
+                                </h:column>
+                            </ui:define>
+                            <ui:define name="restrictions">
+                                <app:restriction condition="productItem.saleable = #{true}"/>
+                            </ui:define>
+                        </app:suggestionBox>
 
-                    <a4j:commandButton action="#{salesAction.addProduct()}"
-                                       value="Agregar" styleClass="button"
-                                       reRender="productDataTable, productField" />
+                        <a4j:commandButton action="#{salesAction.addProduct()}"
+                                           value="Agregar" styleClass="button"
+                                           reRender="productDataTable, productField" />
                 </s:div>
-
-
-                <!--<s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow,left">
-                    <app:suggestionBox id="productSuggestionBox"
-                                       value="#{salesAction.productItemFullName}"
-                                       entity="#{salesAction.productItem}"
-                                       styleClass="input250"
-                                       entityAlias="productItem"
-                                       searchField="name"
-                                       searchCompoundFields="productItem.productItemCode,productItem.name"
-                                       updateFocusOnSelect="true">
-                        <ui:define name="columns">
-                            <h:column>
-                                <h:outputText value="#{entityItem.fullName2}" />
-                            </h:column>
-                        </ui:define>
-                        <ui:define name="restrictions">
-                            <app:restriction condition="productItem.saleable = #{true}"/>
-                        </ui:define>
-                    </app:suggestionBox>
-
-                    <a4j:commandButton action="#{salesAction.addProduct()}"
-                                       value="Agregar" styleClass="button"
-                                       reRender="productDataTable, productField" />
-                </s:decorate>-->
+                <!--</s:decorate>-->
             </s:div>
 
             <s:div id="part2">
-                <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">-->
-                <div class="margin-t2">
-                    <!--<s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">-->
+                <s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <rich:calendar id="orderDate" value="#{salesAction.orderDate}"
                                    popup="true"
                                    datePattern="#{messages['patterns.date']}"
@@ -112,11 +90,9 @@
                         <a4j:support event="onchanged" reRender="orderDate"/>
                         <a4j:support event="oninputchange" reRender="orderDate"/>
                     </rich:calendar>
-                    <!--</s:decorate>-->
-                </div>
-                <!--</s:decorate>-->
+                </s:decorate>
 
-                <s:div id="customerOrderTypeField">
+                <s:decorate id="customerOrderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <h:selectOneMenu id="customerOrderType"
                                      value="#{salesAction.customerOrderType}"
                                      styleClass="inputMedium"
@@ -125,31 +101,14 @@
                         <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
                                        label="#{messages[customerOrderType.type.resourceKey]}"
                                        noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
+                                       hideNoSelectionLabel="true" />
                         <s:convertEntity/>
-                        <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderType"/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderTypeField"/>
                     </h:selectOneMenu>
-                </s:div>
-
+                </s:decorate>
             </s:div>
 
             <s:div id="part3">
-                <!--<s:div id="distributorField">
-                    <label>Delivery: </label>
-                    <h:selectOneMenu id="distributor"
-                                     value="#{salesAction.distributor}"
-                                     styleClass="inputMedium"
-                                     immediate="true"
-                                     tabindex="10">
-                        <s:selectItems value="#{distributorList}" var="distributor"
-                                       label="#{distributor.fullName}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                        <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
-                    </h:selectOneMenu>
-                </s:div>-->
-
                 <s:decorate id="distributorField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">Delivery</ui:define>
                     <h:selectOneMenu id="distributor"
@@ -177,47 +136,31 @@
                                        hideNoSelectionLabel="false"
                                        noSelectionLabel=""/>
                         <s:convertEnum/>
+                        <a4j:support event="onchange" ajaxSingle="true" />
                     </h:selectOneMenu>
                 </s:decorate>
 
             </s:div>
-
         </h:panelGrid>
 
         <h:panelGrid columns="2" cellpadding="0" cellspacing="0"  border="0" width="100%" columnClasses="width10percent,width90percent">
-            <s:div>
-                <c:forEach items="#{salesAction.bestProductList}" var="productItem">
-                    <a4j:commandButton action="#{salesAction.addProduct(productItem)}"
-                                       value="#{productItem.acronym}" styleClass="button"
-                                       reRender="productDataTable" />
+                <s:div>
+                    <c:forEach items="#{salesAction.bestProductList}" var="productItem">
+                        <a4j:commandButton action="#{salesAction.addProduct(productItem)}"
+                                           value="#{productItem.acronym}" styleClass="button"
+                                           reRender="productDataTable" />
 
-                </c:forEach>
-            </s:div>
+                    </c:forEach>
+                </s:div>
         </h:panelGrid>
     </rich:panel>
 
     <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">
-        <!--<s:div id="clientField" styleClass="buttonsLeft">
-            <h:outputText value="#{messages['Client.client']}" styleClass="text09" />
-                <rich:spacer width="5px" />
-                <app:selectPopUp id="clientFieldId"
-                                 required="false"
-                                 textValue="#{salesAction.client.fullName}"
-                                 value="#{salesAction.client}"
-                                 clearAction="#{salesAction.clearClient()}"
-                                 searchModalPanel="clientListModalPanel"
-                                 dataModel="#{clientDataModel}"
-                                 reRender="clientField"
-                                 tabindex="12">
-                </app:selectPopUp>
-        </s:div>-->
         <s:div id="totalAmountField">
-            <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">-->
                 <h:outputText value="Total:" styleClass="text10" />
                 <h:outputText id="totalAmount" value="#{salesAction.calculateTotalAmount()}" styleClass="textBold12Blue" >
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
-            <!--</s:decorate>-->
         </s:div>
 
         <s:div styleClass="buttonsRight">
@@ -230,6 +173,7 @@
             <a4j:commandButton id="creditSaleCommandButton"
                                action="#{salesAction.initCreditSale()}"
                                value="Registrar venta"
+                               rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
                                oncomplete="Richfaces.showModalPanel('confirmCreditSaleModalPanel');"
@@ -239,12 +183,12 @@
             <a4j:commandButton id="cashSaleCommandButton"
                                action="#{salesAction.initCashSale}"
                                value="Cobrar venta"
+                               rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
                                oncomplete="Richfaces.showModalPanel('confirmCashSaleModalPanel');"
                                reRender="productDataTable,confirmCashSaleModalPanel">
             </a4j:commandButton>
-
         </s:div>
     </h:panelGrid>
 
@@ -336,7 +280,7 @@
                                    action="#{salesAction.assignClient(clientItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="clientField"
+                                   reRender="clientField, part2, customerOrderTypeField, customerOrderType, customerCategoryTypeField, customerCategoryTypeId"
                                    oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
             </ui:define>
         </s:decorate>

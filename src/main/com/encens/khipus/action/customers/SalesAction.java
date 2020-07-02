@@ -47,6 +47,7 @@ public class SalesAction {
     private String observation;
 
     private SubsidyEnun subsidyEnun;
+    private CustomerCategoryType customerCategoryTypeEnum;
 
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
@@ -84,6 +85,11 @@ public class SalesAction {
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
         return SubsidyEnun.values();
+    }
+
+    @Factory(value = "customerCategoryTypes", scope = ScopeType.STATELESS)
+    public CustomerCategoryType[] initProductDeliveryTypes() {
+        return CustomerCategoryType.values();
     }
 
     public void openSale(){
@@ -124,8 +130,8 @@ public class SalesAction {
         articleOrder.setUnitCost(BigDecimal.ZERO);
         articleOrder.setPrice(productItem.getSalePrice().doubleValue());
 
-        if (priceItemListMap != null){
-            BigDecimal price = priceItemListMap.get(productItem.getProductItemCode());
+        if (getPriceItemListMap() != null){
+            BigDecimal price = getPriceItemListMap().get(productItem.getProductItemCode());
             System.out.println("--------------> PRICE: " + price);
             if (price != null)
                 articleOrder.setPrice(price.doubleValue());
@@ -185,6 +191,7 @@ public class SalesAction {
         setObservation(null);
         setDistributor(null);
         setSubsidyEnun(null);
+        setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
     }
 
@@ -208,6 +215,7 @@ public class SalesAction {
 
         System.out.println("------------> user: " + currentUser);
         System.out.println("------------> tipo pedido: " + customerOrderType);
+        System.out.println("------------> Subsidio: " + this.subsidyEnun);
 
         CustomerOrder customerOrder = new CustomerOrder();
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
@@ -232,18 +240,24 @@ public class SalesAction {
     }
 
     public void assignClient(Client client){
+        setClient(client);
+        assignCustomerOrderTypeDefault();
+        setCustomerCategoryTypeEnum(null);
+        setPriceItemListMap(null);
 
         if (client.getCustomerCategory() != null)
-            priceItemListMap = priceItemService.getPriceItemsMap(client.getCustomerCategory());
-
-        setClient(client);
+            setPriceItemListMap(priceItemService.getPriceItemsMap(client.getCustomerCategory()));
     }
 
     public void loadConsumerPrices(){
         System.out.println("...............Cargando precios de consumidor...");
-        priceItemListMap = priceItemService.getConsumerPrices();
-        System.out.println("............... ejm: leche uht (118): " + priceItemListMap.get("118"));
+        setPriceItemListMap(priceItemService.getConsumerPrices());
+        System.out.println("............... ejm: leche uht (118): " + getPriceItemListMap().get("118"));
 
+    }
+
+    public void loadPricesByCategory(){
+        setPriceItemListMap(priceItemService.getPricesByCategory(this.customerCategoryTypeEnum));
     }
 
     public void assignCustomerOrderTypeDefault(){
@@ -361,7 +375,7 @@ public class SalesAction {
 
     public void clearClient(){
         setClient(null);
-        this.priceItemListMap = null;
+        this.setPriceItemListMap(null);
 
         clearProduct();
         clearProductsSelected();
@@ -369,6 +383,7 @@ public class SalesAction {
         setObservation(null);
         setDistributor(null);
         setSubsidyEnun(null);
+        setCustomerCategoryTypeEnum(null);
 
         assignCustomerOrderTypeDefault();
     }
@@ -435,5 +450,21 @@ public class SalesAction {
 
     public void setFinalConsumer(Boolean finalConsumer) {
         this.finalConsumer = finalConsumer;
+    }
+
+    public CustomerCategoryType getCustomerCategoryTypeEnum() {
+        return customerCategoryTypeEnum;
+    }
+
+    public void setCustomerCategoryTypeEnum(CustomerCategoryType customerCategoryTypeEnum) {
+        this.customerCategoryTypeEnum = customerCategoryTypeEnum;
+    }
+
+    public Map<String, BigDecimal> getPriceItemListMap() {
+        return priceItemListMap;
+    }
+
+    public void setPriceItemListMap(Map<String, BigDecimal> priceItemListMap) {
+        this.priceItemListMap = priceItemListMap;
     }
 }

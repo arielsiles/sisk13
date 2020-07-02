@@ -1,61 +1,73 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.util.Constants;
+import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Diego
- * Date: 21/12/14
- * Time: 2:03
- * To change this template use File | Settings | File Templates.
+ *
  */
-@TableGenerator(name = "Dosage_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "DOSIFICACIONES",
-        allocationSize = 10)
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "Dosage.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "dosificacion",
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "DOSIFICACIONES",schema = Constants.CASHBOX_SCHEMA)
-
+@Filter(name = Constants.COMPANY_FILTER_NAME)
+@EntityListeners(CompanyListener.class)
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "dosificacion")
 public class Dosage implements BaseModel {
 
     @Id
-    @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dosage_Generator")
+    @Column(name = "IDDOSIFICACION", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dosage.tableGenerator")
     private Long id;
 
-    @Column(name = "NROAUTORIZACION", nullable = false, columnDefinition = "DECIMAL(15,0)")
-    private BigDecimal numberAuthorization = new BigDecimal(0.0);
+    @Column(name = "NROAUTORIZACION", nullable = false)
+    private Long authorizationNumber;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA_VENCIMIENTO")
-    private Date dateExpiration;
+    @Column(name = "FECHAVENCIMIENTO")
+    private Date expirationDate;
 
     @Column(name="LLAVE")
     private String key;
 
-    @Column(name="ACTIVO")
+    @Column(name="ESTADO")
     private String state;
 
-    @Column(name="EST_COD")
-    private String estCod;
+    @Column(name = "NUMEROACTUAL", nullable = false)
+    private Long currentNumber;
 
-    @Column(name = "FACTURADEL", nullable = false, columnDefinition = "DECIMAL(10,0)")
-    private BigDecimal invoiceFrom = new BigDecimal(0.0);
+    @Column(name="NITEMPRESA")
+    private String companyNit;
 
-    @Column(name = "FACTURAAL", nullable = false, columnDefinition = "DECIMAL(10,0)")
-    private BigDecimal invoiceTo = new BigDecimal(0.0);
+    @Column(name="ETIQUETAEMPRESA")
+    private String companyLabel;
 
-    @Column(name = "NRO_ACTUAL", nullable = false, columnDefinition = "DECIMAL(10,0)")
-    private BigDecimal numberCurrent = new BigDecimal(0.0);
+    @Temporal(value = TemporalType.DATE)
+    @Column(name = "FECHAINICIO")
+    private Date startDate;
 
+    @Temporal(value = TemporalType.DATE)
+    @Column(name = "FECHACONTROL")
+    private Date controlDate;
+
+    @Column(name="ETIQUETALEY")
+    private String lawLabel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "IDSUCURSAL", referencedColumnName = "IDSUCURSAL", nullable = false)
+    private CompanyBranch companyBranch;
+
+    @Override
     public Long getId() {
         return id;
     }
@@ -64,20 +76,20 @@ public class Dosage implements BaseModel {
         this.id = id;
     }
 
-    public BigDecimal getNumberAuthorization() {
-        return numberAuthorization;
+    public Long getAuthorizationNumber() {
+        return authorizationNumber;
     }
 
-    public void setNumberAuthorization(BigDecimal numberAuthorization) {
-        this.numberAuthorization = numberAuthorization;
+    public void setAuthorizationNumber(Long authorizationNumber) {
+        this.authorizationNumber = authorizationNumber;
     }
 
-    public Date getDateExpiration() {
-        return dateExpiration;
+    public Date getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setDateExpiration(Date dateExpiration) {
-        this.dateExpiration = dateExpiration;
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public String getKey() {
@@ -96,35 +108,59 @@ public class Dosage implements BaseModel {
         this.state = state;
     }
 
-    public String getEstCod() {
-        return estCod;
+    public Long getCurrentNumber() {
+        return currentNumber;
     }
 
-    public void setEstCod(String estCod) {
-        this.estCod = estCod;
+    public void setCurrentNumber(Long currentNumber) {
+        this.currentNumber = currentNumber;
     }
 
-    public BigDecimal getInvoiceFrom() {
-        return invoiceFrom;
+    public String getCompanyNit() {
+        return companyNit;
     }
 
-    public void setInvoiceFrom(BigDecimal invoiceFrom) {
-        this.invoiceFrom = invoiceFrom;
+    public void setCompanyNit(String companyNit) {
+        this.companyNit = companyNit;
     }
 
-    public BigDecimal getInvoiceTo() {
-        return invoiceTo;
+    public String getCompanyLabel() {
+        return companyLabel;
     }
 
-    public void setInvoiceTo(BigDecimal invoiceTo) {
-        this.invoiceTo = invoiceTo;
+    public void setCompanyLabel(String companyLabel) {
+        this.companyLabel = companyLabel;
     }
 
-    public BigDecimal getNumberCurrent() {
-        return numberCurrent;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setNumberCurrent(BigDecimal numberCurrent) {
-        this.numberCurrent = numberCurrent;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getControlDate() {
+        return controlDate;
+    }
+
+    public void setControlDate(Date controlDate) {
+        this.controlDate = controlDate;
+    }
+
+    public String getLawLabel() {
+        return lawLabel;
+    }
+
+    public void setLawLabel(String lawLabel) {
+        this.lawLabel = lawLabel;
+    }
+
+    public CompanyBranch getCompanyBranch() {
+        return companyBranch;
+    }
+
+    public void setCompanyBranch(CompanyBranch companyBranch) {
+        this.companyBranch = companyBranch;
     }
 }

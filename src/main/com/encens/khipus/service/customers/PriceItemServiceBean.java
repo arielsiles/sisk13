@@ -63,4 +63,18 @@ public class PriceItemServiceBean extends GenericServiceBean implements PriceIte
 
         return resultListMap;
     }
+
+    @Override
+    public Map<String, BigDecimal> getPricesByCategory(CustomerCategoryType customerCategoryType) {
+
+        Map<String, BigDecimal> resultListMap = new HashMap<String, BigDecimal>();
+        CustomerCategory customerCategory = customerCategoryService.getCustomerCategory(customerCategoryType);
+        List<PriceItem> priceItemList = getPriceItems(customerCategory);
+
+        for (PriceItem priceItem : priceItemList){
+            resultListMap.put(priceItem.getProductItemCode(), priceItem.getSalePrice());
+        }
+
+        return resultListMap;
+    }
 }

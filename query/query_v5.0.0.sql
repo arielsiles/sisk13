@@ -1,6 +1,9 @@
 -- ----------------------
 /** query for v5.0.0 **/
 -- ----------------------
+
+alter table funcionalidad add primary key(idfuncionalidad);
+
 /** 12.05.2020 **/
 create table tipoventa (
 	idtipoventa bigint(20) not null,
@@ -165,3 +168,5 @@ alter table categoriacliente add column tipo varchar(64) after nombre;
 update categoriacliente set tipo = 'FACTORY' where idcategoriacliente = 1;
 update categoriacliente set tipo = 'STORE' where idcategoriacliente = 2;
 update categoriacliente set tipo = 'CONSUMER' where idcategoriacliente = 3;
+
+alter table pedidos modify column CON_REPOSICION int(1) default 0;
