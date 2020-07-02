@@ -246,4 +246,24 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
                 .getResultList();
     }
 
+    @Override
+    public List<ProductItem> findProductItemList() {
+        List<ProductItem> result = new ArrayList<ProductItem>();
+        result = em.createQuery("select  p from ProductItem p")
+                                    .getResultList();
+        return result;
+    }
+
+    @Override
+    public List<ProductItem> findBestProductList() {
+        List<ProductItem> result = new ArrayList<ProductItem>();
+        result = em.createQuery("select  p from ProductItem p " +
+                " where p.fixSale =:fixSale " +
+                " order by p.position asc")
+                .setParameter("fixSale", Boolean.TRUE)
+                .getResultList();
+        return result;
+    }
+
+
 }

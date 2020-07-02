@@ -14,6 +14,7 @@ import com.encens.khipus.reports.GenerationReportData;
 import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.customers.RePrintsService;
 import com.encens.khipus.service.warehouse.WarehouseService;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.FileCacheLoader;
 import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.MoneyUtil;
@@ -83,7 +84,8 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         addVoucherMovementDetailSubReport(params,order);
         String etiqueta;
         String codControl;
-        BigDecimal numberAuthorization = dosage.getNumberAuthorization();
+        //BigDecimal numberAuthorization = dosage.getNumberAuthorization();
+        BigDecimal numberAuthorization = BigDecimalUtil.toBigDecimal(dosage.getAuthorizationNumber());
         String key = dosage.getKey();
 
         if(imprimirCopia)
@@ -91,9 +93,9 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         else
             etiqueta = "ORIGINAL";
 
-        ControlCode controlCode = generateCodControl(customerOrder,dosage.getNumberCurrent().intValue(),numberAuthorization,key);
+        ControlCode controlCode = generateCodControl(customerOrder,dosage.getCurrentNumber().intValue(),numberAuthorization,key);
         String nameClient = rePrintsService.findNameClient(order);
-        params.putAll(getReportParams(nameClient,dosage.getNumberCurrent().intValue(),etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
+        params.putAll(getReportParams(nameClient,dosage.getCurrentNumber().intValue(),etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
         super.generateReport("productDeliveryReceiptReport",
                             "/customers/reports/invoiceReceptionReport.jrxml",
                             PageFormat.LEGAL,
@@ -117,7 +119,8 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         setReportFormat(ReportFormat.PDF);
         String etiqueta ;
         String codControl;
-        BigDecimal numberAuthorization = dosage.getNumberAuthorization();
+        //BigDecimal numberAuthorization = dosage.getNumberAuthorization();
+        BigDecimal numberAuthorization = BigDecimalUtil.toBigDecimal(dosage.getAuthorizationNumber());
         String key = dosage.getKey();
         Map params = new HashMap();
         rePrintsNews.clear();
@@ -135,7 +138,7 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         typedReportData.getJasperPrint().getPages().clear();
 
         for(CustomerOrder order:customerOrders){
-                numberInvoice = dosage.getNumberCurrent().intValue();
+                numberInvoice = dosage.getCurrentNumber().intValue();
                 //customerOrder = order;
                 ControlCode controlCode = generateCodControl(order,numberInvoice,numberAuthorization,key);
                String nameClient = rePrintsService.findNameClient(order);
@@ -148,14 +151,14 @@ public class PrintInvoiceReportAction extends GenericReportAction {
 
                 if(!imprimirCopia)
                 {
-                    createArticleOrders( order,(long)numberInvoice,controlCode.getCodigoControl());
+                    createArticleOrders( order, numberInvoice.longValue(), controlCode.getCodigoControl());
                     createReImprint(customerOrder,dosage,numberInvoice,currentUser);
                 }
                 else
                     updateReImprint(order);
 
                 numberInvoice ++;
-                dosage.setNumberCurrent(new BigDecimal(numberInvoice));
+                dosage.setCurrentNumber(numberInvoice.longValue());
 
 
             }
@@ -312,21 +315,21 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         paramMap.put("nitCliente",customerOrder.getClientOrder().getNumberDoc());
         paramMap.put("fecha",customerOrder.getDateDelicery());*/
         paramMap.put("nombreCliente",nameClient);//verificar el nombre del cliente
-        paramMap.put("fechaLimite",dosage.getDateExpiration());
+        paramMap.put("fechaLimite",dosage.getExpirationDate());
         paramMap.put("codigoControl",codControl);
         paramMap.put("tipoEtiqueta",etiqueta);
         //verificar por que no requiere el codigo de control
 
         paramMap.put("llaveQR",keyQR);
-        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotal().toString(), true, messages.get("Reports.cashAvailable.bs")));
-        paramMap.put("total",customerOrder.getTotal());
+        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs")));
+        paramMap.put("total",customerOrder.getTotalAmount());
         barcodeRenderer.generateQR(keyQR,filePath);
         return paramMap;
     }
 
     private ControlCode generateCodControl(CustomerOrder order,Integer numberInvoice,BigDecimal numberAutorization,String key)
     {
-        Double importeBaseCreditFisical = order.getTotal().doubleValue() * 0.13;
+        //Double importeBaseCreditFisical = order.getTotalAmount().doubleValue() * 0.13;
         ControlCode controlCode = null;
           moneyUtil.getLlaveQR(controlCode,key);
         controlCode.generarCodigoQR();

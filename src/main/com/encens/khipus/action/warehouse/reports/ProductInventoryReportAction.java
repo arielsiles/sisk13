@@ -478,7 +478,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         List<ArticleOrder> orderCustomerDetailList = articleOrderService.findCustomerOrderDetailList(startDate, endDate);
         for (ArticleOrder articleOrder:orderCustomerDetailList){
             ArticleMovement articleMovement = new ArticleMovement(
-                    articleOrder.getCustomerOrder().getFechaEntrega(),
+                    articleOrder.getCustomerOrder().getOrderDate(),
                     articleOrder.getCodArt(),
                     MovementDetailType.S,
                     BigDecimalUtil.toBigDecimal(articleOrder.getTotal()),

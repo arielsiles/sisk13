@@ -1,0 +1,294 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{distributorAction.managed}">
+            #{messages['Distributor.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Distributor.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+
+<h:form id="partnerForm">
+
+<div class="buttons">
+    <h:commandButton action="#{distributorAction.create}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!distributorAction.managed and s:hasPermission('DISTRIBUTOR','CREATE')}"
+                     tabindex="1">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <!--<h:commandButton action="#{distributorAction.update}" value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{distributorAction.managed and s:hasPermission('DISTRIBUTOR','UPDATE')}"
+                     tabindex="2"/>
+
+    <h:commandButton value="#{messages['Common.delete']}"
+                     styleClass="button"
+                     rendered="#{distributorAction.managed and s:hasPermission('DISTRIBUTOR','DELETE')}"
+                     tabindex="3">
+        <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+    </h:commandButton>-->
+
+    <h:commandButton action="#{distributorAction.cancel}" value="#{messages['Common.cancel']}"
+                     styleClass="button" immediate="true"
+                     tabindex="4">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{distributorAction.managed}">
+            #{messages['Partner.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Partner.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+    <app:fieldset id="personInformationFieldset" title="#{messages['Partner.person']}">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+            <s:div>
+                <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Partner.person']}</ui:define>
+                    <app:selectPopUp id="person"
+                                     textValue="#{distributorAction.person.fullName}"
+                                     value="#{distributorAction.person}"
+                                     clearAction="pollCopyDataModel.clearPerson()"
+                                     searchModalPanel="personListModalPanel"
+                                     dataModel="#{personDataModel}"
+                                     reRender="personInformationFieldset, contractFieldset"
+
+                                     newModalPanel="personPartnerModalPanel"
+                                     renderedNewLink="true"
+                                     hotKeySelect="alt+2"
+                                     tabindex="11"/>
+                </s:decorate>
+            </s:div>
+
+            <s:div id="documentDiv" rendered="#{not empty distributorAction.person}">
+                <s:decorate id="idNumberField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Distributor.idNumber']}</ui:define>
+                    <h:inputText id="idNumber"
+                                 value="#{distributorAction.person.idNumber}"
+                                 required="true"
+                                 maxlength="100"
+                                 styleClass="input"
+                                 tabindex="2">
+                    </h:inputText>
+                </s:decorate>
+            </s:div>
+            <s:div>
+
+            </s:div>
+        </h:panelGrid>
+    </app:fieldset>
+
+    <!--<s:div id="distributorDetail" rendered="#{not empty distributorAction.person}">
+    <app:fieldset id="contractFieldset" title="#{messages['Partner.partnerDetails']}">
+    <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+    <s:div>
+        <s:decorate id="idNumberField1"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['Distributor.idNumber']}</ui:define>
+            <h:inputText id="idNumber1"
+                         value="#{distributor.idNumber}"
+                         required="true"
+                         maxlength="100"
+                         styleClass="input"
+                         tabindex="2">
+            </h:inputText>
+        </s:decorate>
+
+        <s:div id="documentDiv1">
+            <s:decorate id="documentTypeField1" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Partner.documentType']}</ui:define>
+                <h:selectOneMenu id="documentType1"
+                                 value="#{distributor.documentType}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="3">
+                    <s:selectItems value="#{documentTypeList}" var="documentType"
+                                   label="#{documentType.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange"
+                                 action="#{distributorAction.updateShowExtension()}"
+                                 reRender="documentDiv1"
+                                 ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="extensionField1" template="/include/inputField.xhtml"
+                        rendered="#{distributorAction.showExtension}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['Entity.extension']}</ui:define>
+                <h:selectOneMenu id="extension1"
+                                 value="#{distributor.extensionSite}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="4">
+                    <s:selectItems value="#{extensionList}"
+                                   var="extension"
+                                   label="#{extension.extension}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+
+        <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.birthDay']}</ui:define>
+            <rich:calendar value="#{distributor.birthDay}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="7">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="cellphoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.cellphone']}</ui:define>
+            <h:inputText id="cellphone" value="#{distributor.cellphone}" maxlength="20" tabindex="9" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="homeAddressField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.homeAddress']}</ui:define>
+            <h:inputTextarea id="homeAddress"
+                             value="#{distributor.homeAddress}"
+                             styleClass="textarea"
+                             tabindex="10"
+                             style="width:200px;height:40px;"/>
+        </s:decorate>
+
+    </s:div>
+
+    <s:div>
+
+        <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+            <h:inputText id="firstName" value="#{distributor.firstName}" required="true"
+                         maxlength="200" tabindex="12" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+            <h:inputText id="lastName" value="#{distributor.lastName}" required="true"
+                         maxlength="80" tabindex="13" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+            <h:inputText id="maidenName" value="#{distributor.maidenName}" required="true"
+                         maxlength="200" tabindex="14" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="genderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.gender']}</ui:define>
+            <h:selectOneMenu id="genderType"
+                             value="#{distributor.gender}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="15">
+                <s:selectItems value="#{genderEnum}"
+                               var="gender"
+                               label="#{messages[gender.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="maritalStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.maritalStatus']}</ui:define>
+            <h:selectOneMenu id="maritalStatus"
+                             value="#{distributor.maritalStatus}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="16">
+                <s:selectItems value="#{maritalStatusList.resultList}" var="maritalStatus"
+                               label="#{maritalStatus.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="professionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.profession']}</ui:define>
+            <h:inputText id="maidenName" value="#{distributor.profession}"
+                         maxlength="200" tabindex="17" styleClass="input">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="salutationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Partner.salutation']}</ui:define>
+            <h:selectOneMenu id="salutation" value="#{distributor.salutation}" styleClass="input"
+                             required="true" tabindex="18">
+                <s:selectItems value="#{salutationList.resultList}" var="salutation"
+                               label="#{salutation.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+    </s:div>
+    </h:panelGrid>
+    </app:fieldset>
+    </s:div>-->
+
+</rich:panel>
+
+    <div class="buttons">
+
+    </div>
+
+</h:form>
+
+    <s:decorate id="personListModalPanelContainer" template="/employees/personListModalPanel.xhtml">
+        <ui:param name="dialogId" value="personListModalPanel"/>
+        <ui:param name="container" value="personListModalPanelContainer"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{distributorAction.assignPerson(personItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               ajaxSingle="true"
+                               reRender="personInformationFieldset, distributorDetail"
+                               oncomplete="Richfaces.hideModalPanel('personListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+
+<s:fragment rendered="#{distributorAction.managed}">
+    <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+</s:fragment>
+</ui:define>
+</ui:composition>
+

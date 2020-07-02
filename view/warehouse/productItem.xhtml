@@ -368,6 +368,30 @@
         </h:inputText>
     </s:decorate>
 
+    <s:decorate id="fixSaleField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.bestSeller']}</ui:define>
+        <h:selectBooleanCheckbox id="saleable"
+                                 value="#{productItem.fixSale}"
+                                 tabindex="10"/>
+    </s:decorate>
+
+    <s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.acronym']}</ui:define>
+        <h:inputText id="nameShort"
+                     value="#{productItem.acronym}"
+                     styleClass="inputSmall"
+                     maxlength="14"
+                     tabindex="2"/>
+        <rich:spacer width="5px" />
+        <h:outputText value="#{messages['ProductItem.position']}" />
+        <rich:spacer width="5px" />
+        <h:inputText id="position"
+                     value="#{productItem.position}"
+                     styleClass="inputTiny"
+                     maxlength="14"
+                     tabindex="2"/>
+    </s:decorate>
+
 </rich:panel>
 
 <div class="buttons">

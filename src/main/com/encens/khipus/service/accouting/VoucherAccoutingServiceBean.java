@@ -1327,7 +1327,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         if (sales.size() > 0) {
             for (VentaDirecta sale : sales) {
                 for (ArticleOrder articleOrder : sale.getArticulosPedidos())
-                    totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.multiply(articleOrder.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getAmount())));
+                    totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.multiply(articleOrder.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getQuantity())));
                 sale.setCvFlag(true);
             }
 

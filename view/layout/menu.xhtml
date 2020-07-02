@@ -34,7 +34,7 @@
             s:hasPermission('CUSTOMERCATEGORY','VIEW') or
             s:hasPermission('PRINTINVOICE','VIEW') or
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
-    <h:panelGrid columns="10" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="11" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
@@ -60,9 +60,7 @@
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.sales']}"
-                           rendered="#{
-        s:hasPermission('CASHBOX','VIEW') or
-        s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
+                           rendered="#{s:hasPermission('CASHBOX','VIEW') or s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
                            rendered="#{s:hasPermission('CASHBOX','VIEW')}">
@@ -81,9 +79,16 @@
         </rich:dropDownMenu>
 
         <s:link view="/customers/salesBox.xhtml"
-                value="#{messages['menu.customers.box']}"
+                value="#{messages['menu.customers.sales']}"
+                action="#{salesAction.openSale()}"
+                rendered="#{s:hasPermission('SALES', 'VIEW')}"
                 styleClass="tab-cell"
-                propagation="begin"/>
+                propagation="none"/>
+
+        <s:link view="/customers/clientList.xhtml"
+                value="#{messages['menu.customers.client']}"
+                styleClass="tab-cell"
+                propagation="none"/>
 
         <s:link view="/customers/cashSaleList.xhtml"
                 value="#{messages['menu.customers.sales.cashSales']}"
@@ -185,6 +190,14 @@
                 s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW') or
                 s:hasPermission('CUSTOMERCATEGORY','VIEW') or
                 s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DISTRIBUTOR','VIEW')}">
+                <s:link view="/customers/distributorList.xhtml"
+                        value="#{messages['menu.customers.configuration.distributor']}"
+                        propagation="none"/>
+            </rich:menuItem>
 
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
@@ -471,6 +484,13 @@
         s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW') or
         s:hasPermission('PREPAREDELIVERY','VIEW') or
         s:hasPermission('APPROVEDALLACCOUNTENTRIES','VIEW')}">
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}">
+        <s:link view="/warehouse/productItemList.xhtml"
+                value="#{messages['menu.warehouse.configuration.productItem']}"
+                propagation="none"/>
+    </rich:menuItem>
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}"
                    styleClass="main-menu-item">
@@ -1186,11 +1206,36 @@
                 value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
-                   >
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
         <s:link view="/finances/cashBoxList.xhtml"
                 value="#{messages['menu.finances.configuration.cashBox']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/cashBoxTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.cashBoxType']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxRuleList.xhtml"
+                value="#{messages['menu.finances.taxRule']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxPercentageList.xhtml"
+                value="#{messages['menu.finances.configuration.taxPercentage']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/taxPercentageTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.taxPercentageType']}"
+                propagation="none"/>
+    </rich:menuItem>
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/finances/dosageTypeList.xhtml"
+                value="#{messages['menu.finances.configuration.dosageType']}"
                 propagation="none"/>
     </rich:menuItem>
 

@@ -9,7 +9,10 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.Territoriotrabajo;
+import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.AccountItemService;
@@ -501,11 +504,11 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
             for(Territoriotrabajo territorio:territorios) {
                 for (CustomerOrder pedido : soldProductService.findPedidosPorFechaTerritorio(date,territorio)) {
                     OrderClient orderClient = new OrderClient();
-                    orderClient.setIdOrder(pedido.getCodigo().toString());
-                    orderClient.setName(pedido.getCodigo().toString() + "-" + pedido.getCliente().getNombreCompleto());
+                    orderClient.setIdOrder(pedido.getCode().toString());
+                    orderClient.setName(pedido.getCode().toString() + "-" + pedido.getClient().getNombreCompleto());
                     orderClient.setType("CLIENTE");
-                    orderClient.setState(pedido.getEstado());
-                    orderClient.setCliente(pedido.getCliente());
+                    /*orderClient.setState(pedido.getEstado());*/
+                    orderClient.setCliente(pedido.getClient());
                     orderClient.setStockFlag(pedido.getStockFlag());
                     orderClients.add(orderClient);
                 }
@@ -518,8 +521,8 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         }else{
             for (CustomerOrder pedido : pedidos) {
                 OrderClient orderClient = new OrderClient();
-                orderClient.setIdOrder(pedido.getCodigo().toString());
-                orderClient.setName(pedido.getCliente().getNombreCompleto());
+                orderClient.setIdOrder(pedido.getCode().toString());
+                orderClient.setName(pedido.getClient().getNombreCompleto());
                 orderClient.setType("CLIENTE");
                 orderClient.setStockFlag(pedido.getStockFlag());
                 orderClients.add(orderClient);
@@ -540,7 +543,7 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
      {
         List<Territoriotrabajo> territorios = new ArrayList<Territoriotrabajo>();
          for(CustomerOrder pedido:pedidos){
-             territorios.add(pedido.getCliente().getTerritoriotrabajo());
+             territorios.add(pedido.getClient().getTerritoriotrabajo());
          }
         return territorios;
      }
@@ -604,12 +607,12 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
 
     private boolean fueEntregado() {
         if(customerOrder != null)
-            if(customerOrder.getEstado()!= null) {
+            /*if(customerOrder.getEstado()!= null) {
                 if (!customerOrder.getEstado().equals("PREPARAR")) {
                     setMessageSearchOrder(MessageUtils.getMessage("ProductDelivery.messageWasDeliveryOrder", customerOrder.getCodigo()));
                     return true;
                 }
-            }
+            }*/
 
         if(ventaDirecta != null)
             if(ventaDirecta.getEstado()!=null){
@@ -879,9 +882,9 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         if(!client.getType().equals("TERRITORIO"))
         for(CustomerOrder pedido:pedidos)
         {
-            if(pedido.getCodigo().toString().equals(client.getIdOrder()))
+            if(pedido.getCode().toString().equals(client.getIdOrder()))
             {
-                for(ArticleOrder articulo: pedido.getArticulosPedidos()) {
+                for(ArticleOrder articulo: pedido.getArticleOrderList()) {
                     if(articulo.getCodArt().equals(item.getCodArt()))
                     {
                         cant = articulo.getTotal();
@@ -892,9 +895,9 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         else
             for(CustomerOrder pedido:pedidos)
             {
-                if(pedido.getCliente().getTerritoriotrabajo().getNombre().equals(client.getName()))
+                if(pedido.getClient().getTerritoriotrabajo().getNombre().equals(client.getName()))
                 {
-                    for(ArticleOrder articulo: pedido.getArticulosPedidos()) {
+                    for(ArticleOrder articulo: pedido.getArticleOrderList()) {
                         if(articulo.getCodArt().equals(item.getCodArt()))
                         {
                             cant += articulo.getTotal();
@@ -911,7 +914,7 @@ public class ProductDeliveryAction extends GenericAction<ProductDelivery> {
         Integer total = 0;
         for(CustomerOrder pedido:pedidos)
         {
-                for(ArticleOrder articulo: pedido.getArticulosPedidos())
+                for(ArticleOrder articulo: pedido.getArticleOrderList())
                 {
                     if(articulo.getCodArt().equals(item.getCodArt()))
                     {

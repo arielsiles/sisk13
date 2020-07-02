@@ -191,7 +191,7 @@ public class SoldProductServiceBean extends GenericServiceBean implements SoldPr
         CustomerOrder customerOrder;
         try{
             customerOrder = (CustomerOrder)getEntityManager()
-                    .createQuery("select pe from CustomerOrder pe where pe.codigo =:codigo and pe.estado = 'PREPARAR'")
+                    .createQuery("select pe from CustomerOrder pe where pe.code =:codigo and pe.estado = 'PREPARAR'")
                     .setParameter("codigo",Long.valueOf(numeroPedido).longValue() )
             .getSingleResult();
         }catch (NoResultException e){
@@ -208,7 +208,7 @@ public class SoldProductServiceBean extends GenericServiceBean implements SoldPr
             try {
                 customerOrders = (List<CustomerOrder>) getEntityManager()
                         .createQuery("select pe from CustomerOrder pe " +
-                                "where pe.fechaEntrega =:fecha " +
+                                "where pe.orderDate =:fecha " +
                                 "and pe.estado <> 'ANULADO'")
                         .setParameter("fecha", date, TemporalType.DATE)
                         .getResultList();
@@ -224,9 +224,9 @@ public class SoldProductServiceBean extends GenericServiceBean implements SoldPr
             try {
                 customerOrders = (List<CustomerOrder>) getEntityManager()
                         .createQuery("select pe from CustomerOrder pe " +
-                                "where pe.fechaEntrega =:fecha " +
+                                "where pe.orderDate =:fecha " +
                                 "and pe.estado <> 'ANULADO' " +
-                                "and pe.cliente.territoriotrabajo =:territorio")
+                                "and pe.client.territoriotrabajo =:territorio")
                         .setParameter("territorio", territoriotrabajo)
                         .setParameter("fecha", date, TemporalType.DATE)
                         .getResultList();

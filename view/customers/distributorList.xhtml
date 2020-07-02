@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Distributor.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="distributorSearch">
+            <rich:simpleTogglePanel label="#{messages['Distributor.search']}" switchType="client">
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Distributor.firstName']}</ui:define>
+                    <h:inputText id="firstName" value="#{distributorDataModel.criteria.firstName}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Distributor.lastName']}</ui:define>
+                    <h:inputText id="lastName" value="#{distributorDataModel.criteria.lastName}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Distributor.maidenName']}</ui:define>
+                    <h:inputText id="maidenName" value="#{distributorDataModel.criteria.maidenName}"
+                                 maxlength="80" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{distributorDataModel.search}" reRender="distributorList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+
+                <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/distributor.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('DISTRIBUTOR','CREATE')}"/>
+
+            </div>
+
+            <rich:dataTable value="#{distributorDataModel}" var="distributorItem" id="distributorList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="15%, 25%, 25%, 25%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['Distributor.idNumber']}</rich:column>
+                        <rich:column>#{messages['Distributor.firstName']}</rich:column>
+                        <rich:column>#{messages['Distributor.lastName']}</rich:column>
+                        <rich:column>#{messages['Distributor.maidenName']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{distributorItem.idNumber}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{distributorItem.firstName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{distributorItem.lastName}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{distributorItem.maidenName}"/>
+                </rich:column>
+
+
+                <rich:column styleClass="center">
+                    <!--<h:commandLink value="#{messages['Common.select']}"
+                                   action="#{distributorAction.select(distributorItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DISTRIBUTOR','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>-->
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="distributorList" dataModel="#{distributorDataModel}"/>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

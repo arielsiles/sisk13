@@ -1,11 +1,10 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Client;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 
 /**
  * @author
@@ -17,6 +16,7 @@ import org.jboss.seam.annotations.Scope;
 public class ClientAction extends GenericAction<Client> {
 
     private String clientName;
+    private Boolean personFlag = Boolean.TRUE;
 
     @Factory(value = "client", scope = ScopeType.STATELESS)
     public Client initClient() {
@@ -32,6 +32,18 @@ public class ClientAction extends GenericAction<Client> {
         return "fullName";
     }
 
+    @Override
+    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(Client instance) {
+        String outCome = super.select(instance);
+        return outCome;
+    }
+
+
+    public void changePersonFlag(){
+        System.out.println("------------> changePersonFlag: " + this.personFlag);
+    }
+
     public String getClientName() {
         return clientName;
     }
@@ -41,5 +53,11 @@ public class ClientAction extends GenericAction<Client> {
     }
 
 
+    public Boolean getPersonFlag() {
+        return personFlag;
+    }
 
+    public void setPersonFlag(Boolean personFlag) {
+        this.personFlag = personFlag;
+    }
 }

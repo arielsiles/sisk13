@@ -72,32 +72,63 @@
                 </s:decorate>
             </rich:panel>
 
-            <div class="buttons">
-                <h:commandButton action="#{customerCategoryAction.create}"
-                                 value="#{messages['Common.save']}"
-                                 rendered="#{!customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','CREATE')}"
-                                 styleClass="button"
-                                 tabindex="2"/>
+            <c:if test="#{customerCategoryAction.managed}">
+                <!--<rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">-->
+                    <!--<rich:tab name="priceItemTab" label="#{messages['CustomerCategory.products']}" ajaxSingle="true">-->
+                        <rich:dataTable id="priceItemListId"
+                                        value="#{priceItemDataModel}"
+                                        var="priceItem"
+                                        rows="#{sessionUser.rowsPerPage}"
+                                        width="100%"
+                                        columnsWidth="10%, 60%, 30%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.code']}" />
+                                    </rich:column>
 
-                <h:commandButton action="#{customerCategoryAction.update}"
-                                 value="#{messages['Common.save']}"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','UPDATE')}"
-                                 styleClass="button"
-                                 tabindex="3"/>
-                <h:commandButton value="#{messages['Common.delete']}"
-                                 styleClass="button"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}"
-                                 tabindex="4">
-                    <rich:componentControl for="deleteConfirmation"
-                                           event="onclick"
-                                           disableDefault="true"
-                                           operation="show"/>
-                </h:commandButton>
-                <h:commandButton action="#{customerCategoryAction.cancel}"
-                                 styleClass="button"
-                                 value="#{messages['Common.cancel']}"
-                                 immediate="true"
-                                 tabindex="4"/>
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.name']}" />
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{messages['CustomerCategory.productItem.price']}" />
+                                    </rich:column>
+
+                                    <!--<rich:column styleClass="center">
+                                        <h:outputText value="#{messages['Common.action']}" />
+                                    </rich:column>-->
+
+                                </rich:columnGroup>
+                            </f:facet>
+
+                            <rich:column>
+                                <h:outputText value="#{priceItem.productItemCode}"/>
+                            </rich:column>
+
+                            <rich:column>
+                                <h:outputText value="#{priceItem.productItem.name}"/>
+                            </rich:column>
+
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{priceItem.salePrice}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+
+                            <!--<rich:column styleClass="center"></rich:column>-->
+
+                        </rich:dataTable>
+                        <app:dataScroller id="ListIdListDataScrollerId"
+                                          for="priceItemListId"
+                                          dataModel="#{priceItemDataModel}"/>
+                    <!--</rich:tab>-->
+                <!--</rich:tabPanel>-->
+            </c:if>
+
+
+            <div class="buttons">
+
             </div>
 
         </h:form>

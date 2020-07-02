@@ -91,7 +91,7 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
     @Override
     public void outputProducts(CustomerOrder customerOrder) {
 
-        for ( ArticleOrder articleOrder : customerOrder.getArticulosPedidos() ){
+        for ( ArticleOrder articleOrder : customerOrder.getArticleOrderList() ){
             ProductInventory productInventory = findProductInventoryByCode(articleOrder.getCodArt());
             System.out.println("---> Articulo: " + productInventory.getProductItem().getName());
             Double stock = productInventory.getQuantity().doubleValue();
@@ -103,7 +103,7 @@ public class ProductInventoryServiceBean extends GenericServiceBean implements P
             productInventoryRecord.setQuantity(BigDecimal.valueOf(articleOrder.getTotal()));
             productInventoryRecord.setType(ProductInventoryRecordType.DELIVERY_CUSTOMER_ORDER);
             productInventoryRecord.setMovementType(ProductInventoryRecordType.DELIVERY_CASH_SALE.getType());
-            productInventoryRecord.setDescription(productInventory.getProductItem().getFullName()+", #" + customerOrder.getCodigo());
+            productInventoryRecord.setDescription(productInventory.getProductItem().getFullName()+", #" + customerOrder.getCode());
             productInventoryRecord.setProductInventory(productInventory);
 
             productInventory.getProductInventoryRecords().add(productInventoryRecord);
