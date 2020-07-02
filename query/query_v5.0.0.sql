@@ -170,3 +170,15 @@ update categoriacliente set tipo = 'STORE' where idcategoriacliente = 2;
 update categoriacliente set tipo = 'CONSUMER' where idcategoriacliente = 3;
 
 alter table pedidos modify column CON_REPOSICION int(1) default 0;
+
+-- 01.07.2020
+insert into funcionalidad values (264, 'SALES', null, 1, 1, 'Functionality.customers.sales', 1);
+insert into funcionalidad values (265, 'CREDITSALES', null, 1, 1, 'Functionality.customers.creditSales', 1);
+insert into funcionalidad values (266, 'CASHSALES', null, 1, 1, 'Functionality.customers.cashSales', 1);
+
+
+
+
+
+
+
