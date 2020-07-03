@@ -26,22 +26,22 @@
                 <h:commandButton id="createButtonId"
                                  action="#{customerCategoryAction.create}"
                                  value="#{messages['Common.save']}"
-                                 rendered="#{!customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','CREATE')}"
+                                 rendered="#{!customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','CREATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="updateButtonId"
                                  action="#{customerCategoryAction.update}"
-                                 value="#{messages['Common.save']}"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','UPDATE')}"
+                                 value="Actualizar"
+                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','UPDATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}">
+                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','DELETE')}">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
@@ -71,10 +71,82 @@
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
             </rich:panel>
+            <s:div id="movementDetailListPanel">
+            <div class="buttons">
+                <a4j:commandButton id="addProductItemCommandButton"
+                                   action="#{productItemByWarehouseDataModel.reset()}"
+                                   value="#{messages['WarehouseVoucher.button.addProductItem']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   reRender="productItemsByWarehouseListModalPanel">
+                    <f:attribute name="entityManagerName" value=""/>
+                    <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+                </a4j:commandButton>
+            </div>
 
             <c:if test="#{customerCategoryAction.managed}">
-                <!--<rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">-->
-                    <!--<rich:tab name="priceItemTab" label="#{messages['CustomerCategory.products']}" ajaxSingle="true">-->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['MovementDetail.productItem']}</th>
+                        <th class="rich-table-headercell">Precio</th>
+                        <th class="rich-table-headercell">#{messages['Common.action']}</th>
+                    </tr>
+                    </thead>
+
+                    <c:forEach var="instance" items="#{customerCategoryAction.details}" varStatus="row">
+                        <c:set var="amountFieldId" value="amountField_#{row.index}"/>
+                        <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
+
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{instance.productItem.fullName}"/>
+                            </td>
+                            <!--<td class="rich-table-cell">
+                                <h:outputText value="#{instance.productItem.measureUnit.name}"/>
+                            </td>-->
+
+                            <td class="rich-table-cell right">
+                                <s:div id="#{amountFieldId}">
+                                    <h:inputText id="#{amountInputTextId}"
+                                                 value="#{instance.salePrice}"
+                                                 styleClass="inputSmall right"
+                                                 required="true">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="#{amountInputTextId}"/>
+                                    </h:inputText>
+                                    <!--<h:message for="#{amountInputTextId}"
+                                               styleClass="errors"
+                                               style="display:block;"
+                                               rendered="#{warehouseVoucherCreateAction.enabledAmountField}"/>
+                                    <h:outputText value="#{instance.amount}"
+                                                  styleClass="input"
+                                                  rendered="#{not warehouseVoucherCreateAction.enabledAmountField}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                    </h:outputText>-->
+                                </s:div>
+                            </td>
+
+
+
+                            <td class="rich-table-cell center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{customerCategoryAction.removeMovementDetail(instance)}"
+                                                 ajaxSingle="true"
+                                                 reRender="movementDetailListPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </c:if>
+
+            <!--<c:if test="#{customerCategoryAction.managed}">
                         <rich:dataTable id="priceItemListId"
                                         value="#{priceItemDataModel}"
                                         var="priceItem"
@@ -95,10 +167,6 @@
                                         <h:outputText value="#{messages['CustomerCategory.productItem.price']}" />
                                     </rich:column>
 
-                                    <!--<rich:column styleClass="center">
-                                        <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>-->
-
                                 </rich:columnGroup>
                             </f:facet>
 
@@ -116,20 +184,13 @@
                                 </h:outputText>
                             </rich:column>
 
-                            <!--<rich:column styleClass="center"></rich:column>-->
-
                         </rich:dataTable>
                         <app:dataScroller id="ListIdListDataScrollerId"
                                           for="priceItemListId"
                                           dataModel="#{priceItemDataModel}"/>
-                    <!--</rich:tab>-->
-                <!--</rich:tabPanel>-->
-            </c:if>
+            </c:if>-->
 
-
-            <div class="buttons">
-
-            </div>
+            </s:div>
 
         </h:form>
 
@@ -150,6 +211,22 @@
                                    immediate="true"
                                    rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}"
                                    styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productItemsByWarehouseListModalPanelContainer"
+                    template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{customerCategoryAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="movementDetailListPanel"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

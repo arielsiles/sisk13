@@ -24,5 +24,6 @@ public interface PriceItemService extends GenericService {
     Map<String, BigDecimal> getPriceItemsMap(CustomerCategory customerCategory);
     Map<String, BigDecimal> getConsumerPrices();
     Map<String, BigDecimal> getPricesByCategory(CustomerCategoryType customerCategoryType);
-
+    void updatePriceItems(List<PriceItem> priceItems);
+    void deletePriceItem(PriceItem priceItem);
 }

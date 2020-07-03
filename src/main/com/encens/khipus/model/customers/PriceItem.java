@@ -41,7 +41,7 @@ public class PriceItem implements BaseModel {
     @Column(name = "precio", precision = 12, scale = 2, nullable = false)
     private BigDecimal salePrice;
 
-    @Column(name = "no_cia", insertable = false, updatable = false)
+    @Column(name = "no_cia", insertable = true, updatable = true)
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

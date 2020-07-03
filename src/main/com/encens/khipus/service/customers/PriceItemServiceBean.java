@@ -77,4 +77,26 @@ public class PriceItemServiceBean extends GenericServiceBean implements PriceIte
 
         return resultListMap;
     }
+
+    @Override
+    public void updatePriceItems(List<PriceItem> priceItems) {
+
+        for (PriceItem priceItem : priceItems){
+            System.out.println("-----------> item: " + priceItem.getId());
+            if (em.contains(priceItem)){
+                System.out.println("-----------> item true: " + priceItem.getId());
+                em.merge(priceItem);
+            }else{
+                System.out.println("-----------> item false: " + priceItem.getId());
+                em.persist(priceItem);
+            }
+            em.flush();
+        }
+    }
+
+    @Override
+    public void deletePriceItem(PriceItem priceItem){
+        em.remove(priceItem);
+        em.flush();
+    }
 }
