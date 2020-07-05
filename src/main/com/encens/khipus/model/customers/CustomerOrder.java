@@ -115,6 +115,10 @@ public class CustomerOrder implements BaseModel  {
     @Enumerated(EnumType.STRING)
     private SaleTypeEnum saleType;
 
+    @Basic(optional = true)
+    @Column(name = "impuesto")
+    private Double tax = 0.0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipopedido", referencedColumnName = "idtipopedido")
     private CustomerOrderType customerOrderType;
@@ -129,6 +133,10 @@ public class CustomerOrder implements BaseModel  {
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDPERSONACLIENTE")
     @ManyToOne(optional = false)
     private Client client;
+
+    @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
+    @ManyToOne(optional = true)
+    private Movement movement;
 
     @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDDISTRIBUIDOR")
     @ManyToOne(optional = true)
@@ -293,5 +301,21 @@ public class CustomerOrder implements BaseModel  {
 
     public void setDistributor(Distributor distributor) {
         this.distributor = distributor;
+    }
+
+    public Double getTax() {
+        return tax;
+    }
+
+    public void setTax(Double tax) {
+        this.tax = tax;
+    }
+
+    public Movement getMovement() {
+        return movement;
+    }
+
+    public void setMovement(Movement movement) {
+        this.movement = movement;
     }
 }

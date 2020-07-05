@@ -5,9 +5,11 @@ import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Movement;
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +26,16 @@ import java.util.List;
 @Name("movementService")
 @AutoCreate
 public class MovementServiceBean extends ExtendedGenericServiceBean implements MovementService {
+
+    @In(value = "#{entityManager}")
+    private EntityManager em;
+
+    @Override
+    public void createMovement(Movement movement) {
+        em.persist(movement);
+        em.flush();
+    }
+
     @Override
     public List<Movement> findMovementByDate(Date date) {
         List<Movement> movements = new ArrayList<Movement>();

@@ -34,6 +34,12 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
     }
 
     @Override
+    public void updateCustomerOrder(CustomerOrder customerOrder) {
+        em.merge(customerOrder);
+        em.flush();
+    }
+
+    @Override
     public Long findLastSaleId(User user) {
         System.out.println("------>> userid: " + user.getId());
         System.out.println("------>> user: " + user.getUsername());

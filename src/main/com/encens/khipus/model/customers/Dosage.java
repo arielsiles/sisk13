@@ -2,8 +2,11 @@ package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
+import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -43,6 +46,10 @@ public class Dosage implements BaseModel {
     @Column(name="ESTADO")
     private String state;
 
+    @Column(name = "activo")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean active;
+
     @Column(name = "NUMEROACTUAL", nullable = false)
     private Long currentNumber;
 
@@ -65,7 +72,15 @@ public class Dosage implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDSUCURSAL", referencedColumnName = "IDSUCURSAL", nullable = false)
-    private CompanyBranch companyBranch;
+    private BranchOffice branchOffice;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
+    private Company company;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @Override
     public Long getId() {
@@ -156,11 +171,35 @@ public class Dosage implements BaseModel {
         this.lawLabel = lawLabel;
     }
 
-    public CompanyBranch getCompanyBranch() {
-        return companyBranch;
+    public BranchOffice getBranchOffice() {
+        return branchOffice;
     }
 
-    public void setCompanyBranch(CompanyBranch companyBranch) {
-        this.companyBranch = companyBranch;
+    public void setBranchOffice(BranchOffice branchOffice) {
+        this.branchOffice = branchOffice;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

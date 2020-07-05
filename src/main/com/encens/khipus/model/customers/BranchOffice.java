@@ -11,7 +11,7 @@ import javax.persistence.*;
  * Created with IntelliJ IDEA.
  *
  */
-@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "CompanyBranch.tableGenerator",
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "BranchOffice.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
@@ -22,15 +22,15 @@ import javax.persistence.*;
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "sucursal")
-public class CompanyBranch implements BaseModel {
+public class BranchOffice implements BaseModel {
 
     @Id
     @Column(name = "IDSUCURSAL", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "CompanyBranch.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "BranchOffice.tableGenerator")
     private Long id;
 
     @Column(name="NOMBRE")
-    private String key;
+    private String name;
 
     @Column(name="descripcion")
     private String state;
@@ -44,12 +44,12 @@ public class CompanyBranch implements BaseModel {
         this.id = id;
     }
 
-    public String getKey() {
-        return key;
+    public String getName() {
+        return name;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setName(String key) {
+        this.name = key;
     }
 
     public String getState() {

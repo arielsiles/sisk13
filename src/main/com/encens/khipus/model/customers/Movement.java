@@ -10,25 +10,25 @@ import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Diego
  * Date: 12/11/13
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
 
-/*@TableGenerator(name = "Movement_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ILVA_MOVIMIENTOS",
-        allocationSize = 10)*/
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "Movement.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "movimiento",
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "MOVIMIENTO",schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "movimiento",schema = Constants.CASHBOX_SCHEMA)
 public class Movement implements BaseModel {
 
     @Id
-    @Column(name = "IDMOVIMIENTO", nullable = false)
+    @Column(name = "idmovimiento", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Movement.tableGenerator")
     private Long id;
 
     @Temporal(value = TemporalType.DATE)

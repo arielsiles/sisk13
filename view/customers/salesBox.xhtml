@@ -164,9 +164,16 @@
         </s:div>
 
         <s:div styleClass="buttonsRight">
+            <h:commandButton id="printInvoiceReportButtonId"
+                             action="#{printInvoiceReportAction.generateReport()}"
+                             value="#{messages['SalesBox.printInvoice']}"
+                             rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
+                             styleClass="button"
+                             immediate="true"/>
+
             <h:commandButton id="generateReportButtonId"
                              action="#{saleReportAction.generateReport()}"
-                             value="#{messages['SaleStatus.printSale']}"
+                             value="#{messages['SalesBox.printNote']}"
                              rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>

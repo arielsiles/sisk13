@@ -11,6 +11,8 @@ public interface SaleService extends GenericService {
 
     String createSale(CustomerOrder customerOrder);
 
+    void updateCustomerOrder(CustomerOrder customerOrder);
+
     Long findLastSaleId(User user);
 
     CustomerOrder findSaleById(Long id);

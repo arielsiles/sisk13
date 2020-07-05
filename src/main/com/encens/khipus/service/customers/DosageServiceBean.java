@@ -1,9 +1,5 @@
 package com.encens.khipus.service.customers;
 
-import com.encens.khipus.framework.service.GenericServiceBean;
-import com.encens.khipus.model.contacts.Entity;
-import com.encens.khipus.model.contacts.Person;
-import com.encens.khipus.model.customers.Customer;
 import com.encens.khipus.model.customers.Dosage;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -11,10 +7,6 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Customer service operations
@@ -25,13 +17,35 @@ import java.util.Map;
 @Stateless
 @Name("dosageService")
 @AutoCreate
-public class DosageServiceBean extends GenericServiceBean implements DosageSevice {
+public class DosageServiceBean implements DosageService {
 
-    @In
-    protected Map<String, String> messages;
+    @In(value = "#{entityManager}")
+    private EntityManager em;
 
     @Override
-    public void find() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public Dosage findDosageByOffice(Long branchOfficeId) {
+
+        System.out.println("--------------> branchOfficeId: " + branchOfficeId);
+
+        Dosage result = (Dosage) em.createQuery(
+                " select d from Dosage d " +
+                   " where d.branchOffice.id =:branchOfficeId " +
+                   " and d.active =:active ")
+                .setParameter("branchOfficeId", branchOfficeId)
+                .setParameter("active", Boolean.TRUE)
+                .getSingleResult();
+
+        System.out.println("--------------> result: "+ result);
+
+        return result;
+    }
+
+    @Override
+    public void increaseInvoiceNumber(Dosage dosage) {
+        Long number = dosage.getCurrentNumber();
+        number = number + 1;
+        dosage.setCurrentNumber(number);
+        em.merge(dosage);
+        em.flush();
     }
 }

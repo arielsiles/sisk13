@@ -3,6 +3,7 @@ package com.encens.khipus.model.admin;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
+import com.encens.khipus.model.customers.BranchOffice;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.UserCashBox;
 import org.hibernate.annotations.Filter;
@@ -110,10 +111,13 @@ public class User implements BaseModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserBusinessUnit> businessUnits;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idsucursal", referencedColumnName = "idsucursal", nullable = true)
+    private BranchOffice branchOffice;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
-
 
     @Version
     @Column(name = "version", nullable = false)
@@ -248,5 +252,13 @@ public class User implements BaseModel {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
+    }
+
+    public BranchOffice getBranchOffice() {
+        return branchOffice;
+    }
+
+    public void setBranchOffice(BranchOffice branchOffice) {
+        this.branchOffice = branchOffice;
     }
 }

@@ -117,26 +117,20 @@
                                         <app:realNumberConverter minimum="0"
                                                                  pattern="#{messages['patterns.decimalNumber']}"
                                                                  forId="#{amountInputTextId}"/>
+                                        <a4j:support event="onblur" reRender="#{amountFieldId}"/>
                                     </h:inputText>
-                                    <!--<h:message for="#{amountInputTextId}"
+                                    <h:message for="#{amountInputTextId}"
                                                styleClass="errors"
-                                               style="display:block;"
-                                               rendered="#{warehouseVoucherCreateAction.enabledAmountField}"/>
-                                    <h:outputText value="#{instance.amount}"
-                                                  styleClass="input"
-                                                  rendered="#{not warehouseVoucherCreateAction.enabledAmountField}">
-                                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
-                                    </h:outputText>-->
+                                               style="display:block;" />
                                 </s:div>
                             </td>
-
-
 
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
                                                  action="#{customerCategoryAction.removeMovementDetail(instance)}"
                                                  ajaxSingle="true"
+                                                 rendered="#{s:hasPermission('CUSTOMERCATEGORY', 'DELETE')}"
                                                  reRender="movementDetailListPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>

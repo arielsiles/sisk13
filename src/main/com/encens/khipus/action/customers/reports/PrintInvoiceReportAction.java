@@ -11,16 +11,18 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.reports.GenerationReportData;
+import com.encens.khipus.service.admin.UserService;
+import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.customers.RePrintsService;
+import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.FileCacheLoader;
-import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.MoneyUtil;
 import com.encens.khipus.util.barcode.BarcodeRenderer;
 import com.jatun.titus.reportgenerator.util.TypedReportData;
-import net.sf.jasperreports.engine.JRPrintPage;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
@@ -42,6 +44,24 @@ public class PrintInvoiceReportAction extends GenericReportAction {
 
     @In
     private User currentUser;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+
+    @In
+    private SaleService saleService;
+
+    @In
+    private DosageService dosageService;
+
+    @In
+    private UserService userService;
+
+    private Long customerOrderId;
+    private CustomerOrder lastCustomerOrder;
+
+
+
     @In
     private WarehouseService warehouseService;
 
@@ -54,7 +74,8 @@ public class PrintInvoiceReportAction extends GenericReportAction {
     @In
     private MovementService movementService;
 
-    private Dosage dosage;
+
+    //private Dosage dosage;
     private CustomerOrder customerOrder;
     private MoneyUtil moneyUtil;
     private BarcodeRenderer barcodeRenderer;
@@ -66,7 +87,7 @@ public class PrintInvoiceReportAction extends GenericReportAction {
     private List<Movement> movementsNews = new ArrayList<Movement>();
     private Date date;
 
-    @Restrict("#{s:hasPermission('PRINTINVOICE','VIEW')}")
+    /*@Restrict("#{s:hasPermission('PRINTINVOICE','VIEW')}")
     public void generateReport(CustomerOrder order) {
         log.debug("Generate PrintInvoiceReportAction......");
         try {
@@ -102,45 +123,56 @@ public class PrintInvoiceReportAction extends GenericReportAction {
                             PageOrientation.PORTRAIT,
                             MessageUtils.getMessage("Reports.productDeliveryReceipt.title"),
                             params);
-    }
+    }*/
 
     @Restrict("#{s:hasPermission('PRINTINVOICE','VIEW')}")
     public void generateReport() {
         log.debug("Generate PrintInvoiceReportAction......");
-        try {
-            dosage = warehouseService.findById(Dosage.class,new Long(110));
-        } catch (EntryNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        System.out.println("-------------> currentUser: " + currentUser);
+        System.out.println("-------------> currentUserId: " + currentUser.getId());
+
+        User user = getUser(currentUser.getId());
+
+        System.out.println("-------------> currentUser.getBranchOffice(): " + user.getBranchOffice());
+        System.out.println("--------------> user.getBranchOffice().getId(): " + user.getBranchOffice().getId());
+
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+
+        System.out.println("---------------> dosage" + dosage);
+        this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
+
         moneyUtil = new MoneyUtil();
         barcodeRenderer = new BarcodeRenderer();
 
         TypedReportData typedReportData;
         setReportFormat(ReportFormat.PDF);
-        String etiqueta ;
-        String codControl;
-        //BigDecimal numberAuthorization = dosage.getNumberAuthorization();
-        BigDecimal numberAuthorization = BigDecimalUtil.toBigDecimal(dosage.getAuthorizationNumber());
+        String etiqueta = "ORIGINAL";
+        BigDecimal authorizationNumber = BigDecimalUtil.toBigDecimal(dosage.getAuthorizationNumber());
         String key = dosage.getKey();
+
+        Integer numberInvoice = dosage.getCurrentNumber().intValue();
+        //ControlCode controlCode = generateCodControl(lastCustomerOrder, numberInvoice, authorizationNumber, key);
+        String nameClient = lastCustomerOrder.getClient().getFullName();
+
         Map params = new HashMap();
-        rePrintsNews.clear();
-        movementsNews.clear();
+        //params.putAll(getReportParams(nameClient,numberInvoice,etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
+        params.putAll(getReportParams(nameClient, numberInvoice, etiqueta, "CONTROL-CODE", "KEY-QR"));
+        TypedReportData reportData =   addVoucherMovementDetailSubReport(params, lastCustomerOrder);
 
-        customerOrder = customerOrders.get(0);
-        if(!imprimirCopia)
-        {
-            etiqueta = "ORIGINAL";
-        }else{
-            etiqueta = "COPIA";
+        /*for(JRPrintPage page:(List<JRPrintPage>)reportData.getJasperPrint().getPages())
+            reportData.getJasperPrint().addPage(page);*/
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-            Integer numberInvoice;
-        typedReportData =   addVoucherMovementDetailSubReport(params,customerOrders.get(0));
-        typedReportData.getJasperPrint().getPages().clear();
 
-        for(CustomerOrder order:customerOrders){
+        /*for(CustomerOrder order:customerOrders){
                 numberInvoice = dosage.getCurrentNumber().intValue();
-                //customerOrder = order;
-                ControlCode controlCode = generateCodControl(order,numberInvoice,numberAuthorization,key);
+                ControlCode controlCode = generateCodControl(order,numberInvoice,authorizationNumber,key);
                String nameClient = rePrintsService.findNameClient(order);
 
                params.putAll(getReportParams(nameClient,numberInvoice,etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
@@ -161,25 +193,20 @@ public class PrintInvoiceReportAction extends GenericReportAction {
                 dosage.setCurrentNumber(numberInvoice.longValue());
 
 
-            }
+            }*/
 
-            try {
+            /*try {
                 warehouseService.update(dosage);
             } catch (EntryDuplicatedException e) {
                 e.printStackTrace();
             } catch (ConcurrencyException e) {
                 e.printStackTrace();
-            }
+            }*/
 
-            try {
-                GenerationReportData generationReportData = new GenerationReportData(typedReportData);
-                generationReportData.exportReport();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        createNesmovements();
+
+        /*createNesmovements();
         createNewReImprint();
-        imprimirCopia = true;
+        imprimirCopia = true;*/
 
     }
 
@@ -315,23 +342,22 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         paramMap.put("nitCliente",customerOrder.getClientOrder().getNumberDoc());
         paramMap.put("fecha",customerOrder.getDateDelicery());*/
         paramMap.put("nombreCliente",nameClient);//verificar el nombre del cliente
-        paramMap.put("fechaLimite",dosage.getExpirationDate());
+        //paramMap.put("fechaLimite",dosage.getExpirationDate());
         paramMap.put("codigoControl",codControl);
         paramMap.put("tipoEtiqueta",etiqueta);
         //verificar por que no requiere el codigo de control
 
         paramMap.put("llaveQR",keyQR);
-        paramMap.put("totalLiteral",moneyUtil.Convertir(customerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs")));
-        paramMap.put("total",customerOrder.getTotalAmount());
-        barcodeRenderer.generateQR(keyQR,filePath);
+        paramMap.put("totalLiteral", moneyUtil.Convertir(lastCustomerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs")));
+        paramMap.put("total", lastCustomerOrder.getTotalAmount());
+        barcodeRenderer.generateQR(keyQR, filePath);
         return paramMap;
     }
 
-    private ControlCode generateCodControl(CustomerOrder order,Integer numberInvoice,BigDecimal numberAutorization,String key)
-    {
+    private ControlCode generateCodControl(CustomerOrder order, Integer numberInvoice, BigDecimal numberAutorization, String key) {
         //Double importeBaseCreditFisical = order.getTotalAmount().doubleValue() * 0.13;
         ControlCode controlCode = null;
-          moneyUtil.getLlaveQR(controlCode,key);
+        moneyUtil.getLlaveQR(controlCode, key);
         controlCode.generarCodigoQR();
         return controlCode;
     }
@@ -341,21 +367,22 @@ public class PrintInvoiceReportAction extends GenericReportAction {
      *
      * @param
      */
-    private TypedReportData addVoucherMovementDetailSubReport(Map<String, Object> params,CustomerOrder order) {
+    private TypedReportData addVoucherMovementDetailSubReport(Map<String, Object> params, CustomerOrder order) {
         log.debug("Generating addVoucherMovementDetailSubReport.............................");
 
          this.customerOrder = order;
 
         String ejbql = "SELECT " +
-                " articleOrder.amount, " +
-                " articleOrder.productItem.name, " +
-                " articleOrder.price, " +
-                " articleOrder.total "+
+                " articleOrder.quantity as quantity, " +
+                " articleOrder.productItem.name as name, " +
+                " articleOrder.price as price, " +
+                " articleOrder.total as total, "+
+                " articleOrder.amount as amount "+
                 " FROM ArticleOrder articleOrder";
 
         String[] restrictions = new String[]{
 
-                "articleOrder.customerOrder = #{printInvoiceReportAction.customerOrder.getId()}"};
+                "articleOrder.customerOrder.id = #{printInvoiceReportAction.lastCustomerOrder.getId()}"};
 
         String orderBy = "articleOrder.productItem.name";
 
@@ -433,4 +460,29 @@ public class PrintInvoiceReportAction extends GenericReportAction {
     public void setDate(Date date) {
         this.date = date;
     }
+
+    public Long getCustomerOrderId() {
+        return customerOrderId;
+    }
+
+    public void setCustomerOrderId(Long customerOrderId) {
+        this.customerOrderId = customerOrderId;
+    }
+
+    public CustomerOrder getLastCustomerOrder() {
+        return lastCustomerOrder;
+    }
+
+    public void setLastCustomerOrder(CustomerOrder lastCustomerOrder) {
+        this.lastCustomerOrder = lastCustomerOrder;
+    }
+
+    private User getUser(Long id) {
+        try {
+            return userService.findById(User.class, id);
+        } catch (EntryNotFoundException e) {
+            return null;
+        }
+    }
+
 }

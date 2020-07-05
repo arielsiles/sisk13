@@ -18,7 +18,8 @@ import java.util.List;
  */
 @Local
 public interface MovementService extends GenericService {
-    List<Movement> findMovementByDate(Date date);
 
+    void createMovement(Movement movement);
+    List<Movement> findMovementByDate(Date date);
     List<ArticleOrder> findArticleOrdersByCustomerOrder(CustomerOrder order);
 }

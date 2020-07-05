@@ -38,7 +38,7 @@ public class SaleReportAction extends GenericReportAction {
     private SaleService saleService;
 
     private Long customerOrderId;
-    private CustomerOrder customerOrderLast;
+    private CustomerOrder lastCustomerOrder;
 
     @Create
     public void init() {
@@ -68,7 +68,7 @@ public class SaleReportAction extends GenericReportAction {
                 " customerOrder.code" +
                 " FROM  CustomerOrder as customerOrder " +
                 " JOIN customerOrder.articleOrderList articleOrder " +
-                " WHERE customerOrder.id = " + this.customerOrderLast.getId();
+                " WHERE customerOrder.id = " + this.lastCustomerOrder.getId();
     }
 
     public void generateReport() {
@@ -81,10 +81,10 @@ public class SaleReportAction extends GenericReportAction {
         }
 
         setCustomerOrderId(saleService.findLastSaleId(currentUser));
-        setCustomerOrderLast(saleService.findSaleById(getCustomerOrderId()) );
+        setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()) );
 
         MoneyUtil money = new MoneyUtil();
-        String literalAmount = money.Convertir(this.customerOrderLast.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs"));
+        String literalAmount = money.Convertir(this.lastCustomerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs"));
 
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("currentUser.username", currentUser.getUsername());
@@ -112,11 +112,11 @@ public class SaleReportAction extends GenericReportAction {
         this.customerOrderId = customerOrderId;
     }
 
-    public CustomerOrder getCustomerOrderLast() {
-        return customerOrderLast;
+    public CustomerOrder getLastCustomerOrder() {
+        return lastCustomerOrder;
     }
 
-    public void setCustomerOrderLast(CustomerOrder customerOrderLast) {
-        this.customerOrderLast = customerOrderLast;
+    public void setLastCustomerOrder(CustomerOrder lastCustomerOrder) {
+        this.lastCustomerOrder = lastCustomerOrder;
     }
 }

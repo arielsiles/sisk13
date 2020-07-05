@@ -1,15 +1,17 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.service.customers.CustomerOrderTypeService;
-import com.encens.khipus.service.customers.PriceItemService;
-import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.service.admin.UserService;
+import com.encens.khipus.service.customers.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.SFC;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -60,6 +62,15 @@ public class SalesAction {
 
     @In(required = false)
     private User currentUser;
+
+    @In
+    private UserService userService;
+
+    @In
+    private DosageService dosageService;
+
+    @In
+    private MovementService movementService;
 
     @In
     private ProductItemService productItemService;
@@ -224,11 +235,26 @@ public class SalesAction {
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);
         customerOrder.setState(SaleStatus.PREPARAR);
-        customerOrder.setTotalAmount(totalAmount.doubleValue());
         customerOrder.setSaleType(saleType);
         customerOrder.setCustomerOrderType(customerOrderType);
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
+
+        customerOrder.setTotalAmount(totalAmount.doubleValue());
+        customerOrder.setCommissionPercentage(0.0);
+        customerOrder.setCommissionValue(0.0);
+        BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
+        customerOrder.setTax(tax.doubleValue());
+
+        /** For commissions **/
+        if (client.getCommission() > 0){
+            BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED);
+            BigDecimal commissionValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
+            BigDecimal totalVar = BigDecimalUtil.subtract(totalAmount, commissionValue);
+            customerOrder.setTax(BigDecimalUtil.multiply(totalVar, Constants.VAT).doubleValue());
+            customerOrder.setCommissionValue(commissionValue.doubleValue());
+            customerOrder.setCommissionPercentage(client.getCommission());
+        }
 
         if (subsidyEnun != null)
             customerOrder.setDescripcion(subsidyEnun.getSubsidyType());
@@ -237,6 +263,68 @@ public class SalesAction {
 
         String outcome = saleService.createSale(customerOrder);
 
+        if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH)){
+            Movement movement = createInvoice(customerOrder);
+            movementService.createMovement(movement);
+            customerOrder.setMovement(movement);
+            saleService.updateCustomerOrder(customerOrder);
+        }
+
+    }
+
+    private Movement createInvoice(CustomerOrder customerOrder){
+        User user = getUser(currentUser.getId()); //
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+
+        Long invoiceNumber = dosage.getCurrentNumber();
+        SFC sfc = new SFC(  dosage.getAuthorizationNumber().toString(),
+                            invoiceNumber,
+                            customerOrder.getClient().getNitNumber(),
+                            customerOrder.getClient().getBusinessName(),
+                            customerOrder.getOrderDate(),
+                            customerOrder.getTotalAmount(),
+                            dosage.getKey());
+        String controlCode = sfc.generateControlCode();
+
+        Movement movement = new Movement();
+        movement.setDate(sfc.getDate());
+        movement.setState(Constants.MOVEMENT_STATE_V);
+        movement.setNumber(dosage.getCurrentNumber().intValue());
+        movement.setNit(sfc.getClientNit());
+        movement.setName(sfc.getName());
+        movement.setAmount(BigDecimalUtil.toBigDecimal(sfc.getAmount()));
+        movement.setAmountIce(BigDecimal.ZERO);
+        movement.setExemptExport(BigDecimal.ZERO);
+        movement.setTaxedSalesZero(BigDecimal.ZERO);
+        movement.setSubtotal(BigDecimalUtil.toBigDecimal(sfc.getAmount())); /** todo **/
+        movement.setDiscount(BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
+
+        BigDecimal amountFiscalDebit = BigDecimalUtil.subtract(movement.getAmount(), movement.getDiscount());
+        movement.setAmountFiscalDebit(amountFiscalDebit);
+        movement.setFiscalDebit(BigDecimalUtil.toBigDecimal(customerOrder.getTax()));
+        movement.setControlCode(controlCode);
+        movement.setRegistrationDate(new Date());
+
+
+        String discount = movement.getDiscount().doubleValue() > 0 ? movement.getDiscount().toString() : "0";
+        String qrCode = dosage.getCompanyNit() + "|" +
+                        movement.getNumber() + "|" +
+                        dosage.getAuthorizationNumber() + "|" +
+                        DateUtils.format(movement.getDate(), "dd/MM/yyyy") + "|" +
+                        movement.getSubtotal() + "|" +
+                        movement.getAmountFiscalDebit() + "|" +
+                        movement.getControlCode() + "|" +
+                        movement.getNit() + "|" +
+                        "0|0|0|"  +
+                        discount;
+
+        movement.setQrCode(qrCode);
+        movement.setAuthorizationNumber(dosage.getAuthorizationNumber().toString());
+        movement.setCustomerOrder(customerOrder);
+
+        dosageService.increaseInvoiceNumber(dosage);
+
+        return movement;
     }
 
     public void assignClient(Client client){
@@ -467,4 +555,13 @@ public class SalesAction {
     public void setPriceItemListMap(Map<String, BigDecimal> priceItemListMap) {
         this.priceItemListMap = priceItemListMap;
     }
+
+    private User getUser(Long id) {
+        try {
+            return userService.findById(User.class, id);
+        } catch (EntryNotFoundException e) {
+            return null;
+        }
+    }
+
 }
