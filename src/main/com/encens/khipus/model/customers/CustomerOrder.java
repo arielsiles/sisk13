@@ -71,7 +71,7 @@ public class CustomerOrder implements BaseModel  {
     /* -- */
 
     @Column(name = "DESCRIPCION")
-    private String descripcion;
+    private String description;
 
     @Column(name = "FECHA_PEDIDO")
     @Temporal(TemporalType.DATE)
@@ -151,12 +151,12 @@ public class CustomerOrder implements BaseModel  {
         this.id = id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDescription(String descripcion) {
+        this.description = descripcion;
     }
 
     public Date getCurrentDate() {

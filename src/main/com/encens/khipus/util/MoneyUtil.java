@@ -35,6 +35,7 @@ public class MoneyUtil{
     }
 
     public String Convertir(String numero, boolean mayusculas, String monedaLiteral) {
+        numero = new Double(numero).toString();
         String literal = "";
         String parte_decimal;
         //si el numero utiliza (.) en lugar de (,) -> se reemplaza
@@ -48,13 +49,38 @@ public class MoneyUtil{
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
-            parte_decimal = ( Integer.parseInt(Num[1]) < 10 ? "0" : "") + Num[1] + "/100 " + monedaLiteral;
+            /*if(Integer.parseInt(Num[1]) < 10 && Integer.parseInt(Num[1]) >= 0){
+                if(Integer.parseInt(Num[1]) == 0)
+                {
+                    parte_decimal = "00/100 Bolivianos.";
+                }else{
+                    parte_decimal = Num[1] + "0/100 Bolivianos.";
+                }
+            }else{
+                if(Double.parseDouble(Num[1])>0.01 && Double.parseDouble(Num[1])<0.09)
+                {
+                }
+                parte_decimal = Num[1] + "/100 Bolivianos.";
+            }*/
 
-            if ( (Integer.parseInt(Num[1]) < 10) && (Integer.parseInt(Num[1]) > 0) )
-                parte_decimal = "0" + Num[1] + "/100 " + monedaLiteral;
-            else
-                parte_decimal = "" + Num[1] + "/100 " + monedaLiteral;
+            if(Double.parseDouble(Num[1]) == 0.0)
+                parte_decimal = "00/100 " + monedaLiteral;
+            else{
+                if(        Double.parseDouble("0."+Num[1]) == 0.1
+                        || Double.parseDouble("0."+Num[1]) == 0.2
+                        || Double.parseDouble("0."+Num[1]) == 0.3
+                        || Double.parseDouble("0."+Num[1]) == 0.4
+                        || Double.parseDouble("0."+Num[1]) == 0.5
+                        || Double.parseDouble("0."+Num[1]) == 0.6
+                        || Double.parseDouble("0."+Num[1]) == 0.7
+                        || Double.parseDouble("0."+Num[1]) == 0.8
+                        || Double.parseDouble("0."+Num[1]) == 0.9 ){
 
+                    parte_decimal = Num[1]+ "0/100 " + monedaLiteral;
+                }
+                else
+                    parte_decimal = Num[1]+ "/100 " + monedaLiteral;
+            }
             //se convierte el numero a literal
             if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";
@@ -71,9 +97,9 @@ public class MoneyUtil{
             }
             //devuelve el resultado en mayusculas o minusculas
             if (mayusculas) {
-                return (literal + " " + parte_decimal).toUpperCase();
+                return (literal + parte_decimal).toUpperCase();
             } else {
-                return (literal + " " + parte_decimal);
+                return (literal + parte_decimal);
             }
         } else {//error, no se puede convertir
             return literal = null;

@@ -40,6 +40,13 @@ public final class DateUtils {
         return calendar;
     }
 
+    public static int getDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        return day;
+    }
+
     public static Calendar toDateCalendar(Date date) {
         if (date != null) {
             Calendar calendar = Calendar.getInstance();
@@ -472,6 +479,14 @@ public final class DateUtils {
             case 12: result = "Diciembre"; break;
         }
         return  result;
+    }
+
+    public static String getLiteralDate(String place, Date date){
+        String result = place + ", ";
+        result = result + getDay(date) + " de ";
+        result = result + getMonthLiteral(date) + " de ";
+        result = result + getCurrentYear(date);
+        return result;
     }
 
 }

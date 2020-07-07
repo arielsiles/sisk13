@@ -257,7 +257,7 @@ public class SalesAction {
         }
 
         if (subsidyEnun != null)
-            customerOrder.setDescripcion(subsidyEnun.getSubsidyType());
+            customerOrder.setDescription(subsidyEnun.getSubsidyType());
 
         customerOrder.setArticleOrderList(articleOrderList);
 
