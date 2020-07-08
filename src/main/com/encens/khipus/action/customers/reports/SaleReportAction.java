@@ -47,14 +47,7 @@ public class SaleReportAction extends GenericReportAction {
 
 
     protected String getEjbql() {
-
-        //Long customerOrderId = saleService.findLastSaleId(currentUser);
-        /*setCustomerOrderId(saleService.findLastSaleId(currentUser));
-        setCustomerOrderLast(saleService.findLastSale(currentUser));*/
-
-        //System.out.println("-----------> ID: " + customerOrderId);
         System.out.println("-----------> user: " + currentUser.getUsername());
-
         return "SELECT " +
                 " customerOrder.client, " +
                 " customerOrder.orderDate, " +
@@ -83,8 +76,12 @@ public class SaleReportAction extends GenericReportAction {
         setCustomerOrderId(saleService.findLastSaleId(currentUser));
         setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()) );
 
+        Double subtotal = lastCustomerOrder.getTotalAmount();
+        Double discount = lastCustomerOrder.getCommissionValue();
+        Double totalAmount = subtotal - discount;
+
+
         MoneyUtil money = new MoneyUtil();
-        String literalAmount = money.Convertir(this.lastCustomerOrder.getTotalAmount().toString(), true, messages.get("Reports.cashAvailable.bs"));
 
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("currentUser.username", currentUser.getUsername());
@@ -92,13 +89,28 @@ public class SaleReportAction extends GenericReportAction {
         reportParameters.put("locationName", companyConfiguration.getLocationName());
         reportParameters.put("systemName", companyConfiguration.getSystemName());
         reportParameters.put("documentTitle", messages.get("Sale.report.title"));
+
+        reportParameters.put("subtotal", subtotal);
+        reportParameters.put("discount", discount);
+        reportParameters.put("totalAmount", totalAmount);
+
+        String literalAmount = money.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs"));
         reportParameters.put("literalAmount", literalAmount);
+
+        String observation = "";
+        if (lastCustomerOrder.getMovement() != null)
+            observation = "FACT. " + lastCustomerOrder.getMovement().getNumber();
+
+        if (lastCustomerOrder.getDistributor() != null)
+            observation = observation + " Distribuidor: " + lastCustomerOrder.getDistributor().getFullName();
+
+        reportParameters.put("observation", observation);
 
         setReportFormat(ReportFormat.PDF);
         super.generateReport(
                 "saleReport",
                 "/customers/reports/saleReport.jrxml",
-                PageFormat.LETTER,
+                PageFormat.CUSTOM,
                 PageOrientation.PORTRAIT,
                 messages.get("Sale.report.title"),
                 reportParameters);
