@@ -39,8 +39,8 @@ alter table inv_articulos add column pos int(2) after sigla;
 insert into funcionalidad values (261, 'PRINTINVOICE', null, 1, 15, 'menu.customers.order.printInvoice', 1);
 
 /** 18.05.2020 **/
-select max(a.`IDARTICULOSPEDIDO`)+100 from articulos_pedido a;
-select max(a.`IDPEDIDOS`)+100 from pedidos a;
+-- select max(a.`IDARTICULOSPEDIDO`)+100 from articulos_pedido a;
+-- select max(a.`IDPEDIDOS`)+100 from pedidos a;
 
 insert into secuencia values ('articulos_pedido', 400000); -- verificar secuencia
 insert into secuencia values ('pedidos', 50000);	   -- verificar secuencia
@@ -52,7 +52,7 @@ insert into funcionalidad values (262, 'CLIENT', null, 1, 15, 'Functionality.cus
 alter table personacliente modify column ESPERSONA int(1);
 alter table personacliente modify column con_factura int(11) not null default 1;
 
-select max(a.`idpersonacliente`)+1 from personacliente a;
+-- select max(a.`idpersonacliente`)+1 from personacliente a;
 insert into secuencia values ('personacliente', (select max(idpersonacliente)+1 from personacliente));
 
 /** 17.06.2020 **/
