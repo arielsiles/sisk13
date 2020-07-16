@@ -27,7 +27,7 @@ import java.math.BigDecimal;
                         "from ArticleOrder articleOrder " +
                         "left join articleOrder.customerOrder customerOrder " +
                         "where articleOrder.codArt =:productItemCode " +
-                        "and customerOrder.state <> 'ANULADO' " +
+                        "and customerOrder.state <> :annulledState " +
                         "and customerOrder.orderDate between :startDate and :endDate "),
         @NamedQuery(name  = "ArticleOrder.findCashSaleDetailListGroupBy",
                 query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
@@ -40,7 +40,7 @@ import java.math.BigDecimal;
                 query = "select articleOrder.codArt, sum(articleOrder.total) as total " +
                         "from ArticleOrder articleOrder " +
                         "left join articleOrder.customerOrder customerOrder " +
-                        "where customerOrder.state <> 'ANULADO' " +
+                        "where customerOrder.state <> :annulledState " +
                         "and customerOrder.orderDate between :startDate and :endDate " +
                         "group by articleOrder.codArt "),
         @NamedQuery(name  = "ArticleOrder.findCashSaleDetailList",
@@ -51,7 +51,7 @@ import java.math.BigDecimal;
         @NamedQuery(name  = "ArticleOrder.findCustomerOrderDetailList",
                 query = "select articleOrder " +
                         "from ArticleOrder articleOrder " +
-                        "where articleOrder.customerOrder.state <> 'ANULADO' " +
+                        "where articleOrder.customerOrder.state <> :annulledState " +
                         "and articleOrder.customerOrder.orderDate between :startDate and :endDate ")
         })
 

@@ -1,6 +1,7 @@
 package com.encens.khipus.service.customers;
 
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
+import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.customers.Territoriotrabajo;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -610,8 +611,9 @@ public class AccountItemServiceBean extends ExtendedGenericServiceBean implement
                 datas = (List<Object[]>)getEntityManager()
                         .createQuery("select distinct articulos.productItem.name,articulos.productItem.productItemCode  " +
                                 "from CustomerOrder pe inner join pe.articleOrderList articulos " +
-                                "where pe.estado <> 'ANULADO' " +
+                                "where pe.state <> :anulledState " +
                                 "and pe.orderDate =:fecha")
+                .setParameter("anulledState", SaleStatus.ANULADO)
                 .setParameter("fecha",date,TemporalType.DATE)
                 .getResultList();
 
@@ -635,8 +637,9 @@ public class AccountItemServiceBean extends ExtendedGenericServiceBean implement
         try{
             datas = (List<Object[]>)em.createQuery("select distinct pe.client.territoriotrabajo.nombre,pe.client.territoriotrabajo.idterritoriotrabajo  " +
                     "from CustomerOrder pe " +
-                    "where pe.estado <> 'ANULADO' " +
+                    "where pe.state <> :anulledState " +
                     "and pe.orderDate =:fecha")
+                    .setParameter("anulledState", SaleStatus.ANULADO)
                     .setParameter("fecha",date,TemporalType.DATE)
                     .getResultList();
         }catch (NoResultException e){

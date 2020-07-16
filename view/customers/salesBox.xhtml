@@ -253,11 +253,17 @@
             </rich:column>
 
             <rich:column styleClass="center">
-                <h:inputText value="#{articleItem.promotion}" styleClass="inputTiny"/>
+                <h:inputText value="#{articleItem.promotion}" styleClass="inputTiny">
+                    <a4j:support event="onblur" ajaxSingle="true"
+                                 actionListener="#{salesAction.calculateTotalUnits(articleItem)}"/>
+                </h:inputText>
             </rich:column>
 
             <rich:column styleClass="center">
-                <h:inputText value="#{articleItem.reposicion}" styleClass="inputTiny"/>
+                <h:inputText value="#{articleItem.reposicion}" styleClass="inputTiny">
+                    <a4j:support event="onblur" ajaxSingle="true"
+                                 actionListener="#{salesAction.calculateTotalUnits(articleItem)}"/>
+                </h:inputText>
             </rich:column>
 
             <rich:column></rich:column>

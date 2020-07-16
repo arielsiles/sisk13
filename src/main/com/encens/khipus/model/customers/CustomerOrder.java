@@ -21,7 +21,7 @@ import java.util.Date;
                 @NamedQuery(name = "CustomerOrder.findByDatesForCosts",
                         query = "select c from CustomerOrder c " +
                                 "where c.orderDate between :startDate and :endDate " +
-                                "and c.state = 'CONTABILIZADO' " +
+                                "and c.state = :accounted " +
                                 "and c.cvFlag = 0 " +
                                 "and c.customerOrderType.id = 1 "),
 
@@ -29,7 +29,7 @@ import java.util.Date;
                 @NamedQuery(name = "CustomerOrder.findByDatesForCostsLac",
                         query = "select c from CustomerOrder c " +
                                 "where c.orderDate between :startDate and :endDate " +
-                                "and c.state <> 'ANULADO' " +
+                                "and c.state <> :anulledState " +
                                 "and c.cvFlag = 0 " +
                                 "and c.customerOrderType.id in (1,5) " +
                                 "and c.user.id <> 5 "), /** breque y comercial **/
@@ -37,7 +37,7 @@ import java.util.Date;
                 @NamedQuery(name = "CustomerOrder.findByDatesForCostsVet",
                         query = "select c from CustomerOrder c " +
                                 "where c.orderDate between :startDate and :endDate " +
-                                "and c.state <> 'ANULADO' " +
+                                "and c.state <> :anulledState " +
                                 "and c.cvFlag = 0 " +
                                 "and c.customerOrderType.id in (1,6) " +
                                 "and c.user.id = 5 ") /** cisc **/

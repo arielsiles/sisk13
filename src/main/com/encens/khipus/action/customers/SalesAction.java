@@ -168,6 +168,7 @@ public class SalesAction {
     public void calculateAmount(ArticleOrder articleOrder){
         Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
         articleOrder.setAmount(BigDecimalUtil.toBigDecimal(amount).doubleValue());
+        calculateTotalUnits(articleOrder);
     }
 
     public BigDecimal calculateTotalAmount(){
@@ -177,6 +178,12 @@ public class SalesAction {
         }
         setTotalAmount(result);
         return result;
+    }
+
+    public void calculateTotalUnits(ArticleOrder articleOrder){
+        System.out.println("--------------> Articulo: " + articleOrder.getProductItem().getFullName() + " C: " + articleOrder.getQuantity() + " P: " + articleOrder.getPromotion() + " R: " + articleOrder.getReposicion());
+        articleOrder.setTotal(articleOrder.getQuantity() + articleOrder.getPromotion() + articleOrder.getReposicion());
+        System.out.println("--------------> Total: " + articleOrder.getTotal());
     }
 
     public void clearProduct(){

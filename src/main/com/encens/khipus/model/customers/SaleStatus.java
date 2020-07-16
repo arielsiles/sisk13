@@ -1,6 +1,7 @@
 package com.encens.khipus.model.customers;
 
 public enum SaleStatus {
+    PENDIENTE("SaleStatus.pendiente"),
     PREPARAR("SaleStatus.preparar"),
     ANULADO("SaleStatus.anulado"),
     CONTABILIZADO("SaleStatus.contabilizado");

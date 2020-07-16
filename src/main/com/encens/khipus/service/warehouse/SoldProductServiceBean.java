@@ -2,6 +2,7 @@ package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.customers.Territoriotrabajo;
 import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.warehouse.SoldProduct;
@@ -209,14 +210,11 @@ public class SoldProductServiceBean extends GenericServiceBean implements SoldPr
                 customerOrders = (List<CustomerOrder>) getEntityManager()
                         .createQuery("select pe from CustomerOrder pe " +
                                 "where pe.orderDate =:fecha " +
-                                "and pe.estado <> 'ANULADO'")
+                                "and pe.state <> :anulledState")
                         .setParameter("fecha", date, TemporalType.DATE)
+                        .setParameter("anulledState", SaleStatus.ANULADO)
                         .getResultList();
-                /*customerOrders = (List<CustomerOrder>) getEntityManager()
-                        .createQuery("select pe from CustomerOrder pe " +
-                                "where pe.fechaEntrega =:fecha ")
-                        .setParameter("fecha", date, TemporalType.DATE)
-                        .getResultList();*/
+
             } catch (NoResultException e) {
                 return customerOrders;
             }
@@ -225,10 +223,11 @@ public class SoldProductServiceBean extends GenericServiceBean implements SoldPr
                 customerOrders = (List<CustomerOrder>) getEntityManager()
                         .createQuery("select pe from CustomerOrder pe " +
                                 "where pe.orderDate =:fecha " +
-                                "and pe.estado <> 'ANULADO' " +
+                                "and pe.state <> :anulledState " +
                                 "and pe.client.territoriotrabajo =:territorio")
                         .setParameter("territorio", territoriotrabajo)
                         .setParameter("fecha", date, TemporalType.DATE)
+                        .setParameter("anulledState", SaleStatus.ANULADO)
                         .getResultList();
                 /*customerOrders = (List<CustomerOrder>) getEntityManager()
                         .createQuery("select pe from CustomerOrder pe " +
