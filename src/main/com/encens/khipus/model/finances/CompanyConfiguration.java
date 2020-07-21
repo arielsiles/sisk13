@@ -516,6 +516,41 @@ public class CompanyConfiguration {
     })
     private CashAccount fixedAssetProvidersAccount;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAG_IT", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount transactionTaxExpense;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAP_DEBFISIVA", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fiscalDebitLiability;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAP_ITXPAGAR", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount transactionTaxPayable;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAI_VENTAPRI", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount primarySaleProduct;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAI_VENTASEC", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount secondarySaleProduct;
+
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
@@ -1295,5 +1330,45 @@ public class CompanyConfiguration {
 
     public void setFixedAssetProvidersAccount(CashAccount fixedAssetProvidersAccount) {
         this.fixedAssetProvidersAccount = fixedAssetProvidersAccount;
+    }
+
+    public CashAccount getFiscalDebitLiability() {
+        return fiscalDebitLiability;
+    }
+
+    public void setFiscalDebitLiability(CashAccount fiscalDebitLiability) {
+        this.fiscalDebitLiability = fiscalDebitLiability;
+    }
+
+    public CashAccount getTransactionTaxPayable() {
+        return transactionTaxPayable;
+    }
+
+    public void setTransactionTaxPayable(CashAccount transactionTaxPayable) {
+        this.transactionTaxPayable = transactionTaxPayable;
+    }
+
+    public CashAccount getPrimarySaleProduct() {
+        return primarySaleProduct;
+    }
+
+    public void setPrimarySaleProduct(CashAccount primarySaleProduct) {
+        this.primarySaleProduct = primarySaleProduct;
+    }
+
+    public CashAccount getSecondarySaleProduct() {
+        return secondarySaleProduct;
+    }
+
+    public void setSecondarySaleProduct(CashAccount secondarySaleProduct) {
+        this.secondarySaleProduct = secondarySaleProduct;
+    }
+
+    public CashAccount getTransactionTaxExpense() {
+        return transactionTaxExpense;
+    }
+
+    public void setTransactionTaxExpense(CashAccount transactionTaxExpense) {
+        this.transactionTaxExpense = transactionTaxExpense;
     }
 }

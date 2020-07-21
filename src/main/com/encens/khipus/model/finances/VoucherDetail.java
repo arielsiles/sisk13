@@ -2,10 +2,7 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.customers.Account;
-import com.encens.khipus.model.customers.Client;
-import com.encens.khipus.model.customers.Credit;
-import com.encens.khipus.model.customers.Partner;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
@@ -151,9 +148,13 @@ public class VoucherDetail implements BaseModel {
     @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
     private PurchaseDocument purchaseDocument;
 
+    /*@ManyToOne
+    @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
+    private MovementInvoice movement;*/
+
     @ManyToOne
     @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
-    private MovementInvoice movement;
+    private Movement movement;
 
     public VoucherDetail(String businessUnitCode, String costCenterCode, String account,
                          BigDecimal debit, BigDecimal credit, FinancesCurrencyType currency, BigDecimal exchangeAmount) {
@@ -372,8 +373,8 @@ public class VoucherDetail implements BaseModel {
         }
         if (purchaseDocument != null)
             fullCashAccount = fullCashAccount + " (F." + purchaseDocument.getNumber() + ")";
-        if (movement != null)
-            fullCashAccount = fullCashAccount + " (F." + movement.getInvoiceNumber() + ")";
+        if (getMovement() != null)
+            fullCashAccount = fullCashAccount + " (F." + getMovement().getNumber() + ")";
         if (creditPartner != null)
             fullCashAccount = fullCashAccount + " (" + creditPartner.getPartner().getFullName() + ")";
         if (partner != null) {
@@ -501,11 +502,19 @@ public class VoucherDetail implements BaseModel {
         this.quantityArt = quantityArt;
     }
 
-    public MovementInvoice getMovement() {
+    public Movement getMovement() {
+        return movement;
+    }
+
+    public void setMovement(Movement movement) {
+        this.movement = movement;
+    }
+
+    /*public MovementInvoice getMovement() {
         return movement;
     }
 
     public void setMovement(MovementInvoice movement) {
         this.movement = movement;
-    }
+    }*/
 }

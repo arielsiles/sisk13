@@ -1,22 +1,28 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.exception.EntryNotFoundException;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.finances.CompanyConfiguration;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.ProductItemService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.Constants;
-import com.encens.khipus.util.DateUtils;
-import com.encens.khipus.util.SFC;
+import com.encens.khipus.util.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -86,6 +92,15 @@ public class SalesAction {
 
     @In
     private PriceItemService priceItemService;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+
+    @In
+    protected FacesMessages facesMessages;
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     /*@Create
     public void initialize() {
@@ -224,12 +239,18 @@ public class SalesAction {
 
     public void registerCashSale(){
         System.out.println("......Registrando Venta al Contado...");
-        createSale();
+
+        CustomerOrder customerOrder = createSale();
+        Movement movement = createInvoice(customerOrder);
+        customerOrder.setMovement(movement);
+        saleService.updateCustomerOrder(customerOrder);
+        accountingCashSale(customerOrder, movement);
+
         clearAll();
         assignCustomerOrderTypeDefault();
     }
 
-    public void createSale(){
+    public CustomerOrder createSale(){
 
         System.out.println("------------> user: " + currentUser);
         System.out.println("------------> tipo pedido: " + customerOrderType);
@@ -270,14 +291,16 @@ public class SalesAction {
 
         String outcome = saleService.createSale(customerOrder);
 
-        if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH)){
+        /*if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH)){
             Movement movement = createInvoice(customerOrder);
             movementService.createMovement(movement);
             customerOrder.setMovement(movement);
             saleService.updateCustomerOrder(customerOrder);
-        }
+        }*/
 
+        return customerOrder;
     }
+
 
     private Movement createInvoice(CustomerOrder customerOrder){
         User user = getUser(currentUser.getId()); //
@@ -330,8 +353,55 @@ public class SalesAction {
         movement.setCustomerOrder(customerOrder);
 
         dosageService.increaseInvoiceNumber(dosage);
+        movementService.createMovement(movement);
 
         return movement;
+    }
+
+    private void accountingCashSale(CustomerOrder customerOrder, Movement movement){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                                                            MessageUtils.getMessage("Voucher.cashSale.gloss") + " " +
+                                                                  customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
+
+        VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail debitTransactionTax = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getTransactionTaxExpense(),
+                BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.IT_RETENTION_B),
+                FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail creditTransactionTax = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getTransactionTaxPayable(),
+                debitTransactionTax.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail creditFiscalDebitIVA = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getFiscalDebitLiability(),
+                BigDecimalUtil.toBigDecimal(customerOrder.getTax()), FinancesCurrencyType.D, BigDecimal.ONE);
+
+        BigDecimal amount = BigDecimalUtil.sum(debitGeneralBox.getDebit(), debitTransactionTax.getDebit());
+        amount = BigDecimalUtil.subtract(amount, creditTransactionTax.getCredit(), creditFiscalDebitIVA.getCredit());
+
+        VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getPrimarySaleProduct(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        creditFiscalDebitIVA.setMovement(movement);
+        voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+        voucher.getDetails().add(debitGeneralBox);
+        voucher.getDetails().add(debitTransactionTax);
+        voucher.getDetails().add(creditTransactionTax);
+        voucher.getDetails().add(creditFiscalDebitIVA);
+        voucher.getDetails().add(creditPrimarySaleProduct);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        //return voucher;
     }
 
     public void assignClient(Client client){

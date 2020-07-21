@@ -245,6 +245,7 @@ public final class Constants {
 
     public static final Double IUE_RETENTION = 0.05;
     public static final Double IT_RETENTION  = 0.03;
+    public static final BigDecimal IT_RETENTION_B  = BigDecimalUtil.toBigDecimal(IT_RETENTION);
 
     public static final String IUE_ACCOUNT_CASHBOX = "2420310400";
     public static final String IT_ACCOUNT_CASHBOX  = "2420310500";
