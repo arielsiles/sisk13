@@ -2,6 +2,7 @@ package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Type;
 
@@ -119,6 +120,10 @@ public class CustomerOrder implements BaseModel  {
     @Column(name = "impuesto")
     private Double tax = 0.0;
 
+    @Basic
+    @Column(name = "contabilizado")
+    private Boolean accounted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipopedido", referencedColumnName = "idtipopedido")
     private CustomerOrderType customerOrderType;
@@ -141,6 +146,10 @@ public class CustomerOrder implements BaseModel  {
     @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDDISTRIBUIDOR")
     @ManyToOne(optional = true)
     private Distributor distributor;
+
+    @JoinColumn(name = "id_tmpenc", referencedColumnName = "id_tmpenc")
+    @ManyToOne(optional = true)
+    private Voucher voucher;
 
     @Override
     public Long getId() {
@@ -317,5 +326,21 @@ public class CustomerOrder implements BaseModel  {
 
     public void setMovement(Movement movement) {
         this.movement = movement;
+    }
+
+    public Voucher getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
+    }
+
+    public Boolean getAccounted() {
+        return accounted;
+    }
+
+    public void setAccounted(Boolean accounted) {
+        this.accounted = accounted;
     }
 }

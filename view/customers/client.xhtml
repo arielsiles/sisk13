@@ -175,6 +175,7 @@
         <ui:define name="label">#{messages['Client.territory']}</ui:define>
         <h:selectOneMenu id="territory"
                          value="#{client.territoriotrabajo}"
+                         required="true"
                          styleClass="input">
             <s:selectItems value="#{territorioList}"
                            var="territorio"

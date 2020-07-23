@@ -243,8 +243,10 @@ public class SalesAction {
         CustomerOrder customerOrder = createSale();
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
+        Voucher voucher = accountingCashSale(customerOrder, movement);
+        customerOrder.setVoucher(voucher);
+        customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
-        accountingCashSale(customerOrder, movement);
 
         clearAll();
         assignCustomerOrderTypeDefault();
@@ -358,7 +360,7 @@ public class SalesAction {
         return movement;
     }
 
-    private void accountingCashSale(CustomerOrder customerOrder, Movement movement){
+    private Voucher accountingCashSale(CustomerOrder customerOrder, Movement movement){
         CompanyConfiguration companyConfiguration = null;
         try {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -401,7 +403,7 @@ public class SalesAction {
 
         voucherAccoutingService.saveVoucher(voucher);
 
-        //return voucher;
+        return voucher;
     }
 
     public void assignClient(Client client){

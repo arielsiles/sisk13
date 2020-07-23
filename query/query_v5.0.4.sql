@@ -18,3 +18,7 @@ update configuracion set ctaI_ventasec = '5420110100' where no_cia = '01';
 
 alter table configuracion add column ctaG_it varchar(20) after ctaprovaf;
 update configuracion set ctaG_it = '4470510700' where no_cia = '01';
+
+-- 22.07.2020
+update secuencia set valor = (select max(e.idpersonacliente)+1 from personacliente e) where tabla = 'personacliente';
+update secuencia set valor = (select max(e.idmovimiento)+1000 from movimiento e) where tabla = 'movimiento';

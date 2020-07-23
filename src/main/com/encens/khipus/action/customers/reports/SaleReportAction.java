@@ -7,9 +7,11 @@ import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.MoneyUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -82,13 +84,22 @@ public class SaleReportAction extends GenericReportAction {
 
 
         MoneyUtil money = new MoneyUtil();
+        String documentTitle = messages.get("Sale.report.deliveryNote.title");
+        Long saleNumber =  lastCustomerOrder.getCode();
+        if (lastCustomerOrder.getSaleType().equals(SaleTypeEnum.CASH)) {
+            documentTitle = messages.get("Sale.report.entryNote.title");
+            System.out.println("-------------> voucher: " + lastCustomerOrder.getVoucher());
+            System.out.println("-------------> voucher: " + lastCustomerOrder.getVoucher().getDocumentNumber());
+            saleNumber = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getVoucher().getDocumentNumber()).longValue();
+        }
 
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
         reportParameters.put("currentUser.username", currentUser.getUsername());
         reportParameters.put("companyName", companyConfiguration.getCompanyName());
         reportParameters.put("locationName", companyConfiguration.getLocationName());
         reportParameters.put("systemName", companyConfiguration.getSystemName());
-        reportParameters.put("documentTitle", messages.get("Sale.report.title"));
+        reportParameters.put("documentTitle", documentTitle);
+        reportParameters.put("saleNumber", saleNumber);
 
         reportParameters.put("subtotal", subtotal);
         reportParameters.put("discount", discount);
@@ -99,7 +110,7 @@ public class SaleReportAction extends GenericReportAction {
 
         String observation = "";
         if (lastCustomerOrder.getMovement() != null)
-            observation = "FACT. " + lastCustomerOrder.getMovement().getNumber();
+            observation = "F." + lastCustomerOrder.getMovement().getNumber();
 
         if (lastCustomerOrder.getDistributor() != null)
             observation = observation + " Distribuidor: " + lastCustomerOrder.getDistributor().getFullName();
