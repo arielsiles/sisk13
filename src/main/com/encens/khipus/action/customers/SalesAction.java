@@ -12,6 +12,7 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -101,6 +102,9 @@ public class SalesAction {
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
+
+    @In
+    private CashAccountService cashAccountService;
 
     /*@Create
     public void initialize() {
@@ -226,6 +230,7 @@ public class SalesAction {
         setSubsidyEnun(null);
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
+        setMoneyReturned(BigDecimal.ZERO);
     }
 
     public void registerSale(){
@@ -244,6 +249,18 @@ public class SalesAction {
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
         Voucher voucher = accountingCashSale(customerOrder, movement);
+        customerOrder.setVoucher(voucher);
+        customerOrder.setAccounted(Boolean.TRUE);
+        saleService.updateCustomerOrder(customerOrder);
+
+        clearAll();
+        assignCustomerOrderTypeDefault();
+    }
+
+    public void registerCashSaleNoInvoice(){
+        System.out.println("......Registrando Venta al Contado SF...");
+        CustomerOrder customerOrder = createSale();
+        Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
         customerOrder.setVoucher(voucher);
         customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
@@ -400,6 +417,33 @@ public class SalesAction {
         voucher.getDetails().add(creditTransactionTax);
         voucher.getDetails().add(creditFiscalDebitIVA);
         voucher.getDetails().add(creditPrimarySaleProduct);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        return voucher;
+    }
+
+    private Voucher accountingCashSaleNoInvoice(CustomerOrder customerOrder){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                MessageUtils.getMessage("Voucher.cashSale.gloss") + " " + customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
+
+        VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                FinancesCurrencyType.D, BigDecimal.ONE);
+
+
+        /** 2570110000 - Prevision para contingencias **/
+        VoucherDetail creditContingency = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                cashAccountService.findByAccountCode("2570110000"), debitGeneralBox.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
+
+        voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+        voucher.getDetails().add(debitGeneralBox);
+        voucher.getDetails().add(creditContingency);
 
         voucherAccoutingService.saveVoucher(voucher);
 
