@@ -167,14 +167,14 @@
             <h:commandButton id="printInvoiceReportButtonId"
                              action="#{printInvoiceReportAction.generateReport()}"
                              value="#{messages['SalesBox.printInvoice']}"
-                             rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
+                             rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 
             <h:commandButton id="generateReportButtonId"
                              action="#{saleReportAction.generateReport()}"
                              value="#{messages['SalesBox.printNote']}"
-                             rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
+                             rendered="#{s:hasPermission('CASHSALES', 'VIEW') or s:hasPermission('CREDITSALES', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 
