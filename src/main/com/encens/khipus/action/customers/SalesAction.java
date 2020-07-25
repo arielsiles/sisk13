@@ -1,5 +1,6 @@
 package com.encens.khipus.action.customers;
 
+import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
@@ -69,7 +70,8 @@ public class SalesAction {
 
     @In(required = false)
     private User currentUser;
-
+    @In
+    private SessionUser sessionUser;
     @In
     private UserService userService;
 
@@ -274,7 +276,7 @@ public class SalesAction {
         System.out.println("------------> user: " + currentUser);
         System.out.println("------------> tipo pedido: " + customerOrderType);
         System.out.println("------------> Subsidio: " + this.subsidyEnun);
-
+        observation = (observation == null) ? "" : observation;
         CustomerOrder customerOrder = new CustomerOrder();
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
         customerOrder.setCode(saleCode);
@@ -307,6 +309,15 @@ public class SalesAction {
             customerOrder.setDescription(subsidyEnun.getSubsidyType());
 
         customerOrder.setArticleOrderList(articleOrderList);
+
+        if (customerOrder.getDistributor() != null)
+            customerOrder.setDealerAmount(calculateAmountForDealer(customerOrder));
+
+        if (customerOrder.getDistributor() != null) {
+            String amountDealer = FormatUtils.formatNumber(customerOrder.getDealerAmount(), MessageUtils.getMessage("patterns.decimalNumber"), sessionUser.getLocale());
+            observation = observation + " Distribuidor: " + customerOrder.getDistributor().getFullName() + " - " + amountDealer;
+            customerOrder.setObservation(observation);
+        }
 
         String outcome = saleService.createSale(customerOrder);
 
@@ -448,6 +459,29 @@ public class SalesAction {
         voucherAccoutingService.saveVoucher(voucher);
 
         return voucher;
+    }
+
+    public BigDecimal calculateAmountForDealer(CustomerOrder customerOrder){
+
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        BigDecimal dealerParameter = companyConfiguration.getDealerParameter();
+
+        Map<String, BigDecimal> priceMap = priceItemService.getPricesByCategory(CustomerCategoryType.FACTORY);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (ArticleOrder article:customerOrder.getArticleOrderList()){
+            BigDecimal factoryPrice = priceMap.get(article.getCodArt());
+            BigDecimal difference = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(article.getPrice()), factoryPrice);
+            BigDecimal tax = BigDecimalUtil.multiply(difference, dealerParameter);
+            BigDecimal dealerPrice = BigDecimalUtil.sum(factoryPrice, tax);
+            BigDecimal amount = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(article.getQuantity()), dealerPrice);
+            System.out.println("============> C:" + article.getQuantity() + " F:" + factoryPrice + " D:" + dealerPrice + " Dif:" + difference + " Tax:" + tax + " A:" + amount );
+            totalAmount = BigDecimalUtil.sum(totalAmount, amount);
+        }
+        return totalAmount;
     }
 
     public void assignClient(Client client){

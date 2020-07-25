@@ -551,6 +551,8 @@ public class CompanyConfiguration {
     })
     private CashAccount secondarySaleProduct;
 
+    @Column(name = "distparam")
+    private BigDecimal dealerParameter;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
@@ -1370,5 +1372,13 @@ public class CompanyConfiguration {
 
     public void setTransactionTaxExpense(CashAccount transactionTaxExpense) {
         this.transactionTaxExpense = transactionTaxExpense;
+    }
+
+    public BigDecimal getDealerParameter() {
+        return dealerParameter;
+    }
+
+    public void setDealerParameter(BigDecimal dealerParameter) {
+        this.dealerParameter = dealerParameter;
     }
 }

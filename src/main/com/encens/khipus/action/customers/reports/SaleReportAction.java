@@ -1,5 +1,7 @@
 package com.encens.khipus.action.customers.reports;
 
+import com.encens.khipus.action.SessionUser;
+import com.encens.khipus.action.customers.SalesAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
@@ -35,9 +37,14 @@ public class SaleReportAction extends GenericReportAction {
     @In
     private User currentUser;
     @In
+    private SessionUser sessionUser;
+    @In
     private CompanyConfigurationService companyConfigurationService;
     @In
     private SaleService saleService;
+
+    @In
+    private SalesAction salesAction;
 
     private Long customerOrderId;
     private CustomerOrder lastCustomerOrder;
@@ -112,9 +119,7 @@ public class SaleReportAction extends GenericReportAction {
         if (lastCustomerOrder.getMovement() != null)
             observation = "F." + lastCustomerOrder.getMovement().getNumber();
 
-        if (lastCustomerOrder.getDistributor() != null)
-            observation = observation + " Distribuidor: " + lastCustomerOrder.getDistributor().getFullName();
-
+        observation = observation + ((lastCustomerOrder.getObservation() == null) ? "" : lastCustomerOrder.getObservation());
         reportParameters.put("observation", observation);
 
         setReportFormat(ReportFormat.PDF);

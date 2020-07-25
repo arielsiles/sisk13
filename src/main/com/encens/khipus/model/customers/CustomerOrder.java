@@ -7,6 +7,7 @@ import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
@@ -108,6 +109,9 @@ public class CustomerOrder implements BaseModel  {
     @Basic(optional = false)
     @Column(name = "totalimporte")
     private Double totalAmount = 0.0;
+
+    @Column(name = "montodist")
+    private BigDecimal dealerAmount;
 
     /*@Column(name = "IDTIPOPEDIDO")
     private Long customerOrderTypeId;*/
@@ -342,5 +346,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setAccounted(Boolean accounted) {
         this.accounted = accounted;
+    }
+
+    public BigDecimal getDealerAmount() {
+        return dealerAmount;
+    }
+
+    public void setDealerAmount(BigDecimal dealerAmount) {
+        this.dealerAmount = dealerAmount;
     }
 }
