@@ -1,7 +1,6 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.util.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Type;
@@ -31,7 +30,6 @@ import java.util.Date;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@EntityListeners({UpperCaseStringListener.class})
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "personacliente")
 public class Client implements BaseModel {
 
@@ -89,8 +87,14 @@ public class Client implements BaseModel {
     @Column(name = "PORCENTAJECOMISION")
     private Double commission;
 
+    @Column(name = "PORCENTAJEGARANTIA")
+    private Double guarantee;
+
     @Column(name = "CODIGOCLIENTE")
     private String codigo;
+
+    @Column(name = "TIPO_PERSONA")
+    private String personType;
 
     @Column(name = "ESPERSONA", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
@@ -300,5 +304,21 @@ public class Client implements BaseModel {
 
     public void setCustomerCategory(CustomerCategory customerCategory) {
         this.customerCategory = customerCategory;
+    }
+
+    public String getPersonType() {
+        return personType;
+    }
+
+    public void setPersonType(String personType) {
+        this.personType = personType;
+    }
+
+    public Double getGuarantee() {
+        return guarantee;
+    }
+
+    public void setGuarantee(Double guarantee) {
+        this.guarantee = guarantee;
     }
 }

@@ -85,7 +85,7 @@
             <ui:define name="label">#{messages['Client.idNumber']}</ui:define>
             <h:inputText id="idNumber"
                          value="#{client.idNumber}"
-                         required="false"
+                         required="true"
                          maxlength="100"
                          styleClass="input"
                          tabindex="2">
@@ -94,7 +94,7 @@
 
         <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Client.name']}</ui:define>
-            <h:inputText id="name" value="#{client.name}" required="false"
+            <h:inputText id="name" value="#{client.name}" required="true"
                          maxlength="200" styleClass="input" tabindex="3">
             </h:inputText>
         </s:decorate>
@@ -102,7 +102,7 @@
         <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow"
                     rendered="#{client.personFlag}">
             <ui:define name="label">#{messages['Client.lastName']}</ui:define>
-            <h:inputText id="lastName" value="#{client.lastName}" required="false"
+            <h:inputText id="lastName" value="#{client.lastName}" required="true"
                          maxlength="80" styleClass="input" tabindex="4">
             </h:inputText>
         </s:decorate>
@@ -110,7 +110,7 @@
         <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow"
                     rendered="#{client.personFlag}">
             <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
-            <h:inputText id="maidenName" value="#{client.maidenName}" required="false"
+            <h:inputText id="maidenName" value="#{client.maidenName}" required="true"
                          maxlength="200" tabindex="5" styleClass="input">
             </h:inputText>
         </s:decorate>
@@ -121,7 +121,7 @@
             <ui:define name="label">#{messages['Client.nit']}</ui:define>
             <h:inputText id="idNumber"
                          value="#{client.nitNumber}"
-                         required="false"
+                         required="true"
                          maxlength="100"
                          styleClass="input"
                          tabindex="6">
@@ -130,7 +130,7 @@
 
         <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Client.businessName']}</ui:define>
-            <h:inputText id="businessName" value="#{client.businessName}" required="false"
+            <h:inputText id="businessName" value="#{client.businessName}" required="true"
                          maxlength="200" tabindex="7" styleClass="input">
             </h:inputText>
         </s:decorate>

@@ -39,6 +39,28 @@ public class ClientAction extends GenericAction<Client> {
         return outCome;
     }
 
+    @End
+    @Override
+    public String create() {
+
+        getInstance().setCommission(0.0);
+        getInstance().setGuarantee(0.0);
+        if (getInstance().getPersonFlag())
+            getInstance().setPersonType("cliente");
+        else
+            getInstance().setPersonType("institucion");
+
+        if (getInstance().getName() == null)
+            getInstance().setName("");
+        if (getInstance().getLastName() == null)
+            getInstance().setLastName("");
+        if (getInstance().getMaidenName() == null)
+            getInstance().setMaidenName("");
+
+
+        return super.create();
+
+    }
 
     public void changePersonFlag(){
         System.out.println("------------> changePersonFlag: " + this.personFlag);
