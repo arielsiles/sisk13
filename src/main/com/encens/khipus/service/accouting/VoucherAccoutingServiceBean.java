@@ -1038,10 +1038,10 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostMilkProducts.get(codArt);
-                System.out.println("==========================> COD_ART: " + codArt);
+                //System.out.println("==========================> COD_ART: " + codArt);
                 if (unitCost.doubleValue() > 0){
                     BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
-
+                    System.out.println("=============Create-CV=============> COD_ART: " + codArt + " - unitCost: " + unitCost + " - Cost: " + cost);
                     VoucherDetail voucherCredit = new VoucherDetail();
                     voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);

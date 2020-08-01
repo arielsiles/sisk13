@@ -5,10 +5,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
-import com.encens.khipus.model.warehouse.InventoryMovement;
-import com.encens.khipus.model.warehouse.MovementDetail;
-import com.encens.khipus.model.warehouse.WarehouseDocumentType;
-import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.VoucherBuilder;
@@ -41,10 +38,12 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
                 " where w.documentType =:documentType " +
                 " and w.voucher is null " +
                 " and w.operation is null" +
-                " and w.date between :startDate and :endDate ")
+                " and w.date between :startDate and :endDate " +
+                " and w.state =:state")
                 .setParameter("documentType", documentType)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
                 .getResultList();
 
         return resultList;
