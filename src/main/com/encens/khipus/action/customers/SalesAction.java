@@ -5,16 +5,14 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
-import com.encens.khipus.model.finances.CompanyConfiguration;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
+import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
@@ -107,6 +105,10 @@ public class SalesAction {
 
     @In
     private CashAccountService cashAccountService;
+
+    @In
+    private UserCashBoxService userCashBoxService;
+
 
     /*@Create
     public void initialize() {
@@ -394,12 +396,15 @@ public class SalesAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                                                             MessageUtils.getMessage("Voucher.cashSale.gloss") + " " +
                                                                   customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
 
         VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                //companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                cashBox.getType().getCashAccountBox(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
                 FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitTransactionTax = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
@@ -419,7 +424,8 @@ public class SalesAction {
         amount = BigDecimalUtil.subtract(amount, creditTransactionTax.getCredit(), creditFiscalDebitIVA.getCredit());
 
         VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getPrimarySaleProduct(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
+                //companyConfiguration.getPrimarySaleProduct(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
+                cashBox.getType().getCashAccountIncome(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
 
         creditFiscalDebitIVA.setMovement(movement);
         voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);

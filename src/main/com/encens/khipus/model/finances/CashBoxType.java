@@ -36,6 +36,26 @@ public class CashBoxType implements BaseModel {
     @Column(name = "nombre", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "cuentacaja")
+    private String cashAccountBoxCode;
+
+    @Column(name = "cuentaingreso")
+    private String cashAccountIncomeCode;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentacaja", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountBox;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaingreso", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountIncome;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -75,5 +95,37 @@ public class CashBoxType implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public CashAccount getCashAccountBox() {
+        return cashAccountBox;
+    }
+
+    public void setCashAccountBox(CashAccount cashAccountBox) {
+        this.cashAccountBox = cashAccountBox;
+    }
+
+    public CashAccount getCashAccountIncome() {
+        return cashAccountIncome;
+    }
+
+    public void setCashAccountIncome(CashAccount cashAccountIncome) {
+        this.cashAccountIncome = cashAccountIncome;
+    }
+
+    public String getCashAccountBoxCode() {
+        return cashAccountBoxCode;
+    }
+
+    public void setCashAccountBoxCode(String cashAccountBoxCode) {
+        this.cashAccountBoxCode = cashAccountBoxCode;
+    }
+
+    public String getCashAccountIncomeCode() {
+        return cashAccountIncomeCode;
+    }
+
+    public void setCashAccountIncomeCode(String cashAccountIncomeCode) {
+        this.cashAccountIncomeCode = cashAccountIncomeCode;
     }
 }
