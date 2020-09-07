@@ -155,12 +155,18 @@ public class CreditAction extends GenericAction<Credit> {
         for (CreditReportAction.PaymentPlanData paymentPlanData : paymentPlanDatas)
             listPaymentPlan.add(paymentPlanData);
 
+        if (paidQuotas == 0){
+            result = credit.getGrantDate();
+        }else {
+
         for (int j = 0; j<listPaymentPlan.size(); j++){
             if (i == paidQuotas || paidQuotas == 0) {
                 result = DateUtils.parse(listPaymentPlan.get(j).getPaymentDate(), "dd/MM/yyyy");
                 System.out.println("=======>>>> POSIBLE FECHA SIGUIENTE: " + listPaymentPlan.get(j).getPaymentDate() + " --> (Fecha sig. al total pagado)");
             }
             i++;
+        }
+
         }
 
         System.out.println("-----------------------------");

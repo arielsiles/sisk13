@@ -4,6 +4,7 @@ import com.encens.khipus.action.customers.CreditAction;
 import com.encens.khipus.action.customers.CreditTransactionAction;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.service.customers.CreditService;
+import com.encens.khipus.util.BigDecimalUtil;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 import org.jboss.seam.Component;
@@ -45,6 +46,8 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         creditAction.setInstance(credit);
         creditTransactionAction.setDateTransaction(dateTransaction);
         BigDecimal interestToDate = creditTransactionAction.calculateInterest();
+        BigDecimal criminalInterestValue = creditTransactionAction.getCriminalInterestValue();
+        interestToDate = BigDecimalUtil.sum(interestToDate, criminalInterestValue);
         Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);
 
         //BigDecimal quota = credit.getQuota(); /* Revision */
