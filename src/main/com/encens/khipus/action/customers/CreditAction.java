@@ -156,7 +156,12 @@ public class CreditAction extends GenericAction<Credit> {
             listPaymentPlan.add(paymentPlanData);
 
         if (paidQuotas == 0){
+
             result = credit.getGrantDate();
+
+            if (credit.getNumberQuota() == 1)
+                result = credit.getExpirationDate();
+
         }else {
 
         for (int j = 0; j<listPaymentPlan.size(); j++){
