@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="accountDPFReport" pageWidth="595" pageHeight="467" whenNoDataType="AllSectionsNoDetail" columnWidth="567" leftMargin="14" rightMargin="14" topMargin="31" bottomMargin="31">
 	<property name="ireport.zoom" value="1.7715610000000053"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="33"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="ci" class="java.lang.String"/>
 	<parameter name="cert" class="java.lang.String"/>
 	<parameter name="openDate" class="java.util.Date"/>
@@ -23,210 +23,210 @@
 		<groupHeader>
 			<band height="355" splitType="Stretch">
 				<staticText>
-					<reportElement x="413" y="27" width="50" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="413" y="15" width="50" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[CERT. Nº]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="403" y="43" width="60" height="24" forecolor="#FFFFFF"/>
+					<reportElement x="403" y="32" width="60" height="24" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[FECHA DE VENCIMIENTO]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="92" y="106" width="100" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="102" y="96" width="100" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[CAISC R.L. PAGAR A:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="96" y="145" width="100" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="102" y="140" width="100" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[CON DIRECCION:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="-4" y="182" width="200" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="-4" y="180" width="200" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[DEPOSITO A PLAZO FIJO POR EL VALOR DE:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="285" y="221" width="160" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="286" y="208" width="160" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[CAPITAL DEPOSITADO                 $us:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="285" y="237" width="160" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="286" y="226" width="160" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[INTERES A PERCIBIR                 $us:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="285" y="273" width="160" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="286" y="264" width="160" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[TOTAL A PERCIBIR AL VENC. $us:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="326" y="254" width="119" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="327" y="243" width="119" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[RCIVA:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="0" y="252" width="35" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="0" y="240" width="35" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[PLAZO]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="108" y="252" width="35" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="108" y="240" width="35" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[DIAS]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="0" y="264" width="89" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="0" y="255" width="89" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[TASA DE INTERES]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="181" y="264" width="47" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="181" y="255" width="47" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[% ANUAL]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="21" y="36" width="50" height="12" forecolor="#FFFFFF"/>
+					<reportElement x="21" y="17" width="50" height="12" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[CODIGO]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="75" y="36" width="100" height="12"/>
+					<reportElement x="75" y="17" width="100" height="12"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{ci}]]></textFieldExpression>
 				</textField>
 				<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-					<reportElement x="59" y="52" width="100" height="24"/>
+					<reportElement x="59" y="34" width="100" height="24"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[$P{openDate}]]></textFieldExpression>
 				</textField>
 				<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-					<reportElement x="478" y="43" width="80" height="24"/>
+					<reportElement x="508" y="32" width="60" height="24"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[$P{expirationDate}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="478" y="27" width="80" height="12"/>
+					<reportElement x="508" y="15" width="60" height="12"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{cert}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="208" y="182" width="315" height="12"/>
+					<reportElement x="208" y="180" width="315" height="12"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{literalCapital}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="459" y="219" width="100" height="12"/>
+					<reportElement x="492" y="206" width="75" height="12"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{capital}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="459" y="235" width="100" height="12"/>
+					<reportElement x="492" y="224" width="75" height="12"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{interest}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="459" y="252" width="100" height="12"/>
+					<reportElement x="492" y="241" width="75" height="12"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{rciva}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="459" y="271" width="100" height="12"/>
+					<reportElement x="492" y="262" width="75" height="12"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{totalAmount}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="208" y="95" width="315" height="10"/>
+					<reportElement x="214" y="86" width="315" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{name}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="208" y="138" width="315" height="24"/>
+					<reportElement x="214" y="133" width="307" height="24"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{address}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="35" y="252" width="73" height="12"/>
+					<reportElement x="35" y="240" width="73" height="12"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="10"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{term}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="89" y="264" width="92" height="12"/>
+					<reportElement x="89" y="255" width="92" height="12"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="8"/>
+						<font fontName="Arial" size="10"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{rate}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="208" y="104" width="315" height="10"/>
+					<reportElement x="214" y="95" width="315" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{beneficiary1}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="208" y="113" width="315" height="10"/>
+					<reportElement x="214" y="104" width="315" height="10"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{beneficiary2}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="0" y="52" width="50" height="24" forecolor="#FFFFFF"/>
+					<reportElement x="0" y="34" width="50" height="24" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>

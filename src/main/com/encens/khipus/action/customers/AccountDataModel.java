@@ -29,6 +29,7 @@ public class AccountDataModel extends QueryDataModel<Long, Account> {
             "lower(account.partner.firstName) like concat('%', concat(lower(#{accountDataModel.firstName}), '%'))",
             "lower(account.partner.lastName) like concat('%', concat(lower(#{accountDataModel.lastName}), '%'))",
             "lower(account.partner.maidenName) like concat('%', concat(lower(#{accountDataModel.maidenName}), '%'))",
+            "lower(account.code) like concat('%', concat(lower(#{accountDataModel.criteria.code}), '%'))",
             "lower(account.accountNumber) like concat('%', concat(lower(#{accountDataModel.criteria.accountNumber}), '%'))"
     };
 

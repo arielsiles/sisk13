@@ -25,7 +25,7 @@
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.partner.firstName']}</ui:define>
                     <h:inputText id="firstName" value="#{accountDataModel.firstName}"
-                                 maxlength="80" tabindex="2" styleClass="input">
+                                 maxlength="80" tabindex="1" styleClass="input">
                     </h:inputText>
                 </s:decorate>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
@@ -34,12 +34,24 @@
                                  maxlength="80" tabindex="2" styleClass="input">
                     </h:inputText>
                 </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.partner.maidenName']}</ui:define>
+                    <h:inputText id="lastName" value="#{accountDataModel.maidenName}"
+                                 maxlength="80" tabindex="3" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
             </s:div>
             <s:div>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.code']}</ui:define>
+                    <h:inputText id="accountNumber" value="#{accountDataModel.criteria.code}"
+                                 maxlength="80" tabindex="4" styleClass="inputMedium">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
                     <h:inputText id="accountNumber" value="#{accountDataModel.criteria.accountNumber}"
-                                 maxlength="80" tabindex="3" styleClass="inputMedium">
+                                 maxlength="80" tabindex="5" styleClass="inputMedium">
                     </h:inputText>
                 </s:decorate>
                 <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -70,7 +82,7 @@
             <rich:dataTable value="#{accountDataModel}" var="accountItem" id="accountList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 10%, 10%, 5%, 30%, 20%, 5%, 10%">
+                            columnsWidth="8%, 8%, 8%, 8%, 5%, 30%, 20%, 5%, 8%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -79,6 +91,8 @@
                         <rich:column>#{messages['Account.code']}</rich:column>
 
                         <rich:column>#{messages['Account.openingDate']}</rich:column>
+
+                        <rich:column>#{messages['Account.exprirationDate']}</rich:column>
 
                         <rich:column>#{messages['Account.currency']}</rich:column>
 
@@ -104,6 +118,12 @@
 
                 <rich:column styleClass="center">
                     <h:outputText value="#{accountItem.openingDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountItem.expirationDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </h:outputText>
                 </rich:column>
