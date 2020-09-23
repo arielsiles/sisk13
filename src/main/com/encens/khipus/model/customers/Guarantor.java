@@ -2,6 +2,7 @@ package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
+import com.encens.khipus.model.contacts.Person;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -35,10 +36,16 @@ public class Guarantor implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Guarantor.tableGenerator")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idpersona", nullable = false)
+    private Person person;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idsocio", nullable = false)
-    private Partner partner;
+    @JoinColumn(name = "idcredito", nullable = false)
+    private Credit credit;
+
+    @Column(name = "descripcion", length = 200)
+    private String description;
 
     @Override
     public Long getId() {
@@ -49,11 +56,28 @@ public class Guarantor implements BaseModel {
         this.id = id;
     }
 
-    public Partner getPartner() {
-        return partner;
+
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPartner(Partner partner) {
-        this.partner = partner;
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public Credit getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Credit credit) {
+        this.credit = credit;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

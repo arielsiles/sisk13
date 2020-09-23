@@ -117,6 +117,13 @@ public class CreditAction extends GenericAction<Credit> {
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
+    public String addNewGuarantor() {
+        setOp(OP_UPDATE);
+        return Outcome.SUCCESS;
+    }
+
+
+    @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String addPayoutCredit() {
         setOp(OP_UPDATE);
         return creditTransactionAction.addCreditTransactionPayout(getInstance());

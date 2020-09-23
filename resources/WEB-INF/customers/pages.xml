@@ -288,6 +288,15 @@
                 <redirect view-id="/customers/credit.xhtml"/>
             </rule>
         </navigation>
+        <!-- For Credit, Add New Guarantor -->
+        <navigation from-action="#{creditAction.addNewGuarantor}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/addNewGuarantor.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
         <navigation from-action="#{creditAction.addPayoutCredit}">
             <rule if-outcome="Success">
                 <redirect view-id="/customers/addPayoutCredit.xhtml"/>
@@ -314,8 +323,7 @@
         </navigation>
     </page>
 
-    <page view-id="/customers/addCreditPayment.xhtml"
-          no-conversation-view-id="/customers/creditList.xhtml">
+    <page view-id="/customers/addCreditPayment.xhtml" no-conversation-view-id="/customers/creditList.xhtml">
         <navigation from-action="#{creditTransactionAction.delete}">
             <rule if-outcome="Success">
                 <redirect view-id="/customers/credit.xhtml"/>
@@ -340,6 +348,20 @@
                 <redirect view-id="/customers/credit.xhtml"/>
             </rule>
         </navigation>-->
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/credit.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/addNewGuarantor.xhtml" no-conversation-view-id="/customers/creditList.xhtml">
         <navigation>
             <rule if-outcome="Success">
                 <redirect view-id="/customers/credit.xhtml"/>

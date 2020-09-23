@@ -26,3 +26,4 @@ create table documentogarante(
 
 alter table documentogarante add foreign key (idgarante) references garante (idgarante);
 alter table documentogarante add foreign key (idcompania) references compania (idcompania);
+

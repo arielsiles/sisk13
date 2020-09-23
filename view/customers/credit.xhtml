@@ -38,6 +38,12 @@
                                  immediate="true"
                                  rendered="#{creditAction.managed and credit.delivered}"/>
 
+                <h:commandButton action="#{creditAction.addNewGuarantor}"
+                                 value="#{messages['Credit.guarantor.new']}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 rendered="#{creditAction.managed and credit.delivered}"/>
+
                 <h:commandButton id="createButtonId"
                                  action="#{creditAction.create}"
                                  value="#{messages['Common.save']}"

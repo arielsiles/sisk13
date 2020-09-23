@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8" collation="utf8_general_ci">erp_lechdev</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="credito" view="colnames">
+<left>1002</left>
+<top>497</top>
+<width>250</width>
+<height>254</height>
+<sql_create_table>CREATE TABLE `credito` (
+  `idcredito` bigint(20) NOT NULL,
+  `estado` varchar(3) DEFAULT NULL,
+  `ue` varchar(3) DEFAULT NULL,
+  `codigo` varchar(25) NOT NULL,
+  `codigoant` varchar(15) DEFAULT NULL,
+  `importe` decimal(13,2) NOT NULL,
+  `anual` int(11) NOT NULL,
+  `ipenal` decimal(5,2) DEFAULT NULL,
+  `plazo` int(11) NOT NULL,
+  `cuotas` int(11) NOT NULL,
+  `amortiza` int(11) NOT NULL,
+  `fechaconcesion` date NOT NULL,
+  `fechapago` date NOT NULL,
+  `cuota` decimal(13,2) NOT NULL,
+  `saldo` decimal(13,2) NOT NULL,
+  `fechacreacion` datetime DEFAULT NULL,
+  `ultimopago` date DEFAULT NULL,
+  `fechavence` date DEFAULT NULL,
+  `entregado` int(11) NOT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  `idsocio` bigint(20) NOT NULL,
+  `idtipocredito` bigint(20) DEFAULT NULL,
+  `rev1` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`idcredito`),
+  KEY `idsocio` (`idsocio`),
+  KEY `idtipocredito` (`idtipocredito`),
+  CONSTRAINT `credito_ibfk_1` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
+  CONSTRAINT `credito_ibfk_2` FOREIGN KEY (`idtipocredito`) REFERENCES `tipocredito` (`idtipocredito`),
+  CONSTRAINT `credito_ibfk_3` FOREIGN KEY (`idtipocredito`) REFERENCES `tipocredito` (`idtipocredito`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="socio" view="colnames">
+<left>431</left>
+<top>415</top>
+<width>185</width>
+<height>306</height>
+<sql_create_table>CREATE TABLE `socio` (
+  `idsocio` bigint(20) NOT NULL,
+  `idpersona` bigint(20) DEFAULT NULL,
+  `noidentificacion` varchar(100) DEFAULT NULL,
+  `nit` varchar(100) DEFAULT NULL,
+  `idexttipodocumento` bigint(20) DEFAULT NULL,
+  `idtipodocumento` bigint(20) DEFAULT NULL,
+  `apellidopaterno` varchar(200) DEFAULT NULL,
+  `apellidomaterno` varchar(200) DEFAULT NULL,
+  `nombres` varchar(255) DEFAULT NULL,
+  `fechanacimiento` date DEFAULT NULL,
+  `profesion` varchar(100) DEFAULT NULL,
+  `idsaludo` bigint(20) DEFAULT NULL,
+  `genero` varchar(100) DEFAULT NULL,
+  `idestadocivil` bigint(20) DEFAULT NULL,
+  `domicilio` varchar(500) DEFAULT NULL,
+  `nosocio` varchar(100) NOT NULL,
+  `nsocio` varchar(10) DEFAULT NULL,
+  `estado` varchar(3) DEFAULT NULL,
+  `nocred` int(11) NOT NULL,
+  `nrohijos` int(11) DEFAULT NULL,
+  `contacto` varchar(100) DEFAULT NULL,
+  `telcontacto` varchar(20) DEFAULT NULL,
+  `telfijo` varchar(20) DEFAULT NULL,
+  `telcelular` varchar(20) DEFAULT NULL,
+  `conyuge` varchar(100) DEFAULT NULL,
+  `idzonaproductiva` bigint(20) DEFAULT NULL,
+  `iddepartamento` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idsocio`),
+  KEY `idcompania` (`idcompania`),
+  KEY `idzonaproductiva` (`idzonaproductiva`),
+  KEY `iddepartamento` (`iddepartamento`),
+  KEY `idexttipodocumento` (`idexttipodocumento`),
+  KEY `idtipodocumento` (`idtipodocumento`),
+  KEY `idsaludo` (`idsaludo`),
+  KEY `idestadocivil` (`idestadocivil`),
+  KEY `idpersona` (`idpersona`),
+  CONSTRAINT `socio_ibfk_1` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `socio_ibfk_3` FOREIGN KEY (`idzonaproductiva`) REFERENCES `zonaproductiva` (`idzonaproductiva`),
+  CONSTRAINT `socio_ibfk_4` FOREIGN KEY (`iddepartamento`) REFERENCES `departamento` (`iddepartamento`),
+  CONSTRAINT `socio_ibfk_5` FOREIGN KEY (`idexttipodocumento`) REFERENCES `exttipodocumento` (`idexttipodocumento`),
+  CONSTRAINT `socio_ibfk_6` FOREIGN KEY (`idtipodocumento`) REFERENCES `tipodocumento` (`idtipodocumento`),
+  CONSTRAINT `socio_ibfk_7` FOREIGN KEY (`idsaludo`) REFERENCES `saludo` (`idsaludo`),
+  CONSTRAINT `socio_ibfk_8` FOREIGN KEY (`idestadocivil`) REFERENCES `estadocivil` (`idestadocivil`),
+  CONSTRAINT `socio_ibfk_9` FOREIGN KEY (`idpersona`) REFERENCES `persona` (`idpersona`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="persona" view="colnames">
+<left>97</left>
+<top>129</top>
+<width>189</width>
+<height>294</height>
+<sql_create_table>CREATE TABLE `persona` (
+  `fechanacimiento` date DEFAULT NULL,
+  `nombres` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `genero` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `domicilio` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `apellidopaterno` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `apellidomaterno` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `profesion` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `telcelular` varchar(20) DEFAULT NULL,
+  `idpersona` bigint(20) NOT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  `idpais` bigint(20) DEFAULT NULL,
+  `idestadocivil` bigint(20) DEFAULT NULL,
+  `idsaludo` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`idpersona`),
+  KEY `fk_companiapersona` (`idcompania`),
+  KEY `fk_estadocivilpersona` (`idestadocivil`),
+  KEY `fk_paispersona` (`idpais`),
+  KEY `fk_saludopersona` (`idsaludo`),
+  CONSTRAINT `fk_companiapersona` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_estadocivilpersona` FOREIGN KEY (`idestadocivil`) REFERENCES `estadocivil` (`idestadocivil`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_paispersona` FOREIGN KEY (`idpais`) REFERENCES `pais` (`idpais`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_saludopersona` FOREIGN KEY (`idsaludo`) REFERENCES `saludo` (`idsaludo`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `persona_ibfk_1` FOREIGN KEY (`idpersona`) REFERENCES `entidad` (`identidad`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="garante" view="colnames">
+<left>681</left>
+<top>26</top>
+<width>140</width>
+<height>176</height>
+<sql_create_table>CREATE TABLE `garante` (
+  `idgarante` bigint(20) NOT NULL,
+  `idpersona` bigint(20) NOT NULL,
+  `idcredito` bigint(20) NOT NULL,
+  `descripcion` varchar(100) DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`idgarante`),
+  KEY `idcompania` (`idcompania`),
+  KEY `idpersona` (`idpersona`),
+  KEY `idcredito` (`idcredito`),
+  CONSTRAINT `garante_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
+  CONSTRAINT `garante_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `garante_ibfk_3` FOREIGN KEY (`idpersona`) REFERENCES `persona` (`idpersona`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="documentogarante" view="colnames">
+<left>1084</left>
+<top>84</top>
+<width>163</width>
+<height>158</height>
+<sql_create_table>CREATE TABLE `documentogarante` (
+  `iddocumentogarante` bigint(20) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `idgarante` bigint(20) NOT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`iddocumentogarante`),
+  KEY `idgarante` (`idgarante`),
+  KEY `idcompania` (`idcompania`),
+  CONSTRAINT `documentogarante_ibfk_1` FOREIGN KEY (`idgarante`) REFERENCES `garante` (`idgarante`),
+  CONSTRAINT `documentogarante_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>
