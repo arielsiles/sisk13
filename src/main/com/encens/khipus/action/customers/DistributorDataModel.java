@@ -19,11 +19,7 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class DistributorDataModel extends QueryDataModel<Long, Distributor> {
 
-    private static final String[] RESTRICTIONS = {
-            "lower(distributor.firstName) like concat(lower(#{distributorDataModel.criteria.firstName}), '%')",
-            "lower(distributor.lastName) like concat(lower(#{distributorDataModel.criteria.lastName}), '%')",
-            "lower(distributor.maidenName) like concat(lower(#{distributorDataModel.criteria.maidenName}), '%')"
-    };
+    private static final String[] RESTRICTIONS = {""};
 
     @Override
     public String getEjbql() {

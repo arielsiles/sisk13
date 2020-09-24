@@ -3,6 +3,7 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -26,9 +27,9 @@ import javax.persistence.*;
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
+@Filter(name =  Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "documentogarante")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "documentogarante")
 public class GuarantorDocument implements BaseModel {
 
     @Id

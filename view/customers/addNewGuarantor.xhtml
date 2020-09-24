@@ -12,7 +12,7 @@
 <ui:define name="pageTitle">
     #{messages['Credit.guarantor.new']}
 </ui:define>
-<ui:param name="bodyWidth" value="65%"/>
+<ui:param name="bodyWidth" value="80%"/>
 <!--<ui:param name="bodyAlign" value="center"/>-->
 <ui:param name="selectedTab" value="customers"/>
 
@@ -23,22 +23,11 @@
 
         <div class="buttons">
 
-
-            <!--<h:commandButton id="createButtonId"
-                             action="#{creditTransactionAction.createCreditTransaction(credit)}"
+            <h:commandButton id="createButtonId"
+                             action="#{guarantorAction.createGuarantor(credit)}"
                              value="#{messages['CreditTransaction.save']}"
                              styleClass="button"
-                             rendered="#{!creditTransactionAction.managed}">
-            </h:commandButton>
-
-            <h:commandButton value="#{messages['Common.delete']}"
-                             styleClass="button"
-                             rendered="#{creditTransactionAction.managed}">
-                <rich:componentControl for="deleteConfirmation"
-                                       event="onclick"
-                                       disableDefault="true"
-                                       operation="show"/>
-            </h:commandButton>-->
+                             rendered="#{!creditTransactionAction.managed}" />
 
             <h:commandButton action="#{guarantorAction.cancel}"
                              value="#{messages['Common.cancel']}"
@@ -47,7 +36,7 @@
         </div>
 
         <rich:panel id="formPanel">
-            <f:facet name="header">#{messages['PurchaseOrderPayment.new']}</f:facet>
+            <f:facet name="header">#{messages['Credit.guarantor.new']}</f:facet>
 
 
             <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
@@ -73,56 +62,41 @@
                 </h:inputTextarea>
             </s:decorate>
 
-            <a4j:commandButton id="newRegisterId"
-                               action="#{voucherCreateAction.assignInputVoucherDetail()}"
-                               rendered="#{voucherCreateAction.pending}"
-                               value=" Añadir garantia "
-                               styleClass="button"
-                               immediate="true"
-                               reRender="documentDetailList">
-            </a4j:commandButton>
+            <div class="buttons">
+                <a4j:commandButton id="newRegisterId"
+                                   action="#{guarantorAction.assignGuarantorDocument}"
+                                   rendered="#{voucherCreateAction.pending}"
+                                   value="#{messages['Credit.guarantor.addWarranty']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   reRender="instancesList">
+                </a4j:commandButton>
+            </div>
 
         </rich:panel>
 
 
-        <rich:dataTable value="#{warehousePurchaseOrderDetailListCreateAction.instances}"
+        <rich:dataTable value="#{guarantorAction.guarantorDocumentList}"
                         var="instance"
                         id="instancesList"
-                        rows="#{warehousePurchaseOrderDetailListCreateAction.rows}"
+                        rows="#{guarantorAction.rows}"
                         width="100%"
-                        columnsWidth="30%, 20%, 15%, 15%, 15%, 5%">
+                        columnsWidth="70%, 30%">
             <f:facet name="header">
                 <rich:columnGroup>
 
-                    <rich:column>
-                        #{messages['WarehousePurchaseOrderDetail.requestedQuantity']}
-                    </rich:column>
-                    <rich:column>
-                        #{messages['WarehousePurchaseOrderDetail.totalAmount']}
-                    </rich:column>
-                    <rich:column>
-                        #{messages['Common.action']}
-                    </rich:column>
+                    <rich:column>#{messages['Credit.guarantor.warrantyDetail']}</rich:column>
+                    <rich:column>#{messages['Common.action']}</rich:column>
+
                 </rich:columnGroup>
             </f:facet>
 
             <rich:column styleClass="center">
                 <s:div id="quantityDivId">
                     <h:inputText id="quantityInputTextId"
-                                 value="#{instance.requestedQuantity}"
-                                 styleClass="inputSmall right"
-                                 required="true">
-                        <app:realNumberConverter minimum="0.001"
-                                                 pattern="#{messages['patterns.decimal6FNumber']}"
-                                                 forId="quantityInputTextId"/>
-                        <a4j:support event="onblur"
-                                     ajaxSingle="true"
-                                     action="#{warehousePurchaseOrderDetailListCreateAction.updateTotalAmount(instance)}"
-                                     reRender="quantityDivId, totalAmountDivId, totalAmountGralDivId"/>
-                    </h:inputText>
-                    <h:message for="quantityInputTextId"
-                               styleClass="errors"
-                               style="display:block;"/>
+                                 value="#{instance.description}"
+                                 styleClass="inputLarge500"
+                                 required="true" />
                 </s:div>
             </rich:column>
 
@@ -131,8 +105,8 @@
                     <a4j:commandLink ajaxSingle="true"
                                      immediate="true"
                                      title="#{messages['Common.remove']}"
-                                     action="#{warehousePurchaseOrderDetailListCreateAction.removeInstance(instance)}"
-                                     reRender="purchaseOrderDetailsPanel">
+                                     action="#{guarantorAction.removeInstance(instance)}"
+                                     reRender="instancesList">
                         <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                     </a4j:commandLink>
                 </s:div>

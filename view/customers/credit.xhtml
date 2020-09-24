@@ -265,9 +265,7 @@
             </rich:panel>
             <c:if test="#{creditAction.managed}">
             <rich:tabPanel switchType="ajax" selectedTab="creditTransactionTab">
-                <rich:tab name="creditTransactionTab"
-                          label="#{messages['CreditTransaction.transactions']}"
-                          ajaxSingle="true">
+                <rich:tab name="creditTransactionTab" label="#{messages['CreditTransaction.transactions']}" ajaxSingle="true">
                     <rich:dataTable id="creditTransactionListId"
                                     value="#{creditTransactionDataModel}"
                                     var="creditTransactionItem"
@@ -350,6 +348,48 @@
                                       for="creditTransactionListId"
                                       dataModel="#{creditTransactionDataModel}"/>
                 </rich:tab>
+
+                <rich:tab name="guarantorTab" label="#{messages['Credit.guarantee']}" ajaxSingle="true">
+                    <rich:dataTable id="guarantorListId"
+                                    value="#{GuarantorDocumentDataModel}"
+                                    var="guarantorDocumentItem"
+                                    rows="#{sessionUser.rowsPerPage}"
+                                    width="100%"
+                                    columnsWidth="30%, 60%, 10%%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>
+                                    <h:outputText value="#{messages['Credit.guarantor']}" />
+                                </rich:column>
+
+                                <rich:column>
+                                    <h:outputText value="#{messages['Credit.guarantor.guarantorDocument']}" />
+                                </rich:column>
+
+                                <rich:column styleClass="center">
+                                    <h:outputText value="#{messages['Common.action']}" />
+                                </rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+
+
+                        <rich:column>
+                            <h:outputText value="#{guarantorDocumentItem.guarantor.person.idNumberAndFullName}"/>
+                        </rich:column>
+
+                        <rich:column>
+                            <h:outputText value="#{guarantorDocumentItem.description}"/>
+                        </rich:column>
+
+                        <rich:column styleClass="center">
+
+                        </rich:column>
+                    </rich:dataTable>
+                    <app:dataScroller id="guarantorListDataScrollerId"
+                                      for="guarantorListId"
+                                      dataModel="#{GuarantorDocumentDataModel}"/>
+                </rich:tab>
+
             </rich:tabPanel>
             </c:if>
         </h:form>

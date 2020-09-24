@@ -6,8 +6,8 @@
 <canvas zoom="100">
 <tables>
 <table name="credito" view="colnames">
-<left>1002</left>
-<top>497</top>
+<left>1108</left>
+<top>476</top>
 <width>250</width>
 <height>254</height>
 <sql_create_table>CREATE TABLE `credito` (
@@ -44,8 +44,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="socio" view="colnames">
-<left>431</left>
-<top>415</top>
+<left>619</left>
+<top>408</top>
 <width>185</width>
 <height>306</height>
 <sql_create_table>CREATE TABLE `socio` (
@@ -128,8 +128,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="garante" view="colnames">
-<left>681</left>
-<top>26</top>
+<left>619</left>
+<top>34</top>
 <width>140</width>
 <height>176</height>
 <sql_create_table>CREATE TABLE `garante` (
