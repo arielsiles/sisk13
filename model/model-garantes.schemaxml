@@ -44,8 +44,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="socio" view="colnames">
-<left>619</left>
-<top>408</top>
+<left>376</left>
+<top>351</top>
 <width>185</width>
 <height>306</height>
 <sql_create_table>CREATE TABLE `socio` (
@@ -97,8 +97,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="persona" view="colnames">
-<left>97</left>
-<top>129</top>
+<left>105</left>
+<top>341</top>
 <width>189</width>
 <height>294</height>
 <sql_create_table>CREATE TABLE `persona` (
@@ -128,29 +128,29 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="garante" view="colnames">
-<left>619</left>
-<top>34</top>
+<left>703</left>
+<top>44</top>
 <width>140</width>
 <height>176</height>
 <sql_create_table>CREATE TABLE `garante` (
   `idgarante` bigint(20) NOT NULL,
-  `idpersona` bigint(20) NOT NULL,
+  `idsocio` bigint(20) NOT NULL,
   `idcredito` bigint(20) NOT NULL,
   `descripcion` varchar(100) DEFAULT NULL,
   `version` bigint(20) DEFAULT NULL,
   `idcompania` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`idgarante`),
   KEY `idcompania` (`idcompania`),
-  KEY `idpersona` (`idpersona`),
   KEY `idcredito` (`idcredito`),
-  CONSTRAINT `garante_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
+  KEY `idsocio` (`idsocio`),
+  CONSTRAINT `garante_ibfk_5` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
   CONSTRAINT `garante_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
-  CONSTRAINT `garante_ibfk_3` FOREIGN KEY (`idpersona`) REFERENCES `persona` (`idpersona`)
+  CONSTRAINT `garante_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="documentogarante" view="colnames">
-<left>1084</left>
-<top>84</top>
+<left>1195</left>
+<top>73</top>
 <width>163</width>
 <height>158</height>
 <sql_create_table>CREATE TABLE `documentogarante` (
