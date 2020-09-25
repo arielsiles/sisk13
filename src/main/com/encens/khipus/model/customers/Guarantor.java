@@ -3,7 +3,6 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.contacts.Person;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -41,8 +40,8 @@ public class Guarantor implements BaseModel {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idpersona", nullable = false)
-    private Person person;
+    @JoinColumn(name = "idsocio", nullable = false)
+    private Partner partner;
 
     @Column(name = "descripcion")
     private String description;
@@ -71,15 +70,6 @@ public class Guarantor implements BaseModel {
         this.id = id;
     }
 
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
-
     public Credit getCredit() {
         return credit;
     }
@@ -102,5 +92,13 @@ public class Guarantor implements BaseModel {
 
     public void setGuarantorDocumentList(List<GuarantorDocument> guarantorDocumentList) {
         this.guarantorDocumentList = guarantorDocumentList;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
     }
 }

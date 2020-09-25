@@ -336,6 +336,14 @@ public class Credit implements BaseModel {
         return result;
     }
 
+    public Boolean isFinalized(){
+        Boolean result = Boolean.FALSE;
+
+        if (state.equals(CreditState.FIN))
+            result = Boolean.TRUE;
+
+        return result;
+    }
 
     public List<CreditTransaction> getCreditTransactionList() {
         return creditTransactionList;

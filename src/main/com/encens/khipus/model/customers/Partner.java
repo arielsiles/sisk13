@@ -352,7 +352,7 @@ public class Partner implements BaseModel {
     }
 
     public String getFullName() {
-        return (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName + " " : "") + (firstName != null ? firstName : "");
+        return (firstName != null ? firstName + " " : "") + (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName : "");
     }
 
     public String getFirstAndMaidenName() {

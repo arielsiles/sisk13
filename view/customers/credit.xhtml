@@ -36,13 +36,13 @@
                                  value="#{messages['CreditTransaction.newPayment']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and credit.delivered}"/>
+                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized()}"/>
 
                 <h:commandButton action="#{creditAction.addNewGuarantor}"
                                  value="#{messages['Credit.guarantor.new']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and credit.delivered}"/>
+                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized()}"/>
 
                 <h:commandButton id="createButtonId"
                                  action="#{creditAction.create}"
@@ -349,9 +349,9 @@
                                       dataModel="#{creditTransactionDataModel}"/>
                 </rich:tab>
 
-                <rich:tab name="guarantorTab" label="#{messages['Credit.guarantee']}" ajaxSingle="true">
+                <rich:tab name="guarantorTab" label="#{messages['Credit.guarantors']}" ajaxSingle="true">
                     <rich:dataTable id="guarantorListId"
-                                    value="#{GuarantorDocumentDataModel}"
+                                    value="#{guarantorDocumentDataModel}"
                                     var="guarantorDocumentItem"
                                     rows="#{sessionUser.rowsPerPage}"
                                     width="100%"
@@ -374,7 +374,7 @@
 
 
                         <rich:column>
-                            <h:outputText value="#{guarantorDocumentItem.guarantor.person.idNumberAndFullName}"/>
+                            <h:outputText value="#{guarantorDocumentItem.guarantor.partner.person.idNumberAndFullName}"/>
                         </rich:column>
 
                         <rich:column>
@@ -387,7 +387,7 @@
                     </rich:dataTable>
                     <app:dataScroller id="guarantorListDataScrollerId"
                                       for="guarantorListId"
-                                      dataModel="#{GuarantorDocumentDataModel}"/>
+                                      dataModel="#{guarantorDocumentDataModel}"/>
                 </rich:tab>
 
             </rich:tabPanel>

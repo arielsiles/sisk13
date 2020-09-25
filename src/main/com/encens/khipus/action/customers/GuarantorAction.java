@@ -2,10 +2,10 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.contacts.Person;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.Guarantor;
 import com.encens.khipus.model.customers.GuarantorDocument;
+import com.encens.khipus.model.customers.Partner;
 import com.encens.khipus.service.customers.GuarantorService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -32,8 +32,8 @@ public class GuarantorAction extends GenericAction<Guarantor> {
         return getInstance();
     }
 
-    public void assignPerson(Person person) {
-        getInstance().setPerson(person);
+    public void assignPartner(Partner partner) {
+        getInstance().setPartner(partner);
     }
 
 

@@ -19,11 +19,8 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class GuarantorDocumentDataModel extends QueryDataModel<Long, GuarantorDocument> {
 
-    private static final String[] RESTRICTIONS = {
-            "lower(distributor.firstName) like concat(lower(#{guarantorDocumentDataModel.criteria.firstName}), '%')",
-            "lower(distributor.lastName) like concat(lower(#{guarantorDocumentDataModel.criteria.lastName}), '%')",
-            "lower(distributor.maidenName) like concat(lower(#{guarantorDocumentDataModel.criteria.maidenName}), '%')"
-    };
+    private static final String[] RESTRICTIONS =
+            {"guarantorDocument.guarantor.credit = #{credit}"};
 
     @Override
     public String getEjbql() {

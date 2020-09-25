@@ -25,7 +25,7 @@
 
             <h:commandButton id="createButtonId"
                              action="#{guarantorAction.createGuarantor(credit)}"
-                             value="#{messages['CreditTransaction.save']}"
+                             value="#{messages['Common.save']}"
                              styleClass="button"
                              rendered="#{!creditTransactionAction.managed}" />
 
@@ -39,19 +39,20 @@
             <f:facet name="header">#{messages['Credit.guarantor.new']}</f:facet>
 
 
-            <s:decorate id="personField" template="/include/viewField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Partner.person']}</ui:define>
-                <app:selectPopUp id="person"
-                                 textValue="#{guarantor.person.fullName}"
-                                 value="#{guarantor.person}"
-                                 searchModalPanel="personListModalPanel"
-                                 dataModel="#{personDataModel}"
-                                 reRender="personField"
-                                 hotKeySelect="alt+2"
-                                 tabindex="11"/>
+            <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+                <app:selectPopUp id="partnerFieldId"
+                                 required="true"
+                                 textValue="#{guarantor.partner.fullName}"
+                                 value="#{guarantor.partner}"
+                                 searchModalPanel="partnerListModalPanel"
+                                 dataModel="#{partnerDataModel}"
+                                 reRender="partnerField"
+                                 tabindex="12">
+                </app:selectPopUp>
             </s:decorate>
 
-            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!--<s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Credit.guarantor.description']}</ui:define>
                 <h:inputTextarea id="gloss"
                                  value="#{guarantor.description}"
@@ -60,7 +61,7 @@
                                  tabindex="8">
                     <f:validateLength maximum="255"/>
                 </h:inputTextarea>
-            </s:decorate>
+            </s:decorate>-->
 
             <div class="buttons">
                 <a4j:commandButton id="newRegisterId"
@@ -117,19 +118,20 @@
 
     </h:form>
 
-    <s:decorate id="personListModalPanelContainer" template="/employees/personListModalPanel.xhtml">
-        <ui:param name="dialogId" value="personListModalPanel"/>
-        <ui:param name="container" value="personListModalPanelContainer"/>
-        <ui:define name="assignButton">
-            <a4j:commandButton id="assignButton"
-                               action="#{guarantorAction.assignPerson(personItem)}"
-                               image="/img/active.gif"
-                               styleClass="select-image"
-                               ajaxSingle="true"
-                               reRender="personField"
-                               oncomplete="Richfaces.hideModalPanel('personListModalPanel');"/>
-        </ui:define>
-    </s:decorate>
+    <s:div id="partnerListModalPanelDiv">
+        <s:decorate id="partnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">
+            <ui:param name="containerId" value="partnerListModalPanelContainer"/>
+            <ui:param name="dialogId" value="partnerListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{guarantorAction.assignPartner(partnerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="partnerField"
+                                   oncomplete="Richfaces.hideModalPanel('partnerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
 
 
     <!--Set selector Id to enable focus-->

@@ -26,7 +26,7 @@ public class GuarantorServiceBean implements GuarantorService {
     @Override
     public void createCreditGuarantor(Guarantor guarantor) {
 
-        System.out.println("-----> Garante: " + guarantor.getPerson().getFullName());
+        System.out.println("-----> Garante: " + guarantor.getPartner().getPerson().getFullName());
         em.persist(guarantor);
         em.flush();
 
