@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Credit.report.payrollGuarantor.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Credit.report.payrollGuarantor.title']}
+                </f:facet>
+
+                <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                    <h:inputText id="productiveZone" styleClass="input" value="#{payrollGuarantorZoneReportAction.productiveZone.fullName}"
+                                 readonly="true" required="true" tabindex="1">
+                    </h:inputText>
+                    <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
+                                     title="#{messages['RawMaterialProducer.selectProductiveZone']}"
+                                     onclick="Richfaces.showModalPanel('productiveZoneModalPanel');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+                <s:decorate id="paymentDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Credit.date']}</ui:define>
+                    <rich:calendar id="paymentDate"
+                                   value="#{payrollGuarantorZoneReportAction.dateTransaction}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="false"
+                                   disabled="false"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CreditType.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{payrollGuarantorZoneReportAction.currency}" styleClass="input" required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{currencyList.resultList}" var="currency" label="#{currency.fullName}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{payrollGuarantorZoneReportAction}" showPageFormat="false"
+                                      tabIndex="3"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{payrollGuarantorZoneReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+
+            </div>
+
+        </h:form>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{payrollGuarantorZoneReportAction.assignProductiveZone(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="productiveZoneField"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
+                </p>
+            </ui:define>
+        </s:decorate>
+
+
+
+    </ui:define>
+</ui:composition>

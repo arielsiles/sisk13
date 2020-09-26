@@ -33,4 +33,5 @@ public interface CreditService {
     void updateCredit(Credit credit);
     Object[] getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate);
     Object[] getCreditRecovery(Long productiveZoneId, Date startDate, Date endDate);
+    String findCreditGuarantors(Credit credit);
 }

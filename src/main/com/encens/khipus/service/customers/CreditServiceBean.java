@@ -193,4 +193,31 @@ public class CreditServiceBean implements CreditService {
         return result;
     }
 
+    @Override
+    public String findCreditGuarantors(Credit credit) {
+
+        String result = "";
+
+        System.out.println("................credit: " + credit.getId());
+        System.out.println("................credit: " + credit.getPartner().getFullName());
+
+        List<Guarantor> guarantors = em.createQuery("select guarantor from Guarantor guarantor where guarantor.credit.id =:creditId")
+                .setParameter("creditId", credit.getId())
+                .getResultList();
+
+        System.out.println("..........guarantors.size(): " + guarantors.size());
+
+        for ( int i=0 ; i < guarantors.size() ; i++){
+            System.out.println("............ i: " + i + " - " + guarantors.get(i).getPartner().getFullName());
+            result = result + guarantors.get(i).getPartner().getFullName();
+
+            if (i+1 < guarantors.size() )
+                result = result + " - ";
+        }
+
+        System.out.println("..........RESULT: " + result);
+
+        return result;
+    }
+
 }

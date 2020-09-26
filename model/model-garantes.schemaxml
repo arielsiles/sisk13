@@ -97,8 +97,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="persona" view="colnames">
-<left>105</left>
-<top>341</top>
+<left>24</left>
+<top>348</top>
 <width>189</width>
 <height>294</height>
 <sql_create_table>CREATE TABLE `persona` (
