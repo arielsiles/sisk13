@@ -933,8 +933,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
                 "from ventas v " +
                 "where v.fecha between :startDate and :endDate " +
-                "and v.idusuario <> 5 and v.idtipopedido in (1,5) " +
-                "and v.cod_art not in (192,193,194,795,195,196,188,493,693) " + /** MODIFYID **/
+                "and v.idusuario not in (408, 5) and v.idtipopedido in (1,5) " +
+                "and v.cod_art not in (192,193,194,795,195,196,188,493,693,834,835) " + /** MODIFYID **/
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
@@ -1038,7 +1038,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
             if (quantity.doubleValue() > 0){
                 BigDecimal unitCost = unitCostMilkProducts.get(codArt);
-                //System.out.println("==========================> COD_ART: " + codArt);
+                System.out.println("==========================> COD_ART: " + codArt);
                 if (unitCost.doubleValue() > 0){
                     BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
                     System.out.println("=============Create-CV=============> COD_ART: " + codArt + " - unitCost: " + unitCost + " - Cost: " + cost);
@@ -1066,7 +1066,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
-                "from ventas v where v.fecha between :startDate and :endDate and v.idusuario = 5 " +
+                "from ventas v where v.fecha between :startDate and :endDate and v.idusuario in (408, 5) " +
                 "group by v.cod_art ").setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
         HashMap<String, BigDecimal> unitCostVeterinaryProducts = getUnitCost_veterinaryProducts(startDate, endDate);
