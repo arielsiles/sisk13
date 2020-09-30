@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" scriptletClass="com.encens.khipus.action.customers.reports.PayrollGuarantorZoneReportScriptlet">
-	<property name="ireport.zoom" value="2.357947691000021"/>
-	<property name="ireport.x" value="97"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="4.177248169415689"/>
+	<property name="ireport.x" value="488"/>
+	<property name="ireport.y" value="68"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="dateTransaction" class="java.util.Date"/>
 	<parameter name="companyName" class="java.lang.String"/>
@@ -58,6 +58,9 @@
 		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 	</variable>
 	<variable name="guarantors" class="java.lang.String" resetType="Group" resetGroup="purchaseOrderGroup" calculation="System"/>
+	<variable name="num" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{REPORT_COUNT}.intValue()]]></variableExpression>
+	</variable>
 	<group name="purchaseOrderGroup">
 		<groupExpression><![CDATA[$F{gabName}]]></groupExpression>
 		<groupHeader>
@@ -77,59 +80,66 @@
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement x="0" y="1" width="37" height="15"/>
+						<reportElement x="16" y="1" width="37" height="15"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[Socio]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="37" y="1" width="140" height="15"/>
+						<reportElement x="53" y="1" width="140" height="15"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[Nombre]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="177" y="1" width="35" height="15"/>
+						<reportElement x="193" y="1" width="35" height="15"/>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[Fecha Desembolso]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="213" y="1" width="40" height="15"/>
+						<reportElement x="229" y="1" width="40" height="15"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[Desembolso Capital]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="254" y="1" width="306" height="15"/>
+						<reportElement x="270" y="1" width="290" height="15"/>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
 						</textElement>
 						<text><![CDATA[SOCIOS  GARANTES]]></text>
 					</staticText>
+					<staticText>
+						<reportElement x="0" y="1" width="15" height="15"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="6"/>
+						</textElement>
+						<text><![CDATA[N.]]></text>
+					</staticText>
 				</frame>
 				<textField>
 					<reportElement x="1" y="0" width="177" height="11"/>
 					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="6"/>
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{gabName}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="425" y="0" width="40" height="12"/>
+					<reportElement x="470" y="0" width="40" height="12"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="6"/>
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<text><![CDATA[Moneda:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="498" y="0" width="63" height="13"/>
-					<textElement>
-						<font fontName="Arial" size="8"/>
+					<reportElement x="511" y="0" width="50" height="13"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{currency}]]></textFieldExpression>
 				</textField>
@@ -143,8 +153,8 @@
 						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
 					</graphicElement>
 				</line>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="214" y="0" width="40" height="11"/>
+				<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+					<reportElement x="230" y="0" width="40" height="11"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="6"/>
 					</textElement>
@@ -165,16 +175,16 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
 				</textField>
 				<textField pattern="dd/MM/yyyy">
-					<reportElement x="11" y="4" width="40" height="11"/>
+					<reportElement x="12" y="4" width="40" height="11"/>
 					<textElement verticalAlignment="Bottom">
-						<font fontName="Arial" size="6"/>
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[$P{dateTransaction}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement x="2" y="4" width="9" height="11"/>
 					<textElement verticalAlignment="Bottom">
-						<font fontName="Arial" size="6"/>
+						<font fontName="Arial" size="7"/>
 					</textElement>
 					<text><![CDATA[Al: ]]></text>
 				</staticText>
@@ -211,40 +221,47 @@
 	<detail>
 		<band height="11" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="38" height="11"/>
+				<reportElement x="17" y="0" width="37" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="178" y="0" width="35" height="11"/>
+				<reportElement x="194" y="0" width="35" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{grantDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="214" y="0" width="40" height="11"/>
+				<reportElement x="230" y="0" width="40" height="11"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="38" y="0" width="140" height="11"/>
+				<reportElement x="54" y="0" width="140" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{firstName}+" "+$F{lastName}+" "+$F{maidenName}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="255" y="0" width="306" height="11"/>
+				<reportElement x="271" y="0" width="290" height="11"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{guarantors}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="15" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{num}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

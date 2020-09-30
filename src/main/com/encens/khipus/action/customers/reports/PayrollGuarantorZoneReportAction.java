@@ -53,7 +53,7 @@ public class PayrollGuarantorZoneReportAction extends GenericReportAction {
 
         String dateParam = DateUtils.format(this.dateTransaction, "yyyy-MM-dd");
 
-        ejbql = " SELECT " +
+        /*ejbql = " SELECT " +
                 " productiveZone.number || '-' || productiveZone.name as gabName, " +
                 " credit.state," +
                 " creditType.name as creditTypeName," +
@@ -78,12 +78,30 @@ public class PayrollGuarantorZoneReportAction extends GenericReportAction {
                 " LEFT JOIN partner.productiveZone productiveZone " +
                 " WHERE productiveZone.id = " + productiveZone.getId() +
                 " AND creditTransaction.date <= '" + dateParam + "'" +
-                /*" AND creditTransaction.creditTransactionType = '" + CreditTransactionType.ING + "'" +*/
                 " AND credit.state <> #{creditAction.creditStateFIN} "+
                 " AND credit.creditType.currency.id = " + currency.getId() +
                 " GROUP BY productiveZone.number, productiveZone.name, credit.state, creditType.name, " +
                 " partner.firstName, partner.lastName, partner.maidenName, credit.grantDate, credit.amount, credit.id, " +
                 " credit.expirationDate, credit.previousCode, credit.annualRate, credit.quota " +
+                " ORDER BY partner.firstName, partner.lastName, partner.maidenName";*/
+
+        ejbql = " SELECT " +
+                " productiveZone.number || '-' || productiveZone.name as gabName, " +
+                " credit.state," +
+                " creditType.name as creditTypeName," +
+                " partner.firstName," +
+                " partner.lastName," +
+                " partner.maidenName," +
+                " credit.grantDate," +
+                " credit.amount," +
+                " credit.id as creditId" +
+                " FROM Credit credit " +
+                " LEFT JOIN credit.creditType creditType" +
+                " LEFT JOIN credit.partner partner" +
+                " LEFT JOIN partner.productiveZone productiveZone " +
+                " WHERE productiveZone.id = " + productiveZone.getId() +
+                " AND credit.state <> #{creditAction.creditStateFIN} "+
+                " AND credit.creditType.currency.id = " + currency.getId() +
                 " ORDER BY partner.firstName, partner.lastName, partner.maidenName";
 
         return ejbql;
@@ -113,7 +131,7 @@ public class PayrollGuarantorZoneReportAction extends GenericReportAction {
                 "summaryProviderKardexReport",
                 "/customers/reports/payrollGuarantorZoneReport.jrxml",
                 PageFormat.LETTER,
-                PageOrientation.LANDSCAPE,
+                PageOrientation.PORTRAIT,
                 messages.get("Reports.credit.payrollGuarantor.title"),
                 reportParameters);
 
