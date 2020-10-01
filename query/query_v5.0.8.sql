@@ -14,7 +14,9 @@ alter table tipocaja add column cuentacaja varchar(20) after nombre;
 alter table tipocaja add column cuentaingreso varchar(20) after cuentacaja;
 alter table tipocaja add column no_cia varchar(2) after cuentaingreso;
 
--- previo crear caja, tipo de caja
+-- Crear Tipos de Caja: GAF > Configuracion > Tipos de caja
+-- Crear Cajaa: GAF > Configuracion > Cajas
+-- 
 update tipocaja set cuentacaja = '1110110100', cuentaingreso = '5420110201', no_cia = '01' where idtipocaja = 1;
 update tipocaja set cuentacaja = '1110110300', cuentaingreso = '5420110100', no_cia = '01' where idtipocaja = 2;
 
