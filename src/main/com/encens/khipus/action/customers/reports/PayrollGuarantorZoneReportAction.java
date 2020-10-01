@@ -94,7 +94,8 @@ public class PayrollGuarantorZoneReportAction extends GenericReportAction {
                 " partner.maidenName," +
                 " credit.grantDate," +
                 " credit.amount," +
-                " credit.id as creditId" +
+                " credit.id as creditId, " +
+                " credit.previousCode as code" +
                 " FROM Credit credit " +
                 " LEFT JOIN credit.creditType creditType" +
                 " LEFT JOIN credit.partner partner" +
