@@ -128,6 +128,13 @@ public class SalesAction {
 
     public void openSale(){
         setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
+
+        /*CashBox cashBox = userCashBoxService.findByUser(currentUser);
+        System.out.println("------------> cashBox: " + cashBox);
+        if (cashBox == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "UserCashBox.error.unassignedCashBox", currentUser.getEmployee().getFullName());
+        }*/
+
     }
 
     public void addProduct(ProductItem productItem){
@@ -257,6 +264,8 @@ public class SalesAction {
         customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
 
+        updateProductItemsForOutputs(customerOrder);
+
         clearAll();
         assignCustomerOrderTypeDefault();
     }
@@ -333,6 +342,13 @@ public class SalesAction {
         return customerOrder;
     }
 
+    public void updateProductItemsForOutputs(CustomerOrder customerOrder){
+        for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
+            saleService.updateArticleForOutputs(articleOrder);
+            saleService.removeFromInventory(articleOrder);
+        }
+
+    }
 
     private Movement createInvoice(CustomerOrder customerOrder){
         User user = getUser(currentUser.getId()); //

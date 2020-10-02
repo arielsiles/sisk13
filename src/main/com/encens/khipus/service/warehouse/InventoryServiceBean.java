@@ -1,10 +1,7 @@
 package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.service.GenericServiceBean;
-import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.warehouse.ProductItemPK;
-import com.encens.khipus.model.warehouse.Warehouse;
-import com.encens.khipus.model.warehouse.WarehousePK;
+import com.encens.khipus.model.warehouse.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -52,6 +49,28 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
             return null;
         }
 
+    }
+
+    @Override
+    public Inventory findInventoryByProductItemCode(String productItemCode) {
+        try {
+            return (Inventory) eventEm.createNamedQuery("Inventory.findInventoryByProductItemCode")
+                    .setParameter("productItemCode", productItemCode)
+                    .getSingleResult();
+        } catch (NoResultException exception) {
+            return null;
+        }
+    }
+
+    @Override
+    public InventoryDetail findInventoryDetailByProductItemCode(String productItemCode) {
+        try {
+            return (InventoryDetail) eventEm.createNamedQuery("InventoryDetail.findInventoryDetailByProductItemCode")
+                    .setParameter("productItemCode", productItemCode)
+                    .getSingleResult();
+        } catch (NoResultException exception) {
+            return null;
+        }
     }
 
 

@@ -19,6 +19,9 @@ import java.math.BigDecimal;
         @NamedQuery(name = "Inventory.findUnitaryBalanceByProductItemAndArticle",
                 query = "select inventory.unitaryBalance from Inventory inventory " +
                         "where inventory.productItem.id=:productItemId and inventory.warehouse.id=:warehouseId"),
+        @NamedQuery(name = "Inventory.findInventoryByProductItemCode",
+                query = "select inventory from Inventory inventory " +
+                        "where inventory.productItem.productItemCode=:productItemCode"),
         @NamedQuery(name = "Inventory.findWarehouseByItemArticle",
         query = "select inventory.warehouse from Inventory inventory " +
                 "where inventory.productItem.id = :productItemId")

@@ -29,7 +29,9 @@ import java.math.BigDecimal;
         @NamedQuery(name = "InventoryDetail.findByInventoryAndExecutorUnitCode",
                 query = "select detail from InventoryDetail detail where detail.companyNumber =:companyNumber and detail.productItemCode =:productItemCode and detail.warehouseCode =:warehouseCode and detail.executorUnit =:executorUnit"),
         @NamedQuery(name = "InventoryDetail.findByWarehouseCode",
-                query = "select detail from InventoryDetail detail where detail.companyNumber =:companyNumber and detail.warehouseCode =:warehouseCode and detail.executorUnit =:executorUnit")
+                query = "select detail from InventoryDetail detail where detail.companyNumber =:companyNumber and detail.warehouseCode =:warehouseCode and detail.executorUnit =:executorUnit"),
+        @NamedQuery(name = "InventoryDetail.findInventoryDetailByProductItemCode",
+                query = "select detail from InventoryDetail detail where detail.productItemCode =:productItemCode")
 })
 
 
