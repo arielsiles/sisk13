@@ -5,9 +5,8 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.warehouse.Inventory;
-import com.encens.khipus.model.warehouse.InventoryDetail;
-import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.annotations.AutoCreate;
@@ -99,11 +98,24 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
     }
 
+    private ApprovalWarehouseVoucherService service;
+
     @Override
     public void removeFromInventory(ArticleOrder articleOrder){
 
         Inventory inventory = inventoryService.findInventoryByProductItemCode(articleOrder.getProductItem().getProductItemCode());
-        InventoryDetail inventoryDetail = inventoryService.findInventoryDetailByProductItemCode(articleOrder.getProductItem().getProductItemCode());
+        //InventoryDetail inventoryDetail = inventoryService.findInventoryDetailByProductItemCode(articleOrder.getProductItem().getProductItemCode());
+
+
+        Warehouse warehouse = articleOrder.getProductItem().getWarehouse();
+        InventoryPK inventoryPK = new InventoryPK(warehouse.getId().getCompanyNumber(), warehouse.getWarehouseCode(), articleOrder.getCodArt());
+        //Inventory inventory = getEntityManager().find(Inventory.class, inventoryPK);
+
+        System.out.println("--------------------> INVENTORY: " + inventory);
+        System.out.println("--------------------> WAREHOUSE: " + warehouse);
+        System.out.println("--------------------> EXECUTORUNIT: " + warehouse.getExecutorUnit());
+
+        InventoryDetail inventoryDetail = service.getInventoryDetail(inventory, warehouse.getExecutorUnit(), "0111");
 
         System.out.println("-----------------> Inventory: " + inventory);
         System.out.println("-----------------> InventoryDetail: " + inventoryDetail);
@@ -112,16 +124,9 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
         BigDecimal availableQuantity = inventoryDetail.getQuantity();
         BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
 
-        /*if (BigDecimal.ZERO.compareTo(newAvailableQuantity) == 1) {
-            throw new InventoryUnitaryBalanceException(availableQuantity, articleOrder.getProductItem());
-        }*/
 
         BigDecimal actualUnitaryBalance = inventory.getUnitaryBalance();
         BigDecimal newUnitaryBalance = BigDecimalUtil.subtract(actualUnitaryBalance, requiredQuantity);
-
-        /*if (BigDecimal.ZERO.compareTo(newUnitaryBalance) == 1) {
-            throw new InventoryUnitaryBalanceException(actualUnitaryBalance, articleOrder.getProductItem());
-        }*/
 
 
         System.out.println("----------------> newAvailableQuantity: " + newAvailableQuantity);
@@ -129,12 +134,12 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
 
         inventory.setUnitaryBalance(newUnitaryBalance);
-        em.refresh(inventory);
+        //em.refresh(inventory);
         em.merge(inventory);
         em.flush();
 
         inventoryDetail.setQuantity(newAvailableQuantity);
-        em.refresh(inventoryDetail);
+        //em.refresh(inventoryDetail);
         em.merge(inventoryDetail);
         em.flush();
     }

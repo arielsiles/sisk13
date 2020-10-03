@@ -1261,7 +1261,9 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
     }
 
     @SuppressWarnings(value = "unchecked")
-    private InventoryDetail getInventoryDetail(Inventory inventory, BusinessUnit executorUnit, String costCenterCode) {
+    public InventoryDetail getInventoryDetail(Inventory inventory, BusinessUnit executorUnit, String costCenterCode) {
+
+        System.out.println("-----------------> getInventoryDetail: " + inventory.getProductItem().getFullName());
 
         List<InventoryDetail> inventoryDetails = getEntityManager().
                 createNamedQuery("InventoryDetail.findByExecutorUnitAndCostCenter").
@@ -1280,6 +1282,8 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                     + ", executorUnitCode=" + executorUnit.getFullName()
                     + ", costCenterCode=" + costCenterCode);
         }
+
+        System.out.println("------------------> inventoryDetails.get(0)::: " + inventoryDetails.get(0));
 
         return inventoryDetails.get(0);
     }

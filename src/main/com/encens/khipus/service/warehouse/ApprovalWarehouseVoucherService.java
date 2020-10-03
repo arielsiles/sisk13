@@ -9,6 +9,7 @@ import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.warehouse.*;
 
@@ -161,5 +162,7 @@ public interface ApprovalWarehouseVoucherService extends GenericService {
             ReferentialIntegrityException, ProductItemNotFoundException, WarehouseAccountCashNotFoundException;
 
     void updateSimpleWarehouseVoucher(WarehouseVoucher warehouseVoucher);
+
+    InventoryDetail getInventoryDetail(Inventory inventory, BusinessUnit executorUnit, String costCenterCode);
 
 }
