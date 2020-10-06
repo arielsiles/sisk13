@@ -17,7 +17,7 @@ alter table garante add foreign key (idcompania) references compania (idcompania
 
 create table documentogarante(
 	iddocumentogarante bigint(20) not null,
-	descripcion varchar(255),
+	descripcion varchar(512),
 	idgarante bigint(20) not null,
 	version bigint(20),
 	idcompania bigint(20),
