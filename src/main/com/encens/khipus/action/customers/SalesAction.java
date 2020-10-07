@@ -14,6 +14,7 @@ import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
 import org.jboss.seam.ScopeType;
@@ -109,6 +110,8 @@ public class SalesAction {
     @In
     private UserCashBoxService userCashBoxService;
 
+    @In
+    private InventoryService inventoryService;
 
     /*@Create
     public void initialize() {
@@ -264,7 +267,7 @@ public class SalesAction {
         customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
 
-        updateProductItemsForOutputs(customerOrder);
+        inventoryService.updateInventoryForSales(customerOrder);
 
         clearAll();
         assignCustomerOrderTypeDefault();
@@ -340,14 +343,6 @@ public class SalesAction {
         }*/
 
         return customerOrder;
-    }
-
-    public void updateProductItemsForOutputs(CustomerOrder customerOrder){
-        for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
-            saleService.updateArticleForOutputs(articleOrder);
-            saleService.removeFromInventory(articleOrder);
-        }
-
     }
 
     private Movement createInvoice(CustomerOrder customerOrder){

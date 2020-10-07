@@ -15,6 +15,5 @@ public interface SaleService extends GenericService {
     Long findLastSaleId(User user);
     CustomerOrder findSaleById(Long id);
     void updateArticleForOutputs(ArticleOrder articleOrder);
-    void removeFromInventory(ArticleOrder articleOrder);
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">khipus</database>
+<database charset="utf8" collation="utf8_general_ci">erp_ilvadev</database>
 </source>
 <canvas zoom="100">
 <tables>
@@ -51,8 +51,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="sf_tmpdet" view="colnames">
-<left>565</left>
-<top>165</top>
+<left>518</left>
+<top>31</top>
 <width>224</width>
 <height>135</height>
 <sql_create_table>CREATE TABLE `sf_tmpdet` (
@@ -93,13 +93,12 @@
   CONSTRAINT `sf_tmpdet_ibfk_2` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
   CONSTRAINT `sf_tmpdet_ibfk_3` FOREIGN KEY (`idcuenta`) REFERENCES `cuenta` (`idcuenta`),
   CONSTRAINT `sf_tmpdet_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
-  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
-  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`)
+  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="ventadirecta" view="colnames">
-<left>303</left>
-<top>556</top>
+<left>507</left>
+<top>566</top>
 <width>214</width>
 <height>159</height>
 <sql_create_table>CREATE TABLE `ventadirecta` (
@@ -136,8 +135,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pedidos" view="colnames">
-<left>296</left>
-<top>340</top>
+<left>507</left>
+<top>263</top>
 <width>204</width>
 <height>177</height>
 <sql_create_table>CREATE TABLE `pedidos` (
@@ -155,18 +154,22 @@
   `TOTAL` double DEFAULT NULL,
   `ESTADO_PEDIDO` bigint(20) DEFAULT NULL,
   `IDCLIENTE` bigint(20) DEFAULT NULL,
+  `iddistribuidor` bigint(20) DEFAULT NULL,
+  `tipoventa` varchar(100) DEFAULT NULL,
+  `idtipoventa` bigint(20) DEFAULT NULL,
   `IDTIPOPEDIDO` bigint(20) DEFAULT NULL,
   `ESTADO` varchar(15) DEFAULT NULL,
   `TOTALIMPORTE` double NOT NULL,
+  `MONTODIST` decimal(16,2) DEFAULT NULL,
   `IDUSUARIO` bigint(20) DEFAULT NULL,
   `VALORCOMISION` double DEFAULT '0',
   `VALORGARANTIA` double DEFAULT NULL,
   `CODIGO` bigint(20) DEFAULT NULL,
-  `CON_REPOSICION` int(1) DEFAULT NULL,
+  `CON_REPOSICION` int(1) DEFAULT '0',
   `IDMOVIMIENTO` bigint(24) DEFAULT NULL,
   `PEDIDOSREPOSICION` bigint(20) DEFAULT NULL,
   `IMPUESTO` double DEFAULT NULL,
-  `TIENEFACTURA` tinyint(1) DEFAULT NULL,
+  `TIENEFACTURA` tinyint(1) DEFAULT '1',
   `id_tmpenc` bigint(20) DEFAULT NULL,
   `CONTABILIZADO` tinyint(1) DEFAULT NULL,
   `IDSUCURSAL` bigint(20) DEFAULT NULL,
@@ -179,16 +182,20 @@
   KEY `IDTIPOPEDIDO` (`IDTIPOPEDIDO`),
   KEY `IDUSUARIO` (`IDUSUARIO`),
   KEY `IDMOVIMIENTO` (`IDMOVIMIENTO`),
+  KEY `idtipoventa` (`idtipoventa`),
+  KEY `iddistribuidor` (`iddistribuidor`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`IDCLIENTE`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`IDTIPOPEDIDO`) REFERENCES `tipopedido` (`IDTIPOPEDIDO`),
   CONSTRAINT `pedidos_ibfk_3` FOREIGN KEY (`IDUSUARIO`) REFERENCES `usuario` (`idusuario`),
   CONSTRAINT `pedidos_ibfk_4` FOREIGN KEY (`IDMOVIMIENTO`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
-  CONSTRAINT `pedidos_ibfk_5` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`)
+  CONSTRAINT `pedidos_ibfk_5` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `pedidos_ibfk_6` FOREIGN KEY (`idtipoventa`) REFERENCES `tipoventa` (`idtipoventa`),
+  CONSTRAINT `pedidos_ibfk_7` FOREIGN KEY (`iddistribuidor`) REFERENCES `distribuidor` (`iddistribuidor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="movimiento" view="colnames">
-<left>960</left>
-<top>178</top>
+<left>1088</left>
+<top>196</top>
 <width>237</width>
 <height>311</height>
 <sql_create_table>CREATE TABLE `movimiento` (
@@ -220,9 +227,9 @@
   KEY `IDPEDIDOS` (`IDPEDIDOS`),
   KEY `IDVENTADIRECTA` (`IDVENTADIRECTA`),
   KEY `id_tmpdet` (`id_tmpdet`),
-  CONSTRAINT `movimiento_ibfk_3` FOREIGN KEY (`id_tmpdet`) REFERENCES `sf_tmpdet` (`id_tmpdet`),
   CONSTRAINT `movimiento_ibfk_1` FOREIGN KEY (`IDPEDIDOS`) REFERENCES `pedidos` (`IDPEDIDOS`),
-  CONSTRAINT `movimiento_ibfk_2` FOREIGN KEY (`IDVENTADIRECTA`) REFERENCES `ventadirecta` (`IDVENTADIRECTA`)
+  CONSTRAINT `movimiento_ibfk_2` FOREIGN KEY (`IDVENTADIRECTA`) REFERENCES `ventadirecta` (`IDVENTADIRECTA`),
+  CONSTRAINT `movimiento_ibfk_3` FOREIGN KEY (`id_tmpdet`) REFERENCES `sf_tmpdet` (`id_tmpdet`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 </tables>

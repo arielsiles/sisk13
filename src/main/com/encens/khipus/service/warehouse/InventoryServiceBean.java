@@ -1,7 +1,11 @@
 package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.service.GenericServiceBean;
+import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -22,6 +26,8 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
     @In(value = "#{listEntityManager}")
     private EntityManager eventEm;
 
+    @In
+    private SaleService saleService;
 
     /**
      * Finds the unitaryBalance quantity by ProductItemPK and WarehousePK
@@ -47,6 +53,30 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
                     .getSingleResult();
         }catch (NoResultException e){
             return null;
+        }
+
+    }
+
+    @Override
+    public void updateInventoryForSales(CustomerOrder customerOrder) {
+
+        for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
+
+            Inventory inventory = findInventoryByProductItemCode(articleOrder.getCodArt());
+            System.out.println("-----------> **** ACTUALIZANDO PRODUCTO Inventory: " + inventory.getProductItem().getFullName());
+            BigDecimal requiredQuantity = BigDecimalUtil.toBigDecimal(articleOrder.getTotal());
+            BigDecimal availableQuantity = inventory.getUnitaryBalance();
+            BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
+            inventory.setUnitaryBalance(newAvailableQuantity);
+            eventEm.merge(inventory);
+            eventEm.flush();
+
+            InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(articleOrder.getCodArt());
+            inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+            eventEm.merge(inventoryDetail);
+            eventEm.flush();
+
+            saleService.updateArticleForOutputs(articleOrder);
         }
 
     }
