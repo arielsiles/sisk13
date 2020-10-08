@@ -186,6 +186,29 @@ public class SalesAction {
         clearProduct();
     }
 
+    public void addProductItems(List<ProductItem> productItems) {
+        for (ProductItem productItem : productItems) {
+
+            System.out.println("- - - - - - - - > Productos: " + productItem.getFullName2());
+
+            addProduct(productItem);
+
+            /*if (selectedProductItems.contains(productItem.getId())) {
+                continue;
+            }
+
+            selectedProductItems.add(productItem.getId());
+
+            PriceItem item = new PriceItem();
+            item.setProductItem(productItem);
+            item.setProductItemCode(productItem.getProductItemCode());
+            item.setCustomerCategory(getInstance());
+            item.setCompanyNumber(Constants.COD_COMPANY_DEFAULT);
+            getDetails().add(item);
+            */
+        }
+    }
+
     public void calculateChange(){
         BigDecimal change = BigDecimal.ZERO;
         change = BigDecimalUtil.subtract(moneyReceived, totalAmount);

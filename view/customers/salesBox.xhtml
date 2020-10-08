@@ -333,9 +333,9 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{customerCategoryAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{salesAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
-                               reRender="movementDetailListPanel"
+                               reRender="productDataTable"
                                styleClass="button"
                                oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
         </ui:define>

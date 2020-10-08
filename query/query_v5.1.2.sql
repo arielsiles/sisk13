@@ -8,3 +8,6 @@ alter table cajausuario modify column
 
 alter table cajausuario add foreign key (idcaja) references caja (idcaja);
 alter table cajausuario add foreign key (idusuario) references usuario (idusuario);
+
+
+-- 08.10.2020
