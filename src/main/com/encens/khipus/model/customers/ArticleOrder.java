@@ -128,6 +128,9 @@ public class ArticleOrder {
     @Length(max = 2)
     private String companyNumber = "01";
 
+    @Transient
+    private BigDecimal unitaryBalance;
+
     public String getCodArt() {
         return codArt;
     }
@@ -254,5 +257,13 @@ public class ArticleOrder {
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
+    }
+
+    public BigDecimal getUnitaryBalance() {
+        return unitaryBalance;
+    }
+
+    public void setUnitaryBalance(BigDecimal unitaryBalance) {
+        this.unitaryBalance = unitaryBalance;
     }
 }

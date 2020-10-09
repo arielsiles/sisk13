@@ -45,6 +45,7 @@ public class SalesAction {
     private Boolean cashSaleCheck;
     private Boolean creditSaleCheck;
     private Boolean finalConsumer = Boolean.FALSE;
+    private Boolean zeroProduct = Boolean.FALSE;
 
     //private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
 
@@ -151,6 +152,13 @@ public class SalesAction {
 
         if (client == null) return;
 
+        BigDecimal unitaryBalance = inventoryService.findUnitaryBalanceByProductItemAndArticle(productItem.getWarehouse().getId(), productItem.getId());
+        if (unitaryBalance.compareTo(BigDecimal.ZERO) <= 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
+            return;
+        }
+
+
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
             System.out.println("------>>> contains(productItemCode): " + productItemCodesSelected.contains(productItem.getProductItemCode()));
             clearProduct();
@@ -173,6 +181,7 @@ public class SalesAction {
         articleOrder.setCu(BigDecimal.ZERO);
         articleOrder.setUnitCost(BigDecimal.ZERO);
         articleOrder.setPrice(productItem.getSalePrice().doubleValue());
+        articleOrder.setUnitaryBalance(unitaryBalance);
 
         if (getPriceItemListMap() != null){
             BigDecimal price = getPriceItemListMap().get(productItem.getProductItemCode());
@@ -222,6 +231,12 @@ public class SalesAction {
     }
 
     public void calculateAmount(ArticleOrder articleOrder){
+
+        if (articleOrder.getQuantity() > articleOrder.getUnitaryBalance().intValue()){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
+            articleOrder.setQuantity(0);
+        }
+
         Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
         articleOrder.setAmount(BigDecimalUtil.toBigDecimal(amount).doubleValue());
         calculateTotalUnits(articleOrder);
@@ -229,8 +244,11 @@ public class SalesAction {
 
     public BigDecimal calculateTotalAmount(){
         BigDecimal result = BigDecimal.ZERO;
+        setZeroProduct(Boolean.FALSE);
         for (ArticleOrder articleOrder:articleOrderList){
             result = BigDecimalUtil.sum(result, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
+            if (articleOrder.getQuantity() == 0)
+                setZeroProduct(Boolean.TRUE);
         }
         setTotalAmount(result);
         return result;
@@ -761,4 +779,11 @@ public class SalesAction {
         }
     }
 
+    public Boolean getZeroProduct() {
+        return zeroProduct;
+    }
+
+    public void setZeroProduct(Boolean zeroProduct) {
+        this.zeroProduct = zeroProduct;
+    }
 }

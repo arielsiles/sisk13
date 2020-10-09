@@ -256,7 +256,7 @@
             <rich:column styleClass="center">
                 <h:inputText id="#{quantityFieldId}" value="#{articleItem.quantity}" styleClass="inputSmall" >
                     <a4j:support event="onblur" ajaxSingle="true"
-                                 reRender="productDataTable,#{amountFieldId},totalAmount"
+                                 reRender="productDataTable,#{amountFieldId},totalAmount, #{quantityFieldId}"
                                  actionListener="#{salesAction.calculateAmount(articleItem)}"/>
                 </h:inputText>
             </rich:column>
@@ -281,7 +281,10 @@
                 </h:inputText>
             </rich:column>
 
-            <rich:column></rich:column>
+            <rich:column>
+                <h:outputText value="#{articleItem.unitaryBalance}" />
+            </rich:column>
+
             <rich:column styleClass="center">
                 <s:div id="removeProductId">
                     <a4j:commandLink ajaxSingle="true"
