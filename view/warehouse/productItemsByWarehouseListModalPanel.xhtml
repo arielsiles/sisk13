@@ -8,7 +8,7 @@
                  xmlns:a4j="http://richfaces.org/a4j"
                  xmlns:app="http://encens.com/products/khipus/facelets"
                  id="#{dialogId}"
-                 onshow="jQuery('##{containerId}\\\\:productItemByWarehouseListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+                 onshow="jQuery('##{containerId}\\\\:productItemByWarehouseListForm\\\\:nameField\\\\:name').focus();">
     <f:facet name="header">
         <h:outputText>#{messages['ProductItem.list']}</h:outputText>
     </f:facet>
@@ -23,18 +23,20 @@
                          cellspacing="0"
                          border="0"
                          columnClasses="width50percent,width50percent">
-                <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
-                    <h:inputText id="productItemCode"
-                                 value="#{productItemByWarehouseDataModel.productItemCode}"
-                                 maxlength="150"
-                                 tabindex="1"
-                                 styleClass="input"/>
-                </s:decorate>
+
                 <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
                     <h:inputText id="name"
                                  value="#{productItemByWarehouseDataModel.productItemName}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+                    <h:inputText id="productItemCode"
+                                 value="#{productItemByWarehouseDataModel.productItemCode}"
                                  maxlength="150"
                                  tabindex="2"
                                  styleClass="input"/>
@@ -47,6 +49,7 @@
                         <s:defaultAction/>
                     </a4j:commandButton>
                 </s:decorate>
+
             </h:panelGrid>
         </rich:simpleTogglePanel>
         <br/>
@@ -83,18 +86,12 @@
 
                     <rich:column>#{messages['Inventory.physicalBalance']}</rich:column>
 
-                    <rich:column>
-                        <app:commandSortHeader sortProperty="inventory.unitaryBalance"
-                                               dataModel="#{productItemByWarehouseDataModel}"
-                                               reRender="productItemList, dataScroller">
-                            #{messages['Inventory.unitaryBalance']}
-                        </app:commandSortHeader>
-                    </rich:column>
+
                     <rich:column>
                         <app:commandSortHeader sortProperty="inventory.productItem.unitCost"
                                                dataModel="#{productItemByWarehouseDataModel}"
                                                reRender="productItemList, dataScroller">
-                            #{messages['ProductItem.unitCost']}
+                            #{messages['ProductItem.salePrice']}
                         </app:commandSortHeader>
                     </rich:column>
 
@@ -114,18 +111,14 @@
             <rich:column>
                 <h:outputText value="#{inventoryItem.productItem.name}"/>
             </rich:column>
+
             <rich:column styleClass="right">
                 <h:outputText value="#{inventoryItem.unitaryBalance}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
             </rich:column>
             <rich:column styleClass="right">
-                <h:outputText value="#{inventoryItem.unitaryBalance}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                </h:outputText>
-            </rich:column>
-            <rich:column styleClass="right">
-                <h:outputText value="#{inventoryItem.productItem.unitCost}">
+                <h:outputText value="#{inventoryItem.productItem.salePrice}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
                 </h:outputText>
             </rich:column>

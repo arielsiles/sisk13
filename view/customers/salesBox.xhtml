@@ -281,8 +281,9 @@
                 </h:inputText>
             </rich:column>
 
-            <rich:column>
-                <h:outputText value="#{articleItem.unitaryBalance}" />
+            <rich:column styleClass="center">
+                <!--<h:outputText value="#{articleItem.unitaryBalance}" />-->
+                <h:outputText value="#{salesAction.getUnitaryBalance(articleItem)}" />
             </rich:column>
 
             <rich:column styleClass="center">

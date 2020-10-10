@@ -66,7 +66,6 @@
         <div class="buttonsRight">
             <a4j:commandButton id="confirmRegisterNoInvoiceButton" value="Registrar SF"
                                action="#{salesAction.registerCashSaleNoInvoice()}"
-                               disabled="#{salesAction.zeroProduct}"
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
             />
@@ -75,7 +74,6 @@
             </h:commandButton>
             <a4j:commandButton id="confirmRegisterButton" value="Registrar"
                                action="#{salesAction.registerCashSale()}"
-                               disabled="#{salesAction.zeroProduct}"
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
             />

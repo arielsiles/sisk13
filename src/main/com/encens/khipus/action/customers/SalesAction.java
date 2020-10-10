@@ -146,21 +146,33 @@ public class SalesAction {
         addProduct();
     }
 
-    public void addProduct(){
-        System.out.println("--------> productItemFullName: " + productItemFullName);
-        System.out.println("--------> Producto: " + productItem);
-
-        if (client == null) return;
+    public Boolean isThereInventory(ProductItem productItem){
+        Boolean result = Boolean.TRUE;
 
         BigDecimal unitaryBalance = inventoryService.findUnitaryBalanceByProductItemAndArticle(productItem.getWarehouse().getId(), productItem.getId());
         if (unitaryBalance.compareTo(BigDecimal.ZERO) <= 0){
+            result = Boolean.FALSE;
+        }
+
+        return result;
+    }
+
+    public BigDecimal getUnitaryBalance(ArticleOrder articleOrder){
+        BigDecimal result = inventoryService.findUnitaryBalanceByProductItemAndArticle(articleOrder.getProductItem().getWarehouse().getId(), articleOrder.getProductItem().getId());
+        return  result;
+    }
+
+    public void addProduct(){
+
+        if (client == null) return;
+
+        if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
         }
 
 
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
-            System.out.println("------>>> contains(productItemCode): " + productItemCodesSelected.contains(productItem.getProductItemCode()));
             clearProduct();
             return;
         }
@@ -181,7 +193,7 @@ public class SalesAction {
         articleOrder.setCu(BigDecimal.ZERO);
         articleOrder.setUnitCost(BigDecimal.ZERO);
         articleOrder.setPrice(productItem.getSalePrice().doubleValue());
-        articleOrder.setUnitaryBalance(unitaryBalance);
+        articleOrder.setUnitaryBalance(inventoryService.findUnitaryBalanceByProductItemAndArticle(productItem.getWarehouse().getId(), productItem.getId()));
 
         if (getPriceItemListMap() != null){
             BigDecimal price = getPriceItemListMap().get(productItem.getProductItemCode());
@@ -232,7 +244,8 @@ public class SalesAction {
 
     public void calculateAmount(ArticleOrder articleOrder){
 
-        if (articleOrder.getQuantity() > articleOrder.getUnitaryBalance().intValue()){
+        //if (articleOrder.getQuantity() >  articleOrder.getUnitaryBalance().intValue()){
+        if (articleOrder.getQuantity() >  getUnitaryBalance(articleOrder).intValue()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
             articleOrder.setQuantity(0);
         }
@@ -247,8 +260,7 @@ public class SalesAction {
         setZeroProduct(Boolean.FALSE);
         for (ArticleOrder articleOrder:articleOrderList){
             result = BigDecimalUtil.sum(result, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
-            if (articleOrder.getQuantity() == 0)
-                setZeroProduct(Boolean.TRUE);
+            if (articleOrder.getQuantity() == 0) setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
         }
         setTotalAmount(result);
         return result;
@@ -300,18 +312,36 @@ public class SalesAction {
     public void registerCashSale(){
         System.out.println("......Registrando Venta al Contado...");
 
+        if (client == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar un cliente !");
+            return;
+        }
+
+        if (articleOrderList.isEmpty()){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar al menos un producto !");
+            return;
+        }
+
+        if (zeroProduct){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Revisar productos con cantidad CERO !");
+            return;
+        }
+
+
         CustomerOrder customerOrder = createSale();
-        Movement movement = createInvoice(customerOrder);
-        customerOrder.setMovement(movement);
-        Voucher voucher = accountingCashSale(customerOrder, movement);
-        customerOrder.setVoucher(voucher);
-        customerOrder.setAccounted(Boolean.TRUE);
-        saleService.updateCustomerOrder(customerOrder);
+        if (customerOrder!= null) {
+            Movement movement = createInvoice(customerOrder);
+            customerOrder.setMovement(movement);
+            Voucher voucher = accountingCashSale(customerOrder, movement);
+            customerOrder.setVoucher(voucher);
+            customerOrder.setAccounted(Boolean.TRUE);
+            saleService.updateCustomerOrder(customerOrder);
 
-        inventoryService.updateInventoryForSales(customerOrder);
+            inventoryService.updateInventoryForSales(customerOrder);
 
-        clearAll();
-        assignCustomerOrderTypeDefault();
+            clearAll();
+            assignCustomerOrderTypeDefault();
+        }
     }
 
     public void registerCashSaleNoInvoice(){
@@ -331,6 +361,15 @@ public class SalesAction {
         System.out.println("------------> user: " + currentUser);
         System.out.println("------------> tipo pedido: " + customerOrderType);
         System.out.println("------------> Subsidio: " + this.subsidyEnun);
+
+        /** Verifica existencia de inventario antes de registrar la venta **/
+        for (ArticleOrder articleOrder : articleOrderList){
+            if (!isThereInventory(articleOrder.getProductItem())){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
+                return null;
+            }
+        }
+
         observation = (observation == null) ? "" : observation;
         CustomerOrder customerOrder = new CustomerOrder();
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
