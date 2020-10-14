@@ -300,18 +300,7 @@ public class SalesAction {
         setMoneyReturned(BigDecimal.ZERO);
     }
 
-    public void registerSale(){
-        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
-        System.out.println("------------> Description: " + getObservation());
-        System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
-        createSale();
-        clearAll();
-        assignCustomerOrderTypeDefault();
-    }
-
-    public void registerCashSale(){
-        System.out.println("......Registrando Venta al Contado...");
-
+    public void checkMinimumValues(){
         if (client == null) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar un cliente !");
             return;
@@ -326,7 +315,26 @@ public class SalesAction {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Revisar productos con cantidad CERO !");
             return;
         }
+    }
 
+    public void registerSale(){
+        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
+        System.out.println("------------> Description: " + getObservation());
+        System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
+
+        checkMinimumValues();
+
+        CustomerOrder customerOrder = createSale();
+
+        inventoryService.updateInventoryForSales(customerOrder);
+
+        clearAll();
+        assignCustomerOrderTypeDefault();
+    }
+
+    public void registerCashSale(){
+        System.out.println("......Registrando Venta al Contado...");
+        checkMinimumValues();
 
         CustomerOrder customerOrder = createSale();
         if (customerOrder!= null) {
