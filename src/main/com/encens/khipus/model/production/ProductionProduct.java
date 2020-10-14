@@ -193,4 +193,15 @@ public class ProductionProduct implements BaseModel {
     public void setUnitCost(BigDecimal unitCost) {
         this.unitCost = unitCost;
     }
+
+    /*public Boolean zeroOrNullQuantity(){
+        Boolean result = Boolean.FALSE;
+
+        if (getId() == null)
+            if (getQuantity().compareTo(BigDecimal.ZERO) == 0 || getQuantity() == null )
+                result = Boolean.TRUE;
+
+        return  result;
+    }*/
+
 }

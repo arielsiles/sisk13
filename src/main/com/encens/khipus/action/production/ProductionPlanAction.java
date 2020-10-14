@@ -15,6 +15,7 @@ import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
 import com.encens.khipus.service.production.ProductionPlanService;
 import com.encens.khipus.service.production.ProductionService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -520,14 +521,19 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
             product.setCost(BigDecimal.ZERO);
             product.setProductItemCode(productItem.getProductItemCode());
             product.setProductItem(productItem);
+            product.setQuantity(BigDecimal.ZERO);
             productList.add(product);
         }
     }
 
+    @In
+    private InventoryService inventoryService;
+
     public void removeProduct(ProductionProduct product){
         productList.remove(product);
         productionPlanService.removeProduct(product);
-
+        inventoryService.updateInventoryRemoveFromProduction(product);
+        productionPlanService.updateProductItemRemoveFromProduction(product);
     }
 
     public String hasProduction(ProductionProduct productionProduct){

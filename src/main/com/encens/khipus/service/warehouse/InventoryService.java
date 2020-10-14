@@ -2,6 +2,7 @@ package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.warehouse.*;
 
 import javax.ejb.Local;
@@ -26,4 +27,6 @@ public interface InventoryService extends GenericService {
     InventoryDetail findInventoryDetailByProductItemCode(String productItemCode);
     public Warehouse findWarehouseByItemArticle(ProductItem productItem);
     void updateInventoryForSales(CustomerOrder customerOrder);
+    void updateInventoryForProduction(ProductionProduct product);
+    void updateInventoryRemoveFromProduction(ProductionProduct product);
 }

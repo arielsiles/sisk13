@@ -23,4 +23,7 @@ public interface ProductionPlanService {
     double findTotalWeighed(Date date);
     List<ProductionPlan> getProductionPlanList(Date startDate, Date endDate);
 
+    void updateProductForProduction(ProductionProduct product);
+    void updateProductItemRemoveFromProduction(ProductionProduct product);
+
 }

@@ -200,6 +200,7 @@
                                 <c:if test="#{!productionPlanAction.hasProduction2(productItem)}">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{productItem.quantity}"
+                                             disabled="#{productItem.id != null}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="productsPanel" />

@@ -3,6 +3,7 @@ package com.encens.khipus.service.warehouse;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -79,6 +80,42 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
             saleService.updateArticleForOutputs(articleOrder);
         }
 
+    }
+
+    @Override
+    public void updateInventoryForProduction(ProductionProduct product){
+
+        Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
+        System.out.println("-----------> **** ACTUALIZANDO PRODUCTO PARA PRODUCCION Inventory: " + inventory.getProductItem().getFullName());
+        BigDecimal requiredQuantity = BigDecimalUtil.toBigDecimal(product.getQuantity());
+        BigDecimal availableQuantity = inventory.getUnitaryBalance();
+        BigDecimal newAvailableQuantity = BigDecimalUtil.sum(availableQuantity, requiredQuantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(product.getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
+    }
+
+    @Override
+    public void updateInventoryRemoveFromProduction(ProductionProduct product){
+
+        Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
+        System.out.println("-----------> **** REMOVE PRODUCTO PRODUCCION Inventory: " + inventory.getProductItem().getFullName());
+        BigDecimal requiredQuantity = BigDecimalUtil.toBigDecimal(product.getQuantity());
+        BigDecimal availableQuantity = inventory.getUnitaryBalance();
+        BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(product.getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
     }
 
     @Override

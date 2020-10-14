@@ -3,6 +3,9 @@ package com.encens.khipus.service.production;
 import com.encens.khipus.model.production.CollectionForm;
 import com.encens.khipus.model.production.ProductionPlan;
 import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.warehouse.InventoryService;
+import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -10,6 +13,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +32,9 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
     @In(value = "#{entityManager}")
     private EntityManager em;
 
+    @In
+    private InventoryService inventoryService;
+
     public void updateProductionPlan(ProductionPlan productionPlan, List<ProductionProduct> productList){
 
         for (ProductionProduct product : productList){
@@ -35,6 +42,10 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
                 product.setProductionPlan(productionPlan);
                 em.persist(product);
                 em.flush();
+
+                updateProductForProduction(product);
+                inventoryService.updateInventoryForProduction(product);
+
             }else {
                 em.merge(product);
                 em.flush();
@@ -96,4 +107,43 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         return productionPlanList;
     }
 
+    @Override
+    public void updateProductForProduction(ProductionProduct product) {
+
+        ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
+
+        /** Actualiza CT **/
+        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(product.getQuantity()), 6);
+        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), total, 6);
+        productItem.setCt(newTotalCost);
+
+        /** Actualiza Saldo_Mon **/
+        BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(product.getQuantity()));
+        BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), totalCost, 6);
+        productItem.setInvestmentAmount(newInvestmentAmount);
+
+        em.merge(productItem);
+        em.flush();
+
+    }
+
+    @Override
+    public void updateProductItemRemoveFromProduction(ProductionProduct product) {
+
+        ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
+
+        /** Actualiza CT **/
+        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(product.getQuantity()), 6);
+        BigDecimal newTotalCost = BigDecimalUtil.subtract(productItem.getCt(), total, 6);
+        productItem.setCt(newTotalCost);
+
+        /** Actualiza Saldo_Mon **/
+        BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(product.getQuantity()));
+        BigDecimal newInvestmentAmount = BigDecimalUtil.subtract(productItem.getInvestmentAmount(), totalCost, 6);
+        productItem.setInvestmentAmount(newInvestmentAmount);
+
+        em.merge(productItem);
+        em.flush();
+
+    }
 }
