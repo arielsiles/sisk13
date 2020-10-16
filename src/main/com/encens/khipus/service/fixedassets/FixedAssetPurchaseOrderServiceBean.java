@@ -299,7 +299,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
             for (int i = 0; i < requestedQuantity; i++) {
                 FixedAsset fixedAsset = new FixedAsset();
-                fixedAsset.setState(FixedAssetState.PEN);
+                fixedAsset.setState(FixedAssetState.VIG);
                 fixedAsset.setCurrencyType(FinancesCurrencyType.P);
                 fixedAsset.setAcumulatedDepreciation(BigDecimal.ZERO);
                 fixedAsset.setImprovement(BigDecimal.ZERO);
