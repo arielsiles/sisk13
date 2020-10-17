@@ -264,6 +264,15 @@
                         value="#{messages['menu.customers.configuration.bank']}"
                         propagation="none"/>
             </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('NULLIFYSALE','VIEW')}">
+                <s:link view="/customers/nullifySale.xhtml"
+                        value="#{messages['menu.customers.configuration.nullifySale']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
         </rich:dropDownMenu>
     </h:panelGrid>
 </rich:tab>

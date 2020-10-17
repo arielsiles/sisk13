@@ -10,4 +10,5 @@ alter table cajausuario add foreign key (idcaja) references caja (idcaja);
 alter table cajausuario add foreign key (idusuario) references usuario (idusuario);
 
 
--- 08.10.2020
+-- 17.10.2020
+insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 15, 'menu.customers.configuration.nullifySale', 1);

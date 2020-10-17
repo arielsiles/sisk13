@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Sales.nullifySale']}</ui:define>
+<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+<h:form id="bankForm">
+
+    <div class="buttons">
+
+        <h:commandButton value="#{messages['Sales.nullify']}"
+                         styleClass="button">
+            <rich:componentControl for="nullifyConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{nullifySaleAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+
+
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">#{messages['Sales.nullifySale']}</f:facet>
+
+
+        <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.date']}</ui:define>
+            <rich:calendar value="#{nullifySaleAction.date}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="1"
+                           required="true">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+        <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.saleType']}</ui:define>
+            <h:selectOneMenu id="saleType" value="#{nullifySaleAction.saleType}"
+                             styleClass="input" tabindex="6">
+                <s:selectItems value="#{saleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.saleNumber']}</ui:define>
+            <h:inputText id="code"
+                         value="#{nullifySaleAction.code}"
+                         styleClass="input" />
+            <a4j:commandButton id="amountTransferButtonId"
+                               value="#{messages['Sales.nullifySale.search']}"
+                               action="#{nullifySaleAction.findSale()}" reRender="nameField, invoiceField, totalAmountField"
+                               styleClass="button"
+                               tabindex="4">
+                <s:defaultAction/>
+            </a4j:commandButton>
+        </s:decorate>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.name']}</ui:define>
+            <h:outputText id="name"
+                         value="#{nullifySaleAction.name}"
+                         styleClass="input" />
+        </s:decorate>
+
+        <s:decorate id="invoiceField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.invoice']}</ui:define>
+            <h:outputText id="invoice"
+                          value="#{nullifySaleAction.invoiceNumber}"
+                          styleClass="input" />
+        </s:decorate>
+
+        <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Sales.nullifySale.totalAmount']}</ui:define>
+            <h:outputText id="totalAmount"
+                          value="#{nullifySaleAction.totalAmount}"
+                          styleClass="input" >
+                <app:realNumberConverter forId="totalAmount" pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+
+    </rich:panel>
+
+
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml">
+    <ui:param name="dialogId" value="nullifyConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['Sales.nullifySale.messageNullifyConfirmation']}" />
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{nullifySaleAction.annulSale()}"
+                           value="#{messages['Common.confirm']}"
+                           immediate="true"
+                           tabindex="21"
+                           styleClass="button">
+            <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+        </a4j:commandButton>
+    </ui:define>
+</s:decorate>
+
+</ui:define>
+</ui:composition>

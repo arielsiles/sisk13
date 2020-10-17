@@ -5,6 +5,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -15,6 +16,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Stateless
 @Name("saleService")
@@ -92,5 +94,20 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
         em.merge(productItem);
         em.flush();
 
+    }
+
+    @Override
+    public CustomerOrder findCustomerOrderByParams(SaleTypeEnum saleType, Date date, String code) {
+
+        CustomerOrder customerOrder = (CustomerOrder)em.createQuery("select c from CustomerOrder c" +
+                " where c.saleType =:saleType " +
+                " and c.orderDate =:date " +
+                " and c.code =:code ")
+                .setParameter("saleType", saleType)
+                .setParameter("date", date)
+                .setParameter("code", new Long(code))
+                .getSingleResult();
+
+        return customerOrder;
     }
 }
