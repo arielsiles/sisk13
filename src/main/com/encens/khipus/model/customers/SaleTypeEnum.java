@@ -1,8 +1,8 @@
 package com.encens.khipus.model.customers;
 
 public enum SaleTypeEnum {
-    CASH("VENTADIRECTA", "SaleType.cashSale"),
-    CREDIT("SECUENCIAPEDIDO", "SaleType.creditSale");
+    CASH("VENTADIRECTA", "SaleType.cash"),
+    CREDIT("SECUENCIAPEDIDO", "SaleType.credit");
 
     private String sequenceName;
     private String resourceKey;

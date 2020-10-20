@@ -355,4 +355,14 @@ public class CustomerOrder implements BaseModel  {
     public void setDealerAmount(BigDecimal dealerAmount) {
         this.dealerAmount = dealerAmount;
     }
+
+    public String getInvoiceNumber(){
+        String result = "";
+
+        if (getMovement() != null){
+            result = getMovement().getNumber().toString();
+        }
+
+        return result;
+    }
 }
