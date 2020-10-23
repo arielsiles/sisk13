@@ -909,6 +909,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             //voucherService.create(voucherForGeneration);
             getEntityManager().persist(fixedAssetMovement);
             getEntityManager().flush();
+            voucherForGeneration.setDocumentType(Constants.CD_VOUCHER_DOCTYPE);
             voucherAccoutingService.saveVoucher(voucherForGeneration);
             fixedAssetMovement.setTransactionNumber(voucherForGeneration.getTransactionNumber());
             getEntityManager().merge(fixedAssetMovement);

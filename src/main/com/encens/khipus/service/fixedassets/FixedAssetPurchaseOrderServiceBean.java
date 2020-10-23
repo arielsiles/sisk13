@@ -535,7 +535,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
         voucher.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
-        voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
+        voucher.setDocumentType(Constants.CD_VOUCHER_DOCTYPE);
 
         if (CollectionDocumentType.INVOICE.equals(purchaseOrder.getDocumentType())) {
 

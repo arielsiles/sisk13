@@ -681,7 +681,8 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
     @SuppressWarnings({"UnusedDeclaration"})
     public void computePayment() {
         /* in case of improvement*/
-        if (isManaged() && getInstance().getState().equals(FixedAssetState.VIG)) {
+        //if (isManaged() && getInstance().getState().equals(FixedAssetState.VIG)) {
+        if (isManaged()) {
             computePaymentForImprovement();
         } else {
             /* in case of registration*/

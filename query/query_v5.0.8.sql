@@ -10,9 +10,9 @@ set a.`precio_venta` = v.`PRECIO`
 where a.`cod_alm` = 5
 ;
 
-alter table tipocaja add column cuentacaja varchar(20) after nombre;
-alter table tipocaja add column cuentaingreso varchar(20) after cuentacaja;
-alter table tipocaja add column no_cia varchar(2) after cuentaingreso;
+alter table tipocaja add column cuentacaja varchar(20) after nombre; 		-- ejec en ilva
+alter table tipocaja add column cuentaingreso varchar(20) after cuentacaja;	-- ejec en ilva
+alter table tipocaja add column no_cia varchar(2) after cuentaingreso;		-- ejec en ilva
 
 -- Crear Tipos de Caja: GAF > Configuracion > Tipos de caja
 -- Crear Cajaa: GAF > Configuracion > Cajas
