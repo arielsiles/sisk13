@@ -537,6 +537,9 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
             return Outcome.REDISPLAY;
         }
         try {
+
+            gloss = getInstance().getDetail() + " (" + MessageUtils.getMessage("FixedAssetVoucher.info.fixedAssetDown") + ") " + gloss;
+
             fixedAssetMovement.setBsUfvRate(financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.U.name()));
             fixedAssetMovement.setBsSusRate(financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.name()));
             fixedAssetService.dischargeFixedAsset(getInstance(), gloss, fixedAssetMovement, fixedAssetMovementType);

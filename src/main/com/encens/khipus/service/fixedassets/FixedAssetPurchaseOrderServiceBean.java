@@ -335,6 +335,8 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 fixedAsset.setCustodianJobContract(fixedAssetPurchaseOrderDetail.getCustodianJobContract());
                 fixedAsset.setRegistrationDate(purchaseOrder.getReceptionDate());
 
+                fixedAsset = fixedAssetService.generateCodes(fixedAsset);
+
                 try {
                     //this is gonna persist the entity if it is not managed and if for some reason the entity was already added
                     // to the entity manager (duplicated exceptions), the next time it will persist the entity

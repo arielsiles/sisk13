@@ -112,6 +112,17 @@
                      tabindex="43">
         </h:inputText>
     </s:decorate>
+
+    <s:decorate id="glossDischargeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['FixedAsset.gloss']}</ui:define>
+        <h:inputTextarea id="glossDischarge" value="#{fixedAssetAction.gloss}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="44">
+            <f:validateLength maximum="250"/>
+        </h:inputTextarea>
+    </s:decorate>
+
 </app:fieldset>
 
 <!--detalle-->
