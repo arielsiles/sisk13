@@ -64,4 +64,7 @@
     <factory name="distributorList" value="#{distributorQuery}"/>
     <framework:entity-query name="distributorQuery" ejbql="select d from Distributor d "/>
 
+    <factory name="customerSaleTypes"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.customers.SaleTypeEnum')}"/>
+
 </components>

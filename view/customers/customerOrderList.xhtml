@@ -1,0 +1,175 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['CashSale.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="customerOrderSearch">
+
+        <rich:simpleTogglePanel label="#{messages['CustomerOrder.search']}" switchType="customerOrder">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+
+                <s:div id="leftSidePanel">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Client.name']}</ui:define>
+                        <h:inputText id="name" value="#{customerOrderDataModel.name}"
+                                     maxlength="80" tabindex="1" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Client.lastName']}</ui:define>
+                        <h:inputText id="lastName" value="#{customerOrderDataModel.lastName}"
+                                     maxlength="80" tabindex="2" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
+                        <h:inputText id="maidenName" value="#{customerOrderDataModel.maidenName}"
+                                     maxlength="80" tabindex="3" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+
+                <s:div id="rightSidePanel">
+
+                    <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
+                        <h:selectOneMenu id="saleType" value="#{customerOrderDataModel.saleType}"
+                                         styleClass="inputMedium" tabindex="4">
+                            <s:selectItems value="#{customerSaleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
+                                           hideNoSelectionLabel="false"
+                                           noSelectionLabel=""/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.date']}</ui:define>
+                        <rich:calendar id="initDate" value="#{customerOrderDataModel.initDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </rich:calendar>
+
+                        <rich:calendar id="endDate" value="#{customerOrderDataModel.endDate}"
+                                       inputClass="inputSmall"
+                                       datePattern="#{messages['patterns.date']}"
+                                       enableManualInput="true"
+                                       tabindex="5">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.code']}</ui:define>
+                        <h:inputText id="code" value="#{customerOrderDataModel.criteria.code}"
+                                     maxlength="150" tabindex="6" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.invoice']}</ui:define>
+                        <h:inputText id="invoice" value="#{customerOrderDataModel.invoice}"
+                                     maxlength="150" tabindex="7" styleClass="input">
+                        </h:inputText>
+                        <a4j:commandButton action="#{customerOrderDataModel.search}"
+                                           reRender="customerOrderList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+            <rich:spacer height="10" />
+
+            <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="5%, 10%, 10%, 30%, 10%, 10%, 10%, 10%, 5%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['CustomerOrder.date']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.saleType']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.code']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.name']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.invoice']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.total']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.state']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.type']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.orderDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[customerOrder.saleType.resourceKey]}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.code}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{customerOrder.client.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.getInvoiceNumber()}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{customerOrder.totalAmount}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.state}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.customerOrderType.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    &#160;
+                    <h:commandLink action="#"
+                                   immediate="true">
+                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+                                        title="#{messages['Voucher.report.generateReport']}"/>
+                    </h:commandLink>
+                </rich:column>
+
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="customerOrderList" dataModel="#{customerOrderDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/customers/documentType.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('DOCUMENTTYPE','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

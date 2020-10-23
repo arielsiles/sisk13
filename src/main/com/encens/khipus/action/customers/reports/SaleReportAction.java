@@ -1,7 +1,6 @@
 package com.encens.khipus.action.customers.reports;
 
 import com.encens.khipus.action.SessionUser;
-import com.encens.khipus.action.customers.SalesAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
@@ -43,8 +42,8 @@ public class SaleReportAction extends GenericReportAction {
     @In
     private SaleService saleService;
 
-    @In
-    private SalesAction salesAction;
+    /*@In
+    private SalesAction salesAction;*/
 
     private Long customerOrderId;
     private CustomerOrder lastCustomerOrder;
@@ -82,8 +81,10 @@ public class SaleReportAction extends GenericReportAction {
             e.printStackTrace();
         }
 
-        setCustomerOrderId(saleService.findLastSaleId(currentUser));
-        setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()) );
+        if (lastCustomerOrder != null) {
+            setCustomerOrderId(saleService.findLastSaleId(currentUser));
+            setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()));
+        }
 
         Double subtotal = lastCustomerOrder.getTotalAmount();
         Double discount = lastCustomerOrder.getCommissionValue();
