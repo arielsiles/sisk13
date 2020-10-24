@@ -19,3 +19,6 @@ insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 1, 'menu.customer
 
 insert into af_tipomovs values('01', 'MEJ', 'MEJORA', 'MEJ', 'VIG', 0);
 insert into af_tipomovs values('01', 'TRA', 'TRANSFERENCIA', 'TRA', 'VIG', 0);
+
+
+update af_subgrupos a set a.`ctamej` = a.`ctadavo`;

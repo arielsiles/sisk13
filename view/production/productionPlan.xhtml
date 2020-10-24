@@ -197,6 +197,16 @@
                                 <h:outputText value="#{productItem.productItem.name}"/>
                             </td>
                             <td class="rich-table-cell" align="center">
+
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#"
+                                                 ajaxSingle="true">
+                                    <h:graphicImage value="/img/arrowDown.png" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+
+                                <rich:spacer width="5"/>
+
                                 <c:if test="#{!productionPlanAction.hasProduction2(productItem)}">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{productItem.quantity}"
@@ -212,6 +222,17 @@
                                         <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="#{quantityInputFieldId}"/>
                                     </h:outputText>
                                 </c:if>
+
+                                <rich:spacer width="5"/>
+
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#"
+                                                 ajaxSingle="true"
+                                                 oncomplete="Richfaces.showModalPanel('add');">
+                                    <h:graphicImage value="/img/arrowUp.png" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+
                             </td>
                             <td class="rich-table-cell" align="center">
                                 <h:outputText value="#{productionPlanAction.hasProduction(productItem)}"/>
