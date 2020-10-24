@@ -971,6 +971,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             fixedAssetPayment.setState(FixedAssetPaymentState.APPROVED);
             fixedAssetPayment.setPayAmount(fixedAssetMovement.getBsAmount());
             fixedAssetPayment.setCreationDate(new Date());
+            fixedAssetPayment.setDescription(gloss);
 
             if (fixedAssetPayment.getExchangeRate() == null) {
                 fixedAssetPayment.setExchangeRate(BigDecimal.ONE);
@@ -995,7 +996,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                     VoucherDetailBuilder.newDebitVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
                             fixedAsset.getFixedAssetSubGroup().getOriginalValueCashAccount(),
-                            fixedAssetMovement.getBsAmount(),
+                            netAmount,
                             FinancesCurrencyType.P, BigDecimal.ONE)
             );
 

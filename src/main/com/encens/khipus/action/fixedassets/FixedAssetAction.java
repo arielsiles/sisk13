@@ -609,6 +609,7 @@ public class FixedAssetAction extends GenericAction<FixedAsset> {
             getInstance().setPhoto(null);
         }
         try {
+            gloss = ("¡COMPLETAR C.F.! ") + getInstance().getDetail() + " (" + MessageUtils.getMessage("FixedAssetVoucher.info.fixedAssetImprovement") + ") " + gloss;
             fixedAssetService.positiveImprovementFixedAsset(getInstance(), gloss, fixedAssetMovement, fixedAssetMovementType, getFixedAssetPaymentInstance());
             facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "FixedAssetmovement.info.positiveImproveSucceed");
             return com.encens.khipus.framework.action.Outcome.SUCCESS;

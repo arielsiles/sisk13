@@ -156,7 +156,7 @@
                     <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['FixedAssetPayment.description']}</ui:define>
                         <h:inputTextarea id="description"
-                                         value="#{fixedAssetPayment.description}"
+                                         value="#{fixedAssetAction.gloss}"
                                          styleClass="input textarea"
                                          required="true"
                                          tabindex="1005">
