@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voletaDePago" pageWidth="612" pageHeight="395" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="2.5937424601000036"/>
-	<property name="ireport.x" value="379"/>
-	<property name="ireport.y" value="210"/>
+	<property name="ireport.zoom" value="2.143588810000003"/>
+	<property name="ireport.x" value="685"/>
+	<property name="ireport.y" value="25"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="hora" class="java.util.Date"/>
@@ -110,7 +110,7 @@
 		<defaultValueExpression><![CDATA[$P{totalAlcohol}+$P{credConcentrados}-$P{debConcentrados}]]></defaultValueExpression>
 	</parameter>
 	<parameter name="totalCredito" class="java.lang.Double">
-		<defaultValueExpression><![CDATA[$P{totalConcentrados}+$P{credCredito}+$P{debCredito}]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[$P{totalConcentrados}+$P{credCredito}-$P{debCredito}]]></defaultValueExpression>
 	</parameter>
 	<parameter name="totalVeterinario" class="java.lang.Double">
 		<defaultValueExpression><![CDATA[$P{totalCredito}+$P{credVeterinario}-$P{debVeterinario}]]></defaultValueExpression>
