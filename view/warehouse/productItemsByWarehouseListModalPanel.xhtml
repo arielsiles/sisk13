@@ -24,15 +24,6 @@
                          border="0"
                          columnClasses="width50percent,width50percent">
 
-                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
-                    <h:inputText id="name"
-                                 value="#{productItemByWarehouseDataModel.productItemName}"
-                                 maxlength="150"
-                                 tabindex="1"
-                                 styleClass="input"/>
-                </s:decorate>
-
                 <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
                     <h:inputText id="productItemCode"
@@ -48,6 +39,15 @@
                                        tabindex="3">
                         <s:defaultAction/>
                     </a4j:commandButton>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{productItemByWarehouseDataModel.productItemName}"
+                                 maxlength="150"
+                                 tabindex="1"
+                                 styleClass="input"/>
                 </s:decorate>
 
             </h:panelGrid>

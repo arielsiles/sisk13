@@ -198,11 +198,13 @@
                             </td>
                             <td class="rich-table-cell" align="center">
 
-                                <a4j:commandLink immediate="true"
-                                                 title="#{messages['Common.remove']}"
-                                                 action="#"
-                                                 ajaxSingle="true">
-                                    <h:graphicImage value="/img/arrowDown.png" styleClass="select-image-middle"/>
+                                <a4j:commandLink title="#{messages['Common.remove']}"
+                                                 immediate="true"
+                                                 action="#{productionPlanAction.assignProductToSubtract(productItem)}"
+                                                 ajaxSingle="true"
+                                                 oncomplete="Richfaces.showModalPanel('removeProductQuantityModalPanel');"
+                                                 reRender="productsPanel, removeProductQuantityModalPanel">
+                                    <h:graphicImage value="/img/minus.png" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
 
                                 <rich:spacer width="5"/>
@@ -225,12 +227,13 @@
 
                                 <rich:spacer width="5"/>
 
-                                <a4j:commandLink immediate="true"
-                                                 title="#{messages['Common.remove']}"
-                                                 action="#"
+                                <a4j:commandLink title="#{messages['Common.add']}"
+                                                 immediate="true"
+                                                 action="#{productionPlanAction.assignProductToSum(productItem)}"
                                                  ajaxSingle="true"
-                                                 oncomplete="Richfaces.showModalPanel('add');">
-                                    <h:graphicImage value="/img/arrowUp.png" styleClass="select-image-middle"/>
+                                                 oncomplete="Richfaces.showModalPanel('addProductQuantityModalPanel');"
+                                                 reRender="productsPanel, addProductQuantityModalPanel">
+                                    <h:graphicImage value="/img/more.png" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
 
                             </td>
@@ -240,13 +243,23 @@
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{productionPlanAction.removeProduct(productItem)}"
+                                                 action="#{productionPlanAction.setProductToRemove(productItem)}"
                                                  ajaxSingle="true"
                                                  rendered="#{!productionPlanAction.hasProduction2(productItem)}"
                                                  reRender="productsPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                                           operation="show"/>
                                 </a4j:commandLink>
+
+                                <!--<h:commandButton value="#{messages['Common.delete']}" action="#{productionPlanAction.removeProduct(productItem)}" styleClass="button">
+                                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                                           operation="show"/>
+                                </h:commandButton>-->
+
                             </td>
+
+
                         </tr>
                     </c:forEach>
 
@@ -274,6 +287,34 @@
         </ui:define>
     </s:decorate>
 
+    <s:decorate template="/include/modalDialog.xhtml">
+        <ui:param name="dialogId" value="deleteConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductionPlan.product.delete.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionPlanAction.removeProductionProduct()}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               styleClass="button"
+                               reRender="productsPanel">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </a4j:commandButton>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="addProductQuantityPanelContainer" template="/customers/addProductQuantityModalPanel.xhtml">
+        <ui:param name="containerId" value="addProductQuantityModalPanelContainer"/>
+        <ui:param name="dialogId" value="addProductQuantityModalPanel"/>
+    </s:decorate>
+
+    <s:decorate id="removeProductQuantityPanelContainer" template="/customers/removeProductQuantityModalPanel.xhtml">
+        <ui:param name="containerId" value="removeProductQuantityModalPanelContainer"/>
+        <ui:param name="dialogId" value="removeProductQuantityModalPanel"/>
+    </s:decorate>
 
 </ui:define>
 </ui:composition>

@@ -61,6 +61,14 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     private Gestion gestion;
     private Month month;
 
+    private ProductionProduct previousProduct;
+    private ProductionProduct productToRemove;
+    private ProductionProduct productToSum;
+    private ProductionProduct productToSubtract;
+    private BigDecimal quantitySum;
+    private BigDecimal quantitySubtract;
+    private String gloss;
+
     @Factory(value = "productionPlan", scope = ScopeType.STATELESS)
     public ProductionPlan initProductionPlan() {
         return getInstance();
@@ -102,6 +110,60 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         productionAction.setProductionPlan(getInstance());
         /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
+    }
+
+    public void assignProductToSum(ProductionProduct productionProduct) {
+        setPreviousProduct(productionProduct);
+        productToSum = new ProductionProduct();
+        productToSum.setProductItem(productionProduct.getProductItem());
+        productToSum.setProductItemCode(productionProduct.getProductItem().getProductItemCode());
+        productToSum.setQuantity(BigDecimal.ZERO);
+    }
+
+    public void assignProductToSubtract(ProductionProduct productionProduct) {
+        setPreviousProduct(productionProduct);
+        productToSubtract = new ProductionProduct();
+        productToSubtract.setProductItem(productionProduct.getProductItem());
+        productToSubtract.setProductItemCode(productionProduct.getProductItem().getProductItemCode());
+        productToSubtract.setQuantity(BigDecimal.ZERO);
+    }
+
+    public void addQuantityProductionProduct(){
+        System.out.println("===================> Product sum: " + this.productToSum.getProductItem().getFullName2() + " - " + this.quantitySum);
+        this.productToSum.setQuantity(this.quantitySum);
+        previousProduct.setQuantity(BigDecimalUtil.sum(previousProduct.getQuantity(), quantitySum));
+
+        //Actualizar ProductItem
+        productionPlanService.updateProductForProduction(productToSum);
+        //Actualizar inventario
+        inventoryService.updateInventoryForProduction(productToSum);
+
+        clearAddProductQuantity();
+    }
+
+    public void removeQuantityProductionProduct(){
+        System.out.println("===================> Product remove: " + this.productToSubtract.getProductItem().getFullName2() + " - " + this.quantitySubtract);
+        this.productToSubtract.setQuantity(this.quantitySubtract);
+        previousProduct.setQuantity(BigDecimalUtil.subtract(previousProduct.getQuantity(), quantitySubtract));
+
+        //Actualizar ProductItem
+        productionPlanService.updateProductItemRemoveFromProduction(productToSubtract);
+        //Actualizar inventario
+        inventoryService.updateInventoryRemoveFromProduction(productToSubtract);
+
+        clearRemoveProductQuantity();
+    }
+
+    public void clearAddProductQuantity(){
+        setQuantitySum(BigDecimal.ZERO);
+        setGloss(null);
+        setPreviousProduct(null);
+    }
+
+    public void clearRemoveProductQuantity(){
+        setQuantitySubtract(BigDecimal.ZERO);
+        setGloss(null);
+        setPreviousProduct(null);
     }
 
     public void calculateTotalInditectCost(){
@@ -530,10 +592,16 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
     private InventoryService inventoryService;
 
     public void removeProduct(ProductionProduct product){
-        productList.remove(product);
-        productionPlanService.removeProduct(product);
-        inventoryService.updateInventoryRemoveFromProduction(product);
-        productionPlanService.updateProductItemRemoveFromProduction(product);
+
+        if (product.getId() != null){
+            System.out.println("-----------------------------Z>>> Removing product: " + product.getProductItem().getFullName());
+            productList.remove(product);
+            productionPlanService.removeProduct(product);
+            inventoryService.updateInventoryRemoveFromProduction(product);
+            productionPlanService.updateProductItemRemoveFromProduction(product);
+        }else {
+            productList.remove(product);
+        }
     }
 
     public String hasProduction(ProductionProduct productionProduct){
@@ -637,6 +705,67 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
     public void setTotalVolumePeriod(BigDecimal totalVolumePeriod) {
         this.totalVolumePeriod = totalVolumePeriod;
+    }
+
+    public ProductionProduct getProductToRemove() {
+        return productToRemove;
+    }
+
+    public void setProductToRemove(ProductionProduct productToRemove) {
+        this.productToRemove = productToRemove;
+    }
+
+    public void removeProductionProduct(){
+        removeProduct(this.productToRemove);
+        setProductToRemove(null);
+    }
+
+    public ProductionProduct getProductToSum() {
+        return productToSum;
+    }
+
+    public void setProductToSum(ProductionProduct productToSum) {
+        this.productToSum = productToSum;
+    }
+
+    public BigDecimal getQuantitySum() {
+        return quantitySum;
+    }
+
+    public void setQuantitySum(BigDecimal quantitySum) {
+        this.quantitySum = quantitySum;
+    }
+
+    public BigDecimal getQuantitySubtract() {
+        return quantitySubtract;
+    }
+
+    public void setQuantitySubtract(BigDecimal quantitySubtract) {
+        this.quantitySubtract = quantitySubtract;
+    }
+
+    public String getGloss() {
+        return gloss;
+    }
+
+    public void setGloss(String gloss) {
+        this.gloss = gloss;
+    }
+
+    public ProductionProduct getProductToSubtract() {
+        return productToSubtract;
+    }
+
+    public void setProductToSubtract(ProductionProduct productToSubtract) {
+        this.productToSubtract = productToSubtract;
+    }
+
+    public ProductionProduct getPreviousProduct() {
+        return previousProduct;
+    }
+
+    public void setPreviousProduct(ProductionProduct previousProduct) {
+        this.previousProduct = previousProduct;
     }
 
     /**
