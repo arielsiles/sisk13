@@ -47,8 +47,6 @@ public class SalesAction {
     private Boolean finalConsumer = Boolean.FALSE;
     private Boolean zeroProduct = Boolean.FALSE;
 
-    //private CustomerOrderTypeEnum customerOrderTypeEnum = CustomerOrderTypeEnum.NORMAL;
-
     private CustomerOrderType customerOrderType;
     private SaleTypeEnum saleType;
     private Client client;

@@ -81,10 +81,10 @@ public class SaleReportAction extends GenericReportAction {
             e.printStackTrace();
         }
 
-        if (lastCustomerOrder != null) {
-            setCustomerOrderId(saleService.findLastSaleId(currentUser));
-            setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()));
-        }
+        //if (lastCustomerOrder != null) {
+        setCustomerOrderId(saleService.findLastSaleId(currentUser));
+        setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()));
+        //}
 
         Double subtotal = lastCustomerOrder.getTotalAmount();
         Double discount = lastCustomerOrder.getCommissionValue();

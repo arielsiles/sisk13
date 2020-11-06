@@ -56,6 +56,13 @@ public class CashBoxType implements BaseModel {
     })
     private CashAccount cashAccountIncome;
 
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaxcobrar", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountReceivable;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -127,5 +134,13 @@ public class CashBoxType implements BaseModel {
 
     public void setCashAccountIncomeCode(String cashAccountIncomeCode) {
         this.cashAccountIncomeCode = cashAccountIncomeCode;
+    }
+
+    public CashAccount getCashAccountReceivable() {
+        return cashAccountReceivable;
+    }
+
+    public void setCashAccountReceivable(CashAccount cashAccountReceivable) {
+        this.cashAccountReceivable = cashAccountReceivable;
     }
 }

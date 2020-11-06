@@ -20,5 +20,13 @@ insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 1, 'menu.customer
 insert into af_tipomovs values('01', 'MEJ', 'MEJORA', 'MEJ', 'VIG', 0);
 insert into af_tipomovs values('01', 'TRA', 'TRANSFERENCIA', 'TRA', 'VIG', 0);
 
-
 update af_subgrupos a set a.`ctamej` = a.`ctadavo`;
+
+-- 05.11.2020
+alter table tipocaja add column cuentaxcobrar varchar(20) after cuentaingreso; 
+update tipocaja set cuentaxcobrar = '1421010100' where idtipocaja = 1; -- Para venta de lacteos
+update tipocaja set cuentaxcobrar = '1421010200' where idtipocaja = 2; -- Para venta de veterinaria
+
+insert into funcionalidad values (268, 'ACCOUNTINGCREDITSALE', null, 1, 1, 'Functionality.customers.accountingCreditSales', 1);
+
+

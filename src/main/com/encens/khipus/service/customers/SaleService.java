@@ -8,6 +8,7 @@ import com.encens.khipus.model.customers.SaleTypeEnum;
 
 import javax.ejb.Local;
 import java.util.Date;
+import java.util.List;
 
 @Local
 public interface SaleService extends GenericService {
@@ -18,5 +19,6 @@ public interface SaleService extends GenericService {
     CustomerOrder findSaleById(Long id);
     void updateArticleForOutputs(ArticleOrder articleOrder);
     CustomerOrder findCustomerOrderByParams(SaleTypeEnum saleType, Date date, String code);
+    List<CustomerOrder> getCustomerOrderList(User user, Date date);
 
 }

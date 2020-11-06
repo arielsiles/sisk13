@@ -500,4 +500,19 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/accountingCreditSale.xhtml" no-conversation-view-id="/customers/customerOrderList.xhtml">
+        <navigation from-action="#{accountingCreditSaleAction.accountingCreditSales()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/customerOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/customerOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
+
 </pages>

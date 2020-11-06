@@ -5,6 +5,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.InventoryService;
@@ -16,7 +17,9 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Stateless
 @Name("saleService")
@@ -109,5 +112,23 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
                 .getSingleResult();
 
         return customerOrder;
+    }
+
+    @Override
+    public List<CustomerOrder> getCustomerOrderList(User user, Date date) {
+
+        List<CustomerOrder> resultList = new ArrayList<CustomerOrder>();
+
+        resultList = em.createQuery("" +
+                " select c from CustomerOrder c " +
+                " where c.user =:user " +
+                " and c.orderDate =:date " +
+                " and c.state =:state")
+                .setParameter("user", user)
+                .setParameter("date", date)
+                .setParameter("state", SaleStatus.PENDIENTE)
+                .getResultList();
+
+        return resultList;
     }
 }

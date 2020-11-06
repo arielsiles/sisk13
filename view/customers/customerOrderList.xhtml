@@ -97,7 +97,13 @@
             </h:panelGrid>
         </rich:simpleTogglePanel>
 
-            <rich:spacer height="10" />
+            <div class="buttons">
+                <s:button value="#{messages['CustomerOrder.accounting']}"
+                          view="/customers/accountingCreditSale.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('ACCOUNTINGCREDITSALE','VIEW')}"/>
+            </div>
 
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
                             rows="#{sessionUser.rowsPerPage}"
@@ -157,8 +163,8 @@
                     &#160;
                     <h:commandLink action="#"
                                    immediate="true">
-                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
-                                        title="#{messages['Voucher.report.generateReport']}"/>
+                        <h:graphicImage value="/img/anular.gif" styleClass="select-image"
+                                        title="#{messages['Common.annul']}"/>
                     </h:commandLink>
                 </rich:column>
 

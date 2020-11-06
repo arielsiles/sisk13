@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['CustomerOrder.accountingCreditSale']}</ui:define>
+<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+<h:form id="bankForm">
+
+    <div class="buttons">
+
+        <h:commandButton action="#{accountingCreditSaleAction.accountingCreditSales()}" value="Procesar ventas"
+                         styleClass="button"
+                         onclick="Richfaces.showModalPanel('progressModalPanel');"
+                         tabindex="5">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{accountingCreditSaleAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">#{messages['CustomerOrder.accountingCreditSale']}</f:facet>
+
+        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CustomerOrder.date']}</ui:define>
+            <rich:calendar value="#{accountingCreditSaleAction.accountingDate}"
+                           popup="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           enableManualInput="true"
+                           tabindex="1"
+                           required="true">
+                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+            </rich:calendar>
+        </s:decorate>
+
+    </rich:panel>
+
+
+</h:form>
+
+    <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+        <ui:param name="dialogId" value="progressModalPanel"/>
+        <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+        <ui:define name="progressTitle">#{messages['CustomerOrder.accountingSaleProcess']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['CustomerOrder.accountingSaleProcessMessage']}"/>
+            </p>
+        </ui:define>
+    </s:decorate>
+
+
+<s:fragment rendered="#{!bankAction.managed}">
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</s:fragment>
+<s:fragment rendered="#{bankAction.managed}">
+    <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+</s:fragment>
+</ui:define>
+</ui:composition>
