@@ -397,6 +397,15 @@ public class CompanyConfiguration {
     @Column(name = "IUE",columnDefinition = "DECIMAL(3,2)",nullable = true)
     private Double iue;
 
+    @Column(name = "IVA_TAX", nullable = true)
+    private BigDecimal ivaTaxValue;
+
+    @Column(name = "NET_VAL", nullable = true)
+    private BigDecimal netValue;
+
+    @Column(name = "IT_TAX", nullable = true)
+    private BigDecimal itTaxValue;
+
     @Column(name = "AUTOMODIFCONTRATO", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean contractModificationAuthorization;
@@ -553,6 +562,13 @@ public class CompanyConfiguration {
 
     @Column(name = "distparam")
     private BigDecimal dealerParameter;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTACOMISION", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount commissionSalesCashAccount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
@@ -1380,5 +1396,37 @@ public class CompanyConfiguration {
 
     public void setDealerParameter(BigDecimal dealerParameter) {
         this.dealerParameter = dealerParameter;
+    }
+
+    public CashAccount getCommissionSalesCashAccount() {
+        return commissionSalesCashAccount;
+    }
+
+    public void setCommissionSalesCashAccount(CashAccount commissionSalesCashAccount) {
+        this.commissionSalesCashAccount = commissionSalesCashAccount;
+    }
+
+    public BigDecimal getIvaTaxValue() {
+        return ivaTaxValue;
+    }
+
+    public void setIvaTaxValue(BigDecimal ivaTaxValue) {
+        this.ivaTaxValue = ivaTaxValue;
+    }
+
+    public BigDecimal getNetValue() {
+        return netValue;
+    }
+
+    public void setNetValue(BigDecimal netValue) {
+        this.netValue = netValue;
+    }
+
+    public BigDecimal getItTaxValue() {
+        return itTaxValue;
+    }
+
+    public void setItTaxValue(BigDecimal itTaxValue) {
+        this.itTaxValue = itTaxValue;
     }
 }

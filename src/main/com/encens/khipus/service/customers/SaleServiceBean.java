@@ -115,7 +115,7 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
     }
 
     @Override
-    public List<CustomerOrder> getCustomerOrderList(User user, Date date) {
+    public List<CustomerOrder> getPendingCustomerOrderList(User user, Date date) {
 
         List<CustomerOrder> resultList = new ArrayList<CustomerOrder>();
 

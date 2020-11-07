@@ -54,7 +54,7 @@ public class AccountingCreditSaleAction extends GenericAction {
 
     public String accountingCreditSales(){
         User user = getUser(currentUser.getId());
-        List<CustomerOrder> customerOrderList = saleService.getCustomerOrderList(user, accountingDate);
+        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(user, accountingDate);
 
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println(">>-->>>-->>>---> Ventas a credito: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
@@ -106,7 +106,76 @@ public class AccountingCreditSaleAction extends GenericAction {
 
     private Voucher accountingCreditSaleWithCommission(CustomerOrder customerOrder){
 
-        return null;
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+
+        String invoiceGloss = " ";
+        if (customerOrder.getMovement() != null)
+            invoiceGloss = invoiceGloss + "(F-" + customerOrder.getMovement().getNumber() + ") ";
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + customerOrder.getCode() + invoiceGloss + customerOrder.getClient().getFullName());
+
+
+        /** For creditPrimarySaleProduct **/
+        BigDecimal saleProductIVAValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), companyConfiguration.getIvaTaxValue());
+        BigDecimal saleProductValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), saleProductIVAValue);
+
+        BigDecimal commissionValue = BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue());
+        BigDecimal commissionIVA = BigDecimalUtil.multiply(commissionValue, companyConfiguration.getIvaTaxValue());
+        BigDecimal netCommissionValue = BigDecimalUtil.subtract(commissionValue, commissionIVA);
+
+        BigDecimal itTaxValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), companyConfiguration.getItTaxValue());
+        BigDecimal receivableValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), commissionValue);
+
+        VoucherDetail debitReceivable = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                cashBox.getType().getCashAccountReceivable(), receivableValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail debitCommision = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getCommissionSalesCashAccount(), netCommissionValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail debitFiscalCreditIVACommision = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), commissionIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail debitTaxTransaction = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        /** -- **/
+        VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                cashBox.getType().getCashAccountIncome(), saleProductValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+
+        BigDecimal debitFiscalValue = BigDecimalUtil.multiply(receivableValue, companyConfiguration.getIvaTaxValue());
+
+        VoucherDetail creditDebitFiscal = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getFiscalDebitLiability(), debitFiscalValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail creditItTaxForPaying = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getTransactionTaxPayable(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        VoucherDetail creditFiscalCreditIVACommision = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), commissionIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+
+
+        debitReceivable.setClient(customerOrder.getClient());
+        creditDebitFiscal.setMovement(customerOrder.getMovement());
+        voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
+        voucher.getDetails().add(debitReceivable);
+        voucher.getDetails().add(debitCommision);
+        voucher.getDetails().add(debitFiscalCreditIVACommision);
+        voucher.getDetails().add(debitTaxTransaction);
+        voucher.getDetails().add(creditPrimarySaleProduct);
+        voucher.getDetails().add(creditDebitFiscal);
+        voucher.getDetails().add(creditItTaxForPaying);
+        voucher.getDetails().add(creditFiscalCreditIVACommision);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        return voucher;
     }
 
 

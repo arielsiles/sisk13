@@ -29,4 +29,24 @@ update tipocaja set cuentaxcobrar = '1421010200' where idtipocaja = 2; -- Para v
 
 insert into funcionalidad values (268, 'ACCOUNTINGCREDITSALE', null, 1, 1, 'Functionality.customers.accountingCreditSales', 1);
 
+-- 07.11.2020
+alter table configuracion add column ctacomision varchar(20) after distparam;
+update configuracion c set c.`ctacomision` = '4470210401' where c.`no_cia` = '01';
+
+alter table configuracion add column iva_tax decimal (5, 2) after iue;
+alter table configuracion add column net_val decimal (5, 2) after iva_tax;
+alter table configuracion add column it_tax decimal (5, 2) after net_val;
+
+update configuracion c set c.`iva_tax` = 0.13 where c.`no_cia` = '01';
+update configuracion c set c.`net_val` = 0.87 where c.`no_cia` = '01';
+update configuracion c set c.`it_tax` = 0.03 where c.`no_cia` = '01';
+
+
+
+
+
+
+
+
+
 

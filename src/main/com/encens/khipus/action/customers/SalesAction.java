@@ -383,11 +383,14 @@ public class SalesAction {
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);
-        customerOrder.setState(SaleStatus.PREPARAR);
         customerOrder.setSaleType(saleType);
         customerOrder.setCustomerOrderType(customerOrderType);
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
+        customerOrder.setState(SaleStatus.PENDIENTE);
+
+        if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
+            customerOrder.setState(SaleStatus.CONTABILIZADO);
 
         customerOrder.setTotalAmount(totalAmount.doubleValue());
         customerOrder.setCommissionPercentage(0.0);
@@ -500,7 +503,6 @@ public class SalesAction {
                                                                   customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
 
         VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                //companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
                 cashBox.getType().getCashAccountBox(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
                 FinancesCurrencyType.D, BigDecimal.ONE);
 
