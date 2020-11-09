@@ -10,6 +10,7 @@ import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.fixedassets.FixedAssetGroup;
 import com.encens.khipus.model.fixedassets.FixedAssetLocation;
+import com.encens.khipus.model.fixedassets.FixedAssetState;
 import com.encens.khipus.model.fixedassets.FixedAssetSubGroup;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import org.jboss.seam.ScopeType;
@@ -50,6 +51,8 @@ public class FixedAssetsReportAction extends GenericReportAction {
     private BigDecimal initOriginalValue;
     private BigDecimal endOriginalValue;
 
+    private FixedAssetState stateDefault = FixedAssetState.BAJ;
+
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -70,7 +73,8 @@ public class FixedAssetsReportAction extends GenericReportAction {
                 "fixedAsset.registrationDate>=#{fixedAssetsReportAction.initRegistrationDate}",
                 "fixedAsset.registrationDate<=#{fixedAssetsReportAction.endRegistrationDate}",
                 "fixedAsset.ufvOriginalValue>=#{fixedAssetsReportAction.initOriginalValue}",
-                "fixedAsset.ufvOriginalValue<=#{fixedAssetsReportAction.endOriginalValue}"};
+                "fixedAsset.ufvOriginalValue<=#{fixedAssetsReportAction.endOriginalValue}",
+                "fixedAsset.state <> #{fixedAssetsReportAction.stateDefault}"};
 
         sortProperty = "fixedAssetGroup.id, fixedAssetSubGroup.id, fixedAsset.id";
     }
@@ -288,5 +292,13 @@ public class FixedAssetsReportAction extends GenericReportAction {
 
     public void setFixedAssetLocation(FixedAssetLocation fixedAssetLocation) {
         this.fixedAssetLocation = fixedAssetLocation;
+    }
+
+    public FixedAssetState getStateDefault() {
+        return stateDefault;
+    }
+
+    public void setStateDefault(FixedAssetState stateDefault) {
+        this.stateDefault = stateDefault;
     }
 }

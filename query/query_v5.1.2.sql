@@ -41,6 +41,16 @@ update configuracion c set c.`iva_tax` = 0.13 where c.`no_cia` = '01';
 update configuracion c set c.`net_val` = 0.87 where c.`no_cia` = '01';
 update configuracion c set c.`it_tax` = 0.03 where c.`no_cia` = '01';
 
+-- 09.11.2020
+-- SOLO Para ILVA
+update af_activos a set a.`estado` = 'TDP' where a.`estado` = 'BAJ';
+
+
+select *
+from af_activos a 
+update af_activos a set a.`estado` = 'TDP' 
+where a.`estado` = 'BAJ';
+
 
 
 
