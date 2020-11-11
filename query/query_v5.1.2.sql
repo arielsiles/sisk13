@@ -54,9 +54,3 @@ where a.`estado` = 'BAJ';
 
 
 
-
-
-
-
-
-
