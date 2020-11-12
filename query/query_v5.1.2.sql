@@ -11,7 +11,7 @@ alter table cajausuario add foreign key (idusuario) references usuario (idusuari
 
 
 -- 17.10.2020
-insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 1, 'menu.customers.configuration.nullifySale', 1); -- Por confirmar
+insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 1, 'menu.customers.configuration.nullifySale', 1);  -- Por confirmar
 
 -- 23.10.2020
 -- Verificar AF pendientes

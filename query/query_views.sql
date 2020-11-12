@@ -59,13 +59,14 @@ create or replace view ventas as
 	from articulos_pedido ap
 	join pedidos p 	 on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
 	and p.estado <> 'ANULADO'
-	and ap.cod_art not in (480, 481) -- LAM
+	and ap.cod_art not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090,
+	480, 481) -- LAM
 	union
 	select v.`FECHA_PEDIDO` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, v.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	from articulos_pedido ap
 	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
 	and v.estado <> 'ANULADO'
-	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521)
+	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090)
 ;
 
 -- ----------------------------------------------------------------------
