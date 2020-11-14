@@ -45,12 +45,26 @@ update configuracion c set c.`it_tax` = 0.03 where c.`no_cia` = '01';
 -- SOLO Para ILVA
 update af_activos a set a.`estado` = 'TDP' where a.`estado` = 'BAJ';
 
+-- 14.11.2020
+-- Para Cartera y Creditos
+update arcgms a set cta_niv3 = '1310000000' 
+where a.`cuenta` >= '1310000000' and a.`cuenta` < '1320000000';
 
-select *
-from af_activos a 
-update af_activos a set a.`estado` = 'TDP' 
-where a.`estado` = 'BAJ';
+update arcgms a set cta_niv3 = '1320000000' 
+where a.`cuenta` >= '1320000000' and a.`cuenta` < '1330000000';
 
+update arcgms a set cta_niv3 = '1330000000' 
+where a.`cuenta` >= '1330000000' and a.`cuenta` < '1340000000';
+
+update arcgms a set cta_niv3 = '1380000000' 
+where a.`cuenta` >= '1380000000' and a.`cuenta` < '1390000000';
+
+update arcgms a set cta_niv3 = '1390000000' 
+where a.`cuenta` >= '1390000000' and a.`cuenta` < '1400000000';
+
+
+update arcgms a set a.`cta_raiz` = '1300000000' where a.`cuenta` = '1300000000';
+update arcgms a set a.`cta_niv3` = '1300000000' where a.`cuenta` = '1300000000';
 
 
 
