@@ -73,7 +73,11 @@ public interface VoucherAccoutingService extends GenericService {
 
     public BigDecimal calculateLossesNiv3(String startDate, String endDate, String accountLevel3);
 
+    public BigDecimal calculateBalanceNiv3(String startDate, String endDate, String accountLevel3, String accountType);
+
     public BigDecimal calculateLossesNiv2(String startDate, String endDate, String rootCashAccount);
+
+    public BigDecimal calculateBalanceNiv2(String startDate, String endDate, String rootCashAccount, String accountType);
 
     public void createCostOfCashSales(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
     public void createCostOfSalesCredit(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;

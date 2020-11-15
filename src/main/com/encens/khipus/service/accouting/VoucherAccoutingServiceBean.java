@@ -889,6 +889,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return totalResult;
     }
 
+    public BigDecimal calculateBalanceNiv3(String startDate, String endDate, String accountLevel3, String accountType){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        BigDecimal totalResult = new BigDecimal(0);
+        BigDecimal totalDebit   = new BigDecimal(0);
+        BigDecimal totalCredit  = new BigDecimal(0);
+
+        try {
+            datas = em.createQuery(
+                    " SELECT " +
+                            " cashAccountLeve3.accountCode as accountCode, " +
+                            " cashAccountLeve3.description as description, " +
+                            " SUM(voucherDetail.debit) AS debit, " +
+                            " SUM(voucherDetail.credit) AS credit" +
+                            " FROM VoucherDetail voucherDetail " +
+                            " LEFT JOIN voucherDetail.voucher voucher " +
+                            " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                            " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 cashAccountLeve3 " +
+                            " WHERE cashAccount.accountType = '" + accountType + "'" +
+                            " AND voucher.state <> 'ANL' " +
+                            " AND cashAccountLeve3.accountCode = '"+accountLevel3+"' " +
+                            " AND voucher.date between '"+startDate+"' and '"+endDate+"' " +
+                            " GROUP BY cashAccountLeve3.accountCode, cashAccountLeve3.description "
+            ).getResultList();
+
+            for(Object[] obj: datas){
+                totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)obj[2]), 2);
+                totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)obj[3]), 2);
+            }
+            totalResult = BigDecimalUtil.subtract(totalDebit, totalCredit, 2);
+        }catch (NoResultException e){}
+        return totalResult;
+    }
+
     public BigDecimal calculateLossesNiv2(String startDate, String endDate, String rootCashAccount){
 
         List<Object[]> datas = new ArrayList<Object[]>();
@@ -909,6 +944,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                             " LEFT JOIN voucherDetail.cashAccount cashAccount" +
                             " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
                             " WHERE cashAccount.accountType = 'E' " +
+                            " AND voucher.state <> 'ANL' " +
+                            " AND rootCashAccount.accountCode = '"+rootCashAccount+"' " +
+                            " AND voucher.date between '"+startDate+"' and '"+endDate+"' " +
+                            " GROUP BY rootCashAccount.accountCode, rootCashAccount.description "
+            ).getResultList();
+
+            for(Object[] obj: datas){
+                totalDebit  = BigDecimalUtil.sum(totalDebit, ((BigDecimal)obj[2]), 2);
+                totalCredit = BigDecimalUtil.sum(totalCredit, ((BigDecimal)obj[3]), 2);
+            }
+            totalResult = BigDecimalUtil.subtract(totalDebit, totalCredit, 2);
+        }catch (NoResultException e){}
+        return totalResult;
+    }
+
+    public BigDecimal calculateBalanceNiv2(String startDate, String endDate, String rootCashAccount, String accountType){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        BigDecimal totalResult = new BigDecimal(0);
+        BigDecimal totalDebit   = new BigDecimal(0);
+        BigDecimal totalCredit  = new BigDecimal(0);
+
+        try {
+            datas = em.createQuery(
+                    " SELECT " +
+                            " rootCashAccount.accountCode as accountCode, " +
+                            " rootCashAccount.description as description, " +
+                            " SUM(voucherDetail.debit) AS debit, " +
+                            " SUM(voucherDetail.credit) AS credit" +
+                            " FROM VoucherDetail voucherDetail " +
+                            " LEFT JOIN voucherDetail.voucher voucher " +
+                            " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                            " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                            " WHERE cashAccount.accountType = '" + accountType + "'" +
                             " AND voucher.state <> 'ANL' " +
                             " AND rootCashAccount.accountCode = '"+rootCashAccount+"' " +
                             " AND voucher.date between '"+startDate+"' and '"+endDate+"' " +

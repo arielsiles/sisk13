@@ -79,7 +79,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[TOTAL EGRESOS COSTOS Y GASTOS]]></text>
+				<text><![CDATA[TOTAL GASTOS]]></text>
 			</staticText>
 		</band>
 	</summary>

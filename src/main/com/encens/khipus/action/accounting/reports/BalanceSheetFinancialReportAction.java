@@ -107,6 +107,42 @@ public class BalanceSheetFinancialReportAction extends GenericReportAction {
         params.put("totalCapital", totalCapital);
         params.put("totalLiabilitiesCapital", totalLiabilitiesCapital);
 
+        /** ACTIVO **/
+        Double account11  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1100000000", "A").doubleValue();
+         Double account12  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1200000000", "A").doubleValue();
+        Double account13  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1300000000", "A").doubleValue();
+        Double account14  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1400000000", "A").doubleValue();
+         Double account15  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1500000000", "A").doubleValue();
+        Double account16  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1600000000", "A").doubleValue();
+         Double account17  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1700000000", "A").doubleValue();
+        Double account18  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1800000000", "A").doubleValue();
+
+        Double account131 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1310000000", "A").doubleValue();
+        Double account132 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1320000000", "A").doubleValue();
+        Double account133 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1330000000", "A").doubleValue();
+        Double account138 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1380000000", "A").doubleValue();
+        Double account139 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1390000000", "A").doubleValue();
+
+        //Double totalAssetAccount = account11 + account13 + account14 + account16 + account18;
+        Double totalAccount13X = account131 + account132 + account133 + account138 + account139;
+        Double totalAssetAccount = account11 + account12 + totalAccount13X + account14 + account15 + account16 + account17 + account18;
+
+        params.put("account11", account11);
+        params.put("account12", account12);
+        params.put("account13", account13);
+        params.put("account14", account14);
+        params.put("account15", account15);
+        params.put("account16", account16);
+        params.put("account17", account17);
+        params.put("account18", account18);
+
+        params.put("account131", account131);
+        params.put("account132", account132);
+        params.put("account133", account133);
+        params.put("account138", account138);
+        params.put("account139", account139);
+
+        params.put("totalAssetAccount", totalAssetAccount);
 
         /** PATRIMONIO **/
 
@@ -139,7 +175,7 @@ public class BalanceSheetFinancialReportAction extends GenericReportAction {
         params.put("totalPatrimonio", totalPatrimonio);
         params.put("totalLiabilitiesCapitalRes", totalLiabilitiesCapitalRes);
 
-        addCriteriaAssetSubReport("BALANCESHEETSUBREPORT", params);
+        //addCriteriaAssetSubReport("BALANCESHEETSUBREPORT", params);
         addCriteriaLiabilitiesSubReport("BALANCELIABILITIESSUBREPORT", params);
         //addCriteriaCapitalSubReport("BALANCECAPITALSUBREPORT", params);
 

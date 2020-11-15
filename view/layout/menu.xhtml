@@ -465,14 +465,6 @@
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
-        <s:link view="/accounting/profitAndLossN3Report.xhtml"
-                value="#{messages['menu.finances.accounting.profitAndLossFinancialN3']}"
-                propagation="none" />
-    </rich:menuItem>
-
-    <rich:menuItem submitMode="none"
-                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
-                   styleClass="main-menu-item">
         <s:link view="/accounting/generateClosingResults.xhtml"
                 value="#{messages['menu.finances.accounting.generateClosingResults']}"
                 propagation="begin" />
