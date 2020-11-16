@@ -75,9 +75,9 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="82" y="0" width="91" height="15"/>
+				<reportElement x="0" y="0" width="91" height="15"/>
 				<box rightPadding="5"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[TOTAL PASIVO:]]></text>
