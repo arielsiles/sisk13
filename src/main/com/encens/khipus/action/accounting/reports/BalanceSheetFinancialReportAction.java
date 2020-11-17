@@ -109,12 +109,12 @@ public class BalanceSheetFinancialReportAction extends GenericReportAction {
 
         /** ACTIVO **/
         Double account11  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1100000000", "A").doubleValue();
-         Double account12  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1200000000", "A").doubleValue();
-        Double account13  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1300000000", "A").doubleValue();
+        Double account12  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1200000000", "A").doubleValue();
+        //Double account13  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1300000000", "A").doubleValue();
         Double account14  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1400000000", "A").doubleValue();
-         Double account15  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1500000000", "A").doubleValue();
+        Double account15  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1500000000", "A").doubleValue();
         Double account16  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1600000000", "A").doubleValue();
-         Double account17  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1700000000", "A").doubleValue();
+        Double account17  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1700000000", "A").doubleValue();
         Double account18  = voucherAccoutingService.calculateBalanceNiv2(start, end, "1800000000", "A").doubleValue();
 
         Double account131 = voucherAccoutingService.calculateBalanceNiv3(start, end, "1310000000", "A").doubleValue();
@@ -129,7 +129,7 @@ public class BalanceSheetFinancialReportAction extends GenericReportAction {
 
         params.put("account11", account11);
         params.put("account12", account12);
-        params.put("account13", account13);
+        params.put("account13", totalAccount13X);
         params.put("account14", account14);
         params.put("account15", account15);
         params.put("account16", account16);
