@@ -55,14 +55,14 @@ where e.estado <> 'ANL'
 
 -- 4. VISTA VENTAS union al contado y a credito (lacteos U veterinarios)
 create or replace view ventas as
-	select p.`FECHA_ENTREGA` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, p.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
+	select p.`FECHA_ENTREGA` as FECHA, p.tipoventa, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, p.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
 	from articulos_pedido ap
 	join pedidos p 	 on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
 	and p.estado <> 'ANULADO'
 	and ap.cod_art not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090,
 	480, 481) -- LAM
 	union
-	select v.`FECHA_PEDIDO` as FECHA, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, v.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
+	select v.`FECHA_PEDIDO` as FECHA, v.tipoventa, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, v.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	from articulos_pedido ap
 	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
 	and v.estado <> 'ANULADO'

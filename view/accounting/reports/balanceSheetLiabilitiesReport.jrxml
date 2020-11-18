@@ -62,9 +62,9 @@
 	<summary>
 		<band height="56">
 			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
-				<reportElement x="173" y="0" width="60" height="12"/>
+				<reportElement x="173" y="0" width="60" height="15"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="7" isBold="true"/>
+					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalCreditBalance}]]></textFieldExpression>
 			</textField>
@@ -74,6 +74,14 @@
 					<pen lineWidth="0.5" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="91" height="15"/>
+				<box rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[TOTAL PASIVO:]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>
