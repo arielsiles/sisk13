@@ -8,6 +8,7 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,18 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
     @Override
     public List<String> getRestrictions() {
         return Arrays.asList(RESTRICTIONS);
+    }
+
+    public List<CustomerOrder> getSelectedCustomerOrdes() {
+        List ids = super.getSelectedIdList();
+
+        List<CustomerOrder> result = new ArrayList<CustomerOrder>();
+        for (Object id : ids) {
+            CustomerOrder item = getEntityManager().find(CustomerOrder.class, id);
+            result.add(item);
+        }
+
+        return result;
     }
 
     public String getName() {

@@ -131,4 +131,22 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
         return resultList;
     }
+
+    @Override
+    public List<CustomerOrder> getPendingCustomerOrderList(Date date) {
+
+        List<CustomerOrder> resultList = new ArrayList<CustomerOrder>();
+
+        resultList = em.createQuery("" +
+                " select c from CustomerOrder c " +
+                " where c.orderDate =:date " +
+                " and c.saleType =:saleType " +
+                " and c.state =:state")
+                .setParameter("date", date)
+                .setParameter("saleType", SaleTypeEnum.CREDIT)
+                .setParameter("state", SaleStatus.PENDIENTE)
+                .getResultList();
+
+        return resultList;
+    }
 }

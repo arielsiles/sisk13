@@ -54,7 +54,7 @@ public class AccountingCreditSaleAction extends GenericAction {
 
     public String accountingCreditSales(){
         User user = getUser(currentUser.getId());
-        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(user, accountingDate);
+        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(accountingDate);
 
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println(">>-->>>-->>>---> Ventas a credito: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
@@ -67,14 +67,20 @@ public class AccountingCreditSaleAction extends GenericAction {
             }
 
             /** Ventas normales **/
-            if (    customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) &&
+            if (   (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL)      ||
+                    customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)        ||
+                    customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) &&
                     !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  &&
-                    customerOrder.getCommissionPercentage() == 0
+                    customerOrder.getCommissionPercentage() == 0 ){
 
-                    ){
+                if (customerOrder.getMovement() !=  null){
+                    Voucher voucher = accountingCreditSale(customerOrder);
+                    customerOrder.setVoucher(voucher);
+                }else {
+                    Voucher voucher = accountingCreditSaleWithoutInvoice(customerOrder);
+                    customerOrder.setVoucher(voucher);
+                }
 
-                Voucher voucher = accountingCreditSale(customerOrder);
-                customerOrder.setVoucher(voucher);
             }
 
             /** Reposiciones, degustación y refrigerios **/
@@ -83,6 +89,8 @@ public class AccountingCreditSaleAction extends GenericAction {
                      customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT)) &&
                     !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  ){
 
+                customerOrder.setState(SaleStatus.CONTABILIZADO); /** Solo se fija el estado, se contabiliza en CV **/
+
             }
 
             /** Descuentos: Lacteo, Veterinario **/
@@ -90,7 +98,7 @@ public class AccountingCreditSaleAction extends GenericAction {
                      customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) &&
                     !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  ){
 
-                /** Todo: Realizar el descuento respectivo **/
+                /** Todo: Ya se contabiliza arriba, hacer registro del descuento correspondiente **/
 
             }
 
@@ -221,6 +229,34 @@ public class AccountingCreditSaleAction extends GenericAction {
         voucher.getDetails().add(debitTransactionTax);
         voucher.getDetails().add(creditTransactionTax);
         voucher.getDetails().add(creditFiscalDebitIVA);
+        voucher.getDetails().add(creditPrimarySaleProduct);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        return voucher;
+    }
+
+    private Voucher accountingCreditSaleWithoutInvoice(CustomerOrder customerOrder){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher( null, MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
+                customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
+
+        VoucherDetail debitReceivable = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                cashBox.getType().getCashAccountReceivable(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), FinancesCurrencyType.D, BigDecimal.ONE);
+
+        BigDecimal amount = BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount());
+        VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                cashBox.getType().getCashAccountIncome(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
+
+        debitReceivable.setClient(customerOrder.getClient());
+        voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
+        voucher.getDetails().add(debitReceivable);
         voucher.getDetails().add(creditPrimarySaleProduct);
 
         voucherAccoutingService.saveVoucher(voucher);
