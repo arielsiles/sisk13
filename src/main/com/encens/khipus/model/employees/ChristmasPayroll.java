@@ -206,16 +206,14 @@ public class ChristmasPayroll implements GenericPayroll {
     private Employee employee;
 
     @Temporal(TemporalType.DATE)
-    @NotNull
-    @Column(name = "FECHAINICIOCONTRATO", nullable = false)
+    @Column(name = "FECHAINICIOCONTRATO")
     private Date contractInitDate;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHAFINCONTRATO")
     private Date contractEndDate;
 
-    @Column(name = "DIASTRABAJADOS", nullable = false, precision = 13, scale = 2)
-    @NotNull
+    @Column(name = "DIASTRABAJADOS", precision = 13, scale = 2)
     private BigDecimal workedDays;
 
     @Column(name = "TOTALGANADOSEPTIEMBRE", precision = 13, scale = 2)
@@ -231,16 +229,13 @@ public class ChristmasPayroll implements GenericPayroll {
     @NotNull
     private BigDecimal salary;
 
-    @Column(name = "SUELDOPROMEDIO", nullable = false, precision = 13, scale = 2)
-    @NotNull
+    @Column(name = "SUELDOPROMEDIO", precision = 13, scale = 2)
     private BigDecimal averageSalary;
 
-    @Column(name = "SUELDOCOTIZABLE", nullable = false, precision = 13, scale = 2)
-    @NotNull
+    @Column(name = "SUELDOCOTIZABLE", precision = 13, scale = 2)
     private BigDecimal contributableSalary;
 
-    @Column(name = "LIQUIDOPAGABLE", nullable = false, precision = 13, scale = 2)
-    @NotNull
+    @Column(name = "LIQUIDOPAGABLE", precision = 13, scale = 2)
     private BigDecimal liquid;
 
     @Column(name = "CUENTABANCARIA", length = 255)
@@ -278,8 +273,8 @@ public class ChristmasPayroll implements GenericPayroll {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean activeForTaxPayrollGeneration = Boolean.FALSE;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -290,28 +285,23 @@ public class ChristmasPayroll implements GenericPayroll {
     })
     private CostCenter costCenter;
 
-    @Column(name = "CODIGOCENCOS", length = 6, nullable = false)
-    @NotNull
+    @Column(name = "CODIGOCENCOS", length = 6)
     @Length(max = 6)
     private String costCenterCode;
 
-    @Column(name = "NUMEROCOMPANIA", updatable = false, nullable = false, length = 2)
+    @Column(name = "NUMEROCOMPANIA")
     @Length(max = 2)
-    @NotNull
     private String companyNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCARGO", referencedColumnName = "idcargo", nullable = false)
     private Charge charge;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCATEGORIAPUESTO", referencedColumnName = "idcategoriapuesto", nullable = false)
     private JobCategory jobCategory;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDCOMPANIA", referencedColumnName = "idcompania", nullable = false, updatable = false)
     private Company company;
 

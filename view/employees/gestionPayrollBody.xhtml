@@ -162,11 +162,15 @@
 
 <s:decorate id="gestionPayrollTypeField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['GestionPayroll.gestionPayrollType']}</ui:define>
+
+    <!-- rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+         :::: hasDefaultValuesFromGenerationCycle es por defecto True, se modifico, revisar y corregir
+    -->
     <h:selectOneMenu id="gestionPayrollType"
                      value="#{gestionPayroll.gestionPayrollType}"
                      styleClass="input"
                      required="true"
-                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly and not hasDefaultValuesFromGenerationCycle}"
+                     rendered="#{not gestionPayrollAction.gestionPayrollReadOnly}"
                      tabindex="10">
         <s:selectItems value="#{gestionPayrollTypeEnum}" var="gestionPayrollType"
                        label="#{messages[gestionPayrollType.resourceKey]}"

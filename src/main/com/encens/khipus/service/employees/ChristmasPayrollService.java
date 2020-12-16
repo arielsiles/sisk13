@@ -20,4 +20,6 @@ public interface ChristmasPayrollService extends GenericService {
                                            BigDecimal septemberTotalIncome, BigDecimal octoberTotalIncome,
                                            BigDecimal novemberTotalIncome, BigDecimal averageSalary,
                                            BigDecimal contributableSalary, BankAccount bankAccount);
+
+    void insertChristmasPayroll(ChristmasPayroll christmasPayroll);
 }

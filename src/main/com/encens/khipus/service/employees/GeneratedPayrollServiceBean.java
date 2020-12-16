@@ -870,12 +870,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 BigDecimal averageSalary = BigDecimalUtil.divide(BigDecimalUtil.sum(septemberTotalIncome, octoberTotalIncome, novemberTotalIncome), BigDecimalUtil.toBigDecimal(lastThreeMonthList.size()), SCALE);
                 BigDecimal contributableSalary = workedDays >= 365 ? averageSalary : workedDays > 90 ? (BigDecimalUtil.divide(BigDecimalUtil.multiply(averageSalary, BigDecimalUtil.toBigDecimal(workedDays), SCALE), BigDecimalUtil.toBigDecimal(DAYS_OF_YEAR), SCALE)) : BigDecimal.ZERO;
                 BankAccount bankAccount = payrollReportService.getEmployeeDefaultBankAccount(employeeId);
+
+                em.merge(gestionPayroll);
+
+                em.refresh(generatedPayroll);
+
                 ChristmasPayroll christmasPayroll = christmasPayrollService.buildChristmasPayroll(generatedPayroll, gestionPayroll,
                         employee, initContractDate, salary, workedDays, novemberManagersPayroll,
                         septemberTotalIncome, octoberTotalIncome, novemberTotalIncome, averageSalary,
                         contributableSalary, bankAccount);
-                em.persist(christmasPayroll);
-                em.flush();
+
+                christmasPayrollService.insertChristmasPayroll(christmasPayroll);
+
+                //em.persist(christmasPayroll);
+                //em.flush();
             }
             userTransaction.commit();
             userTransaction.setTransactionTimeout(0);
