@@ -4,7 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets">
 <h:form id="gestionPayrollForm">
@@ -329,6 +328,15 @@
                                immediate="true"
                                action="#{categoryPaymentSlipReportAction.generateReport(generatedPayrollItem)}"
                                rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem) and generatedPayrollAction.isOfficialGeneratedPayrollType(generatedPayrollItem)}"/>
+
+                <rich:menuItem styleClass="left"
+                               icon="/img/pdfIcon.gif"
+                               value="#{messages['GeneratedPayroll.exportChristmasPaymentSlip']}"
+                               immediate="true"
+                               action="#{christmasPaymentSlipReportAction.generateReport(generatedPayrollItem)}"
+                               rendered="#{generatedPayrollAction.isChristmasBonusType(generatedPayrollItem)}"
+                />
+                <!--rendered="#{!generatedPayrollAction.isChristmasBonusType(generatedPayrollItem) and generatedPayrollAction.isOfficialGeneratedPayrollType(generatedPayrollItem)}"-->
 
             </rich:dropDownMenu>
         </h:panelGrid>
