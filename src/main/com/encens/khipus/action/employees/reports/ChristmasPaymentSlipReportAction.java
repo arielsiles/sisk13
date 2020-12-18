@@ -73,7 +73,7 @@ public class ChristmasPaymentSlipReportAction extends GenericReportAction {
                 " christmasPayroll.averageSalary as averageSalary," +
                 " christmasPayroll.contributableSalary as contributableSalary," +
                 " christmasPayroll.workedDays as workedDays, " +
-                " christmasPayroll.averageSalary / 12 as duodecima," +
+                " christmasPayroll.contributableSalary / (christmasPayroll.workedDays / 30) as duodecima," +
                 " christmasPayroll.workedDays / 30 as months" +
                 " FROM ChristmasPayroll christmasPayroll" +
                 " LEFT JOIN christmasPayroll.generatedPayroll generatedPayroll" +
