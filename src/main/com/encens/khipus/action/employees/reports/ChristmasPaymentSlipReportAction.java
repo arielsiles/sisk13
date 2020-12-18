@@ -53,24 +53,38 @@ public class ChristmasPaymentSlipReportAction extends GenericReportAction {
         params.putAll(getReportParamsInfo(payrollGenerationCycle));
 
         setReportFormat(ReportFormat.PDF);
-        super.generateReport("categoryPaymentSlipReport", "/employees/reports/christmasPaymentSlipReport.jrxml", MessageUtils.getMessage("Reports.categoryPaymentSlip.title"), params);
+        super.generateReport("categoryPaymentSlipReport", "/employees/reports/christmasPaymentSlipReport.jrxml", MessageUtils.getMessage("Reports.christmasPaymentSlip.title"), params);
     }
 
     @Override
     protected String getEjbql() {
 
         return "SELECT " +
-                " " +
+                " christmasPayroll.id," +
+                " employee.idNumber as idNumber," +
+                " employee.firstName || ' ' || employee.lastName || ' ' || employee.maidenName as employeeName," +
+                " charge.name as chargeName," +
+                " christmasPayroll.liquid as liquid," +
+                " christmasPayroll.contractInitDate as initDate," +
+                " christmasPayroll.salary as salary," +
+                " christmasPayroll.septemberTotalIncome as septemberTotalIncome," +
+                " christmasPayroll.octoberTotalIncome as octoberTotalIncome," +
+                " christmasPayroll.novemberTotalIncome as novemberTotalIncome," +
+                " christmasPayroll.averageSalary as averageSalary," +
+                " christmasPayroll.contributableSalary as contributableSalary," +
+                " christmasPayroll.workedDays as workedDays, " +
+                " christmasPayroll.averageSalary / 12 as duodecima," +
+                " christmasPayroll.workedDays / 30 as months" +
                 " FROM ChristmasPayroll christmasPayroll" +
                 " LEFT JOIN christmasPayroll.generatedPayroll generatedPayroll" +
                 " LEFT JOIN christmasPayroll.employee employee" +
-                " LEFT JOIN generatedPayroll.charge charge";
+                " LEFT JOIN christmasPayroll.charge charge";
     }
 
     @Create
     public void init() {
-        restrictions = new String[]{"categoryFiscalPayroll.company=#{currentCompany}",
-                "generatedPayroll = #{christmasPaymentSlipReportAction.generatedPayroll}"};
+        restrictions = new String[]{"generatedPayroll = #{christmasPaymentSlipReportAction.generatedPayroll}"};
+
 
         //sortProperty = "categoryFiscalPayroll.number";
     }
