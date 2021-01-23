@@ -637,6 +637,8 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
 
+        interest = BigDecimalUtil.sum(interest, credit.getDeferredQuota(), 6);
+
         this.interestValue = interest;
         this.capitalValue = currentCapital;
         this.totalAmountValue = totalPayment;

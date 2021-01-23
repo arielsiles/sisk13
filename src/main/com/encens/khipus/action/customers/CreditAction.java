@@ -68,6 +68,7 @@ public class CreditAction extends GenericAction<Credit> {
 
     private BigDecimal totalPayment;
     private BigDecimal quotaValue;
+    private BigDecimal deferredQuota;
     private Date paymentDate = new Date();
 
     private Date transferDate;
@@ -75,10 +76,16 @@ public class CreditAction extends GenericAction<Credit> {
 
     private CreditState creditStateFIN = CreditState.FIN;
 
+    @Create
+    public void init() {
+        System.out.println("...........Inicializando credito......");
+        getInstance().setQuota(BigDecimal.ZERO);
+    }
+
     @Factory(value = "credit", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('CREDIT','VIEW')}")
     public Credit initCredit() {
-        quotaValue = BigDecimal.ZERO;
+        //quotaValue = BigDecimal.ZERO;
         return getInstance();
     }
 
@@ -104,7 +111,7 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setCode(creditNumber);
         getInstance().setState(CreditState.VIG);
         getInstance().setCapitalBalance(instance.getAmount());
-        getInstance().setQuota(quotaValue);
+        //getInstance().setQuota(quotaValue);
         super.create();
         sequenceGeneratorService.nextCreditNumber(getInstance().getPartner().getId());
         return Outcome.SUCCESS;
@@ -519,8 +526,28 @@ public class CreditAction extends GenericAction<Credit> {
         Credit credit = getInstance();
         quotaValue = BigDecimal.ZERO;
 
+        if (credit.getNumberQuota() != 0) {
+            //quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2);
+            credit.setQuota(BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2));
+        }
+
+    }
+
+    public void calculateDeferredQuota(){
+        Credit credit = getInstance();
+        deferredQuota = BigDecimal.ZERO;
+
         if (credit.getNumberQuota() != 0)
-            quotaValue = BigDecimalUtil.divide(credit.getAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2);
+            credit.setDeferredQuota(BigDecimalUtil.divide(credit.getDeferredAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2));
+
+    }
+
+    public void calculateDeferredQuota2(){
+        Credit credit = getInstance();
+        deferredQuota = BigDecimal.ZERO;
+
+        if (credit.getNumberQuota() != 0)
+            deferredQuota = BigDecimalUtil.divide(credit.getDeferredAmount(), BigDecimalUtil.toBigDecimal(credit.getNumberQuota()), 2);
 
     }
 
@@ -603,4 +630,11 @@ public class CreditAction extends GenericAction<Credit> {
         return exchangeRate;
     }
 
+    public BigDecimal getDeferredQuota() {
+        return deferredQuota;
+    }
+
+    public void setDeferredQuota(BigDecimal deferredQuota) {
+        this.deferredQuota = deferredQuota;
+    }
 }

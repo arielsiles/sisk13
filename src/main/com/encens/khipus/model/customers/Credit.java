@@ -67,6 +67,9 @@ public class Credit implements BaseModel {
     @Column(name = "importe", precision = 13, scale = 2, nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "montodif", precision = 13, scale = 2)
+    private BigDecimal deferredAmount;
+
     @Column(name = "anual", nullable = false)
     private Integer annualRate;
 
@@ -92,6 +95,9 @@ public class Credit implements BaseModel {
 
     @Column(name = "cuota", precision = 13, scale = 2, nullable = false)
     private BigDecimal quota;
+
+    @Column(name = "cuotadif", precision = 13, scale = 2)
+    private BigDecimal deferredQuota;
 
     @Column(name = "saldo", precision = 13, scale = 2, nullable = false)
     private BigDecimal capitalBalance;
@@ -351,5 +357,21 @@ public class Credit implements BaseModel {
 
     public void setCreditTransactionList(List<CreditTransaction> creditTransactionList) {
         this.creditTransactionList = creditTransactionList;
+    }
+
+    public BigDecimal getDeferredAmount() {
+        return deferredAmount;
+    }
+
+    public void setDeferredAmount(BigDecimal deferredAmount) {
+        this.deferredAmount = deferredAmount;
+    }
+
+    public BigDecimal getDeferredQuota() {
+        return deferredQuota;
+    }
+
+    public void setDeferredQuota(BigDecimal deferredQuota) {
+        this.deferredQuota = deferredQuota;
     }
 }

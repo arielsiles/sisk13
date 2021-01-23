@@ -111,14 +111,21 @@ public class CreditReportAction extends GenericReportAction {
             BigDecimal interes = BigDecimalUtil.multiply(saldoCapital, var_interes, 6);
             interes = BigDecimalUtil.multiply(interes, var_tiempo, 6);
 
+            BigDecimal deferredQuota = BigDecimal.ZERO;
+            if (credit.getDeferredQuota() != null) deferredQuota = credit.getDeferredQuota();
+
+            interes = BigDecimalUtil.sum(interes, deferredQuota);
+
             /* rev */
             if (q == quotas.intValue()){
                 if (saldoCapital != paymentQuota){
                     paymentQuota = saldoCapital;
                 }
             }
+
             BigDecimal totalCuota = BigDecimalUtil.sum(paymentQuota, interes, 6);
-            System.out.println(q + "\t\t" + sdf.format(lastPaymentDate) + "\t\t" + fecha + "\t\t" + dias + "\t\t" + paymentQuota + "\t\t" + interes + "\t\t" + totalCuota + "\t\t" + saldoCapital);
+
+            System.out.println(q + "\t\t" + sdf.format(lastPaymentDate) + "\t\t" + fecha + "\t\t" + dias + "\t\t" + paymentQuota + "\t\t" + interes + "\t\t" + deferredQuota + "\t\t" + totalCuota + "\t\t" + saldoCapital);
 
 
             BigDecimal totalCuotaValue = BigDecimalUtil.toBigDecimal(Math.round(totalCuota.doubleValue()));

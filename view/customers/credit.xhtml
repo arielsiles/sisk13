@@ -18,7 +18,7 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="bodyWidth" value="100%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
 
@@ -87,180 +87,215 @@
                     </c:choose>
                 </f:facet>
 
-                <!--<s:decorate id="partnerField2" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Partner.partner']}</ui:define>
-                    <h:selectOneMenu id="partnerId" value="#{credit.partner}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="1">
-                        <s:selectItems value="#{partnerList.resultList}"
-                                       var="partner"
-                                       label="#{partner.fullName}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>-->
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
 
-                <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
-                    <h:selectOneMenu id="creditTypeId" value="#{credit.creditType}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="1">
-                        <s:selectItems value="#{creditTypeList.resultList}"
-                                       var="creditType"
-                                       label="#{creditType.fullName}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>
+                    <s:div>
+
+                            <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
+                                <h:selectOneMenu id="creditTypeId" value="#{credit.creditType}"
+                                                 styleClass="input"
+                                                 required="true"
+                                                 tabindex="1">
+                                    <s:selectItems value="#{creditTypeList.resultList}"
+                                                   var="creditType"
+                                                   label="#{creditType.fullName}"
+                                                   noSelectionLabel=""
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
 
 
-                <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
-                    <app:selectPopUp id="partnerFieldId"
-                                     required="true"
-                                     textValue="#{credit.partner.fullName}"
-                                     value="#{credit.partner}"
-                                     clearAction="#{creditAction.clearPartner()}"
-                                     searchModalPanel="partnerListModalPanel"
-                                     dataModel="#{partnerDataModel}"
-                                     reRender="partnerField"
-                                     tabindex="12">
-                    </app:selectPopUp>
-                </s:decorate>
+                            <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
+                                <app:selectPopUp id="partnerFieldId"
+                                                 required="true"
+                                                 textValue="#{credit.partner.fullName}"
+                                                 value="#{credit.partner}"
+                                                 clearAction="#{creditAction.clearPartner()}"
+                                                 searchModalPanel="partnerListModalPanel"
+                                                 dataModel="#{partnerDataModel}"
+                                                 reRender="partnerField"
+                                                 tabindex="12">
+                                </app:selectPopUp>
+                            </s:decorate>
 
-                <s:decorate id="previousCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.previousCode']}</ui:define>
-                    <h:inputText id="previousCode" value="#{credit.previousCode}" required="true"
-                                 maxlength="15" tabindex="2" styleClass="input">
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="previousCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.previousCode']}</ui:define>
+                                <h:inputText id="previousCode" value="#{credit.previousCode}" required="true"
+                                             maxlength="15" tabindex="2" styleClass="input">
+                                </h:inputText>
+                            </s:decorate>
 
-                <!--<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
-                    <h:inputText id="bankNumber" value="#{credit.code}" styleClass="input"
-                                 maxlength="25" tabindex="2" required="true"/>
-                </s:decorate>-->
+                            <!--<s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.creditCode']}</ui:define>
+                                <h:inputText id="bankNumber" value="#{credit.code}" styleClass="input"
+                                             maxlength="25" tabindex="2" required="true"/>
+                            </s:decorate>-->
 
-                <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.amount']}</ui:define>
-                    <h:inputText id="amount" value="#{credit.amount}"
-                                 styleClass="input"
-                                 required="true"
-                                 maxlength="20"
-                                 tabindex="3">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="amountField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.amount']}</ui:define>
+                                <h:inputText id="amount" value="#{credit.amount}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="20"
+                                             tabindex="3">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <s:decorate id="annualRateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.annualRate']}</ui:define>
-                    <h:inputText id="annualRate" value="#{credit.annualRate}" styleClass="input"
-                                 required="true" tabindex="4">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="annualRateField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.annualRate']}</ui:define>
+                                <h:inputText id="annualRate" value="#{credit.annualRate}" styleClass="input"
+                                             required="true" tabindex="4">
+                                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <s:decorate id="criminalInterestField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.criminalInterest']}</ui:define>
-                    <h:inputText id="criminalInterest" value="#{credit.criminalInterest}" styleClass="input"
-                                 required="true" tabindex="41">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="criminalInterestField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.criminalInterest']}</ui:define>
+                                <h:inputText id="criminalInterest" value="#{credit.criminalInterest}" styleClass="input"
+                                             required="true" tabindex="41">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="criminalInterest"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <s:decorate id="amortizationField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.amortization']}</ui:define>
-                    <h:inputText id="amortization" value="#{credit.amortization}" styleClass="input"
-                                 required="true" tabindex="5">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="amortizationField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.amortization']}</ui:define>
+                                <h:inputText id="amortization" value="#{credit.amortization}" styleClass="input"
+                                             required="true" tabindex="5">
+                                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <s:decorate id="grantDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.grantDate']}</ui:define>
-                    <rich:calendar value="#{credit.grantDate}"
-                                   popup="true"
-                                   required="true"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   enableManualInput="true"
-                                   tabindex="6">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>
+                            <s:decorate id="grantDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.grantDate']}</ui:define>
+                                <rich:calendar value="#{credit.grantDate}"
+                                               popup="true"
+                                               required="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               styleClass="input"
+                                               enableManualInput="true"
+                                               tabindex="6">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </rich:calendar>
+                            </s:decorate>
 
-                <s:decorate id="firstPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.firstPayment']}</ui:define>
-                    <rich:calendar value="#{credit.firstPayment}"
-                                   popup="true"
-                                   required="true"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   enableManualInput="true"
-                                   tabindex="7">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>
+                            <s:decorate id="firstPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.firstPayment']}</ui:define>
+                                <rich:calendar value="#{credit.firstPayment}"
+                                               popup="true"
+                                               required="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               styleClass="input"
+                                               enableManualInput="true"
+                                               tabindex="7">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </rich:calendar>
+                            </s:decorate>
 
-                <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.term']}</ui:define>
-                    <h:inputText id="term" value="#{credit.term}" styleClass="input"
-                                 required="true" tabindex="8">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="termField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.term']}</ui:define>
+                                <h:inputText id="term" value="#{credit.term}" styleClass="input"
+                                             required="true" tabindex="8">
+                                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <s:decorate id="numberQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.numberQuota']}</ui:define>
-                    <h:inputText id="numberQuota" value="#{credit.numberQuota}" styleClass="input"
-                                 required="true" tabindex="9">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                        <a4j:support event="onchange" action="#{creditAction.calculateQuota()}" reRender="quotaField"/>
-                    </h:inputText>
-                </s:decorate>
+                            <s:decorate id="numberQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.numberQuota']}</ui:define>
+                                <h:inputText id="numberQuota" value="#{credit.numberQuota}" styleClass="input"
+                                             required="true" tabindex="9">
+                                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                                    <a4j:support event="onchange" action="#{creditAction.calculateQuota()}" reRender="quotaField"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <c:if test="#{creditAction.managed}">
-                <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.quota']}</ui:define>
-                    <h:inputText id="quota" value="#{credit.quota}"
-                                 styleClass="input"
-                                 required="true"
-                                 maxlength="20"
-                                 tabindex="10">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
-                    </h:inputText>
-                </s:decorate>
-                </c:if>
+                            <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                                <h:inputText id="quota" value="#{credit.quota}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="20"
+                                             tabindex="10">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
+                                </h:inputText>
+                            </s:decorate>
 
-                <c:if test="#{!creditAction.managed}">
-                    <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Credit.quota']}</ui:define>
-                        <h:inputText id="quota" value="#{creditAction.quotaValue}"
-                                     styleClass="input"
-                                     required="true"
-                                     maxlength="20"
-                                     tabindex="11">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
-                        </h:inputText>
-                    </s:decorate>
-                </c:if>
+                            <!--<c:if test="#{creditAction.managed}">
+                            <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                                <h:inputText id="quota" value="#{credit.quota}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="20"
+                                             tabindex="10">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
+                                </h:inputText>
+                            </s:decorate>
+                            </c:if>
 
-                <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.creditStatus']}</ui:define>
-                    <h:outputText value="#{messages[credit.state.resourceKey]}"/>
-                </s:decorate>
+                            <c:if test="#{!creditAction.managed}">
+                                <s:decorate id="quotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['Credit.quota']}</ui:define>
+                                    <h:inputText id="quota" value="#{creditAction.quotaValue}"
+                                                 styleClass="input"
+                                                 required="true"
+                                                 maxlength="20"
+                                                 tabindex="11">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="quota"/>
+                                    </h:inputText>
+                                </s:decorate>
+                            </c:if>-->
 
-                <s:decorate id="capitalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.capitalBalance']}</ui:define>
-                    <h:outputText id="capitalBalance"
-                                  value="#{credit.capitalBalance}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalBalance"/>
-                    </h:outputText>
-                </s:decorate>
+                            <s:decorate id="creditStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.creditStatus']}</ui:define>
+                                <h:outputText value="#{messages[credit.state.resourceKey]}"/>
+                            </s:decorate>
+
+                            <s:decorate id="capitalBalanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.capitalBalance']}</ui:define>
+                                <h:outputText id="capitalBalance"
+                                              value="#{credit.capitalBalance}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalBalance"/>
+                                </h:outputText>
+                            </s:decorate>
+
+                    </s:div>
+
+                    <s:div>
+                        <s:decorate id="deferredAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Credit.amountToDefer']}</ui:define>
+                            <h:inputText id="deferredAmount" value="#{credit.deferredAmount}"
+                                         styleClass="input"
+                                         required="false"
+                                         maxlength="20"
+                                         tabindex="12">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredAmount"/>
+                                <a4j:support event="onchange" action="#{creditAction.calculateDeferredQuota()}" reRender="deferredQuotaField"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="deferredQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Credit.quotaToDefer']}</ui:define>
+                            <h:inputText id="deferredQuota" value="#{credit.deferredQuota}"
+                                         styleClass="input"
+                                         required="false"
+                                         maxlength="20"
+                                         tabindex="12">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredQuota"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                    </s:div>
+
+                </h:panelGrid>
 
             </rich:panel>
             <c:if test="#{creditAction.managed}">
