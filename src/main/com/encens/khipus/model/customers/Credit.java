@@ -68,7 +68,7 @@ public class Credit implements BaseModel {
     private BigDecimal amount;
 
     @Column(name = "montodif", precision = 13, scale = 2)
-    private BigDecimal deferredAmount;
+    private BigDecimal deferredAmount = BigDecimal.ZERO;
 
     @Column(name = "anual", nullable = false)
     private Integer annualRate;
@@ -97,7 +97,7 @@ public class Credit implements BaseModel {
     private BigDecimal quota;
 
     @Column(name = "cuotadif", precision = 13, scale = 2)
-    private BigDecimal deferredQuota;
+    private BigDecimal deferredQuota = BigDecimal.ZERO;
 
     @Column(name = "saldo", precision = 13, scale = 2, nullable = false)
     private BigDecimal capitalBalance;
