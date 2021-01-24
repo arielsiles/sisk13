@@ -64,6 +64,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     private BigDecimal totalTransferAmount = BigDecimal.ZERO;
 
     private BigDecimal interestValue;
+    private BigDecimal deferredQuotaValue;
     private BigDecimal criminalInterestValue;
     private BigDecimal capitalValue;
     private BigDecimal totalAmountValue;
@@ -147,6 +148,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         creditTransaction.setDays(0);
         creditTransaction.setCapitalBalance(capitalBalance);
         creditTransaction.setInterest(interestValue);
+        creditTransaction.setDeferredQuota(getDeferredQuotaValue());
         creditTransaction.setCriminalInterest(criminalInterestValue);
         creditTransaction.setCapital(capitalValue);
         creditTransaction.setAmount(totalAmountValue);
@@ -637,7 +639,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         getInstance().setCapital(currentCapital);
         getInstance().setAmount(totalPayment);
 
-        interest = BigDecimalUtil.sum(interest, credit.getDeferredQuota(), 6);
+        //interest = BigDecimalUtil.sum(interest, credit.getDeferredQuota(), 6);
 
         this.interestValue = interest;
         this.capitalValue = currentCapital;
@@ -656,10 +658,13 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             totalAmountConvertedValue = BigDecimalUtil.multiply(totalAmountValue, exchangeRate, 2);
             System.out.println("---->>>>>> Total converted: " + totalAmountConvertedValue);
         }*/
+
+        calculateDeferredQuota();
         calculateTotalAmount();
 
         System.out.println("--------------------------> Capital: " + capitalValue);
         System.out.println("--------------------------> Interes: " + interestValue);
+        System.out.println("--------------------------> Cuota diferida: " + getDeferredQuotaValue());
         System.out.println("--------------------------> Interes Penal: " + criminalInterestValue);
         System.out.println("--------------------------> Total  : " + totalAmountValue);
 
@@ -903,6 +908,11 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
 
+    public void refreshCapital(){
+        calculateDeferredQuota();
+        calculateTotalAmount();
+    }
+
     public void calculateTotalAmount() {
         BigDecimal totalAmount = null;
         Credit credit = creditAction.getInstance();
@@ -910,6 +920,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (null != getInstance().getCapital() && null != getInstance().getInterest()) {
             totalAmount = BigDecimalUtil.sum(capitalValue, interestValue, 6);
             totalAmount = BigDecimalUtil.sum(totalAmount, criminalInterestValue, 6);
+            totalAmount = BigDecimalUtil.sum(totalAmount, getDeferredQuotaValue(), 6);
         }
 
         setTotalAmountValue(totalAmount);
@@ -921,6 +932,20 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         if (credit.getCreditType().getCurrency().getSymbol().equals("BS")){
             totalAmountConvertedValue = getTotalAmountValue();
             System.out.println("---->>>>>> Total no converted 1: " + totalAmountConvertedValue);
+        }
+    }
+
+    /** Calculando la cuota del monto diferido */
+    private void calculateDeferredQuota(){
+
+        Credit credit = creditAction.getInstance();
+
+        this.setDeferredQuotaValue(BigDecimal.ZERO);
+        if (credit.getDeferredAmount().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal quotaParam = BigDecimalUtil.divide(this.capitalValue, credit.getQuota());
+            BigDecimal deferredQuota = BigDecimalUtil.multiply(credit.getDeferredQuota(), quotaParam);
+
+            this.setDeferredQuotaValue(deferredQuota);
         }
     }
 
@@ -1126,6 +1151,14 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
     public void setTotalAmountConvertedValue(BigDecimal totalAmountConvertedValue) {
         this.totalAmountConvertedValue = totalAmountConvertedValue;
+    }
+
+    public BigDecimal getDeferredQuotaValue() {
+        return deferredQuotaValue;
+    }
+
+    public void setDeferredQuotaValue(BigDecimal deferredQuotaValue) {
+        this.deferredQuotaValue = deferredQuotaValue;
     }
 }
 

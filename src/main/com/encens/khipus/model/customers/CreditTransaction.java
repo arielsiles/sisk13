@@ -63,6 +63,9 @@ public class CreditTransaction implements Serializable, BaseModel {
     @Column(name = "interes", precision = 13, scale = 2, nullable = false)
     private BigDecimal interest;
 
+    @Column(name = "cuotadif", precision = 13, scale = 2, nullable = false)
+    private BigDecimal deferredQuota;
+
     @Column(name = "interespenal", precision = 13, scale = 2, nullable = false)
     private BigDecimal criminalInterest;
 
@@ -271,5 +274,13 @@ public class CreditTransaction implements Serializable, BaseModel {
 
     public void setDifference(BigDecimal difference) {
         this.difference = difference;
+    }
+
+    public BigDecimal getDeferredQuota() {
+        return deferredQuota;
+    }
+
+    public void setDeferredQuota(BigDecimal deferredQuota) {
+        this.deferredQuota = deferredQuota;
     }
 }

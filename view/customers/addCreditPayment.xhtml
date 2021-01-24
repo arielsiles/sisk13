@@ -71,7 +71,7 @@
                                  immediate="true"
                                  title="#{messages['Common.calculate']}"
                                  action="#{creditTransactionAction.calculateInterest()}"
-                                 reRender="interestField, capitalField, amountField, criminalInterestField, amountConverted"
+                                 reRender="interestField, capitalField, amountField, criminalInterestField, amountConverted, deferredQuotaField"
                                  tabindex="6">
                     <h:graphicImage value="/img/calculator.gif" styleClass="select-image-middle"/>
                     <a4j:support event="onclick" reRender="interestField, capitalField, amountField, amountConverted"/>
@@ -126,13 +126,23 @@
                         </h:inputText>
                     </s:decorate>
 
+                    <s:decorate id="deferredQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Credit.deferredQuota']}</ui:define>
+                        <h:inputText id="deferredQuota"
+                                     value="#{creditTransactionAction.deferredQuotaValue}"
+                                     styleClass="input" required="true" tabindex="2">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                            <a4j:support event="onchange" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField, amountConvertedField, deferredQuotaField"/>
+                        </h:inputText>
+                    </s:decorate>
+
                     <s:decorate id="capitalField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Credit.capital']}</ui:define>
                         <h:inputText id="capital"
                                      value="#{creditTransactionAction.capitalValue}"
                                      styleClass="input" required="true" tabindex="2">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
-                            <a4j:support event="onblur" action="#{creditTransactionAction.calculateTotalAmount()}" reRender="amountField, capitalField, amountConvertedField"/>
+                            <a4j:support event="onblur" action="#{creditTransactionAction.refreshCapital()}" reRender="amountField, capitalField, amountConvertedField, deferredQuotaField"/>
                         </h:inputText>
                     </s:decorate>
 
