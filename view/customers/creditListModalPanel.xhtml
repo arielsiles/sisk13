@@ -1,0 +1,108 @@
+<rich:modalPanel height="520" width="920" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\:creditListForm#{dialogId}\\:nameField\\:name').focus();">
+
+    <!--<c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{accountDataModel}"/>
+    </c:if>-->
+
+    <f:facet name="header">
+        <h:outputText>#{messages['Credit.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="creditListForm#{dialogId}">
+        <rich:simpleTogglePanel label="#{messages['Credit.search']}" switchType="credit">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+
+                <s:div>
+                    <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.firstName']}</ui:define>
+                        <h:inputText id="firstName" value="#{creditDataModel.firstName}" maxlength="20"
+                                     styleClass="input"
+                                     tabindex="2001"/>
+                    </s:decorate>
+
+                    <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.lastName']}</ui:define>
+                        <h:inputText id="lastName" value="#{creditDataModel.lastName}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="2002"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Partner.maidenName']}</ui:define>
+                        <h:inputText id="maidenName" value="#{creditDataModel.maidenName}" maxlength="100"
+                                     styleClass="input"
+                                     tabindex="2003"/>
+                    </s:decorate>
+
+                    <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <a4j:commandButton action="#{creditDataModel.search}"
+                                           reRender="creditList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                           tabindex="2004">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="10%, 20%, 20%, 20%, 10%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>#{messages['Credit.previousCode']}</rich:column>
+                    <rich:column>#{messages['Partner.firstName']}</rich:column>
+                    <rich:column>#{messages['Partner.lastName']}</rich:column>
+                    <rich:column>#{messages['Partner.maidenName']}</rich:column>
+                    <rich:column>#{messages['Credit.capitalBalance']}</rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{creditItem.previousCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{creditItem.partner.firstName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{creditItem.partner.lastName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{creditItem.partner.maidenName}"/>
+            </rich:column>
+
+            <rich:column styleClass="right">
+                <h:outputText value="#{creditItem.capitalBalance}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+
+
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
+                                       event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="creditList" dataModel="#{creditDataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+
+</rich:modalPanel>
+

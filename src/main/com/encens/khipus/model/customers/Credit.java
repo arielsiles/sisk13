@@ -118,6 +118,10 @@ public class Credit implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean delivered = Boolean.FALSE;
 
+    @Column(name = "traspaso", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean transfer = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipocredito", referencedColumnName = "idtipocredito", nullable = true)
     private CreditType creditType;
@@ -141,6 +145,10 @@ public class Credit implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idsocio", nullable = false)
     private Partner partner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcreditoorig", nullable = false)
+    private Credit originCredit;
 
     public long getVersion() {
         return version;
@@ -373,5 +381,21 @@ public class Credit implements BaseModel {
 
     public void setDeferredQuota(BigDecimal deferredQuota) {
         this.deferredQuota = deferredQuota;
+    }
+
+    public Boolean getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(Boolean transfer) {
+        this.transfer = transfer;
+    }
+
+    public Credit getOriginCredit() {
+        return originCredit;
+    }
+
+    public void setOriginCredit(Credit originCredit) {
+        this.originCredit = originCredit;
     }
 }

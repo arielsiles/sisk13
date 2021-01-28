@@ -270,6 +270,21 @@
                     </s:div>
 
                     <s:div>
+
+                        <s:decorate id="originCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label"><h:outputText value="#{messages['Credit.originCredit']}"/></ui:define>
+                            <app:selectPopUp id="originCreditFieldId"
+                                             required="false"
+                                             textValue="#{credit.originCredit.partner.fullName}"
+                                             value="#{credit.originCredit}"
+                                             clearAction="#{voucherCreateAction.clearPartnerAccount()}"
+                                             searchModalPanel="creditListModalPanel"
+                                             dataModel="#{creditDataModel}"
+                                             reRender="originCreditField"
+                                             tabindex="12">
+                            </app:selectPopUp>
+                        </s:decorate>
+
                         <s:decorate id="deferredAmountField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['Credit.amountToDefer']}</ui:define>
                             <h:inputText id="deferredAmount" value="#{credit.deferredAmount}"
@@ -465,7 +480,18 @@
             </s:decorate>
         </s:div>
 
-
+        <s:decorate id="creditListModalPanelContainer" template="/customers/creditListModalPanel.xhtml">
+            <ui:param name="containerId" value="creditListModalPanelContainer"/>
+            <ui:param name="dialogId" value="creditListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditAction.assignOriginCredit(creditItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="originCreditField"
+                                   oncomplete="Richfaces.hideModalPanel('creditListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
 
         <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
     </ui:define>

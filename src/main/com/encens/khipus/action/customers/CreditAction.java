@@ -147,6 +147,10 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setPartner(partner);
     }
 
+    public void assignOriginCredit(Credit credit){
+        getInstance().setOriginCredit(credit);
+    }
+
     public void clearPartner(){
         getInstance().setPartner(null);
     }
