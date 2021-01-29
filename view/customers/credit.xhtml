@@ -26,7 +26,7 @@
 
             <div class="buttons">
 
-                <h:commandButton id="approveTransferButtonId"
+                <!--<h:commandButton id="approveTransferButtonId"
                                  action="#{creditAction.approveTransfer}"
                                  value="#{messages['Credit.approve']}"
                                  styleClass="button"
@@ -35,7 +35,7 @@
                                              !credit.delivered and
                                              !credit.isFinalized() and
                                              s:hasPermission('CREDIT','CREATE')}">
-                </h:commandButton>
+                </h:commandButton>-->
 
                 <h:commandButton action="#{creditAction.addPayoutCredit}"
                                  value="#{messages['CreditTransaction.payoutCredit']}"
@@ -113,7 +113,7 @@
                                 <h:selectBooleanCheckbox id="allDay"
                                                          value="#{credit.transfer}"
                                                          tabindex="14"
-                                                         disabled="#{credit.isFinalized()}">
+                                                         disabled="#{credit.isFinalized() or credit.delivered}">
                                     <a4j:support event="onchange"
                                                  reRender="creditTransferField, originCreditDiv, creditTransferDiv"
                                                  ajaxSingle="true"/>
@@ -121,24 +121,29 @@
                             </s:decorate>
 
                             <s:div id="originCreditDiv">
-                            <s:decorate id="originCreditField" template="/include/inputField.xhtml" styleClass="formRow"
-                                        rendered="#{credit.transfer}">
-                                <ui:define name="label"><h:outputText value="#{messages['Credit.originCredit']}"/></ui:define>
-                                <app:selectPopUp id="originCreditFieldId"
-                                                 required="false"
-                                                 textValue="#{credit.originCredit.partner.fullName}"
-                                                 value="#{credit.originCredit}"
-                                                 clearAction="#{voucherCreateAction.clearPartnerAccount()}"
-                                                 searchModalPanel="creditListModalPanel"
-                                                 dataModel="#{creditDataModel}"
-                                                 reRender="originCreditField, creditAmount"
-                                                 tabindex="12">
-                                </app:selectPopUp>
+                                <s:decorate id="originCreditField" template="/include/inputField.xhtml" styleClass="formRow"
+                                            rendered="#{credit.transfer}">
+                                    <ui:define name="label"><h:outputText value="#{messages['Credit.originCredit']}"/></ui:define>
+                                    <app:selectPopUp id="originCreditFieldId"
+                                                     required="false"
+                                                     textValue="#{credit.originCredit.partner.fullName}"
+                                                     value="#{credit.originCredit}"
+                                                     clearAction="#{voucherCreateAction.clearPartnerAccount()}"
+                                                     searchModalPanel="creditListModalPanel"
+                                                     dataModel="#{creditDataModel}"
+                                                     reRender="originCreditField, capitalBalanceOriginCreditField"
+                                                     tabindex="12">
+                                    </app:selectPopUp>
 
-                                <h:outputText id="creditAmount" value="#{credit.originCredit.capitalBalance}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="creditAmount"/>
-                                </h:outputText>
-                            </s:decorate>
+                                </s:decorate>
+
+                                <s:decorate id="capitalBalanceOriginCreditField" template="/include/inputField.xhtml" styleClass="formRow"
+                                            rendered="#{credit.transfer}">
+                                    <ui:define name="label"><h:outputText value="#{messages['Credit.capitalBalance']}"/></ui:define>
+                                    <h:outputText id="creditAmount" value="#{credit.originCredit.capitalBalance}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="creditAmount"/>
+                                    </h:outputText>
+                                </s:decorate>
                             </s:div>
 
                             <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -524,7 +529,7 @@
                                    action="#{creditAction.assignOriginCredit(creditItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="originCreditField"
+                                   reRender="originCreditField, capitalBalanceOriginCreditField"
                                    oncomplete="Richfaces.hideModalPanel('creditListModalPanel');"/>
             </ui:define>
         </s:decorate>

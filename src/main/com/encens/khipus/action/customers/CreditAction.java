@@ -111,9 +111,11 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setCode(creditNumber);
         getInstance().setState(CreditState.VIG);
         getInstance().setCapitalBalance(instance.getAmount());
-        //getInstance().setQuota(quotaValue);
         super.create();
         sequenceGeneratorService.nextCreditNumber(getInstance().getPartner().getId());
+
+        approveTransfer();
+
         return Outcome.SUCCESS;
     }
 

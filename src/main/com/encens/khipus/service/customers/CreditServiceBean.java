@@ -254,7 +254,23 @@ public class CreditServiceBean implements CreditService {
         creditTransaction.setCredit(originCredit);
         //creditTransaction.setVoucher(voucher);
 
+        CreditTransaction creditTransactionNew = new CreditTransaction();
+        creditTransactionNew.setCapital(originCredit.getCapitalBalance());
+        creditTransactionNew.setInterest(BigDecimal.ZERO);
+        creditTransactionNew.setDeferredQuota(BigDecimal.ZERO);
+        creditTransactionNew.setCriminalInterest(BigDecimal.ZERO);
+        creditTransactionNew.setAmount(originCredit.getCapitalBalance());
+        creditTransactionNew.setDifference(BigDecimal.ZERO);
+        creditTransactionNew.setGloss(gloss);
+        creditTransactionNew.setDate(new Date());
+        creditTransactionNew.setCreationDate(new Date());
+        creditTransactionNew.setDays(0);
+        creditTransactionNew.setCapitalBalance(originCredit.getCapitalBalance());
+        creditTransactionNew.setCreditTransactionType(CreditTransactionType.TRA);
+        creditTransactionNew.setCredit(credit);
+
         em.persist(creditTransaction);
+        em.persist(creditTransactionNew);
         em.flush();
 
 
@@ -295,6 +311,7 @@ public class CreditServiceBean implements CreditService {
         voucherAccoutingService.saveVoucher(voucher);
 
         creditTransactionService.updateTransaction(creditTransaction, voucher);
+        creditTransactionService.updateTransaction(creditTransactionNew, voucher);
 
     }
 
