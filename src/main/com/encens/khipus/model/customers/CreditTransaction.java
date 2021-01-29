@@ -64,7 +64,7 @@ public class CreditTransaction implements Serializable, BaseModel {
     private BigDecimal interest;
 
     @Column(name = "cuotadif", precision = 13, scale = 2, nullable = false)
-    private BigDecimal deferredQuota;
+    private BigDecimal deferredQuota = BigDecimal.ZERO;
 
     @Column(name = "interespenal", precision = 13, scale = 2, nullable = false)
     private BigDecimal criminalInterest;

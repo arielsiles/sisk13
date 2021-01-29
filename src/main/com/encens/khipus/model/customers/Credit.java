@@ -147,7 +147,7 @@ public class Credit implements BaseModel {
     private Partner partner;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idcreditoorig", nullable = false)
+    @JoinColumn(name = "idcreditoorig", nullable = true)
     private Credit originCredit;
 
     public long getVersion() {
@@ -353,10 +353,19 @@ public class Credit implements BaseModel {
     public Boolean isFinalized(){
         Boolean result = Boolean.FALSE;
 
-        if (state.equals(CreditState.FIN))
+        if (state != null) {
+            if (state.equals(CreditState.FIN))
+                result = Boolean.TRUE;
+        }
+        return result;
+    }
+
+    public Boolean isTranferCredit(){
+        Boolean result = Boolean.FALSE;
+        if (originCredit != null)
             result = Boolean.TRUE;
 
-        return result;
+        return  result;
     }
 
     public List<CreditTransaction> getCreditTransactionList() {

@@ -142,6 +142,10 @@ public class CreditAction extends GenericAction<Credit> {
         return creditTransactionAction.select(creditTransaction);
     }
 
+    public void approveTransfer(){
+        creditService.approveTransfer(getInstance());
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Credit.transfer.approvedMessage");
+    }
 
     public void assignPartner(Partner partner){
         getInstance().setPartner(partner);

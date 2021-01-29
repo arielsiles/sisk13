@@ -60,13 +60,14 @@
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{creditDataModel}" var="creditItem" id="creditList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="10%, 20%, 20%, 20%, 10%, 10%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="10%, 18%, 18%, 18%, 10%, 6%, 10%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>#{messages['Credit.previousCode']}</rich:column>
                     <rich:column>#{messages['Partner.firstName']}</rich:column>
                     <rich:column>#{messages['Partner.lastName']}</rich:column>
                     <rich:column>#{messages['Partner.maidenName']}</rich:column>
+                    <rich:column>#{messages['Credit.state']}</rich:column>
                     <rich:column>#{messages['Credit.capitalBalance']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
@@ -84,6 +85,10 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{creditItem.partner.maidenName}"/>
+            </rich:column>
+
+            <rich:column>
+                <h:outputText value="#{creditItem.state}"/>
             </rich:column>
 
             <rich:column styleClass="right">
