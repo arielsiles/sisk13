@@ -46,6 +46,7 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         creditAction.setInstance(credit);
         creditTransactionAction.setDateTransaction(dateTransaction);
         BigDecimal interestToDate = creditTransactionAction.calculateInterest();
+                   interestToDate = BigDecimalUtil.sum(interestToDate, credit.getDeferredQuota());  /** todo **/
         BigDecimal criminalInterestValue = creditTransactionAction.getCriminalInterestValue();
         interestToDate = BigDecimalUtil.sum(interestToDate, criminalInterestValue);
         Long expiredDays = creditAction.calculateExpiredDays(credit, dateTransaction);

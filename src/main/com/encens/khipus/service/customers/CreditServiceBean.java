@@ -239,7 +239,7 @@ public class CreditServiceBean implements CreditService {
         gloss = gloss + " " + originCredit.getPartner().getFullName();
 
         CreditTransaction creditTransaction = new CreditTransaction();
-        creditTransaction.setCapital(originCredit.getCapitalBalance());
+        creditTransaction.setCapital(BigDecimal.ZERO);
         creditTransaction.setInterest(BigDecimal.ZERO);
         creditTransaction.setDeferredQuota(BigDecimal.ZERO);
         creditTransaction.setCriminalInterest(BigDecimal.ZERO);
@@ -255,7 +255,7 @@ public class CreditServiceBean implements CreditService {
         //creditTransaction.setVoucher(voucher);
 
         CreditTransaction creditTransactionNew = new CreditTransaction();
-        creditTransactionNew.setCapital(originCredit.getCapitalBalance());
+        creditTransactionNew.setCapital(BigDecimal.ZERO);
         creditTransactionNew.setInterest(BigDecimal.ZERO);
         creditTransactionNew.setDeferredQuota(BigDecimal.ZERO);
         creditTransactionNew.setCriminalInterest(BigDecimal.ZERO);
