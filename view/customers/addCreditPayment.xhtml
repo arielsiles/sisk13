@@ -34,17 +34,17 @@
                              action="#{creditTransactionAction.createCreditTransaction(credit)}"
                              value="#{messages['CreditTransaction.save']}"
                              styleClass="button"
-                             rendered="#{!creditTransactionAction.managed}">
+                             rendered="#{!creditTransactionAction.managed and s:hasPermission('CREDIT_PAYMENT','CREATE')}">
             </h:commandButton>
 
-            <h:commandButton value="#{messages['Common.delete']}"
+            <!--<h:commandButton value="#{messages['Common.delete']}"
                              styleClass="button"
                              rendered="#{creditTransactionAction.managed}">
                 <rich:componentControl for="deleteConfirmation"
                                        event="onclick"
                                        disableDefault="true"
                                        operation="show"/>
-            </h:commandButton>
+            </h:commandButton>-->
 
             <h:commandButton action="#{creditTransactionAction.cancel}"
                              value="#{messages['Common.cancel']}"
@@ -274,7 +274,7 @@
         </rich:panel>
     </h:form>
 
-    <s:decorate template="/include/modalDialog.xhtml"
+    <!--<s:decorate template="/include/modalDialog.xhtml"
                 rendered="#{creditAction.managed and s:hasPermission('CREDIT','DELETE')}">
         <ui:param name="dialogId" value="deleteConfirmation"/>
         <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
@@ -293,7 +293,7 @@
                                rendered="#{creditAction.managed}"
                                styleClass="button"/>
         </ui:define>
-    </s:decorate>
+    </s:decorate>-->
 
     <s:decorate id="accountListModalPanelContainer" template="/customers/accountListModalPanel.xhtml">
         <ui:param name="containerId" value="accountListModalPanelContainer"/>

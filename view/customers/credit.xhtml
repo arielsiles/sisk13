@@ -30,19 +30,19 @@
                                  value="#{messages['CreditTransaction.payoutCredit']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and !credit.delivered}"/>
+                                 rendered="#{creditAction.managed and !credit.delivered and s:hasPermission('CREDIT_PAYMENT','VIEW')}"/>
 
                 <h:commandButton action="#{creditAction.addCreditPayment}"
                                  value="#{messages['CreditTransaction.newPayment']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized()}"/>
+                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized() and s:hasPermission('CREDIT_PAYMENT','VIEW')}"/>
 
                 <h:commandButton action="#{creditAction.addNewGuarantor}"
                                  value="#{messages['Credit.guarantor.new']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized()}"/>
+                                 rendered="#{creditAction.managed and credit.delivered and !credit.isFinalized() and s:hasPermission('CREDIT_GUARANTOR','CREATE')}" />
 
                 <h:commandButton id="createButtonId"
                                  action="#{creditAction.create}"
@@ -55,7 +55,7 @@
                                  action="#{creditAction.update}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{creditAction.managed and !credit.delivered}">
+                                 rendered="#{creditAction.managed and !credit.delivered and s:hasPermission('CREDIT','UPDATE')}">
                     <s:defaultAction/>
                 </h:commandButton>
 
