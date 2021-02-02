@@ -273,6 +273,13 @@
                 <redirect view-id="/customers/creditList.xhtml"/>
             </rule>
         </navigation>-->
+        <navigation from-action="#{creditAction.create}">
+            <rule if-outcome="Success">
+                <!--<begin-conversation flush-mode="MANUAL"/>-->
+                <redirect view-id="/customers/creditList.xhtml"/>
+                <!-- <redirect view-id="/customers/credit.xhtml"/> -->
+            </rule>
+        </navigation>
         <navigation from-action="#{creditAction.update}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
@@ -314,9 +321,9 @@
             </rule>
         </navigation>
         <navigation>
-            <rule if-outcome="Success">
+            <!--<rule if-outcome="Success">
                 <redirect view-id="/customers/creditList.xhtml"/>
-            </rule>
+            </rule>-->
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/creditList.xhtml"/>
             </rule>

@@ -53,6 +53,9 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
         //BigDecimal quota = credit.getQuota(); /* Revision */
         BigDecimal quota = creditTransactionAction.calculateCapitalBaseCapital(credit); /* Revision */
 
+        /** Sumando al interes la cuota diferida si existe **/
+        BigDecimal deferredQuotaValue = calculateDeferredQuota(credit, quota);
+        interestToDate = BigDecimalUtil.sum(interestToDate, deferredQuotaValue);
 
         if (credit.getNumberQuota() == 1)
             quota = BigDecimal.ZERO;
@@ -66,6 +69,15 @@ public class CreditStatusZoneReportScriptlet extends JRDefaultScriptlet {
 
     }
 
+    private BigDecimal calculateDeferredQuota(Credit credit, BigDecimal capitalValue){
+
+        BigDecimal deferredQuotaValue = BigDecimal.ZERO;
+        if (credit.getDeferredAmount().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal quotaParam = BigDecimalUtil.divide(capitalValue, credit.getQuota());
+            deferredQuotaValue = BigDecimalUtil.multiply(credit.getDeferredQuota(), quotaParam);
+        }
+        return deferredQuotaValue;
+    }
 
     private BigDecimal getFieldAsBigDecimal(String fieldName) throws JRScriptletException {
         BigDecimal bigDecimalValue = null;

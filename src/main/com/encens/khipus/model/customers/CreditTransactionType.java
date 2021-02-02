@@ -6,7 +6,8 @@ package com.encens.khipus.model.customers;
  */
 public enum CreditTransactionType {
     EGR("CreditTransaction.payoutCredit"),
-    ING("CreditTransaction.income");
+    ING("CreditTransaction.income"),
+    TRA("CreditTransaction.transfer");
 
     private String resourceKey;
 

@@ -365,6 +365,9 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
 
             /** For Interest **/
             VoucherDetail voucherDetailInterest = new VoucherDetail();
+
+            BigDecimal interestValue = BigDecimalUtil.sum(creditTransaction.getInterest(), creditTransaction.getDeferredQuota());
+
             if (creditTransaction.getCredit().getState().equals(CreditState.VIG)) {
                 voucherDetailInterest.setAccount(creditTransaction.getCredit().getCreditType().getCurrentInterestAccountCode());
             }
@@ -377,15 +380,15 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             CashAccount interestCashAccount = cashAccountService.findByAccountCode(voucherDetailInterest.getAccount());
             if (interestCashAccount.getCurrency().equals(FinancesCurrencyType.P)){
                 voucherDetailInterest.setDebit(BigDecimal.ZERO);
-                voucherDetailInterest.setCredit(creditTransaction.getInterest());
+                voucherDetailInterest.setCredit(interestValue);
                 voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
                 voucherDetailInterest.setCreditMe(BigDecimal.ZERO);
             }
             if (interestCashAccount.getCurrency().equals(FinancesCurrencyType.D)){
                 voucherDetailInterest.setDebit(BigDecimal.ZERO);
-                voucherDetailInterest.setCredit(BigDecimalUtil.multiply(creditTransaction.getInterest(), exchangeRate, 2));
+                voucherDetailInterest.setCredit(BigDecimalUtil.multiply(interestValue, exchangeRate, 2));
                 voucherDetailInterest.setDebitMe(BigDecimal.ZERO);
-                voucherDetailInterest.setCreditMe(creditTransaction.getInterest());
+                voucherDetailInterest.setCreditMe(interestValue);
             }
 
             /** End For Interest **/
@@ -398,7 +401,7 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
             voucher.getDetails().add(voucherDetailCurrentLoan);
 
 
-            if (creditTransaction.getInterest().doubleValue() > 0)
+            if (interestValue.doubleValue() > 0)
                 voucher.getDetails().add(voucherDetailInterest);
 
             /** revisar ??? nada **/

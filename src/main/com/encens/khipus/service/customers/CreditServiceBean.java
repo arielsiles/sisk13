@@ -2,8 +2,13 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -24,6 +29,11 @@ import java.util.List;
 @Name("creditService")
 @AutoCreate
 public class CreditServiceBean implements CreditService {
+
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private CreditTransactionService creditTransactionService;
 
     @In(value = "#{entityManager}")
     private EntityManager em;
@@ -218,6 +228,91 @@ public class CreditServiceBean implements CreditService {
         System.out.println("..........RESULT: " + result);
 
         return result;
+    }
+
+    @Override
+    public void approveTransfer(Credit credit) {
+
+        Credit originCredit = credit.getOriginCredit();
+
+        String gloss = MessageUtils.getMessage("Credit.transfer.gloss.message");
+        gloss = gloss + " " + originCredit.getPartner().getFullName();
+
+        CreditTransaction creditTransaction = new CreditTransaction();
+        creditTransaction.setCapital(BigDecimal.ZERO);
+        creditTransaction.setInterest(BigDecimal.ZERO);
+        creditTransaction.setDeferredQuota(BigDecimal.ZERO);
+        creditTransaction.setCriminalInterest(BigDecimal.ZERO);
+        creditTransaction.setAmount(originCredit.getCapitalBalance());
+        creditTransaction.setDifference(BigDecimal.ZERO);
+        creditTransaction.setGloss(gloss);
+        creditTransaction.setDate(new Date());
+        creditTransaction.setCreationDate(new Date());
+        creditTransaction.setDays(0);
+        creditTransaction.setCapitalBalance(BigDecimal.ZERO);
+        creditTransaction.setCreditTransactionType(CreditTransactionType.TRA);
+        creditTransaction.setCredit(originCredit);
+        //creditTransaction.setVoucher(voucher);
+
+        CreditTransaction creditTransactionNew = new CreditTransaction();
+        creditTransactionNew.setCapital(BigDecimal.ZERO);
+        creditTransactionNew.setInterest(BigDecimal.ZERO);
+        creditTransactionNew.setDeferredQuota(BigDecimal.ZERO);
+        creditTransactionNew.setCriminalInterest(BigDecimal.ZERO);
+        creditTransactionNew.setAmount(originCredit.getCapitalBalance());
+        creditTransactionNew.setDifference(BigDecimal.ZERO);
+        creditTransactionNew.setGloss(gloss);
+        creditTransactionNew.setDate(new Date());
+        creditTransactionNew.setCreationDate(new Date());
+        creditTransactionNew.setDays(0);
+        creditTransactionNew.setCapitalBalance(originCredit.getCapitalBalance());
+        creditTransactionNew.setCreditTransactionType(CreditTransactionType.TRA);
+        creditTransactionNew.setCredit(credit);
+
+        em.persist(creditTransaction);
+        em.persist(creditTransactionNew);
+        em.flush();
+
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
+        voucher.setGloss(gloss);
+
+        CreditType creditTypeOrigin = credit.getOriginCredit().getCreditType();
+
+        String cashAccountOrigin = creditTypeOrigin.getCurrentAccountCode(); // Vig
+        if (originCredit.getState().equals(CreditState.VEN))
+            cashAccountOrigin = creditTypeOrigin.getExpiredAccountCode();
+        if (originCredit.getState().equals(CreditState.EJE))
+            cashAccountOrigin = creditTypeOrigin.getExecutedAccountCode();
+
+
+        VoucherDetail voucherDetailDebit = new VoucherDetail();
+        voucherDetailDebit.setAccount(credit.getCreditType().getCurrentAccountCode());
+        voucherDetailDebit.setDebit(originCredit.getCapitalBalance());
+        voucherDetailDebit.setCredit(BigDecimal.ZERO);
+        voucherDetailDebit.setCreditPartner(credit);
+
+        VoucherDetail voucherDetailCredit = new VoucherDetail();
+        voucherDetailCredit.setAccount(cashAccountOrigin);
+        voucherDetailCredit.setDebit(BigDecimal.ZERO);
+        voucherDetailCredit.setCredit(originCredit.getCapitalBalance());
+        voucherDetailCredit.setCreditPartner(originCredit);
+
+        voucher.getDetails().add(voucherDetailDebit);
+        voucher.getDetails().add(voucherDetailCredit);
+
+        originCredit.setLastState(originCredit.getState());
+        originCredit.setState(CreditState.FIN);
+        originCredit.setCapitalBalance(BigDecimal.ZERO);
+
+        credit.setDelivered(true);
+
+        voucherAccoutingService.saveVoucher(voucher);
+
+        creditTransactionService.updateTransaction(creditTransaction, voucher);
+        creditTransactionService.updateTransaction(creditTransactionNew, voucher);
+
     }
 
 }

@@ -30,7 +30,7 @@
                                  value="#{messages['CreditTransaction.payoutCredit']}"
                                  styleClass="button"
                                  immediate="true"
-                                 rendered="#{creditAction.managed and !credit.delivered and s:hasPermission('CREDIT_PAYMENT','VIEW')}"/>
+                                 rendered="#{creditAction.managed and !credit.delivered and !credit.transfer and s:hasPermission('CREDIT_PAYMENT','VIEW')}"/>
 
                 <h:commandButton action="#{creditAction.addCreditPayment}"
                                  value="#{messages['CreditTransaction.newPayment']}"
@@ -95,6 +95,45 @@
                              columnClasses="width50percent,width50percent">
 
                     <s:div>
+                            <s:decorate id="creditTransferField"
+                                        template="/include/inputField.xhtml"
+                                        styleClass="formRow">
+                                <ui:define name="label">#{messages['Credit.creditTransfer']}</ui:define>
+                                <h:selectBooleanCheckbox id="allDay"
+                                                         value="#{credit.transfer}"
+                                                         tabindex="14"
+                                                         disabled="#{credit.isFinalized() or credit.delivered}">
+                                    <a4j:support event="onchange"
+                                                 reRender="creditTransferField, originCreditDiv, creditTransferDiv"
+                                                 ajaxSingle="true"/>
+                                </h:selectBooleanCheckbox>
+                            </s:decorate>
+
+                            <s:div id="originCreditDiv">
+                                <s:decorate id="originCreditField" template="/include/inputField.xhtml" styleClass="formRow"
+                                            rendered="#{credit.transfer}">
+                                    <ui:define name="label"><h:outputText value="#{messages['Credit.originCredit']}"/></ui:define>
+                                    <app:selectPopUp id="originCreditFieldId"
+                                                     required="false"
+                                                     textValue="#{credit.originCredit.partner.fullName}"
+                                                     value="#{credit.originCredit}"
+                                                     clearAction="#{voucherCreateAction.clearPartnerAccount()}"
+                                                     searchModalPanel="creditListModalPanel"
+                                                     dataModel="#{creditDataModel}"
+                                                     reRender="originCreditField, capitalBalanceOriginCreditField"
+                                                     tabindex="12">
+                                    </app:selectPopUp>
+
+                                </s:decorate>
+
+                                <s:decorate id="capitalBalanceOriginCreditField" template="/include/inputField.xhtml" styleClass="formRow"
+                                            rendered="#{credit.transfer}">
+                                    <ui:define name="label"><h:outputText value="#{messages['Credit.capitalBalance']}"/></ui:define>
+                                    <h:outputText id="creditAmount" value="#{credit.originCredit.capitalBalance}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="creditAmount"/>
+                                    </h:outputText>
+                                </s:decorate>
+                            </s:div>
 
                             <s:decorate id="creditTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                                 <ui:define name="label">#{messages['Credit.creditType']}</ui:define>
@@ -270,29 +309,35 @@
                     </s:div>
 
                     <s:div>
-                        <s:decorate id="deferredAmountField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Credit.amountToDefer']}</ui:define>
-                            <h:inputText id="deferredAmount" value="#{credit.deferredAmount}"
-                                         styleClass="input"
-                                         required="false"
-                                         maxlength="20"
-                                         tabindex="12">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredAmount"/>
-                                <a4j:support event="onchange" action="#{creditAction.calculateDeferredQuota()}" reRender="deferredQuotaField"/>
-                            </h:inputText>
-                        </s:decorate>
 
-                        <s:decorate id="deferredQuotaField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Credit.quotaToDefer']}</ui:define>
-                            <h:inputText id="deferredQuota" value="#{credit.deferredQuota}"
-                                         styleClass="input"
-                                         required="false"
-                                         maxlength="20"
-                                         tabindex="12">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredQuota"/>
-                            </h:inputText>
-                        </s:decorate>
 
+                        <s:div id="creditTransferDiv">
+
+                            <s:decorate id="deferredAmountField" template="/include/inputField.xhtml" styleClass="formRow"
+                                        rendered="#{credit.transfer}">
+                                <ui:define name="label">#{messages['Credit.amountToDefer']}</ui:define>
+                                <h:inputText id="deferredAmount" value="#{credit.deferredAmount}"
+                                             styleClass="input"
+                                             required="false"
+                                             maxlength="20"
+                                             tabindex="12">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredAmount"/>
+                                    <a4j:support event="onchange" action="#{creditAction.calculateDeferredQuota()}" reRender="deferredQuotaField"/>
+                                </h:inputText>
+                            </s:decorate>
+
+                            <s:decorate id="deferredQuotaField" template="/include/inputField.xhtml" styleClass="formRow"
+                                        rendered="#{credit.transfer}">
+                                <ui:define name="label">#{messages['Credit.quotaToDefer']}</ui:define>
+                                <h:inputText id="deferredQuota" value="#{credit.deferredQuota}"
+                                             styleClass="input"
+                                             required="false"
+                                             maxlength="20"
+                                             tabindex="12">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="deferredQuota"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </s:div>
                     </s:div>
 
                 </h:panelGrid>
@@ -465,7 +510,18 @@
             </s:decorate>
         </s:div>
 
-
+        <s:decorate id="creditListModalPanelContainer" template="/customers/creditListModalPanel.xhtml">
+            <ui:param name="containerId" value="creditListModalPanelContainer"/>
+            <ui:param name="dialogId" value="creditListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{creditAction.assignOriginCredit(creditItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="originCreditField, capitalBalanceOriginCreditField"
+                                   oncomplete="Richfaces.hideModalPanel('creditListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
 
         <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
     </ui:define>

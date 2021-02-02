@@ -111,9 +111,11 @@ public class CreditAction extends GenericAction<Credit> {
         getInstance().setCode(creditNumber);
         getInstance().setState(CreditState.VIG);
         getInstance().setCapitalBalance(instance.getAmount());
-        //getInstance().setQuota(quotaValue);
         super.create();
         sequenceGeneratorService.nextCreditNumber(getInstance().getPartner().getId());
+
+        approveTransfer();
+
         return Outcome.SUCCESS;
     }
 
@@ -142,9 +144,17 @@ public class CreditAction extends GenericAction<Credit> {
         return creditTransactionAction.select(creditTransaction);
     }
 
+    public void approveTransfer(){
+        creditService.approveTransfer(getInstance());
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Credit.transfer.approvedMessage");
+    }
 
     public void assignPartner(Partner partner){
         getInstance().setPartner(partner);
+    }
+
+    public void assignOriginCredit(Credit credit){
+        getInstance().setOriginCredit(credit);
     }
 
     public void clearPartner(){
