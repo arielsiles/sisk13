@@ -93,12 +93,12 @@ public class AccountingCreditSaleAction extends GenericAction {
 
             }
 
-            /** Descuentos: Lacteo, Veterinario **/
+            /** Descuentos: Lacteo, Veterinario en Planilla de acopio **/
             if (    (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)        ||
                      customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) &&
                     !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  ){
 
-                /** Todo: Ya se contabiliza arriba, hacer registro del descuento correspondiente **/
+                /** Todo: Ya se contabiliza arriba, hacer registro del descuento en acopio **/
 
             }
 
@@ -247,6 +247,9 @@ public class AccountingCreditSaleAction extends GenericAction {
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null, MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
                 customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
+
+        System.out.println("--------> cashBox.getType().getCashAccountReceivable(): " + cashBox.getType().getCashAccountReceivable());
+        System.out.println("--------> customerOrder.getTotalAmount(): " + customerOrder.getTotalAmount());
 
         VoucherDetail debitReceivable = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                 cashBox.getType().getCashAccountReceivable(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), FinancesCurrencyType.D, BigDecimal.ONE);

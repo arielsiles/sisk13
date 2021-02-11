@@ -4,7 +4,7 @@ alter table caja add primary key (idcaja);
 alter table tipocaja add primary key (idtipocaja);
 
 
-alter table cajausuario modify column 
+-- alter table cajausuario modify column 
 
 alter table cajausuario add foreign key (idcaja) references caja (idcaja);
 alter table cajausuario add foreign key (idusuario) references usuario (idusuario);
@@ -22,12 +22,7 @@ insert into af_tipomovs values('01', 'TRA', 'TRANSFERENCIA', 'TRA', 'VIG', 0);
 
 update af_subgrupos a set a.`ctamej` = a.`ctadavo`;
 
--- 05.11.2020
-alter table tipocaja add column cuentaxcobrar varchar(20) after cuentaingreso; -- ejecutado en ilva
-update tipocaja set cuentaxcobrar = '1421010100' where idtipocaja = 1; -- Para venta de lacteos
-update tipocaja set cuentaxcobrar = '1421010200' where idtipocaja = 2; -- Para venta de veterinaria
-
-insert into funcionalidad values (268, 'ACCOUNTINGCREDITSALE', null, 1, 1, 'Functionality.customers.accountingCreditSales', 1);
+insert into funcionalidad values (269, 'ACCOUNTINGCREDITSALE', null, 1, 1, 'Functionality.customers.accountingCreditSales', 1);
 
 -- 07.11.2020
 alter table configuracion add column ctacomision varchar(20) after distparam; -- ejecutado en ilva
@@ -43,7 +38,7 @@ update configuracion c set c.`it_tax` = 0.03 where c.`no_cia` = '01'; -- ejecuta
 
 -- 09.11.2020
 -- SOLO Para ILVA
-update af_activos a set a.`estado` = 'TDP' where a.`estado` = 'BAJ';
+update af_activos a set a.`estado` = 'TDP' where a.`estado` = 'BAJ'; -- Revisar para ejecutar
 
 -- 14.11.2020
 -- Para Cartera y Creditos
