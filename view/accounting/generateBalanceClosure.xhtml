@@ -4,9 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['Voucher.balanceClosure']}</ui:define>
@@ -18,11 +16,11 @@
     <div class="buttons">
         <h:commandButton action="#{voucherCreateAction.generateBalanceClosure}"
                          value="#{messages['Voucher.generateClose']}"
-                         styleClass="button" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}" />
+                         styleClass="button" />
 
         <h:commandButton action="#{voucherCreateAction.generateOpeningSeat}"
                          value="#{messages['Voucher.generateOpeningSeat']}"
-                         styleClass="button" rendered="#{s:hasPermission('TRANSFER_VETERINARY_CASHSALE','VIEW')}" />
+                         styleClass="button" />
 
         <h:commandButton action="#{cashSaleAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"/>
