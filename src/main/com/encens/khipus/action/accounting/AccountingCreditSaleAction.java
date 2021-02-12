@@ -59,44 +59,45 @@ public class AccountingCreditSaleAction extends GenericAction {
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println(">>-->>>-->>>---> Ventas a credito: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
 
-            /** Ventas con porcentaje de comision (Eg. Sedem) **/
-            if (customerOrder.getCommissionPercentage() > 0){
 
-                Voucher voucher = accountingCreditSaleWithCommission(customerOrder);
-                customerOrder.setVoucher(voucher);
-            }
+            /** Venta sin facturacion **/
+            if (customerOrder.getMovement() == null){
+                /** Reposiciones, degustación y refrigerios **/
+                if (    (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT)   ||
+                        customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING)        ||
+                        customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT)) ){
 
-            /** Ventas normales **/
-            if (   (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL)      ||
-                    customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)        ||
-                    customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) &&
-                    !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  &&
-                    customerOrder.getCommissionPercentage() == 0 ){
+                    customerOrder.setState(SaleStatus.CONTABILIZADO); /** Solo se fija el estado, se contabiliza en CV **/
 
-                if (customerOrder.getMovement() !=  null){
-                    Voucher voucher = accountingCreditSale(customerOrder);
-                    customerOrder.setVoucher(voucher);
                 }else {
                     Voucher voucher = accountingCreditSaleWithoutInvoice(customerOrder);
                     customerOrder.setVoucher(voucher);
                 }
 
+            }else { /** Ventas facturadas **/
+
+                /** Ventas con porcentaje de comision (Eg. Sedem) **/
+                if (customerOrder.getCommissionPercentage() > 0){
+                    Voucher voucher = accountingCreditSaleWithCommission(customerOrder);
+                    customerOrder.setVoucher(voucher);
+                }
+
+                /** Ventas normales facturadas **/
+                if ( customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) && customerOrder.getCommissionPercentage() == 0 ){
+
+                    if (customerOrder.getMovement() !=  null){
+                        Voucher voucher = accountingCreditSale(customerOrder);
+                        customerOrder.setVoucher(voucher);
+                    }
+
+                }
+
+
             }
 
-            /** Reposiciones, degustación y refrigerios **/
-            if (    (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT)  ||
-                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING)  ||
-                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT)) &&
-                    !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  ){
-
-                customerOrder.setState(SaleStatus.CONTABILIZADO); /** Solo se fija el estado, se contabiliza en CV **/
-
-            }
 
             /** Descuentos: Lacteo, Veterinario en Planilla de acopio **/
-            if (    (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)        ||
-                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) &&
-                    !customerOrder.getState().equals(SaleStatus.CONTABILIZADO)  ){
+            if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK) || customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)){
 
                 /** Todo: Ya se contabiliza arriba, hacer registro del descuento en acopio **/
 
