@@ -54,10 +54,12 @@ public class AccountingCreditSaleAction extends GenericAction {
 
     public String accountingCreditSales(){
         User user = getUser(currentUser.getId());
+
         List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(accountingDate);
 
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println(">>-->>>-->>>---> Ventas a credito: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
+
 
 
             /** Venta sin facturacion **/

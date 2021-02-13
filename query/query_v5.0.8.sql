@@ -17,8 +17,8 @@ alter table tipocaja add column cuentaxcobrar varchar(20) after cuentaingreso; -
 
 -- 1. Crear Tipos de Caja: GAF > Configuracion > Tipos de caja
 -- Insertar cajas (GAF > Configuracion > Cajas)
-insert into tipocaja values (1, 'VENTA LACTEOS', '1110110100', '5420110201', '1421010100', '01', 0, 1);
-insert into tipocaja values (2, 'VENTA VETERINARIA', '1110110100', '5420110201', '1421010100', '01', 0, 1);
+insert into tipocaja values (1, 'VENTA LACTEOS',     '1110110100', '5420110201', '1421010100', '01', 0, 1);
+insert into tipocaja values (2, 'VENTA VETERINARIA', '1110110300', '5420110100', '1421010200', '01', 0, 1);
 
 -- usuario cisc
 update usuario u set u.`clave` = '45e0c1953ab77904731fb68ab35a55db23b04cf5', u.`usuario` = 'cisc', u.`usuariofinanzas` = 1 where u.`idusuario` = 408;
