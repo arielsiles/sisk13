@@ -592,7 +592,22 @@ public class SalesAction {
     public void showSelected(List<CustomerOrder> customerOrderList){
 
         for (CustomerOrder customerOrder : customerOrderList){
-            System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+
+            /** Si no tiene factura, Esta pendiente, Es Credito **/
+            if (customerOrder.getMovement() == null && customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getSaleType().equals(SaleTypeEnum.CREDIT) &&
+                    ( !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT) && // F
+                      !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT) && // T     F
+                      !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING) ) ){   // T
+
+                System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+
+                Movement movement = createInvoice(customerOrder);
+                customerOrder.setMovement(movement);
+                saleService.updateCustomerOrder(customerOrder);
+                System.out.println("==========> FACT: " + movement.getNumber());
+
+            }
+
         }
     }
 
