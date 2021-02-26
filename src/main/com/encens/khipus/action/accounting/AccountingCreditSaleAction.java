@@ -246,9 +246,10 @@ public class AccountingCreditSaleAction extends GenericAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+        //CashBox cashBox = userCashBoxService.findByUser(currentUser);
+        CashBox cashBox = userCashBoxService.findByUser(customerOrder.getUser());
 
-        Voucher voucher = VoucherBuilder.newGeneralVoucher( null, MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
+                Voucher voucher = VoucherBuilder.newGeneralVoucher( null, MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
                 customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
 
         System.out.println("--------> cashBox.getType().getCashAccountReceivable(): " + cashBox.getType().getCashAccountReceivable());
