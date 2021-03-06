@@ -17,10 +17,10 @@ insert into funcionalidad values (267, 'NULLIFYSALE', null, 1, 1, 'menu.customer
 -- Verificar AF pendientes
 -- Configurar cuenta en tabla configuración CTAPROVOBU
 
-insert into af_tipomovs values('01', 'MEJ', 'MEJORA', 'MEJ', 'VIG', 0);
-insert into af_tipomovs values('01', 'TRA', 'TRANSFERENCIA', 'TRA', 'VIG', 0);
+insert into af_tipomovs values('01', 'MEJ', 'MEJORA', 'MEJ', 'VIG', 0); -- eje ilva
+insert into af_tipomovs values('01', 'TRA', 'TRANSFERENCIA', 'TRA', 'VIG', 0); -- eje ilva
 
-update af_subgrupos a set a.`ctamej` = a.`ctadavo`;
+update af_subgrupos a set a.`ctamej` = a.`ctadavo`; -- eje ilva
 
 insert into funcionalidad values (269, 'ACCOUNTINGCREDITSALE', null, 1, 1, 'Functionality.customers.accountingCreditSales', 1);
 

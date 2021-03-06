@@ -639,12 +639,18 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
         }
         FinancesModule financesModule = fixedAssetMonthProcessService.getFinancesModule(FixedAssetDefaultConstants.getFixedAssetModulePK());
         Date firstDayOfCurrentProcessMonth = financesModule.getDate();
+        System.out.println("======> firstDayOfCurrentProcessMonth: " + firstDayOfCurrentProcessMonth);
         /* adjust all the fixedAssets in TDP state whose adjustDate is different to firstDayOfCurrentProcessMonth*/
         List<FixedAsset> totallyDepreciatedFixedAssetList = findTdpFixedAssetsToAdjust(FixedAssetState.TDP, firstDayOfCurrentProcessMonth);
+        System.out.println("======> totallyDepreciatedFixedAssetList.size(): " + totallyDepreciatedFixedAssetList.size());
+        for (FixedAsset fixedAsset : totallyDepreciatedFixedAssetList){
+            System.out.println("--------> Activo: " + fixedAsset.getFullName());
+        }
 
         if (totallyDepreciatedFixedAssetList.size() > 0) {
             /* shows a message indicating that there are still fixed assets not yet depreciated*/
-            throw new ThereAreNotAdjustedFixedAssetException();
+            /** Se comento, no permitia cerrar el mes Enero/2021 **/
+            //throw new ThereAreNotAdjustedFixedAssetException();
         }
 //        ThereAreNotAdjustedFixedAssetException
         try {
