@@ -57,6 +57,7 @@ public class SalesAction {
     private SubsidyEnun subsidyEnun;
     private CustomerCategoryType customerCategoryTypeEnum;
 
+    private Boolean specialBilling = Boolean.FALSE;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -388,6 +389,7 @@ public class SalesAction {
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
         customerOrder.setState(SaleStatus.PENDIENTE);
+        customerOrder.setSpecialBilling(this.specialBilling);
 
         if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
             customerOrder.setState(SaleStatus.CONTABILIZADO);
@@ -589,25 +591,27 @@ public class SalesAction {
         return totalAmount;
     }
 
-    public void showSelected(List<CustomerOrder> customerOrderList){
+    public void processBilling(List<CustomerOrder> customerOrderList){
 
         for (CustomerOrder customerOrder : customerOrderList){
 
-            /** Si no tiene factura, Esta pendiente, Es Credito **/
-            if (customerOrder.getMovement() == null && customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getSaleType().equals(SaleTypeEnum.CREDIT) &&
-                    ( !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT) && // F
-                      !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT) && // T     F
-                      !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING) ) ){   // T
+            if (!customerOrder.getSpecialBilling()) {
 
-                System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+                /** Si no tiene factura, Esta pendiente, Es Credito **/
+                if (customerOrder.getMovement() == null && customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getSaleType().equals(SaleTypeEnum.CREDIT) &&
+                        (!customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT) && // F
+                                !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT) && // T     F
+                                !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING))) {   // T
 
-                Movement movement = createInvoice(customerOrder);
-                customerOrder.setMovement(movement);
-                saleService.updateCustomerOrder(customerOrder);
-                System.out.println("==========> FACT: " + movement.getNumber());
+                    System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
 
+                    Movement movement = createInvoice(customerOrder);
+                    customerOrder.setMovement(movement);
+                    saleService.updateCustomerOrder(customerOrder);
+                    System.out.println("==========> FACT: " + movement.getNumber());
+
+                }
             }
-
         }
     }
 
@@ -854,5 +858,13 @@ public class SalesAction {
 
     public void setZeroProduct(Boolean zeroProduct) {
         this.zeroProduct = zeroProduct;
+    }
+
+    public Boolean getSpecialBilling() {
+        return specialBilling;
+    }
+
+    public void setSpecialBilling(Boolean specialBilling) {
+        this.specialBilling = specialBilling;
     }
 }

@@ -120,6 +120,10 @@ public class CustomerOrder implements BaseModel  {
     @Enumerated(EnumType.STRING)
     private SaleTypeEnum saleType;
 
+    @Column(name = "factesp")
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean specialBilling = Boolean.FALSE;
+
     @Basic(optional = true)
     @Column(name = "impuesto")
     private Double tax = 0.0;
@@ -364,5 +368,13 @@ public class CustomerOrder implements BaseModel  {
         }
 
         return result;
+    }
+
+    public Boolean getSpecialBilling() {
+        return specialBilling;
+    }
+
+    public void setSpecialBilling(Boolean specialBilling) {
+        this.specialBilling = specialBilling;
     }
 }

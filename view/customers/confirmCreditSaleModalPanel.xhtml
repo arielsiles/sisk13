@@ -54,6 +54,15 @@
                 <h:inputText value="#{salesAction.observation}" styleClass="input250"/>
             </s:decorate>
             <br/>
+
+            <s:decorate id="specialBillingField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!--<ui:define name="label">Facturacion especial?</ui:define>-->
+                <h:outputText value="¿Es facturacion especial?" />
+                <h:selectBooleanCheckbox id="specialBilling"
+                                         value="#{salesAction.specialBilling}"/>
+
+            </s:decorate>
+
             <!--<s:decorate id="moneyReturnedField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">Pagó con:</ui:define>
                 <h:outputText value="#{salesAction.moneyReturned}"/>

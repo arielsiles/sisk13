@@ -107,9 +107,9 @@
 
                 <s:div styleClass="buttonsLeft">
                     <h:commandButton id="searchButtonId"
-                                     action="#{salesAction.showSelected(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
-                                     value="#{messages['Common.generate']}" >
+                                     value="#{messages['Common.invoice']}" >
                         <s:defaultAction/>
                     </h:commandButton>
 
@@ -135,7 +135,7 @@
 
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="5%, 5%, 10%, 10%, 25%, 10%, 10%, 10%, 10%, 5%">
+                            width="100%" columnsWidth="5%, 5%, 10%, 7%, 25%, 7%, 10%, 10%, 10%, 6%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -153,6 +153,7 @@
                         <rich:column>#{messages['CustomerOrder.total']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.state']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.type']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.user']}</rich:column>
                         <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                     </rich:columnGroup>
                 </f:facet>
@@ -199,6 +200,10 @@
 
                 <rich:column styleClass="center">
                     <h:outputText value="#{customerOrder.customerOrderType.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.user.username}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
