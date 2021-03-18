@@ -26,10 +26,7 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Name("salesAction")
 @Scope(ScopeType.PAGE)
@@ -52,12 +49,11 @@ public class SalesAction {
     private Client client;
     private Distributor distributor;
     private Date orderDate = new Date();
+    private Date billingSpecialDate = new Date();
     private String observation;
 
     private SubsidyEnun subsidyEnun;
     private CustomerCategoryType customerCategoryTypeEnum;
-
-    private Boolean specialBilling = Boolean.FALSE;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -389,7 +385,6 @@ public class SalesAction {
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
         customerOrder.setState(SaleStatus.PENDIENTE);
-        customerOrder.setSpecialBilling(this.specialBilling);
 
         if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
             customerOrder.setState(SaleStatus.CONTABILIZADO);
@@ -595,9 +590,9 @@ public class SalesAction {
 
         for (CustomerOrder customerOrder : customerOrderList){
 
-            if (!customerOrder.getSpecialBilling()) {
+            if (!customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)) {
 
-                /** Si no tiene factura, Esta pendiente, Es Credito **/
+                /** Si: no tiene factura, Esta pendiente, Es Credito **/
                 if (customerOrder.getMovement() == null && customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getSaleType().equals(SaleTypeEnum.CREDIT) &&
                         (!customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT) && // F
                                 !customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT) && // T     F
@@ -613,6 +608,91 @@ public class SalesAction {
                 }
             }
         }
+    }
+
+    public void processBillingSpecial(List<CustomerOrder> customerOrderList){
+
+        HashMap<String, Integer> products = new HashMap<String, Integer>();
+        HashMap<String, ArticleOrder> productsArt = new HashMap<String, ArticleOrder>();
+
+        CustomerOrder customerOrderBill = new CustomerOrder();
+        List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
+        Double totalAmount = 0.0;
+
+        for (CustomerOrder customerOrder : customerOrderList){
+            if (customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
+                System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+
+                for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
+                    String articleOrderCode = articleOrder.getCodArt();
+
+                    System.out.println("...Pedido: " + customerOrder.getCode() + " - " + articleOrder.getProductItem().getFullName() + " - " + articleOrder.getQuantity() + " - " + articleOrder.getAmount());
+
+                    if (productsArt.containsKey(articleOrderCode)){
+
+                        System.out.println("==> add: " + products.get(articleOrderCode) + " ... " + articleOrder.getQuantity());
+                        Integer quantity = products.get(articleOrderCode);
+                        quantity = quantity + articleOrder.getQuantity();
+                        products.put(articleOrderCode, quantity);
+
+                        ArticleOrder articleOrd = productsArt.get(articleOrderCode);
+                        Integer quantityOrd     = articleOrd.getQuantity() + articleOrder.getQuantity();
+                        articleOrd.setQuantity(quantityOrd);
+                        Double amount = articleOrd.getAmount() + articleOrder.getAmount();
+                        articleOrd.setAmount(amount);
+                        Double price = articleOrd.getAmount() / articleOrd.getQuantity();
+                        articleOrd.setPrice(price);
+                        productsArt.put(articleOrderCode, articleOrd);
+
+                    }else {
+                        products.put(articleOrderCode, articleOrder.getQuantity());
+
+                        ArticleOrder article = new ArticleOrder();
+                        article.setQuantity(articleOrder.getQuantity());
+                        article.setPrice(articleOrder.getPrice());
+                        article.setProductItem(articleOrder.getProductItem());
+                        article.setCodArt(articleOrderCode);
+                        article.setCompanyNumber(Constants.defaultCompanyNumber);
+                        article.setPromotion(0);
+                        article.setReposicion(0);
+                        article.setTotal(articleOrder.getQuantity());
+                        article.setAmount(articleOrder.getAmount());
+
+                        productsArt.put(articleOrderCode, article);
+                        articleOrderList.add(article);
+
+                    }
+                }
+            }
+        }
+
+        for (String key : products.keySet()) {
+            System.out.println(">>>>>>> Producto: " + key + " - Cant. " + products.get(key));
+        }
+
+        Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(SaleTypeEnum.CREDIT.getSequenceName()));
+        customerOrderBill.setCode(saleCode);
+        customerOrderBill.setSaleType(SaleTypeEnum.CREDIT);
+        customerOrderBill.setCustomerOrderType(customerOrderList.get(0).getCustomerOrderType());
+        customerOrderBill.setClient(customerOrderList.get(0).getClient());
+        customerOrderBill.setArticleOrderList(articleOrderList);
+        customerOrderBill.setOrderDate(billingSpecialDate);
+
+        System.out.println("---------PARA FACTURACION----------" + billingSpecialDate);
+        for (ArticleOrder articleOrder : customerOrderBill.getArticleOrderList()) {
+            //articleOrderList.add(articleOrder);
+            System.out.println("---> " + articleOrder.getCodArt() + " - " + articleOrder.getQuantity() + " - " + articleOrder.getPrice() + " - " + articleOrder.getAmount());
+            totalAmount = totalAmount + articleOrder.getAmount();
+        }
+
+        customerOrderBill.setTotalAmount(totalAmount);
+        customerOrderBill.setTax(BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(totalAmount), Constants.VAT).doubleValue());
+        customerOrderBill.setState(SaleStatus.ANULADO);
+        saleService.createSale(customerOrderBill);
+        Movement movement = createInvoice(customerOrderBill);
+        customerOrderBill.setMovement(movement);
+        saleService.updateCustomerOrder(customerOrderBill);
+
     }
 
     public void assignClient(Client client){
@@ -860,11 +940,11 @@ public class SalesAction {
         this.zeroProduct = zeroProduct;
     }
 
-    public Boolean getSpecialBilling() {
-        return specialBilling;
+    public Date getBillingSpecialDate() {
+        return billingSpecialDate;
     }
 
-    public void setSpecialBilling(Boolean specialBilling) {
-        this.specialBilling = specialBilling;
+    public void setBillingSpecialDate(Date billingSpecialDate) {
+        this.billingSpecialDate = billingSpecialDate;
     }
 }

@@ -2,6 +2,7 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.CustomerOrderType;
 import com.encens.khipus.model.customers.SaleTypeEnum;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -27,12 +28,14 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
     private String lastName;
     private String maidenName;
     private SaleTypeEnum saleType;
+    private CustomerOrderType customerOrderType;
     private Integer invoice;
     private Date initDate;
     private Date endDate;
 
     private static final String[] RESTRICTIONS = {
             "customerOrder.saleType = #{customerOrderDataModel.saleType}",
+            "customerOrder.customerOrderType = #{customerOrderDataModel.customerOrderType}",
             "customerOrder.movement.number = #{customerOrderDataModel.invoice}",
             "customerOrder.orderDate >= #{customerOrderDataModel.initDate}",
             "customerOrder.orderDate <= #{customerOrderDataModel.endDate}",
@@ -124,5 +127,13 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public CustomerOrderType getCustomerOrderType() {
+        return customerOrderType;
+    }
+
+    public void setCustomerOrderType(CustomerOrderType customerOrderType) {
+        this.customerOrderType = customerOrderType;
     }
 }

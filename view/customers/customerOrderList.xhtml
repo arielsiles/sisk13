@@ -37,20 +37,6 @@
                                      maxlength="80" tabindex="3" styleClass="input">
                         </h:inputText>
                     </s:decorate>
-                </s:div>
-
-                <s:div id="rightSidePanel">
-
-                    <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
-                        <h:selectOneMenu id="saleType" value="#{customerOrderDataModel.saleType}"
-                                         styleClass="inputMedium" tabindex="4">
-                            <s:selectItems value="#{customerSaleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
-                                           hideNoSelectionLabel="false"
-                                           noSelectionLabel=""/>
-                            <s:convertEnum/>
-                        </h:selectOneMenu>
-                    </s:decorate>
 
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['CustomerOrder.date']}</ui:define>
@@ -71,6 +57,36 @@
                         </rich:calendar>
                     </s:decorate>
 
+                </s:div>
+
+                <s:div id="rightSidePanel">
+
+                    <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
+                        <h:selectOneMenu id="saleType" value="#{customerOrderDataModel.saleType}"
+                                         styleClass="inputMedium" tabindex="4">
+                            <s:selectItems value="#{customerSaleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
+                                           hideNoSelectionLabel="false"
+                                           noSelectionLabel=""/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="customerOrderTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.type']}</ui:define>
+                        <h:selectOneMenu id="customerOrderType"
+                                         value="#{customerOrderDataModel.customerOrderType}"
+                                         styleClass="inputMedium"
+                                         immediate="true"
+                                         tabindex="10">
+                            <s:selectItems value="#{customerOrderTypeList}" var="customerOrderType"
+                                           label="#{messages[customerOrderType.type.resourceKey]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="true" />
+                            <s:convertEntity/>
+                            <a4j:support event="onchange" ajaxSingle="true" reRender="customerOrderTypeField"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
 
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['CustomerOrder.code']}</ui:define>
@@ -113,13 +129,21 @@
                         <s:defaultAction/>
                     </h:commandButton>
 
-                    <!--<a4j:commandButton id="addButton"
+                    <h:commandButton id="billSpecialId"
+                                     action="#{salesAction.processBillingSpecial(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     value="#{messages['CustomerOrder.billSpecial']}" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                    <a4j:commandButton id="creditSaleCommandButton"
+                                       value="Fact. especial"
+                                       styleClass="button"
                                        immediate="true"
-                                       ajaxSingle="true"
-                                       action="#{warehouseVoucherCreateAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
-                                       value="#{messages['Common.add']}"
-                                       reRender="movementDetailListPanel"
-                                       styleClass="button"/>-->
+                                       oncomplete="Richfaces.showModalPanel('confirmBillingSpecialModalPanel');"
+                                       reRender="confirmBillingSpecialModalPanel">
+                    </a4j:commandButton>
+
                 </s:div>
 
                 <s:div styleClass="buttonsRight">
@@ -224,5 +248,11 @@
             </div>
 
         </h:form>
+
+        <s:decorate id="confirmBillingSpecialModalPanelContainer" template="/customers/confirmBillingSpecialModalPanel.xhtml">
+            <ui:param name="containerId" value="confirmBillingSpecialModalPanelContainer"/>
+            <ui:param name="dialogId" value="confirmBillingSpecialModalPanel"/>
+        </s:decorate>
+
     </ui:define>
 </ui:composition>

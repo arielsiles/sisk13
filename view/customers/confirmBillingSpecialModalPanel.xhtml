@@ -7,10 +7,10 @@
                  xmlns:a4j="http://richfaces.org/a4j"
                  xmlns:s="http://jboss.com/products/seam/taglib"
                  xmlns:app="http://encens.com/products/khipus/facelets"
-                 id="#{dialogId}"
-                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+                 id="#{dialogId}">
+
     <f:facet name="header">
-        <h:outputText>#{messages['Sales.confirmSale.title']}</h:outputText>
+        <h:outputText>#{messages['CustomerOrder.billSpecial.title']}</h:outputText>
     </f:facet>
     <f:facet name="controls">
         <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
@@ -41,6 +41,22 @@
                     <f:convertDateTime pattern="#{messages['patterns.date']}"/>
                 </h:outputText>
             </s:decorate>
+
+            <s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha factura:</ui:define>
+                <rich:calendar id="orderDate" value="#{salesAction.billingSpecialDate}"
+                               popup="true"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               inputClass="input80"
+                               tabindex="100"
+                               ajaxSingle="true"
+                               required="false">
+                    <a4j:support event="onchanged" reRender="orderDate"/>
+                    <a4j:support event="oninputchange" reRender="orderDate"/>
+                </rich:calendar>
+            </s:decorate>
+
             <br/>
             <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">TOTAL:</ui:define>
@@ -61,8 +77,8 @@
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </h:commandButton>
-            <a4j:commandButton id="confirmRegisterButton" value="Confirmar"
-                               action="#{salesAction.registerSale()}"
+            <a4j:commandButton id="confirmRegisterButton" value="Aceptar"
+                               action="#{salesAction.processBillingSpecial(customerOrderDataModel.selectedCustomerOrdes)}"
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
             />

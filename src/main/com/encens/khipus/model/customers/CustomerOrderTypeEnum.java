@@ -12,7 +12,8 @@ public enum CustomerOrderTypeEnum {
     REFRESHMENT("CustomerOrderType.type.refreshment"),
     REPLACEMENT("CustomerOrderType.type.replacement"),
     MILK("CustomerOrderType.type.milk"),
-    VETERINARY("CustomerOrderType.type.veterinary");
+    VETERINARY("CustomerOrderType.type.veterinary"),
+    SPECIAL("CustomerOrderType.type.special");
 
     private String resourceKey;
 
