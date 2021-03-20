@@ -10,7 +10,7 @@
                  id="#{dialogId}">
 
     <f:facet name="header">
-        <h:outputText>#{messages['CustomerOrder.billSpecial.title']}</h:outputText>
+        <h:outputText>#{messages['CustomerOrder.billSpecial.confirm']}</h:outputText>
     </f:facet>
     <f:facet name="controls">
         <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
@@ -18,28 +18,12 @@
     <h:form id="productItemListForm">
 
         <!--<rich:panel id="registerSalePanel">-->
-        <app:fieldset id="managementFieldSet" title="#{messages['Sales.confirmSale.resume']}">
+        <app:fieldset id="managementFieldSet" title="#{messages['Sales.confirmSale.specialBill']}">
 
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">::</ui:define>
-                <h:outputText value="#{messages[salesAction.saleType.resourceKey]}" styleClass="msgText1"/>
-            </s:decorate>
-
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Tipo:</ui:define>
-                <h:outputText value="#{messages[salesAction.customerOrderType.type.resourceKey]}" />
-            </s:decorate>
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">Cliente:</ui:define>
-                <h:outputText value="#{salesAction.client.fullName}"/>
-            </s:decorate>
-
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Fecha:</ui:define>
-                <h:outputText value="#{salesAction.orderDate}">
-                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
-                </h:outputText>
+                <h:outputText value="#{salesAction.nameSpecialBill}"/>
             </s:decorate>
 
             <s:decorate id="orderDateField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -59,16 +43,12 @@
 
             <br/>
             <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">TOTAL:</ui:define>
-                <h:outputText value="#{salesAction.totalAmount}" styleClass="textBold12Blue">
+                <ui:define name="label">Importe:</ui:define>
+                <h:outputText value="#{salesAction.amountSpecialBill}" styleClass="textBold12Blue">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
             </s:decorate>
             <br/>
-            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Notas:</ui:define>
-                <h:inputText value="#{salesAction.observation}" styleClass="input250"/>
-            </s:decorate>
 
         </app:fieldset>
         <!--</rich:panel>-->
@@ -80,7 +60,7 @@
             <a4j:commandButton id="confirmRegisterButton" value="Aceptar"
                                action="#{salesAction.processBillingSpecial(customerOrderDataModel.selectedCustomerOrdes)}"
                                styleClass="button"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
+                               reRender="customerOrderList"
             />
         </div>
 

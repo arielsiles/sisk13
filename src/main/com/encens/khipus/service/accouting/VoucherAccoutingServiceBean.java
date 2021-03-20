@@ -195,6 +195,11 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         em.flush();
     }
 
+    public void simpleUpdateVoucher(Voucher voucher){
+        em.merge(voucher);
+        em.flush();
+    }
+
     public void createPurchaseDocumentVoucher(VoucherDetail voucherDetail){
 
         try {

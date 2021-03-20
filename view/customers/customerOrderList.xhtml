@@ -137,6 +137,7 @@
                     </h:commandButton>
 
                     <a4j:commandButton id="creditSaleCommandButton"
+                                       action="#{salesAction.initSpecialBill(customerOrderDataModel.selectedCustomerOrdes)}"
                                        value="Fact. especial"
                                        styleClass="button"
                                        immediate="true"
