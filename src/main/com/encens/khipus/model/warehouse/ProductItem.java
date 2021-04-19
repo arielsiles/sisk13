@@ -87,7 +87,7 @@ public class ProductItem implements BaseModel {
     @Length(max = 31)
     private String productItemAccount;
 
-    @Column(name = "SALDO_MON", precision = 16, scale = 6, nullable = true)
+    @Column(name = "SALDO_MON", precision = 20, scale = 6, nullable = true)
     private BigDecimal investmentAmount;
 
     @Column(name = "COSTO_UNI", precision = 16, scale = 6, nullable = true)
@@ -99,7 +99,7 @@ public class ProductItem implements BaseModel {
     @Column(name = "CU", precision = 16, scale = 6, nullable = true)
     private BigDecimal cu;
 
-    @Column(name = "CT", precision = 16, scale = 6, nullable = true)
+    @Column(name = "CT", precision = 20, scale = 6, nullable = true)
     private BigDecimal ct;
 
     @Column(name = "COD_GRU", nullable = false, updatable = true, insertable = true, length = 3)
