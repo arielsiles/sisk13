@@ -195,7 +195,7 @@
 
             <a4j:commandButton id="creditSaleCommandButton"
                                action="#{salesAction.initCreditSale()}"
-                               value="Registrar venta"
+                               value="Venta credito"
                                rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
@@ -205,7 +205,7 @@
 
             <a4j:commandButton id="cashSaleCommandButton"
                                action="#{salesAction.initCashSale}"
-                               value="Cobrar venta"
+                               value="Venta contado"
                                rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"

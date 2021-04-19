@@ -64,7 +64,7 @@
         <!--</rich:panel>-->
 
         <div class="buttonsRight">
-            <a4j:commandButton id="confirmRegisterNoInvoiceButton" value="Registrar SF"
+            <a4j:commandButton id="confirmRegisterNoInvoiceButton" value="Cobrar SF"
                                action="#{salesAction.registerCashSaleNoInvoice()}"
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
@@ -72,7 +72,7 @@
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </h:commandButton>
-            <a4j:commandButton id="confirmRegisterButton" value="Registrar"
+            <a4j:commandButton id="confirmRegisterButton" value="Cobrar y facturar"
                                action="#{salesAction.registerCashSale()}"
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
