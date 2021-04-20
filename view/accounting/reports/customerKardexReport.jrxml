@@ -36,7 +36,9 @@
 	<field name="credit" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
 	</field>
-	<field name="invoiceNumber" class="java.lang.Integer"/>
+	<field name="invoiceNumber" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+	</field>
 	<variable name="totalCredit" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
 	</variable>
