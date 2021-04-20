@@ -417,6 +417,14 @@
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
+        <s:link view="/accounting/customerKardexReport.xhtml"
+                value="#{messages['menu.finances.accounting.customerKardex']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
         <s:link view="/accounting/summaryClientStateReport.xhtml"
                 value="#{messages['menu.finances.accounting.summaryClientState']}"
                 propagation="none" />

@@ -67,6 +67,9 @@ public class Voucher implements BaseModel{
     @Length(max = 20)
     private String documentNumber;
 
+    @Column(name = "FAC")
+    private Integer invoiceNumber;
+
     @Column(name = "CTA_BCO", updatable = true, length = 20)
     @Length(max = 20)
     private String bankAccountCode;
@@ -529,6 +532,14 @@ public class Voucher implements BaseModel{
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Integer getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(Integer invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
     }
 
     /*@Override

@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['AuxiliaryAnalytical.report']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+    <h:form id="productItemReportForm">
+
+        <rich:panel>
+            <f:facet name="header">
+                #{messages['AuxiliaryAnalytical.report']}
+            </f:facet>
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent">
+
+                <s:decorate id="dateFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateFrom']}</ui:define>
+                    <rich:calendar id="dateFrom"
+                                   value="#{customerKardexReportAction.startDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="1">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="dateToField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.majorReport.dateTo']}</ui:define>
+                    <rich:calendar id="dateTo"
+                                   value="#{customerKardexReportAction.endDate}"
+                                   styleClass="input"
+                                   datePattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   required="true"
+                                   enableManualInput="true"
+                                   tabindex="2">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                             required="true"
+                                             textValue="#{customerKardexReportAction.cashAccount.fullName}"
+                                             value="#{customerKardexReportAction.cashAccount}"
+                                             clearAction="customerKardexReportAction.clearAccount()"
+                                             searchModalPanel="cashAccountListModalPanel"
+                                             dataModel="#{cashAccountDataModel}"
+                                             reRender="itemAccountField"
+                                             tabindex="3"
+                                             styleClass="inputLarge">
+                                <ui:define name="criteriaValues">
+                                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                                </ui:define>
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['Voucher.client']}"/>
+                    </ui:define>
+                    <app:selectPopUp id="clientFieldId"
+                                     required="true"
+                                     textValue="#{customerKardexReportAction.client.fullName}"
+                                     value="#{customerKardexReportAction.client}"
+                                     clearAction="#{customerKardexReportAction.clearClient()}"
+                                     searchModalPanel="clientListModalPanel"
+                                     dataModel="#{clientDataModel}"
+                                     reRender="clientField"
+                                     tabindex="12">
+                    </app:selectPopUp>
+
+                </s:decorate>
+
+            </h:panelGrid>
+        </rich:panel>
+
+        <app:reportDefaultOptions reportAction="#{customerKardexReportAction}" showPageFormat="false"
+                                  tabIndex="11"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{customerKardexReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+    <s:div id="clientListModalPanelDiv">
+        <s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml">
+            <ui:param name="containerId" value="clientListModalPanelContainer"/>
+            <ui:param name="dialogId" value="clientListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{customerKardexReportAction.setClient(clientItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="clientField"
+                                   oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
+
+    <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="hasWarehousePermission" value="true"/>
+        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{customerKardexReportAction.setCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="itemAccountField"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+</ui:define>
+</ui:composition>

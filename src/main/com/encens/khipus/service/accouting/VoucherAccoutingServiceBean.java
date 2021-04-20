@@ -422,6 +422,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return balance;
     }
 
+
+    public Double getCustomerBalance(Date startDate, String cashAccountCode, Long clientId){
+
+        List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>();
+
+        try {
+            voucherDetailList = em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
+                    " left join voucherDetail.voucher voucher " +
+                    " where voucher.date < :startdate " +
+                    " and voucherDetail.account = :cashAccountCode " +
+                    " and voucherDetail.client.id = :clientId " +
+                    " and voucher.state <> 'ANL'")
+                    .setParameter("startdate", startDate)
+                    .setParameter("cashAccountCode", cashAccountCode)
+                    .setParameter("clientId", clientId)
+                    .getResultList();
+        }catch (NoResultException e){
+            return null;
+        }
+
+        Double balance = new Double("0.00");
+        Double balanceD = new Double("0.00");
+        Double balanceC = new Double("0.00");
+
+        for (VoucherDetail voucherDetail : voucherDetailList){
+            balanceD = balanceD + voucherDetail.getDebit().doubleValue();
+            balanceC = balanceC + voucherDetail.getCredit().doubleValue();
+        }
+        balance = (balanceD - balanceC);
+
+        System.out.println("----> SALDO CLIENTE: " + balance);
+
+        return balance;
+    }
+
     public Double getBalanceProvider(Date startDate, String cashAccountCode, String providerCode){
 
         List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>();
