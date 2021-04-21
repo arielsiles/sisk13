@@ -602,17 +602,19 @@ public class SalesAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                 MessageUtils.getMessage("Voucher.cashSale.gloss") + " " + customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
 
         VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getGeneralCashAccountNational(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                cashBox.getType().getCashAccountBox(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
                 FinancesCurrencyType.D, BigDecimal.ONE);
 
 
         /** 2570110000 - Prevision para contingencias **/
         VoucherDetail creditContingency = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                cashAccountService.findByAccountCode("2570110000"), debitGeneralBox.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
+                cashBox.getType().getCashAccountContingency() , debitGeneralBox.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
 
         voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
         voucher.getDetails().add(debitGeneralBox);

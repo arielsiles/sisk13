@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardexProviderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
 	<property name="ireport.zoom" value="2.8531167061100193"/>
-	<property name="ireport.x" value="249"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
@@ -131,28 +131,28 @@
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement x="17" y="1" width="42" height="15"/>
+						<reportElement x="14" y="1" width="42" height="15"/>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<text><![CDATA[Fecha]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="59" y="1" width="15" height="15"/>
+						<reportElement x="56" y="1" width="15" height="15"/>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<text><![CDATA[Doc]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="74" y="1" width="20" height="15"/>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
+						<reportElement x="71" y="1" width="20" height="15"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<text><![CDATA[No.]]></text>
 					</staticText>
 					<staticText>
-						<reportElement x="104" y="1" width="228" height="15"/>
+						<reportElement x="116" y="1" width="254" height="15"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="8"/>
 						</textElement>
@@ -188,18 +188,18 @@
 					<textFieldExpression class="java.lang.Double"><![CDATA[$P{balance}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="1" y="29" width="139" height="11"/>
+					<reportElement x="0" y="29" width="235" height="11"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="7" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{provider}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="333" y="13" width="38" height="15"/>
+					<reportElement x="92" y="13" width="25" height="15"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<text><![CDATA[FACT]]></text>
+					<text><![CDATA[Fact]]></text>
 				</staticText>
 			</band>
 		</groupHeader>
@@ -279,21 +279,21 @@
 	<detail>
 		<band height="11" splitType="Stretch">
 			<textField>
-				<reportElement x="60" y="0" width="15" height="11"/>
+				<reportElement x="57" y="0" width="15" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{documentType}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="75" y="0" width="20" height="11"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<reportElement x="72" y="0" width="20" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{transactionNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="0" width="228" height="11"/>
+				<reportElement x="117" y="0" width="254" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
@@ -314,7 +314,7 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{credit}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="18" y="0" width="42" height="11"/>
+				<reportElement x="15" y="0" width="42" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
@@ -328,14 +328,14 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{delta_sum}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="18" height="11"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<reportElement x="0" y="0" width="15" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Inc_Var}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="333" y="0" width="38" height="11"/>
+				<reportElement x="92" y="0" width="25" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
