@@ -321,6 +321,7 @@ public class SalesAction {
         }
     }
 
+    /** Venta a credito **/
     public void registerSale(){
         System.out.println("------------> Registrando venta Total: " + getTotalAmount());
         System.out.println("------------> Description: " + getObservation());
@@ -335,6 +336,28 @@ public class SalesAction {
         clearAll();
         assignCustomerOrderTypeDefault();
     }
+
+    /** Venta a credito y factura y asiento **/
+    public void registerSaleAndInvoice(){
+        checkMinimumValues();
+
+        CustomerOrder customerOrder = createSale();
+
+        Movement movement = createInvoice(customerOrder);
+        customerOrder.setMovement(movement);
+        //Voucher voucher = accountingCashSale(customerOrder, movement);
+        Voucher voucher = accountingCreditSale(customerOrder, movement);
+        customerOrder.setVoucher(voucher);
+        customerOrder.setAccounted(Boolean.TRUE);
+        customerOrder.setState(SaleStatus.CONTABILIZADO);
+        saleService.updateCustomerOrder(customerOrder);
+
+        inventoryService.updateInventoryForSales(customerOrder);
+
+        clearAll();
+        assignCustomerOrderTypeDefault();
+    }
+
 
     public void registerCashSale(){
         System.out.println("......Registrando Venta al Contado...");
@@ -536,6 +559,9 @@ public class SalesAction {
 
         creditFiscalDebitIVA.setMovement(movement);
         voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
+        voucher.setMovement(movement);
+        voucher.setInvoiceNumber(movement.getNumber());
+
         voucher.getDetails().add(debitClientAccount);
         voucher.getDetails().add(debitTransactionTax);
         voucher.getDetails().add(creditTransactionTax);
@@ -585,6 +611,9 @@ public class SalesAction {
 
         creditFiscalDebitIVA.setMovement(movement);
         voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+        voucher.setMovement(movement);
+        voucher.setInvoiceNumber(movement.getNumber());
+
         voucher.getDetails().add(debitGeneralBox);
         voucher.getDetails().add(debitTransactionTax);
         voucher.getDetails().add(creditTransactionTax);

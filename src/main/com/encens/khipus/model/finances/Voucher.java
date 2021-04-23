@@ -2,6 +2,7 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
+import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Parameter;
@@ -111,6 +112,10 @@ public class Voucher implements BaseModel{
     @Column(name = "GLOSA", updatable = true, length = 1000)
     @Length(max = 1000)
     private String gloss;
+
+    @ManyToOne
+    @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
+    private Movement movement;
 
     /* the cash account*/
     @ManyToOne(fetch = FetchType.LAZY)
@@ -540,6 +545,14 @@ public class Voucher implements BaseModel{
 
     public void setInvoiceNumber(Integer invoiceNumber) {
         this.invoiceNumber = invoiceNumber;
+    }
+
+    public Movement getMovement() {
+        return movement;
+    }
+
+    public void setMovement(Movement movement) {
+        this.movement = movement;
     }
 
     /*@Override
