@@ -3,6 +3,7 @@ package com.encens.khipus.service.production;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.production.SalaryMovementProducerException;
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
+import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -312,5 +313,15 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         return rawMaterialCollectionSessions;
     }
 
+    @Override
+    public void createSalaryMovementProducer(CustomerOrder customerOrder) {
+
+        SalaryMovementProducer salaryMovementProducer = new SalaryMovementProducer();
+        salaryMovementProducer.setDate(customerOrder.getOrderDate());
+
+
+
+
+    }
 
 }

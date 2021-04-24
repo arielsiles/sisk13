@@ -103,6 +103,7 @@ public class AccountingCreditSaleAction extends GenericAction {
 
                 /** Todo: Ya se contabiliza arriba, hacer registro del descuento en acopio **/
 
+
             }
 
             customerOrder.setAccounted(Boolean.TRUE);

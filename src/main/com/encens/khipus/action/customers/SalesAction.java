@@ -346,10 +346,10 @@ public class SalesAction {
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
         //Voucher voucher = accountingCashSale(customerOrder, movement);
-        Voucher voucher = accountingCreditSale(customerOrder, movement);
-        customerOrder.setVoucher(voucher);
-        customerOrder.setAccounted(Boolean.TRUE);
-        customerOrder.setState(SaleStatus.CONTABILIZADO);
+        //Voucher voucher = accountingCreditSale(customerOrder, movement);
+        //customerOrder.setVoucher(voucher);
+        //customerOrder.setAccounted(Boolean.TRUE);
+        //customerOrder.setState(SaleStatus.CONTABILIZADO);
         saleService.updateCustomerOrder(customerOrder);
 
         inventoryService.updateInventoryForSales(customerOrder);
