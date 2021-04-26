@@ -4,14 +4,18 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.production.SalaryMovementProducerException;
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.RoundUtil;
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TemporalType;
 import java.util.ArrayList;
@@ -29,6 +33,14 @@ import java.util.List;
 @Stateless
 @AutoCreate
 public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBean implements SalaryMovementProducerService {
+
+    @In(value = "#{entityManager}")
+    private EntityManager em;
+
+    @In
+    private RawMaterialProducerService rawMaterialProducerService;
+    @In
+    private TypeMovementProducerService typeMovementProducerService;
 
     @Override
     public RawMaterialProducerDiscount prepareDiscount(RawMaterialProducer rawMaterialProducer, Date startDate, Date endDate,ProductiveZone productiveZone) throws EntryNotFoundException {
@@ -313,15 +325,35 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         return rawMaterialCollectionSessions;
     }
 
+    /**
+     * Para descuentos Lacteos y Veterinarios
+     * @param customerOrder
+     */
     @Override
     public void createSalaryMovementProducer(CustomerOrder customerOrder) {
 
+        RawMaterialProducer producer = rawMaterialProducerService.findProducerByIdNumber(customerOrder.getClient().getIdNumber());
+
+        TypeMovementProducer typeMovementProducer = null;
+        if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY))
+            typeMovementProducer = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.VETE);
+        if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK))
+            typeMovementProducer = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.LACT);
+
         SalaryMovementProducer salaryMovementProducer = new SalaryMovementProducer();
         salaryMovementProducer.setDate(customerOrder.getOrderDate());
+        salaryMovementProducer.setState(ProductionCollectionState.PENDING);
+        salaryMovementProducer.setValor(customerOrder.getTotalAmount());
+        salaryMovementProducer.setCompany(producer.getCompany());
+        salaryMovementProducer.setProductiveZone(producer.getProductiveZone());
+        salaryMovementProducer.setRawMaterialProducer(producer);
+        salaryMovementProducer.setTypeMovementProducer(typeMovementProducer);
+        salaryMovementProducer.setDescription(MessageUtils.getMessage("SalaryMovementProducer.creditSale.gloss") + " " +
+                                              customerOrder.getCode() + " " +
+                                              MessageUtils.getMessage(typeMovementProducer.getSalaryMovementProducerTypeEnum().getResourceKey()));
 
-
-
-
+        em.persist(salaryMovementProducer);
+        em.flush();
     }
 
 }

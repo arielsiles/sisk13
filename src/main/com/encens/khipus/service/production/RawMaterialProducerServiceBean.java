@@ -4,9 +4,12 @@ import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialProducer;
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.List;
 
 /**
@@ -21,14 +24,8 @@ import java.util.List;
 @AutoCreate
 public class RawMaterialProducerServiceBean extends ExtendedGenericServiceBean implements RawMaterialProducerService {
 
-    /*@Override
-    public List<RawMaterialProducer> findAllThatDontHaveCollectedRawMaterial(ProductiveZone productiveZone, Date date) {
-        List<RawMaterialProducer> result = getEntityManager().createNamedQuery("RawMaterialProducer.findAllThatDontHaveCollectedRawMaterialByDateAndProductiveZone")
-                                                      .setParameter("productiveZone", productiveZone)
-                                                      .setParameter("date", date)
-                                                      .getResultList();
-        return result;
-    }*/
+    @In("#{entityManager}")
+    private EntityManager em;
 
     @Override
     public List<RawMaterialProducer> findAll(ProductiveZone productiveZone) {
@@ -36,6 +33,16 @@ public class RawMaterialProducerServiceBean extends ExtendedGenericServiceBean i
                                                      .setParameter("productiveZone", productiveZone)
                                                      .getResultList();
         return result;
+    }
+
+    @Override
+    public RawMaterialProducer findProducerByIdNumber(String idNumber) {
+        try {
+            return (RawMaterialProducer) em.createNamedQuery("RawMaterialProducer.findByIdNumber")
+                    .setParameter("idNumber", idNumber).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override

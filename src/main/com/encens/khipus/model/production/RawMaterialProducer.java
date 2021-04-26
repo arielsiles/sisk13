@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @NamedQueries ({
+    @NamedQuery(name = "RawMaterialProducer.findByIdNumber", query = "select e from RawMaterialProducer e where e.idNumber =:idNumber"),
     @NamedQuery(name = "RawMaterialProducer.findAllByProductiveZone",
                 query = "select rawMaterialProducer " +
                         "from RawMaterialProducer rawMaterialProducer " +

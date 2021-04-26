@@ -14,4 +14,7 @@ public interface RawMaterialProducerService extends GenericService {
 //    public List<RawMaterialProducer> findAllThatDontHaveCollectedRawMaterial(ProductiveZone productiveZone, Date date);
 
     public List<RawMaterialProducer> findAll(ProductiveZone productiveZone);
+
+    RawMaterialProducer findProducerByIdNumber(String idNumber);
+
 }

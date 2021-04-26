@@ -14,6 +14,7 @@ import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.production.SalaryMovementProducerService;
 import com.encens.khipus.util.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -51,6 +52,8 @@ public class AccountingCreditSaleAction extends GenericAction {
     private UserCashBoxService userCashBoxService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private SalaryMovementProducerService salaryMovementProducerService;
 
     public String accountingCreditSales(){
         User user = getUser(currentUser.getId());
@@ -102,7 +105,9 @@ public class AccountingCreditSaleAction extends GenericAction {
             if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK) || customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)){
 
                 /** Todo: Ya se contabiliza arriba, hacer registro del descuento en acopio **/
-
+                salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
+                Voucher voucher = accountingCreditSale(customerOrder);
+                customerOrder.setVoucher(voucher);
 
             }
 
@@ -111,7 +116,7 @@ public class AccountingCreditSaleAction extends GenericAction {
             saleService.updateCustomerOrder(customerOrder);
         }
 
-        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CustomerOrder.infofo.accountingSaleProcessSucceed");
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CustomerOrder.info.accountingSaleProcessSucceed");
         return Outcome.SUCCESS;
     }
 
@@ -185,6 +190,11 @@ public class AccountingCreditSaleAction extends GenericAction {
         voucher.getDetails().add(creditItTaxForPaying);
         voucher.getDetails().add(creditFiscalCreditIVACommision);
 
+        if (customerOrder.getMovement() != null){
+            voucher.setInvoiceNumber(customerOrder.getMovement().getNumber());
+            voucher.setMovement(customerOrder.getMovement());
+        }
+
         voucherAccoutingService.saveVoucher(voucher);
 
         return voucher;
@@ -235,6 +245,11 @@ public class AccountingCreditSaleAction extends GenericAction {
         voucher.getDetails().add(creditTransactionTax);
         voucher.getDetails().add(creditFiscalDebitIVA);
         voucher.getDetails().add(creditPrimarySaleProduct);
+
+        if (customerOrder.getMovement() != null){
+            voucher.setInvoiceNumber(customerOrder.getMovement().getNumber());
+            voucher.setMovement(customerOrder.getMovement());
+        }
 
         voucherAccoutingService.saveVoucher(voucher);
 

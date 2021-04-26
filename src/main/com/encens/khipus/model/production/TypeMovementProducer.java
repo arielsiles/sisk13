@@ -7,12 +7,11 @@ package com.encens.khipus.model.production;
  * Time: 20:15
  * To change this template use File | Settings | File Templates.
  */
+
 import com.encens.khipus.model.admin.Company;
-import org.apache.poi.hssf.record.formula.functions.True;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @TableGenerator(name = "TypeMovementProducer_Generator",
         table = "SECUENCIA",
@@ -37,6 +36,10 @@ public class TypeMovementProducer implements com.encens.khipus.model.BaseModel {
 
     @Column(name = "NOMBRE", nullable = false)
     private String name;
+
+    @Column(name = "TIPO", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SalaryMovementProducerTypeEnum salaryMovementProducerTypeEnum;
 
     @Column(name = "MONEDA", nullable = true)
     private String money;
@@ -82,5 +85,13 @@ public class TypeMovementProducer implements com.encens.khipus.model.BaseModel {
 
     public void setTypeMovement(String typeMovement) {
         this.typeMovement = typeMovement;
+    }
+
+    public SalaryMovementProducerTypeEnum getSalaryMovementProducerTypeEnum() {
+        return salaryMovementProducerTypeEnum;
+    }
+
+    public void setSalaryMovementProducerTypeEnum(SalaryMovementProducerTypeEnum salaryMovementProducerTypeEnum) {
+        this.salaryMovementProducerTypeEnum = salaryMovementProducerTypeEnum;
     }
 }
