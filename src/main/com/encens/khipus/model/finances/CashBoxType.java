@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.customers.CustomerCategory;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
@@ -69,6 +70,11 @@ public class CashBoxType implements BaseModel {
             @JoinColumn(name = "cuentacontingencia", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount cashAccountContingency;
+
+
+    @ManyToOne
+    @JoinColumn(name = "idcategoriacliente", nullable = true)
+    private CustomerCategory customerCategory;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -157,5 +163,13 @@ public class CashBoxType implements BaseModel {
 
     public void setCashAccountContingency(CashAccount cashAccountContingency) {
         this.cashAccountContingency = cashAccountContingency;
+    }
+
+    public CustomerCategory getCustomerCategory() {
+        return customerCategory;
+    }
+
+    public void setCustomerCategory(CustomerCategory customerCategory) {
+        this.customerCategory = customerCategory;
     }
 }

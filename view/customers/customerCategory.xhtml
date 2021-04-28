@@ -33,7 +33,7 @@
 
                 <h:commandButton id="updateButtonId"
                                  action="#{customerCategoryAction.update}"
-                                 value="Actualizar"
+                                 value="#{messages['Common.update']}"
                                  rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','UPDATE')}"
                                  styleClass="button">
                     <s:defaultAction/>

@@ -7,6 +7,8 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity for Customer categories
@@ -38,6 +40,13 @@ public class CustomerCategory implements BaseModel {
     @Column(name = "tipo")
     @Enumerated(EnumType.STRING)
     private CustomerCategoryType type;
+
+    /*@ManyToOne
+    @JoinColumn(name = "idtipocaja", nullable = true)
+    private CashBoxType cashBoxType;*/
+
+    @OneToMany(mappedBy = "customerCategory", fetch = FetchType.LAZY)
+    private List<PriceItem> priceItemList = new ArrayList<PriceItem>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -87,5 +96,21 @@ public class CustomerCategory implements BaseModel {
 
     public void setType(CustomerCategoryType type) {
         this.type = type;
+    }
+
+    /*public CashBoxType getCashBoxType() {
+        return cashBoxType;
+    }
+
+    public void setCashBoxType(CashBoxType cashBoxType) {
+        this.cashBoxType = cashBoxType;
+    }*/
+
+    public List<PriceItem> getPriceItemList() {
+        return priceItemList;
+    }
+
+    public void setPriceItemList(List<PriceItem> priceItemList) {
+        this.priceItemList = priceItemList;
     }
 }

@@ -860,6 +860,22 @@ public class SalesAction {
         return productItemService.findBestProductList();
     }
 
+    public List<ProductItem> getBestProductsByCategory(){
+
+        List<ProductItem> resultProductItems = new ArrayList<ProductItem>(0);
+
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+
+        if (cashBox.getType().getCustomerCategory() != null){
+            List<PriceItem> priceItemList = cashBox.getType().getCustomerCategory().getPriceItemList();
+            for (PriceItem priceItem : priceItemList){
+                resultProductItems.add(priceItem.getProductItem());
+            }
+        }
+        return resultProductItems;
+    }
+
+
     public ProductItem getProductItem() {
         return productItem;
     }
