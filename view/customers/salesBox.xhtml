@@ -41,7 +41,7 @@
                 <s:div id="customerCategoryTypeField" styleClass="formRow,left">
                     <h:selectOneRadio id="customerCategoryTypeId" value="#{salesAction.customerCategoryTypeEnum}"
                                       layout="lineDirection">
-                        <s:selectItems value="#{customerCategoryTypes}"
+                        <s:selectItems value="#{fixedCustomerCategoryTypes}"
                                        var="element"
                                        label="#{messages[element.resourceKey]}"/>
                         <s:convertEnum/>

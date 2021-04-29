@@ -1,5 +1,8 @@
 package com.encens.khipus.model.customers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * CustomerCategoryType
  *
@@ -19,6 +22,15 @@ public enum CustomerCategoryType {
 
     CustomerCategoryType(String resourceKey) {
         this.resourceKey = resourceKey;
+    }
+
+    public List<CustomerCategoryType> fixedCategoryTypes(){
+        List<CustomerCategoryType> resulTypes = new ArrayList<CustomerCategoryType>(0);
+        resulTypes.add(CustomerCategoryType.FACTORY);
+        resulTypes.add(CustomerCategoryType.STORE);
+        resulTypes.add(CustomerCategoryType.CONSUMER);
+
+        return resulTypes;
     }
 
     public String getResourceKey() {

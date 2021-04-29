@@ -129,6 +129,17 @@ public class SalesAction {
         return CustomerCategoryType.values();
     }
 
+    @Factory(value = "fixedCustomerCategoryTypes", scope = ScopeType.STATELESS)
+    public List<CustomerCategoryType> initFixedProductDeliveryTypes() {
+        List<CustomerCategoryType> resulTypes = new ArrayList<CustomerCategoryType>(0);
+        resulTypes.add(CustomerCategoryType.FACTORY);
+        resulTypes.add(CustomerCategoryType.STORE);
+        resulTypes.add(CustomerCategoryType.CONSUMER);
+        resulTypes.add(CustomerCategoryType.AGENCY_LIST);
+
+        return resulTypes;
+    }
+
     public void openSale(){
         setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
 

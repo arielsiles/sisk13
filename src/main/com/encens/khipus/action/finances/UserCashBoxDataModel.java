@@ -32,11 +32,12 @@ public class UserCashBoxDataModel extends QueryDataModel<Long, User> {
     public String getEjbql() {
 
         //TODO this query needs to be checked out.
+        return "select distinct user from User user";
         /*return "select distinct user from User user where not exists (select u.user from UserCashBox " +
                 "u where u.user = user and u.state = #{state})";*/
-        return "select distinct user from User user inner join user.roles role inner join role.accessRights accessRight " +
+        /*return "select distinct user from User user inner join user.roles role inner join role.accessRights accessRight " +
                 "where accessRight.function.code ='CASHBOX' " +
-                "and not exists (select u.user from UserCashBox u where u.user = user and u.state = #{state})";
+                "and not exists (select u.user from UserCashBox u where u.user = user and u.state = #{state})";*/
 
     }
 
