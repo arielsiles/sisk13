@@ -1,6 +1,7 @@
 build/
 dist/
 .idea/
+.gradle/
 out/
 .idea/workspace.xml
 *.iml
