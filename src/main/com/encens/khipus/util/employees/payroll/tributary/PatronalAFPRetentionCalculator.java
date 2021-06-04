@@ -54,6 +54,22 @@ public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributary
         instance.setPatronalSolidaryRetentionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(),
                 patronalSolidaryRetentionAFP.getRate(), TWO_DECIMAL_SCALE));
 
+        /** todo AFP **/
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("815059")){
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        /** **/
+
         /*instance.setLaborIndividualAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborIndividualAFP.getRate(), TWO_DECIMAL_SCALE));
         instance.setLaborCommonRiskAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborCommonRiskAFP.getRate(), TWO_DECIMAL_SCALE));
         instance.setLaborSolidaryContributionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborSolidaryContributionAFP.getRate(), TWO_DECIMAL_SCALE));

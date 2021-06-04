@@ -80,6 +80,22 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         instance.setLaborSolidaryContributionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborSolidaryContributionAFP.getRate(), TWO_DECIMAL_SCALE));
         instance.setLaborComissionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborComissionAFP.getRate(), TWO_DECIMAL_SCALE));
 
+        /** todo AFP **/
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("815059")){
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+        /** **/
+
         retentionAFP = BigDecimalUtil.sum(
                 instance.getLaborIndividualAFP(),
                 instance.getLaborCommonRiskAFP(),
