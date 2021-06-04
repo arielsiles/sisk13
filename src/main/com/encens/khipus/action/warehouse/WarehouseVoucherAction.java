@@ -163,6 +163,10 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             for (InventoryMovement inventoryMovement:warehouseVoucher.getInventoryMovementList()) {
                 for (MovementDetail movementDetail:inventoryMovement.getMovementDetailList()) {
                     if (movementDetail.getMovementType().equals(MovementDetailType.S)) {
+
+                        System.out.println("------> 1. " + movementDetail.getProductItem().getFullName());
+                        System.out.println("------> 2. " + warehouseVoucher.getNumber() + " - " + warehouseVoucher.getGloss());
+
                         BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
                         BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
