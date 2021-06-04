@@ -2,7 +2,7 @@
 -- alter table categoriacliente add column idtipocaja bigint(20)after tipo;
 -- alter table categoriacliente add foreign key (idtipocaja) references tipocaja (idtipocaja);
 
-alter table tipocaja add column idcategoriacliente bigint(20)after no_cia;
+alter table tipocaja add column idcategoriacliente bigint(20)after no_cia; -- ejec ilva
 
 -- Configuraciones para release
 -- 0. Crear Almacen Agencia y asignar cuenta contable (1510110203 - Productos Agencia Central)
