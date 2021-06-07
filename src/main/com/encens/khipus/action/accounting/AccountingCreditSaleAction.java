@@ -70,9 +70,10 @@ public class AccountingCreditSaleAction extends GenericAction {
                 /** Reposiciones, degustación y refrigerios **/
                 if (    (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REPLACEMENT)   ||
                         customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TASTING)        ||
-                        customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT)) ){
+                        customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REFRESHMENT)    ||
+                        customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.TRANSFER))  ){
 
-                    customerOrder.setState(SaleStatus.CONTABILIZADO); /** Solo se fija el estado, se contabiliza en CV **/
+                    customerOrder.setState(SaleStatus.CONTABILIZADO); /** Solo se fija el estado, se contabiliza a fin de periodo, CV **/
 
                 }else {
                     Voucher voucher = accountingCreditSaleWithoutInvoice(customerOrder);

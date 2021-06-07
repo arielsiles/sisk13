@@ -34,7 +34,7 @@ public enum WarehouseVoucherType {
     }
 
     public static List<WarehouseVoucherType> getInputTypes() {
-        return Arrays.asList(WarehouseVoucherType.E, WarehouseVoucherType.R, WarehouseVoucherType.D);
+        return Arrays.asList(WarehouseVoucherType.E, WarehouseVoucherType.R, WarehouseVoucherType.D, WarehouseVoucherType.T);
     }
 
     public static List<WarehouseVoucherType> getOutputTypes() {

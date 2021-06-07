@@ -13,7 +13,8 @@ public enum CustomerOrderTypeEnum {
     REPLACEMENT("CustomerOrderType.type.replacement"),
     MILK("CustomerOrderType.type.milk"),
     VETERINARY("CustomerOrderType.type.veterinary"),
-    SPECIAL("CustomerOrderType.type.special");
+    SPECIAL("CustomerOrderType.type.special"),
+    TRANSFER("CustomerOrderType.type.transfer");
 
     private String resourceKey;
 
