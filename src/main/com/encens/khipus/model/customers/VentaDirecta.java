@@ -4,7 +4,6 @@ import com.encens.khipus.model.BaseModel;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
@@ -87,6 +86,10 @@ public class VentaDirecta implements BaseModel  {
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDPERSONACLIENTE")
     @ManyToOne(optional = false)
     private Client cliente;
+
+    @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
+    @ManyToOne(optional = true)
+    private Movement movement;
 
     public Long getIdventadirecta() {
         return idventadirecta;
@@ -211,5 +214,13 @@ public class VentaDirecta implements BaseModel  {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Movement getMovement() {
+        return movement;
+    }
+
+    public void setMovement(Movement movement) {
+        this.movement = movement;
     }
 }

@@ -2,6 +2,7 @@ package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.ProductionProduct;
@@ -169,23 +170,39 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
         for (ArticleOrder ao:cashSaleDetailList){
+            String invoiceLabel = "";
+            if (ao.getVentaDirecta().getMovement() != null){
+                invoiceLabel = "F-" + ao.getVentaDirecta().getMovement().getNumber().toString() + " ";
+            }
             CollectionData collectionData = new CollectionData( ao.getVentaDirecta().getFechaPedido(),
                                                                 ao.getVentaDirecta().getCodigo().toString(),
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
                                                                 "S",
-                                                                "Venta al contado "+ao.getVentaDirecta().getCodigo() + " " + ao.getVentaDirecta().getCliente().getFullName());
+                    invoiceLabel + "Venta al contado "+ao.getVentaDirecta().getCodigo() + " " + ao.getVentaDirecta().getCliente().getFullName());
             datas.add(collectionData);
         }
 
         for (ArticleOrder ao:orderDetailList){
+
+            String invoiceLabel = "";
+            if (ao.getCustomerOrder().getMovement() != null){
+                invoiceLabel = "F-" + ao.getCustomerOrder().getMovement().getNumber().toString() + " ";
+            }
+
+            String typeLabel = "Venta a credito ";
+            if (ao.getCustomerOrder().getSaleType() != null){
+                if (ao.getCustomerOrder().getSaleType().equals(SaleTypeEnum.CASH))
+                    typeLabel = "Venta al contado ";
+            }
+
             CollectionData collectionData = new CollectionData(
                                                                 ao.getCustomerOrder().getOrderDate(),
                                                                 ao.getCustomerOrder().getCode().toString(),
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
                                                                 "S",
-                                                                "Venta a credito " + ao.getCustomerOrder().getCode() + " " + ao.getCustomerOrder().getClient().getFullName());
+                    invoiceLabel + typeLabel + ao.getCustomerOrder().getCode() + " " + ao.getCustomerOrder().getClient().getFullName());
             datas.add(collectionData);
         }
 
