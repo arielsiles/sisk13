@@ -21,6 +21,8 @@ INSERT INTO tipopedido VALUES (8, 'TRANSFERENCIA', 'TRANSFER');
 
 UPDATE inv_tipodocs i SET i.`cod_doc` = 'RPT', i.`desc_def` = 'RECEPCION POR TRANSFERENCIA', i.`descri` = 'RECEPCION P.T.', i.`tipo_vale` = 'R' WHERE i.`cod_doc` = 'TPT';
 
+-- 1.1. Crear un tipo de caja para las diferentes areas de ventas, y configurar cuentas contables
+-- 	Ventas planta, agencia, veterinaria, comercial
 -- 1.1. Crear cajas y asignar usuarios (Alejandra, Delina)
 -- 1.2. En categoriacliente fijar tipo segun corresponde:
 --	FACTORY_LIST *
@@ -28,3 +30,13 @@ UPDATE inv_tipodocs i SET i.`cod_doc` = 'RPT', i.`desc_def` = 'RECEPCION POR TRA
 --	VET_LIST
 
 -- 2. Relacionar en tipo de caja (tipocaja) con la categoriacliente q corresponde
+
+
+--
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(425, 'CASHSALE_INVOICE', 1, 1, 'Functionality.customers.registerCashSaleInvoice', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(426, 'CASHSALE_REGISTER', 1, 1, 'Functionality.customers.registerCashSale', 1);
+
+

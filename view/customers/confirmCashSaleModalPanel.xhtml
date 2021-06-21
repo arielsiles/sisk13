@@ -66,17 +66,19 @@
         <div class="buttonsRight">
             <a4j:commandButton id="confirmRegisterNoInvoiceButton" value="Cobrar SF"
                                action="#{salesAction.registerCashSaleNoInvoice()}"
+                               rendered="#{s:hasPermission('CASHSALE_REGISTER','VIEW')}"
                                styleClass="button"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
-            />
+                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
+
+            <a4j:commandButton id="confirmRegisterButton" value="Cobrar y facturar"
+                               action="#{salesAction.registerCashSale()}"
+                               rendered="#{s:hasPermission('CASHSALE_INVOICE','VIEW')}"
+                               styleClass="button"
+                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
+
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </h:commandButton>
-            <a4j:commandButton id="confirmRegisterButton" value="Cobrar y facturar"
-                               action="#{salesAction.registerCashSale()}"
-                               styleClass="button"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"
-            />
         </div>
 
         <rich:componentControl for="#{dialogId}"
