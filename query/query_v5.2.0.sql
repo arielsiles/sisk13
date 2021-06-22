@@ -39,4 +39,6 @@ VALUES(425, 'CASHSALE_INVOICE', 1, 1, 'Functionality.customers.registerCashSaleI
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
 VALUES(426, 'CASHSALE_REGISTER', 1, 1, 'Functionality.customers.registerCashSale', 1);
 
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(427, 'MAJORACCOUNTING', 5, 1, 'Functionality.accounting.majorAccounting', 1);
 

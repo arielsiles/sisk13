@@ -353,11 +353,12 @@
             s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
             s:hasPermission('CASHACCOUNTGROUP','VIEW') or
             s:hasPermission('COSTCENTER','VIEW') or
+            s:hasPermission('MAJORACCOUNTING','VIEW') or
             s:hasPermission('COSTCENTERGROUP','VIEW')}">
 <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0"
              columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
-<rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW')}">
+<rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW') or s:hasPermission('MAJORACCOUNTING','VIEW')}">
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
@@ -383,7 +384,7 @@
     </rich:menuItem>-->
 
     <rich:menuItem submitMode="none"
-                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   rendered="#{s:hasPermission('MAJORACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/majorAccountingReport.xhtml"
                 value="#{messages['menu.finances.accounting.majorAccounting']}"
