@@ -4,6 +4,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
              version="1.0">
 
+
     <persistence-unit name="khipus">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/khipusDatasource</jta-data-source>
@@ -11,7 +12,7 @@
             <property name="hibernate.hbm2ddl.auto" value="validate"/>
             <property name="hibernate.cache.use_query_cache" value="false"/>
             <property name="hibernate.show_sql" value="false"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="jboss.entity.manager.factory.jndi.name" value="java:/khipusEntityManagerFactory"/>
 
             <property name="hibernate.ejb.event.post-insert"
@@ -34,3 +35,4 @@
         </properties>
     </persistence-unit>
 </persistence>
+
