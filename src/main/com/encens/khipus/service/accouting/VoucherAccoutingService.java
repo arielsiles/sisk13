@@ -93,6 +93,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     HashMap<String, BigDecimal> getUnitCost_milkProducts(Date startDate, Date endDate);
 
+    public BigDecimal getUnitCost_lastPeriod(String productItemCode);
+
     public Double calculateCashTransferAmount(Date startDate, Date endDate);
 
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double amountTransfer, String gloss) throws CompanyConfigurationNotFoundException;

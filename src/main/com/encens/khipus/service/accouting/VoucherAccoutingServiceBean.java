@@ -11,6 +11,7 @@ import com.encens.khipus.model.customers.VentaDirecta;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -1373,6 +1374,29 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         return result;
     }
+
+    public BigDecimal getUnitCost_lastPeriod(String productItemCode){
+        BigDecimal result = null;
+
+        List<InventoryPeriod> inventoryPeriodList = new ArrayList<InventoryPeriod>();
+
+        inventoryPeriodList = (List<InventoryPeriod>) em.createQuery(
+                "Select i from InventoryPeriod i " +
+                   "where i.productItemCode =:productItemCode " +
+                   "and i.quantity > 0")
+                .setParameter("productItemCode", productItemCode)
+                .getResultList();
+
+        if (inventoryPeriodList.size() > 0){
+            result = inventoryPeriodList.get(inventoryPeriodList.size()-1).getUnitCost();
+        }
+
+        System.out.println("-------------------> unitCost:" + result);
+
+        return  result;
+    }
+
+
 
     public BigDecimal getUnitCost_milkProduct(String codArt, Date startDate, Date endDate){
 

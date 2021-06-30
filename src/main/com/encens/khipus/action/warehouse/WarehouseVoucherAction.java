@@ -131,6 +131,12 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
             System.out.println("------> unitCost: " + unitCost);
             System.out.println("------> Quantity: " + movementDetail.getQuantity());
+
+            /** todo: Si unitCost es null, busca en los periodos anteriores **/
+            if (unitCost == null){
+                unitCost = voucherAccoutingService.getUnitCost_lastPeriod(movementDetail.getProductItemCode());
+            }
+
             BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
             VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
