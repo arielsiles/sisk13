@@ -9,8 +9,8 @@ import com.encens.khipus.exception.employees.PayrollSelectItemsHasAccountingReco
 import com.encens.khipus.exception.employees.UpdateActivePaymentException;
 import com.encens.khipus.exception.finances.*;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.employees.*;
 import com.encens.khipus.model.employees.Currency;
+import com.encens.khipus.model.employees.*;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.finances.QuotaService;
 import com.encens.khipus.service.finances.RotatoryFundCollectionService;
@@ -1230,7 +1230,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     totalOtherIncomes = categoryTributaryPayroll.getTotalOtherIncomes().doubleValue();
                     //totalRCIvaDiscount = totalRCIvaDiscount + categoryTributaryPayroll.getRetentionClearance().doubleValue();
                     totalRCIvaDiscount = categoryTributaryPayroll.getRetentionClearance().doubleValue();
-                    System.out.println("--------> RCIVA get: " + totalRCIvaDiscount);
+                    //System.out.println("--------> RCIVA get: " + totalRCIvaDiscount);
                     totalAfpDiscount = categoryTributaryPayroll.getRetentionAFP().doubleValue();
                 } else {
                     if (employee.getRetentionFlag()) {
@@ -1388,7 +1388,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 managersPayroll.setAfp(null != categoryTributaryPayroll && categoryTributaryPayroll.getRetentionAFP().compareTo(BigDecimal.ZERO) == 1 ?
                         categoryTributaryPayroll.getRetentionAFP() : BigDecimalUtil.toBigDecimal(0));
 
-                System.out.println("=======> set totalRCIvaDiscount: " + totalRCIvaDiscount);
+                //System.out.println("=======> set totalRCIvaDiscount: " + totalRCIvaDiscount);
                 managersPayroll.setRciva(BigDecimalUtil.toBigDecimal(totalRCIvaDiscount));
                 managersPayroll.setUnit(currentJobContract.getJob().getOrganizationalUnit().getName());
                 OrganizationalLevel areaLevel = findOrganizationalLevelByName("AREA");

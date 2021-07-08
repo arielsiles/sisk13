@@ -10,15 +10,23 @@
         <param-value>com.sun.facelets.FaceletViewHandler</param-value>
     </context-param>
 
+    <!-- FLech -->
     <!--<context-param>
         <param-name>org.richfaces.SKIN</param-name>
         <param-value>DEFAULT</param-value>
     </context-param>-->
 
+    <!-- ilva, cisc -->
     <context-param>
         <param-name>org.richfaces.SKIN</param-name>
         <param-value>glassX</param-value>
     </context-param>
+
+    <!-- ilvaa -->
+    <!--<context-param>
+        <param-name>org.richfaces.SKIN</param-name>
+        <param-value>darkX</param-value>
+    </context-param>-->
 
     <context-param>
         <param-name>org.ajax4jsf.COMPRESS_SCRIPT</param-name>
