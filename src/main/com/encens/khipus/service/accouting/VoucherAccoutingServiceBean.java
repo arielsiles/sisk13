@@ -4,10 +4,7 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.ProductSaleType;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.CashSale;
-import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.customers.VentaDirecta;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
@@ -1622,11 +1619,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return  result;
     }
 
+    public Double calculateCashTransferAmountFromCustomerOrder(Date startDate, Date endDate){
+
+        /** MODIFYID **/
+        Double result = (Double) em.createQuery (
+                "select sum(c.totalAmount) from CustomerOrder c " +
+                "where c.orderDate between :startDate and :endDate " +
+                "and c.state <> :state " +
+                "and c.user.id=408 " +
+                "and c.flagct = :flagct ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", SaleStatus.ANULADO)
+                .setParameter("flagct", Boolean.FALSE)
+                .getSingleResult();
+
+        System.out.println("===================> start: " + startDate.toString() + " - " + result);
+        System.out.println("===================>   end: " + endDate.toString() + " - " + result);
+
+        if (result == null)
+            result = new Double(0);
+
+        return  result;
+    }
+
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double transferAmount, String gloss) throws CompanyConfigurationNotFoundException{
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
         List<CashSale> cashSaleList = em.createNamedQuery("CashSale.findBetweenDates")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("flagct", Boolean.FALSE)
+                .getResultList();
+
+        List<CustomerOrder> customerOrderList = em.createNamedQuery("CustomerOrder.findBetweenDates")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("flagct", Boolean.FALSE)
@@ -1638,10 +1665,17 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         DateIterator iDate = new DateIterator(startDate, endDate);
         while (iDate.hasNext()) {
             Double amount = calculateCashTransferAmount(iDate.getCurrent(), iDate.getCurrent());
+            Double amount2 = calculateCashTransferAmountFromCustomerOrder(iDate.getCurrent(), iDate.getCurrent());
             if (amount > 0){
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                         companyConfiguration.getSavingsBankAccount(),
                         BigDecimalUtil.toBigDecimal(amount),
+                        FinancesCurrencyType.P, null));
+            }
+            if (amount2 > 0){
+                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                        companyConfiguration.getSavingsBankAccount(),
+                        BigDecimalUtil.toBigDecimal(amount2),
                         FinancesCurrencyType.P, null));
             }
             iDate.next();
@@ -1655,6 +1689,11 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         for (CashSale cashSale:cashSaleList){
             cashSale.setFlagct(true);
+            em.flush();
+        }
+
+        for (CustomerOrder customerOrder:customerOrderList){
+            customerOrder.setFlagct(true);
             em.flush();
         }
 

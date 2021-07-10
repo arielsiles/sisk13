@@ -50,7 +50,7 @@ public class CashSaleAction extends GenericAction<CashSale> {
         try {
             if (transferAmount > 0){
                 voucherAccoutingService.generateCashTransferAccountEntry(startDate, endDate, getTransferAmount(), gloss);
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"CashSale.message.transfer", transferAmount);
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"CashSale.message.transferAmount", transferAmount);
             }else {
                 setTransferAmount(0.0);
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"CashSale.message.amountZero");
@@ -66,7 +66,10 @@ public class CashSaleAction extends GenericAction<CashSale> {
 
     public void calculateTransfer(){
 
-        setTransferAmount(voucherAccoutingService.calculateCashTransferAmount(startDate, endDate));
+        Double amount_ventadirecta = voucherAccoutingService.calculateCashTransferAmount(startDate, endDate);
+        Double amount_pedidos = voucherAccoutingService.calculateCashTransferAmountFromCustomerOrder(startDate, endDate);
+
+        setTransferAmount(amount_ventadirecta + amount_pedidos);
         if (transferAmount == 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"CashSale.message.amountZero");
         }

@@ -97,6 +97,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     public Double calculateCashTransferAmount(Date startDate, Date endDate);
 
+    public Double calculateCashTransferAmountFromCustomerOrder(Date startDate, Date endDate);
+
     public void generateCashTransferAccountEntry(Date startDate, Date endDate, Double amountTransfer, String gloss) throws CompanyConfigurationNotFoundException;
 
     void createPurchaseDocumentVoucher(VoucherDetail voucherDetail);

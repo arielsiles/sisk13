@@ -3,21 +3,12 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.util.Constants;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * CashSale entity
@@ -34,14 +25,14 @@ import java.util.List;
                         query = "select c from CashSale c " +
                                 "where c.date between :startDate and :endDate " +
                                 "and c.state <> 'ANULADO' " +
-                                "and c.user.id=5 " +
+                                "and c.user.id=408 " +
                                 "and c.flagct = :flagct "),
                 /** Solo ventas osby **/
                 @NamedQuery(name = "CashSale.calculateCashTransferAmount",
                         query = "select sum(c.total) from CashSale c " +
                                 "where c.date between :startDate and :endDate " +
                                 "and c.state <> 'ANULADO' " +
-                                "and c.user.id=5 " +
+                                "and c.user.id=408 " +
                                 "and c.flagct = :flagct ")
         }
 )

@@ -42,7 +42,14 @@ import java.util.Date;
                                 "and c.state <> :anulledState " +
                                 "and c.cvFlag = 0 " +
                                 "and c.customerOrderType.id in (1,6) " +
-                                "and c.user.id = 5 ") /** cisc **/
+                                "and c.user.id = 5 "), /** cisc **/
+
+                @NamedQuery(name = "CustomerOrder.findBetweenDates",
+                        query = "select c from CustomerOrder c " +
+                                "where c.orderDate between :startDate and :endDate " +
+                                "and c.state <> 'ANULADO' " +
+                                "and c.user.id = 408 " +
+                                "and c.flagct = :flagct ")
         }
 )
 
@@ -127,6 +134,10 @@ public class CustomerOrder implements BaseModel  {
     @Basic
     @Column(name = "contabilizado")
     private Boolean accounted;
+
+    @Column(name = "flagct", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean flagct = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipopedido", referencedColumnName = "idtipopedido")
@@ -366,4 +377,11 @@ public class CustomerOrder implements BaseModel  {
         return result;
     }
 
+    public Boolean getFlagct() {
+        return flagct;
+    }
+
+    public void setFlagct(Boolean flagct) {
+        this.flagct = flagct;
+    }
 }
