@@ -1625,11 +1625,13 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         Double result = (Double) em.createQuery (
                 "select sum(c.totalAmount) from CustomerOrder c " +
                 "where c.orderDate between :startDate and :endDate " +
+                "and c.saleType = :saleType " +
                 "and c.state <> :state " +
                 "and c.user.id=408 " +
                 "and c.flagct = :flagct ")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
+                .setParameter("saleType", SaleTypeEnum.CASH)
                 .setParameter("state", SaleStatus.ANULADO)
                 .setParameter("flagct", Boolean.FALSE)
                 .getSingleResult();
