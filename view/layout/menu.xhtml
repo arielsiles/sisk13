@@ -136,6 +136,12 @@
             </rich:menuItem>
 
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/contributionStatusReport.xhtml"
+                        value="#{messages['menu.customers.report.contributionStatus']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/savingStatusReport.xhtml"
                         value="#{messages['menu.customers.report.savingStatus']}"
                         propagation="none"/>
