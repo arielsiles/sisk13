@@ -42,6 +42,10 @@ public class Warehouse implements BaseModel {
     @Length(max = 20)
     private String cashAccount;
 
+    @Column(name = "TIPO")
+    @Enumerated(EnumType.STRING)
+    private WarehouseType warehouseType;
+
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
@@ -175,5 +179,13 @@ public class Warehouse implements BaseModel {
 
     public void setDefaultOutputWarehouse(boolean defaultOutputWarehouse) {
         this.defaultOutputWarehouse = defaultOutputWarehouse;
+    }
+
+    public WarehouseType getWarehouseType() {
+        return warehouseType;
+    }
+
+    public void setWarehouseType(WarehouseType warehouseType) {
+        this.warehouseType = warehouseType;
     }
 }

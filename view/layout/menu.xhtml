@@ -1335,6 +1335,14 @@
                         propagation="none" />
             </rich:menuItem>
 
+            <rich:menuItem submitMode="none"
+                           rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                           styleClass="main-menu-item">
+                <s:link view="/accounting/generateCostOfSalesByWarehouse.xhtml"
+                        value="#{messages['menu.finances.accounting.generateCostOfSalesByWarehouse']}"
+                        propagation="none" />
+            </rich:menuItem>
+
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.production.planification.Reportes']}" >
