@@ -360,9 +360,9 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
             service.finalizePurchaseOrder(getInstance());
             PurchaseOrderPayment purchaseOrderPayment = getLiquidationPayment();
 
-            System.out.println("------------> purchaseOrderPayment: " + purchaseOrderPayment);
+            /*System.out.println("------------> purchaseOrderPayment: " + purchaseOrderPayment);
             System.out.println("------------> purchaseOrderPayment.getPayAmount(): " + purchaseOrderPayment.getPayAmount());
-            System.out.println("------------> purchaseOrderPayment.getSourceAmount(): " + purchaseOrderPayment.getSourceAmount());
+            System.out.println("------------> purchaseOrderPayment.getSourceAmount(): " + purchaseOrderPayment.getSourceAmount());*/
 
             BigDecimal defaultExchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.name());
             service.createFixedAssetPurchaseOrderFinalizedAccountEntry(getInstance(), defaultExchangeRate);

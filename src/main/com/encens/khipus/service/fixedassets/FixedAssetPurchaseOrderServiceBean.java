@@ -558,15 +558,18 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
-        }/* else {
-            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
-                    executorUnitCode,
-                    costCenterCode,
-                    companyConfiguration.getFixedAssetInTransitAccount(),
-                    purchaseOrder.getTotalAmount(),
-                    FinancesCurrencyType.P,
-                    BigDecimal.ONE));
-        }*/
+        } else {
+            for (FixedAssetPurchaseOrderDetail fixedAssetPurchaseOrderDetail : purchaseOrder.getFixedAssetPurchaseOrderDetailList()){
+                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                        executorUnitCode,
+                        costCenterCode,
+                        fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getWarehouseCashAccount(),
+                        //purchaseOrder.getTotalAmount(),
+                        fixedAssetPurchaseOrderDetail.getBsTotalAmount(),
+                        FinancesCurrencyType.P,
+                        BigDecimal.ONE));
+            }
+        }
 
         /*if (BigDecimalUtil.isPositive(sumAdvancePaymentAmount)) {
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
