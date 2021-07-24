@@ -54,7 +54,7 @@ where e.estado <> 'ANL'
 -- -----------------------------------------------------------------
 
 -- 4. VISTA VENTAS union al contado y a credito (lacteos U veterinarios)
-create or replace view ventas as
+/*create or replace view ventas as
 	select p.`FECHA_ENTREGA` as FECHA, p.tipoventa, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, p.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
 	from articulos_pedido ap
 	join pedidos p 	 on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
@@ -65,6 +65,24 @@ create or replace view ventas as
 	select v.`FECHA_PEDIDO` as FECHA, v.tipoventa, ap.`IDARTICULOSPEDIDO`, ap.`cod_art`, ap.`CANTIDAD`, 0, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, v.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1
 	from articulos_pedido ap
 	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
+	and v.estado <> 'ANULADO'
+	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090); */
+create or replace view ventas as
+	select p.`FECHA_ENTREGA` as FECHA, p.tipoventa, ap.`IDARTICULOSPEDIDO`, a.`cod_alm`, ap.`cod_art`, a.`descri`,
+	ap.`CANTIDAD`, ap.PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, p.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, p.idusuario, p.idtipopedido
+	from articulos_pedido ap
+	join pedidos p 	     on ap.`IDPEDIDOS` = p.`IDPEDIDOS`
+	join inv_articulos a on ap.`cod_art` = a.`cod_art`
+	and p.`FECHA_ENTREGA` >= '2020-01-01'
+	and p.estado <> 'ANULADO'
+	and ap.cod_art not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090, 480, 481)
+	union
+	select v.`FECHA_PEDIDO` as FECHA, v.tipoventa, ap.`IDARTICULOSPEDIDO`, a.`cod_alm`, ap.`cod_art`, a.`descri`,
+	ap.`CANTIDAD`, 0 as PROMOCION, ap.`REPOSICION`, ap.`TOTAL`, ap.importe, v.idcliente, ap.`IDPEDIDOS`, ap.`IDVENTADIRECTA`, v.idusuario, 1 as idtipopedido
+	from articulos_pedido ap
+	join ventadirecta v on ap.`IDVENTADIRECTA` = v.`IDVENTADIRECTA`
+	join inv_articulos a on ap.`cod_art` = a.`cod_art`
+	and v.`FECHA_PEDIDO` >= '2020-01-01'
 	and v.estado <> 'ANULADO'
 	and ap.`cod_art` not in (192,193,194,795,195,196,188,493,693,832,833,834,835,197, 490, 521, 1078, 1090)
 ;
