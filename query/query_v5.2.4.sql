@@ -1,5 +1,6 @@
 /** 16/07/2021 **/
 ALTER TABLE inv_almacenes ADD COLUMN tipo VARCHAR(20) AFTER descri; -- ejec en ILVA
+-- Ejec en ILVA:
 UPDATE inv_almacenes a SET a.`tipo` = 'INPUTS' WHERE a.`cod_alm` = 1;
 UPDATE inv_almacenes a SET a.`tipo` = 'DAIRY' WHERE a.`cod_alm` = 2;
 UPDATE inv_almacenes a SET a.`tipo` = 'MATERIAL' WHERE a.`cod_alm` = 3;
@@ -13,22 +14,3 @@ UPDATE inv_almacenes a SET a.`tipo` = 'AGENCY' WHERE a.`cod_alm` = 8;
 ALTER TABLE registroacopio ADD FOREIGN KEY (`idplanillaacopio`) REFERENCES `planillaacopio`(`idplanillaacopio`);
 ALTER TABLE registroacopio ADD FOREIGN KEY (`idzonaproductiva`) REFERENCES zonaproductiva(`idzonaproductiva`);
 ALTER TABLE productormateriaprima ADD FOREIGN KEY (`idzonaproductiva`) REFERENCES zonaproductiva(`idzonaproductiva`);
-
-
-
--- _DELETE FROM acopiomateriaprima;
--- _delete from sesionacopio;
--- _DELETE FROM registroacopio;
--- _DELETE FROM planillaacopio;
-
---
-SELECT *
-FROM ventadirecta v
-WHERE v.`FECHA_PEDIDO` >= '2021-04-01'
-;
-
-SELECT p.`IDPEDIDOS`, p.`DESCRIPCION`, p.`FECHA_ENTREGA`
-FROM pedidos p
-JOIN articulos_pedido a ON p.`DESCRIPCION` = a.`IDVENTADIRECTA`
-WHERE p.`IDPEDIDOS` BETWEEN 3628 AND 3930
-;
