@@ -17,6 +17,7 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.SalaryMovementProducerService;
 import com.encens.khipus.util.*;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -55,8 +56,12 @@ public class AccountingCreditSaleAction extends GenericAction {
     @In
     private SalaryMovementProducerService salaryMovementProducerService;
 
+
+    @End
     public String accountingCreditSales(){
         User user = getUser(currentUser.getId());
+
+        generateDiscountForCreditSales(); // Generando descuentos en acopio por ventas a credito (Veterinaria, Lacteos)
 
         List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(accountingDate);
 
@@ -97,34 +102,25 @@ public class AccountingCreditSaleAction extends GenericAction {
                     }
                 }
             }
-
-
-            /** Descuentos: Lacteo, Veterinario en Planilla de acopio **/
-            /*if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK) || customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)){
-                salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
-            }*/
-
-            customerOrder.setAccounted(Boolean.TRUE);
             customerOrder.setState(SaleStatus.CONTABILIZADO);
             saleService.updateCustomerOrder(customerOrder);
         }
-
-        accountingCreditSales(accountingDate, CustomerOrderTypeEnum.VETERINARY);
 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CustomerOrder.info.accountingSaleProcessSucceed");
         return Outcome.SUCCESS;
     }
 
-    public void accountingCreditSales(Date date, CustomerOrderTypeEnum customerOrderTypeEnum){
-        User user = getUser(currentUser.getId());
-        System.out.println("-----> date: " + date);
-        System.out.println("-----> customerOrderTypeEnum: " + customerOrderTypeEnum);
-        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(date, customerOrderTypeEnum);
+    private void generateDiscountForCreditSales(){
 
-        System.out.println("---> size: " + customerOrderList.size());
+        User user = getUser(currentUser.getId());
+        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(accountingDate, CustomerOrderTypeEnum.MILK);
 
         for (CustomerOrder customerOrder : customerOrderList){
-            System.out.println(">>-->>>-->>>---> Ventas a credito, Descuentos: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
+            salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
+        }
+
+        List<CustomerOrder> customerOrderList2 = saleService.getPendingCustomerOrderList(accountingDate, CustomerOrderTypeEnum.VETERINARY);
+        for (CustomerOrder customerOrder : customerOrderList2){
             salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
         }
 

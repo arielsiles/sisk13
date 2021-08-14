@@ -152,24 +152,14 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
         List<CustomerOrder> resultList = new ArrayList<CustomerOrder>();
 
-        /*resultList = em.createQuery("" +
-                " select c from CustomerOrder c " +
-                " where c.orderDate =:date " +
-                " and c.saleType =:saleType " +
-                " and c.state =:state " +
-                " and c.customerOrderType.type =:customerOrderTypeEnum")
-                .setParameter("date", date)
-                .setParameter("saleType", SaleTypeEnum.CREDIT)
-                .setParameter("state", SaleStatus.PENDIENTE)
-                .setParameter("customerOrderTypeEnum", customerOrderTypeEnum)
-                .getResultList();*/
-
         resultList = em.createQuery("" +
                 " select c from CustomerOrder c " +
                 " where c.orderDate =:date " +
-                " and c.customerOrderType.type =:customerOrderTypeEnum")
+                " and c.customerOrderType.type =:customerOrderTypeEnum " +
+                " and c.state =:state")
                 .setParameter("date", date)
                 .setParameter("customerOrderTypeEnum", customerOrderTypeEnum)
+                .setParameter("state", SaleStatus.PENDIENTE)
                 .getResultList();
 
         return resultList;
