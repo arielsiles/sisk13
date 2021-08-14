@@ -334,6 +334,8 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
 
         RawMaterialProducer producer = rawMaterialProducerService.findProducerByIdNumber(customerOrder.getClient().getIdNumber());
 
+        System.out.println("-----------> Productor: " + producer );
+
         TypeMovementProducer typeMovementProducer = null;
         if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY))
             typeMovementProducer = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.VETE);
@@ -351,6 +353,8 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         salaryMovementProducer.setDescription(MessageUtils.getMessage("SalaryMovementProducer.creditSale.gloss") + " " +
                                               customerOrder.getCode() + " " +
                                               MessageUtils.getMessage(typeMovementProducer.getSalaryMovementProducerTypeEnum().getResourceKey()));
+
+        System.out.println("-----------------> SalaryMovementProducer: " + salaryMovementProducer);
 
         em.persist(salaryMovementProducer);
         em.flush();

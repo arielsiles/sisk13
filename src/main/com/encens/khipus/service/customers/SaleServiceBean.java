@@ -3,10 +3,7 @@ package com.encens.khipus.service.customers;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.customers.SaleStatus;
-import com.encens.khipus.model.customers.SaleTypeEnum;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -145,6 +142,34 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
                 .setParameter("date", date)
                 .setParameter("saleType", SaleTypeEnum.CREDIT)
                 .setParameter("state", SaleStatus.PENDIENTE)
+                .getResultList();
+
+        return resultList;
+    }
+
+    @Override
+    public List<CustomerOrder> getPendingCustomerOrderList(Date date, CustomerOrderTypeEnum customerOrderTypeEnum) {
+
+        List<CustomerOrder> resultList = new ArrayList<CustomerOrder>();
+
+        /*resultList = em.createQuery("" +
+                " select c from CustomerOrder c " +
+                " where c.orderDate =:date " +
+                " and c.saleType =:saleType " +
+                " and c.state =:state " +
+                " and c.customerOrderType.type =:customerOrderTypeEnum")
+                .setParameter("date", date)
+                .setParameter("saleType", SaleTypeEnum.CREDIT)
+                .setParameter("state", SaleStatus.PENDIENTE)
+                .setParameter("customerOrderTypeEnum", customerOrderTypeEnum)
+                .getResultList();*/
+
+        resultList = em.createQuery("" +
+                " select c from CustomerOrder c " +
+                " where c.orderDate =:date " +
+                " and c.customerOrderType.type =:customerOrderTypeEnum")
+                .setParameter("date", date)
+                .setParameter("customerOrderTypeEnum", customerOrderTypeEnum)
                 .getResultList();
 
         return resultList;

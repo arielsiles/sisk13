@@ -4,6 +4,7 @@ import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
 import com.encens.khipus.model.customers.SaleTypeEnum;
 
 import javax.ejb.Local;
@@ -21,5 +22,6 @@ public interface SaleService extends GenericService {
     CustomerOrder findCustomerOrderByParams(SaleTypeEnum saleType, Date date, String code);
     List<CustomerOrder> getPendingCustomerOrderList(User user, Date date);
     List<CustomerOrder> getPendingCustomerOrderList(Date date);
+    List<CustomerOrder> getPendingCustomerOrderList(Date date, CustomerOrderTypeEnum customerOrderTypeEnum);
 
 }

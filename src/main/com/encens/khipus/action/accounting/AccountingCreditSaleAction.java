@@ -63,8 +63,6 @@ public class AccountingCreditSaleAction extends GenericAction {
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println(">>-->>>-->>>---> Ventas a credito: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
 
-
-
             /** Venta sin facturacion **/
             if (customerOrder.getMovement() == null){
                 /** Reposiciones, degustación y refrigerios **/
@@ -89,36 +87,47 @@ public class AccountingCreditSaleAction extends GenericAction {
                 }
 
                 /** Ventas normales facturadas **/
-                if ( customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) && customerOrder.getCommissionPercentage() == 0 ){
+                if ((customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) ||
+                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)   ||
+                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) && customerOrder.getCommissionPercentage() == 0 ){
 
                     if (customerOrder.getMovement() !=  null){
                         Voucher voucher = accountingCreditSale(customerOrder);
                         customerOrder.setVoucher(voucher);
                     }
-
                 }
-
-
             }
 
 
             /** Descuentos: Lacteo, Veterinario en Planilla de acopio **/
-            if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK) || customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)){
-
-                /** Todo: Ya se contabiliza arriba, hacer registro del descuento en acopio **/
+            /*if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK) || customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)){
                 salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
-                Voucher voucher = accountingCreditSale(customerOrder);
-                customerOrder.setVoucher(voucher);
-
-            }
+            }*/
 
             customerOrder.setAccounted(Boolean.TRUE);
             customerOrder.setState(SaleStatus.CONTABILIZADO);
             saleService.updateCustomerOrder(customerOrder);
         }
 
+        accountingCreditSales(accountingDate, CustomerOrderTypeEnum.VETERINARY);
+
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CustomerOrder.info.accountingSaleProcessSucceed");
         return Outcome.SUCCESS;
+    }
+
+    public void accountingCreditSales(Date date, CustomerOrderTypeEnum customerOrderTypeEnum){
+        User user = getUser(currentUser.getId());
+        System.out.println("-----> date: " + date);
+        System.out.println("-----> customerOrderTypeEnum: " + customerOrderTypeEnum);
+        List<CustomerOrder> customerOrderList = saleService.getPendingCustomerOrderList(date, customerOrderTypeEnum);
+
+        System.out.println("---> size: " + customerOrderList.size());
+
+        for (CustomerOrder customerOrder : customerOrderList){
+            System.out.println(">>-->>>-->>>---> Ventas a credito, Descuentos: " + DateUtils.format(accountingDate, "dd/MM/yyyy") + " - " + customerOrder.getCode() + " - " + customerOrder.getTotalAmount());
+            salaryMovementProducerService.createSalaryMovementProducer(customerOrder);
+        }
+
     }
 
 
