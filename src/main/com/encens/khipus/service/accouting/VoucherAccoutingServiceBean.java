@@ -9,6 +9,7 @@ import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
+import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -1369,6 +1370,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         result.put("521", BigDecimal.ZERO);
         result.put("693", BigDecimal.ZERO);
 
+        /** Adicionando lista de productos equivalentes (Productos agencia) **/
+        List<ProductItem> productItemEqList = getProductItemEqList();
+        for (ProductItem productItem : productItemEqList){
+            result.put(productItem.getProductItemCodeEq(), result.get(productItem.getProductItemCode()));
+        }
+
         return result;
     }
 
@@ -1393,6 +1400,19 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return  result;
     }
 
+    public List<ProductItem> getProductItemEqList(){
+        HashMap<String, String> result = new HashMap<String, String>();
+        List<ProductItem> productItemList = new ArrayList<ProductItem>();
+        productItemList = (List<ProductItem>) em.createQuery("select p from ProductItem p " +
+                " where p.productItemCodeEq is not null")
+                .getResultList();
+
+        /*for (ProductItem productItem : productItemList){
+            result.put(productItem.getProductItemCode(), productItem.getProductItemCodeEq());
+        }
+        return result;*/
+        return productItemList;
+    }
 
 
     public BigDecimal getUnitCost_milkProduct(String codArt, Date startDate, Date endDate){

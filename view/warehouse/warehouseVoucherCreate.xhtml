@@ -455,6 +455,21 @@
             <f:validateLength maximum="250"/>
         </h:inputTextarea>
     </s:decorate>
+
+    <s:decorate id="transferOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label"><h:outputText value="#{messages['CustomerOrder.order']}"/></ui:define>
+        <app:selectPopUp id="transferOrderFieldId"
+                         required="false"
+                         textValue="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder.code}"
+                         value="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder}"
+                         clearAction="#{warehouseVoucherCreateAction.clearTransferCustomerOrder()}"
+                         searchModalPanel="customerOrderListModalPanel"
+                         dataModel="#{customerOrderDataModel}"
+                         reRender="transferOrderField"
+                         tabindex="12">
+        </app:selectPopUp>
+    </s:decorate>
+
 </s:div>
 </h:panelGrid>
 </app:fieldset>
@@ -804,6 +819,23 @@
         </ui:define>
     </s:decorate>
 </s:div>
+
+    <s:div id="customerOrderListModalPanelDiv">
+
+        <s:decorate id="customerOrderListModalPanelContainer" template="/customers/customerOrderListModalPanel.xhtml">
+            <ui:param name="containerId" value="customerOrderListModalPanelContainer"/>
+            <ui:param name="dialogId" value="customerOrderListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{warehouseVoucherCreateAction.assignTransferCustomerOrder(customerOrder)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="transferOrderField"
+                                   oncomplete="Richfaces.hideModalPanel('customerOrderListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </s:div>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>

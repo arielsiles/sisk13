@@ -589,6 +589,15 @@
                                    timeZone="#{sessionUser.timeZone}"/>
             </h:outputText>
         </s:decorate>
+
+        <s:decorate id="transferCustomerOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CustomerOrder.order']}</ui:define>
+            <h:outputText
+                    value="#{warehouseVoucherUpdateAction.warehouseVoucher.transferCustomerOrder.code}"
+                    styleClass="input">
+            </h:outputText>
+        </s:decorate>
+
     </s:div>
     <s:div id="rightSidePanel">
         <s:div id="warehousePanel">

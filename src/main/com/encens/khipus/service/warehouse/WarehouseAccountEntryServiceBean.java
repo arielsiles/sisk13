@@ -1959,5 +1959,37 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         return warehouseVoucherList;
     }
 
+    public List<WarehouseVoucher> getVouchersFromTransferCustomerOrder(Date startDate, Date endDate){
+
+        List<WarehouseVoucher> warehouseVoucherList = em.createQuery("" +
+                "select voucher from WarehouseVoucher voucher " +
+                " where voucher.date between :startDate and :endDate " +
+                " and voucher.documentCode =:documentCode " +
+                " and voucher.state =:state " +
+                " ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("documentCode", "RPT")
+                .setParameter("state", WarehouseVoucherState.APR)
+                .getResultList();
+
+        return warehouseVoucherList;
+    }
+
+    /*public List<CustomerOrder> getTransferOrderList(Date startDate, Date endDate){
+
+        List<CustomerOrder> customerOrderList = em.createQuery("" +
+                "select c from CustomerOrder c " +
+                " where c.orderDate between :startDate and :endDate " +
+                " and c.customerOrderType.type =:type " +
+                " and c.state <> :state ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", SaleStatus.ANULADO)
+                .setParameter("type", CustomerOrderTypeEnum.TRANSFER)
+                .getResultList();
+
+        return customerOrderList;
+    }*/
 
 }

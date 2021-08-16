@@ -3,6 +3,7 @@ package com.encens.khipus.action.warehouse;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
@@ -80,6 +81,62 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         }
         if (warehouseVoucherTPList.size() > 0)
             createAccountingForVoucherTP(warehouseVoucherTPList, startDate, endDate);
+
+        /** Contabilizando pedidos transferencia de almacen **/
+        System.out.println("========> Contabilizando vales-pedidos transferencia de almacen <=============");
+        /*List<CustomerOrder> transferOrderList =  warehouseAccountEntryService.getTransferOrderList(startDate, endDate);
+        HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
+
+        for (CustomerOrder customerOrder : transferOrderList){
+            System.out.println("-----> Pedido: " + customerOrder.getCode() + " : " + customerOrder.getTotalAmount() + " $bs");
+            createAccountingForTransferOrders(customerOrder, unitCostMilkProducts);
+        }*/
+
+        createAccountingForTransferWarehouseVouchers(startDate, endDate);
+
+    }
+
+    public void createAccountingForTransferWarehouseVouchers(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+
+        List<WarehouseVoucher> transferWarehouseVoucherList = warehouseAccountEntryService.getVouchersFromTransferCustomerOrder(startDate, endDate);
+
+        if (transferWarehouseVoucherList.size() > 0){
+
+            HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
+            CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+
+            String ctaAlmPT   = companyConfiguration.getCtaAlmPT().getAccountCode();
+            String ctaAlmPTAG = companyConfiguration.getCtaAlmPTAG().getAccountCode();
+
+            Voucher voucher = new Voucher();
+            voucher.setDate(endDate);
+            voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
+            voucher.setGloss("Transferencia de almacen pedidos del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+
+            for (WarehouseVoucher warehouseVoucher : transferWarehouseVoucherList){
+
+                for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
+                    BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+                    BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
+
+                    VoucherDetail voucherDetailDebit = new VoucherDetail(ctaAlmPTAG, amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
+                            movementDetail.getProductItemCode(), movementDetail.getQuantity());
+
+                    voucher.getDetails().add(voucherDetailDebit);
+                }
+
+                for (ArticleOrder articleOrder : warehouseVoucher.getTransferCustomerOrder().getArticleOrderList()){
+                    BigDecimal unitCost = unitCostMilkProducts.get(articleOrder.getProductItem().getProductItemCode());
+                    BigDecimal amount = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()), unitCost, 2);
+
+                    VoucherDetail voucherDetailCredit = new VoucherDetail(ctaAlmPT, BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
+                            articleOrder.getProductItem().getProductItemCode(), BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()));
+
+                    voucher.getDetails().add(voucherDetailCredit);
+                }
+            }
+            voucherAccoutingService.saveVoucher(voucher);
+        }
     }
 
     public void createAccountingForVoucherBA(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {

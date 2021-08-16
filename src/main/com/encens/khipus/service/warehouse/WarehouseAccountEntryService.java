@@ -79,4 +79,8 @@ public interface WarehouseAccountEntryService extends GenericService {
 
     List<WarehouseVoucher> getVouchersWithoutAccounting(Date startDate, Date endDate);
 
+    List<WarehouseVoucher> getVouchersFromTransferCustomerOrder(Date startDate, Date endDate);
+
+    //List<CustomerOrder> getTransferOrderList(Date startDate, Date endDate);
+
 }

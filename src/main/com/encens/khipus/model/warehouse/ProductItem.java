@@ -53,6 +53,9 @@ public class ProductItem implements BaseModel {
     @Column(name = "COD_ART", insertable = false, updatable = false)
     private String productItemCode;
 
+    @Column(name = "CODEQ", insertable = false, updatable = false)
+    private String productItemCodeEq;
+
     @Column(name = "COD_ALM")
     private String warehouseCode;
 
@@ -503,5 +506,13 @@ public class ProductItem implements BaseModel {
 
     public void setPosition(Integer position) {
         this.position = position;
+    }
+
+    public String getProductItemCodeEq() {
+        return productItemCodeEq;
+    }
+
+    public void setProductItemCodeEq(String productItemCodeEq) {
+        this.productItemCodeEq = productItemCodeEq;
     }
 }

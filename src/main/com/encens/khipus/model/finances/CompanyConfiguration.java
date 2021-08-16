@@ -96,6 +96,13 @@ public class CompanyConfiguration {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CTAALMPTAG", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount ctaAlmPTAG;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "CTACOSTPV", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaCostPV;
@@ -1428,5 +1435,13 @@ public class CompanyConfiguration {
 
     public void setItTaxValue(BigDecimal itTaxValue) {
         this.itTaxValue = itTaxValue;
+    }
+
+    public CashAccount getCtaAlmPTAG() {
+        return ctaAlmPTAG;
+    }
+
+    public void setCtaAlmPTAG(CashAccount ctaAlmPTAG) {
+        this.ctaAlmPTAG = ctaAlmPTAG;
     }
 }

@@ -5,6 +5,7 @@ import com.encens.khipus.exception.warehouse.MonthProcessValidException;
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherPendantException;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
@@ -30,8 +31,7 @@ import java.util.List;
  * @author
  * @version 3.0
  */
-@Name("warehouseVoucherCreateAction")
-@Scope(ScopeType.CONVERSATION)
+@Name("warehouseVoucherCreateAction") @Scope(ScopeType.CONVERSATION)
 public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction {
 
     private MovementDetailUIController uiController = null;
@@ -300,6 +300,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     public void assignWarehouse(Warehouse warehouse) {
         cleanMovementDetailFields();
         super.assignWarehouse(warehouse);
+    }
+
+    public void assignTransferCustomerOrder(CustomerOrder customerOrder){
+        getWarehouseVoucher().setTransferCustomerOrder(customerOrder);
     }
 
     @Override

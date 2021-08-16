@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.BusinessUnit;
+import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CostCenter;
@@ -231,6 +232,10 @@ public class WarehouseVoucher implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "idtmpenc", nullable = true)
     private Voucher voucher;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "IDPEDIDOSTR", nullable = true)
+    private CustomerOrder transferCustomerOrder;
 
     public WarehouseVoucherPK getId() {
         return id;
@@ -639,4 +644,11 @@ public class WarehouseVoucher implements BaseModel {
         return result;
     }
 
+    public CustomerOrder getTransferCustomerOrder() {
+        return transferCustomerOrder;
+    }
+
+    public void setTransferCustomerOrder(CustomerOrder transferCustomerOrder) {
+        this.transferCustomerOrder = transferCustomerOrder;
+    }
 }
