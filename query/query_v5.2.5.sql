@@ -1,4 +1,5 @@
 -- 15.08.2021
+-- EJEC EN ILVA HASTA ...
 UPDATE pedidos p SET p.`IDTIPOPEDIDO` = 8
 WHERE p.`FECHA_ENTREGA` BETWEEN '2021-04-01' AND '2021-07-31'
 AND p.`IDCLIENTE` = 2238
@@ -128,6 +129,11 @@ UPDATE inv_articulos SET codeq = 	1411	 WHERE cod_art = 	138	;
 UPDATE inv_articulos SET codeq = 	1410	 WHERE cod_art = 	143	;
 
 -- Actualizar vista 'VENTAS'
-
 -- UPDATE inv_almacenes SET tipo = 'DAIRYAGENCY' WHERE COD_ALM = 8;
+
+-- EJEC EN ILVA HASTA ACA
+ALTER TABLE inv_almacenes ADD COLUMN ctacosto VARCHAR(20) AFTER cuenta;
+UPDATE inv_almacenes i SET i.`ctacosto` = '4420110201' WHERE i.`cod_alm` = 2;
+
+
 
