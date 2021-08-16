@@ -5,8 +5,8 @@ AND p.`IDCLIENTE` = 2238
 AND p.`IDTIPOPEDIDO` = 1
 ;
 
--- ALTER TABLE configuracion ADD COLUMN ctaAlmPTAG VARCHAR(20) AFTER ctaAlmPT;
--- update configuracion set ctaAlmPTAG = '1510110203';
+ALTER TABLE configuracion ADD COLUMN ctaAlmPTAG VARCHAR(20) AFTER ctaAlmPT;
+UPDATE configuracion SET ctaAlmPTAG = '1510110203';
 
 ALTER TABLE inv_vales ADD COLUMN idpedidostr BIGINT(20);
 ALTER TABLE inv_vales ADD FOREIGN KEY (idpedidostr) REFERENCES pedidos(IDPEDIDOS);
@@ -127,6 +127,7 @@ UPDATE inv_articulos SET codeq = 	1412	 WHERE cod_art = 	136	;
 UPDATE inv_articulos SET codeq = 	1411	 WHERE cod_art = 	138	;
 UPDATE inv_articulos SET codeq = 	1410	 WHERE cod_art = 	143	;
 
+-- Actualizar vista 'VENTAS'
 
-
+-- UPDATE inv_almacenes SET tipo = 'DAIRYAGENCY' WHERE COD_ALM = 8;
 

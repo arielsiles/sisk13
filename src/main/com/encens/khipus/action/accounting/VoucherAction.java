@@ -7,6 +7,8 @@ import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.warehouse.Warehouse;
+import com.encens.khipus.model.warehouse.WarehouseType;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
 import org.jboss.seam.ScopeType;
@@ -32,6 +34,8 @@ public class VoucherAction extends GenericAction<Voucher> {
 
     private SaleType saleType;
     private ProductSaleType productSaleType;
+
+    private Warehouse warehouse;
 
     private Date startDate;
     private Date endDate;
@@ -102,6 +106,27 @@ public class VoucherAction extends GenericAction<Voucher> {
 
     }
 
+    public void generateCostOfSalesByWarehouse()throws CompanyConfigurationNotFoundException {
+
+        if (this.warehouse.getWarehouseType().equals(WarehouseType.DAIRY)){
+            voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse.getWarehouseCode());
+            voucherAccoutingService.createCostOfSale_MilkProductsReplacement(startDate, endDate, this.warehouse.getWarehouseCode());
+
+            voucherAccoutingService.createCostOfSale_MilkProductsTastingOrRefreshment(startDate, endDate, new Long(2), "4470610218", this.warehouse.getWarehouseCode()); //Degustacion
+            voucherAccoutingService.createCostOfSale_MilkProductsTastingOrRefreshment(startDate, endDate, new Long(3), "4470610218", this.warehouse.getWarehouseCode()); //Refrigerio
+        }
+
+        if (this.warehouse.getWarehouseType().equals(WarehouseType.VETERINARY)){
+            voucherAccoutingService.createCostOfSale_VeterinaryProducts(startDate, endDate, this.warehouse.getWarehouseCode());
+        }
+
+        if (this.warehouse.getWarehouseType().equals(WarehouseType.AGENCY)){
+            //voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse.getWarehouseCode());
+        }
+
+    }
+
+
     public Voucher getVoucher() {
         return voucher;
     }
@@ -164,5 +189,13 @@ public class VoucherAction extends GenericAction<Voucher> {
 
     public void setProductSaleType(ProductSaleType productSaleType) {
         this.productSaleType = productSaleType;
+    }
+
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 }

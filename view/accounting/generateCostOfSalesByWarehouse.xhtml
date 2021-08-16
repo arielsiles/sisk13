@@ -55,16 +55,16 @@
                             styleClass="formRow">
                     <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
                     <app:quickSearch id="quickSearchWarehouse"
-                                     textValue="productInventoryReportAction.warehouse.warehouseCode"
-                                     value="#{productInventoryReportAction.warehouse}"
+                                     textValue="voucherAction.warehouse.warehouseCode"
+                                     value="#{voucherAction.warehouse}"
                                      searchField="warehouseCode"
                                      alias="warehouse"
                                      reRender="warehouseField"
                                      tabindex="3">
                     </app:quickSearch>
                     <app:selectPopUp id="warehouse"
-                                     textValue="#{productInventoryReportAction.warehouse.name}"
-                                     value="#{productInventoryReportAction.warehouse}"
+                                     textValue="#{voucherAction.warehouse.name}"
+                                     value="#{voucherAction.warehouse}"
                                      selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
                                      clearAction="ProductInventoryReportAction.cleanWarehouseField()"
                                      searchModalPanel="warehouseModalPanel"
@@ -73,27 +73,12 @@
                                      hotKeySelect="alt+1"/>
                 </s:decorate>
 
-                <!--<s:decorate id="productSaleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Product.productSaleType']}</ui:define>
-                    <h:selectOneMenu id="productSaleType"
-                                     value="#{voucherAction.productSaleType}"
-                                     styleClass="input"
-                                     required="true"
-                                     tabindex="3">
-                        <s:selectItems value="#{productSaleTypeEnum}" var="productSaleType"
-                                       label="#{messages[productSaleType.resourceKey]}"
-                                       hideNoSelectionLabel="false"
-                                       noSelectionLabel=""/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>
-                </s:decorate>-->
-
             </h:panelGrid>
         </rich:panel>
 
 
         <div class="buttons">
-            <h:commandButton action="#{voucherAction.generateCostOfSales}"
+            <h:commandButton action="#{voucherAction.generateCostOfSalesByWarehouse}"
                              styleClass="button"
                              value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
                 <s:defaultAction/>

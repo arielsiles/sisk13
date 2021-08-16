@@ -86,6 +86,11 @@ public interface VoucherAccoutingService extends GenericService {
     public void createCostOfCashSales(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
     public void createCostOfSalesCredit(Date startDate, Date endDate, ProductSaleType productSaleType) throws CompanyConfigurationNotFoundException;
 
+    public void createCostOfSale_MilkProducts(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException;
+    public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException;
+    public void createCostOfSale_MilkProductsTastingOrRefreshment(Date startDate, Date endDate, Long orderTypeId, String costAccount, String cod_alm) throws CompanyConfigurationNotFoundException;
+    public void createCostOfSale_VeterinaryProducts(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException;
+
     public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException;
     public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException;
     public void createCostOfSale_MilkProductsTastingOrRefreshment(Date startDate, Date endDate, Long orderTypeId, String costAccount) throws CompanyConfigurationNotFoundException;

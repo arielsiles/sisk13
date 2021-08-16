@@ -1035,7 +1035,166 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
     /** MODIFYID **/
+    public void createCostOfSale_MilkProducts(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException {
 
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
+                "from ventas v " +
+                "where v.fecha between :startDate and :endDate " +
+                "and v.cod_alm =:cod_alm " +
+                "and v.idtipopedido in (1, 5) " +
+                "group by v.cod_art ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("cod_alm", cod_alm)
+                .getResultList();
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        System.out.println("----------SALES---------");
+        for (Object[] sale : sales){
+            System.out.println("---> sales: |" + (String)sale[0] + "|" + (BigDecimal)sale[1]);
+        }
+        System.out.println("----------END SALES---------");
+
+        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaCostPT().getAccountCode(), startDate, endDate);
+
+
+    }
+
+    /** Reposiciones + Promociones **/
+    public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException {
+
+        List<Object[]> sales = em.createNativeQuery("" +
+                "SELECT z.cod_art, SUM(z.cantidad) " +
+                "FROM ( " +
+                "" +
+                "SELECT v.cod_art, SUM(v.REPOSICION) + SUM(v.promocion) + SUM(v.cantidad) AS cantidad " + /*Tipo de pedido reposicion*/
+                "FROM ventas v  " +
+                "WHERE v.fecha BETWEEN :startDate AND :endDate " +
+                "AND v.`cod_alm` =:cod_alm " +
+                "AND v.idtipopedido IN (4) " + /*Pedidos tipo Reposicion*/
+                "GROUP BY v.cod_art " +
+                "UNION " +
+                "" +
+                "SELECT v.cod_art, SUM(v.REPOSICION) + SUM(v.promocion) AS cantidad " + /*Reposicion, promocion pedidos normales (contado, credito) */
+                "FROM ventas v " +
+                "WHERE v.fecha BETWEEN :startDate AND :endDate " +
+                "AND v.`cod_alm` =:cod_alm " +
+                "AND v.idtipopedido IN (1) " +
+                "GROUP BY v.cod_art " +
+                ") z " +
+                "GROUP BY z.cod_art ")
+                .setParameter("startDate", startDate).setParameter("endDate", endDate)
+                .setParameter("cod_alm", cod_alm)
+                .getResultList();
+
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por REPOSICIONES y PROMOCIONES en " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        createVoucherDetailForCostOfSales(sales, voucher, "4470510300", startDate, endDate);
+    }
+
+    /** Degustacion o Refrigerio **/
+    public void createCostOfSale_MilkProductsTastingOrRefreshment(Date startDate, Date endDate, Long orderTypeId, String costAccount, String cod_alm) throws CompanyConfigurationNotFoundException {
+
+        List<Object[]> sales = em.createNativeQuery("" +
+                "SELECT v.cod_art, SUM(v.cantidad) AS cantidad " +
+                "FROM ventas v " +
+                "WHERE v.fecha BETWEEN :startDate AND :endDate " +
+                "AND v.`cod_alm` =:cod_alm " +
+                "AND v.idtipopedido =:orderTypeId " +
+                "GROUP BY v.cod_art " )
+                .setParameter("startDate", startDate).setParameter("endDate", endDate)
+                .setParameter("cod_alm", cod_alm)
+                .setParameter("orderTypeId", orderTypeId)
+                .getResultList();
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+
+        String tastingOrRefreshment = "DEGUSTACIONES";
+        if (orderTypeId == 3)
+            tastingOrRefreshment = "REFRIGERIOS";
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por " + tastingOrRefreshment +" en " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        createVoucherDetailForCostOfSales(sales, voucher, costAccount, startDate, endDate);
+    }
+
+    public void createCostOfSale_VeterinaryProducts(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException {
+
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        List<Object[]> sales = em.createNativeQuery("" +
+                "select v.cod_art, sum(v.cantidad) " +
+                "from ventas v where v.fecha between :startDate and :endDate " +
+                "and v.cod_alm =:cod_alm " +
+                "group by v.cod_art ")
+                .setParameter("startDate", startDate).setParameter("endDate", endDate)
+                .setParameter("cod_alm", cod_alm)
+                .getResultList();
+
+        HashMap<String, BigDecimal> unitCostVeterinaryProducts = getUnitCost_veterinaryProducts(startDate, endDate);
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.VETERINARY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucher.addVoucherDetail(voucherDebit);
+        voucherDebit.setAccount(companyConfiguration.getCtaCostPV().getAccountCode());
+        voucherDebit.setDebit(totalCost);
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+
+        totalCost = BigDecimal.ZERO;
+        for (Object[] sale : sales){
+            String codArt = (String)sale[0];
+            BigDecimal quantity = (BigDecimal) sale[1];
+
+            /** Uncomment for test **/
+            System.out.println("=============> Create CV for: " + codArt + " - " + quantity);
+
+            if (quantity.doubleValue() > 0){
+                BigDecimal unitCost = unitCostVeterinaryProducts.get(codArt);
+                if (unitCost.doubleValue() > 0){
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 2);
+                    totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
+
+                    VoucherDetail voucherCredit = new VoucherDetail();
+                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPV().getAccountCode());
+                    voucherCredit.setDebit(BigDecimal.ZERO);
+                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+
+                    voucherCredit.setProductItemCode(codArt);
+                    voucherCredit.setQuantityArt(quantity);
+
+                    voucherCredit.setCurrency(FinancesCurrencyType.P);
+                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
+                    voucherCredit.setDebitMe(BigDecimal.ZERO);
+                    voucherCredit.setCreditMe(BigDecimal.ZERO);
+                    voucher.addVoucherDetail(voucherCredit);
+                }
+            }
+        }
+        voucherDebit.setDebit(totalCost);
+        saveVoucher(voucher);
+    }
+
+
+    /** MODIFYID **/
     public void createCostOfSale_MilkProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();

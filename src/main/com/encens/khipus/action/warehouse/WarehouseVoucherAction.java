@@ -21,10 +21,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author
@@ -113,7 +110,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
             voucher.setGloss("Transferencia de almacen pedidos del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
-            for (WarehouseVoucher warehouseVoucher : transferWarehouseVoucherList){
+            /*for (WarehouseVoucher warehouseVoucher : transferWarehouseVoucherList){
 
                 for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
                     BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
@@ -134,7 +131,53 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
                     voucher.getDetails().add(voucherDetailCredit);
                 }
+            }*/
+
+
+            /* Consolidando productos y cantidades usando HashMap */
+            HashMap<String, BigDecimal> transferProducts = new HashMap<String, BigDecimal>();
+            HashMap<String, BigDecimal> transferProductsPT = new HashMap<String, BigDecimal>();
+
+            for (WarehouseVoucher warehouseVoucher : transferWarehouseVoucherList){
+                for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
+                    if (transferProducts.containsKey(movementDetail.getProductItemCode())){
+                        BigDecimal quantity = transferProducts.get(movementDetail.getProductItemCode());
+                        quantity = BigDecimalUtil.sum(quantity, movementDetail.getQuantity());
+                        transferProducts.put(movementDetail.getProductItemCode(), quantity);
+                    }else
+                        transferProducts.put(movementDetail.getProductItemCode(), movementDetail.getQuantity());
+                }
+
+                for (ArticleOrder articleOrder : warehouseVoucher.getTransferCustomerOrder().getArticleOrderList()){
+                    if (transferProductsPT.containsKey(articleOrder.getCodArt())){
+                        BigDecimal quantity = transferProductsPT.get(articleOrder.getCodArt());
+                        quantity = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()));
+                        transferProductsPT.put(articleOrder.getCodArt(), quantity);
+                    }else
+                        transferProductsPT.put(articleOrder.getCodArt(), BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()));
+                }
             }
+
+            for (Map.Entry<String, BigDecimal> entry : transferProducts.entrySet() ){
+                String cod_art      = entry.getKey();
+                BigDecimal quantity = entry.getValue();
+                BigDecimal unitCost = unitCostMilkProducts.get(cod_art);
+                BigDecimal amount = BigDecimalUtil.multiply(quantity, unitCost, 2);
+
+                VoucherDetail voucherDetailDebit = new VoucherDetail(ctaAlmPTAG, amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE, cod_art, quantity);
+                voucher.getDetails().add(voucherDetailDebit);
+            }
+
+            for (Map.Entry<String, BigDecimal> entry : transferProductsPT.entrySet() ){
+                String cod_art      = entry.getKey();
+                BigDecimal quantity = entry.getValue();
+                BigDecimal unitCost = unitCostMilkProducts.get(cod_art);
+                BigDecimal amount = BigDecimalUtil.multiply(quantity, unitCost, 2);
+
+                VoucherDetail voucherDetailCredit = new VoucherDetail(ctaAlmPT, BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE, cod_art, quantity);
+                voucher.getDetails().add(voucherDetailCredit);
+            }
+
             voucherAccoutingService.saveVoucher(voucher);
         }
     }
