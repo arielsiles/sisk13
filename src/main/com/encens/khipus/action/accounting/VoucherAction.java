@@ -109,8 +109,8 @@ public class VoucherAction extends GenericAction<Voucher> {
     public void generateCostOfSalesByWarehouse()throws CompanyConfigurationNotFoundException {
 
         if (this.warehouse.getWarehouseType().equals(WarehouseType.DAIRY)){
-            voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse.getWarehouseCode());
-            voucherAccoutingService.createCostOfSale_MilkProductsReplacement(startDate, endDate, this.warehouse.getWarehouseCode());
+            voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse);
+            voucherAccoutingService.createCostOfSale_MilkProductsReplacement(startDate, endDate, this.warehouse);
 
             voucherAccoutingService.createCostOfSale_MilkProductsTastingOrRefreshment(startDate, endDate, new Long(2), "4470610218", this.warehouse.getWarehouseCode()); //Degustacion
             voucherAccoutingService.createCostOfSale_MilkProductsTastingOrRefreshment(startDate, endDate, new Long(3), "4470610218", this.warehouse.getWarehouseCode()); //Refrigerio
@@ -121,7 +121,8 @@ public class VoucherAction extends GenericAction<Voucher> {
         }
 
         if (this.warehouse.getWarehouseType().equals(WarehouseType.AGENCY)){
-            //voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse.getWarehouseCode());
+            voucherAccoutingService.createCostOfSale_MilkProducts(startDate, endDate, this.warehouse);
+            voucherAccoutingService.createCostOfSale_MilkProductsReplacement(startDate, endDate, this.warehouse);
         }
 
     }

@@ -10,6 +10,7 @@ import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -1035,7 +1036,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
     /** MODIFYID **/
-    public void createCostOfSale_MilkProducts(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException {
+    public void createCostOfSale_MilkProducts(Date startDate, Date endDate, Warehouse warehouse) throws CompanyConfigurationNotFoundException {
 
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         List<Object[]> sales = em.createNativeQuery("select v.cod_art, sum(v.cantidad) " +
@@ -1046,11 +1047,13 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "group by v.cod_art ")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
-                .setParameter("cod_alm", cod_alm)
+                .setParameter("cod_alm", warehouse.getWarehouseCode())
                 .getResultList();
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas (" + warehouse.getName() + ") "
+                + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " "
+                + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
         voucher.setDate(endDate);
 
@@ -1060,13 +1063,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }
         System.out.println("----------END SALES---------");
 
-        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaCostPT().getAccountCode(), startDate, endDate);
+        //createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaCostPT().getAccountCode(), startDate, endDate);
+        createVoucherDetailForCostOfSales(sales, voucher, warehouse, startDate, endDate);
 
 
     }
 
     /** Reposiciones + Promociones **/
-    public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate, String cod_alm) throws CompanyConfigurationNotFoundException {
+    public void createCostOfSale_MilkProductsReplacement(Date startDate, Date endDate, Warehouse warehouse) throws CompanyConfigurationNotFoundException {
 
         List<Object[]> sales = em.createNativeQuery("" +
                 "SELECT z.cod_art, SUM(z.cantidad) " +
@@ -1089,16 +1093,18 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 ") z " +
                 "GROUP BY z.cod_art ")
                 .setParameter("startDate", startDate).setParameter("endDate", endDate)
-                .setParameter("cod_alm", cod_alm)
+                .setParameter("cod_alm", warehouse.getWarehouseCode())
                 .getResultList();
 
 
         String periodMessage = Month.getMonth(startDate).getMonthLiteral() + "/" + DateUtils.getCurrentYear(startDate);
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por REPOSICIONES y PROMOCIONES en " + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "Costo de ventas por REPOSICIONES y PROMOCIONES (" + warehouse.getName() + ") "
+                + MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey()) + " " + periodMessage +" Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy"));
         voucher.setDocumentType(Constants.CV_VOUCHER_DOCTYPE);
         voucher.setDate(endDate);
 
-        createVoucherDetailForCostOfSales(sales, voucher, "4470510300", startDate, endDate);
+        //createVoucherDetailForCostOfSales(sales, voucher, "4470510300", startDate, endDate);
+        createVoucherDetailForCostOfSales(sales, voucher, warehouse, startDate, endDate);
     }
 
     /** Degustacion o Refrigerio **/
@@ -1312,6 +1318,52 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     System.out.println("=============Create-CV=============> COD_ART: " + codArt + " - unitCost: " + unitCost + " - Cost: " + cost);
                     VoucherDetail voucherCredit = new VoucherDetail();
                     voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setDebit(BigDecimal.ZERO);
+                    voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
+                    voucherCredit.setProductItemCode(codArt);
+                    voucherCredit.setQuantityArt(quantity);
+                    voucherCredit.setCurrency(FinancesCurrencyType.P);
+                    voucherCredit.setExchangeAmount(BigDecimal.ONE);
+                    voucherCredit.setDebitMe(BigDecimal.ZERO);
+                    voucherCredit.setCreditMe(BigDecimal.ZERO);
+                    voucher.addVoucherDetail(voucherCredit);
+
+                    totalCost = BigDecimalUtil.sum(totalCost, voucherCredit.getCredit(), 2);
+                }
+            }
+        }
+        voucherDebit.setDebit(totalCost);
+        saveVoucher(voucher);
+    }
+
+    public void createVoucherDetailForCostOfSales(List<Object[]> sales, Voucher voucher, Warehouse warehouse, Date startDate, Date endDate)throws CompanyConfigurationNotFoundException {
+
+        //CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        HashMap<String, BigDecimal> unitCostMilkProducts = getUnitCost_milkProducts(startDate, endDate);
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucher.addVoucherDetail(voucherDebit);
+        voucherDebit.setAccount(warehouse.getCashAccountCost());
+        voucherDebit.setDebit(totalCost);
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+
+        for (Object[] sale : sales){
+            String codArt = (String)sale[0];
+            BigDecimal quantity = (BigDecimal) sale[1];
+
+            if (quantity.doubleValue() > 0){
+                BigDecimal unitCost = unitCostMilkProducts.get(codArt);
+                System.out.println("==========================> COD_ART: " + codArt);
+                if (unitCost.doubleValue() > 0){
+                    BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
+                    System.out.println("=============Create-CV By Warehouse=============> COD_ART: " + codArt + " - unitCost: " + unitCost + " - Cost: " + cost);
+                    VoucherDetail voucherCredit = new VoucherDetail();
+                    voucherCredit.setAccount(warehouse.getCashAccount());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
                     voucherCredit.setProductItemCode(codArt);

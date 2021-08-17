@@ -134,6 +134,8 @@ UPDATE inv_articulos SET codeq = 	1410	 WHERE cod_art = 	143	;
 -- EJEC EN ILVA HASTA ACA
 ALTER TABLE inv_almacenes ADD COLUMN ctacosto VARCHAR(20) AFTER cuenta;
 UPDATE inv_almacenes i SET i.`ctacosto` = '4420110201' WHERE i.`cod_alm` = 2;
+UPDATE inv_almacenes i SET i.`ctacosto` = '4420110201' WHERE i.`cod_alm` = 8;
+
 
 
 

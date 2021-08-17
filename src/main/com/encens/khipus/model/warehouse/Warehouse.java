@@ -42,6 +42,10 @@ public class Warehouse implements BaseModel {
     @Length(max = 20)
     private String cashAccount;
 
+    @Column(name = "CTACOSTO",nullable = false)
+    @Length(max = 20)
+    private String cashAccountCost;
+
     @Column(name = "TIPO")
     @Enumerated(EnumType.STRING)
     private WarehouseType warehouseType;
@@ -187,5 +191,13 @@ public class Warehouse implements BaseModel {
 
     public void setWarehouseType(WarehouseType warehouseType) {
         this.warehouseType = warehouseType;
+    }
+
+    public String getCashAccountCost() {
+        return cashAccountCost;
+    }
+
+    public void setCashAccountCost(String cashAccountCost) {
+        this.cashAccountCost = cashAccountCost;
     }
 }
