@@ -2072,4 +2072,31 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     }
 
+    public List<Object[]> getProductionCostAccountResults(Date startDate, Date endDate, CashAccount cashAccountProductionCost){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        datas = em.createQuery(
+                " SELECT " +
+                        " cashAccount.accountCode, " +
+                        " cashAccount.description, " +
+                        " SUM(voucherDetail.debit) AS debit, " +
+                        " SUM(voucherDetail.credit) AS credit" +
+                        " FROM VoucherDetail voucherDetail " +
+                        " LEFT JOIN voucherDetail.voucher voucher " +
+                        " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                        " WHERE voucher.state <> 'ANL' " +
+                        " AND voucher.date between :startDate and :endDate " +
+                        " AND cashAccount.accountType =:typeE " +
+                        " AND cashAccount.accountLevel3Code =:accountLevel3Code " +
+                        " GROUP BY cashAccount.accountCode, cashAccount.description ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("typeE", CashAccountType.E)
+                .setParameter("accountLevel3Code", cashAccountProductionCost.getAccountCode()) /** MODIFYID **/
+                .getResultList();
+
+        return datas;
+    }
+
 }
