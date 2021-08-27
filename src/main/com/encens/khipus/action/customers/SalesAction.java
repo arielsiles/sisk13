@@ -398,6 +398,8 @@ public class SalesAction {
         customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
 
+        inventoryService.updateInventoryForSales(customerOrder);
+
         clearAll();
         assignCustomerOrderTypeDefault();
     }
