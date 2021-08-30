@@ -819,6 +819,19 @@ public class SalesAction {
         clearSpecialBilling();
     }
 
+    public void printInvoices(List<CustomerOrder> customerOrderList){
+
+
+        for (CustomerOrder customerOrder : customerOrderList){
+
+            System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+
+        }
+
+
+
+    }
+
     public void assignClient(Client client){
         setClient(client);
         assignCustomerOrderTypeDefault();

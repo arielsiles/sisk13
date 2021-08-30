@@ -88,50 +88,12 @@ public class PrintInvoiceReportAction extends GenericReportAction {
     private List<Movement> movementsNews = new ArrayList<Movement>();
     private Date date;
 
-    /*@Restrict("#{s:hasPermission('PRINTINVOICE','VIEW')}")
-    public void generateReport(CustomerOrder order) {
-        log.debug("Generate PrintInvoiceReportAction......");
-        try {
-            dosage = warehouseService.findById(Dosage.class,new Long(110));
-        } catch (EntryNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        moneyUtil = new MoneyUtil();
-        barcodeRenderer = new BarcodeRenderer();
-        customerOrder = order;
-        setReportFormat(ReportFormat.PDF);
-
-        Map params = new HashMap();
-
-        addVoucherMovementDetailSubReport(params,order);
-        String etiqueta;
-        String codControl;
-        //BigDecimal numberAuthorization = dosage.getNumberAuthorization();
-        BigDecimal numberAuthorization = BigDecimalUtil.toBigDecimal(dosage.getAuthorizationNumber());
-        String key = dosage.getKey();
-
-        if(imprimirCopia)
-            etiqueta = "COPIA";
-        else
-            etiqueta = "ORIGINAL";
-
-        ControlCode controlCode = generateCodControl(customerOrder,dosage.getCurrentNumber().intValue(),numberAuthorization,key);
-        String nameClient = rePrintsService.findNameClient(order);
-        params.putAll(getReportParams(nameClient,dosage.getCurrentNumber().intValue(),etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
-        super.generateReport("productDeliveryReceiptReport",
-                            "/customers/reports/invoiceReceptionReport.jrxml",
-                            PageFormat.LEGAL,
-                            PageOrientation.PORTRAIT,
-                            MessageUtils.getMessage("Reports.productDeliveryReceipt.title"),
-                            params);
-    }*/
-
     @Restrict("#{s:hasPermission('PRINTINVOICE','VIEW')}")
     public void generateReport() {
         log.debug("Generate PrintInvoiceReportAction......");
 
         User user = getUser(currentUser.getId());
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
         this.customerOrderId = saleService.findLastSaleId(user);
         this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
 
@@ -173,46 +135,86 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        /*for(CustomerOrder order:customerOrders){
-                numberInvoice = dosage.getCurrentNumber().intValue();
-                ControlCode controlCode = generateCodControl(order,numberInvoice,authorizationNumber,key);
-               String nameClient = rePrintsService.findNameClient(order);
+    public void printInvoices(List<CustomerOrder> customerOrderList){
 
-               params.putAll(getReportParams(nameClient,numberInvoice,etiqueta,controlCode.getCodigoControl(),controlCode.getKeyQR()));
-               TypedReportData reportData =   addVoucherMovementDetailSubReport(params,order);
+        /*User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); *//** Solo es impresion, revisar la dosificacion que obtiene??? **//*
 
-                    for(JRPrintPage page:(List<JRPrintPage>)reportData.getJasperPrint().getPages())
-                        typedReportData.getJasperPrint().addPage(page);
+        TypedReportData reportData = null;
 
-                if(!imprimirCopia)
-                {
-                    createArticleOrders( order, numberInvoice.longValue(), controlCode.getCodigoControl());
-                    createReImprint(customerOrder,dosage,numberInvoice,currentUser);
-                }
-                else
-                    updateReImprint(order);
+        for (CustomerOrder customerOrder : customerOrderList){
+            System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+            String name         = customerOrder.getClient().getBusinessName();
+            String clientNit    = customerOrder.getMovement().getNit();
+            Date invoiceDate    = customerOrder.getMovement().getDate();
+            Long invoiceNumber  = customerOrder.getMovement().getNumber().longValue();
+            String controlCode  = customerOrder.getMovement().getControlCode();
+            String qrCode       = customerOrder.getMovement().getQrCode();
+            Double totalAmount  = customerOrder.getTotalAmount();
+            Double discount     = customerOrder.getCommissionValue();
 
-                numberInvoice ++;
-                dosage.setCurrentNumber(numberInvoice.longValue());
+            String labelType = "ORIGINAL";
+            Map params = new HashMap();
 
+            params.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelType));
+            reportData = addDetailSubReport(params, customerOrder);
+        }
 
-            }*/
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
-            /*try {
-                warehouseService.update(dosage);
-            } catch (EntryDuplicatedException e) {
-                e.printStackTrace();
-            } catch (ConcurrencyException e) {
-                e.printStackTrace();
-            }*/
+        log.debug("Generate PrintInvoiceReportAction......");
 
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
+        this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
 
-        /*createNesmovements();
-        createNewReImprint();
-        imprimirCopia = true;*/
+        moneyUtil = new MoneyUtil();
+        barcodeRenderer = new BarcodeRenderer();
+
+        TypedReportData typedReportData;
+        setReportFormat(ReportFormat.PDF);
+
+        lastCustomerOrder = customerOrderList.get(0);
+        String name = lastCustomerOrder.getClient().getBusinessName();
+        String clientNit = lastCustomerOrder.getMovement().getNit();
+        Date invoiceDate = lastCustomerOrder.getMovement().getDate();
+        Long invoiceNumber = lastCustomerOrder.getMovement().getNumber().longValue();
+        String controlCode = lastCustomerOrder.getMovement().getControlCode();
+        String qrCode = lastCustomerOrder.getMovement().getQrCode();
+        Double totalAmount = lastCustomerOrder.getTotalAmount();
+        Double discount = lastCustomerOrder.getCommissionValue();
+
+        String labelType = "ORIGINAL";
+        Map params = new HashMap();
+        params.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelType));
+        TypedReportData reportData =   addDetailSubReport(params, lastCustomerOrder);
+
+        String labelTypeCopy = "COPIA";
+        Map paramsCopy = new HashMap();
+        paramsCopy.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelTypeCopy));
+        TypedReportData reportDataCopy =   addDetailSubReport(paramsCopy, lastCustomerOrder);
+
+        for (Object jrPrintPage : reportDataCopy.getJasperPrint().getPages()) {
+            reportData.getJasperPrint().addPage((JRPrintPage) jrPrintPage);
+        }
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
+
 
     private void createNewReImprint()
     {
