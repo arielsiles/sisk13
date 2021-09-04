@@ -148,11 +148,19 @@
                                        reRender="confirmBillingSpecialModalPanel">
                     </a4j:commandButton>
 
-                    <h:commandButton id="printInvoiceId"
-                                     action="#{printInvoiceReportAction.printInvoices(customerOrderDataModel.selectedCustomerOrdes)}"
+                    <h:commandButton id="printInvoiceOriginalId"
+                                     action="#{printInvoiceReportAction.printInvoicesOriginal(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
                                      rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['CustomerOrder.printInvoices']}" >
+                                     value="#{messages['CustomerOrder.printInvoicesOriginal']}" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                    <h:commandButton id="printInvoiceCopyId"
+                                     action="#{printInvoiceReportAction.printInvoicesCopy(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     value="#{messages['CustomerOrder.printInvoicesCopy']}" >
                         <s:defaultAction/>
                     </h:commandButton>
 

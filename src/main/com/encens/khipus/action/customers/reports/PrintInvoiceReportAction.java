@@ -137,73 +137,71 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         }
     }
 
-    public void printInvoices(List<CustomerOrder> customerOrderList){
+    public void printInvoicesOriginal(List<CustomerOrder> customerOrderList){
+        //printInvoices(customerOrderList, "ORIGINAL");
 
-        /*User user = getUser(currentUser.getId());
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); *//** Solo es impresion, revisar la dosificacion que obtiene??? **//*
 
-        TypedReportData reportData = null;
+        List<TypedReportData> reportDataList = new ArrayList<TypedReportData>();
 
-        for (CustomerOrder customerOrder : customerOrderList){
-            System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
-            String name         = customerOrder.getClient().getBusinessName();
-            String clientNit    = customerOrder.getMovement().getNit();
-            Date invoiceDate    = customerOrder.getMovement().getDate();
-            Long invoiceNumber  = customerOrder.getMovement().getNumber().longValue();
-            String controlCode  = customerOrder.getMovement().getControlCode();
-            String qrCode       = customerOrder.getMovement().getQrCode();
-            Double totalAmount  = customerOrder.getTotalAmount();
-            Double discount     = customerOrder.getCommissionValue();
+        for (CustomerOrder order : customerOrderList){
+            reportDataList.add(printInvoice(order, "original"));
+        }
 
-            String labelType = "ORIGINAL";
-            Map params = new HashMap();
+        TypedReportData result = reportDataList.get(0);
 
-            params.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelType));
-            reportData = addDetailSubReport(params, customerOrder);
+        for (int i=1 ; i < reportDataList.size() ; i++){
+            result.getJasperPrint().getPages().addAll(reportDataList.get(i).getJasperPrint().getPages());
         }
 
         try {
-            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            GenerationReportData generationReportData = new GenerationReportData(result);
             generationReportData.exportReport();
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
+
+    }
+
+    public void printInvoicesCopy(List<CustomerOrder> customerOrderList){
+        printInvoices(customerOrderList, "COPIA");
+    }
+
+    public void printInvoices(List<CustomerOrder> customerOrderList, String labelType){
 
         log.debug("Generate PrintInvoiceReportAction......");
 
         User user = getUser(currentUser.getId());
         Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
-        this.customerOrderId = saleService.findLastSaleId(user);
-        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
 
         moneyUtil = new MoneyUtil();
         barcodeRenderer = new BarcodeRenderer();
-
-        TypedReportData typedReportData;
         setReportFormat(ReportFormat.PDF);
 
-        lastCustomerOrder = customerOrderList.get(0);
-        String name = lastCustomerOrder.getClient().getBusinessName();
-        String clientNit = lastCustomerOrder.getMovement().getNit();
-        Date invoiceDate = lastCustomerOrder.getMovement().getDate();
-        Long invoiceNumber = lastCustomerOrder.getMovement().getNumber().longValue();
-        String controlCode = lastCustomerOrder.getMovement().getControlCode();
-        String qrCode = lastCustomerOrder.getMovement().getQrCode();
-        Double totalAmount = lastCustomerOrder.getTotalAmount();
-        Double discount = lastCustomerOrder.getCommissionValue();
-
-        String labelType = "ORIGINAL";
         Map params = new HashMap();
+        CustomerOrder customerOrderOne = customerOrderList.get(0);
+        Movement movement = customerOrderOne.getMovement();
+        String name         = movement.getName();
+        String clientNit    = movement.getNit();
+        Date invoiceDate    = movement.getDate();
+        Long invoiceNumber  = movement.getNumber().longValue();
+        String controlCode  = movement.getControlCode();
+        String qrCode       = movement.getQrCode();
+        Double totalAmount  = movement.getAmount().doubleValue();
+        Double discount     = movement.getDiscount().doubleValue();
+
         params.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelType));
-        TypedReportData reportData =   addDetailSubReport(params, lastCustomerOrder);
+        TypedReportData reportData =   addDetailSubReport(params, customerOrderOne);
 
-        String labelTypeCopy = "COPIA";
-        Map paramsCopy = new HashMap();
-        paramsCopy.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelTypeCopy));
-        TypedReportData reportDataCopy =   addDetailSubReport(paramsCopy, lastCustomerOrder);
+        for (int i = 1 ; i < customerOrderList.size() ; i++){
+            CustomerOrder order = customerOrderList.get(i);
+            Movement mov = order.getMovement();
+            Map paramMap  = new HashMap();
 
-        for (Object jrPrintPage : reportDataCopy.getJasperPrint().getPages()) {
-            reportData.getJasperPrint().addPage((JRPrintPage) jrPrintPage);
+            paramMap.putAll(getReportParams(dosage, mov.getName(), mov.getNit(), mov.getDate(), mov.getNumber().longValue(),
+                                            mov.getAmount().doubleValue(), mov.getDiscount().doubleValue(), mov.getControlCode(), mov.getQrCode(), labelType));
+
+            TypedReportData typedReportData =   addDetailSubReport(paramMap, order);
+            reportData.getJasperPrint().getPages().addAll(typedReportData.getJasperPrint().getPages());
         }
 
         try {
@@ -214,6 +212,60 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         }
 
     }
+
+
+    public TypedReportData printInvoice(CustomerOrder order, String labelType){
+
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
+
+        moneyUtil = new MoneyUtil();
+        BarcodeRenderer barcodeRenderer = new BarcodeRenderer();
+        setReportFormat(ReportFormat.PDF);
+
+        //Map params = new HashMap();
+        Movement movement = order.getMovement();
+        String name         = movement.getName();
+        String clientNit    = movement.getNit();
+        Date invoiceDate    = movement.getDate();
+        Long invoiceNumber  = movement.getNumber().longValue();
+        String controlCode  = movement.getControlCode();
+        String qrCode       = movement.getQrCode();
+        Double totalAmount  = movement.getAmount().doubleValue();
+        Double discount     = movement.getDiscount().doubleValue();
+
+        //params.putAll(getReportParams(dosage, name, clientNit, invoiceDate, invoiceNumber, totalAmount, discount, controlCode, qrCode, labelType));
+
+        Double subtotal = totalAmount;
+        totalAmount = totalAmount - discount;
+
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("companyNit", dosage.getCompanyNit());
+        paramMap.put("invoiceNumber", invoiceNumber);
+        paramMap.put("authorizationNumber", dosage.getAuthorizationNumber());
+        paramMap.put("clientNit", clientNit);
+        paramMap.put("name", name);
+        paramMap.put("invoiceDateLiteral", DateUtils.getLiteralDate("Cochabamba", invoiceDate));
+        paramMap.put("expirationDate", dosage.getExpirationDate());
+        paramMap.put("controlCode", controlCode);
+        paramMap.put("companyLabel", dosage.getCompanyLabel());
+        paramMap.put("lawLabel", dosage.getLawLabel());
+        paramMap.put("labelType", labelType);
+        paramMap.put("llaveQR", qrCode);
+        paramMap.put("subtotal", subtotal);
+        paramMap.put("discount", discount);
+        paramMap.put("total", totalAmount);
+        paramMap.put("literalTotal", moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
+
+        String filePath = FileCacheLoader.i.getPath("/customers/reports/qr_inv.png");
+        barcodeRenderer.generateQR(qrCode, filePath);
+
+        TypedReportData reportData =   addDetailSubReport(paramMap, order);
+
+        return reportData;
+
+    }
+
 
 
     private void createNewReImprint()
@@ -365,9 +417,7 @@ public class PrintInvoiceReportAction extends GenericReportAction {
                 " articleOrder.customerOrder.description as description "+
                 " FROM ArticleOrder articleOrder";
 
-        String[] restrictions = new String[]{
-
-                "articleOrder.customerOrder.id = #{printInvoiceReportAction.lastCustomerOrder.getId()}"};
+        String[] restrictions = new String[]{"articleOrder.customerOrder.id = #{printInvoiceReportAction.customerOrder.getId()}"};
 
         String orderBy = "articleOrder.productItem.name";
 
