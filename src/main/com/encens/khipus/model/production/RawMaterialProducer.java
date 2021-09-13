@@ -52,6 +52,10 @@ public class RawMaterialProducer extends Person {
     @Type(type = "IntegerBoolean")
     private Boolean responsible;
 
+    @Column(name = "ACTIVO", nullable = false)
+    @Type(type = "IntegerBoolean")
+    private Boolean active;
+
     @Column(name = "numerocuenta", length = 50, nullable = true)
     @Length(max = 50)
     private String accountNumber;
@@ -184,6 +188,14 @@ public class RawMaterialProducer extends Person {
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
 

@@ -18,7 +18,7 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-
+    <ui:param name="bodyWidth" value="70%"/>
     <ui:param name="selectedTab" value="products"/>
 
     <ui:define name="body">
@@ -112,7 +112,9 @@
                         <ui:define name="label">#{messages['RawMaterialCollectionSession.totalAmount']}</ui:define>
                         <h:outputText value="#{rawMaterialCollectionSessionAction.totalAmount}"/>
                     </s:decorate>
-                    <s:decorate id="optionsNavegation" template="/include/viewField.xhtml" styleClass="formRow">
+
+                    <!-- Botones saltar siguiente anterior -->
+                    <!--<s:decorate id="optionsNavegation" template="/include/viewField.xhtml" styleClass="formRow">
                         <a4j:commandButton action="#{rawMaterialCollectionSessionAction.postDate(rawMaterialCollectionSession.productiveZone,rawMaterialCollectionSession.date)}"
                                            id = "buttonPos"
                                            value="#{messages['RawMaterialCollectionSession.postDate']}"
@@ -142,14 +144,18 @@
                                          reRender="formPanel"
                                          styleClass="button">
                         </a4j:commandButton>
-                    </s:decorate>
+                    </s:decorate>-->
+
                 </h:panelGrid>
 
                 <rich:dataTable id="collectedRawMaterialList"
                                 value="#{rawMaterialCollectionSession.collectedRawMaterialList}"
-                                var="collectedRawMaterialItem" width="100%" columnsWidth="25%,25%,25%">
+                                var="collectedRawMaterialItem" width="100%" columnsWidth="10,25%,25%,25%,15%">
                     <f:facet name="header">
                         <rich:columnGroup>
+                            <rich:column>
+                                #{messages['RawMaterialProducer.idNumber']}
+                            </rich:column>
                             <rich:column>
                                 #{messages['RawMaterialProducer.lastName']}
                             </rich:column>
@@ -165,16 +171,19 @@
                         </rich:columnGroup>
                     </f:facet>
 
-                    <rich:column>
+                    <rich:column styleClass="#{collectedRawMaterialItem.rawMaterialProducer.active?'labelActive':''}">
+                        <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.idNumber}"/>
+                    </rich:column>
+                    <rich:column styleClass="#{collectedRawMaterialItem.rawMaterialProducer.active?'labelActive':''}">
                         <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.lastName}"/>
                     </rich:column>
-                    <rich:column>
+                    <rich:column styleClass="#{collectedRawMaterialItem.rawMaterialProducer.active?'labelActive':''}">
                         <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.maidenName}"/>
                     </rich:column>
-                    <rich:column>
+                    <rich:column styleClass="#{collectedRawMaterialItem.rawMaterialProducer.active?'labelActive':''}">
                         <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.firstName}"/>
                     </rich:column>
-                    <rich:column>
+                    <rich:column styleClass="#{collectedRawMaterialItem.rawMaterialProducer.active?'labelActive':''}">
                         <h:inputText id="totalAmount" value="#{collectedRawMaterialItem.amount}" required="true"
                                      style="width:95%;">
                             <a4j:support ajaxSingle="true" event="onblur" reRender="totalAmountField"/>

@@ -521,6 +521,10 @@ input.bigText {
     background-color: #ADD8E6;
 }
 
+.labelActive {
+    background-color: #D6EAF8;
+}
+
 .labelNew {
     background-color: #06d518;
 }

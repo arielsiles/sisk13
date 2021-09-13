@@ -193,6 +193,12 @@
     <rich:spacer height="10" />
 
     <app:fieldset id="productiveZoneFieldSet" title="#{messages['RawMaterialProducer.productiveZone']}">
+
+        <s:decorate id="activeProducerField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['RawMaterialProducer.activeProducer']}</ui:define>
+            <h:selectBooleanCheckbox value="#{rawMaterialProducer.active}" />
+        </s:decorate>
+
         <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['RawMaterialProducer.responsible']}</ui:define>
             <h:selectBooleanCheckbox value="#{rawMaterialProducer.responsible}" />
