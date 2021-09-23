@@ -2,7 +2,7 @@
 -- 1. Plan
 SELECT *
 FROM pr_plan
-WHERE `fecha` BETWEEN '2021-07-01' AND '2021-07-31'
+WHERE `fecha` BETWEEN '2021-08-01' AND '2021-08-31'
 ;
 
 -- 2. Produccion
@@ -11,7 +11,7 @@ FROM pr_produccion
 WHERE `idplan` IN (
 	SELECT p.`idplan`
 	FROM pr_plan p
-	WHERE p.`fecha` BETWEEN '2021-07-01' AND '2021-07-31'
+	WHERE p.`fecha` BETWEEN '2021-08-01' AND '2021-08-31'
 );
 
 -- 3. Productos
@@ -20,7 +20,7 @@ FROM pr_producto
 WHERE `idplan` IN (
 	SELECT p.`idplan`
 	FROM pr_plan p
-	WHERE p.`fecha` BETWEEN '2021-07-01' AND '2021-07-31'
+	WHERE p.`fecha` BETWEEN '2021-08-01' AND '2021-08-31'
 );
 
 -- 4. Insumos
@@ -32,18 +32,18 @@ WHERE `idproduccion` IN (
 	WHERE pr.`idplan` IN (
 		SELECT p.`idplan`
 		FROM pr_plan p
-		WHERE p.`fecha` BETWEEN '2021-07-01' AND '2021-07-31'
+		WHERE p.`fecha` BETWEEN '2021-08-01' AND '2021-08-31'
 	)
 );
 
 -- 5. periodocostoindirecto
 SELECT * FROM periodocostoindirecto
-WHERE idgestion = 9 AND mes = 7;
+WHERE idgestion = 9 AND mes = 8;
 
 -- 6.
 SELECT *
 FROM costosindirectos
-WHERE idperiodocostoindirecto = 64
+WHERE idperiodocostoindirecto = 65
 ;
 
 -- Eliminar produccion
