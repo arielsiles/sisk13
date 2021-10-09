@@ -725,7 +725,7 @@ public class SalesAction {
         String glossCodes = "";
 
         for (CustomerOrder customerOrder : customerOrderList){
-            if (customerOrder.getState().equals(SaleStatus.PENDIENTE) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
+            if (customerOrder.getState().equals(SaleStatus.CONTABILIZADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
                 System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
 
                 for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
@@ -802,19 +802,23 @@ public class SalesAction {
             customerOrderBill.setMovement(movement);
 
             for(CustomerOrder customerOrder : customerOrderList){
-                customerOrder.setMovement(movement);
-                customerOrder.setState(SaleStatus.CONTABILIZADO);
-                saleService.updateCustomerOrder(customerOrder);
-                glossCodes = glossCodes + " " + customerOrder.getCode();
+                if (!customerOrder.getState().equals(SaleStatus.ANULADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
+                    customerOrder.setMovement(movement);
+                    customerOrder.setState(SaleStatus.CONTABILIZADO);
+                    saleService.updateCustomerOrder(customerOrder);
+                    glossCodes = glossCodes + " " + customerOrder.getCode();
+                }
             }
 
-            Voucher voucher = accountingCreditSale(customerOrderBill, movement);
+            // Para contabilizar el pedido para facturar fin de mes
+            /*Voucher voucher = accountingCreditSale(customerOrderBill, movement);
             voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + glossCodes + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
             voucherAccoutingService.simpleUpdateVoucher(voucher);
 
             customerOrderBill.setVoucher(voucher);
             customerOrderBill.setAccounted(Boolean.TRUE);
             saleService.updateCustomerOrder(customerOrderBill);
+            */
         }
         clearSpecialBilling();
     }
@@ -830,6 +834,10 @@ public class SalesAction {
 
 
 
+    }
+
+    public boolean isAnnulled(CustomerOrder customerOrder){
+        return customerOrder.getState().equals(SaleStatus.ANULADO);
     }
 
     public void assignClient(Client client){
@@ -871,7 +879,8 @@ public class SalesAction {
 
         Double amount = 0.0;
         for (CustomerOrder customerOrder : customerOrderList){
-            amount = amount + customerOrder.getTotalAmount();
+            if (!customerOrder.getState().equals(SaleStatus.ANULADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL))
+                amount = amount + customerOrder.getTotalAmount();
         }
         setAmountSpecialBill(amount);
     }

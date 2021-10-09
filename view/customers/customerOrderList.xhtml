@@ -205,6 +205,7 @@
                 <rich:column styleClass="center">
                     <h:selectBooleanCheckbox id="selectCheckboxItem"
                                              immediate="true"
+                                             disabled="#{salesAction.isAnnulled(customerOrder)}"
                                              value="#{customerOrderDataModel.selectedList[customerOrderDataModel.page][customerOrder.id]}">
                         <a4j:support event="onchange" reRender="selectCheckboxItem"/>
                     </h:selectBooleanCheckbox>
