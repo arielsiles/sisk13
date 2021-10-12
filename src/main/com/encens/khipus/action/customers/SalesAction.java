@@ -544,9 +544,20 @@ public class SalesAction {
                 MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
                         customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
 
+        CashAccount debitAccount = cashBox.getType().getCashAccountReceivable();
+        Client client = customerOrder.getClient();
+        System.out.println("----------ZZZZz>>> Tipo Pedido: " + customerOrder.getCustomerOrderType().getType());
+        if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)) {
+            System.out.println("----->>> TRUE");
+            debitAccount = cashBox.getType().getCashAccountIncome();
+            client = null;
+        }
+
         VoucherDetail debitClientAccount = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                cashBox.getType().getCashAccountReceivable(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                debitAccount, BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
                 FinancesCurrencyType.D, BigDecimal.ONE);
+
+        debitClientAccount.setClient(client);
 
         VoucherDetail debitTransactionTax = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                 companyConfiguration.getTransactionTaxExpense(),
@@ -568,7 +579,7 @@ public class SalesAction {
                 //companyConfiguration.getPrimarySaleProduct(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
                 cashBox.getType().getCashAccountIncome(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
 
-        debitClientAccount.setClient(customerOrder.getClient());
+
 
         creditFiscalDebitIVA.setMovement(movement);
         voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
@@ -722,10 +733,10 @@ public class SalesAction {
         CustomerOrder customerOrderBill = new CustomerOrder();
         List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
         Double totalAmount = 0.0;
-        String glossCodes = "";
+        //String glossCodes = "";
 
         for (CustomerOrder customerOrder : customerOrderList){
-            if (customerOrder.getState().equals(SaleStatus.CONTABILIZADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
+            if (customerOrder.getState().equals(SaleStatus.CONTABILIZADO)){
                 System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
 
                 for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
@@ -781,7 +792,7 @@ public class SalesAction {
             Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(SaleTypeEnum.CREDIT.getSequenceName()));
             customerOrderBill.setCode(saleCode);
             customerOrderBill.setSaleType(SaleTypeEnum.CREDIT);
-            customerOrderBill.setCustomerOrderType(customerOrderList.get(0).getCustomerOrderType());
+            customerOrderBill.setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeSpecial());
             customerOrderBill.setClient(customerOrderList.get(0).getClient());
             customerOrderBill.setArticleOrderList(articleOrderList);
             customerOrderBill.setOrderDate(billingSpecialDate);
@@ -802,23 +813,19 @@ public class SalesAction {
             customerOrderBill.setMovement(movement);
 
             for(CustomerOrder customerOrder : customerOrderList){
-                if (!customerOrder.getState().equals(SaleStatus.ANULADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)){
-                    customerOrder.setMovement(movement);
-                    customerOrder.setState(SaleStatus.CONTABILIZADO);
-                    saleService.updateCustomerOrder(customerOrder);
-                    glossCodes = glossCodes + " " + customerOrder.getCode();
-                }
+                customerOrder.setMovement(movement);
+                saleService.updateCustomerOrder(customerOrder);
             }
 
             // Para contabilizar el pedido para facturar fin de mes
-            /*Voucher voucher = accountingCreditSale(customerOrderBill, movement);
-            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + glossCodes + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
+            Voucher voucher = accountingCreditSale(customerOrderBill, movement);
+            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
             voucherAccoutingService.simpleUpdateVoucher(voucher);
 
             customerOrderBill.setVoucher(voucher);
             customerOrderBill.setAccounted(Boolean.TRUE);
             saleService.updateCustomerOrder(customerOrderBill);
-            */
+
         }
         clearSpecialBilling();
     }
@@ -879,7 +886,7 @@ public class SalesAction {
 
         Double amount = 0.0;
         for (CustomerOrder customerOrder : customerOrderList){
-            if (!customerOrder.getState().equals(SaleStatus.ANULADO) && customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL))
+            if (!customerOrder.getState().equals(SaleStatus.ANULADO))
                 amount = amount + customerOrder.getTotalAmount();
         }
         setAmountSpecialBill(amount);

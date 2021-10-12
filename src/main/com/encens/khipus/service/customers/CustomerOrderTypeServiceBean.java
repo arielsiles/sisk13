@@ -24,4 +24,12 @@ public class CustomerOrderTypeServiceBean implements CustomerOrderTypeService {
                 .setParameter("type", CustomerOrderTypeEnum.NORMAL)
                 .getSingleResult();
     }
+
+    @Override
+    public CustomerOrderType findCustomerOrderTypeSpecial() {
+        return (CustomerOrderType) em.createQuery("select c from CustomerOrderType c " +
+                " where c.type =:type")
+                .setParameter("type", CustomerOrderTypeEnum.SPECIAL)
+                .getSingleResult();
+    }
 }

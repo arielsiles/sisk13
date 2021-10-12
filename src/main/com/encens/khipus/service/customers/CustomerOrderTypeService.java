@@ -10,4 +10,6 @@ public interface CustomerOrderTypeService {
 
     CustomerOrderType findCustomerOrderTypeDefault();
 
+    CustomerOrderType findCustomerOrderTypeSpecial();
+
 }
