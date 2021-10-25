@@ -8,10 +8,11 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.warehouse.ProductItem;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+
+//import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -19,8 +20,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "promocion")
-@XmlRootElement
-
+//@XmlRootElement
 public class Promocion implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
