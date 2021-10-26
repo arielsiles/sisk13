@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="voletaDePago" pageWidth="612" pageHeight="395" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="2.143588810000003"/>
-	<property name="ireport.x" value="685"/>
+	<property name="ireport.x" value="250"/>
 	<property name="ireport.y" value="25"/>
 	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
 	<parameter name="fecha" class="java.util.Date"/>
@@ -187,26 +187,6 @@
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="HH.mm" isBlankWhenNull="true">
-				<reportElement key="date_text" style="titleStyle" positionType="Float" x="325" y="12" width="247" height="12"/>
-				<box padding="1">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$P{hora}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement key="date_text" style="titleStyle" positionType="Float" x="325" y="0" width="247" height="12"/>
-				<box padding="1">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="49" width="28" height="14"/>
