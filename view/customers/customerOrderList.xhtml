@@ -134,15 +134,16 @@
                                      action="#{salesAction.processBillingSpecial(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
                                      rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['CustomerOrder.billSpecial']}" >
+                                     value="Fact. Especial 2" >
                         <s:defaultAction/>
                     </h:commandButton>
 
+                    <!-- Para facturacion de pedidos a fin de mes -->
                     <a4j:commandButton id="creditSaleCommandButton"
                                        action="#{salesAction.initSpecialBill(customerOrderDataModel.selectedCustomerOrdes)}"
-                                       value="Fact. especial"
+                                       value="#{messages['CustomerOrder.billSpecial']}"
                                        styleClass="button"
-                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING_END_MONTH','VIEW')}"
                                        immediate="true"
                                        oncomplete="Richfaces.showModalPanel('confirmBillingSpecialModalPanel');"
                                        reRender="confirmBillingSpecialModalPanel">

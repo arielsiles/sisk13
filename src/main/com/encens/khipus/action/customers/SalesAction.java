@@ -524,7 +524,7 @@ public class SalesAction {
 
         movement.setQrCode(qrCode);
         movement.setAuthorizationNumber(dosage.getAuthorizationNumber().toString());
-        /*movement.setCustomerOrder(customerOrder);*/
+        movement.setCustomerOrder(customerOrder);
 
         dosageService.increaseInvoiceNumber(dosage);
         movementService.createMovement(movement);
@@ -805,26 +805,27 @@ public class SalesAction {
 
             customerOrderBill.setTotalAmount(totalAmount);
             customerOrderBill.setTax(BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(totalAmount), Constants.VAT).doubleValue());
-            customerOrderBill.setState(SaleStatus.ANULADO);
+            customerOrderBill.setState(SaleStatus.PREPARAR);
             customerOrderBill.setUser(currentUser);
-            /*saleService.createSale(customerOrderBill);*/
+
+            saleService.createSale(customerOrderBill);
 
             Movement movement = createInvoice(customerOrderBill);
             customerOrderBill.setMovement(movement);
 
-            for(CustomerOrder customerOrder : customerOrderList){
+            /*for(CustomerOrder customerOrder : customerOrderList){
                 customerOrder.setMovement(movement);
                 saleService.updateCustomerOrder(customerOrder);
-            }
+            }*/
 
             // Para contabilizar el pedido para facturar fin de mes
             Voucher voucher = accountingCreditSale(customerOrderBill, movement);
             voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
             voucherAccoutingService.simpleUpdateVoucher(voucher);
 
-            /*customerOrderBill.setVoucher(voucher);
+            customerOrderBill.setVoucher(voucher);
             customerOrderBill.setAccounted(Boolean.TRUE);
-            saleService.updateCustomerOrder(customerOrderBill);*/
+            saleService.updateCustomerOrder(customerOrderBill);
 
         }
         clearSpecialBilling();
