@@ -173,11 +173,13 @@
         <url-pattern>/seam/resource/*</url-pattern>
     </servlet-mapping>-->
 
-    <!--<servlet>
+    <servlet>
         <servlet-name>Rest Servlet</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <!--<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>-->
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <!--<param-name>com.sun.jersey.config.property.packages</param-name>-->
+            <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.encens.khipus.restful</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -185,7 +187,7 @@
     <servlet-mapping>
         <servlet-name>Rest Servlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>-->
+    </servlet-mapping>
 
     <!--<servlet>-->
     <!--<servlet-name>Document Store Servlet</servlet-name>-->

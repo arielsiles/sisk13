@@ -167,6 +167,15 @@
                 </s:div>
 
                 <s:div styleClass="buttonsRight">
+
+
+                    <h:commandButton id="restClientActionId"
+                                     action="#{restClientAction.executeService1()}"
+                                     styleClass="button"
+                                     value="Servicio 1" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
                     <s:button value="#{messages['CustomerOrder.accounting']}"
                               view="/customers/accountingCreditSale.xhtml"
                               styleClass="button"
