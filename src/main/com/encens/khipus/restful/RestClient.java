@@ -1,10 +1,4 @@
- package com.encens.khipus.util;
-
-
-/*import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;*/
+ package com.encens.khipus.restful;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,11 +12,6 @@ class RestClient {
     private static HttpURLConnection connection;
 
     public static void main(String[] args){
-
-        /*Client client = ClientBuilder.newClient();
-        WebTarget tut = client.target("https://jsonplaceholder.typicode.com/posts");
-        Response response = tut.request("text/html").get();
-        System.out.println(response);*/
 
         BufferedReader reader;
         String line;
