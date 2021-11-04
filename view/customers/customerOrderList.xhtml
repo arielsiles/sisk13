@@ -169,7 +169,14 @@
                 <s:div styleClass="buttonsRight">
 
 
-                    <h:commandButton id="restClientActionId"
+                    <h:commandButton id="rest2ClientActionId"
+                                     action="#{restClientAction.executeService2()}"
+                                     styleClass="button"
+                                     value="Servicio 2" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                    <h:commandButton id="rest1ClientActionId"
                                      action="#{restClientAction.executeService1()}"
                                      styleClass="button"
                                      value="Servicio 1" >
