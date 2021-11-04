@@ -163,22 +163,22 @@
         <url-pattern>/seam/resource/*</url-pattern>
     </servlet-mapping>-->
 
-    <!--<servlet>
+    <servlet>
         <servlet-name>Seam Resource Servlet</servlet-name>
         <servlet-class>org.jboss.seam.servlet.SeamResourceServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>Seam Resource Servlet</servlet-name>
-        <url-pattern>/seam/resource/*</url-pattern>
-    </servlet-mapping>-->
+        <url-pattern>/resource/*</url-pattern>
+    </servlet-mapping>
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>Rest Servlet</servlet-name>
-        <!--<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>-->
+        &lt;!&ndash;<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>&ndash;&gt;
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <!--<param-name>com.sun.jersey.config.property.packages</param-name>-->
+            &lt;!&ndash;<param-name>com.sun.jersey.config.property.packages</param-name>&ndash;&gt;
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.encens.khipus.restful</param-value>
         </init-param>
@@ -187,7 +187,7 @@
     <servlet-mapping>
         <servlet-name>Rest Servlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <!--<servlet>-->
     <!--<servlet-name>Document Store Servlet</servlet-name>-->
