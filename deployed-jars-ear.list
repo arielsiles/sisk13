@@ -39,3 +39,5 @@ commons-collections-2.1.1.jar
 facturas 1.0.jar
 javase-1.7.jar
 core-1.7.jar
+jackson-core-2.9.9.jar
+jackson-databind-2.9.9.3.jar

@@ -1,9 +1,12 @@
 package com.encens.khipus.action.restful;
 
+import com.encens.khipus.action.restful.pojo.UserPOJO;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +19,59 @@ import java.net.URL;
 @Scope(ScopeType.PAGE)
 public class RestClientAction {
 
+
+    public void executeService3(){
+
+        HttpURLConnection connection = null;
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+
+        try {
+
+            URL url = new URL("https://jsonplaceholder.typicode.com/users");
+            connection = (HttpURLConnection) url.openConnection();
+
+            // Request Setup
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int status = connection.getResponseCode();
+
+            if (status > 299){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+            }
+
+            //System.out.println(responseContent.toString());
+            String userJsonSource = responseContent.toString();
+            JsonNode node = Json.parse(userJsonSource);
+            UserPOJO userPOJO = Json.fromJson(node, UserPOJO.class);
+
+            System.out.println("Id: " + userPOJO.getId());
+            System.out.println("Name: " + userPOJO.getName());
+            System.out.println("UserName: " + userPOJO.getUsername());
+            System.out.println("Email: " + userPOJO.getEmail());
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
+
+    }
 
     public void executeService2() throws IOException {
 

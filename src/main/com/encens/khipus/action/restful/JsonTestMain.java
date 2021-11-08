@@ -17,7 +17,6 @@ public class JsonTestMain {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 }
