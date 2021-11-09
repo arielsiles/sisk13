@@ -1,6 +1,7 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.SessionUser;
+import com.encens.khipus.action.billing.BillControllerAction;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
@@ -17,6 +18,7 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -118,6 +120,9 @@ public class SalesAction {
         System.out.println("------------------> Inicializando..............");
         setOrderDate(new Date());
     }*/
+
+    @In(create = true)
+    private BillControllerAction billControllerAction;
 
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
@@ -384,6 +389,12 @@ public class SalesAction {
             saleService.updateCustomerOrder(customerOrder);
 
             inventoryService.updateInventoryForSales(customerOrder);
+
+            try {
+                billControllerAction.testBillController(customerOrder);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
 
             clearAll();
             assignCustomerOrderTypeDefault();

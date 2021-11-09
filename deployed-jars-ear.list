@@ -38,6 +38,7 @@ commons-dbcp-1.2.2.jar
 commons-collections-2.1.1.jar
 facturas 1.0.jar
 core-1.7.jar
+zxing-j2se-1.7.jar
 
 javax.ws.rs-api-2.0.1.jar
 jackson-annotations-2.9.3.jar
