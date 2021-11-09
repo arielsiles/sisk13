@@ -2,7 +2,6 @@ package com.encens.khipus.action.restful;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 
@@ -12,7 +11,7 @@ public class Json {
 
     private static ObjectMapper getDefaultObjectMapper() {
         ObjectMapper defaultObjectMapper = new ObjectMapper();
-        defaultObjectMapper.registerModule(new JavaTimeModule());
+        //defaultObjectMapper.registerModule(new JavaTimeModule());
         defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         return defaultObjectMapper;

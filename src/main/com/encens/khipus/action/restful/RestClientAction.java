@@ -1,12 +1,14 @@
 package com.encens.khipus.action.restful;
 
 import com.encens.khipus.action.restful.pojo.UserPOJO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-import javax.jws.soap.SOAPBinding;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +16,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 @Name("restClientAction")
 @Scope(ScopeType.PAGE)
@@ -56,12 +59,27 @@ public class RestClientAction {
             //System.out.println(responseContent.toString());
             String userJsonSource = responseContent.toString();
             JsonNode node = Json.parse(userJsonSource);
-            UserPOJO userPOJO = Json.fromJson(node, UserPOJO.class);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            UserPOJO[] users = objectMapper.readValue(userJsonSource, UserPOJO[].class);
+            //List<UserPOJO> userPOJOList = new ArrayList(Arrays.asList(users));
+            List<UserPOJO> userPOJOList = objectMapper.readValue(userJsonSource, new TypeReference<List<UserPOJO>>(){});
+
+            System.out.println(Json.prettyPrint(node));
+
+            //userPOJOList.forEach(x -> System.out.println(x.toString()));
+            for (int i = 0 ; i < userPOJOList.size() ; i++){
+                UserPOJO userPOJO = userPOJOList.get(i);
+                System.out.println(userPOJO.getId() + " --> " + userPOJO.getName() + " - " + userPOJO.getEmail());
+            }
+
+            /*UserPOJO userPOJO = Json.fromJson(node, UserPOJO.class);
 
             System.out.println("Id: " + userPOJO.getId());
             System.out.println("Name: " + userPOJO.getName());
             System.out.println("UserName: " + userPOJO.getUsername());
-            System.out.println("Email: " + userPOJO.getEmail());
+            System.out.println("Email: " + userPOJO.getEmail());*/
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
