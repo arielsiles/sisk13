@@ -23,6 +23,38 @@ import java.util.List;
 public class RestClientAction {
 
 
+    public void executeService4() throws IOException {
+
+
+        URL url = new URL ("https://jsonplaceholder.typicode.com/posts");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json; utf-8");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+
+        String jsonInputString = "{\n" +
+                "    \"title\": \"Foo\",\n" +
+                "    \"body\": \"bar\",\n" +
+                "    \"userId\": \"1\"\n" +
+                "}";
+
+
+        OutputStream os = con.getOutputStream();
+        byte[] input = jsonInputString.getBytes("utf-8");
+        os.write(input, 0, input.length);
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+            response.append(responseLine.trim());
+        }
+        System.out.println(response.toString());
+
+
+    }
+
     public void executeService3(){
 
         HttpURLConnection connection = null;
