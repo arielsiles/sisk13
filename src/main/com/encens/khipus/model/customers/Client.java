@@ -105,6 +105,10 @@ public class Client implements BaseModel {
     private ClientType clientType;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipodocfac", nullable = false)
+    private DocumentType invoiceDocumentType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
     private CustomerCategory customerCategory;
 
@@ -320,5 +324,13 @@ public class Client implements BaseModel {
 
     public void setGuarantee(Double guarantee) {
         this.guarantee = guarantee;
+    }
+
+    public DocumentType getInvoiceDocumentType() {
+        return invoiceDocumentType;
+    }
+
+    public void setInvoiceDocumentType(DocumentType invoiceDocumentType) {
+        this.invoiceDocumentType = invoiceDocumentType;
     }
 }

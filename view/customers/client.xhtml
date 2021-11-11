@@ -6,6 +6,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 <ui:define name="pageTitle">
     <c:choose>
@@ -117,7 +118,7 @@
     </s:div>
 
     <s:div id="institutionData">
-        <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <!--<s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Client.nit']}</ui:define>
             <h:inputText id="idNumber"
                          value="#{client.nitNumber}"
@@ -126,14 +127,14 @@
                          styleClass="input"
                          tabindex="6">
             </h:inputText>
-        </s:decorate>
+        </s:decorate>-->
 
-        <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <!--<s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Client.businessName']}</ui:define>
             <h:inputText id="businessName" value="#{client.businessName}" required="true"
                          maxlength="200" tabindex="7" styleClass="input">
             </h:inputText>
-        </s:decorate>
+        </s:decorate>-->
     </s:div>
 
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -200,6 +201,56 @@
             <s:convertEntity/>
         </h:selectOneMenu>
     </s:decorate>
+
+    <app:fieldset id="dataToBillFielset" title="#{messages['Invoice.dataToBill']}">
+
+        <s:decorate id="documentField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.document']}</ui:define>
+            <h:selectOneMenu id="documentType"
+                             value="#{client.invoiceDocumentType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{documentTypeList}"
+                               var="documentType"
+                               label="#{documentType.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             action="#{clientAction.updateShowNitExtension()}"
+                             reRender="documentDiv"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:div id="documentDiv">
+
+            <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{clientAction.showNitExtension}" >
+                <ui:define name="label">#{messages['Client.nit']}</ui:define>
+                <h:inputText id="idNumber"
+                             value="#{client.nitNumber}"
+                             required="true"
+                             maxlength="100"
+                             styleClass="input"
+                             tabindex="6">
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{clientAction.showNitExtension or clientAction.showIdNumberExtension}">
+                <ui:define name="label">#{messages['Client.businessName']}</ui:define>
+                <h:inputText id="businessName" value="#{client.businessName}" required="true"
+                             maxlength="200" tabindex="7" styleClass="input">
+                </h:inputText>
+            </s:decorate>
+
+        </s:div>
+
+
+
+
+    </app:fieldset>
 
 
 </s:div>
