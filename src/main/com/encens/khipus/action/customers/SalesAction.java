@@ -18,7 +18,6 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -27,11 +26,12 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Name("salesAction")
-@Scope(ScopeType.PAGE)
+@Scope(ScopeType.CONVERSATION)
 public class SalesAction {
 
     private ProductItem productItem;
@@ -375,7 +375,7 @@ public class SalesAction {
     }
 
 
-    public void registerCashSale(){
+    public void registerCashSale() throws IOException {
         System.out.println("......Registrando Venta al Contado...");
         checkMinimumValues();
 
@@ -390,11 +390,7 @@ public class SalesAction {
 
             inventoryService.updateInventoryForSales(customerOrder);
 
-            try {
-                billControllerAction.testBillController(customerOrder);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            billControllerAction.createBill(customerOrder);
 
             clearAll();
             assignCustomerOrderTypeDefault();

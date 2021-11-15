@@ -22,4 +22,5 @@ public interface MovementService extends GenericService {
     void createMovement(Movement movement);
     List<Movement> findMovementByDate(Date date);
     List<ArticleOrder> findArticleOrdersByCustomerOrder(CustomerOrder order);
+    void updateMovement(Movement movement);
 }

@@ -19,7 +19,6 @@ public class ClientAction extends GenericAction<Client> {
     private Boolean personFlag = Boolean.TRUE;
 
     private boolean showNitExtension = false;
-    private boolean showIdNumberExtension = false;
 
     @Factory(value = "client", scope = ScopeType.STATELESS)
     public Client initClient() {
@@ -67,12 +66,6 @@ public class ClientAction extends GenericAction<Client> {
 
     public void updateShowNitExtension() {
         showNitExtension = true;
-        showIdNumberExtension = false;
-    }
-
-    public void updateShowIdNumberExtension() {
-        showIdNumberExtension = true;
-        showNitExtension = false;
     }
 
     public void changePersonFlag(){
@@ -102,13 +95,5 @@ public class ClientAction extends GenericAction<Client> {
 
     public void setShowNitExtension(boolean showNitExtension) {
         this.showNitExtension = showNitExtension;
-    }
-
-    public boolean isShowIdNumberExtension() {
-        return showIdNumberExtension;
-    }
-
-    public void setShowIdNumberExtension(boolean showIdNumberExtension) {
-        this.showIdNumberExtension = showIdNumberExtension;
     }
 }

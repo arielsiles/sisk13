@@ -69,4 +69,10 @@ public class MovementServiceBean extends ExtendedGenericServiceBean implements M
         return  articleOrders;
     }
 
+    @Override
+    public void updateMovement(Movement movement) {
+        em.merge(movement);
+        em.flush();
+    }
+
 }

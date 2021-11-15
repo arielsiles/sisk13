@@ -90,6 +90,30 @@ public class Movement implements BaseModel {
     @Column(name = "NRO_AUTORIZACION")
     private String authorizationNumber;
 
+    @Column(name = "CUF")
+    private String cuf;
+
+    @Column(name = "FECHASIN")
+    private String fechaSin;
+
+    @Column(name = "LEYENDA")
+    private String leyenda;
+
+    @Column(name = "DESCRI")
+    private String descri;
+
+    @Column(name = "CODESTADO")
+    private String codigoEstado;
+
+    @Column(name = "CODIGOREC")
+    private String codigoRecepcion;
+
+    @Column(name = "FACTURA")
+    @Lob
+    private String factura;
+
+    /** **/
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "ID_TMPDET", nullable = true, insertable = true, updatable = false)
     private VoucherDetail voucherDetailFiscalDebit;
@@ -272,5 +296,62 @@ public class Movement implements BaseModel {
 
     public void setFiscalDebit(BigDecimal fiscalDebit) {
         this.fiscalDebit = fiscalDebit;
+    }
+
+    /** SIN DATA **/
+    public String getCuf() {
+        return cuf;
+    }
+
+    public void setCuf(String cuf) {
+        this.cuf = cuf;
+    }
+
+    public String getFechaSin() {
+        return fechaSin;
+    }
+
+    public void setFechaSin(String fechaSin) {
+        this.fechaSin = fechaSin;
+    }
+
+    public String getLeyenda() {
+        return leyenda;
+    }
+
+    public void setLeyenda(String leyenda) {
+        this.leyenda = leyenda;
+    }
+
+    public String getDescri() {
+        return descri;
+    }
+
+    public void setDescri(String descri) {
+        this.descri = descri;
+    }
+
+    public String getCodigoEstado() {
+        return codigoEstado;
+    }
+
+    public void setCodigoEstado(String codigoEstado) {
+        this.codigoEstado = codigoEstado;
+    }
+
+    public String getCodigoRecepcion() {
+        return codigoRecepcion;
+    }
+
+    public void setCodigoRecepcion(String codigoRecepcion) {
+        this.codigoRecepcion = codigoRecepcion;
+    }
+
+    public String getFactura() {
+        return factura;
+    }
+
+    public void setFactura(String factura) {
+        this.factura = factura;
     }
 }

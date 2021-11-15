@@ -83,7 +83,7 @@
                 action="#{salesAction.openSale()}"
                 rendered="#{s:hasPermission('SALES', 'VIEW')}"
                 styleClass="tab-cell"
-                propagation="none"/>
+                propagation="begin"/>
 
         <s:link view="/customers/clientList.xhtml"
                 value="#{messages['menu.customers.client']}"

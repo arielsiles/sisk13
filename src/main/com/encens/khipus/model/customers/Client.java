@@ -105,8 +105,12 @@ public class Client implements BaseModel {
     private ClientType clientType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idtipodocfac", nullable = false)
+    @JoinColumn(name = "idtipodocsin", referencedColumnName = "idtipodocumento")
     private DocumentType invoiceDocumentType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idmetodopagosin", referencedColumnName = "idmetodopago")
+    private PaymentMethodSin paymentMethodSin;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
@@ -332,5 +336,13 @@ public class Client implements BaseModel {
 
     public void setInvoiceDocumentType(DocumentType invoiceDocumentType) {
         this.invoiceDocumentType = invoiceDocumentType;
+    }
+
+    public PaymentMethodSin getPaymentMethodSin() {
+        return paymentMethodSin;
+    }
+
+    public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
+        this.paymentMethodSin = paymentMethodSin;
     }
 }

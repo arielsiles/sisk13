@@ -33,6 +33,12 @@ public class Dosage implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dosage.tableGenerator")
     private Long id;
 
+    @Column(name="caeb")
+    private String economicActivityCode;
+
+    @Column(name="cod_docsector")
+    private Integer sectorDocumentCode; // 1:FACTURA COMPRA-VENTA | 2:RECIBO DE ALQUILER DE BIENES INMUEBLES | ...
+
     @Column(name = "NROAUTORIZACION", nullable = false)
     private Long authorizationNumber;
 
@@ -201,5 +207,21 @@ public class Dosage implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getEconomicActivityCode() {
+        return economicActivityCode;
+    }
+
+    public void setEconomicActivityCode(String economicActivityCode) {
+        this.economicActivityCode = economicActivityCode;
+    }
+
+    public Integer getSectorDocumentCode() {
+        return sectorDocumentCode;
+    }
+
+    public void setSectorDocumentCode(Integer sectorDocumentCode) {
+        this.sectorDocumentCode = sectorDocumentCode;
     }
 }

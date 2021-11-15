@@ -304,6 +304,9 @@ public final class Constants {
 
     public static final String MOVEMENT_STATE_V = "V";
 
+    public static final Integer CODIGO_MONEDA_SIN = 1;
+    public static final Integer TIPO_CAMBIO_SIN = 1;
+
     private Constants() {
     }
 }

@@ -21,6 +21,9 @@
     <factory name="creditTypeList" value="#{creditTypeQuery}"/>
     <framework:entity-query name="creditTypeQuery" ejbql="select c from CreditType c"/>
 
+    <factory name="paymentMethodSinList" value="#{PaymentMethodSinQuery}"/>
+    <framework:entity-query name="PaymentMethodSinQuery" ejbql="select p from PaymentMethodSin p"/>
+
     <factory name="discountPolicyTypeList" value="#{discountPolicyTypeQuery}"/>
     <framework:entity-query name="discountPolicyTypeQuery" ejbql="select d from DiscountPolicyType d"
                             order="d.measurement DESC">

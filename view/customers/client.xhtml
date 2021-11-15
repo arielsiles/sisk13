@@ -225,9 +225,8 @@
 
         <s:div id="documentDiv">
 
-            <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow"
-                        rendered="#{clientAction.showNitExtension}" >
-                <ui:define name="label">#{messages['Client.nit']}</ui:define>
+            <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.nitOrCi']}</ui:define>
                 <h:inputText id="idNumber"
                              value="#{client.nitNumber}"
                              required="true"
@@ -237,8 +236,7 @@
                 </h:inputText>
             </s:decorate>
 
-            <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow"
-                        rendered="#{clientAction.showNitExtension or clientAction.showIdNumberExtension}">
+            <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Client.businessName']}</ui:define>
                 <h:inputText id="businessName" value="#{client.businessName}" required="true"
                              maxlength="200" tabindex="7" styleClass="input">
@@ -247,6 +245,20 @@
 
         </s:div>
 
+        <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.paymentMethod']}</ui:define>
+            <h:selectOneMenu id="paymentMethod"
+                             value="#{client.paymentMethodSin}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{paymentMethodSinList}"
+                               var="paymentMethod"
+                               label="#{paymentMethod.description}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
 
 

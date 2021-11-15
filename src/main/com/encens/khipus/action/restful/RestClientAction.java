@@ -22,6 +22,71 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class RestClientAction {
 
+    public void executeService5() throws IOException {
+
+
+        URL url = new URL ("http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/bills");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json; utf-8");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+
+        String jsonInputString = "{\n" +
+                "  \"numeroFactura\": 4,\n" +
+                "  \"nombreRazonSocial\": \"RAMIREZ\",\n" +
+                "  \"codigoTipoDocumentoIdentidad\": 1,\n" +
+                "  \"numeroDocumento\": \"5153244\",\n" +
+                "  \"codigoCliente\": \"10101010\",\n" +
+                "  \"codigoMetodoPago\": 1,\n" +
+                "  \"usuario\": \"milena\",\n" +
+                "  \"codigoDocumentoSector\": 1,\n" +
+                "  \"codigoMoneda\": 1,\n" +
+                "  \"tipoCambio\": 1,\n" +
+                "  \"montoTotal\": 500,\n" +
+                "  \"montoTotalSujetoIva\": 500,\n" +
+                "  \"montoTotalMoneda\": 500,\n" +
+                "  \"detalle\": [\n" +
+                "    {\n" +
+                "      \"actividadEconomica\": \"105000\",\n" +
+                "      \"codigoProductoSin\": 22221,\n" +
+                "      \"codigoProducto\": \"JN-22221\",\n" +
+                "      \"unidadMedida\": 26,\n" +
+                "      \"descripcion\": \"LECHE EVAPORADA\",\n" +
+                "      \"cantidad\": 10,\n" +
+                "      \"precioUnitario\": 7.5,\n" +
+                "      \"montoDescuento\": 0,\n" +
+                "      \"subTotal\": 75\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"actividadEconomica\": \"105000\",\n" +
+                "      \"codigoProductoSin\": 22211,\n" +
+                "      \"codigoProducto\": \"JN-22211\",\n" +
+                "      \"unidadMedida\": 4,\n" +
+                "      \"descripcion\": \"LECHE ENTERA EN POLVO\",\n" +
+                "      \"cantidad\": 10,\n" +
+                "      \"precioUnitario\": 42.5,\n" +
+                "      \"montoDescuento\": 0,\n" +
+                "      \"subTotal\": 425\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+
+        OutputStream os = con.getOutputStream();
+        byte[] input = jsonInputString.getBytes("utf-8");
+        os.write(input, 0, input.length);
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+            response.append(responseLine.trim());
+        }
+        System.out.println(response.toString());
+
+
+    }
 
     public void executeService4() throws IOException {
 
