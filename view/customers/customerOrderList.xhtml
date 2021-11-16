@@ -289,11 +289,13 @@
 
                 <rich:column styleClass="center">
                     &#160;
-                    <h:commandLink action="#"
+                    <h:commandLink action="#{employeeAction.select(employeeItem)}"
                                    immediate="true">
                         <h:graphicImage value="/img/anular.gif" styleClass="select-image"
                                         title="#{messages['Common.annul']}"/>
+                        <s:conversationPropagation value="none"/>
                     </h:commandLink>
+
                 </rich:column>
 
             </rich:dataTable>

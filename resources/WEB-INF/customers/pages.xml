@@ -16,6 +16,15 @@
         </navigation>
     </page>
 
+    <page view-id="/employees/customerOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{customerOrderAction.cancelOrder(customerOrderItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/cancelOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/customers/documentType.xhtml" no-conversation-view-id="/customers/documentTypeList.xhtml">
         <navigation from-action="#{extensionAction.addExtension}">
             <rule if-outcome="Success">
