@@ -384,7 +384,7 @@
 				<text><![CDATA[SON:]]></text>
 			</staticText>
 			<image scaleImage="RetainShape" onErrorType="Icon" evaluationTime="Report">
-				<reportElement key="COMPANY_LOGO_ELEMENT" x="504" y="34" width="70" height="70" isRemoveLineWhenBlank="true"/>
+				<reportElement key="COMPANY_LOGO_ELEMENT" x="503" y="34" width="70" height="70" isRemoveLineWhenBlank="true"/>
 				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
@@ -392,7 +392,8 @@
 					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.0"/>
 				</box>
-				<imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/customers/reports/qr_inv.png")]]></imageExpression>
+				<imageExpression class="java.awt.Image"><![CDATA[com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(
+    new com.google.zxing.qrcode.QRCodeWriter().encode($P{llaveQR}, com.google.zxing.BarcodeFormat.QR_CODE, 300, 300))]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="402" y="0" width="70" height="11"/>

@@ -16,7 +16,8 @@ import javax.ws.rs.core.Response;*/
          Date date = new Date(new Long("1636818442561"));
          System.out.println("Fecha: " + date);
 
-         String urlcode = "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2";
+         //String urlcode = "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2";
+         String urlcode = "https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2";
 
          String paramNit = "valorNit";
          String paramCuf = "valorCuf";

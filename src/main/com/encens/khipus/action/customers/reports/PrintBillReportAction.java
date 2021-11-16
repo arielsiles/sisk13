@@ -139,16 +139,18 @@ public class PrintBillReportAction extends GenericReportAction {
         paramMap.put("fechasin", new Date(new Long(movement.getFechaSin())));
         paramMap.put("leyenda", movement.getLeyenda());
 
-        // "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2";
+        // https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=valorTamaño
         String urlcode = companyConfiguration.getQrcodeURL();
         String paramNit = "valorNit";
         String paramCuf = "valorCuf";
         String paramNroFactura = "valorNroFactura";
 
-        String newUrlCode = urlcode.replaceAll(paramNit, dosage.getCompanyNit());
-        newUrlCode = newUrlCode.replaceAll(paramCuf, movement.getCuf());
-        newUrlCode = newUrlCode.replaceAll(paramNroFactura, lastCustomerOrder.getMovement().getNumber().toString());
-        paramMap.put("llaveQR", newUrlCode);
+        urlcode = urlcode.replaceAll(paramNit, dosage.getCompanyNit());
+        urlcode = urlcode.replaceAll(paramCuf, movement.getCuf());
+        urlcode = urlcode.replaceAll(paramNroFactura, lastCustomerOrder.getMovement().getNumber().toString());
+        paramMap.put("llaveQR", urlcode);
+
+        System.out.println("URL CODE: " + urlcode);
 
         barcodeRenderer.generateQR(lastCustomerOrder.getMovement().getQrCode(), filePath);
         //barcodeRenderer.generateQR(newUrlCode, filePath);
