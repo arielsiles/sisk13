@@ -38,6 +38,15 @@ ALTER TABLE dosificacion ADD COLUMN cod_docsector INT(11) AFTER caeb;
 UPDATE dosificacion d SET d.`cod_docsector` = 1;
 --
 
+ALTER TABLE configuracion ADD COLUMN url_createbill VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN url_cancelbill VARCHAR(300) AFTER url_createbill;
+ALTER TABLE configuracion ADD COLUMN url_qr VARCHAR(300) AFTER url_cancelbill;
+
+UPDATE configuracion c SET c.`url_createbill` = 'http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/bills';
+UPDATE configuracion c SET c.`url_cancelbill` = 'http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/cancel-bill';
+UPDATE configuracion c SET c.`url_qr` = 'https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2';
+
+--
 ALTER TABLE movimiento ADD COLUMN CUF VARCHAR(255) AFTER NROFACTURA;
 ALTER TABLE movimiento ADD COLUMN FECHASIN VARCHAR(100) AFTER CUF;
 ALTER TABLE movimiento ADD COLUMN LEYENDA VARCHAR(300) AFTER NRO_AUTORIZACION;

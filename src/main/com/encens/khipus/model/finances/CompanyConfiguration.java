@@ -53,6 +53,15 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_createbill")
+    private String createbillURL;
+
+    @Column(name = "url_cancelbill")
+    private String cancelbillURL;
+
+    @Column(name = "url_qr")
+    private String qrcodeURL;
+
     @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1443,5 +1452,29 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPTAG(CashAccount ctaAlmPTAG) {
         this.ctaAlmPTAG = ctaAlmPTAG;
+    }
+
+    public String getCreatebillURL() {
+        return createbillURL;
+    }
+
+    public void setCreatebillURL(String createbillURL) {
+        this.createbillURL = createbillURL;
+    }
+
+    public String getCancelbillURL() {
+        return cancelbillURL;
+    }
+
+    public void setCancelbillURL(String cancelbillURL) {
+        this.cancelbillURL = cancelbillURL;
+    }
+
+    public String getQrcodeURL() {
+        return qrcodeURL;
+    }
+
+    public void setQrcodeURL(String qrcodeURL) {
+        this.qrcodeURL = qrcodeURL;
     }
 }

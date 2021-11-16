@@ -2,11 +2,13 @@ package com.encens.khipus.action.billing;
 
 import com.encens.khipus.action.restful.Json;
 import com.encens.khipus.exception.EntryNotFoundException;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Dosage;
 import com.encens.khipus.model.customers.Movement;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.rest.BillResponsePOJO;
 import com.encens.khipus.model.rest.DetallePedidoPOJO;
 import com.encens.khipus.model.rest.PedidoPOJO;
@@ -14,6 +16,7 @@ import com.encens.khipus.model.rest.ReceptionResponsePOJO;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.MovementService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +25,8 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,6 +53,12 @@ public class BillControllerAction {
     @In
     private MovementService movementService;
 
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+
+    @In
+    private FacesMessages facesMessages;
+
     public void testBillController(CustomerOrder customerOrder) throws JsonProcessingException {
         PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
         String jsonPedido = pedidoToJson(pedidoPOJO);
@@ -59,8 +70,16 @@ public class BillControllerAction {
 
     public void createBill(CustomerOrder customerOrder) throws IOException {
 
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        String url_createbill = companyConfiguration.getCreatebillURL();
+
         System.out.println("---------- BILLING ----------");
-        URL url = new URL ("http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/bills");
+        //URL url = new URL ("http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/bills");
+        URL url = new URL (url_createbill);
 
         PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
         String jsonPedido = pedidoToJson(pedidoPOJO);
