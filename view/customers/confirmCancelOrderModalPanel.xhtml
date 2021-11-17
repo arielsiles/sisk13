@@ -1,0 +1,84 @@
+<rich:modalPanel height="250" width="500" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Sales.confirmSale.title']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemListForm">
+
+        <!--<rich:panel id="registerSalePanel">-->
+        <app:fieldset id="managementFieldSet"  title="#{messages['Sales.confirmSale.resume']}">
+
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Cliente:</ui:define>
+                <h:outputText value="#{customerOrder.client.fullName}"/>
+            </s:decorate>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha:</ui:define>
+                <h:outputText value="#{customerOrder.orderDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                </h:outputText>
+            </s:decorate>
+            <br/>
+            <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">TOTAL:</ui:define>
+                <h:outputText value="#{customerOrder.totalAmount}" styleClass="textBold12Blue">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+
+            <br/>
+            <s:decorate id="cancellationReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Invoice.cancellationReason']}</ui:define>
+                <h:selectOneMenu id="cancellationReason"
+                                 value="#{customerOrderAction.cancellationReason}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="8">
+                    <s:selectItems value="#{cancellationReasonList}"
+                                   var="cancellationReason"
+                                   label="#{cancellationReason.description}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Observacion:</ui:define>
+                <h:inputText value="#{customerOrderAction.observationCancel}" styleClass="input250"/>
+            </s:decorate>
+
+        </app:fieldset>
+        <!--</rich:panel>-->
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="cancelOrderButton" value="Anular"
+                               action="#{customerOrderAction.annulOrder(customerOrder)}"
+                               styleClass="button"
+                               reRender="customerOrderList"/>
+
+
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, cancelOrderButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

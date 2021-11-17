@@ -289,12 +289,22 @@
 
                 <rich:column styleClass="center">
                     &#160;
-                    <h:commandLink action="#{employeeAction.select(employeeItem)}"
+
+                    <a4j:commandLink id="cashSaleCommandButton"
+                                       action="#{customerOrderAction.select(customerOrder)}"
+                                       value="Anular"
+                                       styleClass="button"
+                                       immediate="true"
+                                       oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
+                                       reRender="customerOrderList, confirmCancelOrderModalPanel">
+                    </a4j:commandLink>
+
+                    <!--<h:commandLink action="#{employeeAction.select(employeeItem)}"
                                    immediate="true">
                         <h:graphicImage value="/img/anular.gif" styleClass="select-image"
                                         title="#{messages['Common.annul']}"/>
                         <s:conversationPropagation value="none"/>
-                    </h:commandLink>
+                    </h:commandLink>-->
 
                 </rich:column>
 
@@ -311,6 +321,11 @@
         <s:decorate id="confirmBillingSpecialModalPanelContainer" template="/customers/confirmBillingSpecialModalPanel.xhtml">
             <ui:param name="containerId" value="confirmBillingSpecialModalPanelContainer"/>
             <ui:param name="dialogId" value="confirmBillingSpecialModalPanel"/>
+        </s:decorate>
+
+        <s:decorate id="confirmCancelOrderModalPanelContainer" template="/customers/confirmCancelOrderModalPanel.xhtml">
+            <ui:param name="containerId" value="confirmCancelOrderModalPanelContainer"/>
+            <ui:param name="dialogId" value="confirmCancelOrderModalPanel"/>
         </s:decorate>
 
     </ui:define>

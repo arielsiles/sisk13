@@ -9,10 +9,7 @@ import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Dosage;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.finances.CompanyConfiguration;
-import com.encens.khipus.model.rest.BillResponsePOJO;
-import com.encens.khipus.model.rest.DetallePedidoPOJO;
-import com.encens.khipus.model.rest.PedidoPOJO;
-import com.encens.khipus.model.rest.ReceptionResponsePOJO;
+import com.encens.khipus.model.rest.*;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.MovementService;
@@ -70,10 +67,11 @@ public class BillControllerAction {
 
     public void createBill(CustomerOrder customerOrder) throws IOException {
 
-        CompanyConfiguration companyConfiguration = null;
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        /*CompanyConfiguration companyConfiguration = null;
         try {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}*/
 
         String url_createbill = companyConfiguration.getCreatebillURL();
 
@@ -123,6 +121,49 @@ public class BillControllerAction {
         movement.setFactura(billResponsePOJO.getFactura());
 
         movementService.updateMovement(movement);
+    }
+
+    public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
+        System.out.println("---------- CANCEL BILL ----------");
+        if (customerOrder.getMovement() != null){
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            URL url = new URL (companyConfiguration.getCancelbillURL());
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO();
+            cancelBillPOJO.setCancellationReasonCode(reasonCode);
+            cancelBillPOJO.setCuf(customerOrder.getMovement().getCuf());
+
+            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
+            System.out.println(jsonCancelBill);
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            OutputStream os = con.getOutputStream();
+            byte[] input = jsonCancelBill.getBytes("utf-8");
+            os.write(input, 0, input.length);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+
+            String responseJsonString = response.toString();
+            System.out.println("---------- RESPONSE CANCEL BILL ----------");
+
+            JsonNode jsonNode = Json.parse(responseJsonString);
+            String result = Json.prettyPrint(jsonNode);
+            System.out.println(result);
+
+            Movement movement = customerOrder.getMovement();
+            movement.setState("A");
+            movement.setGloss(jsonNode.get("codigoDescripcion").asText());
+            movementService.updateMovement(movement);
+        }
     }
 
     public void createResponseObject(String responseJsonString) throws IOException {
@@ -204,6 +245,17 @@ public class BillControllerAction {
         try {
             return userService.findById(User.class, id);
         } catch (EntryNotFoundException e) {
+            return null;
+        }
+    }
+
+    private CompanyConfiguration getCompanyConfiguration(){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            return companyConfiguration;
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;
             return null;
         }
     }
