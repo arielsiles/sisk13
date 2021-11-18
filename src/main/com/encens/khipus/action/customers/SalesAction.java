@@ -204,6 +204,7 @@ public class SalesAction {
         articleOrder.setPromotion(0);
         articleOrder.setReposicion(0);
         articleOrder.setTotal(0);
+        articleOrder.setDiscount(0.0);
         articleOrder.setAmount(0.0);
         articleOrder.setCu(BigDecimal.ZERO);
         articleOrder.setUnitCost(BigDecimal.ZERO);
@@ -455,6 +456,12 @@ public class SalesAction {
             customerOrder.setTax(BigDecimalUtil.multiply(totalVar, Constants.VAT).doubleValue());
             customerOrder.setCommissionValue(commissionValue.doubleValue());
             customerOrder.setCommissionPercentage(client.getCommission());
+
+            for (ArticleOrder articleOrder : articleOrderList){
+                double discount = articleOrder.getAmount() * percentage.doubleValue();
+                articleOrder.setDiscount(discount);
+                //articleOrder.setAmount(articleOrder.getAmount()-discount);
+            }
         }
 
         if (subsidyEnun != null)
@@ -483,7 +490,7 @@ public class SalesAction {
         return customerOrder;
     }
 
-    private Movement createInvoice(CustomerOrder customerOrder){
+    public Movement createInvoice(CustomerOrder customerOrder){
         User user = getUser(currentUser.getId()); //
         Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
 

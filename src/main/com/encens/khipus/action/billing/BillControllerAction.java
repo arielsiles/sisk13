@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -68,15 +69,8 @@ public class BillControllerAction {
     public void createBill(CustomerOrder customerOrder) throws IOException {
 
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-        /*CompanyConfiguration companyConfiguration = null;
-        try {
-            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}*/
-
         String url_createbill = companyConfiguration.getCreatebillURL();
-
         System.out.println("---------- BILLING ----------");
-        //URL url = new URL ("http://ec2-3-17-55-228.us-east-2.compute.amazonaws.com:8080/api/billing/bills");
         URL url = new URL (url_createbill);
 
         PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
@@ -199,6 +193,8 @@ public class BillControllerAction {
         if (clientCode == null)
             clientCode = customerOrder.getClient().getNitNumber();
 
+        BigDecimal amountValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
+
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
         pedidoPOJO.setCodigoCliente(clientCode);
@@ -207,9 +203,9 @@ public class BillControllerAction {
         pedidoPOJO.setCodigoDocumentoSector(dosage.getSectorDocumentCode());
         pedidoPOJO.setCodigoMoneda(Constants.CODIGO_MONEDA_SIN);
         pedidoPOJO.setTipoCambio(Constants.TIPO_CAMBIO_SIN);
-        pedidoPOJO.setMontoTotal(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()));
-        pedidoPOJO.setMontoTotalSujetoIva(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()));
-        pedidoPOJO.setMontoTotalMoneda(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()));
+        pedidoPOJO.setMontoTotal(amountValue);
+        pedidoPOJO.setMontoTotalSujetoIva(amountValue);
+        pedidoPOJO.setMontoTotalMoneda(amountValue);
 
         List<DetallePedidoPOJO> detallePedidoPOJOList = new ArrayList<DetallePedidoPOJO>();
 
@@ -222,8 +218,8 @@ public class BillControllerAction {
             detalle.setDescripcion(articleOrder.getProductItem().getName());
             detalle.setCantidad(articleOrder.getQuantity());
             detalle.setPrecioUnitario(articleOrder.getPrice());
-            detalle.setMontoDescuento(0.0);
-            detalle.setSubTotal(articleOrder.getAmount());
+            detalle.setMontoDescuento(articleOrder.getDiscount());
+            detalle.setSubTotal(articleOrder.getAmount()-articleOrder.getDiscount());
 
             detallePedidoPOJOList.add(detalle);
         }

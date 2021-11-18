@@ -4,10 +4,13 @@ import com.encens.khipus.action.billing.BillControllerAction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.customers.CancellationReason;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.customers.Movement;
+import com.encens.khipus.service.customers.SaleService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author
@@ -20,6 +23,10 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
 
     @In(create = true)
     private BillControllerAction billControllerAction;
+    @In
+    private SalesAction salesAction;
+    @In
+    private SaleService saleService;
 
     private CancellationReason cancellationReason;
     private String observationCancel;
@@ -45,6 +52,20 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
         cleanAnnulOrder();
     }
+
+    public void executeBilling(List<CustomerOrder> customerOrderList) throws IOException {
+
+        for (CustomerOrder customerOrder : customerOrderList){
+            System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " + customerOrder.getTotalAmount());
+
+            Movement movement = salesAction.createInvoice(customerOrder);
+            customerOrder.setMovement(movement);
+            saleService.updateCustomerOrder(customerOrder);
+            billControllerAction.createBill(customerOrder);
+        }
+
+    }
+
 
     public void cleanAnnulOrder(){
         setCancellationReason(null);

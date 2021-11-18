@@ -122,6 +122,16 @@
 
 
                 <s:div styleClass="buttonsLeft">
+
+                    <a4j:commandButton id="executeBillingId"
+                                     action="#{customerOrderAction.executeBilling(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     reRender="customerOrderList"
+                                     value="#{messages['Common.invoice']}" >
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    -
                     <h:commandButton id="searchButtonId"
                                      action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"

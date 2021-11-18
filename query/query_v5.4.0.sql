@@ -11,6 +11,14 @@ ALTER TABLE personacliente ADD COLUMN idtipodocsin BIGINT(20) AFTER telefono;
 UPDATE tipodocumento d SET d.`codsin` = 1 WHERE d.`nombre` = 'CI';
 UPDATE tipodocumento d SET d.`codsin` = 5 WHERE d.`nombre` = 'NIT';
 
+INSERT INTO tipodocumento VALUES (3, 'PERSON', 'CEX - CEDULA DE IDENTIDAD DE EXTRANJERO', 2, 0, 1);
+INSERT INTO tipodocumento VALUES (4, 'PERSON', 'PAS - PASAPORTE', 3, 0, 1);
+INSERT INTO tipodocumento VALUES (5, 'PERSON', 'OD - OTRO DOCUMENTO DE IDENTIDAD', 4, 0, 1);
+
+UPDATE tipodocumento d SET d.`nombre` = 'CI - CEDULA DE IDENTIDAD' WHERE d.`nombre` = 'CI';
+UPDATE tipodocumento d SET d.`nombre` = 'NIT - NUMERO DE IDENTIFICACION TRIBUTARIA' WHERE d.`nombre` = 'NIT';
+
+
 UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 2;
 UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 5;
 UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 8;
@@ -33,6 +41,8 @@ INSERT INTO sin_metodopago VALUES (4, 8, 'DEPOSITO EN CUENTA');
 INSERT INTO sin_metodopago VALUES (5, 5, 'OTROS');
 
 ALTER TABLE personacliente ADD COLUMN idmetodopagosin BIGINT(20) AFTER razonsocial;
+
+UPDATE personacliente p SET p.`idmetodopagosin` = 1 WHERE p.`idmetodopagosin` IS NULL;
 
 ALTER TABLE dosificacion ADD COLUMN cod_docsector INT(11) AFTER caeb;
 UPDATE dosificacion d SET d.`cod_docsector` = 1;
@@ -66,6 +76,11 @@ INSERT INTO sin_motivoanulacion VALUES (1, 1, 'FACTURA MAL EMITIDA');
 INSERT INTO sin_motivoanulacion VALUES (2, 2, 'NOTA DE CREDITO-DEBITO MAL EMITIDA');
 INSERT INTO sin_motivoanulacion VALUES (3, 3, 'DATOS DE EMISION INCORRECTOS');
 INSERT INTO sin_motivoanulacion VALUES (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
+
+--
+
+ALTER TABLE articulos_pedido ADD COLUMN descuento DOUBLE AFTER total;
+UPDATE articulos_pedido a SET a.`descuento` = 0 WHERE a.`descuento` IS NULL;
 
 --
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1400	;
