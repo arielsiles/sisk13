@@ -377,6 +377,16 @@ public class CustomerOrder implements BaseModel  {
         return result;
     }
 
+    public String isValidInvoice(){
+        String result = "NO";
+        if (getMovement() != null){
+            if (getMovement().getCodigoEstado() != null)
+                if (getMovement().getCodigoEstado().equals("908"))
+                    result = "SI";
+        }
+        return result;
+    }
+
     public Boolean getFlagct() {
         return flagct;
     }

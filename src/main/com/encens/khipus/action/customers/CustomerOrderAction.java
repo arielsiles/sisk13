@@ -5,9 +5,12 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.customers.CancellationReason;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Movement;
+import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,8 +28,11 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     private BillControllerAction billControllerAction;
     @In
     private SalesAction salesAction;
+
     @In
     private SaleService saleService;
+    @In
+    private InventoryService inventoryService;
 
     private CancellationReason cancellationReason;
     private String observationCancel;
@@ -43,17 +49,27 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         return outCome;
     }
 
-    public void annulOrder(CustomerOrder customerOrder) throws IOException {
-        System.out.println("--->> " +   customerOrder.getCode() + " - " +
-                                        customerOrder.getClient().getFullName() + " - " +
-                                        customerOrder.getTotalAmount() + " - " +
-                                        cancellationReason.getDescription());
+    public void annulOrder(CustomerOrder customerOrder) {
+        System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " +
+                                        customerOrder.getTotalAmount() + " - " + cancellationReason.getDescription());
 
-        billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+        try {
+            billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorAnnulOrder");
+            return;
+        }
+
+        customerOrder.setState(SaleStatus.ANULADO);
+        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+
+        saleService.updateCustomerOrder(customerOrder);
         cleanAnnulOrder();
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
     }
 
-    public void executeBilling(List<CustomerOrder> customerOrderList) throws IOException {
+    public void executeBilling(List<CustomerOrder> customerOrderList) {
 
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " + customerOrder.getTotalAmount());
@@ -61,9 +77,12 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
             Movement movement = salesAction.createInvoice(customerOrder);
             customerOrder.setMovement(movement);
             saleService.updateCustomerOrder(customerOrder);
-            billControllerAction.createBill(customerOrder);
+            try {
+                billControllerAction.createBill(customerOrder);
+            } catch (IOException e) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+            }
         }
-
     }
 
 

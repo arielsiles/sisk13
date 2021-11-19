@@ -225,7 +225,7 @@
 
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="5%, 5%, 10%, 7%, 25%, 7%, 10%, 10%, 10%, 6%, 5%">
+                            width="100%" columnsWidth="5%, 5%, 5%, 5%, 25%, 5%, 5%, 7%, 10%, 10%, 6%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -240,6 +240,7 @@
                         <rich:column>#{messages['CustomerOrder.code']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.name']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.invoice']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.validInvoice']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.total']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.state']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.type']}</rich:column>
@@ -279,6 +280,10 @@
                     <h:outputText value="#{customerOrder.getInvoiceNumber()}"/>
                 </rich:column>
 
+                <rich:column styleClass="center">
+                    <h:outputText value="#{customerOrder.isValidInvoice()}"/>
+                </rich:column>
+
                 <rich:column styleClass="right">
                     <h:outputText value="#{customerOrder.totalAmount}">
                         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
@@ -305,6 +310,7 @@
                                        value="Anular"
                                        styleClass="button"
                                        immediate="true"
+                                       rendered="#{!salesAction.isAnnulled(customerOrder)}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                        reRender="customerOrderList, confirmCancelOrderModalPanel">
                     </a4j:commandLink>

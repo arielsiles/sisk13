@@ -67,54 +67,55 @@ public class BillControllerAction {
     }
 
     public void createBill(CustomerOrder customerOrder) throws IOException {
+        if (!hasInvoice(customerOrder)) {
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            String url_createbill = companyConfiguration.getCreatebillURL();
+            System.out.println("---------- BILLING ----------");
+            URL url = new URL(url_createbill);
 
-        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-        String url_createbill = companyConfiguration.getCreatebillURL();
-        System.out.println("---------- BILLING ----------");
-        URL url = new URL (url_createbill);
+            PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
+            String jsonPedido = pedidoToJson(pedidoPOJO);
+            System.out.println(jsonPedido);
 
-        PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
-        String jsonPedido = pedidoToJson(pedidoPOJO);
-        System.out.println(jsonPedido);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
 
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json; utf-8");
-        con.setRequestProperty("Accept", "application/json");
-        con.setDoOutput(true);
+            OutputStream os = con.getOutputStream();
+            byte[] input = jsonPedido.getBytes("utf-8");
+            os.write(input, 0, input.length);
 
-        OutputStream os = con.getOutputStream();
-        byte[] input = jsonPedido.getBytes("utf-8");
-        os.write(input, 0, input.length);
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-        StringBuilder response = new StringBuilder();
-        String responseLine = null;
-        while ((responseLine = br.readLine()) != null) {
-            response.append(responseLine.trim());
+            String responseJsonString = response.toString();
+            System.out.println("---------- RESPONSE ----------");
+
+            JsonNode jsonNode = Json.parse(responseJsonString);
+            String result = Json.prettyPrint(jsonNode);
+            System.out.println(result);
+
+            createResponseObject(responseJsonString);
+
+            BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
+
+            Movement movement = customerOrder.getMovement();
+            movement.setCuf(billResponsePOJO.getCuf());
+            movement.setFechaSin(billResponsePOJO.getFecha().toString());
+            movement.setLeyenda(billResponsePOJO.getLeyenda());
+            movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
+            movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
+            movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
+            movement.setFactura(billResponsePOJO.getFactura());
+
+            movementService.updateMovement(movement);
         }
-
-        String responseJsonString = response.toString();
-        System.out.println("---------- RESPONSE ----------");
-
-        JsonNode jsonNode = Json.parse(responseJsonString);
-        String result = Json.prettyPrint(jsonNode);
-        System.out.println(result);
-
-        createResponseObject(responseJsonString);
-
-        BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
-
-        Movement movement = customerOrder.getMovement();
-        movement.setCuf(billResponsePOJO.getCuf());
-        movement.setFechaSin(billResponsePOJO.getFecha().toString());
-        movement.setLeyenda(billResponsePOJO.getLeyenda());
-        movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
-        movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
-        movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
-        movement.setFactura(billResponsePOJO.getFactura());
-
-        movementService.updateMovement(movement);
     }
 
     public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
@@ -155,7 +156,8 @@ public class BillControllerAction {
 
             Movement movement = customerOrder.getMovement();
             movement.setState("A");
-            movement.setGloss(jsonNode.get("codigoDescripcion").asText());
+            movement.setCodigoEstado(jsonNode.get("codigoEstado").asText());
+            movement.setDescri(jsonNode.get("codigoDescripcion").asText());
             movementService.updateMovement(movement);
         }
     }
@@ -243,6 +245,16 @@ public class BillControllerAction {
         } catch (EntryNotFoundException e) {
             return null;
         }
+    }
+
+    private boolean hasInvoice(CustomerOrder customerOrder){
+        boolean result = false;
+
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getCuf() != null)
+                result = true;
+        }
+        return result;
     }
 
     private CompanyConfiguration getCompanyConfiguration(){

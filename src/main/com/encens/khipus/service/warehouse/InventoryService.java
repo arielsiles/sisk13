@@ -28,5 +28,6 @@ public interface InventoryService extends GenericService {
     public Warehouse findWarehouseByItemArticle(ProductItem productItem);
     void updateInventoryForSales(CustomerOrder customerOrder);
     void updateInventoryForProduction(ProductionProduct product);
+    void updateInventoryForSalesAnnuled(CustomerOrder customerOrder);
     void updateInventoryRemoveFromProduction(ProductionProduct product);
 }

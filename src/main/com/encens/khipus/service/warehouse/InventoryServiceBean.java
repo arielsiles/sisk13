@@ -101,6 +101,28 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
     }
 
     @Override
+    public void updateInventoryForSalesAnnuled(CustomerOrder customerOrder) {
+
+        for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
+            Inventory inventory = findInventoryByProductItemCode(articleOrder.getCodArt());
+            BigDecimal returnQuantity    = BigDecimalUtil.toBigDecimal(articleOrder.getTotal());
+            BigDecimal availableQuantity = inventory.getUnitaryBalance();
+
+            BigDecimal newAvailableQuantity = BigDecimalUtil.sum(availableQuantity, returnQuantity);
+            inventory.setUnitaryBalance(newAvailableQuantity);
+            eventEm.merge(inventory);
+            eventEm.flush();
+
+            InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(articleOrder.getCodArt());
+            inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+            eventEm.merge(inventoryDetail);
+            eventEm.flush();
+
+            saleService.updateArticleForInputs(articleOrder);
+        }
+    }
+
+    @Override
     public void updateInventoryRemoveFromProduction(ProductionProduct product){
 
         Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
