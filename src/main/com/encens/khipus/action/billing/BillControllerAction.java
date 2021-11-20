@@ -67,7 +67,7 @@ public class BillControllerAction {
     }
 
     public void createBill(CustomerOrder customerOrder) throws IOException {
-        if (!hasInvoice(customerOrder)) {
+        //if (!hasInvoice(customerOrder)) {
             CompanyConfiguration companyConfiguration = getCompanyConfiguration();
             String url_createbill = companyConfiguration.getCreatebillURL();
             System.out.println("---------- BILLING ----------");
@@ -115,7 +115,7 @@ public class BillControllerAction {
             movement.setFactura(billResponsePOJO.getFactura());
 
             movementService.updateMovement(movement);
-        }
+        //}
     }
 
     public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
@@ -248,7 +248,7 @@ public class BillControllerAction {
         }
     }
 
-    private boolean hasInvoice(CustomerOrder customerOrder){
+    public boolean hasInvoice(CustomerOrder customerOrder){
         boolean result = false;
 
         if (customerOrder.getMovement() != null){

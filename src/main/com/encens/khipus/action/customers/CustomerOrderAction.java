@@ -66,7 +66,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         saleService.updateCustomerOrder(customerOrder);
         cleanAnnulOrder();
 
-        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
+        //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
     }
 
     public void executeBilling(List<CustomerOrder> customerOrderList) {
@@ -74,11 +74,17 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         for (CustomerOrder customerOrder : customerOrderList){
             System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " + customerOrder.getTotalAmount());
 
-            Movement movement = salesAction.createInvoice(customerOrder);
-            customerOrder.setMovement(movement);
-            saleService.updateCustomerOrder(customerOrder);
+            if (customerOrder.getMovement() == null) {
+                Movement movement = salesAction.createInvoice(customerOrder);
+                customerOrder.setMovement(movement);
+                saleService.updateCustomerOrder(customerOrder);
+            }
+
             try {
-                billControllerAction.createBill(customerOrder);
+                System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
+                if (!billControllerAction.hasInvoice(customerOrder)){
+                    billControllerAction.createBill(customerOrder);
+                }
             } catch (IOException e) {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
             }

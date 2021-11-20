@@ -65,10 +65,12 @@
         <!--</rich:panel>-->
 
         <div class="buttonsRight">
-            <a4j:commandButton id="cancelOrderButton" value="Anular"
+            <a4j:commandButton id="annulOrderButton" value="Anular"
                                action="#{customerOrderAction.annulOrder(customerOrder)}"
                                styleClass="button"
-                               reRender="customerOrderList"/>
+                               reRender="customerOrderList">
+                <s:defaultAction/>
+            </a4j:commandButton>
 
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
@@ -77,7 +79,7 @@
         </div>
 
         <rich:componentControl for="#{dialogId}"
-                               attachTo="closeLink, cancelOrderButton"
+                               attachTo="closeLink, annulOrderButton"
                                operation="hide"
                                event="onclick"/>
     </h:form>

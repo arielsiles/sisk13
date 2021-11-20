@@ -305,7 +305,7 @@
                 <rich:column styleClass="center">
                     &#160;
 
-                    <a4j:commandLink id="cashSaleCommandButton"
+                    <a4j:commandButton id="cashSaleCommandButton"
                                        action="#{customerOrderAction.select(customerOrder)}"
                                        value="Anular"
                                        styleClass="button"
@@ -313,7 +313,7 @@
                                        rendered="#{!salesAction.isAnnulled(customerOrder)}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                        reRender="customerOrderList, confirmCancelOrderModalPanel">
-                    </a4j:commandLink>
+                    </a4j:commandButton>
 
                     <!--<h:commandLink action="#{employeeAction.select(employeeItem)}"
                                    immediate="true">
