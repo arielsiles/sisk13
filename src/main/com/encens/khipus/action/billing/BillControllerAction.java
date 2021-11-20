@@ -214,7 +214,8 @@ public class BillControllerAction {
         for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
             DetallePedidoPOJO detalle = new DetallePedidoPOJO();
             detalle.setActividadEconomica(dosage.getEconomicActivityCode());
-            detalle.setCodigoProductoSin(articleOrder.getProductItem().getProductItemCodeSin());
+            //detalle.setCodigoProductoSin(articleOrder.getProductItem().getProductItemCodeSin());
+            detalle.setCodigoProductoSin(articleOrder.getProductItem().getProductService().getProductCode().toString());
             detalle.setCodigoProducto(articleOrder.getCodArt());
             detalle.setUnidadMedida(articleOrder.getProductItem().getMeasureUnitSin());
             detalle.setDescripcion(articleOrder.getProductItem().getName());

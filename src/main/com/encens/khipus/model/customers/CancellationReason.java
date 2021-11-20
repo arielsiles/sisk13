@@ -14,7 +14,7 @@ import javax.persistence.*;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 @NamedQueries(
         {
-                @NamedQuery(name = "CancellationReason.findAll", query = "select o from ClientType o ")
+                @NamedQuery(name = "CancellationReason.findAll", query = "select o from CancellationReason o ")
         }
 )
 

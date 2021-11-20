@@ -64,6 +64,9 @@
     <factory name="cancellationReasonList" value="#{cancellationReasonQuery}"/>
     <framework:entity-query name="cancellationReasonQuery" ejbql="select c from CancellationReason c" />
 
+    <factory name="productsServicesList" value="#{productsServicesQuery}"/>
+    <framework:entity-query name="productsServicesQuery" ejbql="select c from ProductsServices c" />
+
     <factory name="customerCategoryList" value="#{customerCategoryQuery}"/>
     <framework:entity-query name="customerCategoryQuery" ejbql="select c from CustomerCategory c" />
 

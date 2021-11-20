@@ -3,6 +3,8 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.model.customers.Distributor;
+import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.production.MeasurementUnit;
@@ -145,6 +147,10 @@ public class ProductItem implements BaseModel {
     @Version
     @Column(name = "version")
     private long version;
+
+    @ManyToOne
+    @JoinColumn(name = "idprodutoservicio", referencedColumnName = "idprodutoservicio")
+    private ProductsServices productService;
 
     @ManyToOne
     @JoinColumns({
@@ -536,5 +542,13 @@ public class ProductItem implements BaseModel {
 
     public void setMeasureUnitSin(Integer measureUnitSin) {
         this.measureUnitSin = measureUnitSin;
+    }
+
+    public ProductsServices getProductService() {
+        return productService;
+    }
+
+    public void setProductService(ProductsServices productService) {
+        this.productService = productService;
     }
 }

@@ -69,7 +69,8 @@ ALTER TABLE movimiento ADD COLUMN FACTURA LONGTEXT AFTER CODIGOREC;
 CREATE TABLE sin_motivoanulacion (
 	idmotivoanulacion BIGINT(20) NOT NULL,
 	codigo INT(11),
-	descripcion VARCHAR(100)
+	descripcion VARCHAR(100),
+	PRIMARY KEY (idmotivoanulacion)
 );
 
 INSERT INTO sin_motivoanulacion VALUES (1, 1, 'FACTURA MAL EMITIDA');
@@ -81,6 +82,38 @@ INSERT INTO sin_motivoanulacion VALUES (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO 
 
 ALTER TABLE articulos_pedido ADD COLUMN descuento DOUBLE AFTER total;
 UPDATE articulos_pedido a SET a.`descuento` = 0 WHERE a.`descuento` IS NULL;
+
+-- 19.11.2021
+UPDATE personacliente p SET p.`idmetodopagosin` = 2
+WHERE p.`NOM` LIKE '%hiperma%'
+;
+
+UPDATE personacliente p SET p.`idmetodopagosin` = 3
+WHERE p.`NOM` LIKE '%hiperma%'
+;
+
+CREATE TABLE sin_produtoservicio (
+	idprodutoservicio BIGINT(20) NOT NULL,
+	codactividad VARCHAR(20), 
+	codproducto INT(11),
+	descproducto VARCHAR(100),
+	PRIMARY KEY (idprodutoservicio)
+);
+
+INSERT INTO sin_produtoservicio VALUES (1, '105000', 22290, 'PRODUCTOS LACTEOS N.C.P.');
+INSERT INTO sin_produtoservicio VALUES (2, '105000', 22229, 'LECHE Y CREMA N.C.P.');
+INSERT INTO sin_produtoservicio VALUES (3, '105000', 22230, 'YOGUR Y OTROS TIPOS DE LECHE O CREMA FERMENTADOS O ACIDIFICADOS');
+INSERT INTO sin_produtoservicio VALUES (4, '105000', 22251, 'QUESO DE LECHE DE BOVINO, FRESCOS O PROCESADOS');
+INSERT INTO sin_produtoservicio VALUES (5, '105000', 88150, 'SERVICIOS DE ELABORACIÓN DE PRODUCTOS LACTEOS');
+
+INSERT INTO sin_produtoservicio VALUES (6, '105000', 99100, 'OTROS PRODUCTOS O SERVICIOS ALCANZADOS POR EL IVA');
+
+ALTER TABLE inv_articulos ADD COLUMN idprodutoservicio BIGINT(20) AFTER cod_art;
+
+ALTER TABLE inv_articulos ADD FOREIGN KEY (idprodutoservicio) REFERENCES sin_produtoservicio (idprodutoservicio);
+
+UPDATE inv_articulos i SET i.`idprodutoservicio` = 1 WHERE i.`cod_alm` IN (2, 8);
+UPDATE inv_articulos i SET i.`idprodutoservicio` = 6 WHERE i.`cod_alm` IN (5);
 
 --
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1400	;
