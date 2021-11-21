@@ -458,9 +458,9 @@ public class SalesAction {
             customerOrder.setCommissionPercentage(client.getCommission());
 
             for (ArticleOrder articleOrder : articleOrderList){
-                double discount = articleOrder.getAmount() * percentage.doubleValue();
-                articleOrder.setDiscount(discount);
-                //articleOrder.setAmount(articleOrder.getAmount()-discount);
+                //double discount = articleOrder.getAmount() * percentage.doubleValue();
+                BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getAmount()), percentage);
+                articleOrder.setDiscount(discountValue.doubleValue());
             }
         }
 
