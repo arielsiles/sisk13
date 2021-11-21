@@ -14,7 +14,7 @@
         <h:form id="customerOrderSearch">
 
         <rich:simpleTogglePanel label="#{messages['CustomerOrder.search']}" switchType="customerOrder">
-            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
+            <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width33percent, width33percent, width33percent">
 
                 <s:div id="leftSidePanel">
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
@@ -59,7 +59,7 @@
 
                 </s:div>
 
-                <s:div id="rightSidePanel">
+                <s:div id="centerSidePanel">
 
                     <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
@@ -100,6 +100,33 @@
                         <h:inputText id="invoice" value="#{customerOrderDataModel.invoice}"
                                      maxlength="150" tabindex="7" styleClass="input">
                         </h:inputText>
+                        <!--<a4j:commandButton action="#{customerOrderDataModel.search}"
+                                           reRender="customerOrderList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                            <s:defaultAction/>
+                        </a4j:commandButton>-->
+                    </s:decorate>
+                </s:div>
+
+                <s:div id="rightSidePanel">
+
+                    <s:decorate id="territoryField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.territory']}</ui:define>
+                        <h:selectOneMenu id="territory"
+                                         value="#{customerOrderDataModel.territoriotrabajo}"
+                                         styleClass="inputMedium"
+                                         immediate="true"
+                                         tabindex="10">
+                            <s:selectItems value="#{territoriotrabajoList}" var="territoriotrabajo"
+                                           label="#{territoriotrabajo.nombre}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="true" />
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <a4j:commandButton action="#{customerOrderDataModel.search}"
                                            reRender="customerOrderList, dataScroller"
                                            styleClass="button"
@@ -107,6 +134,7 @@
                             <s:defaultAction/>
                         </a4j:commandButton>
                     </s:decorate>
+
                 </s:div>
 
                 <rich:jQuery selector="#name" query="focus()" timing="onload"/>
@@ -131,7 +159,17 @@
                                      value="#{messages['Common.invoice']}" >
                         <s:defaultAction/>
                     </a4j:commandButton>
+
+                    <h:commandButton id="generateInvoicesId"
+                                       action="#{printBillReportAction.generateInvoicesReport(customerOrderDataModel.selectedCustomerOrdes)}"
+                                       styleClass="button"
+                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                       value="Imprimir Facts" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
                     -
+
                     <h:commandButton id="searchButtonId"
                                      action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
@@ -223,9 +261,10 @@
 
             </h:panelGrid>
 
+            <!--rows="#{sessionUser.rowsPerPage50}"-->
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
-                            rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="5%, 5%, 5%, 5%, 25%, 5%, 5%, 7%, 10%, 10%, 6%, 5%">
+                            rows="20"
+                            width="100%" columnsWidth="2%, 5%, 5%, 5%, 25%, 5%, 10%, 7%, 10%, 10%, 6%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -240,7 +279,7 @@
                         <rich:column>#{messages['CustomerOrder.code']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.name']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.invoice']}</rich:column>
-                        <rich:column>#{messages['CustomerOrder.validInvoice']}</rich:column>
+                        <rich:column>#{messages['CustomerOrder.invoiceStatusSIN']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.total']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.state']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.type']}</rich:column>
@@ -281,7 +320,7 @@
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    <h:outputText value="#{customerOrder.isValidInvoice()}"/>
+                    <h:outputText value="#{customerOrder.getInvoiceStatusSIN()}"/>
                 </rich:column>
 
                 <rich:column styleClass="right">
@@ -305,6 +344,7 @@
                 <rich:column styleClass="center">
                     &#160;
 
+                    <!--action="#{customerOrderAction.select(customerOrder)}"-->
                     <a4j:commandButton id="cashSaleCommandButton"
                                        action="#{customerOrderAction.select(customerOrder)}"
                                        value="Anular"
@@ -315,12 +355,7 @@
                                        reRender="customerOrderList, confirmCancelOrderModalPanel">
                     </a4j:commandButton>
 
-                    <!--<h:commandLink action="#{employeeAction.select(employeeItem)}"
-                                   immediate="true">
-                        <h:graphicImage value="/img/anular.gif" styleClass="select-image"
-                                        title="#{messages['Common.annul']}"/>
-                        <s:conversationPropagation value="none"/>
-                    </h:commandLink>-->
+
 
                 </rich:column>
 

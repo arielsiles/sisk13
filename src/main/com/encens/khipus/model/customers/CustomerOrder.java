@@ -387,6 +387,18 @@ public class CustomerOrder implements BaseModel  {
         return result;
     }
 
+    public String getInvoiceStatusSIN(){
+        String result = "";
+        if (getMovement() != null){
+            if (getMovement().getCuf() != null){
+                result = getMovement().getDescri();
+                if (result.equals("ANULACION CONFIRMADA"))
+                    result = "ANULADA";
+            }
+        }
+        return result;
+    }
+
     public Boolean getFlagct() {
         return flagct;
     }

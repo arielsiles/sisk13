@@ -58,6 +58,9 @@
     <factory name="customerOrderTypeList" value="#{customerOrderTypeQuery}"/>
     <framework:entity-query name="customerOrderTypeQuery" ejbql="select c from CustomerOrderType c "/>
 
+    <factory name="territoriotrabajoList" value="#{territoriotrabajoQuery}"/>
+    <framework:entity-query name="territoriotrabajoQuery" ejbql="select c from Territoriotrabajo c "/>
+
     <factory name="clientTypeList" value="#{clientTypeQuery}"/>
     <framework:entity-query name="clientTypeQuery" ejbql="select c from ClientType c" />
 

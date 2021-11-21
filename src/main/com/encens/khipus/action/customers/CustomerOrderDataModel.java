@@ -4,6 +4,7 @@ import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.CustomerOrderType;
 import com.encens.khipus.model.customers.SaleTypeEnum;
+import com.encens.khipus.model.customers.Territoriotrabajo;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -29,6 +30,7 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
     private String maidenName;
     private SaleTypeEnum saleType;
     private CustomerOrderType customerOrderType;
+    private Territoriotrabajo territoriotrabajo;
     private Integer invoice;
     private Date initDate;
     private Date endDate;
@@ -36,6 +38,7 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
     private static final String[] RESTRICTIONS = {
             "customerOrder.saleType = #{customerOrderDataModel.saleType}",
             "customerOrder.customerOrderType = #{customerOrderDataModel.customerOrderType}",
+            "customerOrder.client.territoriotrabajo = #{customerOrderDataModel.territoriotrabajo}",
             "customerOrder.movement.number = #{customerOrderDataModel.invoice}",
             "customerOrder.orderDate >= #{customerOrderDataModel.initDate}",
             "customerOrder.orderDate <= #{customerOrderDataModel.endDate}",
@@ -47,7 +50,7 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
 
     @Create
     public void init() {
-        sortProperty = "customerOrder.orderDate";
+        sortProperty = "customerOrder.id";
         sortAsc = false;
     }
 
@@ -135,5 +138,13 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
 
     public void setCustomerOrderType(CustomerOrderType customerOrderType) {
         this.customerOrderType = customerOrderType;
+    }
+
+    public Territoriotrabajo getTerritoriotrabajo() {
+        return territoriotrabajo;
+    }
+
+    public void setTerritoriotrabajo(Territoriotrabajo territoriotrabajo) {
+        this.territoriotrabajo = territoriotrabajo;
     }
 }

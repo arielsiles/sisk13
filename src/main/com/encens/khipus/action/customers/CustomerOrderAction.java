@@ -6,6 +6,8 @@ import com.encens.khipus.model.customers.CancellationReason;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.customers.SaleStatus;
+import com.encens.khipus.model.finances.VoucherState;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import org.jboss.seam.ScopeType;
@@ -33,6 +35,8 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     private SaleService saleService;
     @In
     private InventoryService inventoryService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     private CancellationReason cancellationReason;
     private String observationCancel;
@@ -64,6 +68,12 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         inventoryService.updateInventoryForSalesAnnuled(customerOrder);
 
         saleService.updateCustomerOrder(customerOrder);
+
+        if (customerOrder.getVoucher() != null){
+            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
+            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+        }
+
         cleanAnnulOrder();
 
         //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
@@ -91,6 +101,10 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         }
     }
 
+
+    public void printInvoices(List<CustomerOrder> customerOrderList){
+
+    }
 
     public void cleanAnnulOrder(){
         setCancellationReason(null);

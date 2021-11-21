@@ -29,10 +29,7 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Encens S.R.L.
@@ -82,8 +79,8 @@ public class PrintBillReportAction extends GenericReportAction {
         this.customerOrderId = saleService.findLastSaleId(user);
         this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
 
-        moneyUtil = new MoneyUtil();
-        barcodeRenderer = new BarcodeRenderer();
+        //moneyUtil = new MoneyUtil();
+        //barcodeRenderer = new BarcodeRenderer();
 
         setReportFormat(ReportFormat.PDF);
 
@@ -100,6 +97,59 @@ public class PrintBillReportAction extends GenericReportAction {
         }
     }
 
+    public void generateInvoicesReport(List<CustomerOrder> customerOrderList){
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Obtiene la dosificacion activa de la sucursal del usuario ? **/
+        setReportFormat(ReportFormat.PDF);
+
+        System.out.println("---------> Pedido List 0: " + customerOrderList.get(0));
+        System.out.println("---------> Pedido List 0: " + customerOrderList.get(0).getTotalAmount());
+
+        /*Map params = new HashMap();
+        params.putAll(getReportParams(dosage, customerOrderList.get(0)));
+        TypedReportData reportData = addDetailReport(params, customerOrderList.get(0));
+
+        for (int i=1 ; i< customerOrderList.size() ; i++){
+            Map paramsAdd = new HashMap();
+            paramsAdd.putAll(getReportParams(dosage, customerOrderList.get(i)));
+            TypedReportData reportDataAdd = addDetailReport(paramsAdd, customerOrderList.get(i));
+
+            for (Object jrPrintPage : reportDataAdd.getJasperPrint().getPages()) {
+                reportData.getJasperPrint().addPage((JRPrintPage) jrPrintPage);
+            }
+
+            reportData.getJasperPrint().getPages().addAll(reportDataAdd.getJasperPrint().getPages());
+
+        }
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+        } catch (IOException e) {e.printStackTrace();}
+        */
+
+        /*Map params = new HashMap();
+        params.putAll(getReportParams(dosage, customerOrderList.get(0)));*/
+
+        List<TypedReportData> reportDataList = new ArrayList<TypedReportData>();
+        for (CustomerOrder order : customerOrderList){
+            Map params = new HashMap();
+            params.putAll(getReportParams(dosage, order));
+            reportDataList.add(addDetailReport(params, order));
+        }
+
+        TypedReportData result = reportDataList.get(0);
+        for (int i=1 ; i < reportDataList.size() ; i++){
+            result.getJasperPrint().getPages().addAll(reportDataList.get(i).getJasperPrint().getPages());
+        }
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(result);
+            generationReportData.exportReport();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * get report params
@@ -108,6 +158,9 @@ public class PrintBillReportAction extends GenericReportAction {
      */
     private Map<String, Object> getReportParams(Dosage dosage, CustomerOrder lastCustomerOrder) {
         String filePath = FileCacheLoader.i.getPath("/customers/reports/qr_inv.png");
+
+        moneyUtil = new MoneyUtil();
+        barcodeRenderer = new BarcodeRenderer();
 
         CompanyConfiguration companyConfiguration = null;
         try {
