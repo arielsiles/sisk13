@@ -197,6 +197,10 @@ public class BillControllerAction {
 
         BigDecimal amountValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
 
+        /** todo parametrizar **/
+        pedidoPOJO.setCodigoSucursal(dosage.getBranchOffice().getOfficeCode());
+        pedidoPOJO.setCodigoPuntoVenta(dosage.getBranchOffice().getPosCode());
+
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
         pedidoPOJO.setCodigoCliente(clientCode);

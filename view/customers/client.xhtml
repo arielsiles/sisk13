@@ -153,6 +153,13 @@
                          style="width:200px;height:40px;"/>
     </s:decorate>
 
+    <s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.discount']}</ui:define>
+        <h:inputText id="discount" value="#{client.commission}" required="false" tabindex="8" styleClass="inputTiny">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:inputText>
+    </s:decorate>
+
 </s:div>
 
 <s:div>

@@ -5,6 +5,8 @@ import java.util.List;
 
 public class PedidoPOJO {
 
+    private Integer codigoSucursal;
+    private Integer codigoPuntoVenta;
     private Integer numeroFactura;
     private String nombreRazonSocial; //: RAMIREZ
     private Integer codigoTipoDocumentoIdentidad; // 1:CI - CEDULA DE IDENTIDAD | 2:CEX - CEDULA DE IDENTIDAD DE EXTRANJERO | 5:NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA
@@ -131,5 +133,21 @@ public class PedidoPOJO {
 
     public void setNumeroFactura(Integer numeroFactura) {
         this.numeroFactura = numeroFactura;
+    }
+
+    public Integer getCodigoSucursal() {
+        return codigoSucursal;
+    }
+
+    public void setCodigoSucursal(Integer codigoSucursal) {
+        this.codigoSucursal = codigoSucursal;
+    }
+
+    public Integer getCodigoPuntoVenta() {
+        return codigoPuntoVenta;
+    }
+
+    public void setCodigoPuntoVenta(Integer codigoPuntoVenta) {
+        this.codigoPuntoVenta = codigoPuntoVenta;
     }
 }

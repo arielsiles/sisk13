@@ -78,23 +78,29 @@ public class PrintBillReportAction extends GenericReportAction {
         Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
         this.customerOrderId = saleService.findLastSaleId(user);
         this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
-
-        //moneyUtil = new MoneyUtil();
-        //barcodeRenderer = new BarcodeRenderer();
-
         setReportFormat(ReportFormat.PDF);
 
-        String labelType = "ORIGINAL";
-        Map params = new HashMap();
-        params.putAll(getReportParams(dosage, lastCustomerOrder));
-        TypedReportData reportData =   addDetailReport(params, lastCustomerOrder);
+        if (lastCustomerOrder.getMovement() != null) {
+            if (lastCustomerOrder.getMovement().getDescri() != null) {
+                if (lastCustomerOrder.getMovement().getDescri().equals("VALIDADA")) {
 
-        try {
-            GenerationReportData generationReportData = new GenerationReportData(reportData);
-            generationReportData.exportReport();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                    String labelType = "ORIGINAL";
+                    Map params = new HashMap();
+                    params.putAll(getReportParams(dosage, lastCustomerOrder));
+                    TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
+
+                    try {
+                        GenerationReportData generationReportData = new GenerationReportData(reportData);
+                        generationReportData.exportReport();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+            } else
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+        }else
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"FACTURACION INVALIDA, Consulte con el Administrador");;
     }
 
     public void generateInvoicesReport(List<CustomerOrder> customerOrderList){

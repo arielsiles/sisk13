@@ -391,7 +391,14 @@ public class SalesAction {
 
             inventoryService.updateInventoryForSales(customerOrder);
 
-            billControllerAction.createBill(customerOrder);
+            try {
+                System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
+                if (!billControllerAction.hasInvoice(customerOrder)){
+                    billControllerAction.createBill(customerOrder);
+                }
+            } catch (IOException e) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+            }
 
             clearAll();
             assignCustomerOrderTypeDefault();
@@ -450,18 +457,21 @@ public class SalesAction {
 
         /** For commissions **/
         if (client.getCommission() > 0){
-            BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED);
+            BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED, 4);
             BigDecimal commissionValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
             BigDecimal totalVar = BigDecimalUtil.subtract(totalAmount, commissionValue);
             customerOrder.setTax(BigDecimalUtil.multiply(totalVar, Constants.VAT).doubleValue());
-            customerOrder.setCommissionValue(commissionValue.doubleValue());
+            //customerOrder.setCommissionValue(commissionValue.doubleValue());
             customerOrder.setCommissionPercentage(client.getCommission());
 
+            BigDecimal sumDiscount = BigDecimal.ZERO;
             for (ArticleOrder articleOrder : articleOrderList){
                 //double discount = articleOrder.getAmount() * percentage.doubleValue();
                 BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getAmount()), percentage);
                 articleOrder.setDiscount(discountValue.doubleValue());
+                sumDiscount = BigDecimalUtil.sum(sumDiscount, discountValue);
             }
+            customerOrder.setCommissionValue(sumDiscount.doubleValue());
         }
 
         if (subsidyEnun != null)

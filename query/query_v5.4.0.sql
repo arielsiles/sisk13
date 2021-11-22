@@ -115,6 +115,18 @@ ALTER TABLE inv_articulos ADD FOREIGN KEY (idprodutoservicio) REFERENCES sin_pro
 UPDATE inv_articulos i SET i.`idprodutoservicio` = 1 WHERE i.`cod_alm` IN (2, 8);
 UPDATE inv_articulos i SET i.`idprodutoservicio` = 6 WHERE i.`cod_alm` IN (5);
 
+-- 21.11.2021
+
+ALTER TABLE sucursal ADD COLUMN codsin INT(11) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN codpos INT(11) AFTER codsin;
+
+UPDATE sucursal s SET s.`codsin` = 0 WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`codpos` = 0 WHERE s.`IDSUCURSAL` = 1;
+
+UPDATE sucursal s SET s.`codsin` = 0 WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`codpos` = 1 WHERE s.`IDSUCURSAL` = 2;
+
+
 --
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1400	;
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1399	;

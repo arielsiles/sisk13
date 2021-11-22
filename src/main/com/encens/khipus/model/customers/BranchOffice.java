@@ -33,7 +33,13 @@ public class BranchOffice implements BaseModel {
     private String name;
 
     @Column(name="descripcion")
-    private String state;
+    private String description;
+
+    @Column(name="codsin")
+    private Integer officeCode;
+
+    @Column(name="codpos")
+    private Integer posCode;
 
     @Override
     public Long getId() {
@@ -52,11 +58,28 @@ public class BranchOffice implements BaseModel {
         this.name = key;
     }
 
-    public String getState() {
-        return state;
+
+    public String getDescription() {
+        return description;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getOfficeCode() {
+        return officeCode;
+    }
+
+    public void setOfficeCode(Integer officeCode) {
+        this.officeCode = officeCode;
+    }
+
+    public Integer getPosCode() {
+        return posCode;
+    }
+
+    public void setPosCode(Integer posCode) {
+        this.posCode = posCode;
     }
 }
