@@ -1,9 +1,7 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.util.Constants;
-import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
 
@@ -19,8 +17,8 @@ import javax.persistence.*;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Filter(name = Constants.COMPANY_FILTER_NAME)
-@EntityListeners(CompanyListener.class)
+/*@Filter(name = Constants.COMPANY_FILTER_NAME)*/
+/*@EntityListeners(CompanyListener.class)*/
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "sucursal")
 public class BranchOffice implements BaseModel {
 

@@ -132,6 +132,23 @@
                      tabindex="5"/>
     </s:decorate>
 
+
+    <s:decorate id="branchOfficeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.branchOfficeAndPos']}</ui:define>
+        <h:selectOneMenu id="branchOffice"
+                         value="#{user.branchOffice}"
+                         styleClass="input"
+                         immediate="true"
+                         tabindex="10">
+            <s:selectItems value="#{branchOfficeList}" var="branchOffice"
+                           label="#{branchOffice.description}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="true" />
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+
     <s:decorate id="financesUserField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['User.financesUser']}</ui:define>
         <h:selectBooleanCheckbox id="financesUser"

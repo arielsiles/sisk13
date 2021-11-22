@@ -80,9 +80,15 @@ public class PrintBillReportAction extends GenericReportAction {
         this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
         setReportFormat(ReportFormat.PDF);
 
-        if (lastCustomerOrder.getMovement() != null) {
+
+        if (!hasValidInvoice(lastCustomerOrder)){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+            return;
+        }
+
+        /*if (lastCustomerOrder.getMovement() != null) {
             if (lastCustomerOrder.getMovement().getDescri() != null) {
-                if (lastCustomerOrder.getMovement().getDescri().equals("VALIDADA")) {
+                if (lastCustomerOrder.getMovement().getDescri().equals("VALIDADA")) {*/
 
                     String labelType = "ORIGINAL";
                     Map params = new HashMap();
@@ -95,12 +101,26 @@ public class PrintBillReportAction extends GenericReportAction {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else
+
+                /*} else
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
             } else
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
         }else
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"FACTURACION INVALIDA, Consulte con el Administrador");;
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"FACTURACION INVALIDA, Consulte con el Administrador");*/
+    }
+
+    private boolean hasValidInvoice(CustomerOrder customerOrder){
+        boolean result = false;
+        if (customerOrder.getMovement() != null) {
+            if (customerOrder.getMovement().getDescri() != null) {
+                if (customerOrder.getMovement().getDescri().equals("VALIDADA")) {
+                    result = true;
+                }
+            }
+        }
+
+        return result;
     }
 
     public void generateInvoicesReport(List<CustomerOrder> customerOrderList){
@@ -111,33 +131,14 @@ public class PrintBillReportAction extends GenericReportAction {
         System.out.println("---------> Pedido List 0: " + customerOrderList.get(0));
         System.out.println("---------> Pedido List 0: " + customerOrderList.get(0).getTotalAmount());
 
-        /*Map params = new HashMap();
-        params.putAll(getReportParams(dosage, customerOrderList.get(0)));
-        TypedReportData reportData = addDetailReport(params, customerOrderList.get(0));
-
-        for (int i=1 ; i< customerOrderList.size() ; i++){
-            Map paramsAdd = new HashMap();
-            paramsAdd.putAll(getReportParams(dosage, customerOrderList.get(i)));
-            TypedReportData reportDataAdd = addDetailReport(paramsAdd, customerOrderList.get(i));
-
-            for (Object jrPrintPage : reportDataAdd.getJasperPrint().getPages()) {
-                reportData.getJasperPrint().addPage((JRPrintPage) jrPrintPage);
-            }
-
-            reportData.getJasperPrint().getPages().addAll(reportDataAdd.getJasperPrint().getPages());
-
-        }
-        try {
-            GenerationReportData generationReportData = new GenerationReportData(reportData);
-            generationReportData.exportReport();
-        } catch (IOException e) {e.printStackTrace();}
-        */
-
-        /*Map params = new HashMap();
-        params.putAll(getReportParams(dosage, customerOrderList.get(0)));*/
-
         List<TypedReportData> reportDataList = new ArrayList<TypedReportData>();
         for (CustomerOrder order : customerOrderList){
+
+            if (!hasValidInvoice(order)){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"FACTURACION INVALIDA, Consulte con el Administrador");
+                return;
+            }
+
             Map params = new HashMap();
             params.putAll(getReportParams(dosage, order));
             reportDataList.add(addDetailReport(params, order));
