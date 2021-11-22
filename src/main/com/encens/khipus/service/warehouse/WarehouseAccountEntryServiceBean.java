@@ -916,7 +916,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                             bankExchangeRate));
                     voucher.setEmployeeName(purchaseOrderPayment.getBeneficiaryName());
                 }
-
+                /** Pago con factura al contado **/
                 if(purchaseOrder.getWithBill().equals(Constants.WITH_BILL) && purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CASH)){
                     Double cashBoxValue     = voucherAmountNationalAmount.doubleValue();
                     Double fiscalCreditIVA  = cashBoxValue * 0.13;
@@ -953,8 +953,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.setEmployeeName(purchaseOrderPayment.getBeneficiaryName());
 
                 }
-
-                if(purchaseOrder.getWithBill().equals(Constants.WITH_BILL) && purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CREDIT)){
+                /** Pago con (factura o recibo) a credito **/
+                //if(purchaseOrder.getWithBill().equals(Constants.WITH_BILL) && purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CREDIT)){
+                if((purchaseOrder.getWithBill().equals(Constants.WITH_BILL) || purchaseOrder.getWithBill().equals(Constants.WITHOUT_BILL)) && purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CREDIT)){
 
                     Double cashBoxValue     = voucherAmountNationalAmount.doubleValue();
 

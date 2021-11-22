@@ -612,6 +612,7 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
 
         if (purchasePayment != null &&!BigDecimalUtil.isZeroOrNull(new BigDecimal(totalPayAmount)) && !BigDecimalUtil.isZeroOrNull(new BigDecimal(totalSourceAmount))){
 
+            System.out.println("----> entity: " + entity.toString());
             String transactionNumber = warehouseAccountEntryService.createEntryAccountPurchaseOrderForPaymentWithCashBox(entity,
                                                                                                                          purchasePayment,
                                                                                                                          new BigDecimal(totalSourceAmount),
