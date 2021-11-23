@@ -305,6 +305,8 @@ public class ProductionAction extends GenericAction<Production> {
 
     public BigDecimal getSupplyUnitCost(Supply supplyDetail){
 
+        System.out.println("====> " + supplyDetail.getId());
+        System.out.println("====> " + supplyDetail.getProductItem().getFullName());
         BigDecimal unitCost = supplyDetail.getProductItem().getUnitCost();
 
         if (supplyDetail.hasFormula() ){
