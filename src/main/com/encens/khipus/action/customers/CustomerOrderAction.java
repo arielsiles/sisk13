@@ -97,6 +97,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                 }
             } catch (IOException e) {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+                return;
             }
         }
     }

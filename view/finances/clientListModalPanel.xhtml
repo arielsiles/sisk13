@@ -43,7 +43,7 @@
                     <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
                     <h:inputText id="am" value="#{dataModel.criteria.maidenName}" maxlength="100"
                                  styleClass="input"
-                                 tabindex="2002"/>
+                                 tabindex="2003"/>
                 </s:decorate>
 
                 <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -58,7 +58,7 @@
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="clientItem" id="clientList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 30%, 30%,10%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 25%, 25%, 15, 5%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>
@@ -82,6 +82,7 @@
                             #{messages['Client.maidenName']}
                         </app:commandSortHeader>
                     </rich:column>
+                    <rich:column>#{messages['Client.nitOrCi']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
                     </rich:column>
@@ -95,6 +96,9 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{clientItem.maidenName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{clientItem.nitNumber}"/>
             </rich:column>
             <rich:column styleClass="center">
                 <ui:insert name="assignButton"/>
