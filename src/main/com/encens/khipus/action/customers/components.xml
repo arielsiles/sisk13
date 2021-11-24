@@ -82,4 +82,7 @@
     <factory name="branchOfficeList" value="#{branchOfficeQuery}"/>
     <framework:entity-query name="branchOfficeQuery" ejbql="select d from BranchOffice d "/>
 
+    <factory name="economicActivityList" value="#{economicActivityQuery}"/>
+    <framework:entity-query name="economicActivityQuery" ejbql="select d from EconomicActivity d "/>
+
 </components>
