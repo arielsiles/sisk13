@@ -129,6 +129,15 @@ UPDATE sucursal s SET s.`codpos` = 1 WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(0)' WHERE s.`IDSUCURSAL` = 1;
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(1)' WHERE s.`IDSUCURSAL` = 2;
 
+-- 23.11.2021
+ALTER TABLE  inv_articulos ADD COLUMN caeb VARCHAR(10) AFTER codsin;
+
+CREATE TABLE sin_actividadeconomica (
+	codigo VARCHAR(100),
+	nombre VARCHAR(100),
+	PRIMARY KEY (codigo)
+);
+
 --
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1400	;
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1399	;
