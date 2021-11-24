@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.EconomicActivity;
+import com.encens.khipus.model.customers.MeasureUnitSIN;
 import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
@@ -155,6 +156,10 @@ public class ProductItem implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "caeb", referencedColumnName = "codigo")
     private EconomicActivity economicActivity;
+
+    @ManyToOne
+    @JoinColumn(name = "cod_meds", referencedColumnName = "nro")
+    private MeasureUnitSIN measureUnit;
 
     @ManyToOne
     @JoinColumns({
@@ -562,5 +567,14 @@ public class ProductItem implements BaseModel {
 
     public void setEconomicActivity(EconomicActivity economicActivity) {
         this.economicActivity = economicActivity;
+    }
+
+
+    public MeasureUnitSIN getMeasureUnit() {
+        return measureUnit;
+    }
+
+    public void setMeasureUnit(MeasureUnitSIN measureUnit) {
+        this.measureUnit = measureUnit;
     }
 }

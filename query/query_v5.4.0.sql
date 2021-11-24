@@ -138,6 +138,87 @@ CREATE TABLE sin_actividadeconomica (
 	PRIMARY KEY (codigo)
 );
 
+-- 24.11.2021
+
+CREATE TABLE sin_unidadmedida (
+	nro INT(11),
+	codigouni VARCHAR(10),
+	descripcion VARCHAR(100),
+	PRIMARY KEY (nro)
+);
+
+
+-- revisar
+INSERT INTO sin_unidadmedida VALUES (	1	,	'Q'	, 	'QUINTAL'	);
+INSERT INTO sin_unidadmedida VALUES (	2	,	'CMT'	, 	'CENTIMETRO LINEAL'	);
+INSERT INTO sin_unidadmedida VALUES (	3	,	'CEN'	, 	'CIENTO DE UNIDADES'	);
+INSERT INTO sin_unidadmedida VALUES (	4	,	'CY'	, 	'CILINDRO'	);
+INSERT INTO sin_unidadmedida VALUES (	5	,	'CJ'	, 	'CONOS'	);
+INSERT INTO sin_unidadmedida VALUES (	6	,	'DZN'	, 	'DOCENA'	);
+INSERT INTO sin_unidadmedida VALUES (	7	,	'GLI'	, 	'GALON INGLES'	);
+INSERT INTO sin_unidadmedida VALUES (	8	,	'HLT'	, 	'HECTOLITRO'	);
+INSERT INTO sin_unidadmedida VALUES (	9	,	'SET'	, 	'JUEGO'	);
+INSERT INTO sin_unidadmedida VALUES (	10	,	'NIU'	, 	'UNIDAD (BIENES)'	);
+INSERT INTO sin_unidadmedida VALUES (	11	,	'DIA'	, 	'DIAS'	);
+INSERT INTO sin_unidadmedida VALUES (	12	,	'BJ'	, 	'BALDE'	);
+INSERT INTO sin_unidadmedida VALUES (	13	,	'BLL'	, 	'BARRILES'	);
+INSERT INTO sin_unidadmedida VALUES (	14	,	'ONZ'	, 	'ONZAS'	);
+INSERT INTO sin_unidadmedida VALUES (	15	,	'PF'	, 	'PALETAS'	);
+INSERT INTO sin_unidadmedida VALUES (	16	,	'PK'	, 	'PAQUETE'	);
+INSERT INTO sin_unidadmedida VALUES (	17	,	'PR'	, 	'PAR'	);
+INSERT INTO sin_unidadmedida VALUES (	18	,	'FOT'	, 	'PIES'	);
+INSERT INTO sin_unidadmedida VALUES (	19	,	'FTK'	, 	'PIES CUADRADOS'	);
+INSERT INTO sin_unidadmedida VALUES (	20	,	'FTQ'	, 	'PIES CUBICOS'	);
+INSERT INTO sin_unidadmedida VALUES (	21	,	'PZA'	, 	'PIEZAS'	);
+INSERT INTO sin_unidadmedida VALUES (	22	,	'PG'	, 	'PLACAS'	);
+INSERT INTO sin_unidadmedida VALUES (	23	,	'ST'	, 	'PLIEGO'	);
+INSERT INTO sin_unidadmedida VALUES (	24	,	'OT'	, 	'ONZA TROY'	);
+INSERT INTO sin_unidadmedida VALUES (	25	,	'LF'	, 	'LIBRA FINA'	);
+INSERT INTO sin_unidadmedida VALUES (	26	,	'DP'	, 	'DISPLAY'	);
+INSERT INTO sin_unidadmedida VALUES (	27	,	'BU'	, 	'BULTO'	);
+INSERT INTO sin_unidadmedida VALUES (	28	,	'MES'	, 	'MESES'	);
+INSERT INTO sin_unidadmedida VALUES (	29	,	'INH'	, 	'PULGADAS'	);
+INSERT INTO sin_unidadmedida VALUES (	30	,	'RM'	, 	'RESMA'	);
+INSERT INTO sin_unidadmedida VALUES (	31	,	'DR'	, 	'TAMBOR'	);
+INSERT INTO sin_unidadmedida VALUES (	32	,	'STN'	, 	'TONELADA CORTA'	);
+INSERT INTO sin_unidadmedida VALUES (	33	,	'LTN'	, 	'TONELADA LARGA'	);
+INSERT INTO sin_unidadmedida VALUES (	34	,	'TNE'	, 	'TONELADAS'	);
+INSERT INTO sin_unidadmedida VALUES (	35	,	'TU'	, 	'TUBOS'	);
+INSERT INTO sin_unidadmedida VALUES (	36	,	'ZZ'	, 	'UNIDAD (SERVICIOS)'	);
+INSERT INTO sin_unidadmedida VALUES (	37	,	'GLL'	, 	'US GALON (3,7843 L)'	);
+INSERT INTO sin_unidadmedida VALUES (	38	,	'YRD'	, 	'YARDA'	);
+INSERT INTO sin_unidadmedida VALUES (	39	,	'YDK'	, 	'YARDA CUADRADA'	);
+INSERT INTO sin_unidadmedida VALUES (	40	,	'OTR'	, 	'OTRO'	);
+INSERT INTO sin_unidadmedida VALUES (	41	,	'BG'	, 	'BOLSA'	);
+INSERT INTO sin_unidadmedida VALUES (	42	,	'BO'	, 	'BOTELLAS'	);
+INSERT INTO sin_unidadmedida VALUES (	43	,	'BE'	, 	'FARDO'	);
+INSERT INTO sin_unidadmedida VALUES (	44	,	'GRM'	, 	'GRAMO'	);
+INSERT INTO sin_unidadmedida VALUES (	45	,	'GRO'	, 	'GRUESA'	);
+INSERT INTO sin_unidadmedida VALUES (	46	,	'LEF'	, 	'HOJA'	);
+INSERT INTO sin_unidadmedida VALUES (	47	,	'KGM'	, 	'KILOGRAMO'	);
+INSERT INTO sin_unidadmedida VALUES (	48	,	'BOB'	, 	'BOBINAS'	);
+INSERT INTO sin_unidadmedida VALUES (	49	,	'BX'	, 	'CAJA'	);
+INSERT INTO sin_unidadmedida VALUES (	50	,	'CT'	, 	'CARTONES'	);
+INSERT INTO sin_unidadmedida VALUES (	51	,	'CMK'	, 	'CENTIMETRO CUADRADO'	);
+INSERT INTO sin_unidadmedida VALUES (	52	,	'CMQ'	, 	'CENTIMETRO CUBICO'	);
+INSERT INTO sin_unidadmedida VALUES (	53	,	'KWH'	, 	'KILOVATIO HORA'	);
+INSERT INTO sin_unidadmedida VALUES (	54	,	'KT'	, 	'KIT'	);
+INSERT INTO sin_unidadmedida VALUES (	55	,	'CA'	, 	'LATAS'	);
+INSERT INTO sin_unidadmedida VALUES (	56	,	'LBR'	, 	'LIBRAS'	);
+INSERT INTO sin_unidadmedida VALUES (	57	,	'LTR'	, 	'LITRO'	);
+INSERT INTO sin_unidadmedida VALUES (	58	,	'MWH'	, 	'MEGAWATT HORA'	);
+INSERT INTO sin_unidadmedida VALUES (	59	,	'MTR'	, 	'METRO'	);
+INSERT INTO sin_unidadmedida VALUES (	60	,	'MTK'	, 	'METRO CUADRADO'	);
+INSERT INTO sin_unidadmedida VALUES (	61	,	'MTQ'	, 	'METRO CUBICO'	);
+INSERT INTO sin_unidadmedida VALUES (	62	,	'MGM'	, 	'MILIGRAMOS'	);
+INSERT INTO sin_unidadmedida VALUES (	63	,	'MLT'	, 	'MILILITRO'	);
+INSERT INTO sin_unidadmedida VALUES (	64	,	'MMT'	, 	'MILIMETRO'	);
+INSERT INTO sin_unidadmedida VALUES (	65	,	'MMK'	, 	'MILIMETRO CUADRADO'	);
+INSERT INTO sin_unidadmedida VALUES (	66	,	'MMQ'	, 	'MILIMETRO CUBICO'	);
+INSERT INTO sin_unidadmedida VALUES (	67	,	'MLL'	, 	'MILLARES'	);
+INSERT INTO sin_unidadmedida VALUES (	68	,	'UM'	, 	'MILLON DE UNIDADES'	);
+INSERT INTO sin_unidadmedida VALUES (	69	,	'KTM'	, 	'KILOMETRO'	);
+
 --
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1400	;
 UPDATE inv_articulos SET codsin = 	22290	 WHERE cod_art = 	1399	;

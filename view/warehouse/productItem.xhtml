@@ -392,38 +392,54 @@
                      tabindex="2"/>
     </s:decorate>
 
+    <app:fieldset id="dataToBillFielset" title="#{messages['Invoice.sinHomologation']}">
 
-    <s:decorate id="economicActivityField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['ProductItem.economicActivity']}</ui:define>
-        <h:selectOneMenu id="economicActivity"
-                         value="#{productItem.economicActivity}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="8">
-            <s:selectItems value="#{economicActivityList}"
-                           var="economicActivity"
-                           label="#{economicActivity.fullName}"
-                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
+        <s:decorate id="economicActivityField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductItem.economicActivity']}</ui:define>
+            <h:selectOneMenu id="economicActivity"
+                             value="#{productItem.economicActivity}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{economicActivityList}"
+                               var="economicActivity"
+                               label="#{economicActivity.fullName}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
-    <s:decorate id="productCodeSinField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['ProductItem.productCodeSin']}</ui:define>
-        <h:selectOneMenu id="productCodeSin"
-                         value="#{productItem.productService}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="8">
-            <s:selectItems value="#{productsServicesList}"
-                           var="product"
-                           label="#{product.fullName}"
-                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
+        <s:decorate id="productCodeSinField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductItem.productCodeSin']}</ui:define>
+            <h:selectOneMenu id="productCodeSin"
+                             value="#{productItem.productService}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{productsServicesList}"
+                               var="product"
+                               label="#{product.fullName}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
+        <s:decorate id="measureUnitSINField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductItem.unitMeasureSIN']}</ui:define>
+            <h:selectOneMenu id="measureUnitSIN"
+                             value="#{productItem.measureUnit}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{measureUnitSINList}"
+                               var="measureUnitSIN"
+                               label="#{measureUnitSIN}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
 
+    </app:fieldset>
 
 </rich:panel>
 
