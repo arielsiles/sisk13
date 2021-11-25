@@ -96,4 +96,14 @@ public class ClientAction extends GenericAction<Client> {
     public void setShowNitExtension(boolean showNitExtension) {
         this.showNitExtension = showNitExtension;
     }
+
+    public boolean hasDocumentTypeCI(){
+        boolean result = false;
+        if (getInstance().getInvoiceDocumentType() != null)
+            if (getInstance().getInvoiceDocumentType().getSinCode() == 1)
+                result = true;
+
+        return result;
+    }
+
 }

@@ -70,7 +70,7 @@ public class ProductsServices implements BaseModel {
     }
 
     public String getFullName() {
-        return getProductCode().toString() + " - " + getDescription();
+        return getProductCode().toString() + " - " + getActivityCode() + " - " + getDescription();
     }
 
 }

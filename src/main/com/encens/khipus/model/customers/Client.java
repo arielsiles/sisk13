@@ -41,6 +41,9 @@ public class Client implements BaseModel {
     @Column(name = "NRO_DOC")
     private String idNumber;
 
+    @Column(name = "COMP")
+    private String complement;
+
     @Column(name = "AP")
     private String lastName;
 
@@ -77,6 +80,9 @@ public class Client implements BaseModel {
 
     @Column(name = "TELEFONO")
     private Integer phone;
+
+    @Column(name = "EMAIL")
+    private String email;
 
     @Column(name = "NIT")
     private String nitNumber;
@@ -344,5 +350,21 @@ public class Client implements BaseModel {
 
     public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
         this.paymentMethodSin = paymentMethodSin;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getComplement() {
+        return complement;
+    }
+
+    public void setComplement(String complement) {
+        this.complement = complement;
     }
 }

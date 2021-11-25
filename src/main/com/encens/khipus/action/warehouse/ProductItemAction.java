@@ -162,6 +162,8 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             return validationOutcome;
         }
 
+        System.out.println("-----------------------> MED: " + getInstance().getMeasureUnit().getDescription());
+
         Long currentVersion = (Long) getVersion(getInstance());
         try {
             productItemService.updateProductItem(getInstance());

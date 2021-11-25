@@ -208,8 +208,8 @@ public class BillControllerAction {
         pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodSin().getCode());
         pedidoPOJO.setUsuario(user.getUsername());
         pedidoPOJO.setCodigoDocumentoSector(dosage.getSectorDocumentCode());
-        pedidoPOJO.setCodigoMoneda(Constants.CODIGO_MONEDA_SIN);
-        pedidoPOJO.setTipoCambio(Constants.TIPO_CAMBIO_SIN);
+        pedidoPOJO.setCodigoMoneda(Constants.CODIGO_MONEDA_SIN); /** todo **/
+        pedidoPOJO.setTipoCambio(Constants.TIPO_CAMBIO_SIN); /** todo **/
         pedidoPOJO.setMontoTotal(amountValue);
         pedidoPOJO.setMontoTotalSujetoIva(amountValue);
         pedidoPOJO.setMontoTotalMoneda(amountValue);
@@ -218,11 +218,14 @@ public class BillControllerAction {
 
         for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
             DetallePedidoPOJO detalle = new DetallePedidoPOJO();
-            detalle.setActividadEconomica(dosage.getEconomicActivityCode());
+            //detalle.setActividadEconomica(dosage.getEconomicActivityCode());
+            detalle.setActividadEconomica(articleOrder.getProductItem().getProductService().getActivityCode());
+
             //detalle.setCodigoProductoSin(articleOrder.getProductItem().getProductItemCodeSin());
             detalle.setCodigoProductoSin(articleOrder.getProductItem().getProductService().getProductCode().toString());
+
             detalle.setCodigoProducto(articleOrder.getCodArt());
-            detalle.setUnidadMedida(articleOrder.getProductItem().getMeasureUnitSin());
+            detalle.setUnidadMedida(articleOrder.getProductItem().getMeasureUnit().getNumber());
             detalle.setDescripcion(articleOrder.getProductItem().getName());
             detalle.setCantidad(articleOrder.getQuantity());
             detalle.setPrecioUnitario(articleOrder.getPrice());

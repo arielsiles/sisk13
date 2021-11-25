@@ -3,7 +3,6 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.customers.EconomicActivity;
 import com.encens.khipus.model.customers.MeasureUnitSIN;
 import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
@@ -56,11 +55,8 @@ public class ProductItem implements BaseModel {
     @Column(name = "COD_ART", insertable = false, updatable = false)
     private String productItemCode;
 
-    @Column(name = "CODSIN")
-    private String productItemCodeSin;
-
-    @Column(name = "COD_MEDS")
-    private Integer measureUnitSin;
+    /*@Column(name = "COD_MEDS")
+    private Integer measureUnitSin;*/
 
     @Column(name = "CODEQ", insertable = false, updatable = false)
     private String productItemCodeEq;
@@ -152,10 +148,6 @@ public class ProductItem implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "idprodutoservicio", referencedColumnName = "idprodutoservicio")
     private ProductsServices productService;
-
-    @ManyToOne
-    @JoinColumn(name = "caeb", referencedColumnName = "codigo")
-    private EconomicActivity economicActivity;
 
     @ManyToOne
     @JoinColumn(name = "cod_meds", referencedColumnName = "nro")
@@ -537,21 +529,13 @@ public class ProductItem implements BaseModel {
         this.productItemCodeEq = productItemCodeEq;
     }
 
-    public String getProductItemCodeSin() {
-        return productItemCodeSin;
-    }
-
-    public void setProductItemCodeSin(String productItemCodeSin) {
-        this.productItemCodeSin = productItemCodeSin;
-    }
-
-    public Integer getMeasureUnitSin() {
+    /*public Integer getMeasureUnitSin() {
         return measureUnitSin;
     }
 
     public void setMeasureUnitSin(Integer measureUnitSin) {
         this.measureUnitSin = measureUnitSin;
-    }
+    }*/
 
     public ProductsServices getProductService() {
         return productService;
@@ -560,15 +544,6 @@ public class ProductItem implements BaseModel {
     public void setProductService(ProductsServices productService) {
         this.productService = productService;
     }
-
-    public EconomicActivity getEconomicActivity() {
-        return economicActivity;
-    }
-
-    public void setEconomicActivity(EconomicActivity economicActivity) {
-        this.economicActivity = economicActivity;
-    }
-
 
     public MeasureUnitSIN getMeasureUnit() {
         return measureUnit;

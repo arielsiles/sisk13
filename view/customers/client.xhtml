@@ -18,7 +18,7 @@
         </c:otherwise>
     </c:choose>
 </ui:define>
-<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyWidth" value="90%"/>
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
@@ -81,6 +81,7 @@
     </s:decorate>
 
     <s:div id="personData">
+
         <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow"
                     rendered="#{client.personFlag}">
             <ui:define name="label">#{messages['Client.idNumber']}</ui:define>
@@ -88,10 +89,12 @@
                          value="#{client.idNumber}"
                          required="true"
                          maxlength="100"
-                         styleClass="input"
+                         styleClass="input100"
                          tabindex="2">
             </h:inputText>
+
         </s:decorate>
+
 
         <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Client.name']}</ui:define>
@@ -137,10 +140,104 @@
         </s:decorate>-->
     </s:div>
 
+    <br />
+    <s:div>
+        <h:outputLabel style="font-weight: bold;font-size: 9pt;" >#{messages['Invoice.dataToBill']}</h:outputLabel>
+    </s:div>
+    <br />
+
+    <!--<app:fieldset id="dataToBillFielset" title="#{messages['Invoice.billing']}">-->
+
+        <s:decorate id="documentField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.document']}</ui:define>
+            <h:selectOneMenu id="documentType"
+                             value="#{client.invoiceDocumentType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{documentTypeList}"
+                               var="documentType"
+                               label="#{documentType.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="complementDiv"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:div id="documentDiv">
+
+            <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.nitOrCi']}</ui:define>
+                <h:inputText id="idNumber"
+                             value="#{client.nitNumber}"
+                             required="true"
+                             maxlength="100"
+                             styleClass="input100"
+                             tabindex="6">
+                </h:inputText>
+
+                <s:span id="complementDiv">
+                    <rich:spacer width="5"/>
+                    <h:outputLabel value="#{messages['Client.complement']}" rendered="#{clientAction.hasDocumentTypeCI()}"/>
+                    <rich:spacer width="5"/>
+                    <h:inputText id="complement"
+                                 value="#{client.complement}"
+                                 required="false"
+                                 maxlength="3"
+                                 rendered="#{clientAction.hasDocumentTypeCI()}"
+                                 styleClass="inputTiny"
+                                 tabindex="2">
+                    </h:inputText>
+                </s:span>
+
+            </s:decorate>
+
+            <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.businessName']}</ui:define>
+                <h:inputText id="businessName" value="#{client.businessName}" required="true"
+                             maxlength="200" tabindex="7" styleClass="input">
+                </h:inputText>
+            </s:decorate>
+
+        </s:div>
+
+        <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.paymentMethod']}</ui:define>
+            <h:selectOneMenu id="paymentMethod"
+                             value="#{client.paymentMethodSin}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="8">
+                <s:selectItems value="#{paymentMethodSinList}"
+                               var="paymentMethod"
+                               label="#{paymentMethod.description}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+
+
+    <!--</app:fieldset>-->
+
+
+</s:div>
+
+<s:div>
+
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.phone']}</ui:define>
         <h:inputText id="phone" value="#{client.phone}" required="false"
                      maxlength="200" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="emailField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.email']}</ui:define>
+        <h:inputText id="email" value="#{client.email}" required="false"
+                     maxlength="100" tabindex="8" styleClass="input">
         </h:inputText>
     </s:decorate>
 
@@ -152,17 +249,6 @@
                          tabindex="9"
                          style="width:200px;height:40px;"/>
     </s:decorate>
-
-    <s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.discount']}</ui:define>
-        <h:inputText id="discount" value="#{client.commission}" required="false" tabindex="8" styleClass="inputTiny">
-            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-        </h:inputText>
-    </s:decorate>
-
-</s:div>
-
-<s:div>
 
     <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.clientType']}</ui:define>
@@ -209,67 +295,12 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <app:fieldset id="dataToBillFielset" title="#{messages['Invoice.dataToBill']}">
-
-        <s:decorate id="documentField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Invoice.document']}</ui:define>
-            <h:selectOneMenu id="documentType"
-                             value="#{client.invoiceDocumentType}"
-                             styleClass="input"
-                             required="true"
-                             tabindex="8">
-                <s:selectItems value="#{documentTypeList}"
-                               var="documentType"
-                               label="#{documentType.name}"
-                               noSelectionLabel="" hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-                <a4j:support event="onchange"
-                             action="#{clientAction.updateShowNitExtension()}"
-                             reRender="documentDiv"
-                             ajaxSingle="true"/>
-            </h:selectOneMenu>
-        </s:decorate>
-
-        <s:div id="documentDiv">
-
-            <s:decorate id="nitNumberField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Client.nitOrCi']}</ui:define>
-                <h:inputText id="idNumber"
-                             value="#{client.nitNumber}"
-                             required="true"
-                             maxlength="100"
-                             styleClass="input"
-                             tabindex="6">
-                </h:inputText>
-            </s:decorate>
-
-            <s:decorate id="businessNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Client.businessName']}</ui:define>
-                <h:inputText id="businessName" value="#{client.businessName}" required="true"
-                             maxlength="200" tabindex="7" styleClass="input">
-                </h:inputText>
-            </s:decorate>
-
-        </s:div>
-
-        <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['Invoice.paymentMethod']}</ui:define>
-            <h:selectOneMenu id="paymentMethod"
-                             value="#{client.paymentMethodSin}"
-                             styleClass="input"
-                             required="true"
-                             tabindex="8">
-                <s:selectItems value="#{paymentMethodSinList}"
-                               var="paymentMethod"
-                               label="#{paymentMethod.description}"
-                               noSelectionLabel="" hideNoSelectionLabel="false"/>
-                <s:convertEntity/>
-            </h:selectOneMenu>
-        </s:decorate>
-
-
-
-    </app:fieldset>
+    <s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.discount']}</ui:define>
+        <h:inputText id="discount" value="#{client.commission}" required="false" tabindex="8" styleClass="inputTiny">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:inputText>
+    </s:decorate>
 
 
 </s:div>
