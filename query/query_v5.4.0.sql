@@ -1,7 +1,8 @@
 -- 09.11.2021
--- ALTER TABLE inv_articulos ADD COLUMN codsin VARCHAR(10) AFTER cod_art;
+-- ALTER TABLE inv_articulos ADD COLUMN codsin VARCHAR(10) AFTER cod_art;     -- delete
+-- ALTER TABLE dosificacion ADD COLUMN caeb VARCHAR(20) AFTER IDDOSIFICACION; -- delete
+
 ALTER TABLE inv_articulos ADD COLUMN cod_meds INT(11) AFTER cod_med;
-ALTER TABLE dosificacion ADD COLUMN caeb VARCHAR(20) AFTER IDDOSIFICACION;
 
 -- 11.11.2021
 ALTER TABLE tipodocumento ADD COLUMN codsin INT(10) AFTER nombre;
@@ -130,13 +131,14 @@ UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(0)' WHERE s.`IDSUCURS
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(1)' WHERE s.`IDSUCURSAL` = 2;
 
 -- 23.11.2021
+/*
 ALTER TABLE  inv_articulos ADD COLUMN caeb VARCHAR(10) AFTER codsin;
-
 CREATE TABLE sin_actividadeconomica (
 	codigo VARCHAR(100),
 	nombre VARCHAR(100),
 	PRIMARY KEY (codigo)
 );
+*/
 
 -- 24.11.2021
 
@@ -147,6 +149,16 @@ CREATE TABLE sin_unidadmedida (
 	PRIMARY KEY (nro)
 );
 
+-- 25.11.2021
+
+ALTER TABLE personacliente ADD COLUMN email VARCHAR(100) AFTER telefono;
+ALTER TABLE personacliente ADD COLUMN COMP VARCHAR(10) AFTER NRO_DOC;
+
+-- tmp
+UPDATE inv_articulos i SET i.`codsin` = NULL;
+ALTER TABLE inv_articulos DROP COLUMN codsin;
+ALTER TABLE inv_articulos DROP COLUMN caeb;
+--
 
 -- revisar
 INSERT INTO sin_unidadmedida VALUES (	1	,	'Q'	, 	'QUINTAL'	);
