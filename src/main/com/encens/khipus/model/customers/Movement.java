@@ -41,6 +41,10 @@ public class Movement implements BaseModel {
     @Column(name = "ESTADO")
     private String state;
 
+    @Column(name = "TIPOEMISION")
+    @Enumerated(EnumType.STRING)
+    private InvoiceEmissionType emissionType;
+
     @Column(name = "NROFACTURA")
     private Integer number;
 
@@ -353,5 +357,13 @@ public class Movement implements BaseModel {
 
     public void setFactura(String factura) {
         this.factura = factura;
+    }
+
+    public InvoiceEmissionType getEmissionType() {
+        return emissionType;
+    }
+
+    public void setEmissionType(InvoiceEmissionType emissionType) {
+        this.emissionType = emissionType;
     }
 }

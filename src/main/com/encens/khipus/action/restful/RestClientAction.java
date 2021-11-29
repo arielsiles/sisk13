@@ -191,14 +191,43 @@ public class RestClientAction {
     public void executeService2() throws IOException {
 
 
-        URL url = new URL ("https://jsonplaceholder.typicode.com/users");
+        //URL url = new URL ("https://jsonplaceholder.typicode.com/users");
+        URL url = new URL ("http://10.0.0.106:8080/api/billing/bills");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json; utf-8");
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
 
-        String jsonInputString = "{\"name\": \"Upendra\", \"job\": \"Programmer\"}";
+        //String jsonInputString = "{\"name\": \"Upendra\", \"job\": \"Programmer\"}";
+        String jsonInputString = "{\n" +
+                "  \"codigoSucursal\" : 0,\n" +
+                "  \"codigoPuntoVenta\" : 0,\n" +
+                "  \"numeroFactura\" : 15,\n" +
+                "  \"nombreRazonSocial\" : \"ADELA CHAMBI ROJAS\",\n" +
+                "  \"codigoTipoDocumentoIdentidad\" : 1,\n" +
+                "  \"numeroDocumento\" : \"5260634\",\n" +
+                "  \"codigoCliente\" : \"5260634\",\n" +
+                "  \"codigoMetodoPago\" : 1,\n" +
+                "  \"usuario\" : \"ilva\",\n" +
+                "  \"codigoDocumentoSector\" : 1,\n" +
+                "  \"codigoMoneda\" : 1,\n" +
+                "  \"tipoCambio\" : 1,\n" +
+                "  \"montoTotal\" : 1000,\n" +
+                "  \"montoTotalSujetoIva\" : 1000,\n" +
+                "  \"montoTotalMoneda\" : 1000,\n" +
+                "  \"detalle\" : [ {\n" +
+                "    \"actividadEconomica\" : \"105000\",\n" +
+                "    \"codigoProductoSin\" : \"22290\",\n" +
+                "    \"codigoProducto\" : \"118\",\n" +
+                "    \"unidadMedida\" : 57,\n" +
+                "    \"descripcion\" : \"LECHE NATURAL UHT 950 ML\",\n" +
+                "    \"cantidad\" : 200,\n" +
+                "    \"precioUnitario\" : 5.0,\n" +
+                "    \"montoDescuento\" : 0.0,\n" +
+                "    \"subTotal\" : 1000.0\n" +
+                "  } ]\n" +
+                "}";
 
 
         OutputStream os = con.getOutputStream();
@@ -230,7 +259,8 @@ public class RestClientAction {
 
         try {
 
-            URL url = new URL("https://jsonplaceholder.typicode.com/albums");
+            //URL url = new URL("https://jsonplaceholder.typicode.com/albums");
+            URL url = new URL("http://10.0.0.106:8080/api/billing/ping");
             connection = (HttpURLConnection) url.openConnection();
 
             // Request Setup

@@ -85,6 +85,12 @@
                 styleClass="tab-cell"
                 propagation="begin"/>
 
+        <s:link view="/customers/customerOrderList.xhtml"
+                value="#{messages['menu.customers.configuration.customerOrderList']}"
+                rendered="#{s:hasPermission('SALES', 'VIEW')}"
+                styleClass="tab-cell"
+                propagation="begin"/>
+
         <s:link view="/customers/clientList.xhtml"
                 value="#{messages['menu.customers.client']}"
                 styleClass="tab-cell"

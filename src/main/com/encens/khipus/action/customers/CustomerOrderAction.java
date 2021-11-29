@@ -8,6 +8,8 @@ import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.admin.UserService;
+import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import org.jboss.seam.ScopeType;
@@ -31,6 +33,10 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     @In
     private SalesAction salesAction;
 
+    @In
+    private UserService userService;
+    @In
+    private DosageService dosageService;
     @In
     private SaleService saleService;
     @In
@@ -91,12 +97,15 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
             }
 
             try {
+
                 System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
                 if (!billControllerAction.hasInvoice(customerOrder)){
                     billControllerAction.createBill(customerOrder);
                 }
+
             } catch (IOException e) {
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+                //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion, venta a crédito...");
                 return;
             }
         }

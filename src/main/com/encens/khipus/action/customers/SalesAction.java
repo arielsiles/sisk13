@@ -380,6 +380,12 @@ public class SalesAction {
         System.out.println("......Registrando Venta al Contado...");
         checkMinimumValues();
 
+        if (this.client == null || totalAmount.compareTo(BigDecimal.ZERO) == 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, datos incompletos...");
+            return;
+        }
+
+
         CustomerOrder customerOrder = createSale();
         if (customerOrder!= null) {
             Movement movement = createInvoice(customerOrder);
@@ -397,7 +403,8 @@ public class SalesAction {
                     billControllerAction.createBill(customerOrder);
                 }
             } catch (IOException e) {
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+                //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion, venta al contado...");
             }
 
             clearAll();

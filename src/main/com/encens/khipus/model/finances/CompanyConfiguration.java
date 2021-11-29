@@ -62,6 +62,9 @@ public class CompanyConfiguration {
     @Column(name = "url_qr")
     private String qrcodeURL;
 
+    @Column(name = "url_ping")
+    private String connectionTestURL;
+
     @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1476,5 +1479,13 @@ public class CompanyConfiguration {
 
     public void setQrcodeURL(String qrcodeURL) {
         this.qrcodeURL = qrcodeURL;
+    }
+
+    public String getConnectionTestURL() {
+        return connectionTestURL;
+    }
+
+    public void setConnectionTestURL(String connectionTestURL) {
+        this.connectionTestURL = connectionTestURL;
     }
 }

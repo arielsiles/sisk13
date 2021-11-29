@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 <ui:define name="pageTitle">
     <c:choose>
@@ -296,9 +295,8 @@
     </s:decorate>
 
     <s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.discount']}</ui:define>
+        <ui:define name="label">#{messages['Client.discountPercentage']}</ui:define>
         <h:inputText id="discount" value="#{client.commission}" required="false" tabindex="8" styleClass="inputTiny">
-            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:inputText>
     </s:decorate>
 

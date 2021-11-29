@@ -4,10 +4,7 @@ import com.encens.khipus.action.restful.Json;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.customers.Dosage;
-import com.encens.khipus.model.customers.Movement;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.rest.*;
 import com.encens.khipus.service.admin.UserService;
@@ -16,6 +13,7 @@ import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.ServerResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jboss.seam.ScopeType;
@@ -31,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,26 +56,74 @@ public class BillControllerAction {
     @In
     private FacesMessages facesMessages;
 
-    public void testBillController(CustomerOrder customerOrder) throws JsonProcessingException {
-        PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
-        String jsonPedido = pedidoToJson(pedidoPOJO);
-        System.out.println("---------- BILLING ----------");
-        System.out.println(jsonPedido);
+    public Boolean connectionTest() {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        String url_ping = companyConfiguration.getConnectionTestURL();
 
-        //createBill(jsonPedido);
+        HttpURLConnection connection = null;
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+
+        ServerResponse serverResponse = null;
+
+        try {
+            URL url = new URL(url_ping);
+            connection = (HttpURLConnection) url.openConnection();
+
+            // Request Setup
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int status = connection.getResponseCode();
+
+            if (status > 299){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                serverResponse = new ServerResponse(Boolean.FALSE, status, responseContent.toString());
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                serverResponse = new ServerResponse(Boolean.TRUE, status, responseContent.toString());
+            }
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
+
+        System.out.println("-------------- TEST CONNECTION GET -----------");
+        System.out.println("--> Connection: " + serverResponse.getConnection());
+        System.out.println("--> Response Code: " + serverResponse.getResponseCode());
+        System.out.println("--> Response: " + serverResponse.getResponseJson());
+
+        return serverResponse.getConnection();
     }
 
-    public void createBill(CustomerOrder customerOrder) throws IOException {
-        //if (!hasInvoice(customerOrder)) {
-            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-            String url_createbill = companyConfiguration.getCreatebillURL();
-            System.out.println("---------- BILLING ----------");
-            URL url = new URL(url_createbill);
 
-            PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
-            String jsonPedido = pedidoToJson(pedidoPOJO);
-            System.out.println(jsonPedido);
+    /**
+     *
+     * @param urlEndpoint
+     * @param jsonParam
+     * @return
+     */
+    public ServerResponse doPostHttpConnection(String urlEndpoint, String jsonParam) {
 
+        ServerResponse serverResponse = null;
+
+        try {
+            URL url = new URL(urlEndpoint);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(7000);
             con.setRequestMethod("POST");
@@ -85,7 +132,7 @@ public class BillControllerAction {
             con.setDoOutput(true);
 
             OutputStream os = con.getOutputStream();
-            byte[] input = jsonPedido.getBytes("utf-8");
+            byte[] input = jsonParam.getBytes("utf-8");
             os.write(input, 0, input.length);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
@@ -95,14 +142,42 @@ public class BillControllerAction {
                 response.append(responseLine.trim());
             }
 
-            String responseJsonString = response.toString();
-            System.out.println("---------- RESPONSE ----------");
+            System.out.println("======> Response Post: " + response.toString());
+            serverResponse = new ServerResponse(Boolean.TRUE, con.getResponseCode(), response.toString());
+            System.out.println("....------> doPostHttpConnection: serverResponse: " + serverResponse);
 
-            JsonNode jsonNode = Json.parse(responseJsonString);
+        } catch (IOException e){
+            System.out.println("---------------> Exception doPostHttpConnection");
+            return new ServerResponse(Boolean.FALSE, -1, null);
+        }
+
+
+        return serverResponse;
+    }
+
+    public void createBill(CustomerOrder customerOrder) throws IOException {
+
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        String url_createbill = companyConfiguration.getCreatebillURL();
+        System.out.println("---------- BILLING ----------");
+
+        PedidoPOJO pedidoPOJO = createPedidoPojo(customerOrder);
+        String jsonPedido = pedidoToJson(pedidoPOJO);
+        System.out.println(jsonPedido);
+
+        if (connectionTest()) {
+            System.out.println(">>>>> CONEXION EXITOSA!!!");
+            ServerResponse serverResponse = doPostHttpConnection(url_createbill, jsonPedido);
+            System.out.println("---------- SERVER RESPONSE ----------");
+            System.out.println("--> Connection: " + serverResponse.getConnection());
+            System.out.println("--> Response Code: " + serverResponse.getResponseCode());
+            System.out.println("--> Response Json: " + serverResponse.getResponseJson());
+
+            JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
             String result = Json.prettyPrint(jsonNode);
             System.out.println(result);
 
-            createResponseObject(responseJsonString);
+            createResponseObject(serverResponse.getResponseJson());
 
             BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
 
@@ -114,19 +189,89 @@ public class BillControllerAction {
             movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
             movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
             movement.setFactura(billResponsePOJO.getFactura());
+            movement.setEmissionType(InvoiceEmissionType.ONLINE);
 
             movementService.updateMovement(movement);
-        //}
+
+        } else {
+            System.out.println(">>>>> SIN CONEXION!!!");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion fuera de linea...");
+        }
+
+
     }
 
     public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
         System.out.println("---------- CANCEL BILL ----------");
+        User user = getUser(currentUser.getId()); //
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+
+        if (customerOrder.getMovement() != null){
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(
+                    dosage.getBranchOffice().getOfficeCode(),
+                    dosage.getBranchOffice().getPosCode(),reasonCode,
+                    customerOrder.getMovement().getCuf());
+
+            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
+            System.out.println(jsonCancelBill);
+
+            /*
+            URL url = new URL (companyConfiguration.getCancelbillURL());
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            OutputStream os = con.getOutputStream();
+            byte[] input = jsonCancelBill.getBytes("utf-8");
+            os.write(input, 0, input.length);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            String responseJsonString = response.toString();
+            */
+
+            if (connectionTest()) {
+                System.out.println(">>>>> CONEXION EXITOSA!!!");
+                ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
+                System.out.println("---------- RESPONSE CANCEL BILL ----------");
+                //JsonNode jsonNode = Json.parse(responseJsonString);
+                JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                String result = Json.prettyPrint(jsonNode);
+                System.out.println(result);
+
+                Movement movement = customerOrder.getMovement();
+                movement.setState("A");
+                movement.setCodigoEstado(jsonNode.get("codigoEstado").asText());
+                movement.setDescri(jsonNode.get("codigoDescripcion").asText());
+                movementService.updateMovement(movement);
+            } else {
+                System.out.println(">>>>> SIN CONEXION!!!");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"No es posible anular por el momento...");
+            }
+        }
+    }
+
+    /*public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
+        System.out.println("---------- CANCEL BILL ----------");
+        User user = getUser(currentUser.getId()); //
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+
         if (customerOrder.getMovement() != null){
             CompanyConfiguration companyConfiguration = getCompanyConfiguration();
             URL url = new URL (companyConfiguration.getCancelbillURL());
-            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO();
-            cancelBillPOJO.setCancellationReasonCode(reasonCode);
-            cancelBillPOJO.setCuf(customerOrder.getMovement().getCuf());
+
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(
+                    dosage.getBranchOffice().getOfficeCode(),
+                    dosage.getBranchOffice().getPosCode(),reasonCode,
+                    customerOrder.getMovement().getCuf());
 
             String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
             System.out.println(jsonCancelBill);
@@ -161,7 +306,7 @@ public class BillControllerAction {
             movement.setDescri(jsonNode.get("codigoDescripcion").asText());
             movementService.updateMovement(movement);
         }
-    }
+    }*/
 
     public void createResponseObject(String responseJsonString) throws IOException {
         JsonNode nodeResponse = Json.parse(responseJsonString);
