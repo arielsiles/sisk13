@@ -519,7 +519,9 @@ public class SalesAction {
                             customerOrder.getOrderDate(),
                             customerOrder.getTotalAmount(),
                             dosage.getKey());
-        String controlCode = sfc.generateControlCode();
+        /** Gen. Codigo de Control **/
+        //String controlCode = sfc.generateControlCode();
+        String controlCode = "0";
 
         Movement movement = new Movement();
         movement.setDate(sfc.getDate());
