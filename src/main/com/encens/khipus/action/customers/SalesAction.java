@@ -540,9 +540,12 @@ public class SalesAction {
 
         CashBox cashBox = userCashBoxService.findByUser(currentUser);
 
+        /*Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
+                        customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());*/
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                 MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
-                        customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
+                        customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
 
         CashAccount debitAccount = cashBox.getType().getCashAccountReceivable();
         Client client = customerOrder.getClient();
@@ -605,9 +608,13 @@ public class SalesAction {
 
         CashBox cashBox = userCashBoxService.findByUser(currentUser);
 
-        Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+        /*Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                                                             MessageUtils.getMessage("Voucher.cashSale.gloss") + " " +
-                                                                  customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
+                                                                  customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());*/
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                MessageUtils.getMessage("Voucher.cashSale.gloss") + " " +
+                        customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
 
         VoucherDetail debitGeneralBox = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                 cashBox.getType().getCashAccountBox(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
@@ -820,7 +827,8 @@ public class SalesAction {
 
             // Para contabilizar el pedido para facturar fin de mes
             Voucher voucher = accountingCreditSale(customerOrderBill, movement);
-            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
+            //voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
+            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + customerOrderBill.getClient().getFullName());
             voucherAccoutingService.simpleUpdateVoucher(voucher);
 
             customerOrderBill.setVoucher(voucher);

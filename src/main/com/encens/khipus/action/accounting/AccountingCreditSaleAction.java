@@ -137,8 +137,9 @@ public class AccountingCreditSaleAction extends GenericAction {
         CashBox cashBox = userCashBoxService.findByUser(currentUser);
 
         String invoiceGloss = " ";
-        if (customerOrder.getMovement() != null)
-            invoiceGloss = invoiceGloss + "(F-" + customerOrder.getMovement().getNumber() + ") ";
+        // uncomment para fijar factura en la glosa
+        /*if (customerOrder.getMovement() != null)
+            invoiceGloss = invoiceGloss + "(F-" + customerOrder.getMovement().getNumber() + ") ";*/
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                 MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + customerOrder.getCode() + invoiceGloss + customerOrder.getClient().getFullName());
