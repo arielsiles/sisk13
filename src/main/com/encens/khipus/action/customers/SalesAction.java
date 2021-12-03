@@ -61,6 +61,8 @@ public class SalesAction {
     private String nameSpecialBill = "";
     private Double amountSpecialBill = 0.0;
 
+    private String connectionStatus;
+
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
 
@@ -1058,6 +1060,21 @@ public class SalesAction {
         assignCustomerOrderTypeDefault();
     }
 
+    public Boolean connectionTest(){
+        Boolean result = Boolean.FALSE;
+
+        if (billControllerAction.connectionTest()){
+            connectionStatus = "Online";
+            result = Boolean.TRUE;
+        } else {
+            connectionStatus = "Offline";
+        }
+
+        System.out.println("-----> Test Conexion: " + connectionStatus);
+
+        return result;
+    }
+
     public Date getOrderDate() {
         return orderDate;
     }
@@ -1176,5 +1193,13 @@ public class SalesAction {
 
     public void setAmountSpecialBill(Double amountSpecialBill) {
         this.amountSpecialBill = amountSpecialBill;
+    }
+
+    public String getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(String connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 }

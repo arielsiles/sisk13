@@ -53,8 +53,8 @@ ALTER TABLE configuracion ADD COLUMN url_createbill VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_cancelbill VARCHAR(300) AFTER url_createbill;
 ALTER TABLE configuracion ADD COLUMN url_qr VARCHAR(300) AFTER url_cancelbill;
 
-UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.106:8080/api/billing/bills';
-UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.106:8080/api/billing/cancel-bill';
+UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.194:8080/api/billing/bills';
+UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.194:8080/api/billing/cancel-bill';
 UPDATE configuracion c SET c.`url_qr` = 'https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2';
 
 --
@@ -164,7 +164,7 @@ ALTER TABLE personacliente ADD COLUMN COMP VARCHAR(10) AFTER NRO_DOC;
 ALTER TABLE movimiento ADD COLUMN TIPOEMISION VARCHAR(100) AFTER estado;
 
 ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
-UPDATE configuracion c SET c.url_ping = 'http://10.0.0.106:8080/api/sync/ping';
+UPDATE configuracion c SET c.url_ping = 'http://10.0.0.194:8080/api/sync/ping';
 
 -- revisar
 INSERT INTO sin_unidadmedida VALUES (	1	,	'Q'	, 	'QUINTAL'	);

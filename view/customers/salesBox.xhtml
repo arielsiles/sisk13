@@ -192,12 +192,29 @@
 
         <s:div styleClass="buttonsRight">
 
+            <s:span id="connectionStatus">
+                <h:outputText styleClass="textBold12Blue">#{salesAction.connectionStatus}</h:outputText>
+            </s:span>
+
+            <!-- -->
+            <a4j:commandButton id="connectionTestButton"
+                               action="#{salesAction.connectionTest()}"
+                               value="Test Conexion"
+                               rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
+                               styleClass="button"
+                               immediate="true"
+                               ajaxSingle="true"
+                               reRender="connectionStatus">
+            </a4j:commandButton>
+
             <h:commandButton id="printBillReportButtonId"
                              action="#{printBillReportAction.generateReport()}"
                              value="Print Fact"
                              rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
+
+            <!-- -->
 
             <h:commandButton id="printInvoiceReportButtonId"
                              action="#{printInvoiceReportAction.generateReport()}"
