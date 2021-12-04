@@ -166,6 +166,12 @@ ALTER TABLE movimiento ADD COLUMN TIPOEMISION VARCHAR(100) AFTER estado;
 ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
 UPDATE configuracion c SET c.url_ping = 'http://10.0.0.194:8080/api/sync/ping';
 
+-- 04.12.2021
+
+
+
+--
+--
 -- revisar
 INSERT INTO sin_unidadmedida VALUES (	1	,	'Q'	, 	'QUINTAL'	);
 INSERT INTO sin_unidadmedida VALUES (	2	,	'CMT'	, 	'CENTIMETRO LINEAL'	);
