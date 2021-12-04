@@ -540,12 +540,13 @@ public class SalesAction {
 
         CashBox cashBox = userCashBoxService.findByUser(currentUser);
 
-        /*Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
-                MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
-                        customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());*/
+        // Comment, uncomment para fijar factura en la glosa
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                 MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
-                        customerOrder.getCode() + " " + customerOrder.getClient().getFullName());
+                        customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
+        /*Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
+                MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
+                        customerOrder.getCode() + " " + customerOrder.getClient().getFullName());*/
 
         CashAccount debitAccount = cashBox.getType().getCashAccountReceivable();
         Client client = customerOrder.getClient();
