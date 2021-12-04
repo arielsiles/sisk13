@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,6 +60,8 @@ public class BillControllerAction {
     public Boolean connectionTest() {
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
         String url_ping = companyConfiguration.getConnectionTestURL();
+
+        System.out.println("---->----> URL PING: " + url_ping);
 
         HttpURLConnection connection = null;
         BufferedReader reader;
@@ -95,7 +98,11 @@ public class BillControllerAction {
             }
 
 
+        } catch (ConnectException e) {
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
         } catch (MalformedURLException e) {
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
