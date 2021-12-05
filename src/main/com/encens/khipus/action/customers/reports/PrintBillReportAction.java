@@ -17,6 +17,7 @@ import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.FileCacheLoader;
 import com.encens.khipus.util.MoneyUtil;
@@ -29,6 +30,7 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -86,28 +88,18 @@ public class PrintBillReportAction extends GenericReportAction {
             return;
         }
 
-        /*if (lastCustomerOrder.getMovement() != null) {
-            if (lastCustomerOrder.getMovement().getDescri() != null) {
-                if (lastCustomerOrder.getMovement().getDescri().equals("VALIDADA")) {*/
+        String labelType = "ORIGINAL";
+        Map params = new HashMap();
+        params.putAll(getReportParams(dosage, lastCustomerOrder));
+        TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
 
-                    String labelType = "ORIGINAL";
-                    Map params = new HashMap();
-                    params.putAll(getReportParams(dosage, lastCustomerOrder));
-                    TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                    try {
-                        GenerationReportData generationReportData = new GenerationReportData(reportData);
-                        generationReportData.exportReport();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                /*} else
-                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
-            } else
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
-        }else
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"FACTURACION INVALIDA, Consulte con el Administrador");*/
     }
 
     private boolean hasValidInvoice(CustomerOrder customerOrder){
@@ -174,8 +166,13 @@ public class PrintBillReportAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        Double subtotal = lastCustomerOrder.getTotalAmount();
-        Double totalAmount = lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue();
+        //Double subtotal = lastCustomerOrder.getTotalAmount();
+        //Double totalAmount = lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue();
+
+        BigDecimal subtotal     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
+        BigDecimal discount     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue());
+        BigDecimal totalAmount  = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()),
+                                                          BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue()));
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());
@@ -189,10 +186,18 @@ public class PrintBillReportAction extends GenericReportAction {
         paramMap.put("companyLabel", dosage.getCompanyLabel());
         paramMap.put("lawLabel", dosage.getLawLabel());
         paramMap.put("labelType", "");
-        paramMap.put("subtotal", subtotal);
-        paramMap.put("discount", lastCustomerOrder.getCommissionValue());
-        paramMap.put("total", totalAmount);
+        paramMap.put("subtotal", subtotal.doubleValue());
+        paramMap.put("discount", discount.doubleValue());
+        paramMap.put("total", totalAmount.doubleValue());
         paramMap.put("literalTotal", moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
+
+        /*
+        System.out.println("................subtotal: " + lastCustomerOrder.getTotalAmount());
+        System.out.println("................CommissionValue: " + lastCustomerOrder.getCommissionValue());
+        System.out.println("................totalAmount: " + (lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue()));
+        System.out.println("................TOTALAMOUNT: " + totalAmount);
+        System.out.println("................Literal: " + moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
+        */
 
         Movement movement = lastCustomerOrder.getMovement();
         paramMap.put("cuf", movement.getCuf());

@@ -28,10 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,8 +73,8 @@ public class BillControllerAction {
 
             // Request Setup
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(7000);
+            connection.setReadTimeout(7000);
 
             int status = connection.getResponseCode();
 
@@ -98,13 +95,21 @@ public class BillControllerAction {
             }
 
 
+        } catch (SocketTimeoutException e) {
+            System.out.println(".............. EXCEPTION: SocketTimeoutException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
         } catch (ConnectException e) {
+            System.out.println(".............. EXCEPTION: ConnectException");
             serverResponse = new ServerResponse(Boolean.FALSE, null, "");
             e.printStackTrace();
         } catch (MalformedURLException e) {
+            System.out.println(".............. EXCEPTION: MalformedURLException");
             serverResponse = new ServerResponse(Boolean.FALSE, null, "");
             e.printStackTrace();
         } catch (IOException e) {
+            System.out.println(".............. EXCEPTION: IOException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
             e.printStackTrace();
         } finally {
             connection.disconnect();
@@ -382,7 +387,12 @@ public class BillControllerAction {
             detalle.setCantidad(articleOrder.getQuantity());
             detalle.setPrecioUnitario(articleOrder.getPrice());
             detalle.setMontoDescuento(articleOrder.getDiscount());
-            detalle.setSubTotal(articleOrder.getAmount()-articleOrder.getDiscount());
+            //detalle.setSubTotal(articleOrder.getAmount()-articleOrder.getDiscount());
+
+            detalle.setSubTotal(BigDecimalUtil.subtract(
+                    BigDecimalUtil.toBigDecimal(articleOrder.getAmount()),
+                    BigDecimalUtil.toBigDecimal(articleOrder.getDiscount())
+            ).doubleValue());
 
             detallePedidoPOJOList.add(detalle);
         }

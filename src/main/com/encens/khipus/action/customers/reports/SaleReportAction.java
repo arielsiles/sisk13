@@ -20,6 +20,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 /**
@@ -86,9 +87,14 @@ public class SaleReportAction extends GenericReportAction {
         setLastCustomerOrder(saleService.findSaleById(getCustomerOrderId()));
         //}
 
-        Double subtotal = lastCustomerOrder.getTotalAmount();
+        /*Double subtotal = lastCustomerOrder.getTotalAmount();
         Double discount = lastCustomerOrder.getCommissionValue();
-        Double totalAmount = subtotal - discount;
+        Double totalAmount = subtotal - discount;*/
+
+        BigDecimal subtotal     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
+        BigDecimal discount     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue());
+        BigDecimal totalAmount  = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()),
+                BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue()));
 
 
         MoneyUtil money = new MoneyUtil();
@@ -109,9 +115,9 @@ public class SaleReportAction extends GenericReportAction {
         reportParameters.put("documentTitle", documentTitle);
         reportParameters.put("saleNumber", saleNumber);
 
-        reportParameters.put("subtotal", subtotal);
-        reportParameters.put("discount", discount);
-        reportParameters.put("totalAmount", totalAmount);
+        reportParameters.put("subtotal", subtotal.doubleValue());
+        reportParameters.put("discount", discount.doubleValue());
+        reportParameters.put("totalAmount", totalAmount.doubleValue());
 
         String literalAmount = money.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs"));
         reportParameters.put("literalAmount", literalAmount);
