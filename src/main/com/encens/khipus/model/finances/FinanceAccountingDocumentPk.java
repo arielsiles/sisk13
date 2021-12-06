@@ -17,7 +17,7 @@ public class FinanceAccountingDocumentPk implements Serializable {
     @Column(name = "COD_ENTI", length = 6, updatable = false, nullable = false)
     private String entityCode;
 
-    @Column(name = "NO_AUTO", length = 6, updatable = false, nullable = false)
+    @Column(name = "NO_AUTO", updatable = false, nullable = false)
     private String authorizationNumber;
 
     @Column(name = "NO_FACT", length = 20, updatable = false, nullable = false)

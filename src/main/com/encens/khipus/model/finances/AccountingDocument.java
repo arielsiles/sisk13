@@ -81,8 +81,8 @@ public class AccountingDocument implements BaseModel {
     @Length(max = 20)
     private String number;
 
-    @Column(name = "NUMEROAUTORIZACION", length = 20)
-    @Length(max = 20)
+    @Column(name = "NUMEROAUTORIZACION", length = 150)
+    @Length(max = 150)
     private String authorizationNumber;
 
     @GeneratedValue(generator = "AccountingDocument.sequenceGenerator")
