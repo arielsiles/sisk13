@@ -169,10 +169,8 @@ public class PrintBillReportAction extends GenericReportAction {
         //Double subtotal = lastCustomerOrder.getTotalAmount();
         //Double totalAmount = lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue();
 
-        BigDecimal subtotal     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
-        BigDecimal discount     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue());
-        BigDecimal totalAmount  = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()),
-                                                          BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue()));
+        BigDecimal subtotal     = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getProductDiscountValue());
+        BigDecimal totalAmount  = BigDecimalUtil.subtract(subtotal, lastCustomerOrder.getAdditionalDiscountValue());
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());
@@ -187,7 +185,7 @@ public class PrintBillReportAction extends GenericReportAction {
         paramMap.put("lawLabel", dosage.getLawLabel());
         paramMap.put("labelType", "");
         paramMap.put("subtotal", subtotal.doubleValue());
-        paramMap.put("discount", discount.doubleValue());
+        paramMap.put("discount", lastCustomerOrder.getAdditionalDiscountValue().doubleValue());
         paramMap.put("total", totalAmount.doubleValue());
         paramMap.put("literalTotal", moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
 

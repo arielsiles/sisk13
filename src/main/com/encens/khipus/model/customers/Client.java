@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -89,6 +90,12 @@ public class Client implements BaseModel {
 
     @Column(name = "RAZONSOCIAL")
     private String businessName;
+
+    @Column(name = "DESCUENTO")
+    private BigDecimal additionalDiscount;
+
+    @Column(name = "DESCUENTOPROD")
+    private BigDecimal productDiscount;
 
     @Column(name = "PORCENTAJECOMISION")
     private Double commission;
@@ -366,5 +373,21 @@ public class Client implements BaseModel {
 
     public void setComplement(String complement) {
         this.complement = complement;
+    }
+
+    public BigDecimal getAdditionalDiscount() {
+        return additionalDiscount;
+    }
+
+    public void setAdditionalDiscount(BigDecimal additionalDiscount) {
+        this.additionalDiscount = additionalDiscount;
+    }
+
+    public BigDecimal getProductDiscount() {
+        return productDiscount;
+    }
+
+    public void setProductDiscount(BigDecimal productDiscount) {
+        this.productDiscount = productDiscount;
     }
 }

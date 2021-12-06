@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
-                xmlns:rich="http://richfaces.org/rich"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 <ui:define name="pageTitle">
     <c:choose>
@@ -294,9 +294,27 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <!--<s:decorate id="discountField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.discountPercentage']}</ui:define>
         <h:inputText id="discount" value="#{client.commission}" required="false" tabindex="8" styleClass="inputTiny">
+            <a4j:support event="onchange" reRender="discountField"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="discount"/>
+        </h:inputText>
+    </s:decorate>-->
+
+    <s:decorate id="productDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.productDiscountPercentage']}</ui:define>
+        <h:inputText id="productDiscount" value="#{client.productDiscount}" required="false" tabindex="8" styleClass="inputTiny">
+            <a4j:support event="onchange" reRender="productDiscountField"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="productDiscount"/>
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="additionalDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.additionalDiscountPercentage']}</ui:define>
+        <h:inputText id="additionalDiscount" value="#{client.additionalDiscount}" required="false" tabindex="8" styleClass="inputTiny">
+            <a4j:support event="onchange" reRender="additionalDiscountField"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="additionalDiscount"/>
         </h:inputText>
     </s:decorate>
 

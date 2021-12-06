@@ -8,18 +8,19 @@ public class PedidoPOJO {
     private Integer codigoSucursal;
     private Integer codigoPuntoVenta;
     private Integer numeroFactura;
-    private String nombreRazonSocial; //: RAMIREZ
-    private Integer codigoTipoDocumentoIdentidad; // 1:CI - CEDULA DE IDENTIDAD | 2:CEX - CEDULA DE IDENTIDAD DE EXTRANJERO | 5:NIT - NÚMERO DE IDENTIFICACIÓN TRIBUTARIA
-    private String numeroDocumento; //: "5153244"
-    private String codigoCliente; //: "10101010"
-    private Integer codigoMetodoPago; // 1:EFECTIVO | 3:CHEQUE | 6:PAGO POSTERIOR | 7:TRANSFERENCIA BANCARIA | 8:DEPOSITO EN CUENTA |
-    private String usuario; // "milena"
-    private Integer codigoDocumentoSector; // 1:FACTURA COMPRA-VENTA (sector-document-types)
-    private Integer codigoMoneda; // 1:BOLIVIANO
-    private Integer tipoCambio; // 1,
-    private BigDecimal montoTotal; // 500
-    private BigDecimal montoTotalSujetoIva; // 500
+    private String nombreRazonSocial;
+    private Integer codigoTipoDocumentoIdentidad;
+    private String numeroDocumento;
+    private String codigoCliente;
+    private Integer codigoMetodoPago;
+    private String usuario;
+    private Integer codigoDocumentoSector;
+    private Integer codigoMoneda;
+    private Integer tipoCambio;
+    private BigDecimal montoTotal;
+    private BigDecimal montoTotalSujetoIva;
     private BigDecimal montoTotalMoneda;
+    private BigDecimal descuentoAdicional;
 
     private List<DetallePedidoPOJO> detalle;
 
@@ -149,5 +150,13 @@ public class PedidoPOJO {
 
     public void setCodigoPuntoVenta(Integer codigoPuntoVenta) {
         this.codigoPuntoVenta = codigoPuntoVenta;
+    }
+
+    public BigDecimal getDescuentoAdicional() {
+        return descuentoAdicional;
+    }
+
+    public void setDescuentoAdicional(BigDecimal descuentoAdicional) {
+        this.descuentoAdicional = descuentoAdicional;
     }
 }

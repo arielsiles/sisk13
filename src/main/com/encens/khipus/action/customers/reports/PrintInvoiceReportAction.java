@@ -110,7 +110,7 @@ public class PrintInvoiceReportAction extends GenericReportAction {
         String controlCode = lastCustomerOrder.getMovement().getControlCode();
         String qrCode = lastCustomerOrder.getMovement().getQrCode();
         Double totalAmount = lastCustomerOrder.getTotalAmount();
-        Double discount = lastCustomerOrder.getCommissionValue();
+        Double discount = lastCustomerOrder.getAdditionalDiscountValue().doubleValue();
 
         String labelType = "ORIGINAL";
         Map params = new HashMap();

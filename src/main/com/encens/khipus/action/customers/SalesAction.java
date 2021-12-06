@@ -483,6 +483,30 @@ public class SalesAction {
             customerOrder.setCommissionValue(sumDiscount.doubleValue());
         }
 
+
+        /** For Additional Discount **/
+        if (client.getAdditionalDiscount().doubleValue() > 0){
+            BigDecimal percentage = BigDecimalUtil.divide(client.getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED);
+            BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
+            customerOrder.setAdditionalDiscountValue(discountValue);
+        }
+
+        /** For commissions **/
+        if (client.getProductDiscount().doubleValue() > 0){
+            BigDecimal percentage = BigDecimalUtil.divide(client.getProductDiscount(), BigDecimalUtil.ONE_HUNDRED);
+            BigDecimal sumDiscount = BigDecimal.ZERO;
+
+            for (ArticleOrder articleOrder : articleOrderList){
+                BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getAmount()), percentage);
+                articleOrder.setDiscount(discountValue.doubleValue());
+                sumDiscount = BigDecimalUtil.sum(sumDiscount, discountValue);
+            }
+            customerOrder.setProductDiscountValue(sumDiscount);
+        }
+
+        customerOrder.setTax(BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
+                BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue())).doubleValue());
+
         if (subsidyEnun != null)
             customerOrder.setDescription(subsidyEnun.getSubsidyType());
 
@@ -498,13 +522,6 @@ public class SalesAction {
         }
 
         String outcome = saleService.createSale(customerOrder);
-
-        /*if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH)){
-            Movement movement = createInvoice(customerOrder);
-            movementService.createMovement(movement);
-            customerOrder.setMovement(movement);
-            saleService.updateCustomerOrder(customerOrder);
-        }*/
 
         return customerOrder;
     }
@@ -536,7 +553,8 @@ public class SalesAction {
         movement.setExemptExport(BigDecimal.ZERO);
         movement.setTaxedSalesZero(BigDecimal.ZERO);
         movement.setSubtotal(BigDecimalUtil.toBigDecimal(sfc.getAmount())); /** todo **/
-        movement.setDiscount(BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
+        //movement.setDiscount(BigDecimalUtil.toBigDecimal(customerOrder.getCommmissionValue()));
+        movement.setDiscount(BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue()));
 
         BigDecimal amountFiscalDebit = BigDecimalUtil.subtract(movement.getAmount(), movement.getDiscount());
         movement.setAmountFiscalDebit(amountFiscalDebit);

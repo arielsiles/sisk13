@@ -91,10 +91,9 @@ public class SaleReportAction extends GenericReportAction {
         Double discount = lastCustomerOrder.getCommissionValue();
         Double totalAmount = subtotal - discount;*/
 
-        BigDecimal subtotal     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
-        BigDecimal discount     = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue());
-        BigDecimal totalAmount  = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()),
-                BigDecimalUtil.toBigDecimal(lastCustomerOrder.getCommissionValue()));
+        BigDecimal subtotal           = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getProductDiscountValue());
+        BigDecimal additionalDiscount = lastCustomerOrder.getAdditionalDiscountValue();
+        BigDecimal totalAmount        = BigDecimalUtil.subtract(subtotal, additionalDiscount);
 
 
         MoneyUtil money = new MoneyUtil();
@@ -116,7 +115,7 @@ public class SaleReportAction extends GenericReportAction {
         reportParameters.put("saleNumber", saleNumber);
 
         reportParameters.put("subtotal", subtotal.doubleValue());
-        reportParameters.put("discount", discount.doubleValue());
+        reportParameters.put("discount", additionalDiscount.doubleValue());
         reportParameters.put("totalAmount", totalAmount.doubleValue());
 
         String literalAmount = money.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs"));

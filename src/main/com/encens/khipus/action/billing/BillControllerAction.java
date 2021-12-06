@@ -353,7 +353,8 @@ public class BillControllerAction {
         if (clientCode == null)
             clientCode = customerOrder.getClient().getNitNumber();
 
-        BigDecimal amountValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
+        BigDecimal totalDiscount = BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue());
+        BigDecimal amountValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), totalDiscount);
 
         /** todo parametrizar **/
         pedidoPOJO.setCodigoSucursal(dosage.getBranchOffice().getOfficeCode());
@@ -370,6 +371,7 @@ public class BillControllerAction {
         pedidoPOJO.setMontoTotal(amountValue);
         pedidoPOJO.setMontoTotalSujetoIva(amountValue);
         pedidoPOJO.setMontoTotalMoneda(amountValue);
+        pedidoPOJO.setDescuentoAdicional(customerOrder.getAdditionalDiscountValue());
 
         List<DetallePedidoPOJO> detallePedidoPOJOList = new ArrayList<DetallePedidoPOJO>();
 

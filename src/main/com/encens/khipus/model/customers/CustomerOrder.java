@@ -100,6 +100,12 @@ public class CustomerOrder implements BaseModel  {
     @Column(name = "PORCENTAJEGARANTIA")
     private Double guaranteePercentage = 0.0;
 
+    @Column(name = "DESCUENTOPRODUCTO")
+    private BigDecimal productDiscountValue = BigDecimal.ZERO;
+
+    @Column(name = "DESCUENTOADICIONAL")
+    private BigDecimal additionalDiscountValue = BigDecimal.ZERO;
+
     @Column(name = "VALORCOMISION")
     private Double commissionValue = 0.0;
 
@@ -405,5 +411,21 @@ public class CustomerOrder implements BaseModel  {
 
     public void setFlagct(Boolean flagct) {
         this.flagct = flagct;
+    }
+
+    public BigDecimal getProductDiscountValue() {
+        return productDiscountValue;
+    }
+
+    public void setProductDiscountValue(BigDecimal productDiscountValue) {
+        this.productDiscountValue = productDiscountValue;
+    }
+
+    public BigDecimal getAdditionalDiscountValue() {
+        return additionalDiscountValue;
+    }
+
+    public void setAdditionalDiscountValue(BigDecimal additionalDiscountValue) {
+        this.additionalDiscountValue = additionalDiscountValue;
     }
 }

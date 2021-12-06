@@ -86,7 +86,7 @@ public class AccountingCreditSaleAction extends GenericAction {
             }else { /** Ventas facturadas **/
 
                 /** Ventas con porcentaje de comision (Eg. Sedem) **/
-                if (customerOrder.getCommissionPercentage() > 0){
+                if (customerOrder.getAdditionalDiscountValue().doubleValue() > 0){
                     Voucher voucher = accountingCreditSaleWithCommission(customerOrder);
                     customerOrder.setVoucher(voucher);
                 }
@@ -94,7 +94,7 @@ public class AccountingCreditSaleAction extends GenericAction {
                 /** Ventas normales facturadas **/
                 if ((customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) ||
                      customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)   ||
-                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) && customerOrder.getCommissionPercentage() == 0 ){
+                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) && customerOrder.getAdditionalDiscountValue().doubleValue() == 0 ){
 
                     if (customerOrder.getMovement() !=  null){
                         Voucher voucher = accountingCreditSale(customerOrder);
@@ -148,12 +148,16 @@ public class AccountingCreditSaleAction extends GenericAction {
         BigDecimal saleProductIVAValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), companyConfiguration.getIvaTaxValue());
         BigDecimal saleProductValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), saleProductIVAValue);
 
-        BigDecimal commissionValue = BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue());
-        BigDecimal commissionIVA = BigDecimalUtil.multiply(commissionValue, companyConfiguration.getIvaTaxValue());
-        BigDecimal netCommissionValue = BigDecimalUtil.subtract(commissionValue, commissionIVA);
+        //BigDecimal commissionValue_ = BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue());
+        //BigDecimal commissionIVA_ = BigDecimalUtil.multiply(commissionValue, companyConfiguration.getIvaTaxValue());
+
+        BigDecimal discountValue = BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue());
+        BigDecimal discountIVA = BigDecimalUtil.multiply(discountValue, companyConfiguration.getIvaTaxValue());
+
+        BigDecimal netCommissionValue = BigDecimalUtil.subtract(discountValue, discountIVA);
 
         BigDecimal itTaxValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), companyConfiguration.getItTaxValue());
-        BigDecimal receivableValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), commissionValue);
+        BigDecimal receivableValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), discountValue);
 
         VoucherDetail debitReceivable = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                 cashBox.getType().getCashAccountReceivable(), receivableValue, FinancesCurrencyType.D, BigDecimal.ONE);
@@ -162,7 +166,7 @@ public class AccountingCreditSaleAction extends GenericAction {
                 companyConfiguration.getCommissionSalesCashAccount(), netCommissionValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitFiscalCreditIVACommision = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), commissionIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitTaxTransaction = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
                 companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
@@ -181,7 +185,7 @@ public class AccountingCreditSaleAction extends GenericAction {
                 companyConfiguration.getTransactionTaxPayable(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditFiscalCreditIVACommision = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), commissionIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
 
 
         debitReceivable.setClient(customerOrder.getClient());
