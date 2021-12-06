@@ -1067,7 +1067,7 @@ public class SalesAction {
             connectionStatus = "Online";
             result = Boolean.TRUE;
         } else {
-            connectionStatus = "Offline";
+            connectionStatus = "Sin conexion";
         }
 
         System.out.println("-----> Test Conexion: " + connectionStatus);

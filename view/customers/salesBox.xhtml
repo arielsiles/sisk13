@@ -197,6 +197,16 @@
             </s:span>
 
             <!-- -->
+            <a4j:commandButton id="onlineOfflineModeCommandButton"
+                               action="#{salesAction.initCashSale}"
+                               value="On/Off line"
+
+                               styleClass="button"
+                               immediate="true"
+                               oncomplete="Richfaces.showModalPanel('confirmOnlineOfflineModeModalPanel');"
+                               reRender="productDataTable, confirmOnlineOfflineModeModalPanel">
+            </a4j:commandButton>
+
             <a4j:commandButton id="connectionTestButton"
                                action="#{salesAction.connectionTest()}"
                                value="Test Conexion"
@@ -373,6 +383,11 @@
     <s:decorate id="confirmCashSaleModalPanelContainer" template="/customers/confirmCashSaleModalPanel.xhtml">
         <ui:param name="containerId" value="confirmCashSaleModalPanelContainer"/>
         <ui:param name="dialogId" value="confirmCashSaleModalPanel"/>
+    </s:decorate>
+
+    <s:decorate id="confirmOnlineOfflineModeContainer" template="/customers/confirmOnlineOfflineModeModalPanel.xhtml">
+        <ui:param name="containerId" value="confirmOnlineOfflineModeModalPanelContainer"/>
+        <ui:param name="dialogId" value="confirmOnlineOfflineModeModalPanel"/>
     </s:decorate>
 
     <s:decorate id="productItemsByWarehouseListModalPanelContainer"
