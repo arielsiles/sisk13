@@ -169,8 +169,10 @@ public class PrintBillReportAction extends GenericReportAction {
         //Double subtotal = lastCustomerOrder.getTotalAmount();
         //Double totalAmount = lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue();
 
-        BigDecimal subtotal     = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getProductDiscountValue());
-        BigDecimal totalAmount  = BigDecimalUtil.subtract(subtotal, lastCustomerOrder.getAdditionalDiscountValue());
+        //BigDecimal subtotal     = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getProductDiscountValue());
+        //BigDecimal totalAmount  = BigDecimalUtil.subtract(subtotal, lastCustomerOrder.getAdditionalDiscountValue());
+        BigDecimal subtotal    = BigDecimalUtil.sum(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getAdditionalDiscountValue());
+        BigDecimal totalAmount = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());

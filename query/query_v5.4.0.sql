@@ -27,10 +27,6 @@ UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 8;
 UPDATE dosificacion d SET d.`caeb` = '105000';
 UPDATE personacliente p SET p.`idtipodocsin` = 2 WHERE p.`TIPO_PERSONA` = 'institucion';
 
-
-UPDATE personacliente p SET p.`DESCUENTO` = p.`PORCENTAJECOMISION` WHERE p.`PORCENTAJECOMISION` > 0 ;
-UPDATE personacliente p SET p.`PORCENTAJECOMISION` = 0 WHERE p.`PORCENTAJECOMISION` > 0 ;
-
 --
 CREATE TABLE sin_metodopago (
 	idmetodopago BIGINT(20) NOT NULL,
@@ -182,6 +178,10 @@ ALTER TABLE pedidos ADD COLUMN DESCUENTOADICIONAL DECIMAL(16,2) AFTER TOTALIMPOR
 
 UPDATE pedidos p SET p.`DESCUENTOADICIONAL` = 0;
 UPDATE pedidos p SET p.`DESCUENTOPRODUCTO` = 0;
+
+--
+UPDATE personacliente p SET p.`DESCUENTO` = p.`PORCENTAJECOMISION` WHERE p.`PORCENTAJECOMISION` > 0 ;
+UPDATE personacliente p SET p.`PORCENTAJECOMISION` = 0 WHERE p.`PORCENTAJECOMISION` > 0 ;
 
 --
 --

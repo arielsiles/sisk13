@@ -168,6 +168,14 @@
                         <s:defaultAction/>
                     </h:commandButton>
 
+                    <h:commandButton id="generateNotesId"
+                                     action="#{saleReportAction.generateNotesReport(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     value="Imprimir Notas" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
                     -
 
                     <h:commandButton id="searchButtonId"

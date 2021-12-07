@@ -185,7 +185,12 @@ public class BillControllerAction {
             System.out.println("--> Response Code: " + serverResponse.getResponseCode());
             System.out.println("--> Response Json: " + serverResponse.getResponseJson());
 
-            JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+            if (serverResponse.getResponseCode() == -1){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION, -1");
+                return;
+            }
+
+            JsonNode jsonNode = Json.parse(serverResponse.getResponseJson()); /** **/
             String result = Json.prettyPrint(jsonNode);
             System.out.println(result);
 
@@ -207,7 +212,7 @@ public class BillControllerAction {
 
         } else {
             System.out.println(">>>>> SIN CONEXION!!!");
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion fuera de linea...");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION...");
         }
 
 
