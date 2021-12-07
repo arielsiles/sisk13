@@ -238,7 +238,8 @@ public class PrintBillReportAction extends GenericReportAction {
                 " articleOrder.total as total, "+
                 " articleOrder.amount as amount, "+
                 " articleOrder.customerOrder.description as description," +
-                " articleOrder.codArt "+
+                " articleOrder.codArt," +
+                " articleOrder.discount "+
                 " FROM ArticleOrder articleOrder";
 
         String[] restrictions = new String[]{"articleOrder.customerOrder.id = #{printBillReportAction.customerOrder.getId()}"};

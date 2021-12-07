@@ -268,8 +268,15 @@ public class SalesAction {
             articleOrder.setQuantity(0);
         }
 
-        Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
-        articleOrder.setAmount(BigDecimalUtil.toBigDecimal(amount).doubleValue());
+        //Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
+        BigDecimal amountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()), BigDecimalUtil.toBigDecimal(articleOrder.getPrice()));
+        BigDecimal discount    = BigDecimalUtil.multiply(amountValue, BigDecimalUtil.divide(getClient().getProductDiscount(), BigDecimalUtil.ONE_HUNDRED, 4) );
+
+        articleOrder.setDiscount(discount.doubleValue());
+
+        amountValue = BigDecimalUtil.subtract(amountValue, discount);
+        articleOrder.setAmount(amountValue.doubleValue());
+
         calculateTotalUnits(articleOrder);
     }
 
@@ -461,11 +468,11 @@ public class SalesAction {
         customerOrder.setTotalAmount(totalAmount.doubleValue());
         customerOrder.setCommissionPercentage(0.0);
         customerOrder.setCommissionValue(0.0);
-        BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
-        customerOrder.setTax(tax.doubleValue());
+        //BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
+        //customerOrder.setTax(tax.doubleValue());
 
         /** For commissions **/
-        if (client.getCommission() > 0){
+        /*if (client.getCommission() > 0){
             BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED, 4);
             BigDecimal commissionValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
             BigDecimal totalVar = BigDecimalUtil.subtract(totalAmount, commissionValue);
@@ -481,31 +488,34 @@ public class SalesAction {
                 sumDiscount = BigDecimalUtil.sum(sumDiscount, discountValue);
             }
             customerOrder.setCommissionValue(sumDiscount.doubleValue());
-        }
+        }*/
 
-
-        /** For Additional Discount **/
-        if (client.getAdditionalDiscount().doubleValue() > 0){
-            BigDecimal percentage = BigDecimalUtil.divide(client.getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED);
-            BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
-            customerOrder.setAdditionalDiscountValue(discountValue);
-        }
-
-        /** For commissions **/
+        /** For Product Discount **/
+        System.out.println("----------------> client.getProductDiscount(): " + client.getProductDiscount().doubleValue());
         if (client.getProductDiscount().doubleValue() > 0){
-            BigDecimal percentage = BigDecimalUtil.divide(client.getProductDiscount(), BigDecimalUtil.ONE_HUNDRED);
             BigDecimal sumDiscount = BigDecimal.ZERO;
 
             for (ArticleOrder articleOrder : articleOrderList){
-                BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getAmount()), percentage);
-                articleOrder.setDiscount(discountValue.doubleValue());
-                sumDiscount = BigDecimalUtil.sum(sumDiscount, discountValue);
+                sumDiscount = BigDecimalUtil.sum(sumDiscount, BigDecimalUtil.toBigDecimal(articleOrder.getDiscount()));
+                System.out.println("........sumDiscount: " + sumDiscount);
             }
             customerOrder.setProductDiscountValue(sumDiscount);
         }
 
-        customerOrder.setTax(BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()),
-                BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue())).doubleValue());
+        System.out.println("==============> 1.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
+        System.out.println("==============> 1.PRODUCT DISCOUNT: " + customerOrder.getProductDiscountValue());
+
+        /** For Additional Discount **/
+        if (client.getAdditionalDiscount().doubleValue() > 0){
+            BigDecimal percentage = BigDecimalUtil.divide(client.getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4);
+            BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
+
+            customerOrder.setAdditionalDiscountValue(discountValue);
+            customerOrder.setTotalAmount(BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), discountValue).doubleValue());
+        }
+        System.out.println("==============> 2.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
+
+        customerOrder.setTax( BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT).doubleValue() );
 
         if (subsidyEnun != null)
             customerOrder.setDescription(subsidyEnun.getSubsidyType());

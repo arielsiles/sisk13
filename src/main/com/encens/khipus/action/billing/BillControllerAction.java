@@ -73,8 +73,8 @@ public class BillControllerAction {
 
             // Request Setup
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(7000);
-            connection.setReadTimeout(7000);
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
 
             int status = connection.getResponseCode();
 
@@ -354,7 +354,7 @@ public class BillControllerAction {
             clientCode = customerOrder.getClient().getNitNumber();
 
         BigDecimal totalDiscount = BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue());
-        BigDecimal amountValue = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), totalDiscount);
+        BigDecimal amountValue = BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount());
 
         /** todo parametrizar **/
         pedidoPOJO.setCodigoSucursal(dosage.getBranchOffice().getOfficeCode());
@@ -389,12 +389,7 @@ public class BillControllerAction {
             detalle.setCantidad(articleOrder.getQuantity());
             detalle.setPrecioUnitario(articleOrder.getPrice());
             detalle.setMontoDescuento(articleOrder.getDiscount());
-            //detalle.setSubTotal(articleOrder.getAmount()-articleOrder.getDiscount());
-
-            detalle.setSubTotal(BigDecimalUtil.subtract(
-                    BigDecimalUtil.toBigDecimal(articleOrder.getAmount()),
-                    BigDecimalUtil.toBigDecimal(articleOrder.getDiscount())
-            ).doubleValue());
+            detalle.setSubTotal(articleOrder.getAmount());
 
             detallePedidoPOJOList.add(detalle);
         }
