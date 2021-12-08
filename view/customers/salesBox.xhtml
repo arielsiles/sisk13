@@ -182,7 +182,8 @@
 
     </rich:panel>
 
-    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">
+    <!--<h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">-->
+    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width30percent,width70percent">
         <s:div id="totalAmountField">
                 <h:outputText value="Total:" styleClass="text10" />
                 <h:outputText id="totalAmount" value="#{salesAction.calculateTotalAmount()}" styleClass="textBold12Blue" >
@@ -198,7 +199,7 @@
 
             <!-- -->
             <a4j:commandButton id="onlineOfflineModeCommandButton"
-                               action="#{salesAction.initCashSale}"
+                               action="#{salesAction.chekBillingMode()}"
                                value="On/Off line"
 
                                styleClass="button"

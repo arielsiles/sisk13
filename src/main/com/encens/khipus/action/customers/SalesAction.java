@@ -62,6 +62,7 @@ public class SalesAction {
     private Double amountSpecialBill = 0.0;
 
     private String connectionStatus;
+    private String billingMode;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -1103,6 +1104,15 @@ public class SalesAction {
         return result;
     }
 
+    public void chekBillingMode() throws IOException {
+
+        if (billControllerAction.checkBillingMode())
+            this.setBillingMode("En Linea");
+        else
+            this.setBillingMode("Fuera de Linea");
+
+    }
+
     public Date getOrderDate() {
         return orderDate;
     }
@@ -1229,5 +1239,13 @@ public class SalesAction {
 
     public void setConnectionStatus(String connectionStatus) {
         this.connectionStatus = connectionStatus;
+    }
+
+    public String getBillingMode() {
+        return billingMode;
+    }
+
+    public void setBillingMode(String billingMode) {
+        this.billingMode = billingMode;
     }
 }

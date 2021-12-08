@@ -20,8 +20,8 @@
         <rich:panel id="onOffPanel">
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Cliente:</ui:define>
-                <h:outputText value="#{salesAction.client.fullName}"/>
+                <ui:define name="label">Modo Facturación:</ui:define>
+                <h:outputText value="#{salesAction.billingMode}"/>
             </s:decorate>
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">

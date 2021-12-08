@@ -234,27 +234,6 @@ public class BillControllerAction {
             String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
             System.out.println(jsonCancelBill);
 
-            /*
-            URL url = new URL (companyConfiguration.getCancelbillURL());
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json; utf-8");
-            con.setRequestProperty("Accept", "application/json");
-            con.setDoOutput(true);
-
-            OutputStream os = con.getOutputStream();
-            byte[] input = jsonCancelBill.getBytes("utf-8");
-            os.write(input, 0, input.length);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-            StringBuilder response = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            String responseJsonString = response.toString();
-            */
-
             if (connectionTest()) {
                 System.out.println(">>>>> CONEXION EXITOSA!!!");
                 ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
@@ -276,54 +255,34 @@ public class BillControllerAction {
         }
     }
 
-    /*public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
-        System.out.println("---------- CANCEL BILL ----------");
-        User user = getUser(currentUser.getId()); //
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+    public Boolean checkBillingMode() throws IOException{
 
-        if (customerOrder.getMovement() != null){
-            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-            URL url = new URL (companyConfiguration.getCancelbillURL());
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
-            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(
-                    dosage.getBranchOffice().getOfficeCode(),
-                    dosage.getBranchOffice().getPosCode(),reasonCode,
-                    customerOrder.getMovement().getCuf());
+        CheckBillingModePOJO checkBillingModePOJO = new CheckBillingModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
+        String jsonString = Json.prettyPrint(Json.toJson(checkBillingModePOJO));
+        System.out.println("-----------------------CheckBillingModePOJO-------------------");
+        System.out.println("----------> URL: " + companyConfiguration.getCheckBillingModeURL());
+        System.out.println(jsonString);
 
-            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
-            System.out.println(jsonCancelBill);
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCheckBillingModeURL() , jsonString);
 
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json; utf-8");
-            con.setRequestProperty("Accept", "application/json");
-            con.setDoOutput(true);
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
 
-            OutputStream os = con.getOutputStream();
-            byte[] input = jsonCancelBill.getBytes("utf-8");
-            os.write(input, 0, input.length);
+        CheckBillingModeResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, CheckBillingModeResponsePOJO.class);
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-            StringBuilder response = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
+        System.out.println("----> Response isOnline: " + responsePOJO.getIsOnline());
 
-            String responseJsonString = response.toString();
-            System.out.println("---------- RESPONSE CANCEL BILL ----------");
+        if (responsePOJO.getIsOnline())
+            System.out.println("---> ok true");
+        else
+            System.out.println("----> Fail true");
 
-            JsonNode jsonNode = Json.parse(responseJsonString);
-            String result = Json.prettyPrint(jsonNode);
-            System.out.println(result);
-
-            Movement movement = customerOrder.getMovement();
-            movement.setState("A");
-            movement.setCodigoEstado(jsonNode.get("codigoEstado").asText());
-            movement.setDescri(jsonNode.get("codigoDescripcion").asText());
-            movementService.updateMovement(movement);
-        }
-    }*/
+        return responsePOJO.getIsOnline();
+    }
 
     public void createResponseObject(String responseJsonString) throws IOException {
         JsonNode nodeResponse = Json.parse(responseJsonString);

@@ -53,6 +53,9 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_online_offline_mode")
+    private String checkBillingModeURL;
+
     @Column(name = "url_createbill")
     private String createbillURL;
 
@@ -1487,5 +1490,13 @@ public class CompanyConfiguration {
 
     public void setConnectionTestURL(String connectionTestURL) {
         this.connectionTestURL = connectionTestURL;
+    }
+
+    public String getCheckBillingModeURL() {
+        return checkBillingModeURL;
+    }
+
+    public void setCheckBillingModeURL(String checkBillingModeURL) {
+        this.checkBillingModeURL = checkBillingModeURL;
     }
 }

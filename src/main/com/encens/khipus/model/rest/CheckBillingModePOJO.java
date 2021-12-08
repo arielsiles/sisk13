@@ -8,6 +8,11 @@ public class CheckBillingModePOJO {
     private Integer codigoSucursal;
     private Integer codigoPuntoVenta;
 
+    public CheckBillingModePOJO(Integer codigoSucursal, Integer codigoPuntoVenta) {
+        this.codigoSucursal = codigoSucursal;
+        this.codigoPuntoVenta = codigoPuntoVenta;
+    }
+
     public Integer getCodigoSucursal() {
         return codigoSucursal;
     }
