@@ -52,12 +52,15 @@ UPDATE dosificacion d SET d.`cod_docsector` = 1;
 ALTER TABLE configuracion ADD COLUMN url_createbill VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_cancelbill VARCHAR(300) AFTER url_createbill;
 ALTER TABLE configuracion ADD COLUMN url_qr VARCHAR(300) AFTER url_cancelbill;
+ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
+ALTER TABLE configuracion ADD COLUMN url_online_offline_mode VARCHAR(300) AFTER lugar;
 
+UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.196:8080/api/billing/query-online-offline-mode';
+UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
 UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.196:8080/api/billing/bills';
 UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.196:8080/api/billing/cancel-bill';
 UPDATE configuracion c SET c.`url_qr` = 'https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2';
 
-UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
 
 --
 ALTER TABLE movimiento ADD COLUMN CUF VARCHAR(255) AFTER NROFACTURA;
@@ -164,9 +167,6 @@ ALTER TABLE personacliente ADD COLUMN COMP VARCHAR(10) AFTER NRO_DOC;
 
 -- 27.11.2021
 ALTER TABLE movimiento ADD COLUMN TIPOEMISION VARCHAR(100) AFTER estado;
-
-ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
-UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
 
 -- 06.12.2021
 ALTER TABLE personacliente ADD COLUMN DESCUENTO DECIMAL(10, 2) AFTER iddepartamento;
