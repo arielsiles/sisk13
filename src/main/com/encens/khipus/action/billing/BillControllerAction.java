@@ -284,6 +284,27 @@ public class BillControllerAction {
         return responsePOJO.getIsOnline();
     }
 
+    public List<SignificantEventCodePOJO> querySignificantEvents() throws IOException {
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+        SignificantEventPOJO significantEventPOJO = new SignificantEventPOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
+        String jsonString = Json.prettyPrint(Json.toJson(significantEventPOJO));
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getSignificantEventURL(), jsonString);
+
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println("-----------------querySignificantEvents------------");
+        System.out.println(result);
+
+        SignificantEventResponsePOJO objectResponse = Json.fromJson(jsonNodeResponse, SignificantEventResponsePOJO.class);
+        System.out.println("-----------------SignificantEvents Object------------");
+        System.out.println("----> transaccion: " + objectResponse.getTransaccion());
+        System.out.println("----> listaCodigos: " + objectResponse.getListaCodigos().size());
+
+        return objectResponse.getListaCodigos();
+    }
+
     public void createResponseObject(String responseJsonString) throws IOException {
         JsonNode nodeResponse = Json.parse(responseJsonString);
         BillResponsePOJO billResponsePOJO = Json.fromJson(nodeResponse, BillResponsePOJO.class);

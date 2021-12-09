@@ -8,6 +8,11 @@ public class SignificantEventPOJO {
     private Integer codigoSucursal;
     private Integer codigoPuntoVenta;
 
+    public SignificantEventPOJO(Integer codigoSucursal, Integer codigoPuntoVenta) {
+        this.codigoSucursal = codigoSucursal;
+        this.codigoPuntoVenta = codigoPuntoVenta;
+    }
+
     public Integer getCodigoSucursal() {
         return codigoSucursal;
     }

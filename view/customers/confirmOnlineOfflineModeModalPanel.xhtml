@@ -6,7 +6,6 @@
                  xmlns:f="http://java.sun.com/jsf/core"
                  xmlns:a4j="http://richfaces.org/a4j"
                  xmlns:s="http://jboss.com/products/seam/taglib"
-                 xmlns:app="http://encens.com/products/khipus/facelets"
                  id="#{dialogId}"
                  onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
     <f:facet name="header">
@@ -20,11 +19,25 @@
         <rich:panel id="onOffPanel">
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Modo Facturación:</ui:define>
+                <ui:define name="label">Facturación:</ui:define>
                 <h:outputText value="#{salesAction.billingMode}"/>
             </s:decorate>
 
-            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <s:decorate id="significantEventField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Evento:</ui:define>
+                <h:selectOneMenu id="significantEvent"
+                                 value="#{salesAction.significantEventSelected}"
+                                 styleClass="input"
+                                 required="false"
+                                 tabindex="10">
+                    <s:selectItems value="#{salesAction.significantEventsCodes}" var="significantEventCode"
+                                   label="#{significantEventCode.descripcion}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">Fecha:</ui:define>
                 <h:outputText value="#{salesAction.orderDate}">
                     <f:convertDateTime pattern="#{messages['patterns.date']}"/>
@@ -52,7 +65,7 @@
                 <h:outputText value="#{salesAction.moneyReturned}" styleClass="textBold12Green">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
-            </s:decorate>
+            </s:decorate>-->
 
 
         </rich:panel>

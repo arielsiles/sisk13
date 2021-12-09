@@ -7,6 +7,7 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.rest.SignificantEventCodePOJO;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
@@ -63,6 +64,9 @@ public class SalesAction {
 
     private String connectionStatus;
     private String billingMode;
+
+    private List<SignificantEventCodePOJO> significantEventsCodes;
+    private SignificantEventCodePOJO significantEventSelected;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -1104,6 +1108,11 @@ public class SalesAction {
         return result;
     }
 
+    public void initBillingMode() throws IOException {
+        chekBillingMode();
+        setSignificantEventsCodes(billControllerAction.querySignificantEvents());
+    }
+
     public void chekBillingMode() throws IOException {
 
         if (billControllerAction.checkBillingMode())
@@ -1247,5 +1256,21 @@ public class SalesAction {
 
     public void setBillingMode(String billingMode) {
         this.billingMode = billingMode;
+    }
+
+    public List<SignificantEventCodePOJO> getSignificantEventsCodes() {
+        return significantEventsCodes;
+    }
+
+    public void setSignificantEventsCodes(List<SignificantEventCodePOJO> significantEventsCodes) {
+        this.significantEventsCodes = significantEventsCodes;
+    }
+
+    public SignificantEventCodePOJO getSignificantEventSelected() {
+        return significantEventSelected;
+    }
+
+    public void setSignificantEventSelected(SignificantEventCodePOJO significantEventSelected) {
+        this.significantEventSelected = significantEventSelected;
     }
 }

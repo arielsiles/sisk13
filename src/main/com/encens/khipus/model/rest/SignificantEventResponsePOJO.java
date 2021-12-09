@@ -10,7 +10,7 @@ public class SignificantEventResponsePOJO {
     private boolean transaccion;
     private List<SignificantEventCodePOJO> listaCodigos;
 
-    public boolean isTransaccion() {
+    public boolean getTransaccion() {
         return transaccion;
     }
 

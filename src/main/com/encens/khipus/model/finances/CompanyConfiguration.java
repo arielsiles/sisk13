@@ -53,6 +53,9 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_significant_event")
+    private String significantEventURL;
+
     @Column(name = "url_online_offline_mode")
     private String checkBillingModeURL;
 
@@ -1498,5 +1501,13 @@ public class CompanyConfiguration {
 
     public void setCheckBillingModeURL(String checkBillingModeURL) {
         this.checkBillingModeURL = checkBillingModeURL;
+    }
+
+    public String getSignificantEventURL() {
+        return significantEventURL;
+    }
+
+    public void setSignificantEventURL(String significantEventURL) {
+        this.significantEventURL = significantEventURL;
     }
 }
