@@ -54,7 +54,9 @@ ALTER TABLE configuracion ADD COLUMN url_cancelbill VARCHAR(300) AFTER url_creat
 ALTER TABLE configuracion ADD COLUMN url_qr VARCHAR(300) AFTER url_cancelbill;
 ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
 ALTER TABLE configuracion ADD COLUMN url_online_offline_mode VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN url_significant_event VARCHAR(300) AFTER lugar;
 
+UPDATE configuracion c SET c.url_significant_event = "http://10.0.0.106:8080/api/sync/significant-events";
 UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.196:8080/api/billing/query-online-offline-mode';
 UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
 UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.196:8080/api/billing/bills';
