@@ -53,6 +53,12 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_set_online_mode")
+    private String onlineModeURL;
+
+    @Column(name = "url_set_offline_mode")
+    private String offlineModeURL;
+
     @Column(name = "url_significant_event")
     private String significantEventURL;
 
@@ -1509,5 +1515,21 @@ public class CompanyConfiguration {
 
     public void setSignificantEventURL(String significantEventURL) {
         this.significantEventURL = significantEventURL;
+    }
+
+    public String getOnlineModeURL() {
+        return onlineModeURL;
+    }
+
+    public void setOnlineModeURL(String onlineModeURL) {
+        this.onlineModeURL = onlineModeURL;
+    }
+
+    public String getOfflineModeURL() {
+        return offlineModeURL;
+    }
+
+    public void setOfflineModeURL(String offlineModeURL) {
+        this.offlineModeURL = offlineModeURL;
     }
 }

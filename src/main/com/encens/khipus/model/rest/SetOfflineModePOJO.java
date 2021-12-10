@@ -10,6 +10,13 @@ public class SetOfflineModePOJO {
     private String cafc;
     private Integer eventCode;
 
+    public SetOfflineModePOJO(Integer codigoSucursal, Integer codigoPuntoVenta, String cafc, Integer eventCode) {
+        this.codigoSucursal = codigoSucursal;
+        this.codigoPuntoVenta = codigoPuntoVenta;
+        this.cafc = cafc;
+        this.eventCode = eventCode;
+    }
+
     public Integer getCodigoSucursal() {
         return codigoSucursal;
     }

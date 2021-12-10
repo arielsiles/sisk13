@@ -56,6 +56,12 @@ ALTER TABLE configuracion ADD COLUMN url_ping VARCHAR(300) AFTER url_qr;
 ALTER TABLE configuracion ADD COLUMN url_online_offline_mode VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_significant_event VARCHAR(300) AFTER lugar;
 
+ALTER TABLE configuracion ADD COLUMN url_set_offline_mode VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN url_set_online_mode VARCHAR(300) AFTER lugar;
+
+UPDATE configuracion c SET c.`url_set_online_mode` = "http://10.0.0.106:8080/api/billing/set-online-mode";
+UPDATE configuracion c SET c.`url_set_offline_mode` = "http://10.0.0.106:8080/api/billing/set-offline-mode";
+
 UPDATE configuracion c SET c.url_significant_event = "http://10.0.0.106:8080/api/sync/significant-events";
 UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.196:8080/api/billing/query-online-offline-mode';
 UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
@@ -184,8 +190,23 @@ UPDATE pedidos p SET p.`DESCUENTOADICIONAL` = 0;
 UPDATE pedidos p SET p.`DESCUENTOPRODUCTO` = 0;
 
 --
+-- Para actualizar Descuentos en clientes
 UPDATE personacliente p SET p.`DESCUENTO` = p.`PORCENTAJECOMISION` WHERE p.`PORCENTAJECOMISION` > 0 ;
 UPDATE personacliente p SET p.`PORCENTAJECOMISION` = 0 WHERE p.`PORCENTAJECOMISION` > 0 ;
+
+CREATE TABLE sin_eventosignificativo(
+	codigo INT(11),	
+	descripcion VARCHAR(100),
+	PRIMARY KEY (codigo)
+);
+
+INSERT INTO sin_eventosignificativo VALUES (1, 'CORTE DEL SERVICIO DE INTERNET');
+INSERT INTO sin_eventosignificativo VALUES (2, 'INACCESIBILIDAD AL SERVICIO WEB DE LA ADMINISTRACIÓN TRIBUTARIA');
+INSERT INTO sin_eventosignificativo VALUES (3, 'INGRESO A ZONAS SIN INTERNET POR DESPLIEGUE DE PUNTO DE VENTA EN VEHICULOS AUTOMOTORES');
+INSERT INTO sin_eventosignificativo VALUES (4, 'VENTA EN LUGARES SIN INTERNET');
+INSERT INTO sin_eventosignificativo VALUES (5, 'CORTE DE SUMINISTRO DE ENERGIA ELECTRICA');
+INSERT INTO sin_eventosignificativo VALUES (6, 'VIRUS INFORMÁTICO O FALLA DE SOFTWARE');
+INSERT INTO sin_eventosignificativo VALUES (7, 'CAMBIO DE INFRAESTRUCTURA DEL SISTEMA INFORMÁTICO DE FACTURACIÓN O FALLA DE HARDWARE');
 
 --
 --

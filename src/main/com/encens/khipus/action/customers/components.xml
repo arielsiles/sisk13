@@ -85,4 +85,7 @@
     <factory name="measureUnitSINList" value="#{measureUnitSINQuery}"/>
     <framework:entity-query name="measureUnitSINQuery" ejbql="select d from MeasureUnitSIN d "/>
 
+    <factory name="significantEventSINList" value="#{significantEventSINQuery}"/>
+    <framework:entity-query name="significantEventSINQuery" ejbql="select d from SignificantEventSIN d "/>
+
 </components>

@@ -4,6 +4,8 @@ import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.action.billing.BillControllerAction;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.*;
@@ -33,7 +35,7 @@ import java.util.*;
 
 @Name("salesAction")
 @Scope(ScopeType.CONVERSATION)
-public class SalesAction {
+public class SalesAction extends GenericAction {
 
     private ProductItem productItem;
     private String productItemFullName;
@@ -65,8 +67,13 @@ public class SalesAction {
     private String connectionStatus;
     private String billingMode;
 
-    private List<SignificantEventCodePOJO> significantEventsCodes;
-    private SignificantEventCodePOJO significantEventSelected;
+    private String cafcCode;
+    private boolean showCAFC = false;
+
+    private List<SignificantEventCodePOJO> significantEventsCodes; // no usado
+    private SignificantEventCodePOJO significantEventSelected; // no usado
+
+    private SignificantEventSIN significantEventSIN;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -985,6 +992,25 @@ public class SalesAction {
         return resultProductItems;
     }
 
+    public boolean showInputCAFC(){
+        System.out.println("********************>>>> >>> >>>" + getSignificantEventSIN());
+
+        boolean result = false;
+        if (getSignificantEventSIN() != null) { /** todo codes **/
+            if (    getSignificantEventSIN().getCode() == 5 ||
+                    getSignificantEventSIN().getCode() == 6 ||
+                    getSignificantEventSIN().getCode() == 7) {
+                result = true;
+            } else
+                result = false;
+        }
+        return result;
+    }
+
+    public String changeBillingMode(){
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION CAMBIADO!!!");
+        return Outcome.SUCCESS;
+    }
 
     public ProductItem getProductItem() {
         return productItem;
@@ -1108,9 +1134,10 @@ public class SalesAction {
         return result;
     }
 
+    // No usado
     public void initBillingMode() throws IOException {
         chekBillingMode();
-        setSignificantEventsCodes(billControllerAction.querySignificantEvents());
+        //setSignificantEventsCodes(billControllerAction.querySignificantEvents());
     }
 
     public void chekBillingMode() throws IOException {
@@ -1272,5 +1299,29 @@ public class SalesAction {
 
     public void setSignificantEventSelected(SignificantEventCodePOJO significantEventSelected) {
         this.significantEventSelected = significantEventSelected;
+    }
+
+    public String getCafcCode() {
+        return cafcCode;
+    }
+
+    public void setCafcCode(String cafcCode) {
+        this.cafcCode = cafcCode;
+    }
+
+    public boolean isShowCAFC() {
+        return showCAFC;
+    }
+
+    public void setShowCAFC(boolean showCAFC) {
+        this.showCAFC = showCAFC;
+    }
+
+    public SignificantEventSIN getSignificantEventSIN() {
+        return significantEventSIN;
+    }
+
+    public void setSignificantEventSIN(SignificantEventSIN significantEventSIN) {
+        this.significantEventSIN = significantEventSIN;
     }
 }

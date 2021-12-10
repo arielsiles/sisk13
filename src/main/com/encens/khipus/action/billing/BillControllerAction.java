@@ -255,6 +255,11 @@ public class BillControllerAction {
         }
     }
 
+    /**
+     *
+     * @return true en linea, false fuera de linea
+     * @throws IOException
+     */
     public Boolean checkBillingMode() throws IOException{
 
         User user = getUser(currentUser.getId());
@@ -284,6 +289,22 @@ public class BillControllerAction {
         return responsePOJO.getIsOnline();
     }
 
+
+    public void changeToOnlineBillingMode(){
+
+    }
+
+    public void changeToOfflineBillingMode(SignificantEventSIN significantEventSIN, String cafcCode){
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+        SetOfflineModePOJO setOfflineModePOJO = new SetOfflineModePOJO(user.getBranchOffice().getOfficeCode(),user.getBranchOffice().getPosCode(), cafcCode, significantEventSIN.getCode());
+
+        /** todo **/
+
+    }
+
+    // No usado
     public List<SignificantEventCodePOJO> querySignificantEvents() throws IOException {
         User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();

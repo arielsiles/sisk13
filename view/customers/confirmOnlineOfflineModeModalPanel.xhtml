@@ -23,66 +23,46 @@
                 <h:outputText value="#{salesAction.billingMode}"/>
             </s:decorate>
 
-            <s:decorate id="significantEventField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Evento:</ui:define>
-                <h:selectOneMenu id="significantEvent"
-                                 value="#{salesAction.significantEventSelected}"
-                                 styleClass="input"
-                                 required="false"
-                                 tabindex="10">
-                    <s:selectItems value="#{salesAction.significantEventsCodes}" var="significantEventCode"
-                                   label="#{significantEventCode.descripcion}"
-                                   noSelectionLabel=""
-                                   hideNoSelectionLabel="false"/>
-                </h:selectOneMenu>
-            </s:decorate>
+            <s:div id="significantEventDiv">
+                <s:decorate id="significantEventField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">Evento:</ui:define>
+                    <h:selectOneMenu id="significantEvent"
+                                     value="#{salesAction.significantEventSelected}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="10">
+                        <s:selectItems value="#{salesAction.significantEventsCodes}" var="significantEventCode"
+                                       label="#{significantEventCode}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
 
-            <!--<s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Fecha:</ui:define>
-                <h:outputText value="#{salesAction.orderDate}">
-                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
-                </h:outputText>
-            </s:decorate>
-            <br/>
-            <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">TOTAL:</ui:define>
-                <h:outputText value="#{salesAction.totalAmount}" styleClass="textBold12Blue">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                </h:outputText>
-            </s:decorate>
-            <br/>
-            <s:decorate id="moneyReceivedField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Pagó con:</ui:define>
-                <h:inputText id="moneyReceivedId" value="#{salesAction.moneyReceived}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="moneyReceivedId"/>
-                    <a4j:support event="onblur" ajaxSingle="true" reRender="moneyReceivedField,moneyReturnedField"
-                                 actionListener="#{salesAction.calculateChange()}"/>
-                </h:inputText>
-            </s:decorate>
-            <br/>
-            <s:decorate id="moneyReturnedField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Cambio:</ui:define>
-                <h:outputText value="#{salesAction.moneyReturned}" styleClass="textBold12Green">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                </h:outputText>
-            </s:decorate>-->
+                        <a4j:support event="onchange"
+                                     action="#{salesAction.updateShowCAFC()}"
+                                     reRender="cafcField"
+                                     ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cafcField"
+                            rendered="#{salesAction.showCAFC}"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">CAFC:</ui:define>
+                    <h:inputText id="cafc"
+                                 value="#{salesAction.cafcCode}"
+                                 required="false"
+                                 maxlength="100"
+                                 styleClass="input"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+
+            </s:div>
 
 
         </rich:panel>
 
         <div class="buttonsRight">
-            <a4j:commandButton id="confirmRegisterNoInvoiceButton" value="Cobrar SF"
-                               action="#{salesAction.registerCashSaleNoInvoice()}"
-                               rendered="#{s:hasPermission('CASHSALE_REGISTER','VIEW')}"
-                               styleClass="button"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
-
-            <a4j:commandButton id="confirmRegisterButton" value="Cobrar y facturar"
-                               action="#{salesAction.registerCashSale()}"
-                               rendered="#{s:hasPermission('CASHSALE_INVOICE','VIEW')}"
-                               styleClass="button"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
-
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </h:commandButton>

@@ -529,6 +529,18 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/changeBillingMode.xhtml" no-conversation-view-id="/customers/customerOrderList.xhtml">
+        <navigation from-action="#{salesAction.changeBillingMode()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/changeBillingMode.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/salesBox.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
 
 
 </pages>
