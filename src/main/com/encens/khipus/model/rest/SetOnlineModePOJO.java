@@ -8,6 +8,11 @@ public class SetOnlineModePOJO {
     private Integer codigoSucursal;
     private Integer codigoPuntoVenta;
 
+    public SetOnlineModePOJO(Integer codigoSucursal, Integer codigoPuntoVenta) {
+        this.codigoSucursal = codigoSucursal;
+        this.codigoPuntoVenta = codigoPuntoVenta;
+    }
+
     public Integer getCodigoSucursal() {
         return codigoSucursal;
     }

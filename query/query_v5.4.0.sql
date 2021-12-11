@@ -194,6 +194,7 @@ UPDATE pedidos p SET p.`DESCUENTOPRODUCTO` = 0;
 UPDATE personacliente p SET p.`DESCUENTO` = p.`PORCENTAJECOMISION` WHERE p.`PORCENTAJECOMISION` > 0 ;
 UPDATE personacliente p SET p.`PORCENTAJECOMISION` = 0 WHERE p.`PORCENTAJECOMISION` > 0 ;
 
+-- 10.12.2021
 CREATE TABLE sin_eventosignificativo(
 	codigo INT(11),	
 	descripcion VARCHAR(100),

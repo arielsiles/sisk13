@@ -1007,7 +1007,14 @@ public class SalesAction extends GenericAction {
         return result;
     }
 
-    public String changeBillingMode(){
+    public String changeBillingMode() throws IOException {
+
+        String cafc = null;
+        if (showInputCAFC())
+            cafc = getCafcCode();
+
+        billControllerAction.changeToOfflineBillingMode(this.significantEventSIN, cafc);
+
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION CAMBIADO!!!");
         return Outcome.SUCCESS;
     }

@@ -194,6 +194,7 @@ public class BillControllerAction {
             String result = Json.prettyPrint(jsonNode);
             System.out.println(result);
 
+            /** NULL cuando la facturacion es offline **/
             createResponseObject(serverResponse.getResponseJson());
 
             BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
@@ -290,17 +291,40 @@ public class BillControllerAction {
     }
 
 
-    public void changeToOnlineBillingMode(){
+    public void changeToOnlineBillingMode() throws IOException {
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
+        SetOnlineModePOJO setOnlineModePOJO = new SetOnlineModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
+        String jsonString = Json.prettyPrint(Json.toJson(setOnlineModePOJO));
+        System.out.println("-----------------------changeToOfflineBillingMode-------------------");
+        System.out.println("----------> URL: " + companyConfiguration.getOnlineModeURL());
+        System.out.println(jsonString);
+
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL() , jsonString);
+
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
     }
 
-    public void changeToOfflineBillingMode(SignificantEventSIN significantEventSIN, String cafcCode){
+    public void changeToOfflineBillingMode(SignificantEventSIN significantEventSIN, String cafcCode) throws IOException {
         User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
         SetOfflineModePOJO setOfflineModePOJO = new SetOfflineModePOJO(user.getBranchOffice().getOfficeCode(),user.getBranchOffice().getPosCode(), cafcCode, significantEventSIN.getCode());
+        String jsonString = Json.prettyPrint(Json.toJson(setOfflineModePOJO));
+        System.out.println("-----------------------changeToOfflineBillingMode-------------------");
+        System.out.println("----------> URL: " + companyConfiguration.getOfflineModeURL());
+        System.out.println(jsonString);
 
-        /** todo **/
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL() , jsonString);
+
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
+
+
 
     }
 

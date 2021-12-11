@@ -531,8 +531,9 @@
 
     <page view-id="/customers/changeBillingMode.xhtml" no-conversation-view-id="/customers/customerOrderList.xhtml">
         <navigation from-action="#{salesAction.changeBillingMode()}">
+            <begin-conversation join="true" flush-mode="MANUAL"/>
             <rule if-outcome="Success">
-                <redirect view-id="/customers/changeBillingMode.xhtml"/>
+                <redirect view-id="/customers/salesBox.xhtml"/>
             </rule>
         </navigation>
         <navigation>
