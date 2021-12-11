@@ -105,10 +105,9 @@ public class PrintBillReportAction extends GenericReportAction {
     private boolean hasValidInvoice(CustomerOrder customerOrder){
         boolean result = false;
         if (customerOrder.getMovement() != null) {
-            if (customerOrder.getMovement().getDescri() != null) {
-                if (customerOrder.getMovement().getDescri().equals("VALIDADA")) {
-                    result = true;
-                }
+            /** todo **/
+            if (customerOrder.getMovement().getCuf() != null) {
+                result = true;
             }
         }
 

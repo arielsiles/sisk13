@@ -3,11 +3,13 @@ package com.encens.khipus.model.rest;
 public class BillResponsePOJO {
 
     private Integer numeroFactura;
+    private String tipo;
     private String cuf;
     private String direccion;
     private Long fecha;
     private String leyenda;
     private ReceptionResponsePOJO respuestaRecepcion;
+    private String hash;
     private String factura;
 
     public Integer getNumeroFactura() {
@@ -64,5 +66,21 @@ public class BillResponsePOJO {
 
     public void setFactura(String factura) {
         this.factura = factura;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }

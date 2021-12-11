@@ -195,7 +195,7 @@ public class BillControllerAction {
             System.out.println(result);
 
             /** NULL cuando la facturacion es offline **/
-            createResponseObject(serverResponse.getResponseJson());
+            printResponseObject(serverResponse.getResponseJson());
 
             BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
 
@@ -203,11 +203,15 @@ public class BillControllerAction {
             movement.setCuf(billResponsePOJO.getCuf());
             movement.setFechaSin(billResponsePOJO.getFecha().toString());
             movement.setLeyenda(billResponsePOJO.getLeyenda());
-            movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
-            movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
-            movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
+
+            if (billResponsePOJO.getRespuestaRecepcion() != null) {
+                movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
+                movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
+                movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
+            }
+
             movement.setFactura(billResponsePOJO.getFactura());
-            movement.setEmissionType(InvoiceEmissionType.ONLINE);
+            movement.setEmissionType(billResponsePOJO.getTipo());
 
             movementService.updateMovement(movement);
 
@@ -350,7 +354,7 @@ public class BillControllerAction {
         return objectResponse.getListaCodigos();
     }
 
-    public void createResponseObject(String responseJsonString) throws IOException {
+    public void printResponseObject(String responseJsonString) throws IOException {
         JsonNode nodeResponse = Json.parse(responseJsonString);
         BillResponsePOJO billResponsePOJO = Json.fromJson(nodeResponse, BillResponsePOJO.class);
 
@@ -360,13 +364,18 @@ public class BillControllerAction {
         System.out.println("direccion: " + billResponsePOJO.getDireccion());
         System.out.println("fecha: " + billResponsePOJO.getFecha());
         System.out.println("leyenda: " + billResponsePOJO.getLeyenda());
-        System.out.println("- respuestaRecepcion -");
+
+        System.out.println("-------> respuestaRecepcion <-------");
         ReceptionResponsePOJO receptionResponsePOJO = billResponsePOJO.getRespuestaRecepcion();
-        System.out.println("codigoDescripcion: " + receptionResponsePOJO.getCodigoDescripcion());
-        System.out.println("codigoEstado: " + receptionResponsePOJO.getCodigoEstado());
-        System.out.println("codigoRecepcion: " + receptionResponsePOJO.getCodigoRecepcion());
-        System.out.println("transaccion: " + receptionResponsePOJO.getTransaccion());
-        System.out.println("mensajesList: " + receptionResponsePOJO.getMensajesList());
+        System.out.println("===> " + billResponsePOJO.getRespuestaRecepcion());
+        if (billResponsePOJO.getRespuestaRecepcion() != null) {
+
+            System.out.println("codigoDescripcion: " + receptionResponsePOJO.getCodigoDescripcion());
+            System.out.println("codigoEstado: " + receptionResponsePOJO.getCodigoEstado());
+            System.out.println("codigoRecepcion: " + receptionResponsePOJO.getCodigoRecepcion());
+            System.out.println("transaccion: " + receptionResponsePOJO.getTransaccion());
+            System.out.println("mensajesList: " + receptionResponsePOJO.getMensajesList());
+        }
 
     }
 

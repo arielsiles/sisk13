@@ -307,6 +307,9 @@ public final class Constants {
     public static final Integer CODIGO_MONEDA_SIN = 1;
     public static final Integer TIPO_CAMBIO_SIN = 1;
 
+    public static final String ONLINE = "ONLINE";
+    public static final String OFFLINE = "OFFLINE";
+
     private Constants() {
     }
 }

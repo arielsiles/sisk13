@@ -398,8 +398,9 @@ public class CustomerOrder implements BaseModel  {
         if (getMovement() != null){
             if (getMovement().getCuf() != null){
                 result = getMovement().getDescri();
-                if (result.equals("ANULACION CONFIRMADA"))
-                    result = "ANULADA";
+                if (result != null)
+                    if (result.equals("ANULACION CONFIRMADA"))
+                        result = "ANULADA";
             }
         }
         return result;
