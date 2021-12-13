@@ -1007,7 +1007,7 @@ public class SalesAction extends GenericAction {
         return result;
     }
 
-    public String changeBillingMode() throws IOException {
+    public String changeToOfflineBillingMode() throws IOException {
 
         String cafc = null;
         if (showInputCAFC())
@@ -1015,7 +1015,31 @@ public class SalesAction extends GenericAction {
 
         billControllerAction.changeToOfflineBillingMode(this.significantEventSIN, cafc);
 
-        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION CAMBIADO!!!");
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: FUERA DE LINEA!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String changeToOnlineBillingMode() throws IOException {
+        billControllerAction.changeToOnlineBillingMode();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: EN LINEA!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String prepareOfflineBillPackages() throws IOException {
+        billControllerAction.prepareOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"PREPARANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String processOfflineBillPackages() throws IOException {
+        billControllerAction.processOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"PROCESANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String validateOfflineBillPackages() throws IOException {
+        billControllerAction.validateOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"VALIDANDO: FACTURAS OFFLINE!!!");
         return Outcome.SUCCESS;
     }
 

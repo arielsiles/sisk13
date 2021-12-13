@@ -1,6 +1,8 @@
 package com.encens.khipus.model.rest;
 
 
+import java.util.Date;
+
 /**
  * Created by Admin on 8/12/2021.
  */
@@ -50,5 +52,9 @@ public class CheckBillingModeResponsePOJO {
 
     public void setOfflineBills(Integer offlineBills) {
         this.offlineBills = offlineBills;
+    }
+
+    public Date getInitDate(){
+        return new Date(new Long(getStartDate()));
     }
 }

@@ -4,19 +4,9 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
                 template="/layout/template.xhtml">
-<ui:define name="pageTitle">
-    <c:choose>
-        <c:when test="#{clientAction.managed}">
-            #{messages['Client.edit']}
-        </c:when>
-        <c:otherwise>
-            #{messages['Client.new']}
-        </c:otherwise>
-    </c:choose>
-</ui:define>
+<ui:define name="pageTitle">#{messages['Invoice.changeBillingMode.title']}</ui:define>
 <ui:param name="bodyWidth" value="60%"/>
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
@@ -24,7 +14,32 @@
 <h:form id="billingModeForm">
 
     <div class="buttons">
-        <h:commandButton action="#{salesAction.changeBillingMode()}" value="#{messages['Common.save']}"
+
+        <h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.processOfflineBillPackages()}" value="#{messages['Invoice.billingMode.process']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.changeToOnlineBillingMode()}" value="#{messages['Invoice.billingMode.changeOnlineMode']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>
@@ -45,12 +60,13 @@
             <h:outputText value="#{salesAction.billingMode}"/>
         </s:decorate>
 
-        <s:decorate id="significantEventField" template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate id="significantEventField" rendered="#{billControllerAction.checkBillingModeResponse.isOnline}"
+                    template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Invoice.billingMode.event']}</ui:define>
             <h:selectOneMenu id="significantEvent"
                              value="#{salesAction.significantEventSIN}"
                              styleClass="input"
-                             required="true"
+                             required="false"
                              tabindex="8">
                 <s:selectItems value="#{significantEventSINList}"
                                var="significantEventSIN"
@@ -77,6 +93,27 @@
                              tabindex="5">
                 </h:inputText>
             </s:decorate>
+        </s:div>
+
+        <s:div id="offLineMode" rendered="#{!billControllerAction.checkBillingModeResponse.isOnline}">
+
+            <s:decorate id="eventoField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Evento</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.description}"/>
+            </s:decorate>
+
+            <s:decorate id="facturasField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Facturas</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.offlineBills}"/>
+            </s:decorate>
+
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha inicio</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.getInitDate()}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </s:decorate>
+
         </s:div>
 
 </rich:panel>

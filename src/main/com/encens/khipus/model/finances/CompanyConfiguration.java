@@ -53,6 +53,15 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_validate_offline_bill_packages")
+    private String validateOfflineBillPackagesURL;
+
+    @Column(name = "url_process_offline_bill_packages")
+    private String processOfflineBillPackagesURL;
+
+    @Column(name = "url_prepare_offline_bill_packages")
+    private String prepareOfflineBillPackagesURL;
+
     @Column(name = "url_set_online_mode")
     private String onlineModeURL;
 
@@ -1531,5 +1540,29 @@ public class CompanyConfiguration {
 
     public void setOfflineModeURL(String offlineModeURL) {
         this.offlineModeURL = offlineModeURL;
+    }
+
+    public String getValidateOfflineBillPackagesURL() {
+        return validateOfflineBillPackagesURL;
+    }
+
+    public void setValidateOfflineBillPackagesURL(String validateOfflineBillPackagesURL) {
+        this.validateOfflineBillPackagesURL = validateOfflineBillPackagesURL;
+    }
+
+    public String getProcessOfflineBillPackagesURL() {
+        return processOfflineBillPackagesURL;
+    }
+
+    public void setProcessOfflineBillPackagesURL(String processOfflineBillPackagesURL) {
+        this.processOfflineBillPackagesURL = processOfflineBillPackagesURL;
+    }
+
+    public String getPrepareOfflineBillPackagesURL() {
+        return prepareOfflineBillPackagesURL;
+    }
+
+    public void setPrepareOfflineBillPackagesURL(String prepareOfflineBillPackagesURL) {
+        this.prepareOfflineBillPackagesURL = prepareOfflineBillPackagesURL;
     }
 }

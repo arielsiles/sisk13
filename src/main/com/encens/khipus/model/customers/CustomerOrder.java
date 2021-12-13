@@ -383,6 +383,14 @@ public class CustomerOrder implements BaseModel  {
         return result;
     }
 
+    public String getEmissionType(){
+        String result = "";
+        if (getMovement() != null) {
+            result = getMovement().getEmissionType();
+        }
+        return result;
+    }
+
     public String isValidInvoice(){
         String result = "NO";
         if (getMovement() != null){

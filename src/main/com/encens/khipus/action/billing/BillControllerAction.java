@@ -36,6 +36,8 @@ import java.util.List;
 @Scope(ScopeType.CONVERSATION)
 public class BillControllerAction {
 
+    private CheckBillingModeResponsePOJO checkBillingModeResponse;
+
     @In(required = false)
     private User currentUser;
 
@@ -123,6 +125,70 @@ public class BillControllerAction {
         return serverResponse.getConnection();
     }
 
+    public ServerResponse doGetHttpConnection(String urlEndpoint) {
+
+        HttpURLConnection connection = null;
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+
+        ServerResponse serverResponse = null;
+
+        try {
+            URL url = new URL(urlEndpoint);
+            connection = (HttpURLConnection) url.openConnection();
+
+            // Request Setup
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
+
+            int status = connection.getResponseCode();
+
+            if (status > 299){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                serverResponse = new ServerResponse(Boolean.FALSE, status, responseContent.toString());
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                serverResponse = new ServerResponse(Boolean.TRUE, status, responseContent.toString());
+            }
+
+
+        } catch (SocketTimeoutException e) {
+            System.out.println(".............. EXCEPTION: SocketTimeoutException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
+        } catch (ConnectException e) {
+            System.out.println(".............. EXCEPTION: ConnectException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            System.out.println(".............. EXCEPTION: MalformedURLException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println(".............. EXCEPTION: IOException");
+            serverResponse = new ServerResponse(Boolean.FALSE, null, "");
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
+
+        System.out.println("-------------- TEST CONNECTION GET -----------");
+        System.out.println("--> Connection: " + serverResponse.getConnection());
+        System.out.println("--> Response Code: " + serverResponse.getResponseCode());
+        System.out.println("--> Response: " + serverResponse.getResponseJson());
+
+        return serverResponse;
+    }
 
     /**
      *
@@ -283,13 +349,17 @@ public class BillControllerAction {
         System.out.println(result);
 
         CheckBillingModeResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, CheckBillingModeResponsePOJO.class);
+        this.checkBillingModeResponse = responsePOJO; // ***
 
         System.out.println("----> Response isOnline: " + responsePOJO.getIsOnline());
 
-        if (responsePOJO.getIsOnline())
+        if (responsePOJO.getIsOnline()) {
+
             System.out.println("---> ok true");
-        else
+        }
+        else {
             System.out.println("----> Fail true");
+        }
 
         return responsePOJO.getIsOnline();
     }
@@ -301,11 +371,11 @@ public class BillControllerAction {
 
         SetOnlineModePOJO setOnlineModePOJO = new SetOnlineModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
         String jsonString = Json.prettyPrint(Json.toJson(setOnlineModePOJO));
-        System.out.println("-----------------------changeToOfflineBillingMode-------------------");
+        System.out.println("-----------------------changeToOnlineBillingMode-------------------");
         System.out.println("----------> URL: " + companyConfiguration.getOnlineModeURL());
         System.out.println(jsonString);
 
-        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL() , jsonString);
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOnlineModeURL() , jsonString);
 
         JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
         String result = Json.prettyPrint(jsonNodeResponse);
@@ -327,9 +397,36 @@ public class BillControllerAction {
         JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
         String result = Json.prettyPrint(jsonNodeResponse);
         System.out.println(result);
+    }
 
+    public void prepareOfflineBillPackages() throws IOException {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ServerResponse serverResponse = doGetHttpConnection(companyConfiguration.getPrepareOfflineBillPackagesURL());
 
+        System.out.println("-----------------------GET RESPONSE prepareOfflineBillPackages-------------------");
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
+    }
 
+    public void processOfflineBillPackages() throws IOException {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ServerResponse serverResponse = doGetHttpConnection(companyConfiguration.getProcessOfflineBillPackagesURL());
+
+        System.out.println("-----------------------GET RESPONSE processOfflineBillPackages-------------------");
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
+    }
+
+    public void validateOfflineBillPackages() throws IOException {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ServerResponse serverResponse = doGetHttpConnection(companyConfiguration.getValidateOfflineBillPackagesURL());
+
+        System.out.println("-----------------------GET RESPONSE validateOfflineBillPackages-------------------");
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        String result = Json.prettyPrint(jsonNodeResponse);
+        System.out.println(result);
     }
 
     // No usado
@@ -475,4 +572,11 @@ public class BillControllerAction {
         }
     }
 
+    public CheckBillingModeResponsePOJO getCheckBillingModeResponse() {
+        return checkBillingModeResponse;
+    }
+
+    public void setCheckBillingModeResponse(CheckBillingModeResponsePOJO checkBillingModeResponse) {
+        this.checkBillingModeResponse = checkBillingModeResponse;
+    }
 }

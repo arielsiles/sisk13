@@ -42,6 +42,6 @@ public class SignificantEventSIN {
     }
 
     public String toString(){
-        return getCode() + "." + getDescription();
+        return getCode() + "-" + getDescription();
     }
 }
