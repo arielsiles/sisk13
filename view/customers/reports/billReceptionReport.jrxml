@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="609" pageHeight="467" whenNoDataType="AllSectionsNoDetail" columnWidth="575" leftMargin="17" rightMargin="17" topMargin="14" bottomMargin="13" isSummaryWithPageHeaderAndFooter="true">
 	<property name="ireport.zoom" value="1.7715610000000026"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="51"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="companyNit" class="java.lang.String"/>
 	<parameter name="invoiceNumber" class="java.lang.Long"/>
@@ -22,6 +22,12 @@
 	<parameter name="cuf" class="java.lang.String"/>
 	<parameter name="fechasin" class="java.util.Date"/>
 	<parameter name="leyenda" class="java.lang.String"/>
+	<parameter name="activity" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="branchName" class="java.lang.String"/>
+	<parameter name="posName" class="java.lang.String"/>
+	<parameter name="phone" class="java.lang.String"/>
+	<parameter name="place" class="java.lang.String"/>
 	<field name="quantity" class="java.lang.Integer">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -92,46 +98,11 @@
 	<title>
 		<band height="122">
 			<staticText>
-				<reportElement x="0" y="0" width="205" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Cooperativa Integral de Servicios Cochabamba Ltda.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="10" width="200" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[SUCURSAL N. 2]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="40" width="200" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Teléfono: 4577003]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="20" width="200" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[No. Punto de Venta 0]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="0" y="30" width="200" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Avenida Libertadores No. 454, Zona/Barrio Mirabel]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="50" width="200" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Punata - Cochabamba - Bolivia]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="234" y="61" width="112" height="18"/>
@@ -141,28 +112,28 @@
 				<text><![CDATA[FACTURA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="400" y="0" width="75" height="12"/>
+				<reportElement x="393" y="0" width="75" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[NIT]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="400" y="11" width="75" height="12"/>
+				<reportElement x="393" y="11" width="75" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[FACTURA Nº]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="400" y="22" width="75" height="12"/>
+				<reportElement x="393" y="22" width="75" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[COD. AUTORIZACIÓN]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="475" y="0" width="100" height="12"/>
+				<reportElement x="468" y="0" width="107" height="12"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
@@ -170,7 +141,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyNit}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="475" y="11" width="100" height="12"/>
+				<reportElement x="468" y="11" width="107" height="12"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
@@ -178,7 +149,7 @@
 				<textFieldExpression class="java.lang.Long"><![CDATA[$P{invoiceNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="475" y="23" width="100" height="50"/>
+				<reportElement x="468" y="23" width="107" height="32"/>
 				<box leftPadding="2"/>
 				<textElement verticalAlignment="Top">
 					<font size="8"/>
@@ -304,7 +275,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
-				<text><![CDATA[CÓDIGO]]></text>
+				<text><![CDATA[CÓDIGO PRODUCTO]]></text>
 			</staticText>
 			<image>
 				<reportElement x="260" y="0" width="61" height="61"/>
@@ -324,6 +295,54 @@
 				</textElement>
 				<text><![CDATA[DESCUENTO]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="250" height="11"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="10" width="199" height="11"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{branchName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="20" width="199" height="11"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{posName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="40" width="199" height="11"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{phone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="50" width="199" height="11"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{place}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="393" y="55" width="182" height="24"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{activity}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

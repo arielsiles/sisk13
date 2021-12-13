@@ -15,7 +15,7 @@
 
     <div class="buttons">
 
-        <h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+        <!--<h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>
@@ -31,7 +31,7 @@
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>
-        </h:commandButton>
+        </h:commandButton>-->
 
         <h:commandButton action="#{salesAction.changeToOnlineBillingMode()}" value="#{messages['Invoice.billingMode.changeOnlineMode']}"
                          styleClass="button"
@@ -45,7 +45,7 @@
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{salesAction.cancel}" value="#{messages['Common.cancel']}"
+        <h:commandButton action="#{salesAction.cancelBillingMode()}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="104">
         </h:commandButton>
@@ -118,9 +118,27 @@
 
 </rich:panel>
 
-<div class="buttons">
+    <div class="buttons">
 
-</div>
+        <h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.processOfflineBillPackages()}" value="#{messages['Invoice.billingMode.process']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+    </div>
 
 </h:form>
 

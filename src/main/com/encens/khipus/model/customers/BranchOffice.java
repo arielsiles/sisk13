@@ -33,7 +33,25 @@ public class BranchOffice implements BaseModel {
     @Column(name="descripcion")
     private String description;
 
-    @Column(name="codsin")
+    @Column(name="ACTIVIDAD")
+    private String activity;
+
+    @Column(name="NOMBRE_EMPRESA")
+    private String companyName;
+
+    @Column(name="NOMBRE_SUCURSAL")
+    private String branchName;
+
+    @Column(name="NOMBRE_POS")
+    private String posName;
+
+    @Column(name="TELEFONOS")
+    private String phone;
+
+    @Column(name="LUGAR")
+    private String place;
+
+    @Column(name="codsuc")
     private Integer officeCode;
 
     @Column(name="codpos")
@@ -79,5 +97,53 @@ public class BranchOffice implements BaseModel {
 
     public void setPosCode(Integer posCode) {
         this.posCode = posCode;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
+    }
+
+    public String getPosName() {
+        return posName;
+    }
+
+    public void setPosName(String posName) {
+        this.posName = posName;
     }
 }

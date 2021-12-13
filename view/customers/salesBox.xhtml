@@ -212,7 +212,8 @@
                       view="/customers/changeBillingMode.xhtml"
                       styleClass="button"
                       propagation="begin"
-                      rendered="#{s:hasPermission('CASHSALES','VIEW')}"/>
+                      rendered="#{s:hasPermission('CASHSALES','VIEW')}">
+            </s:button>
 
             <a4j:commandButton id="connectionTestButton"
                                action="#{salesAction.connectionTest()}"

@@ -198,6 +198,13 @@ public class PrintBillReportAction extends GenericReportAction {
         System.out.println("................Literal: " + moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
         */
 
+        paramMap.put("activity", dosage.getBranchOffice().getActivity());
+        paramMap.put("companyName", dosage.getBranchOffice().getCompanyName());
+        paramMap.put("branchName", dosage.getBranchOffice().getBranchName());
+        paramMap.put("posName", dosage.getBranchOffice().getPosName());
+        paramMap.put("phone", dosage.getBranchOffice().getPhone());
+        paramMap.put("place", dosage.getBranchOffice().getPlace());
+
         Movement movement = lastCustomerOrder.getMovement();
         paramMap.put("cuf", movement.getCuf());
         paramMap.put("fechasin", new Date(new Long(movement.getFechaSin())));

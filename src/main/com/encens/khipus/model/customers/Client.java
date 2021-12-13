@@ -117,7 +117,7 @@ public class Client implements BaseModel {
     @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
     private ClientType clientType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idtipodocsin", referencedColumnName = "idtipodocumento")
     private DocumentType invoiceDocumentType;
 

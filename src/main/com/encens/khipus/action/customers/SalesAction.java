@@ -1007,6 +1007,10 @@ public class SalesAction extends GenericAction {
         return result;
     }
 
+    public String cancelBillingMode(){
+        return Outcome.CANCEL;
+    }
+
     public String changeToOfflineBillingMode() throws IOException {
 
         String cafc = null;

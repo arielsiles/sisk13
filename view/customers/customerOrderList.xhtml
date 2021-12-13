@@ -186,17 +186,9 @@
                         <s:defaultAction/>
                     </h:commandButton>
 
-                    <h:commandButton id="billSpecialId"
-                                     action="#{salesAction.processBillingSpecial(customerOrderDataModel.selectedCustomerOrdes)}"
-                                     styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['CustomerOrder.billSpecial']}" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
                     <a4j:commandButton id="creditSaleCommandButton"
                                        action="#{salesAction.initSpecialBill(customerOrderDataModel.selectedCustomerOrdes)}"
-                                       value="Fact. especial"
+                                       value="#{messages['CustomerOrder.billSpecial']}"
                                        styleClass="button"
                                        rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
                                        immediate="true"
@@ -224,6 +216,7 @@
 
                 <s:div styleClass="buttonsRight">
 
+                    <!-- Services Test
                     <h:commandButton id="rest5ClientActionId"
                                      action="#{restClientAction.executeService5()}"
                                      styleClass="button"
@@ -258,6 +251,7 @@
                                      value="Servicio 1" >
                         <s:defaultAction/>
                     </h:commandButton>
+                    -->
 
                     <s:button value="#{messages['CustomerOrder.accounting']}"
                               view="/customers/accountingCreditSale.xhtml"

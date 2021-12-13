@@ -496,6 +496,9 @@ public class BillControllerAction {
         pedidoPOJO.setCodigoSucursal(dosage.getBranchOffice().getOfficeCode());
         pedidoPOJO.setCodigoPuntoVenta(dosage.getBranchOffice().getPosCode());
 
+        System.out.println("----------> getClient: " + customerOrder.getClient().getFullName());
+        System.out.println("----------> getInvoiceDocumentType.getSinCode:" + customerOrder.getClient().getInvoiceDocumentType().getSinCode());
+
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
         pedidoPOJO.setCodigoCliente(clientCode);

@@ -62,9 +62,9 @@ ALTER TABLE configuracion ADD COLUMN url_prepare_offline_bill_packages VARCHAR(3
 ALTER TABLE configuracion ADD COLUMN url_process_offline_bill_packages VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_validate_offline_bill_packages VARCHAR(300) AFTER lugar;
 
-UPDATE configuracion c SET c.url_prepare_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/prepare-offline-bill-packages";
-UPDATE configuracion c SET c.url_process_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/process-offline-bill-packages";
-UPDATE configuracion c SET c.url_validate_offline_bill_packages = "http://10.0.0.106:8080/api/billing/validate-offline-bill-packages";
+UPDATE configuracion c SET c.url_prepare_offline_bill_packages  = "http://10.0.0.196:8080/api/billing/prepare-offline-bill-packages";
+UPDATE configuracion c SET c.url_process_offline_bill_packages  = "http://10.0.0.196:8080/api/billing/process-offline-bill-packages";
+UPDATE configuracion c SET c.url_validate_offline_bill_packages = "http://10.0.0.196:8080/api/billing/validate-offline-bill-packages";
 
 UPDATE configuracion c SET c.`url_set_online_mode` = "http://10.0.0.106:8080/api/billing/set-online-mode";
 UPDATE configuracion c SET c.`url_set_offline_mode` = "http://10.0.0.106:8080/api/billing/set-offline-mode";
@@ -137,7 +137,7 @@ UPDATE inv_articulos i SET i.`idprodutoservicio` = 6 WHERE i.`cod_alm` IN (5);
 
 -- 21.11.2021
 
-ALTER TABLE sucursal ADD COLUMN codsin INT(11) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN codsuc INT(11) AFTER descripcion;
 ALTER TABLE sucursal ADD COLUMN codpos INT(11) AFTER codsin;
 
 UPDATE sucursal s SET s.`codsin` = 0 WHERE s.`IDSUCURSAL` = 1;
@@ -214,6 +214,28 @@ INSERT INTO sin_eventosignificativo VALUES (4, 'VENTA EN LUGARES SIN INTERNET');
 INSERT INTO sin_eventosignificativo VALUES (5, 'CORTE DE SUMINISTRO DE ENERGIA ELECTRICA');
 INSERT INTO sin_eventosignificativo VALUES (6, 'VIRUS INFORMÁTICO O FALLA DE SOFTWARE');
 INSERT INTO sin_eventosignificativo VALUES (7, 'CAMBIO DE INFRAESTRUCTURA DEL SISTEMA INFORMÁTICO DE FACTURACIÓN O FALLA DE HARDWARE');
+
+-- 
+ALTER TABLE sucursal ADD COLUMN LUGAR VARCHAR(150) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN TELEFONOS VARCHAR(150) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN NOMBRE_POS VARCHAR(150) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN NOMBRE_SUCURSAL VARCHAR(150) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN NOMBRE_EMPRESA VARCHAR(150) AFTER descripcion;
+ALTER TABLE sucursal ADD COLUMN ACTIVIDAD VARCHAR(150) AFTER descripcion;
+
+UPDATE sucursal s SET s.`NOMBRE_EMPRESA`  = 'COOPERATIVA INTEGRAL DE SERVICIOS COCHABAMBA LTDA.' WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`NOMBRE_SUCURSAL` = 'SUCURSAL 2' WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`TELEFONOS` = 'Teléfono: 4577003' WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`LUGAR` = 'PUNATA - COCHABAMBA' WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`ACTIVIDAD` = 'ELABORACIÓN DE PRODUCTOS LÁCTEOS' WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`NOMBRE_POS` = 'No. Punto de Venta 0' WHERE s.`IDSUCURSAL` = 2;
+
+UPDATE sucursal s SET s.`NOMBRE_EMPRESA`  = 'COOPERATIVA INTEGRAL DE SERVICIOS COCHABAMBA LTDA.' WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`NOMBRE_SUCURSAL` = 'CASA MATRIZ' WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`TELEFONOS` = 'Teléfono: 4577009' WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`LUGAR` = 'PUNATA - COCHABAMBA' WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`ACTIVIDAD` = 'OTROS TIPOS DE INTERMEDIACIÓN FINANCIERA, INCLUYE CASAS DE CAMBIO' WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`NOMBRE_POS` = 'No. Punto de Venta 0' WHERE s.`IDSUCURSAL` = 1;
 
 --
 --
