@@ -204,6 +204,7 @@ public class PrintBillReportAction extends GenericReportAction {
         paramMap.put("posName", dosage.getBranchOffice().getPosName());
         paramMap.put("phone", dosage.getBranchOffice().getPhone());
         paramMap.put("place", dosage.getBranchOffice().getPlace());
+        paramMap.put("address", dosage.getBranchOffice().getAddress());
 
         Movement movement = lastCustomerOrder.getMovement();
         paramMap.put("cuf", movement.getCuf());

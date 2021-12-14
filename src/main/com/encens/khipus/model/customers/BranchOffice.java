@@ -51,6 +51,9 @@ public class BranchOffice implements BaseModel {
     @Column(name="LUGAR")
     private String place;
 
+    @Column(name="DIRECCION")
+    private String address;
+
     @Column(name="codsuc")
     private Integer officeCode;
 
@@ -145,5 +148,13 @@ public class BranchOffice implements BaseModel {
 
     public void setPosName(String posName) {
         this.posName = posName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
