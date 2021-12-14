@@ -36,6 +36,21 @@
                                      reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
+
+                    <a4j:commandButton id="validateNitButton"
+                                       action="#{salesAction.validateNit()}"
+                                       value="Validar NIT"
+                                       rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
+                                       styleClass="button"
+                                       immediate="true"
+                                       ajaxSingle="true"
+                                       reRender="nitValidationMessage">
+                    </a4j:commandButton>
+
+                    <s:span id="nitValidationMessage">
+                        <h:outputText>#{salesAction.nitValidationMessage}</h:outputText>
+                    </s:span>
+
                 </s:div>
 
                 <s:div id="customerCategoryTypeField" styleClass="formRow,left">
@@ -377,7 +392,7 @@
                                    action="#{salesAction.assignClient(clientItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="clientField, part2, customerOrderTypeField, customerOrderType, customerCategoryTypeField, customerCategoryTypeId"
+                                   reRender="clientField, nitValidationMessage, part2, customerOrderTypeField, customerOrderType, customerCategoryTypeField, customerCategoryTypeId"
                                    oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
             </ui:define>
         </s:decorate>

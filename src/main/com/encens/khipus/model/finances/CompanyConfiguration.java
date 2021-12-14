@@ -53,6 +53,9 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_nit_verification")
+    private String nitVerificationURL;
+
     @Column(name = "url_validate_offline_bill_packages")
     private String validateOfflineBillPackagesURL;
 
@@ -1564,5 +1567,13 @@ public class CompanyConfiguration {
 
     public void setPrepareOfflineBillPackagesURL(String prepareOfflineBillPackagesURL) {
         this.prepareOfflineBillPackagesURL = prepareOfflineBillPackagesURL;
+    }
+
+    public String getNitVerificationURL() {
+        return nitVerificationURL;
+    }
+
+    public void setNitVerificationURL(String nitVerificationURL) {
+        this.nitVerificationURL = nitVerificationURL;
     }
 }

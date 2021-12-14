@@ -101,9 +101,10 @@
                 <h:outputText value="#{clientItem.nitNumber}"/>
             </rich:column>
             <rich:column styleClass="center">
-                <ui:insert name="assignButton"/>
-                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
-                                       event="onclick"/>
+                <s:div rendered="#{clientItem.validNitNumber()}">
+                    <ui:insert name="assignButton"/>
+                    <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+                </s:div>
             </rich:column>
         </rich:dataTable>
         <app:dataScroller id="dataScroller" for="clientList" dataModel="#{dataModel}"/>

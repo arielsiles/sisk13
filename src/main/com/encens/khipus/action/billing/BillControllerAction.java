@@ -56,7 +56,14 @@ public class BillControllerAction {
     @In
     private FacesMessages facesMessages;
 
-    public Boolean connectionTest() {
+    public Boolean connectionTest() throws IOException {
+
+        /** TODO Probar **/
+        if (!checkBillingMode()) {
+            System.out.println(">>>>> FUERA DE LINEA => CONEXION EXITOSA!!!");
+            return true;
+        }
+
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
         String url_ping = companyConfiguration.getConnectionTestURL();
 
@@ -225,7 +232,7 @@ public class BillControllerAction {
             System.out.println("....------> doPostHttpConnection: serverResponse: " + serverResponse);
 
         } catch (IOException e){
-            System.out.println("---------------> Exception doPostHttpConnection");
+            System.out.println("---------------> Exception doPostHttpConnection: -1, Json:null" );
             return new ServerResponse(Boolean.FALSE, -1, null);
         }
 
@@ -326,6 +333,28 @@ public class BillControllerAction {
         }
     }
 
+
+    public String nitVerification(Long nit) throws IOException{
+
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+        NitVerificationPOJO nitVerificationPOJO = new NitVerificationPOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode(), nit);
+        String jsonString = Json.prettyPrint(Json.toJson(nitVerificationPOJO));
+        System.out.println("-----------------------CheckBillingModePOJO-------------------");
+        System.out.println("----------> URL: " + companyConfiguration.getNitVerificationURL());
+        System.out.println(jsonString);
+
+        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getNitVerificationURL(), jsonString);
+        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+        NitVerificationResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, NitVerificationResponsePOJO.class);
+
+        System.out.println("---====> Mensaje: " + responsePOJO.getMensaje());
+        System.out.println("---====> NIT: " + responsePOJO.getNitParaVerificacion());
+
+        return responsePOJO.getMensaje();
+    }
+
     /**
      *
      * @return true en linea, false fuera de linea
@@ -377,9 +406,14 @@ public class BillControllerAction {
 
         ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOnlineModeURL() , jsonString);
 
-        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-        String result = Json.prettyPrint(jsonNodeResponse);
-        System.out.println(result);
+        if (serverResponse.getResponseJson() != null) {
+            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+            String result = Json.prettyPrint(jsonNodeResponse);
+            System.out.println(result);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: FUERA DE LINEA!!!");
+        }else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible en este momento, intentelo mas tarde.");
+        }
     }
 
     public void changeToOfflineBillingMode(SignificantEventSIN significantEventSIN, String cafcCode) throws IOException {
@@ -394,9 +428,14 @@ public class BillControllerAction {
 
         ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL() , jsonString);
 
-        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-        String result = Json.prettyPrint(jsonNodeResponse);
-        System.out.println(result);
+        if (serverResponse.getResponseJson() != null) {
+            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+            String result = Json.prettyPrint(jsonNodeResponse);
+            System.out.println(result);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: EN LINEA!!!");
+        }else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible en este momento, intentelo mas tarde.");
+        }
     }
 
     public void prepareOfflineBillPackages() throws IOException {
@@ -570,7 +609,7 @@ public class BillControllerAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
             return companyConfiguration;
         } catch (CompanyConfigurationNotFoundException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");
             return null;
         }
     }

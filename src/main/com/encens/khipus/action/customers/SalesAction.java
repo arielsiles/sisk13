@@ -70,6 +70,8 @@ public class SalesAction extends GenericAction {
     private String cafcCode;
     private boolean showCAFC = false;
 
+    private String nitValidationMessage;
+
     private List<SignificantEventCodePOJO> significantEventsCodes; // no usado
     private SignificantEventCodePOJO significantEventSelected; // no usado
 
@@ -335,6 +337,8 @@ public class SalesAction extends GenericAction {
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
         setMoneyReturned(BigDecimal.ZERO);
+
+        setNitValidationMessage(null);
     }
 
     public void clearSpecialBilling(){
@@ -927,6 +931,7 @@ public class SalesAction extends GenericAction {
         assignCustomerOrderTypeDefault();
         setCustomerCategoryTypeEnum(null);
         setPriceItemListMap(null);
+        setNitValidationMessage(null);
 
         if (client.getCustomerCategory() != null)
             setPriceItemListMap(priceItemService.getPriceItemsMap(client.getCustomerCategory()));
@@ -1018,14 +1023,11 @@ public class SalesAction extends GenericAction {
             cafc = getCafcCode();
 
         billControllerAction.changeToOfflineBillingMode(this.significantEventSIN, cafc);
-
-        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: FUERA DE LINEA!!!");
         return Outcome.SUCCESS;
     }
 
     public String changeToOnlineBillingMode() throws IOException {
         billControllerAction.changeToOnlineBillingMode();
-        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: EN LINEA!!!");
         return Outcome.SUCCESS;
     }
 
@@ -1150,15 +1152,16 @@ public class SalesAction extends GenericAction {
         setDistributor(null);
         setSubsidyEnun(null);
         setCustomerCategoryTypeEnum(null);
+        setNitValidationMessage(null);
 
         assignCustomerOrderTypeDefault();
     }
 
-    public Boolean connectionTest(){
+    public Boolean connectionTest() throws IOException {
         Boolean result = Boolean.FALSE;
 
         if (billControllerAction.connectionTest()){
-            connectionStatus = "Online";
+            connectionStatus = "Conexion OK";
             result = Boolean.TRUE;
         } else {
             connectionStatus = "Sin conexion";
@@ -1167,6 +1170,18 @@ public class SalesAction extends GenericAction {
         System.out.println("-----> Test Conexion: " + connectionStatus);
 
         return result;
+    }
+
+    public void validateNit(){
+        String result = "";
+        try {
+            result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
+            setNitValidationMessage(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            setNitValidationMessage("¿?");
+        }
     }
 
     // No usado
@@ -1358,5 +1373,13 @@ public class SalesAction extends GenericAction {
 
     public void setSignificantEventSIN(SignificantEventSIN significantEventSIN) {
         this.significantEventSIN = significantEventSIN;
+    }
+
+    public String getNitValidationMessage() {
+        return nitValidationMessage;
+    }
+
+    public void setNitValidationMessage(String nitValidationMessage) {
+        this.nitValidationMessage = nitValidationMessage;
     }
 }

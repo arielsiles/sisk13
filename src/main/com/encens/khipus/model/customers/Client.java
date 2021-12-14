@@ -287,6 +287,14 @@ public class Client implements BaseModel {
         return result;
     }
 
+    public boolean validNitNumber(){
+        Long number = new Long(getNitNumber());
+        if (number <= 0)
+            return false;
+        else
+            return true;
+    }
+
     public Territoriotrabajo getTerritoriotrabajo() {
         return territoriotrabajo;
     }
