@@ -346,13 +346,16 @@ public class BillControllerAction {
         System.out.println(jsonString);
 
         ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getNitVerificationURL(), jsonString);
-        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-        NitVerificationResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, NitVerificationResponsePOJO.class);
+        if (serverResponse.getResponseJson() != null) {
+            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+            NitVerificationResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, NitVerificationResponsePOJO.class);
 
-        System.out.println("---====> Mensaje: " + responsePOJO.getMensaje());
-        System.out.println("---====> NIT: " + responsePOJO.getNitParaVerificacion());
-
-        return responsePOJO.getMensaje();
+            System.out.println("---====> Mensaje: " + responsePOJO.getMensaje());
+            System.out.println("---====> NIT: " + responsePOJO.getNitParaVerificacion());
+            return responsePOJO.getMensaje();
+        }else {
+            return "No se pudo validar!";
+        }
     }
 
     /**

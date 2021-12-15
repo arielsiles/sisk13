@@ -1178,9 +1178,9 @@ public class SalesAction extends GenericAction {
             result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
             setNitValidationMessage(result);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            setNitValidationMessage("¿?");
+            setNitValidationMessage("¡No se pudo validar!");
         }
     }
 
