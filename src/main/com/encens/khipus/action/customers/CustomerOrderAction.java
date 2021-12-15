@@ -7,9 +7,11 @@ import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.finances.VoucherState;
+import com.encens.khipus.model.rest.CancelBillResponsePOJO;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
+import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import org.jboss.seam.ScopeType;
@@ -43,6 +45,8 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     private InventoryService inventoryService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private MovementService movementService;
 
     private CancellationReason cancellationReason;
     private String observationCancel;
@@ -62,26 +66,33 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     public void annulOrder(CustomerOrder customerOrder) {
         System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " +
                                         customerOrder.getTotalAmount() + " - " + cancellationReason.getDescription());
-
+        CancelBillResponsePOJO cancelResponse = null;
         try {
-            billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+            cancelResponse = billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
         } catch (IOException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorAnnulOrder");
             return;
         }
 
-        customerOrder.setState(SaleStatus.ANULADO);
-        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+        if (cancelResponse != null) {
 
-        saleService.updateCustomerOrder(customerOrder);
+            customerOrder.setState(SaleStatus.ANULADO);
+            inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+            saleService.updateCustomerOrder(customerOrder);
 
-        if (customerOrder.getVoucher() != null){
-            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
-            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+            Movement movement = customerOrder.getMovement();
+            movement.setState("A");
+            movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
+            movement.setDescri(cancelResponse.getCodigoDescripcion());
+            movementService.updateMovement(movement);
+
+            if (customerOrder.getVoucher() != null) {
+                customerOrder.getVoucher().setState(VoucherState.ANL.toString());
+                voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+            }
+
+            cleanAnnulOrder();
         }
-
-        cleanAnnulOrder();
-
         //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
     }
 

@@ -296,18 +296,17 @@ public class BillControllerAction {
 
     }
 
-    public void cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
+    public CancelBillResponsePOJO cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
         System.out.println("---------- CANCEL BILL ----------");
         User user = getUser(currentUser.getId()); //
         Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
 
+        CancelBillResponsePOJO responseResult = null;
+
         if (customerOrder.getMovement() != null){
             CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-
-            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(
-                    dosage.getBranchOffice().getOfficeCode(),
-                    dosage.getBranchOffice().getPosCode(),reasonCode,
-                    customerOrder.getMovement().getCuf());
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(dosage.getBranchOffice().getOfficeCode(), dosage.getBranchOffice().getPosCode(),
+                    reasonCode, customerOrder.getMovement().getCuf());
 
             String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
             System.out.println(jsonCancelBill);
@@ -315,22 +314,29 @@ public class BillControllerAction {
             if (connectionTest()) {
                 System.out.println(">>>>> CONEXION EXITOSA!!!");
                 ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
-                System.out.println("---------- RESPONSE CANCEL BILL ----------");
-                //JsonNode jsonNode = Json.parse(responseJsonString);
-                JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
-                String result = Json.prettyPrint(jsonNode);
-                System.out.println(result);
+                if (serverResponse.getResponseJson() != null) {
+                    System.out.println("---------- RESPONSE CANCEL BILL ----------");
+                    JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                    String resultJson = Json.prettyPrint(jsonNode);
+                    System.out.println(resultJson);
 
-                Movement movement = customerOrder.getMovement();
-                movement.setState("A");
-                movement.setCodigoEstado(jsonNode.get("codigoEstado").asText());
-                movement.setDescri(jsonNode.get("codigoDescripcion").asText());
-                movementService.updateMovement(movement);
+                    CancelBillResponsePOJO responsePOJO = Json.fromJson(jsonNode, CancelBillResponsePOJO.class);
+                    /** todo **/
+                    if (responsePOJO.getCodigoDescripcion().equals("ANULACION CONFIRMADA")){
+                        responseResult = responsePOJO;
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Factura anulada correctamente.");
+                    }else {
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular por el momento....");
+                    }
+                }else {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error al anular...");
+                }
             } else {
                 System.out.println(">>>>> SIN CONEXION!!!");
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"No es posible anular por el momento...");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular por el momento...");
             }
         }
+        return responseResult;
     }
 
 
@@ -413,7 +419,7 @@ public class BillControllerAction {
             JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
             String result = Json.prettyPrint(jsonNodeResponse);
             System.out.println(result);
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: FUERA DE LINEA!!!");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: EN LINEA!!!");
         }else {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible en este momento, intentelo mas tarde.");
         }
@@ -423,21 +429,26 @@ public class BillControllerAction {
         User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
-        SetOfflineModePOJO setOfflineModePOJO = new SetOfflineModePOJO(user.getBranchOffice().getOfficeCode(),user.getBranchOffice().getPosCode(), cafcCode, significantEventSIN.getCode());
-        String jsonString = Json.prettyPrint(Json.toJson(setOfflineModePOJO));
-        System.out.println("-----------------------changeToOfflineBillingMode-------------------");
-        System.out.println("----------> URL: " + companyConfiguration.getOfflineModeURL());
-        System.out.println(jsonString);
+        if (significantEventSIN != null) {
+            SetOfflineModePOJO setOfflineModePOJO = new SetOfflineModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode(), cafcCode, significantEventSIN.getCode());
+            String jsonString = Json.prettyPrint(Json.toJson(setOfflineModePOJO));
+            System.out.println("-----------------------changeToOfflineBillingMode-------------------");
+            System.out.println("----------> URL: " + companyConfiguration.getOfflineModeURL());
+            System.out.println(jsonString);
 
-        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL() , jsonString);
 
-        if (serverResponse.getResponseJson() != null) {
-            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-            String result = Json.prettyPrint(jsonNodeResponse);
-            System.out.println(result);
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"MODO DE FACTURACION: EN LINEA!!!");
-        }else {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible en este momento, intentelo mas tarde.");
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getOfflineModeURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                String result = Json.prettyPrint(jsonNodeResponse);
+                System.out.println(result);
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "MODO DE FACTURACION: FUERA DE LINEA!!!");
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde.");
+            }
+        } else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible, evento invalido.");
         }
     }
 

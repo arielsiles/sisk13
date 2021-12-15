@@ -173,12 +173,15 @@ public class PrintBillReportAction extends GenericReportAction {
         BigDecimal subtotal    = BigDecimalUtil.sum(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getAdditionalDiscountValue());
         BigDecimal totalAmount = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
 
+
+
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());
         paramMap.put("invoiceNumber", lastCustomerOrder.getMovement().getNumber().longValue());
         paramMap.put("authorizationNumber", dosage.getAuthorizationNumber());
         paramMap.put("clientNit", lastCustomerOrder.getMovement().getNit());
-        paramMap.put("name", lastCustomerOrder.getClient().getBusinessName());
+        //paramMap.put("name", lastCustomerOrder.getClient().getBusinessName()); Err
+        paramMap.put("name", lastCustomerOrder.getMovement().getName());
         paramMap.put("invoiceDateLiteral", DateUtils.getLiteralDate("Cochabamba", lastCustomerOrder.getMovement().getDate()));
         paramMap.put("expirationDate", dosage.getExpirationDate());
         paramMap.put("controlCode", "");

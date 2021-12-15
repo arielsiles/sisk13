@@ -565,14 +565,18 @@ public class SalesAction extends GenericAction {
                             customerOrder.getTotalAmount(),
                             dosage.getKey());
         /** Gen. Codigo de Control **/
-        //String controlCode = sfc.generateControlCode();
-        String controlCode = "0";
+        String controlCode = sfc.generateControlCode();
+        //String controlCode = "0"; /** todo **/
+
+        String nitCiValue = sfc.getClientNit();
+        if (customerOrder.getClient().getComplement() != null)
+            nitCiValue = nitCiValue + " " + customerOrder.getClient().getComplement();
 
         Movement movement = new Movement();
         movement.setDate(sfc.getDate());
         movement.setState(Constants.MOVEMENT_STATE_V);
         movement.setNumber(dosage.getCurrentNumber().intValue());
-        movement.setNit(sfc.getClientNit());
+        movement.setNit(nitCiValue);
         movement.setName(sfc.getName());
         movement.setAmount(BigDecimalUtil.toBigDecimal(sfc.getAmount()));
         movement.setAmountIce(BigDecimal.ZERO);
