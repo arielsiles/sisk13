@@ -39,12 +39,6 @@
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
-                         styleClass="button"
-                         tabindex="101">
-            <s:defaultAction/>
-        </h:commandButton>
-
         <h:commandButton action="#{salesAction.cancelBillingMode()}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="104">
@@ -133,6 +127,12 @@
         </h:commandButton>
 
         <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>

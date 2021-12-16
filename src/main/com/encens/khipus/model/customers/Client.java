@@ -243,6 +243,10 @@ public class Client implements BaseModel {
         return nitNumber;
     }
 
+    public String getNitNumberComplement() {
+        return nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
+    }
+
     public void setNitNumber(String nit) {
         this.nitNumber = nit;
     }

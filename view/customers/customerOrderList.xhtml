@@ -266,7 +266,7 @@
             <!--rows="#{sessionUser.rowsPerPage50}"-->
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
                             rows="20"
-                            width="100%" columnsWidth="2%, 5%, 5%, 5%, 25%, 5%, 5%, 10%, 7%, 10%, 10%, 6%, 5%">
+                            width="100%" columnsWidth="2%, 5%, 5%, 5%, 25%, 5%, 5%, 10%, 8%, 5%, 10%, 5%, 10%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -337,7 +337,7 @@
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    <h:outputText value="#{customerOrder.state}"/>
+                    <h:outputText value="#{messages[customerOrder.state.status]}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">

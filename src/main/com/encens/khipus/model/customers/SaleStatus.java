@@ -1,15 +1,17 @@
 package com.encens.khipus.model.customers;
 
 public enum SaleStatus {
-    PENDIENTE("SaleStatus.pendiente"),
-    PREPARAR("SaleStatus.preparar"),
-    ANULADO("SaleStatus.anulado"),
-    CONTABILIZADO("SaleStatus.contabilizado");
+    PENDIENTE("SaleStatus.pendiente", "CustomerOrder.state.PEN"),
+    PREPARAR("SaleStatus.preparar", "CustomerOrder.state.PRE"),
+    ANULADO("SaleStatus.anulado", "CustomerOrder.state.ANL"),
+    CONTABILIZADO("SaleStatus.contabilizado", "CustomerOrder.state.CONTA");
 
     private String resourceKey;
+    private String status;
 
-    private SaleStatus(String resourceKey) {
+    SaleStatus(String resourceKey, String status) {
         this.resourceKey = resourceKey;
+        this.status = status;
     }
 
     public String getResourceKey() {
@@ -18,5 +20,13 @@ public enum SaleStatus {
 
     public void setResourceKey(String resourceKey) {
         this.resourceKey = resourceKey;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

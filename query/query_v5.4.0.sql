@@ -60,21 +60,19 @@ ALTER TABLE configuracion ADD COLUMN url_set_online_mode VARCHAR(300) AFTER luga
 ALTER TABLE configuracion ADD COLUMN url_prepare_offline_bill_packages VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_process_offline_bill_packages VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_validate_offline_bill_packages VARCHAR(300) AFTER lugar;
-
 ALTER TABLE configuracion ADD COLUMN url_nit_verification VARCHAR(300) AFTER lugar;
 
-UPDATE configuracion c SET c.`url_nit_verification` = 'http://10.0.0.196:8080/api/codes/nitVerifications';
-
-UPDATE configuracion c SET c.url_prepare_offline_bill_packages  = "http://10.0.0.196:8080/api/billing/prepare-offline-bill-packages";
-UPDATE configuracion c SET c.url_process_offline_bill_packages  = "http://10.0.0.196:8080/api/billing/process-offline-bill-packages";
-UPDATE configuracion c SET c.url_validate_offline_bill_packages = "http://10.0.0.196:8080/api/billing/validate-offline-bill-packages";
+UPDATE configuracion c SET c.`url_nit_verification` = 'http://10.0.0.106:8080/api/codes/nitVerifications';
+UPDATE configuracion c SET c.url_prepare_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/prepare-offline-bill-packages";
+UPDATE configuracion c SET c.url_process_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/process-offline-bill-packages";
+UPDATE configuracion c SET c.url_validate_offline_bill_packages = "http://10.0.0.106:8080/api/billing/validate-offline-bill-packages";
 UPDATE configuracion c SET c.`url_set_online_mode` = "http://10.0.0.106:8080/api/billing/set-online-mode";
 UPDATE configuracion c SET c.`url_set_offline_mode` = "http://10.0.0.106:8080/api/billing/set-offline-mode";
 UPDATE configuracion c SET c.url_significant_event = "http://10.0.0.106:8080/api/sync/significant-events";
-UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.196:8080/api/billing/query-online-offline-mode';
-UPDATE configuracion c SET c.url_ping = 'http://10.0.0.196:8080/api/sync/ping';
-UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.196:8080/api/billing/bills';
-UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.196:8080/api/billing/cancel-bill';
+UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.106:8080/api/billing/query-online-offline-mode';
+UPDATE configuracion c SET c.url_ping = 'http://10.0.0.106:8080/api/sync/ping';
+UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.106:8080/api/billing/bills';
+UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.106:8080/api/billing/cancel-bill';
 UPDATE configuracion c SET c.`url_qr` = 'https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2';
 
 
@@ -252,6 +250,12 @@ ALTER TABLE personacliente ADD COLUMN CODMETODOPAGOSIN INT(11) AFTER RAZONSOCIAL
 UPDATE personacliente p SET p.`CODMETODOPAGOSIN` = 5;
 
 ALTER TABLE personacliente DROP COLUMN idmetodopagosin;
+
+-- 16.12.2021
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(430, 'BRANCHOFFICE', 2, 15, 'Functionality.admin.brachOffice', 1);
+
+
 
 --
 --

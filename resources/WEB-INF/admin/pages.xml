@@ -109,4 +109,20 @@
             </rule>
         </navigation>
     </page>
+
+    <page view-id="/admin/branchOfficeList.xhtml">
+        <navigation from-action="#{branchOfficeAction.select(branchOfficeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/admin/branchOffice.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/admin/branchOffice.xhtml" no-conversation-view-id="/admin/branchOfficeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/admin/branchOfficeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>
