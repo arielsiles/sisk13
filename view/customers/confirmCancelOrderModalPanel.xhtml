@@ -68,10 +68,8 @@
             <a4j:commandButton id="annulOrderButton" value="Anular"
                                action="#{customerOrderAction.annulOrder(customerOrder)}"
                                styleClass="button"
-                               reRender="customerOrderList">
-                <s:defaultAction/>
+                               reRender="customerOrderSearch, customerOrderList">
             </a4j:commandButton>
-
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>

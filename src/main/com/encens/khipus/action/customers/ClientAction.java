@@ -3,6 +3,8 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.PaymentMethodSin;
+import com.encens.khipus.service.customers.ClientService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -15,8 +17,12 @@ import org.jboss.seam.annotations.*;
 @Scope(ScopeType.CONVERSATION)
 public class ClientAction extends GenericAction<Client> {
 
+    @In
+    private ClientService clientService;
+
     private String clientName;
     private Boolean personFlag = Boolean.TRUE;
+    private PaymentMethodSin paymentMethodSin;
 
     private boolean showNitExtension = false;
 
@@ -38,6 +44,7 @@ public class ClientAction extends GenericAction<Client> {
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Client instance) {
         String outCome = super.select(instance);
+        setPaymentMethodSin(clientService.findPaymentMethodSin(instance.getPaymentMethodTypeCode()));
         return outCome;
     }
 
@@ -59,9 +66,17 @@ public class ClientAction extends GenericAction<Client> {
         if (getInstance().getMaidenName() == null)
             getInstance().setMaidenName("");
 
+        getInstance().setPaymentMethodTypeCode(this.paymentMethodSin.getCode());
 
         return super.create();
 
+    }
+
+    @End
+    @Override
+    public String update() {
+        getInstance().setPaymentMethodTypeCode(this.paymentMethodSin.getCode());
+        return super.update();
     }
 
     public void updateShowNitExtension() {
@@ -106,4 +121,11 @@ public class ClientAction extends GenericAction<Client> {
         return result;
     }
 
+    public PaymentMethodSin getPaymentMethodSin() {
+        return paymentMethodSin;
+    }
+
+    public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
+        this.paymentMethodSin = paymentMethodSin;
+    }
 }

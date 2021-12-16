@@ -349,9 +349,7 @@
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    &#160;
-
-                    <!--action="#{customerOrderAction.select(customerOrder)}"-->
+                    <!--&#160;-->
                     <a4j:commandButton id="cashSaleCommandButton"
                                        action="#{customerOrderAction.select(customerOrder)}"
                                        value="Anular"
@@ -359,9 +357,8 @@
                                        immediate="true"
                                        rendered="#{!salesAction.isAnnulled(customerOrder)}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
-                                       reRender="customerOrderList, confirmCancelOrderModalPanel">
+                                       reRender="confirmCancelOrderModalPanel">
                     </a4j:commandButton>
-
 
 
                 </rich:column>

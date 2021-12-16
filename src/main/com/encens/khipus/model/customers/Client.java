@@ -91,11 +91,14 @@ public class Client implements BaseModel {
     @Column(name = "RAZONSOCIAL")
     private String businessName;
 
+    @Column(name = "CODMETODOPAGOSIN")
+    private Integer paymentMethodTypeCode;
+
     @Column(name = "DESCUENTO")
-    private BigDecimal additionalDiscount;
+    private BigDecimal additionalDiscount = BigDecimal.ZERO;
 
     @Column(name = "DESCUENTOPROD")
-    private BigDecimal productDiscount;
+    private BigDecimal productDiscount  = BigDecimal.ZERO;;
 
     @Column(name = "PORCENTAJECOMISION")
     private Double commission;
@@ -120,10 +123,6 @@ public class Client implements BaseModel {
     @ManyToOne
     @JoinColumn(name = "idtipodocsin", referencedColumnName = "idtipodocumento")
     private DocumentType invoiceDocumentType;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idmetodopagosin", referencedColumnName = "idmetodopago")
-    private PaymentMethodSin paymentMethodSin;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
@@ -359,14 +358,6 @@ public class Client implements BaseModel {
         this.invoiceDocumentType = invoiceDocumentType;
     }
 
-    public PaymentMethodSin getPaymentMethodSin() {
-        return paymentMethodSin;
-    }
-
-    public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
-        this.paymentMethodSin = paymentMethodSin;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -397,5 +388,13 @@ public class Client implements BaseModel {
 
     public void setProductDiscount(BigDecimal productDiscount) {
         this.productDiscount = productDiscount;
+    }
+
+    public Integer getPaymentMethodTypeCode() {
+        return paymentMethodTypeCode;
+    }
+
+    public void setPaymentMethodTypeCode(Integer paymentMethodTypeCode) {
+        this.paymentMethodTypeCode = paymentMethodTypeCode;
     }
 }

@@ -205,7 +205,7 @@
         <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Invoice.paymentMethod']}</ui:define>
             <h:selectOneMenu id="paymentMethod"
-                             value="#{client.paymentMethodSin}"
+                             value="#{clientAction.paymentMethodSin}"
                              styleClass="input"
                              required="true"
                              tabindex="8">

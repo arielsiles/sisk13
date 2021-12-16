@@ -324,7 +324,7 @@ public class BillControllerAction {
                     /** todo **/
                     if (responsePOJO.getCodigoDescripcion().equals("ANULACION CONFIRMADA")){
                         responseResult = responsePOJO;
-                        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Factura anulada correctamente.");
+                        //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Factura anulada correctamente.");
                     }else {
                         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular por el momento....");
                     }
@@ -555,7 +555,8 @@ public class BillControllerAction {
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
         pedidoPOJO.setCodigoCliente(clientCode);
-        pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodSin().getCode());
+        //pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodSin().getCode());
+        pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodTypeCode());
         pedidoPOJO.setUsuario(user.getUsername());
         pedidoPOJO.setCodigoDocumentoSector(dosage.getSectorDocumentCode());
         pedidoPOJO.setCodigoMoneda(Constants.CODIGO_MONEDA_SIN); /** todo **/
