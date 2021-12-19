@@ -2423,6 +2423,13 @@
                         value="#{messages['menu.admin.configuration.branchOffice']}"
                         propagation="none"/>
             </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BRANCHOFFICE','VIEW')}">
+                <s:link view="/admin/dosageList.xhtml"
+                        value="#{messages['menu.admin.configuration.dosage']}"
+                        propagation="none"/>
+            </rich:menuItem>
         </rich:dropDownMenu>
     </h:panelGrid>
 </rich:tab>

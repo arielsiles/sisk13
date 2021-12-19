@@ -138,12 +138,12 @@ UPDATE inv_articulos i SET i.`idprodutoservicio` = 6 WHERE i.`cod_alm` IN (5);
 -- 21.11.2021
 
 ALTER TABLE sucursal ADD COLUMN codsuc INT(11) AFTER descripcion;
-ALTER TABLE sucursal ADD COLUMN codpos INT(11) AFTER codsin;
+ALTER TABLE sucursal ADD COLUMN codpos INT(11) AFTER codsuc;
 
-UPDATE sucursal s SET s.`codsin` = 0 WHERE s.`IDSUCURSAL` = 1;
+UPDATE sucursal s SET s.`codsuc` = 0 WHERE s.`IDSUCURSAL` = 1;
 UPDATE sucursal s SET s.`codpos` = 0 WHERE s.`IDSUCURSAL` = 1;
 
-UPDATE sucursal s SET s.`codsin` = 0 WHERE s.`IDSUCURSAL` = 2;
+UPDATE sucursal s SET s.`codsuc` = 0 WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`codpos` = 1 WHERE s.`IDSUCURSAL` = 2;
 
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(0)' WHERE s.`IDSUCURSAL` = 1;
@@ -255,7 +255,16 @@ ALTER TABLE personacliente DROP COLUMN idmetodopagosin;
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
 VALUES(430, 'BRANCHOFFICE', 2, 15, 'Functionality.admin.brachOffice', 1);
 
+-- 18.12.2021
+-- incluir update secuencia dosificacion
 
+ALTER TABLE sucursal ADD COLUMN VERSION BIGINT(20) NULL AFTER direccion;
+ALTER TABLE sucursal ADD COLUMN idcompania BIGINT(20) NULL AFTER VERSION;
+
+UPDATE sucursal s SET s.`version` = 0;
+UPDATE sucursal s SET s.`idcompania` = 1;
+
+INSERT INTO secuencia VALUES ('sucursal', 3);
 
 --
 --

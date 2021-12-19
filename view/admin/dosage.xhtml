@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{dosageAction.managed}">
+            #{messages['Common.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Common.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+<h:form id="dosageForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{dosageAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!dosageAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <a4j:commandButton id="updateButtonId"
+                       action="#{dosageAction.update}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{dosageAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
+                       reRender="dosageForm">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+    <h:commandButton action="#{dosageAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{dosageAction.managed}">
+            #{messages['Common.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['Common.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+<h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+<s:div>
+    <s:decorate id="authorizationNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.authorizationNumber']}</ui:define>
+        <h:inputText id="authorizationNumber" value="#{dosage.authorizationNumber}"
+                     required="true"
+                     tabindex="1"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.startDate']}</ui:define>
+        <rich:calendar id="expirationDate"
+                       enableManualInput="true"
+                       value="#{dosage.startDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       required="true"
+                       tabindex="2">
+        </rich:calendar>
+    </s:decorate>
+
+    <s:decorate id="expirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.expirationDate']}</ui:define>
+        <rich:calendar id="expirationDate"
+                       enableManualInput="true"
+                       value="#{dosage.expirationDate}"
+                       datePattern="#{messages['patterns.date']}"
+                       required="true"
+                       tabindex="2">
+        </rich:calendar>
+    </s:decorate>
+
+    <s:decorate id="keyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.key']}</ui:define>
+        <h:inputText id="key" value="#{dosage.key}"
+                     required="true"
+                     tabindex="3"
+                     styleClass="inputLarge500"/>
+    </s:decorate>
+
+    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.state']}</ui:define>
+        <h:inputText id="companyName" value="#{dosage.state}"
+                     required="true"
+                     tabindex="4"
+                     styleClass="inputSmall"/>
+    </s:decorate>
+
+    <s:decorate id="activeField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.active']}</ui:define>
+        <h:selectBooleanCheckbox id="active"
+                                 value="#{dosage.active}"
+                                 tabindex="5">
+        </h:selectBooleanCheckbox>
+    </s:decorate>
+
+    <s:decorate id="currentNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.currentNumber']}</ui:define>
+        <h:inputText id="currentNumber" value="#{dosage.currentNumber}"
+                     required="true"
+                     tabindex="6"
+                     styleClass="inputNumberTiny"/>
+    </s:decorate>
+
+    <s:decorate id="companyNitField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.companyNit']}</ui:define>
+        <h:inputText id="companyNit" value="#{dosage.companyNit}"
+                     required="true"
+                     tabindex="7"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="companyLabelField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.companyLabel']}</ui:define>
+        <h:inputText id="companyLabel" value="#{dosage.companyLabel}"
+                     required="true"
+                     tabindex="8"
+                     styleClass="inputLarge400"/>
+    </s:decorate>
+
+    <s:decorate id="lawLabelField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Dosage.lawLabel']}</ui:define>
+        <h:inputText id="lawLabel" value="#{dosage.lawLabel}"
+                     required="true"
+                     tabindex="9"
+                     styleClass="inputLarge500"/>
+    </s:decorate>
+
+    <s:decorate id="branchOfficeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['User.branchOfficeAndPos']}</ui:define>
+        <h:selectOneMenu id="branchOffice"
+                         value="#{dosage.branchOffice}"
+                         styleClass="input"
+                         immediate="true"
+                         tabindex="10">
+            <s:selectItems value="#{branchOfficeList}" var="branchOffice"
+                           label="#{branchOffice.description}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="true" />
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+</s:div>
+
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+
+</div>
+</h:form>
+
+<rich:jQuery selector="#idauthorizationNumber" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>
+
