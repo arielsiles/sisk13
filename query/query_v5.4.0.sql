@@ -268,6 +268,19 @@ UPDATE sucursal s SET s.`idcompania` = 1;
 
 INSERT INTO secuencia VALUES ('sucursal', 3);
 
+-- 22.12.2021
+
+CREATE TABLE sin_actividad (
+	idactividad BIGINT(20) NOT NULL,
+	codigocaeb VARCHAR(50),
+	descripcion VARCHAR(150),
+	tipoactividad VARCHAR(10)
+);
+
+INSERT sin_actividad VALUES (1, '640000', 'OTROS TIPOS DE INTERMEDIACIÓN FINANCIERA, INCLUYE CASAS DE CAMBIO', 'P');
+INSERT sin_actividad VALUES (2, '640001', 'COMPRA Y VENTA DE MONEDA EXTRANJERA', 'S');
+INSERT sin_actividad VALUES (3, '105000', 'ELABORACIÓN DE PRODUCTOS LÁCTEOS', 'S');
+
 --
 --
 -- revisar
