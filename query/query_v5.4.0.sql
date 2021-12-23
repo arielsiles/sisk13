@@ -257,6 +257,8 @@ VALUES(430, 'BRANCHOFFICE', 2, 15, 'Functionality.admin.brachOffice', 1);
 
 -- 18.12.2021
 -- incluir update secuencia dosificacion
+INSERT INTO secuencia VALUES ('dosificacion', 0);
+UPDATE SECUENCIA SET VALOR=(SELECT MAX(d.`IDDOSIFICACION`)+1 FROM dosificacion d) WHERE TABLA='dosificacion';
 
 ALTER TABLE sucursal ADD COLUMN VERSION BIGINT(20) NULL AFTER direccion;
 ALTER TABLE sucursal ADD COLUMN idcompania BIGINT(20) NULL AFTER VERSION;
