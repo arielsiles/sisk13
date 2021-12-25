@@ -555,10 +555,9 @@ public class BillControllerAction {
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
         pedidoPOJO.setCodigoCliente(clientCode);
-        //pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodSin().getCode());
         pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodTypeCode());
         pedidoPOJO.setUsuario(user.getUsername());
-        pedidoPOJO.setCodigoDocumentoSector(dosage.getSectorDocumentCode());
+        pedidoPOJO.setCodigoDocumentoSector(dosage.getBranchOffice().getSectorDocumentCode());
         pedidoPOJO.setCodigoMoneda(Constants.CODIGO_MONEDA_SIN); /** todo **/
         pedidoPOJO.setTipoCambio(Constants.TIPO_CAMBIO_SIN); /** todo **/
         pedidoPOJO.setMontoTotal(amountValue);
