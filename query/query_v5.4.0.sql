@@ -1,7 +1,4 @@
 -- 09.11.2021
--- ALTER TABLE inv_articulos ADD COLUMN codsin VARCHAR(10) AFTER cod_art;     -- delete
--- ALTER TABLE dosificacion ADD COLUMN caeb VARCHAR(20) AFTER IDDOSIFICACION; -- delete
-
 ALTER TABLE inv_articulos ADD COLUMN cod_meds INT(11) AFTER cod_med;
 
 -- 11.11.2021
@@ -24,7 +21,6 @@ UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 2;
 UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 5;
 UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 8;
 
-UPDATE dosificacion d SET d.`caeb` = '105000';
 UPDATE personacliente p SET p.`idtipodocsin` = 2 WHERE p.`TIPO_PERSONA` = 'institucion';
 
 --
@@ -45,8 +41,6 @@ ALTER TABLE personacliente ADD COLUMN idmetodopagosin BIGINT(20) AFTER razonsoci
 
 UPDATE personacliente p SET p.`idmetodopagosin` = 1 WHERE p.`idmetodopagosin` IS NULL;
 
-ALTER TABLE dosificacion ADD COLUMN cod_docsector INT(11) AFTER caeb;
-UPDATE dosificacion d SET d.`cod_docsector` = 1;
 --
 
 ALTER TABLE configuracion ADD COLUMN url_createbill VARCHAR(300) AFTER lugar;
@@ -61,7 +55,14 @@ ALTER TABLE configuracion ADD COLUMN url_prepare_offline_bill_packages VARCHAR(3
 ALTER TABLE configuracion ADD COLUMN url_process_offline_bill_packages VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_validate_offline_bill_packages VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_nit_verification VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN url_activities VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN url_products_services VARCHAR(300) AFTER lugar;
 
+ALTER TABLE configuracion ADD COLUMN url_measure_units VARCHAR(300) AFTER lugar;
+UPDATE configuracion c SET c.url_measure_units = 'http://10.0.0.106:8080/api/sync/measure-units';
+
+UPDATE configuracion c SET c.url_products_services = 'http://10.0.0.106:8080/api/sync/products-and-services';
+UPDATE configuracion c SET c.url_activities = 'http://10.0.0.106:8080/api/sync/activities';
 UPDATE configuracion c SET c.`url_nit_verification` = 'http://10.0.0.106:8080/api/codes/nitVerifications';
 UPDATE configuracion c SET c.url_prepare_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/prepare-offline-bill-packages";
 UPDATE configuracion c SET c.url_process_offline_bill_packages  = "http://10.0.0.106:8080/api/billing/process-offline-bill-packages";
@@ -149,24 +150,17 @@ UPDATE sucursal s SET s.`codpos` = 1 WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(0)' WHERE s.`IDSUCURSAL` = 1;
 UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(1)' WHERE s.`IDSUCURSAL` = 2;
 
--- 23.11.2021
-/*
-ALTER TABLE  inv_articulos ADD COLUMN caeb VARCHAR(10) AFTER codsin;
-CREATE TABLE sin_actividadeconomica (
-	codigo VARCHAR(100),
-	nombre VARCHAR(100),
-	PRIMARY KEY (codigo)
-);
-*/
-
 -- 24.11.2021
+-- drop table sin_unidadmedida;
 
 CREATE TABLE sin_unidadmedida (
-	nro INT(11),
-	codigouni VARCHAR(10),
+	idunidadmedida BIGINT(20) NOT NULL,
+	codigo INT(11),
 	descripcion VARCHAR(100),
-	PRIMARY KEY (nro)
+	PRIMARY KEY (idunidadmedida)
 );
+
+UPDATE inv_articulos i SET i.`cod_meds` = NULL;
 
 -- 25.11.2021
 
@@ -224,6 +218,9 @@ ALTER TABLE sucursal ADD COLUMN NOMBRE_SUCURSAL VARCHAR(150) AFTER codpos;
 ALTER TABLE sucursal ADD COLUMN NOMBRE_EMPRESA VARCHAR(150) AFTER codpos;
 ALTER TABLE sucursal ADD COLUMN ACTIVIDAD VARCHAR(150) AFTER codpos;
 
+ALTER TABLE sucursal ADD COLUMN docsector INT(11) AFTER codpos;
+
+
 UPDATE sucursal s SET s.`NOMBRE_EMPRESA`  = 'COOPERATIVA INTEGRAL DE SERVICIOS COCHABAMBA LTDA.' WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`NOMBRE_SUCURSAL` = 'SUCURSAL 2' WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`TELEFONOS` = 'Teléfono: 4577003' WHERE s.`IDSUCURSAL` = 2;
@@ -280,6 +277,14 @@ CREATE TABLE sin_actividad (
 INSERT sin_actividad VALUES (1, '640000', 'OTROS TIPOS DE INTERMEDIACIÓN FINANCIERA, INCLUYE CASAS DE CAMBIO', 'P');
 INSERT sin_actividad VALUES (2, '640001', 'COMPRA Y VENTA DE MONEDA EXTRANJERA', 'S');
 INSERT sin_actividad VALUES (3, '105000', 'ELABORACIÓN DE PRODUCTOS LÁCTEOS', 'S');
+
+-- 23.12.2021
+ALTER TABLE inv_articulos ADD COLUMN codsin INT(11) AFTER cod_art;
+ALTER TABLE inv_articulos ADD COLUMN codact VARCHAR(50) AFTER cod_art;
+
+UPDATE inv_articulos i SET i.`idprodutoservicio` = NULL;
+
+
 
 --
 --

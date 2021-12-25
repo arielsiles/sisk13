@@ -63,6 +63,9 @@ public class BranchOffice implements BaseModel {
     @Column(name="codpos")
     private Integer posCode;
 
+    @Column(name="docsector")
+    private Integer sectorDocumentCode; // 1:FACTURA COMPRA-VENTA
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -183,5 +186,13 @@ public class BranchOffice implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Integer getSectorDocumentCode() {
+        return sectorDocumentCode;
+    }
+
+    public void setSectorDocumentCode(Integer sectorDocumentCode) {
+        this.sectorDocumentCode = sectorDocumentCode;
     }
 }

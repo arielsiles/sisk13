@@ -5,8 +5,7 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.warehouse.ProductItemMinimalStockIsGreaterThanMaximumStockException;
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.ArticulosPromocion;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
@@ -70,4 +69,7 @@ public interface ProductItemService extends GenericService {
 
     List<ProductItem> findBestProductList();
 
+    EconomicActivity findEconomicActivity(String code);
+    ProductsServices findProductsAndServices(Integer code);
+    MeasureUnitSIN findMeasureUnitSIN(Integer code);
 }

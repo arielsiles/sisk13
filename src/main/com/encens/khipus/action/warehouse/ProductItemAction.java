@@ -9,6 +9,9 @@ import com.encens.khipus.exception.warehouse.ProductItemMinimalStockIsGreaterTha
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.customers.EconomicActivity;
+import com.encens.khipus.model.customers.MeasureUnitSIN;
+import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.common.SequenceGeneratorService;
@@ -57,6 +60,10 @@ public class ProductItemAction extends GenericAction<ProductItem> {
     @In
     private SessionUser sessionUser;
 
+    private EconomicActivity economicActivity;
+    private ProductsServices productService;
+    private MeasureUnitSIN measureUnitSIN;
+
     @Create
     public void atCreateTime() {
         if (!isManaged()) {
@@ -95,6 +102,14 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             return validationOutcome;
         }
         try {
+
+            if (economicActivity != null)
+                getInstance().setEconomicActivityCode(economicActivity.getActivityCode());
+            if (productService != null)
+                getInstance().setProductSinCode(productService.getProductCode());
+            if (measureUnitSIN != null)
+                getInstance().setMeasureUnitSinCode(measureUnitSIN.getCode());
+
             productItemService.createProductItem(getInstance());
             createProductionItem(getInstance());
             addCreatedMessage();
@@ -106,6 +121,17 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             addProductItemMinimalStockIsGreaterThanMaximumStockErrorMessage();
             return Outcome.REDISPLAY;
         }
+    }
+
+    @Override
+    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    public String select(ProductItem instance){
+
+        setEconomicActivity(productItemService.findEconomicActivity(instance.getEconomicActivityCode()));
+        setProductService(productItemService.findProductsAndServices(instance.getProductSinCode()));
+        setMeasureUnitSIN(productItemService.findMeasureUnitSIN(instance.getMeasureUnitSinCode()));
+
+        return super.select(instance);
     }
 
     private void createProductionItem(ProductItem productItem) {
@@ -162,10 +188,16 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             return validationOutcome;
         }
 
-        System.out.println("-----------------------> MED: " + getInstance().getMeasureUnit().getDescription());
-
         Long currentVersion = (Long) getVersion(getInstance());
         try {
+
+            if (economicActivity != null)
+                getInstance().setEconomicActivityCode(economicActivity.getActivityCode());
+            if (productService != null)
+                getInstance().setProductSinCode(productService.getProductCode());
+            if (measureUnitSIN != null)
+                getInstance().setMeasureUnitSinCode(measureUnitSIN.getCode());
+
             productItemService.updateProductItem(getInstance());
             updateProductionItem(getInstance());
             addUpdatedMessage();
@@ -283,5 +315,29 @@ public class ProductItemAction extends GenericAction<ProductItem> {
                 "ProductItem.error.minimalStockIsGreaterThanMaximumStock",
                 FormatUtils.formatNumber(getInstance().getMinimalStock(), messages.get("patterns.decimal6FNumber"), sessionUser.getLocale()),
                 FormatUtils.formatNumber(getInstance().getMaximumStock(), messages.get("patterns.decimal6FNumber"), sessionUser.getLocale()));
+    }
+
+    public EconomicActivity getEconomicActivity() {
+        return economicActivity;
+    }
+
+    public void setEconomicActivity(EconomicActivity economicActivity) {
+        this.economicActivity = economicActivity;
+    }
+
+    public ProductsServices getProductService() {
+        return productService;
+    }
+
+    public void setProductService(ProductsServices productService) {
+        this.productService = productService;
+    }
+
+    public MeasureUnitSIN getMeasureUnitSIN() {
+        return measureUnitSIN;
+    }
+
+    public void setMeasureUnitSIN(MeasureUnitSIN measureUnitSIN) {
+        this.measureUnitSIN = measureUnitSIN;
     }
 }

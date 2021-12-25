@@ -222,6 +222,15 @@
                                reRender="productDataTable, confirmOnlineOfflineModeModalPanel">
             </a4j:commandButton>-->
 
+            <a4j:commandButton id="syncButton"
+                               action="#{syncControllerAction.syncData()}"
+                               value="SYNC"
+                               styleClass="button"
+                               immediate="true"
+                               ajaxSingle="true">
+            </a4j:commandButton>
+
+
             <s:button value="On/Off Line"
                       action="#{salesAction.initBillingMode()}"
                       view="/customers/changeBillingMode.xhtml"

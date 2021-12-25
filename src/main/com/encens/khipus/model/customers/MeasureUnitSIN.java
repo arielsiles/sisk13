@@ -1,11 +1,9 @@
 package com.encens.khipus.model.customers;
 
+import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.util.Constants;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Entity
@@ -14,34 +12,43 @@ import javax.persistence.Table;
  * version: 2.7
  */
 
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "MeasureUnitSIN.tableGenerator",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "sin_unidadmedida",
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
+
 @Entity
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "sin_unidadmedida")
-public class MeasureUnitSIN {
+public class MeasureUnitSIN implements BaseModel {
 
     @Id
-    @Column(name = "nro")
-    private Integer number;
+    @Column(name = "idunidadmedida", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "MeasureUnitSIN.tableGenerator")
+    private Long id;
 
-    @Column(name = "codigouni")
-    private String unitCode;
+    @Column(name = "codigo")
+    private Integer code;
 
     @Column(name = "descripcion")
     private String description;
 
-    public Integer getNumber() {
-        return number;
+    @Override
+    public Long getId() {
+        return id;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getUnitCode() {
-        return unitCode;
+    public Integer getCode() {
+        return code;
     }
 
-    public void setUnitCode(String unitCode) {
-        this.unitCode = unitCode;
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     public String getDescription() {
@@ -51,9 +58,4 @@ public class MeasureUnitSIN {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public String toString(){
-        return getNumber() + " - " + getDescription() + " (" + getUnitCode() + ")";
-    }
-
 }

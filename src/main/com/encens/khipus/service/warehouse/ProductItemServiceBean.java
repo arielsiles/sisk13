@@ -7,9 +7,7 @@ import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.BusinessUnit;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.ArticulosPromocion;
-import com.encens.khipus.model.customers.Promocion;
+import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.admin.BusinessUnitService;
@@ -265,5 +263,46 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         return result;
     }
 
+    @Override
+    public EconomicActivity findEconomicActivity(String code){
+
+        try {
+            return (EconomicActivity)
+                    em.createQuery("select e from EconomicActivity e " +
+                            " where e.activityCode =:activityCode ")
+                            .setParameter("activityCode", code)
+                            .getSingleResult();
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
+    public ProductsServices findProductsAndServices(Integer code) {
+
+        try {
+            return (ProductsServices)
+                    em.createQuery("select p from ProductsServices p " +
+                            " where p.productCode =:productCode ")
+                            .setParameter("productCode", code)
+                            .getSingleResult();
+        }catch (Exception e){
+            return null;
+        }
+
+    }
+
+    @Override
+    public MeasureUnitSIN findMeasureUnitSIN(Integer code) {
+        try {
+            return (MeasureUnitSIN)
+                    em.createQuery("select p from MeasureUnitSIN p " +
+                            " where p.code =:code ")
+                            .setParameter("code", code)
+                            .getSingleResult();
+        }catch (Exception e){
+            return null;
+        }
+    }
 
 }

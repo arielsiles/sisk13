@@ -53,6 +53,15 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "url_measure_units")
+    private String measureUnitsURL;
+
+    @Column(name = "url_products_services")
+    private String productsAndServicesURL;
+
+    @Column(name = "url_activities")
+    private String activitiesURL;
+
     @Column(name = "url_nit_verification")
     private String nitVerificationURL;
 
@@ -1575,5 +1584,29 @@ public class CompanyConfiguration {
 
     public void setNitVerificationURL(String nitVerificationURL) {
         this.nitVerificationURL = nitVerificationURL;
+    }
+
+    public String getActivitiesURL() {
+        return activitiesURL;
+    }
+
+    public void setActivitiesURL(String activitiesURL) {
+        this.activitiesURL = activitiesURL;
+    }
+
+    public String getProductsAndServicesURL() {
+        return productsAndServicesURL;
+    }
+
+    public void setProductsAndServicesURL(String productsAndServicesURL) {
+        this.productsAndServicesURL = productsAndServicesURL;
+    }
+
+    public String getMeasureUnitsURL() {
+        return measureUnitsURL;
+    }
+
+    public void setMeasureUnitsURL(String measureUnitsURL) {
+        this.measureUnitsURL = measureUnitsURL;
     }
 }

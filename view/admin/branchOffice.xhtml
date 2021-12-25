@@ -97,11 +97,19 @@
                      styleClass="input"/>
     </s:decorate>
 
+    <s:decorate id="sectorDocumentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.sectorDocumentCode']}</ui:define>
+        <h:inputText id="sectorDocumentCode" value="#{branchOffice.sectorDocumentCode}"
+                     required="true"
+                     tabindex="5"
+                     styleClass="inputTiny"/>
+    </s:decorate>
+
     <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['BranchOffice.description']}</ui:define>
         <h:inputText id="description" value="#{branchOffice.description}"
                      required="true"
-                     tabindex="5"
+                     tabindex="6"
                      styleClass="input"/>
     </s:decorate>
 
@@ -109,7 +117,7 @@
         <ui:define name="label">#{messages['BranchOffice.economicActivity']}</ui:define>
         <h:inputText id="activity" value="#{branchOffice.activity}"
                      required="true"
-                     tabindex="6"
+                     tabindex="7"
                      styleClass="inputLarge400"/>
     </s:decorate>
 
@@ -117,7 +125,7 @@
         <ui:define name="label">#{messages['BranchOffice.companyName']}</ui:define>
         <h:inputText id="companyName" value="#{branchOffice.companyName}"
                      required="true"
-                     tabindex="7"
+                     tabindex="8"
                      styleClass="inputLarge400"/>
     </s:decorate>
 
@@ -125,7 +133,7 @@
         <ui:define name="label">#{messages['BranchOffice.branchName']}</ui:define>
         <h:inputText id="branchName" value="#{branchOffice.branchName}"
                      required="true"
-                     tabindex="8"
+                     tabindex="9"
                      styleClass="input"/>
     </s:decorate>
 
@@ -133,7 +141,7 @@
         <ui:define name="label">#{messages['BranchOffice.place']}</ui:define>
         <h:inputText id="place" value="#{branchOffice.place}"
                      required="true"
-                     tabindex="9"
+                     tabindex="10"
                      styleClass="input"/>
     </s:decorate>
 
@@ -141,7 +149,7 @@
         <ui:define name="label">#{messages['BranchOffice.phone']}</ui:define>
         <h:inputText id="phone" value="#{branchOffice.phone}"
                      required="true"
-                     tabindex="10"
+                     tabindex="11"
                      styleClass="input"/>
     </s:decorate>
 
@@ -149,7 +157,7 @@
         <ui:define name="label">#{messages['BranchOffice.address']}</ui:define>
         <h:inputText id="address" value="#{branchOffice.address}"
                      required="true"
-                     tabindex="11"
+                     tabindex="12"
                      styleClass="inputLarge400"/>
     </s:decorate>
 

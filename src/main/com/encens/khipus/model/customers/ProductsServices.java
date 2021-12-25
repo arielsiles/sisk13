@@ -14,7 +14,7 @@ import javax.persistence.*;
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 @NamedQueries(
         {
-                @NamedQuery(name = "ProductsServices.findAll", query = "select o from CancellationReason o ")
+                @NamedQuery(name = "ProductsServices.findAll", query = "select o from ProductsServices o ")
         }
 )
 
@@ -35,6 +35,10 @@ public class ProductsServices implements BaseModel {
 
     @Column(name = "descproducto")
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "codactividad", referencedColumnName = "codigocaeb", updatable = false, insertable = false)
+    private EconomicActivity economicActivity;
 
     @Override
     public Long getId() {
@@ -73,4 +77,11 @@ public class ProductsServices implements BaseModel {
         return getProductCode().toString() + " - " + getActivityCode() + " - " + getDescription();
     }
 
+    public EconomicActivity getEconomicActivity() {
+        return economicActivity;
+    }
+
+    public void setEconomicActivity(EconomicActivity economicActivity) {
+        this.economicActivity = economicActivity;
+    }
 }

@@ -3,7 +3,6 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.customers.MeasureUnitSIN;
 import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
@@ -55,8 +54,14 @@ public class ProductItem implements BaseModel {
     @Column(name = "COD_ART", insertable = false, updatable = false)
     private String productItemCode;
 
-    /*@Column(name = "COD_MEDS")
-    private Integer measureUnitSin;*/
+    @Column(name = "CODACT")
+    private String economicActivityCode;
+
+    @Column(name = "CODSIN")
+    private Integer productSinCode;
+
+    @Column(name = "COD_MEDS")
+    private Integer measureUnitSinCode;
 
     @Column(name = "CODEQ", insertable = false, updatable = false)
     private String productItemCodeEq;
@@ -144,14 +149,6 @@ public class ProductItem implements BaseModel {
     @Version
     @Column(name = "version")
     private long version;
-
-    @ManyToOne
-    @JoinColumn(name = "idprodutoservicio", referencedColumnName = "idprodutoservicio")
-    private ProductsServices productService;
-
-    @ManyToOne
-    @JoinColumn(name = "cod_meds", referencedColumnName = "nro")
-    private MeasureUnitSIN measureUnit;
 
     @ManyToOne
     @JoinColumns({
@@ -529,27 +526,28 @@ public class ProductItem implements BaseModel {
         this.productItemCodeEq = productItemCodeEq;
     }
 
-    /*public Integer getMeasureUnitSin() {
-        return measureUnitSin;
+    public String getEconomicActivityCode() {
+        return economicActivityCode;
     }
 
-    public void setMeasureUnitSin(Integer measureUnitSin) {
-        this.measureUnitSin = measureUnitSin;
-    }*/
-
-    public ProductsServices getProductService() {
-        return productService;
+    public void setEconomicActivityCode(String economicActivityCode) {
+        this.economicActivityCode = economicActivityCode;
     }
 
-    public void setProductService(ProductsServices productService) {
-        this.productService = productService;
+
+    public Integer getProductSinCode() {
+        return productSinCode;
     }
 
-    public MeasureUnitSIN getMeasureUnit() {
-        return measureUnit;
+    public void setProductSinCode(Integer productSinCode) {
+        this.productSinCode = productSinCode;
     }
 
-    public void setMeasureUnit(MeasureUnitSIN measureUnit) {
-        this.measureUnit = measureUnit;
+    public Integer getMeasureUnitSinCode() {
+        return measureUnitSinCode;
+    }
+
+    public void setMeasureUnitSinCode(Integer measureUnitSin) {
+        this.measureUnitSinCode = measureUnitSin;
     }
 }

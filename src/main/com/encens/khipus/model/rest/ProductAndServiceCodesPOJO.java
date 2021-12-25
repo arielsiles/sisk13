@@ -9,7 +9,7 @@ public class ProductAndServiceCodesPOJO {
 
     private String codigoActividad;
     private Integer codigoProducto;
-    private Integer descripcionProducto;
+    private String descripcionProducto;
     private List<String> nandina;
 
     public String getCodigoActividad() {
@@ -28,19 +28,19 @@ public class ProductAndServiceCodesPOJO {
         this.codigoProducto = codigoProducto;
     }
 
-    public Integer getDescripcionProducto() {
-        return descripcionProducto;
-    }
-
-    public void setDescripcionProducto(Integer descripcionProducto) {
-        this.descripcionProducto = descripcionProducto;
-    }
-
     public List<String> getNandina() {
         return nandina;
     }
 
     public void setNandina(List<String> nandina) {
         this.nandina = nandina;
+    }
+
+    public String getDescripcionProducto() {
+        return descripcionProducto;
+    }
+
+    public void setDescripcionProducto(String descripcionProducto) {
+        this.descripcionProducto = descripcionProducto;
     }
 }
