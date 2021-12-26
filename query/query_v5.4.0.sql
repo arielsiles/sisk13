@@ -37,9 +37,8 @@ INSERT INTO sin_metodopago VALUES (3, 7, 'TRANSFERENCIA BANCARIA');
 INSERT INTO sin_metodopago VALUES (4, 8, 'DEPOSITO EN CUENTA');
 INSERT INTO sin_metodopago VALUES (5, 5, 'OTROS');
 
-ALTER TABLE personacliente ADD COLUMN idmetodopagosin BIGINT(20) AFTER razonsocial;
-
-UPDATE personacliente p SET p.`idmetodopagosin` = 1 WHERE p.`idmetodopagosin` IS NULL;
+-- ALTER TABLE personacliente ADD COLUMN idmetodopagosin BIGINT(20) AFTER razonsocial;
+-- UPDATE personacliente p SET p.`idmetodopagosin` = 1 WHERE p.`idmetodopagosin` IS NULL;
 
 --
 
@@ -57,10 +56,9 @@ ALTER TABLE configuracion ADD COLUMN url_validate_offline_bill_packages VARCHAR(
 ALTER TABLE configuracion ADD COLUMN url_nit_verification VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_activities VARCHAR(300) AFTER lugar;
 ALTER TABLE configuracion ADD COLUMN url_products_services VARCHAR(300) AFTER lugar;
-
 ALTER TABLE configuracion ADD COLUMN url_measure_units VARCHAR(300) AFTER lugar;
-UPDATE configuracion c SET c.url_measure_units = 'http://10.0.0.106:8080/api/sync/measure-units';
 
+UPDATE configuracion c SET c.url_measure_units = 'http://10.0.0.106:8080/api/sync/measure-units';
 UPDATE configuracion c SET c.url_products_services = 'http://10.0.0.106:8080/api/sync/products-and-services';
 UPDATE configuracion c SET c.url_activities = 'http://10.0.0.106:8080/api/sync/activities';
 UPDATE configuracion c SET c.`url_nit_verification` = 'http://10.0.0.106:8080/api/codes/nitVerifications';
@@ -100,19 +98,10 @@ INSERT INTO sin_motivoanulacion VALUES (3, 3, 'DATOS DE EMISION INCORRECTOS');
 INSERT INTO sin_motivoanulacion VALUES (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
 
 --
-
 ALTER TABLE articulos_pedido ADD COLUMN descuento DOUBLE AFTER total;
 UPDATE articulos_pedido a SET a.`descuento` = 0 WHERE a.`descuento` IS NULL;
 
 -- 19.11.2021
-UPDATE personacliente p SET p.`idmetodopagosin` = 2
-WHERE p.`NOM` LIKE '%hiperma%'
-;
-
-UPDATE personacliente p SET p.`idmetodopagosin` = 3
-WHERE p.`NOM` LIKE '%hiperma%'
-;
-
 CREATE TABLE sin_produtoservicio (
 	idprodutoservicio BIGINT(20) NOT NULL,
 	codactividad VARCHAR(20), 
@@ -121,20 +110,14 @@ CREATE TABLE sin_produtoservicio (
 	PRIMARY KEY (idprodutoservicio)
 );
 
+/*
 INSERT INTO sin_produtoservicio VALUES (1, '105000', 22290, 'PRODUCTOS LACTEOS N.C.P.');
 INSERT INTO sin_produtoservicio VALUES (2, '105000', 22229, 'LECHE Y CREMA N.C.P.');
 INSERT INTO sin_produtoservicio VALUES (3, '105000', 22230, 'YOGUR Y OTROS TIPOS DE LECHE O CREMA FERMENTADOS O ACIDIFICADOS');
 INSERT INTO sin_produtoservicio VALUES (4, '105000', 22251, 'QUESO DE LECHE DE BOVINO, FRESCOS O PROCESADOS');
 INSERT INTO sin_produtoservicio VALUES (5, '105000', 88150, 'SERVICIOS DE ELABORACIÓN DE PRODUCTOS LACTEOS');
-
 INSERT INTO sin_produtoservicio VALUES (6, '105000', 99100, 'OTROS PRODUCTOS O SERVICIOS ALCANZADOS POR EL IVA');
-
-ALTER TABLE inv_articulos ADD COLUMN idprodutoservicio BIGINT(20) AFTER cod_art;
-
-ALTER TABLE inv_articulos ADD FOREIGN KEY (idprodutoservicio) REFERENCES sin_produtoservicio (idprodutoservicio);
-
-UPDATE inv_articulos i SET i.`idprodutoservicio` = 1 WHERE i.`cod_alm` IN (2, 8);
-UPDATE inv_articulos i SET i.`idprodutoservicio` = 6 WHERE i.`cod_alm` IN (5);
+*/
 
 -- 21.11.2021
 
@@ -147,9 +130,6 @@ UPDATE sucursal s SET s.`codpos` = 0 WHERE s.`IDSUCURSAL` = 1;
 UPDATE sucursal s SET s.`codsuc` = 0 WHERE s.`IDSUCURSAL` = 2;
 UPDATE sucursal s SET s.`codpos` = 1 WHERE s.`IDSUCURSAL` = 2;
 
-UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(0)' WHERE s.`IDSUCURSAL` = 1;
-UPDATE sucursal s SET s.`descripcion` = 'ILVA - SUC(0) POS(1)' WHERE s.`IDSUCURSAL` = 2;
-
 -- 24.11.2021
 -- drop table sin_unidadmedida;
 
@@ -160,19 +140,12 @@ CREATE TABLE sin_unidadmedida (
 	PRIMARY KEY (idunidadmedida)
 );
 
-UPDATE inv_articulos i SET i.`cod_meds` = NULL;
-
 -- 25.11.2021
 
 ALTER TABLE personacliente ADD COLUMN email VARCHAR(100) AFTER telefono;
 ALTER TABLE personacliente ADD COLUMN COMP VARCHAR(10) AFTER NRO_DOC;
 
--- tmp
--- UPDATE inv_articulos i SET i.`codsin` = NULL;
--- ALTER TABLE inv_articulos DROP COLUMN codsin;
--- ALTER TABLE inv_articulos DROP COLUMN caeb;
 --
-
 -- 27.11.2021
 ALTER TABLE movimiento ADD COLUMN TIPOEMISION VARCHAR(100) AFTER estado;
 
@@ -217,7 +190,6 @@ ALTER TABLE sucursal ADD COLUMN NOMBRE_POS VARCHAR(150) AFTER codpos;
 ALTER TABLE sucursal ADD COLUMN NOMBRE_SUCURSAL VARCHAR(150) AFTER codpos;
 ALTER TABLE sucursal ADD COLUMN NOMBRE_EMPRESA VARCHAR(150) AFTER codpos;
 ALTER TABLE sucursal ADD COLUMN ACTIVIDAD VARCHAR(150) AFTER codpos;
-
 ALTER TABLE sucursal ADD COLUMN docsector INT(11) AFTER codpos;
 
 
@@ -241,12 +213,12 @@ UPDATE sucursal s SET s.`DIRECCION` = 'AVENIDA LIBERTADORES NRO.454 ZONA LOCALID
 UPDATE sucursal s SET s.`NOMBRE` = 'CISC', s.`descripcion` = 'CISC - SUC(0) POS(0)', s.`codsuc` = 0, s.`codpos` = 0 WHERE s.`IDSUCURSAL` = 1;
 UPDATE sucursal s SET s.`NOMBRE` = 'ILVA', s.`descripcion` = 'ILVA - SUC(2) POS(1)', s.`codsuc` = 2, s.`codpos` = 0 WHERE s.`IDSUCURSAL` = 2;
 
--- ASOCIAR DISIFICACION CON LA SUCURSAL CORRESPONDIENTE
+UPDATE sucursal s SET s.`docsector` = 1;
+
+-- ASOCIAR DOSIFICACION CON LA SUCURSAL CORRESPONDIENTE
 
 ALTER TABLE personacliente ADD COLUMN CODMETODOPAGOSIN INT(11) AFTER RAZONSOCIAL;
 UPDATE personacliente p SET p.`CODMETODOPAGOSIN` = 5;
-
-ALTER TABLE personacliente DROP COLUMN idmetodopagosin;
 
 -- 16.12.2021
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
@@ -274,90 +246,37 @@ CREATE TABLE sin_actividad (
 	tipoactividad VARCHAR(10)
 );
 
+/*
 INSERT sin_actividad VALUES (1, '640000', 'OTROS TIPOS DE INTERMEDIACIÓN FINANCIERA, INCLUYE CASAS DE CAMBIO', 'P');
 INSERT sin_actividad VALUES (2, '640001', 'COMPRA Y VENTA DE MONEDA EXTRANJERA', 'S');
 INSERT sin_actividad VALUES (3, '105000', 'ELABORACIÓN DE PRODUCTOS LÁCTEOS', 'S');
+*/
 
 -- 23.12.2021
 ALTER TABLE inv_articulos ADD COLUMN codsin INT(11) AFTER cod_art;
 ALTER TABLE inv_articulos ADD COLUMN codact VARCHAR(50) AFTER cod_art;
-
 UPDATE inv_articulos i SET i.`idprodutoservicio` = NULL;
 
+-- 25.12.2021 Alistar Base de Datos para SIN
 
+UPDATE inv_articulos i SET i.`cod_meds` = 57 WHERE i.`cod_alm` = 2;
+UPDATE inv_articulos i SET i.`codact` = '105000', i.`codsin` = '99100' WHERE i.`cod_alm` = 2;
 
---
---
--- revisar
-INSERT INTO sin_unidadmedida VALUES (	1	,	'Q'	, 	'QUINTAL'	);
-INSERT INTO sin_unidadmedida VALUES (	2	,	'CMT'	, 	'CENTIMETRO LINEAL'	);
-INSERT INTO sin_unidadmedida VALUES (	3	,	'CEN'	, 	'CIENTO DE UNIDADES'	);
-INSERT INTO sin_unidadmedida VALUES (	4	,	'CY'	, 	'CILINDRO'	);
-INSERT INTO sin_unidadmedida VALUES (	5	,	'CJ'	, 	'CONOS'	);
-INSERT INTO sin_unidadmedida VALUES (	6	,	'DZN'	, 	'DOCENA'	);
-INSERT INTO sin_unidadmedida VALUES (	7	,	'GLI'	, 	'GALON INGLES'	);
-INSERT INTO sin_unidadmedida VALUES (	8	,	'HLT'	, 	'HECTOLITRO'	);
-INSERT INTO sin_unidadmedida VALUES (	9	,	'SET'	, 	'JUEGO'	);
-INSERT INTO sin_unidadmedida VALUES (	10	,	'NIU'	, 	'UNIDAD (BIENES)'	);
-INSERT INTO sin_unidadmedida VALUES (	11	,	'DIA'	, 	'DIAS'	);
-INSERT INTO sin_unidadmedida VALUES (	12	,	'BJ'	, 	'BALDE'	);
-INSERT INTO sin_unidadmedida VALUES (	13	,	'BLL'	, 	'BARRILES'	);
-INSERT INTO sin_unidadmedida VALUES (	14	,	'ONZ'	, 	'ONZAS'	);
-INSERT INTO sin_unidadmedida VALUES (	15	,	'PF'	, 	'PALETAS'	);
-INSERT INTO sin_unidadmedida VALUES (	16	,	'PK'	, 	'PAQUETE'	);
-INSERT INTO sin_unidadmedida VALUES (	17	,	'PR'	, 	'PAR'	);
-INSERT INTO sin_unidadmedida VALUES (	18	,	'FOT'	, 	'PIES'	);
-INSERT INTO sin_unidadmedida VALUES (	19	,	'FTK'	, 	'PIES CUADRADOS'	);
-INSERT INTO sin_unidadmedida VALUES (	20	,	'FTQ'	, 	'PIES CUBICOS'	);
-INSERT INTO sin_unidadmedida VALUES (	21	,	'PZA'	, 	'PIEZAS'	);
-INSERT INTO sin_unidadmedida VALUES (	22	,	'PG'	, 	'PLACAS'	);
-INSERT INTO sin_unidadmedida VALUES (	23	,	'ST'	, 	'PLIEGO'	);
-INSERT INTO sin_unidadmedida VALUES (	24	,	'OT'	, 	'ONZA TROY'	);
-INSERT INTO sin_unidadmedida VALUES (	25	,	'LF'	, 	'LIBRA FINA'	);
-INSERT INTO sin_unidadmedida VALUES (	26	,	'DP'	, 	'DISPLAY'	);
-INSERT INTO sin_unidadmedida VALUES (	27	,	'BU'	, 	'BULTO'	);
-INSERT INTO sin_unidadmedida VALUES (	28	,	'MES'	, 	'MESES'	);
-INSERT INTO sin_unidadmedida VALUES (	29	,	'INH'	, 	'PULGADAS'	);
-INSERT INTO sin_unidadmedida VALUES (	30	,	'RM'	, 	'RESMA'	);
-INSERT INTO sin_unidadmedida VALUES (	31	,	'DR'	, 	'TAMBOR'	);
-INSERT INTO sin_unidadmedida VALUES (	32	,	'STN'	, 	'TONELADA CORTA'	);
-INSERT INTO sin_unidadmedida VALUES (	33	,	'LTN'	, 	'TONELADA LARGA'	);
-INSERT INTO sin_unidadmedida VALUES (	34	,	'TNE'	, 	'TONELADAS'	);
-INSERT INTO sin_unidadmedida VALUES (	35	,	'TU'	, 	'TUBOS'	);
-INSERT INTO sin_unidadmedida VALUES (	36	,	'ZZ'	, 	'UNIDAD (SERVICIOS)'	);
-INSERT INTO sin_unidadmedida VALUES (	37	,	'GLL'	, 	'US GALON (3,7843 L)'	);
-INSERT INTO sin_unidadmedida VALUES (	38	,	'YRD'	, 	'YARDA'	);
-INSERT INTO sin_unidadmedida VALUES (	39	,	'YDK'	, 	'YARDA CUADRADA'	);
-INSERT INTO sin_unidadmedida VALUES (	40	,	'OTR'	, 	'OTRO'	);
-INSERT INTO sin_unidadmedida VALUES (	41	,	'BG'	, 	'BOLSA'	);
-INSERT INTO sin_unidadmedida VALUES (	42	,	'BO'	, 	'BOTELLAS'	);
-INSERT INTO sin_unidadmedida VALUES (	43	,	'BE'	, 	'FARDO'	);
-INSERT INTO sin_unidadmedida VALUES (	44	,	'GRM'	, 	'GRAMO'	);
-INSERT INTO sin_unidadmedida VALUES (	45	,	'GRO'	, 	'GRUESA'	);
-INSERT INTO sin_unidadmedida VALUES (	46	,	'LEF'	, 	'HOJA'	);
-INSERT INTO sin_unidadmedida VALUES (	47	,	'KGM'	, 	'KILOGRAMO'	);
-INSERT INTO sin_unidadmedida VALUES (	48	,	'BOB'	, 	'BOBINAS'	);
-INSERT INTO sin_unidadmedida VALUES (	49	,	'BX'	, 	'CAJA'	);
-INSERT INTO sin_unidadmedida VALUES (	50	,	'CT'	, 	'CARTONES'	);
-INSERT INTO sin_unidadmedida VALUES (	51	,	'CMK'	, 	'CENTIMETRO CUADRADO'	);
-INSERT INTO sin_unidadmedida VALUES (	52	,	'CMQ'	, 	'CENTIMETRO CUBICO'	);
-INSERT INTO sin_unidadmedida VALUES (	53	,	'KWH'	, 	'KILOVATIO HORA'	);
-INSERT INTO sin_unidadmedida VALUES (	54	,	'KT'	, 	'KIT'	);
-INSERT INTO sin_unidadmedida VALUES (	55	,	'CA'	, 	'LATAS'	);
-INSERT INTO sin_unidadmedida VALUES (	56	,	'LBR'	, 	'LIBRAS'	);
-INSERT INTO sin_unidadmedida VALUES (	57	,	'LTR'	, 	'LITRO'	);
-INSERT INTO sin_unidadmedida VALUES (	58	,	'MWH'	, 	'MEGAWATT HORA'	);
-INSERT INTO sin_unidadmedida VALUES (	59	,	'MTR'	, 	'METRO'	);
-INSERT INTO sin_unidadmedida VALUES (	60	,	'MTK'	, 	'METRO CUADRADO'	);
-INSERT INTO sin_unidadmedida VALUES (	61	,	'MTQ'	, 	'METRO CUBICO'	);
-INSERT INTO sin_unidadmedida VALUES (	62	,	'MGM'	, 	'MILIGRAMOS'	);
-INSERT INTO sin_unidadmedida VALUES (	63	,	'MLT'	, 	'MILILITRO'	);
-INSERT INTO sin_unidadmedida VALUES (	64	,	'MMT'	, 	'MILIMETRO'	);
-INSERT INTO sin_unidadmedida VALUES (	65	,	'MMK'	, 	'MILIMETRO CUADRADO'	);
-INSERT INTO sin_unidadmedida VALUES (	66	,	'MMQ'	, 	'MILIMETRO CUBICO'	);
-INSERT INTO sin_unidadmedida VALUES (	67	,	'MLL'	, 	'MILLARES'	);
-INSERT INTO sin_unidadmedida VALUES (	68	,	'UM'	, 	'MILLON DE UNIDADES'	);
-INSERT INTO sin_unidadmedida VALUES (	69	,	'KTM'	, 	'KILOMETRO'	);
+-- alter table dosificacion drop column caeb;
+-- alter table dosificacion drop column cod_docsector;
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(431, 'BILLING_MANAGE_SFE', 2, 1, 'Functionality.admin.manageBillingSFE', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(432, 'CASHSALE_PRINT_INVOICE_SFV', 1, 1, 'Functionality.customers.PrintInvoiceSFV', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(433, 'CASHSALE_PRINT_INVOICE_SFE', 1, 1, 'Functionality.customers.PrintInvoiceSFE', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(434, 'CREDITSALE_INVOICING_SFE', 1, 1, 'Functionality.customers.orderInvoicingSFE', 1);
+
 
 --
 --

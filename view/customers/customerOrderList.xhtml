@@ -154,7 +154,7 @@
                     <a4j:commandButton id="executeBillingId"
                                      action="#{customerOrderAction.executeBilling(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING_SFE','VIEW')}"
                                      reRender="customerOrderList"
                                      value="#{messages['Common.invoice']}" >
                         <s:defaultAction/>
@@ -163,7 +163,7 @@
                     <h:commandButton id="generateInvoicesId"
                                        action="#{printBillReportAction.generateInvoicesReport(customerOrderDataModel.selectedCustomerOrdes)}"
                                        styleClass="button"
-                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING_SFE','VIEW')}"
                                        value="Imprimir Facts" >
                         <s:defaultAction/>
                     </h:commandButton>
@@ -171,44 +171,8 @@
                     <h:commandButton id="generateNotesId"
                                      action="#{saleReportAction.generateNotesReport(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING_SFE','VIEW')}"
                                      value="Imprimir Notas" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    -
-
-                    <h:commandButton id="searchButtonId"
-                                     action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
-                                     styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['Common.invoice']}" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <a4j:commandButton id="creditSaleCommandButton"
-                                       action="#{salesAction.initSpecialBill(customerOrderDataModel.selectedCustomerOrdes)}"
-                                       value="#{messages['CustomerOrder.billSpecial']}"
-                                       styleClass="button"
-                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                       immediate="true"
-                                       oncomplete="Richfaces.showModalPanel('confirmBillingSpecialModalPanel');"
-                                       reRender="confirmBillingSpecialModalPanel">
-                    </a4j:commandButton>
-
-                    <h:commandButton id="printInvoiceOriginalId"
-                                     action="#{printInvoiceReportAction.printInvoicesOriginal(customerOrderDataModel.selectedCustomerOrdes)}"
-                                     styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['CustomerOrder.printInvoicesOriginal']}" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <h:commandButton id="printInvoiceCopyId"
-                                     action="#{printInvoiceReportAction.printInvoicesCopy(customerOrderDataModel.selectedCustomerOrdes)}"
-                                     styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="#{messages['CustomerOrder.printInvoicesCopy']}" >
                         <s:defaultAction/>
                     </h:commandButton>
 
@@ -252,6 +216,40 @@
                         <s:defaultAction/>
                     </h:commandButton>
                     -->
+
+                    <h:commandButton id="searchButtonId"
+                                     action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     value="#{messages['Common.invoice']}" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                    <a4j:commandButton id="creditSaleCommandButton"
+                                       action="#{salesAction.initSpecialBill(customerOrderDataModel.selectedCustomerOrdes)}"
+                                       value="#{messages['CustomerOrder.billSpecial']}"
+                                       styleClass="button"
+                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                       immediate="true"
+                                       oncomplete="Richfaces.showModalPanel('confirmBillingSpecialModalPanel');"
+                                       reRender="confirmBillingSpecialModalPanel">
+                    </a4j:commandButton>
+
+                    <h:commandButton id="printInvoiceOriginalId"
+                                     action="#{printInvoiceReportAction.printInvoicesOriginal(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     value="#{messages['CustomerOrder.printInvoicesOriginal']}" >
+                        <s:defaultAction/>
+                    </h:commandButton>
+
+                    <h:commandButton id="printInvoiceCopyId"
+                                     action="#{printInvoiceReportAction.printInvoicesCopy(customerOrderDataModel.selectedCustomerOrdes)}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
+                                     value="#{messages['CustomerOrder.printInvoicesCopy']}" >
+                        <s:defaultAction/>
+                    </h:commandButton>
 
                     <s:button value="#{messages['CustomerOrder.accounting']}"
                               view="/customers/accountingCreditSale.xhtml"
